@@ -9,77 +9,116 @@
   <img src="https://img.shields.io/badge/License-Apache--2.0-lightgrey.svg?style=flat-square" alt="License">
 </p>
 
-**ComfyUI-IYKYK** (If You Know You Know) 是专为 ComfyUI 打造的专业级东亚人像写真与成人美学提示词生成、情境亲和加权与物理冲突消解套件。
-
-> 📌 **项目溯源与致谢 (Origin & Acknowledgement)**  
-> 本项目核心架构与词库规范基于开源项目 [ShuaiHui/nsfw-prompt-templates-asian](https://github.com/ShuaiHui/nsfw-prompt-templates-asian) 深度重构。我们将其定义的 **16 步视觉认知流水线**、**17 大物理与语义冲突消解引擎**、**14 大核心情境亲和矩阵**、**77 套经典预设模板**、**28 大服装品类 × 6 级裸露解构** 与 **24 档高级扩展库** 完整封装为纯原生、零外部依赖的高性能 ComfyUI 自定义节点套件。
-
-> 🤖 **开发与审查声明 (Architecture & Development Statement)**  
-> 本项目的代码架构、数据清洗与结构化建模、17 大冲突消解引擎、14 大情境矩阵、Draft-7 深度递归强门禁、24 档数据驱动扩展策略与发布自动化测试套件由人类开发者与 AI (Google DeepMind Antigravity / Gemini / GPT-5.6 Sol) 协同开发与架构审查完成。
+<p align="center">
+  <strong>专为 ComfyUI 打造的专业级东亚人像写真与成人美学提示词生成系统</strong><br>
+  <em>16 步视觉认知流水线 · 17 大多规则物理与语义冲突消解 · 14 大核心情境亲和加权 · 28 服装 × 6 裸露解构 × 24 档扩展库</em>
+</p>
 
 ---
 
-## 🌟 核心架构与技术特性
+## 📑 目录导航
+
+- [📖 项目简介与溯源](#-项目简介与溯源)
+- [🌟 核心架构与流水线](#-核心架构与流水线)
+- [🛡️ 17 大多规则物理与语义冲突消解引擎](#️-17-大多规则物理与语义冲突消解引擎)
+- [🧠 14 大核心情境亲和度矩阵](#-14-大核心情境亲和度矩阵)
+- [👗 服装解构体系与 24 档扩展库](#-服装解构体系与-24-档扩展库)
+- [🎛️ 节点套件说明与参数详解](#️-节点套件说明与参数详解)
+- [🚀 详细安装指南](#-详细安装指南)
+- [🧪 工程规范与质量门禁](#-工程规范与质量门禁)
+- [❓ 常见问题 (FAQ)](#-常见问题-faq)
+- [📄 开源协议与免责声明](#-开源协议与免责声明)
+
+---
+
+## 📖 项目简介与溯源
+
+在文生图（Stable Diffusion / SDXL / FLUX）人像写真与剧情场景创作中，传统随机抽卡与简单提示词堆叠极易产生大量严重的视觉与物理逻辑缺陷：
+- **场景割裂**：同时出现“露天雪景温泉”与“餐厅室内包厢”等相互矛盾的独立空间；
+- **肢体与伪影异常**：双手抱头/双手撑地姿势下仍强行手持手机、相机、扇子，导致 AI 生成 3 只手以上的畸形；
+- **材质假死与崩图**：`sheer`/`see-through` 等词汇引发材质穿透伪影，导致衣物与皮肤融化变形；
+- **构图脱节**：面部大特写时提示词中充斥高跟鞋、大腿袜、脚踝描述，导致背景生成异物；
+- **穿脱逻辑自相矛盾**：全裸或私处暴露状态下依然残留内裤或外套穿着描述。
+
+**ComfyUI-IYKYK** (If You Know You Know) 通过纯原生、零外部依赖的高性能 Python 架构，从根本上消解这些痛点。
+
+> 📌 **开源项目溯源与致谢**  
+> 本项目核心架构与词库规范基于开源项目 [ShuaiHui/nsfw-prompt-templates-asian](https://github.com/ShuaiHui/nsfw-prompt-templates-asian) 深度重构。我们将其定义的 **16 步视觉认知流水线**、**17 大物理与语义冲突消解引擎**、**14 大核心情境亲和矩阵**、**77 套经典手写预设模板**、**28 大服装品类 × 6 级裸露解构** 与 **24 档高级扩展库** 完整封装为 ComfyUI 原生节点套件。
+
+> 🤖 **开发与审查声明**  
+> 本项目的代码架构、数据建模、冲突消解算法、情境亲和加权、Draft-7 深度递归强门禁、24 档数据驱动扩展策略与发布自动化测试套件由人类开发者与 AI (Google DeepMind Antigravity / Gemini / GPT-5.6 Sol) 协同开发与架构审查完成。
+
+---
+
+## 🌟 核心架构与流水线
+
+### 全链路处理流程图
 
 ```mermaid
 graph TD
-    UI["用户界面 (15 可配置槽位 / 77 经典预设)"] --> SAMPLER["1. 数据采样引擎 (DataSampler)"]
+    INPUT["用户输入 / 随机抽卡 (15 控件 / 77 预设)"] --> SAMPLER["1. 数据采样引擎 (DataSampler)"]
     SAMPLER --> AFFINITY["14 大情境亲和加权 (Context Affinity Matrix)"]
-    SAMPLER --> CLOTH_EXT["服装 24 档数据驱动扩展 (9 露肤 + 5 透肉 + 10 情趣衣柜)"]
-    AFFINITY & CLOTH_EXT --> FRAGS["PromptFragment 结构化片段流 (带 exclusive_group 与 order)"]
-    FRAGS --> RESOLVER["2. 17 大冲突消解引擎 (ConflictResolver)"]
+    SAMPLER --> EXT["24 档服装数据驱动扩展 (9 露肤 + 5 透肉 + 10 情趣衣柜)"]
+    AFFINITY & EXT --> FRAGMENTS["PromptFragment 结构化流 (绑定 exclusive_group 与 order)"]
+    FRAGMENTS --> RESOLVER["2. 17 大冲突消解引擎 (ConflictResolver)"]
     RESOLVER --> ASSEMBLER["3. 16 步认知流水线装配器 (PromptAssembler)"]
-    ASSEMBLER --> PROTECT["受保护结构保留 (<lora:...>, 引号, 括号, 转义)"]
-    PROTECT --> TRUNC["250 词栈式边界安全截断 (Stack-based Truncation)"]
-    TRUNC --> OUT["高质量英文 Prompt / 负向词 / 中文概要"]
+    ASSEMBLER --> PROTECT["Span 级受保护语法保留 (<lora:...>, 引号, 括号, 转义)"]
+    PROTECT --> TRUNCATE["250 词栈式边界安全截断 (Stack-based Truncation)"]
+    TRUNCATE --> OUTPUT["高质量英文 Prompt / 负向词 / 中文概要说明"]
 ```
 
 ---
 
-### 1. 🎴 严谨的流水线槽位口径体系
-本项目在工程上明确区分三层槽位概念，杜绝概念混淆：
-- **15 用户可配置控件**：场景大类、剧情主题、景别构图、拍摄视角、裸露等级、服装款式与状态、发型发色、饰品头饰、妆容细节、姿势动作、情绪表情、光影预设、胶片风格、液体效果、纹身标记、道具物件、角色设定、真实微瑕、画质等级。
-- **16 步视觉认知装配流水线**：按扩散模型注意力机制层层递进（`场景空间` → `景别视角` → `角色设定` → `裸露状态` → `服装穿脱` → `光影氛围` → `姿势动作` → `表情眼神` → `妆容细节` → `发型饰品` → `微瑕质感` → `纹身标记` → `道具环境` → `液体系统` → `胶片影调` → `画质锚点`）。
-- **18 项内部调度槽位 (`SLOT_PIPELINE_ORDER`)**：底层通过 `PromptFragment` 数据结构承载 18 个细分装配槽位与空间互斥组（`exclusive_group`）。
+### 🎴 三层槽位口径体系
+
+为了向用户与开发者提供精准的工程概念，本项目在架构上严格明确三层槽位定义：
+
+1. **15 用户可配置控件**：
+   `场景大类`、`剧情主题`、`景别构图`、`拍摄视角`、`裸露等级`、`服装款式与状态`、`发型发色`、`饰品头饰`、`妆容细节`、`姿势动作`、`情绪表情`、`光影预设`、`胶片风格`、`液体效果`、`纹身标记`、`道具物件`、`角色设定`、`真实微瑕`、`画质等级`。
+2. **16 步视觉认知装配流水线**：
+   严格遵循扩散模型自粗至细、自外至内的注意力机制层层递进：
+   `场景空间` → `景别视角` → `角色设定` → `裸露状态` → `服装穿脱` → `光影氛围` → `姿势动作` → `表情眼神` → `妆容细节` → `发型饰品` → `微瑕质感` → `纹身标记` → `道具环境` → `液体系统` → `胶片影调` → `画质锚点`。
+3. **18 项内部调度槽位 (`SLOT_PIPELINE_ORDER`)**：
+   底层通过 `PromptFragment` 数据结构承载 18 个细分装配槽位、权重与空间互斥组（`exclusive_group`）。
 
 ---
 
-### 2. 🛡️ 17 大物理与语义自洽冲突消解引擎
+## 🛡️ 17 大多规则物理与语义冲突消解引擎
 
-插件内置基于 `PromptFragment` 结构化管道的 17 规则冲突消解引擎，在生成前自动修复各种 AI 绘图典型物理与视觉崩图矛盾：
+插件内置基于 `PromptFragment` 结构化管道的 17 大规则冲突消解引擎，在生成前自动分析并修复提示词内部的各种物理与视觉崩图矛盾：
 
-| 规则编号 | 规则名称 | 冲突消解原理与保护机制 |
+| 规则编号 | 规则标识 | 消解原理与保护机制 |
 | :--- | :--- | :--- |
-| **Rule 1** | **空间环境自洽互斥** (`spatial_environmental_mutual_exclusion`) | 全部 122 个场景子分类绑定 `exclusive_group`，按输入顺序锁定首个主场景，杜绝「温泉与餐厅并存」、「室内温泉与露天雪景并存」等跨空间矛盾。 |
-| **Rule 2** | **裸露与内衣状态互斥** (`nudity_clothing_conflicts`) | 严格划分 L1～L6 裸露等级：私处暴露时自动剔除内裤，全裸（L5/L6）时自动剔除穿着描述并将衣物转换为散落背景。 |
-| **Rule 3** | **材质穿透伪影消解** (`material_penetration`) | 自动拦截 `sheer/see-through` 等易崩词，替换为真实物理脱法（如解纽扣、滑落、湿身紧贴）。 |
-| **Rule 4** | **视线与镜头角度几何对齐** (`gaze_angle_geometry`) | 仰拍（低角度）强制俯视下看镜头，俯拍（高角度）强制仰视上看镜头，POV 视角强制直视镜头。 |
-| **Rule 5** | **视线方向唯一性** (`gaze_mutual_exclusion`) | 消解「直视镜头」与「移开视线/看向他处」之间的方向互斥。 |
-| **Rule 6** | **液体微量与安全法则** (`liquid_restrictions`) | 自动添加微量量词（如 `faint trace of`, `thin streak of`），杜绝眼部液体引发白内障畸形。 |
-| **Rule 7** | **设备与画质兼容性** (`device_quality_compatibility`) | 监控（CCTV）/手机自拍模式下自动过滤 8K、单反、摄影写真等高保真冲突词。 |
-| **Rule 8** | **纹身真皮层融合** (`tattoo_fusion`) | 严格作用于纹身槽位，自动注入 6 词真皮层融合描述，杜绝 `pink`/`drink`/`link` 等子串误触发。 |
-| **Rule 9** | **姿势手部占用与道具互斥** (`pose_hand_occupation`) | 双手抱头、双手被绑、双手撑地等占用姿势下，自动剔除手持手机/相机/扇子/酒杯等动作，根除多手伪影。 |
-| **Rule 10** | **情绪表情与眼神方向一致** (`emotion_gaze_affinity`) | 消解害羞与直视对视、冷淡与挑逗眨眼等割裂人设。 |
-| **Rule 11** | **环境光照与黑夜白昼自洽** (`environmental_lighting_coherence`) | 场景主锚点优先：夜景场所与深夜天气下自动过滤日光/阳光透过窗户等日间光照词条。 |
-| **Rule 12** | **妆容与细节自洽** (`makeup_details_coherence`) | 素颜无妆状态下自动剔除睫毛膏融化、口红涂抹晕开等糊妆词。 |
-| **Rule 13** | **景别特写与下肢足部自洽** (`framing_lower_body_coherence`) | 头部/面部极致特写时自动剔除高跟鞋、大腿袜、吊袜带、足部描述，防止构图注意力割裂与背景畸形肢体。 |
-| **Rule 14** | **饰品遮挡与视线动作自洽** (`accessory_occlusion_gaze_coherence`) | 蒙眼布/遮眼/闭眼状态下自动剔除直视镜头、眨眼等动作，消除布条上强行画眼睛的视觉伪影。 |
-| **Rule 15** | **黑白胶片与高饱和色彩互斥** (`monochrome_film_chroma_coherence`) | 黑白/单色胶片下消解彩虹/高饱和 RGB 霓虹色彩，保留纯正明暗与影调反差。 |
-| **Rule 16** | **服装款式与解构状态互斥** (`clothing_style_state_coherence`) | 连体泳衣/死库水禁止解纽扣/掀裙；牛仔裤/长裤禁止裙开衩与裙摆飘动。 |
-| **Rule 17** | **多手持道具唯一性消解** (`handheld_props_single_holder`) | 同时出现多个手持动作时仅保留首个主手持动作，彻底消除 AI 生成 3 只手以上的畸形。 |
+| **Rule 1** | **空间环境自洽互斥**<br>`spatial_environmental_mutual_exclusion` | 全部 122 个场景子分类绑定唯一 `exclusive_group`，按片段顺序锁定首个主场景，杜绝“温泉与餐厅并存”、“室内温泉与露天雪景并存”等跨空间矛盾。 |
+| **Rule 2** | **裸露与内衣状态互斥**<br>`nudity_clothing_conflicts` | 严格划分 L1～L6 裸露等级：私处暴露时自动剔除内裤，全裸（L5/L6）时自动剔除穿着描述并将衣物转换为散落背景描述。 |
+| **Rule 3** | **材质穿透伪影消解**<br>`material_penetration` | 自动拦截易崩图词条（如 `sheer`, `see-through`），智能替换为真实物理脱法（如解纽扣、滑落、湿身紧贴）。 |
+| **Rule 4** | **视线与镜头角度几何对齐**<br>`gaze_angle_geometry` | 仰拍（低角度）强制俯视下看镜头，俯拍（高角度）强制仰视上看镜头，POV 视角强制直视镜头。 |
+| **Rule 5** | **视线方向唯一性**<br>`gaze_mutual_exclusion` | 消解“直视镜头（direct eye contact）”与“移开视线/看向他处（looking away）”之间的方向互斥。 |
+| **Rule 6** | **液体微量与安全法则**<br>`liquid_restrictions` | 自动添加微量修饰词（如 `faint trace of`, `thin streak of`），杜绝眼部液体引发白内障畸形。 |
+| **Rule 7** | **设备与画质兼容性**<br>`device_quality_compatibility` | 监控（CCTV）/手机自拍模式下自动过滤 8K、单反、摄影写真等高保真冲突词。 |
+| **Rule 8** | **纹身真皮层融合**<br>`tattoo_fusion` | 严格作用于纹身槽位，自动注入 6 词真皮层融合描述，杜绝 `pink`/`drink`/`link` 等子串误触发。 |
+| **Rule 9** | **姿势手部占用与道具互斥**<br>`pose_hand_occupation` | 双手抱头、双手被绑、双手撑地等占用姿势下，自动剔除手持手机/相机/扇子/酒杯等动作，根除多手伪影。 |
+| **Rule 10** | **情绪表情与眼神方向一致**<br>`emotion_gaze_affinity` | 消解害羞与直视对视、冷淡与挑逗眨眼等割裂人设。 |
+| **Rule 11** | **环境光照与黑夜白昼自洽**<br>`environmental_lighting_coherence` | 场景主锚点优先：夜景场所与深夜天气下自动过滤日光/阳光透过窗户等日间光照词条。 |
+| **Rule 12** | **妆容与细节自洽**<br>`makeup_details_coherence` | 素颜无妆状态下自动剔除睫毛膏融化、口红涂抹晕开等糊妆词。 |
+| **Rule 13** | **景别特写与下肢足部自洽**<br>`framing_lower_body_coherence` | 头部/面部极致特写时自动剔除高跟鞋、大腿袜、吊袜带、足部描述，防止构图注意力割裂与背景畸形肢体。 |
+| **Rule 14** | **饰品遮挡与视线动作自洽**<br>`accessory_occlusion_gaze_coherence` | 蒙眼布/遮眼/闭眼状态下自动剔除直视镜头、眨眼等动作，消除布条上强行画眼睛的视觉伪影。 |
+| **Rule 15** | **黑白胶片与高饱和色彩互斥**<br>`monochrome_film_chroma_coherence` | 黑白/单色胶片下消解彩虹/高饱和 RGB 霓虹色彩，保留纯正明暗与影调反差。 |
+| **Rule 16** | **服装款式与解构状态互斥**<br>`clothing_style_state_coherence` | 连体泳衣/死库水禁止解纽扣/掀裙；牛仔裤/长裤禁止裙开衩与裙摆飘动。 |
+| **Rule 17** | **多手持道具唯一性消解**<br>`handheld_props_single_holder` | 同时出现多个手持动作时仅保留首个主手持动作，彻底消除 AI 生成 3 只手以上的畸形。 |
 
 ---
 
-### 3. 🧠 14 大核心情境亲和度矩阵 (Context Affinity Matrix)
+## 🧠 14 大核心情境亲和度矩阵
 
-当各槽位设为 `随机 (Random)` 时，插件根据场景主题自动识别核心情境，并在专属情境词库中执行加权采样（14 大情境矩阵全槽位 ID 100% 精确交叉复核）：
+当槽位设为 `随机 (Random)` 时，插件不会进行盲目随机，而是自动根据场景与主题推断核心情境，并在专属词库中执行加权采样。矩阵中涉及的所有槽位 ID 均经过自动化交叉复核验证，确保 **100% 精确存在**：
 
 | 情境分类 (Context) | 典型适用场景 | 自动亲和槽位联动特性 (Clothing / Char / Makeup / Props / etc.) |
 | :--- | :--- | :--- |
 | 🏫 **`school` (校园)** | 教室、图书室、体育馆、保健室 | 水手服/西装校服、女学生/教师、清纯伪素颜、双马尾/黑长直、黑框眼镜、手机录像 |
 | 💼 **`office` (职场)** | 办公室、会议室、茶水间、电梯 | OL西装套裙/针织衫、女下属/女上司、轻熟妆/烟熏、低马尾/大波浪、红酒杯、工作牌 |
 | 🏥 **`medical` (医疗)** | 医院病房、诊所、体检室 | 护士服、温柔护士、清纯素颜、护士帽、听诊器、微汗水珠 |
-| ♨️ **`onsen_bath` (温泉)** | 露天风吕、温泉旅馆、钱汤浴室 | 浴衣/和服/死库水、人妻/邻家女友、微醺潮红/水光妆、湿发贴脸、沐浴水滴 |
+| ♨️ **`onsen_bath` (温泉浴室)** | 露天风吕、温泉旅馆、钱汤浴室 | 浴衣/和服/死库水、人妻/邻家女友、微醺潮红/水光妆、湿发贴脸、沐浴水滴 |
 | ⛓️ **`bondage_sm` (SM调教)** | 监禁密室、地下室、废弃建筑 | 乳胶紧身衣/皮革束腰、调教女仆/女上司、崩溃哭妆/受虐妆、项圈手铐/红绳、耻骨淫纹 |
 | ⛩️ **`traditional` (和风传统)** | 和室、神社寺庙、日式茶室 | 和服/振袖/旗袍/汉服、极道和彫龙/樱花纹身、和风折扇/油纸伞、古典盘发 |
 | 🚇 **`transit` (公共交通)** | 电车车厢、地铁站台、新干线、机舱 | JK制服/OL西装/随性常服、清纯妆/微红、马尾辫、随身手机、金细锁骨链 |
@@ -93,40 +132,75 @@ graph TD
 
 ---
 
-### 4. 👗 服装 28 大类 × 6 级裸露解构 × 24 档数据驱动扩展库
+## 👗 服装解构体系与 24 档扩展库
+
+### 1. 28 大经典服装分类与 12 种解构状态
+- **28 经典品类**：旗袍、汉服、改良国风、和服、浴衣、振袖、水手服、西装校服、体育服/死库水、韩服、韩系校服、职场OL西装、护士服、女仆装、餐厅服务员、蕾丝情趣内衣、丝绸睡袍、吊带睡裙、微型比基尼、高叉连体泳衣、乳胶紧身衣、皮革束腰、兔女郎装、啦啦队服、露背晚礼服、街头随性常服、夜店紧身裙、童贞杀露背毛衣。
+- **12 穿脱解构状态**：自动联动、整齐穿着、解开纽扣、吊带滑落、裙摆掀起、内衣拉下、湿身透光、汗湿透光、撕裂破损、衣衫凌乱、仅剩内衣、脱掉散落一旁。
+
+### 2. 24 档数据驱动扩展库 (`extension_policy`)
+在 `clothing.json` 中以单一事实来源（SSOT）统一定义策略，实现 **24/24 扩展逐 ID 100% 稳定可达**：
 
 ```
-clothing.json (单一事实来源)
-├── categories: 28 大经典服装分类 (旗袍, 汉服, 和服, JK, OL, 护士, 女仆, 兔女郎, 乳胶衣等)
-├── clothing_states: 12 大穿脱解构状态 (解纽扣, 吊带滑落, 裙摆掀起, 湿身透光, 仅剩内衣等)
-├── clothing_nudity_linkage: L1～L6 裸露等级精准脱法咬合
-└── extension_policy (数据驱动采样，24/24 扩展逐 ID 100% 可达):
-    ├── sfw_exposure_tiers (9 档露肤): 领口镂空 → 露肩 → 乳沟浅露 → 高开衩 → 腰部镂空 → 露腰露腹 → 大面积镂空 → 大露背 → 侧缝全开
-    ├── cloth_transparency_tiers (5 档透度): 薄纱微透 → 半透朦胧 → 逆光透影 → 通透显影 → 极致透薄
-    └── lingerie_wardrobe (10 类情趣衣柜): 薄透透视 → 蕾丝镂空 → 三点式 → 连体连袜 → 开裆免脱 → 吊袜袜装 → 束身束缚 → 制服角色 → 国风旗袍 → 皮装乳胶
+clothing.json
+├── sfw_exposure_tiers (9 档露肤):
+│   ├── 领口镂空 (轻度)
+│   ├── 露肩 (轻中度)
+│   ├── 乳沟浅露 (中度)
+│   ├── 高开衩露腿 (中度)
+│   ├── 腰部镂空 (重度)
+│   ├── 露腰露腹 (重度)
+│   ├── 大面积镂空 (极重)
+│   ├── 极致大露背 (极重)
+│   └── 侧缝全开 (极限)
+│
+├── cloth_transparency_tiers (5 档透度):
+│   ├── 薄纱微透 (轻度)
+│   ├── 半透朦胧 (轻中度)
+│   ├── 逆光透影 (中度)
+│   ├── 通透显影 (重度)
+│   └── 极致透薄 (极重)
+│
+└── lingerie_wardrobe (10 类情趣衣柜):
+    ├── 薄透透视
+    ├── 蕾丝镂空
+    ├── 三点式
+    ├── 连体连袜 (Bodystocking)
+    ├── 开裆免脱 (Crotchless)
+    ├── 吊袜袜装 (Garter belt)
+    ├── 束身束缚 (Corset cincher)
+    ├── 制服角色 (Cosplay)
+    ├── 国风旗袍 (Oriental cheongsam)
+    └── 皮装乳胶 (Leather/Latex)
 ```
 
-- **纯净与安全隔离**：L1（包裹）、L5（全裸）、L6（特写）在 1000 随机种子测试下扩展命中数为 0（零污染）；L2/L3/L4 严格按策略受控扩展。
+- **零污染安全隔离**：L1（包裹）、L5（全裸）、L6（特写全见）在 1000 随机种子测试下扩展命中数为 0（绝不混入无关扩展词）；L2/L3/L4 严格按 `extension_policy` 策略采样。
 
 ---
 
-### 5. 🛡️ 标准 Draft-7 递归校验强门禁与发布隔离
-
-- **真·Draft-7 深度递归校验**：覆盖全量 19 个运行时数据文件的 JSON Schema 定义（包含 `pattern`, `enum`, `minItems`, `maxItems`, `uniqueItems`, `required`, `properties`）。
-- **零源码泄漏的发布沙箱构建**：`scripts/build_release.py` 在独立沙箱执行 `python3 -I` 隔离测试，确保发布 ZIP 包仅包含 33 个必要运行时文件，校验和确定性可复现。
-- **Span 级受保护语法字节保留**：`<lora:model:0.8>`, `"quoted phrase"`, `(masterpiece:1.2)`, `[tag1:tag2:10]`, `escaped\,comma` 经装配流水线 100% 原样保留，配合栈式嵌套校验器严防语法破损。
-
----
-
-## 🎛️ 节点套件说明
+## 🎛️ 节点套件说明与参数详解
 
 ### 1. 🎴 IYKYK 15槽位提示词生成器 (`IYKYKPromptGenerator`)
-全维度的 15 槽位精准控制，每个槽位均可独立选择「无」、「随机」或指定具体项目。
+全维度的 15 槽位精准控制生成器。
 
-**输出端口**：
-- `正面提示词 (STRING)`: 经过 16 步装配、17 大冲突消解、受保护语法保留及 250 词安全截断后的英文正面提示词。
-- `负面提示词 (STRING)`: 高质量通用清洗防崩负面提示词。
-- `中文场景描述 (STRING)`: 当前画面配置的中文概要说明。
+| 端口/参数 | 类型 | 说明 |
+| :--- | :--- | :--- |
+| `scene` | 下拉菜单 | 场景大类选择（包含 24 细分类别，支持指定或随机） |
+| `theme` | 下拉菜单 | 剧情主题风格 |
+| `shot_type` / `camera_angle` | 下拉菜单 | 景别构图与拍摄视角 |
+| `nudity_level` | 下拉菜单 | 6 级裸露控制（L1 包裹暗示 → L6 特写全见） |
+| `clothing_style` / `clothing_state` | 下拉菜单 | 服装款式与穿脱解构状态（支持自动联动） |
+| `hairstyle` / `jewelry` | 下拉菜单 | 发型发色与头饰首饰 |
+| `makeup` / `pose` / `expression` | 下拉菜单 | 妆容细节、姿势动作与情绪表情 |
+| `lighting_preset` / `film_stock` | 下拉菜单 | 专业摄影光影预设与胶片质感 |
+| `liquid_effect` / `tattoo_style` | 下拉菜单 | 液体水珠系统与纹身标记 |
+| `prop_style` / `character_role` | 下拉菜单 | 场景互动道具与人物角色卡 |
+| `imperfections` / `quality_tier` | 下拉菜单 | 真实皮肤微瑕质感与画质等级 |
+| `custom_tags` | 多行文本 | 用户自定义额外提示词（支持权重语法与 LoRA） |
+| `prompt_seed` | 整数控件 | **-1 为动态随机抽卡**；**>=0 为确定性复现种子** |
+| **输出: 正面提示词 (STRING)** | 输出 | 经装配、消解与安全截断的高质量英文 Prompt |
+| **输出: 负面提示词 (STRING)** | 输出 | 通用清洗防崩负面词 |
+| **输出: 中文场景描述 (STRING)** | 输出 | 当前画面配置的中文概要说明 |
 
 ---
 
@@ -136,13 +210,27 @@ clothing.json (单一事实来源)
 ---
 
 ### 3. 🧩 IYKYK 自定义槽位拼装器 (`IYKYKCustomSlotCombiner`)
-支持自由文本输入或多节点连接各槽位文本，底层统一执行 17 大冲突消解引擎与画质强化装配流水线。
+支持多节点连线或自由输入各槽位文本，底层统一执行 17 大冲突消解与 16 步画质强化装配流水线。
 
 ---
 
-## 🚀 安装方法
+## 🚀 详细安装指南
 
-### 方法 1：Git Clone（推荐）
+### 方法 1：ComfyUI Manager 安装（通过 Git URL）
+
+1. 打开 ComfyUI 界面，点击右下角的 **`Manager`** 按钮；
+2. 在管理器菜单中点击 **`Install via Git URL`**（通过 Git URL 安装）；
+3. 在弹出的输入框中粘贴本仓库地址：
+   ```text
+   https://github.com/imymi/ComfyUI-IYKYK.git
+   ```
+4. 点击 **`OK`**，等待 Manager 自动下载并完成安装；
+5. 在弹出的提示中点击 **`Restart`** 重启 ComfyUI 即可。
+
+---
+
+### 方法 2：Git Clone（终端命令行推荐）
+
 进入 ComfyUI 的 `custom_nodes` 目录并克隆本仓库：
 
 ```bash
@@ -150,30 +238,31 @@ cd /path/to/ComfyUI/custom_nodes
 git clone https://github.com/imymi/ComfyUI-IYKYK.git
 ```
 
-### 方法 2：ComfyUI Manager 安装（通过 Git URL）
-1. 打开 ComfyUI 界面上的 **Manager** 面板；
-2. 点击 **`Install via Git URL`**（通过 Git URL 安装）；
-3. 在输入框中粘贴本仓库地址：
-   ```text
-   https://github.com/imymi/ComfyUI-IYKYK.git
-   ```
-4. 点击 **OK**，等待安装完成后点击 **Restart** 重启 ComfyUI 即可。
+---
 
 ### 方法 3：手动下载发布包
-从 [Releases](https://github.com/imymi/ComfyUI-IYKYK/releases) 下载最新的 `ComfyUI-IYKYK-v1.1.0-rc6.zip`，解压至 `ComfyUI/custom_nodes/ComfyUI-IYKYK`。
 
-重启 ComfyUI 后，在节点右键菜单中即可找到 **`IYKYK / 提示词生成`**。
+1. 前往 GitHub [Releases](https://github.com/imymi/ComfyUI-IYKYK/releases) 页面下载最新的发布包 `ComfyUI-IYKYK-v1.1.0-rc6.zip`；
+2. 解压到 `ComfyUI/custom_nodes/ComfyUI-IYKYK` 目录下；
+3. 重启 ComfyUI。
+
+重启后，在 ComfyUI 画布空白处双击或右键，搜索 **`IYKYK`** 即可调出节点。
 
 ---
 
-## 🧪 质量验证与自动化测试
+## 🧪 工程规范与质量门禁
 
-本项目拥有严密的自动化测试套件与持续集成门禁，覆盖全量核心逻辑：
+本项目建立了极其严格的工程质量门禁与持续集成验证：
 
 ```bash
-# 执行全量 88 项单元测试与 Draft-7 递归校验
+# 1. 执行 Draft-7 递归 Schema 强门禁校验
 python3 scripts/validate_data.py --strict
+
+# 2. 执行全量 88 项单元测试与集成测试
 python3 -m unittest discover -s tests -v
+
+# 3. 隔离沙箱构建与确定性发布包打包
+python3 scripts/build_release.py
 ```
 
 ```text
@@ -187,13 +276,26 @@ OK
 - ✅ `test_catalog_rule_reachability.py`: 规则 catalog terms 100% 精确覆盖与端到端消解
 - ✅ `test_props_and_extensions_reachability.py`: 24/24 扩展逐 ID 100% 可达与 L1/L5/L6 零污染
 - ✅ `test_schema_negatives.py`: 14 项 Draft-7 负向变异与严格拦截测试
-- ✅ `test_finalize_boundaries.py`: 受保护语法 Span 级保留与栈式括号嵌套测试
+- ✅ `test_finalize_boundaries.py`: Span 级受保护语法保留与栈式括号嵌套测试
 - ✅ `test_nudity_levels.py`: 28 服装 × 6 裸露等级全矩阵脱法测试
-- ✅ `test_release_build.py`: 确定性发布构建与真隔离沙箱烟测
+- ✅ `test_release_build.py`: 零源码泄漏的真隔离沙箱烟测与确定性构建
 
 ---
 
-## 📄 鸣谢与开源协议
+## ❓ 常见问题 (FAQ)
+
+### Q1: 在 ComfyUI Manager 搜索栏中直接搜不到 `ComfyUI-IYKYK` 怎么办？
+**A**: 由于本项目为新发布仓库，尚未被官方中心索引库自动收录。请使用 Manager 的 **`Install via Git URL`** 功能，粘贴 `https://github.com/imymi/ComfyUI-IYKYK.git` 即可一秒安装。
+
+### Q2: 自定义输入中的 LoRA 语法 `<lora:name:0.8>` 会被冲突消解引擎破坏吗？
+**A**: **绝对不会**。底层已实现 Span 级受保护语法解析机制，所有形如 `<lora:...>`, `(weight:1.2)`, `[tag1:tag2:10]`, `"quoted string"`, `escaped\,comma` 的结构在装配与截断过程中均享受 100% 字节级不可变保护。
+
+### Q3: 如何固定某一次随机生成的提示词？
+**A**: 将 `prompt_seed` 从 `-1` 改为当前生成使用的具体数字（或右键固定 seed），节点将启用 ComfyUI 缓存机制，实现 100% 确定性复现。
+
+---
+
+## 📄 开源协议与免责声明
 
 - **词库与理论溯源**：基于 [ShuaiHui/nsfw-prompt-templates-asian](https://github.com/ShuaiHui/nsfw-prompt-templates-asian) 深度开发。
 - **协议**：本项目基于 [Apache-2.0 License](LICENSE) 开源。
