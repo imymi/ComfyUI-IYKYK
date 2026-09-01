@@ -1,0 +1,19 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "ShotTypesDataset",
+  "type": "object",
+  "required": [
+    "shot_types",
+    "camera_angles"
+  ],
+  "properties": {
+    "shot_types": {
+      "type": "array",
+      "minItems": 5
+    },
+    "camera_angles": {
+      "type": "array",
+      "minItems": 5
+    }
+  }
+}

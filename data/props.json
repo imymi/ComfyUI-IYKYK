@@ -100,6 +100,75 @@
         "Nintendo Switch console on bed",
         "headphones around neck"
       ]
+    },
+    {
+      "id": "digital_camera_record",
+      "name_zh": "📸 黑色数码微单/记录互动",
+      "items": [
+        {
+          "id": "digital_camera_in_hand",
+          "name_zh": "手持数码微单相机",
+          "tags": [
+            "holding black compact digital camera",
+            "camera screen facing outward recording",
+            "recording the intimate moment",
+            "compact camera in hand"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "oriental_fan_umbrella",
+      "name_zh": "🪭 古风刺绣团扇/油纸伞/折扇",
+      "items": [
+        {
+          "id": "embroidered_round_fan",
+          "name_zh": "刺绣团扇",
+          "tags": [
+            "holding embroidered round silk fan",
+            "translucent silk fan shielding chest",
+            "delicate bamboo handle"
+          ]
+        },
+        {
+          "id": "oil_paper_umbrella",
+          "name_zh": "油纸伞",
+          "tags": [
+            "holding oiled paper umbrella propped on shoulder",
+            "translucent umbrella canopy filtering warm light"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "flower_bouquet_petals",
+      "name_zh": "💐 浪漫鲜花花束/抱花",
+      "items": [
+        {
+          "id": "fresh_flower_bouquet",
+          "name_zh": "怀抱鲜花花束",
+          "tags": [
+            "holding lush fresh floral bouquet",
+            "flower petals pressed against chest",
+            "bouquet wrapped in crinkled craft paper"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "plush_doll_teddy",
+      "name_zh": "🧸 巨型毛绒玩偶/泰迪熊",
+      "items": [
+        {
+          "id": "fluffy_teddy_bear",
+          "name_zh": "毛绒泰迪熊",
+          "tags": [
+            "hugging large fluffy plush teddy bear",
+            "arms wrapped around cute stuffed animal",
+            "soft plush toy on bed"
+          ]
+        }
+      ]
     }
   ]
 }

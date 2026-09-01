@@ -1,0 +1,19 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "AccessoriesDataset",
+  "type": "object",
+  "required": [
+    "hairstyles",
+    "headwear_jewelry"
+  ],
+  "properties": {
+    "hairstyles": {
+      "type": "array",
+      "minItems": 5
+    },
+    "headwear_jewelry": {
+      "type": "array",
+      "minItems": 5
+    }
+  }
+}

@@ -19,7 +19,7 @@ from pathlib import Path
 from random import Random
 from typing import Any, Dict, List, Optional, Sequence
 
-from .conflict_resolver import ConflictResolver, sanitize_prompt
+from .conflict_resolver import ConflictResolver, sanitize_prompt, is_protected_fragment
 from .models import PromptFragment
 
 MAX_PROMPT_WORDS = 250
@@ -139,7 +139,7 @@ def finalize_prompt(
     # 1. 过滤空片段
     valid_frags: List[PromptFragment] = []
     for f in fragments:
-        t = f.text.strip().strip(",")
+        t = f.text if is_protected_fragment(f.text) else f.text.strip().strip(",")
         if t:
             valid_frags.append(
                 PromptFragment(
@@ -147,6 +147,7 @@ def finalize_prompt(
                     source_slot=f.source_slot,
                     source_item_id=f.source_item_id,
                     context_ids=f.context_ids,
+                    exclusive_group=f.exclusive_group,
                     order=f.order,
                 )
             )
@@ -167,16 +168,16 @@ def finalize_prompt(
             seen_keys.add(key)
             deduped_frags.append(f)
 
-    # 4. 严谨的 250 词边界管理
+    # 4. 严谨的 250 词边界管理（以 PromptFragment 序列为单位计算预算）
     accepted_texts: List[str] = []
     current_word_count = 0
 
     for f in deduped_frags:
-        frag_text = f.text.strip().strip(",")
+        is_structural = is_protected_fragment(f.text)
+        frag_text = f.text if is_structural else f.text.strip().strip(",")
         if not frag_text:
             continue
         frag_words = len(frag_text.split())
-        is_structural = any(c in frag_text for c in "()[]<>\"")
 
         # 单个结构化片段超长检查
         if is_structural and frag_words > max_words:
@@ -196,18 +197,19 @@ def finalize_prompt(
                     accepted_texts.append(" ".join(words))
                     current_word_count += len(words)
             else:
-                # 结构化片段不能破坏，跳过当前片段，继续检查后续是否有较短片段可装入
+                # 结构化片段必须保持原子性，绝不中途切断，跳过当前片段
                 continue
 
-    # 5. 渲染为字符串并最终清洗
+    # 5. 由渲染器按 ", " 规范化拼接
     raw_prompt = ", ".join(accepted_texts)
     sanitized = sanitize_prompt(raw_prompt)
 
-    # 最终防御性验证
+    # 最终完整性与词数断言（绝不二次盲目截断字符串破坏语法）
     final_words = len(sanitized.split())
     if final_words > max_words:
-        # 极少数情况下逗号规范化后词数可能有微小漂移，进行纯单词边界安全截断
-        sanitized = " ".join(sanitized.split()[:max_words]).rstrip(",")
+        raise PromptValidationError(
+            f"Rendered prompt word count {final_words} exceeds maximum allowed budget {max_words}"
+        )
 
     return sanitized
 

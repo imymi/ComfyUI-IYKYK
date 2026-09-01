@@ -1,48 +1,64 @@
 import { app } from "../../scripts/app.js";
 import { EXTENSION_VERSION } from "./version.js";
 
-const DEFAULT_VALUES = {
-    // 🎴 IYKYK 15槽位提示词生成器
-    "预设模板": "无 (None)",
-    "风格配方": "无 (None)",
-    "场景大类": "随机 (Random)",
-    "剧情主题": "随机 (Random)",
-    "景别构图": "自动 (Auto)",
-    "拍摄视角": "自动 (Auto)",
-    "裸露等级": "随机 (Random)",
-    "服装款式": "随机 (Random)",
-    "服装状态": "自动联动裸露等级 (Auto Link Nudity)",
-    "发型发色": "随机 (Random)",
-    "饰品头饰": "无 (None)",
-    "妆容细节": "无 (None)",
-    "姿势动作": "随机 (Random)",
-    "情绪表情": "随机 (Random)",
-    "光影预设": "自动 (Auto)",
-    "胶片风格": "无 (None)",
-    "液体效果": "无 (None)",
-    "纹身标记": "无 (None)",
-    "道具物件": "无 (None)",
-    "角色设定": "无 (None)",
-    "真实微瑕": "无 (None)",
-    "画质等级": "高清写真 (High)",
-    "prompt_seed": -1,
+const NODE_DEFAULTS = {
+    // 🎴 节点 1: IYKYK 15槽位提示词生成器
+    "IYKYKPromptGenerator": {
+        "预设模板": "无 (None)",
+        "风格配方": "无 (None)",
+        "场景大类": "随机 (Random)",
+        "剧情主题": "随机 (Random)",
+        "景别构图": "自动 (Auto)",
+        "拍摄视角": "自动 (Auto)",
+        "裸露等级": "随机 (Random)",
+        "服装款式": "随机 (Random)",
+        "服装状态": "自动联动裸露等级 (Auto Link Nudity)",
+        "发型发色": "随机 (Random)",
+        "饰品头饰": "无 (None)",
+        "妆容细节": "无 (None)",
+        "姿势动作": "随机 (Random)",
+        "情绪表情": "随机 (Random)",
+        "光影预设": "自动 (Auto)",
+        "胶片风格": "无 (None)",
+        "液体效果": "无 (None)",
+        "纹身标记": "无 (None)",
+        "道具物件": "无 (None)",
+        "角色设定": "无 (None)",
+        "真实微瑕": "无 (None)",
+        "画质等级": "高清写真 (High)",
+        "prompt_seed": -1,
+        "control_after_generate": "fixed"
+    },
 
-    // 🧩 IYKYK 自定义槽位拼装器
-    "画质修饰": "best quality, masterpiece",
-    "场景主题": "",
-    "景别视角": "",
-    "裸露状态": "",
-    "服装款式": "",
-    "光影氛围": "",
-    "姿势动作": "",
-    "表情眼神": "",
-    "风格胶片": "",
-    "妆容发型": "",
-    "微瑕细节": "",
-    "纹身标记": "",
-    "道具物件": "",
-    "角色体液": "",
-    "自定义追加": ""
+    // 📋 节点 2: IYKYK 模板浏览器
+    "IYKYKPresetBrowser": {
+        "预设模板": "01_纯欲胶片 (Pure Desire 35mm Film)",
+        "风格配方": "无 (None)",
+        "画质等级": "高清写真 (High)",
+        "prompt_seed": -1,
+        "control_after_generate": "fixed"
+    },
+
+    // 🧩 节点 3: IYKYK 自定义槽位拼装器
+    "IYKYKCustomSlotCombiner": {
+        "prompt_seed": -1,
+        "control_after_generate": "fixed",
+        "场景主题": "",
+        "景别视角": "",
+        "裸露状态": "",
+        "服装款式": "",
+        "光影氛围": "",
+        "姿势动作": "",
+        "表情眼神": "",
+        "风格胶片": "",
+        "妆容发型": "",
+        "微瑕细节": "",
+        "纹身标记": "",
+        "道具物件": "",
+        "角色体液": "",
+        "画质修饰": "best quality, masterpiece",
+        "自定义追加": ""
+    }
 };
 
 /**
@@ -51,9 +67,32 @@ const DEFAULT_VALUES = {
 function resetNodeDefaults(node) {
     if (!node || !node.widgets) return;
 
+    const comfyClass = node.comfyClass || "";
+    const classDefaults = NODE_DEFAULTS[comfyClass] || {};
+
     for (const widget of node.widgets) {
-        if (widget.name && widget.name in DEFAULT_VALUES) {
-            widget.value = DEFAULT_VALUES[widget.name];
+        if (!widget || !widget.name) continue;
+
+        let defVal = undefined;
+        if (widget.name in classDefaults) {
+            defVal = classDefaults[widget.name];
+        } else if (widget.options && widget.options.default !== undefined) {
+            defVal = widget.options.default;
+        } else if (widget.default_value !== undefined) {
+            defVal = widget.default_value;
+        }
+
+        if (defVal !== undefined) {
+            if (widget.options && Array.isArray(widget.options.values)) {
+                if (widget.options.values.includes(defVal)) {
+                    widget.value = defVal;
+                } else if (widget.options.values.length > 0) {
+                    widget.value = widget.options.values[0];
+                }
+            } else {
+                widget.value = defVal;
+            }
+
             if (typeof widget.callback === "function") {
                 widget.callback(widget.value);
             }

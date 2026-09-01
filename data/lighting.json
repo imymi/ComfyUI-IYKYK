@@ -270,6 +270,62 @@
         "window light silhouette",
         "breast silhouette outline"
       ]
+    },
+    {
+      "name": "美颜补光灯 / 环形眼神光 (Ring Beauty Light / Catchlight)",
+      "name_zh": "美颜补光灯/环形眼神光",
+      "tags": [
+        "ring beauty light close to face",
+        "soft circular catchlight in pupils",
+        "minimized facial shadows",
+        "flawless beauty fill light",
+        "bright illuminated face"
+      ],
+      "erotic_tags": []
+    },
+    {
+      "name": "纱帘散射光 (Diffused Sheer Curtain Light)",
+      "name_zh": "纱帘散射柔光",
+      "tags": [
+        "soft sunlight filtered through sheer curtains",
+        "gentle diffused indoor illumination",
+        "seamless soft ambient light",
+        "delicate room glow with no harsh shadows"
+      ],
+      "erotic_tags": []
+    },
+    {
+      "name": "树影斑驳光 (Dappled Sunlight & Leaf Shadows)",
+      "name_zh": "树影斑驳日光",
+      "tags": [
+        "dappled sunlight filtering through tree canopy",
+        "flickering leaf shadow patterns on body and floor",
+        "organic natural light spots",
+        "sunlit forest ambiance"
+      ],
+      "erotic_tags": []
+    },
+    {
+      "name": "落日余晖金色侧光 (Golden Hour Sunset Sidelight)",
+      "name_zh": "落日金色侧光",
+      "tags": [
+        "low-angle golden sunset sidelight",
+        "warm golden rim lighting on body edges",
+        "long dramatic shadows",
+        "amber evening glow"
+      ],
+      "erotic_tags": []
+    },
+    {
+      "name": "逆光透亮发丝 (Backlit Luminous Glow)",
+      "name_zh": "逆光透亮发丝",
+      "tags": [
+        "direct backlight creating radiant glowing outline",
+        "illuminated glowing hair strands",
+        "luminous ethereal silhouette edges",
+        "bright rim light from behind"
+      ],
+      "erotic_tags": []
     }
   ],
   "cinematic_lighting": [

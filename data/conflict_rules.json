@@ -58,7 +58,185 @@
             "cameltoe"
           ]
         }
-      ]
+      ],
+      "level_rules": {
+        "L1": {
+          "name_zh": "包裹暗示 (Fully Clothed / Suggestive)",
+          "banned_patterns": [
+            "skirt pulled up",
+            "skirt hiked up",
+            "skirt lifted",
+            "skirt riding up",
+            "dress hitched up",
+            "dress pulled up",
+            "revealing panties",
+            "showing panties",
+            "panties visible",
+            "visible panties",
+            "panties showing",
+            "panties pulled",
+            "pulling panties",
+            "no panties",
+            "upskirt",
+            "flashing skirt",
+            "stepping out of skirt",
+            "skirt pooled at feet",
+            "lifting skirt",
+            "panties only",
+            "only panties",
+            "only lace panties",
+            "only underwear",
+            "bra visible",
+            "bra slipping",
+            "bra removed",
+            "bra pushed up",
+            "bra pulled down",
+            "adjusting bra",
+            "unclasped bra",
+            "wearing bra",
+            "lace bra",
+            "thong",
+            "topless",
+            "bare breasts",
+            "exposed breasts",
+            "uncovered breasts",
+            "bare chest",
+            "breasts bare",
+            "chest exposed",
+            "cleavage",
+            "underboob",
+            "sideboob",
+            "nipple",
+            "pussy",
+            "vagina",
+            "genitals",
+            "labia",
+            "crotch close-up",
+            "spread legs",
+            "spreading labia",
+            "thighs spread",
+            "thighs bare",
+            "cock sliding",
+            "penetrated",
+            "face-fucked",
+            "cum dripping down thigh",
+            "dripping on breasts",
+            "cupping breasts",
+            "hands on breasts",
+            "gripping breasts",
+            "breasts bouncing",
+            "nude",
+            "naked",
+            "fully nude",
+            "completely naked",
+            "full frontal nudity",
+            "all clothes removed",
+            "stripped bare",
+            "unclothed",
+            "birthday suit",
+            "nude photo",
+            "nude outline",
+            "nude silhouette",
+            "painterly nude",
+            "half-lit nude",
+            "high contrast nude",
+            "flattering nude lighting",
+            "angelic nude lighting",
+            "unbuttoned",
+            "blouse open",
+            "shirt open",
+            "slipping off shoulder",
+            "dress slipping off"
+          ]
+        },
+        "L2": {
+          "name_zh": "差分微露 (Partially Exposed)",
+          "banned_patterns": [
+            "topless",
+            "bare breasts",
+            "exposed breasts",
+            "uncovered breasts",
+            "shirt open showing bare breasts",
+            "bra removed",
+            "bra pushed up above breasts",
+            "breasts bare",
+            "pussy",
+            "vagina",
+            "labia",
+            "spread legs",
+            "spreading labia",
+            "skirt pulled up revealing panties",
+            "skirt hiked up to waist",
+            "panties only",
+            "only panties",
+            "pulling panties down",
+            "cock sliding",
+            "penetrated",
+            "completely naked",
+            "full nude",
+            "fully nude",
+            "full frontal nudity",
+            "all clothes removed",
+            "stripped bare",
+            "birthday suit"
+          ]
+        },
+        "L3": {
+          "name_zh": "半裸诱惑 (Half Nude)",
+          "banned_patterns": [
+            "pussy visible",
+            "spread labia",
+            "vaginal opening",
+            "bare pussy",
+            "spreading labia",
+            "completely naked",
+            "full frontal nudity",
+            "birthday suit"
+          ]
+        },
+        "L4": {
+          "name_zh": "极简遮挡 (Minimal Covering)",
+          "banned_patterns": [
+            "wearing blazer",
+            "wearing coat",
+            "wearing jacket",
+            "wearing sweater",
+            "fully clothed",
+            "neatly dressed",
+            "formal kimono",
+            "buttoned-up blouse",
+            "spreading labia",
+            "vaginal opening exposed"
+          ]
+        },
+        "L5": {
+          "name_zh": "完全裸露 (Full Nude)",
+          "banned_patterns": [
+            "wearing skirt",
+            "wearing dress",
+            "wearing blazer",
+            "wearing blouse",
+            "wearing uniform",
+            "wearing sweater",
+            "wearing panties",
+            "wearing bra",
+            "wearing pantyhose",
+            "fully clothed",
+            "neatly dressed",
+            "crisp clothing"
+          ]
+        },
+        "L6": {
+          "name_zh": "特写全见 (Explicit Genital Close-up)",
+          "banned_patterns": [
+            "fully clothed",
+            "neatly dressed",
+            "modest outfit",
+            "wearing blazer",
+            "wearing sweater"
+          ]
+        }
+      }
     },
     {
       "id": "material_penetration",
@@ -273,32 +451,658 @@
       },
       "venue_clusters": {
         "onsen": [
-          "onsen", "hot spring", "rotenburo", "ryokan bath", "public bath", "sento", "sauna", "jacuzzi", "soapland bath"
+          "onsen",
+          "hot spring",
+          "rotenburo",
+          "ryokan bath",
+          "public bath",
+          "sento",
+          "sauna",
+          "jacuzzi",
+          "soapland bath"
         ],
         "dining": [
-          "cafe booth", "coffee shop", "yatai stall", "street food cart", "ramen shop", "izakaya", "bar counter", "love hotel restaurant", "food stall with curtain"
+          "cafe booth",
+          "coffee shop",
+          "yatai stall",
+          "street food cart",
+          "ramen shop",
+          "izakaya",
+          "bar counter",
+          "love hotel restaurant",
+          "food stall with curtain"
         ],
         "school": [
-          "classroom", "blackboard", "student desk", "teacher desk", "school library", "gym storage", "infirmary"
+          "classroom",
+          "blackboard",
+          "student desk",
+          "teacher desk",
+          "school library",
+          "gym storage",
+          "infirmary"
         ],
         "office": [
-          "office cubicle", "conference room", "executive desk", "office elevator", "break room", "corporate office"
+          "office cubicle",
+          "conference room",
+          "executive desk",
+          "office elevator",
+          "break room",
+          "corporate office"
         ],
         "transport": [
-          "subway car", "train seat", "train door", "train interior", "airplane cabin", "car backseat", "bus interior", "shinkansen"
+          "subway car",
+          "train seat",
+          "train door",
+          "train interior",
+          "airplane cabin",
+          "car backseat",
+          "bus interior",
+          "shinkansen"
         ],
         "outdoor": [
-          "riverbank", "embankment", "behind bushes", "under bridge", "park at night", "beach at night", "forest clearing", "mountain trail", "seaside cave"
+          "riverbank",
+          "embankment",
+          "behind bushes",
+          "under bridge",
+          "park at night",
+          "beach at night",
+          "forest clearing",
+          "mountain trail",
+          "seaside cave"
         ],
         "bedroom": [
-          "bedroom", "love hotel room", "tatami futon", "messy bed", "hotel room bed"
+          "bedroom",
+          "love hotel room",
+          "tatami futon",
+          "messy bed",
+          "hotel room bed"
         ]
       },
       "outdoor_exclusive": [
-        "outdoor bath", "rotenburo", "open-air bath", "onsen with snow view", "snow view", "riverbank", "embankment", "under bridge", "behind bushes", "park at night", "beach at night", "forest clearing", "mountain trail", "seaside cave", "outdoor hot spring"
+        "outdoor bath",
+        "rotenburo",
+        "open-air bath",
+        "onsen with snow view",
+        "snow view",
+        "riverbank",
+        "embankment",
+        "under bridge",
+        "behind bushes",
+        "park at night",
+        "beach at night",
+        "forest clearing",
+        "mountain trail",
+        "seaside cave",
+        "outdoor hot spring"
       ],
       "indoor_exclusive": [
-        "indoor onsen", "private onsen", "onsen changing room", "changing room", "locker room", "bathroom", "shower room", "bedroom", "living room", "kitchen", "office cubicle", "classroom", "cafe booth", "elevator", "dressing room", "shower stall", "spinning room"
+        "indoor onsen",
+        "private onsen",
+        "onsen changing room",
+        "changing room",
+        "locker room",
+        "bathroom",
+        "shower room",
+        "bedroom",
+        "living room",
+        "kitchen",
+        "office cubicle",
+        "classroom",
+        "cafe booth",
+        "elevator",
+        "dressing room",
+        "shower stall",
+        "spinning room"
+      ]
+    },
+    {
+      "id": "pose_hand_occupation",
+      "description": "姿势手部占用与手持道具/饰品互斥：当姿势双手被占用时，禁止手持酒杯、团扇、手机、托盘等手持道具动作",
+      "busy_pose_triggers": [
+        "hands behind back",
+        "hands tied behind back",
+        "hands bound",
+        "arms above head",
+        "arms raised high above head",
+        "lying with arms above head",
+        "hands on head",
+        "hands behind head",
+        "gripping sheets",
+        "gripping bedsheet",
+        "clutching pillow with both hands",
+        "pulling shirt over head",
+        "unhooking bra behind back",
+        "pulling panties down with both hands",
+        "on all fours",
+        "on hands and knees",
+        "hands on floor",
+        "crawling on floor",
+        "spreading labia with both hands",
+        "holding legs open",
+        "arms wrapped around neck",
+        "hands braced on chest",
+        "covering eyes with both hands",
+        "hands clasped behind back",
+        "hands over mouth to silence",
+        "hands clasped in prayer"
+      ],
+      "banned_handheld_patterns": [
+        "compact camera in hand",
+        "arms wrapped around cute stuffed animal",
+        "holding black compact digital camera",
+        "smartphone in hand recording",
+        "holding smartphone",
+        "phone held in hand",
+        "holding game controller",
+        "holding camera",
+        "holding embroidered round silk fan",
+        "holding folding fan",
+        "holding round fan",
+        "holding fan in hand",
+        "holding oiled paper umbrella propped on shoulder",
+        "holding oil paper umbrella",
+        "holding umbrella in hand",
+        "holding lush fresh floral bouquet",
+        "holding flower bouquet",
+        "hugging large fluffy plush teddy bear",
+        "holding wine glass in hand",
+        "holding wine glass",
+        "holding champagne glass",
+        "wine glass in hand",
+        "swirling glass in hand",
+        "holding wand vibrator",
+        "holding controller",
+        "holding tea cup",
+        "holding cigarette",
+        "cigarette between fingers",
+        "holding sword",
+        "holding microphone",
+        "holding tray"
+      ],
+      "catalog_busy_pose_triggers": [
+        "hands behind back",
+        "arms above head",
+        "lying with arms above head",
+        "hands behind head",
+        "gripping sheets",
+        "pulling shirt over head",
+        "on all fours",
+        "on hands and knees",
+        "spreading labia with both hands",
+        "hands clasped behind back",
+        "hands clasped in prayer"
+      ],
+      "custom_busy_pose_triggers": [
+        "hands tied behind back",
+        "hands bound",
+        "arms raised high above head",
+        "hands on head",
+        "gripping bedsheet",
+        "clutching pillow with both hands",
+        "unhooking bra behind back",
+        "pulling panties down with both hands",
+        "hands on floor",
+        "crawling on floor",
+        "holding legs open",
+        "arms wrapped around neck",
+        "hands braced on chest",
+        "covering eyes with both hands",
+        "hands over mouth to silence"
+      ],
+      "catalog_handheld_patterns": [
+        "compact camera in hand",
+        "arms wrapped around cute stuffed animal",
+        "holding black compact digital camera",
+        "smartphone in hand recording",
+        "holding game controller",
+        "holding embroidered round silk fan",
+        "holding oiled paper umbrella propped on shoulder",
+        "holding lush fresh floral bouquet",
+        "hugging large fluffy plush teddy bear"
+      ],
+      "custom_handheld_patterns": [
+        "holding smartphone",
+        "phone held in hand",
+        "holding camera",
+        "holding folding fan",
+        "holding round fan",
+        "holding fan in hand",
+        "holding oil paper umbrella",
+        "holding umbrella in hand",
+        "holding flower bouquet",
+        "holding wine glass in hand",
+        "holding wine glass",
+        "holding champagne glass",
+        "wine glass in hand",
+        "swirling glass in hand",
+        "holding wand vibrator",
+        "holding controller",
+        "holding tea cup",
+        "holding cigarette",
+        "cigarette between fingers",
+        "holding sword",
+        "holding microphone",
+        "holding tray"
+      ]
+    },
+    {
+      "id": "emotion_gaze_affinity",
+      "description": "情绪与眼神方向一致性：害羞/服从时禁止挑逗/直视，冷淡时禁止俏皮/眨眼",
+      "conflicts": [
+        {
+          "emotion_triggers": [
+            "shy expression",
+            "blushing cheeks",
+            "blushing shyly",
+            "shy smile",
+            "bashful expression",
+            "timid look"
+          ],
+          "banned_gaze": [
+            "seductive smile",
+            "sultry gaze",
+            "predatory inviting gaze",
+            "direct eye-contact",
+            "direct eye contact",
+            "eye-fucking",
+            "predatory gaze",
+            "challenging dominant gaze",
+            "bold seductive stare",
+            "winking cheekily"
+          ],
+          "catalog_emotion_triggers": [
+            "shy expression",
+            "blushing cheeks",
+            "shy smile",
+            "timid look"
+          ],
+          "custom_emotion_triggers": [
+            "blushing shyly",
+            "bashful expression"
+          ],
+          "catalog_banned_gaze": [
+            "seductive smile",
+            "sultry gaze",
+            "predatory inviting gaze",
+            "eye-fucking",
+            "challenging dominant gaze",
+            "winking cheekily"
+          ],
+          "custom_banned_gaze": [
+            "direct eye-contact",
+            "direct eye contact",
+            "predatory gaze",
+            "bold seductive stare"
+          ]
+        },
+        {
+          "emotion_triggers": [
+            "bored expression",
+            "deadpan face",
+            "cold aloof expression",
+            "emotionless face"
+          ],
+          "banned_gaze": [
+            "playful wink",
+            "winking playfully",
+            "sweet smile",
+            "gleeful eyes",
+            "flirty wink"
+          ],
+          "catalog_emotion_triggers": [
+            "bored expression",
+            "deadpan face"
+          ],
+          "custom_emotion_triggers": [
+            "cold aloof expression",
+            "emotionless face"
+          ],
+          "catalog_banned_gaze": [
+            "winking playfully"
+          ],
+          "custom_banned_gaze": [
+            "playful wink",
+            "sweet smile",
+            "gleeful eyes",
+            "flirty wink"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "environmental_lighting_coherence",
+      "description": "光照色温与黑夜环境互斥：日间自然光/晴天日光下禁止深夜场所与黑夜天气",
+      "daylight_triggers": [
+        "natural daylight",
+        "golden hour sunset sidelight",
+        "soft sunlight filtered through sheer curtains",
+        "dappled sunlight filtering through tree canopy",
+        "golden hour"
+      ],
+      "banned_night_elements": [
+        "hotel balcony night",
+        "park at night",
+        "beach at night",
+        "hotel corridor late night",
+        "nightclub",
+        "back alley",
+        "deep dark night",
+        "pitch black background"
+      ],
+      "catalog_daylight_triggers": [
+        "soft sunlight filtered through sheer curtains",
+        "dappled sunlight filtering through tree canopy",
+        "golden hour"
+      ],
+      "custom_daylight_triggers": [
+        "natural daylight",
+        "golden hour sunset sidelight"
+      ],
+      "catalog_banned_night_elements": [
+        "hotel balcony night",
+        "park at night",
+        "beach at night",
+        "hotel corridor late night",
+        "nightclub",
+        "back alley"
+      ],
+      "custom_banned_night_elements": [
+        "deep dark night",
+        "pitch black background"
+      ]
+    },
+    {
+      "id": "makeup_details_coherence",
+      "description": "妆容与细节自洽：素颜禁止糊妆，连裤袜/过膝袜去除独立长度冗余",
+      "no_makeup_triggers": [
+        "natural makeup",
+        "pure face",
+        "clean beauty",
+        "low-saturation clear glass skin",
+        "minimal makeup"
+      ],
+      "banned_makeup_smudge": [
+        "smeared lipstick on cheek",
+        "smudged eyeliner",
+        "smudged kohl eyeliner",
+        "ruined makeup"
+      ],
+      "catalog_no_makeup_triggers": [
+        "natural makeup",
+        "pure face",
+        "clean beauty",
+        "low-saturation clear glass skin",
+        "minimal makeup"
+      ],
+      "custom_no_makeup_triggers": [],
+      "catalog_banned_makeup_smudge": [
+        "smeared lipstick on cheek",
+        "smudged eyeliner",
+        "smudged kohl eyeliner",
+        "ruined makeup"
+      ],
+      "custom_banned_makeup_smudge": []
+    },
+    {
+      "id": "framing_lower_body_coherence",
+      "name_zh": "景别特写与下肢/足部元素自洽",
+      "description": "景别特写与下肢/足部元素自洽：极特写/脸部特写时剔除高跟鞋、过膝袜、大腿袜、全身下半身足部动作，防止画面注意力割裂与多肢体伪影",
+      "catalog_close_up_triggers": [
+        "extreme close-up",
+        "macro detail shot",
+        "close-up",
+        "face shot filling frame",
+        "focused on facial expression"
+      ],
+      "custom_close_up_triggers": [
+        "portrait close-up",
+        "tight headshot",
+        "macro shot of lips",
+        "eyes close-up",
+        "facial macro shot"
+      ],
+      "close_up_triggers": [
+        "extreme close-up",
+        "macro detail shot",
+        "close-up",
+        "face shot filling frame",
+        "focused on facial expression",
+        "portrait close-up",
+        "tight headshot",
+        "macro shot of lips",
+        "eyes close-up",
+        "facial macro shot"
+      ],
+      "catalog_banned_lower_body": [
+        "garter straps",
+        "garter belt",
+        "garter_stockings",
+        "bare feet",
+        "high heels"
+      ],
+      "custom_banned_lower_body": [
+        "thigh-high stockings",
+        "stiletto heels",
+        "knee-high boots",
+        "strappy sandals",
+        "feet visible",
+        "kneeling on tatami"
+      ],
+      "banned_lower_body": [
+        "garter straps",
+        "garter belt",
+        "garter_stockings",
+        "bare feet",
+        "high heels",
+        "thigh-high stockings",
+        "stiletto heels",
+        "knee-high boots",
+        "strappy sandals",
+        "feet visible",
+        "kneeling on tatami"
+      ]
+    },
+    {
+      "id": "accessory_occlusion_gaze_coherence",
+      "name_zh": "饰品遮挡与视线/面部动作自洽",
+      "description": "饰品遮挡与视线/面部动作自洽：蒙眼布/遮眼/闭眼时禁止视线对视与眨眼",
+      "catalog_occlusion_triggers": [
+        "black lace blindfold covering eyes",
+        "sheer patterned eye mask",
+        "eyes closed in ecstasy",
+        "sleeping with eyes closed"
+      ],
+      "custom_occlusion_triggers": [
+        "blindfold",
+        "eyes blindfolded",
+        "silk blindfold",
+        "covering eyes with hands",
+        "covering eyes with both hands",
+        "hands over eyes"
+      ],
+      "occlusion_triggers": [
+        "black lace blindfold covering eyes",
+        "sheer patterned eye mask",
+        "eyes closed in ecstasy",
+        "sleeping with eyes closed",
+        "blindfold",
+        "eyes blindfolded",
+        "silk blindfold",
+        "covering eyes with hands",
+        "covering eyes with both hands",
+        "hands over eyes"
+      ],
+      "catalog_banned_gaze_actions": [
+        "making eye contact with camera then breaking away shyly",
+        "eye-fucking the viewer",
+        "predatory inviting gaze",
+        "devouring hungry stare",
+        "challenging dominant gaze",
+        "lustful stare"
+      ],
+      "custom_banned_gaze_actions": [
+        "direct eye contact",
+        "direct eye contact with camera",
+        "looking at viewer",
+        "looking up at camera",
+        "looking down at camera",
+        "winking",
+        "playful wink",
+        "staring into lens",
+        "dilated pupils",
+        "sparkling eyes",
+        "intense eye contact"
+      ],
+      "banned_gaze_actions": [
+        "making eye contact with camera then breaking away shyly",
+        "eye-fucking the viewer",
+        "predatory inviting gaze",
+        "devouring hungry stare",
+        "challenging dominant gaze",
+        "lustful stare",
+        "direct eye contact",
+        "direct eye contact with camera",
+        "looking at viewer",
+        "looking up at camera",
+        "looking down at camera",
+        "winking",
+        "playful wink",
+        "staring into lens",
+        "dilated pupils",
+        "sparkling eyes",
+        "intense eye contact"
+      ]
+    },
+    {
+      "id": "monochrome_film_chroma_coherence",
+      "name_zh": "黑白胶片与高饱和色彩互斥",
+      "description": "黑白胶片与高饱和色彩互斥：黑白/单色胶片下消解彩虹/高饱和RGB霓虹色彩，保留反差与明暗影调",
+      "catalog_monochrome_triggers": [
+        "high contrast B&W",
+        "fine grain B&W",
+        "classic monochrome",
+        "professional monochrome",
+        "rich tonal B&W",
+        "cinematic B&W",
+        "warm brown monochrome"
+      ],
+      "custom_monochrome_triggers": [
+        "kodak tri-x 400",
+        "ilford hp5 plus",
+        "fujifilm acros 100",
+        "black and white film",
+        "monochrome photography",
+        "b&w film stock"
+      ],
+      "monochrome_triggers": [
+        "high contrast B&W",
+        "fine grain B&W",
+        "classic monochrome",
+        "professional monochrome",
+        "rich tonal B&W",
+        "cinematic B&W",
+        "warm brown monochrome",
+        "kodak tri-x 400",
+        "ilford hp5 plus",
+        "fujifilm acros 100",
+        "black and white film",
+        "monochrome photography",
+        "b&w film stock"
+      ],
+      "catalog_banned_chroma": [
+        "vibrant neon glow",
+        "neon rim lighting",
+        "cyan and magenta lighting",
+        "rainbow prism flares",
+        "colorful reflections",
+        "sunset orange warmth"
+      ],
+      "custom_banned_chroma": [
+        "vibrant neon cyan and magenta",
+        "rainbow prism flares",
+        "cyberpunk neon glow",
+        "bright saturated colors",
+        "pastel candy palette",
+        "electric purple rim light"
+      ],
+      "banned_chroma": [
+        "vibrant neon glow",
+        "neon rim lighting",
+        "cyan and magenta lighting",
+        "rainbow prism flares",
+        "colorful reflections",
+        "sunset orange warmth",
+        "vibrant neon cyan and magenta",
+        "cyberpunk neon glow",
+        "bright saturated colors",
+        "pastel candy palette",
+        "electric purple rim light"
+      ]
+    },
+    {
+      "id": "clothing_style_state_coherence",
+      "name_zh": "服装款式与解构状态互斥",
+      "description": "服装款式与解构状态互斥：连体泳衣/紧身衣禁止解纽扣/掀裙，长裤/短裤禁止裙摆飘动与裙衩",
+      "one_piece_triggers": [
+        "one-piece swimsuit",
+        "school swimsuit (sukumizu)",
+        "sukumizu",
+        "competition swimsuit",
+        "leotard",
+        "bodysuit",
+        "bodystocking"
+      ],
+      "one_piece_banned_states": [
+        "unbuttoned dress shirt",
+        "unbuttoned blouse",
+        "unbuttoning shirt",
+        "skirt lifted",
+        "skirt hiked up",
+        "skirt slit revealing",
+        "lifting pleated skirt",
+        "unzipped jeans",
+        "unzipping pants",
+        "button undone"
+      ],
+      "pants_triggers": [
+        "skinny jeans",
+        "denim jeans",
+        "leather pants",
+        "cargo pants",
+        "tailored trousers",
+        "denim shorts",
+        "hot pants"
+      ],
+      "pants_banned_states": [
+        "skirt slit revealing",
+        "lifting skirt",
+        "skirt hiked up to waist",
+        "pleated skirt floating",
+        "skirt blown by wind"
+      ]
+    },
+    {
+      "id": "handheld_props_single_holder",
+      "name_zh": "多手持道具唯一性消解",
+      "description": "多手持道具唯一性消解：同时出现多个手持道具动作时保留首个主手持动作，消除多肢体异常",
+      "handheld_patterns": [
+        "holding smartphone",
+        "holding camera",
+        "holding folding fan",
+        "holding round silk fan",
+        "holding round fan",
+        "holding umbrella",
+        "holding bouquet",
+        "holding wine glass",
+        "holding champagne glass",
+        "holding tea cup",
+        "holding sword",
+        "holding wand vibrator",
+        "holding microphone",
+        "holding tray",
+        "holding game controller",
+        "holding black compact digital camera",
+        "holding oiled paper umbrella"
       ]
     }
   ]

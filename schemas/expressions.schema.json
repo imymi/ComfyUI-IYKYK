@@ -1,0 +1,29 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "ExpressionsDataset",
+  "type": "object",
+  "required": [
+    "emotions",
+    "gaze_rules",
+    "mouth_actions",
+    "progression_phases"
+  ],
+  "properties": {
+    "emotions": {
+      "type": "array",
+      "minItems": 10
+    },
+    "gaze_rules": {
+      "type": "array",
+      "minItems": 3
+    },
+    "mouth_actions": {
+      "type": "array",
+      "minItems": 5
+    },
+    "progression_phases": {
+      "type": "array",
+      "minItems": 3
+    }
+  }
+}

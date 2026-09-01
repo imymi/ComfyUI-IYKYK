@@ -16,7 +16,7 @@ class TestSceneStructure(unittest.TestCase):
     def setUp(self):
         self.sampler = DataSampler(DATA_DIR)
         self.scenes_data = json.loads((DATA_DIR / "scenes.json").read_text(encoding="utf-8"))
-        self.expectations = json.loads((DATA_DIR / "scene_context_expectations.json").read_text(encoding="utf-8"))
+        self.expectations = json.loads((REPO_DIR / "tests" / "fixtures" / "scene_context_expectations.json").read_text(encoding="utf-8"))
 
     def test_all_122_scenes_match_expectations(self):
         all_items = []

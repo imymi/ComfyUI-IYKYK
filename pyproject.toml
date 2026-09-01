@@ -4,8 +4,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "comfyui-iykyk"
-version = "1.1.0-rc3"
-description = "ComfyUI-IYKYK: East Asian Portrait & Aesthetics Prompt Generator & Multi-Rule Conflict Resolver"
+version = "1.1.0-rc6"
+description = "ComfyUI Advanced Japanese/Asian Themed Realistic & SFW/NSFW Prompt Generator with Hierarchical Context Flow"
 readme = "README.md"
 requires-python = ">=3.9"
 authors = [

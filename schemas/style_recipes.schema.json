@@ -1,0 +1,14 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "StyleRecipesDataset",
+  "type": "object",
+  "required": [
+    "recipes"
+  ],
+  "properties": {
+    "recipes": {
+      "type": "array",
+      "minItems": 8
+    }
+  }
+}

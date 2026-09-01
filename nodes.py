@@ -201,16 +201,31 @@ class IYKYKPromptGenerator:
 
         # 槽位 3 & 4: 裸露等级与服装穿脱联动
         nudity_tags, lvl_code = _sampler.sample_nudity(裸露等级, rng)
-        slots["nudity"] = nudity_tags
-        slots["clothing"] = _sampler.sample_clothing_with_nudity_linkage(
+        slots["nudity"] = [
+            PromptFragment(
+                text=t,
+                source_slot="nudity",
+                source_item_id=lvl_code,
+            )
+            for t in nudity_tags
+        ]
+        clothing_tags = _sampler.sample_clothing_with_nudity_linkage(
             服装款式, 服装状态, lvl_code, rng, context=context
         )
+        slots["clothing"] = [
+            PromptFragment(
+                text=t,
+                source_slot="clothing",
+                source_item_id=lvl_code,
+            )
+            for t in clothing_tags
+        ]
 
         # 槽位 5: 光影氛围
-        slots["lighting"] = _sampler.sample_lighting(光影预设, rng)
+        slots["lighting"] = _sampler.sample_lighting(光影预设, rng, nudity_level_code=lvl_code)
 
         # 槽位 6: 姿势动作
-        slots["pose"] = _sampler.sample_pose(姿势动作, rng)
+        slots["pose"] = _sampler.sample_pose(姿势动作, rng, nudity_level_code=lvl_code)
 
         # 槽位 7: 表情眼神
         slots["expression"] = _sampler.sample_expression(情绪表情, rng)

@@ -427,28 +427,137 @@
           "high mandarin collar",
           "silk hugging silhouette curves"
         ],
-        "jk_seifuku": [
-          "neatly worn sailor uniform",
-          "tucked white shirt",
-          "crisp pleated skirt"
+        "hanfu": [
+          "neatly worn traditional hanfu",
+          "cross-collar silk robe",
+          "sash tied at waist"
         ],
-        "ol_suit": [
-          "fitted black blazer",
-          "buttoned-up white blouse",
-          "tight pencil skirt"
+        "modern_chinese": [
+          "fitted modern cheongsam",
+          "mandarin collar",
+          "form-fitting silk silhouette"
         ],
         "kimono": [
           "formal Japanese kimono",
           "tightly tied obi sash",
           "elegant traditional robe"
         ],
+        "yukata": [
+          "neatly wrapped summer yukata",
+          "tight obi belt",
+          "traditional cotton yukata"
+        ],
+        "furisode": [
+          "formal furisode kimono",
+          "tightly bound obi",
+          "long flowing sleeves"
+        ],
+        "jk_seifuku": [
+          "neatly worn sailor uniform",
+          "tucked white shirt",
+          "crisp pleated skirt"
+        ],
+        "blazer_uniform": [
+          "buttoned school blazer",
+          "tucked collared shirt",
+          "neat pleated skirt"
+        ],
+        "gym_uniform": [
+          "fitted gym t-shirt",
+          "classic navy bloomers",
+          "modest athletic wear"
+        ],
+        "hanbok": [
+          "traditional Korean hanbok",
+          "tied jeogori jacket",
+          "voluminous chima skirt"
+        ],
+        "korean_school": [
+          "fitted school uniform blazer",
+          "buttoned collared blouse",
+          "neat pencil skirt"
+        ],
+        "ol_suit": [
+          "fitted black blazer",
+          "buttoned-up white blouse",
+          "tight pencil skirt"
+        ],
+        "nurse_uniform": [
+          "buttoned white nurse dress",
+          "clean nurse uniform",
+          "nurse cap"
+        ],
+        "maid_dress": [
+          "neat French maid dress",
+          "crisp white apron",
+          "buttoned maid uniform"
+        ],
+        "waitress_uniform": [
+          "fitted waitress uniform",
+          "buttoned vest",
+          "neat waist apron"
+        ],
+        "lingerie_lace": [
+          "tight silk camisole",
+          "modest loungewear",
+          "form-fitting silhouette"
+        ],
+        "silk_robe": [
+          "silk robe tightly wrapped with sash tied",
+          "satin loungewear hugging silhouette"
+        ],
+        "camisole_slip": [
+          "fitted silk slip dress",
+          "form-fitting nightgown",
+          "silhouette visible through silk"
+        ],
+        "bikini_micro": [
+          "fitted sporty swimwear",
+          "full coverage rashguard",
+          "tight beachwear"
+        ],
         "one_piece_swimsuit": [
           "tight one-piece swimsuit",
           "compression fabric hugging body curves"
         ],
-        "silk_robe": [
-          "silk robe tightly wrapped with sash tied",
-          "satin slip hugging silhouette"
+        "latex_catsuit": [
+          "glossy black latex catsuit",
+          "fully zipped bodysuit",
+          "form-fitting rubber suit"
+        ],
+        "leather_corset": [
+          "fitted leather vest",
+          "tight laced corset over blouse",
+          "form-fitting leather outfit"
+        ],
+        "bunny_suit": [
+          "tight satin bunny suit",
+          "fully zipped bodice",
+          "bunny ears headband"
+        ],
+        "cheerleader": [
+          "fitted cheerleader uniform",
+          "tucked sleeveless top",
+          "crisp pleated skirt"
+        ],
+        "evening_dress": [
+          "elegant floor-length evening gown",
+          "fitted formal dress",
+          "sleek silhouette"
+        ],
+        "street_casual": [
+          "fitted graphic t-shirt",
+          "denim pants",
+          "casual neat outfit"
+        ],
+        "party_club": [
+          "tight bodycon mini dress",
+          "form-fitting club dress",
+          "silhouette hugging curves"
+        ],
+        "knit_sweater": [
+          "cozy oversized turtleneck knit sweater",
+          "chunky sweater hugging silhouette"
         ]
       }
     },
@@ -464,28 +573,137 @@
       "state_name": "解开1-2颗扣/香肩滑落",
       "style_overrides": {
         "qipao": [
-          "silk qipao with high thigh slit",
+          "silk qipao with thigh slit",
           "bare leg exposed to upper thigh",
           "mandarin collar unbuttoned"
         ],
-        "jk_seifuku": [
-          "sailor collar loosened",
-          "collarbone visible",
-          "pleated miniskirt swaying"
+        "hanfu": [
+          "hanfu cross-collar loosened",
+          "collarbone exposed",
+          "flowing silk robe"
         ],
-        "ol_suit": [
-          "blouse unbuttoned from top, 2 buttons undone",
-          "cleavage peeking",
-          "black pantyhose"
+        "modern_chinese": [
+          "modern qipao with side slit",
+          "collarbone visible",
+          "open neckline"
         ],
         "kimono": [
           "kimono collar loose at neck",
           "bare nape and shoulder revealed",
           "loosened obi sash"
         ],
+        "yukata": [
+          "loose yukata collar",
+          "bare nape exposed",
+          "relaxed obi sash"
+        ],
+        "furisode": [
+          "furisode collar slightly opened",
+          "bare neck and collarbone",
+          "loose obi"
+        ],
+        "jk_seifuku": [
+          "sailor collar loosened",
+          "collarbone visible",
+          "pleated miniskirt swaying"
+        ],
+        "blazer_uniform": [
+          "blazer unbuttoned",
+          "top collar buttons undone",
+          "collarbone peeking"
+        ],
+        "gym_uniform": [
+          "gym t-shirt collar stretched",
+          "collarbone exposed",
+          "high-cut gym bloomers"
+        ],
+        "hanbok": [
+          "jeogori ribbon loosened",
+          "bare neck and collarbone revealed"
+        ],
+        "korean_school": [
+          "school blouse top button undone",
+          "subtle cleavage peeking",
+          "tight skirt"
+        ],
+        "ol_suit": [
+          "blouse unbuttoned from top, 2 buttons undone",
+          "cleavage peeking",
+          "black pantyhose"
+        ],
+        "nurse_uniform": [
+          "nurse dress top button undone",
+          "collarbone visible",
+          "fitted uniform"
+        ],
+        "maid_dress": [
+          "maid dress collar loosened",
+          "strap slipping off shoulder",
+          "frilly apron"
+        ],
+        "waitress_uniform": [
+          "waitress vest unbuttoned",
+          "top blouse buttons undone",
+          "collarbone peeking"
+        ],
+        "lingerie_lace": [
+          "sheer lace robe over bra",
+          "strap slipping off shoulder",
+          "subtle cleavage peeking"
+        ],
         "silk_robe": [
           "silk robe slipping off one shoulder",
           "thin strap slipping down"
+        ],
+        "camisole_slip": [
+          "thin strap slipping off shoulder",
+          "low neckline revealing upper chest"
+        ],
+        "bikini_micro": [
+          "bikini top showing cleavage",
+          "low-rise bikini bottoms",
+          "bare midriff"
+        ],
+        "one_piece_swimsuit": [
+          "deep plunging neckline swimsuit",
+          "high-cut leg opening showing hip"
+        ],
+        "latex_catsuit": [
+          "latex catsuit zipper pulled halfway down",
+          "cleavage peeking from glossy suit"
+        ],
+        "leather_corset": [
+          "leather corset loosened at top",
+          "push-up cleavage exposed",
+          "leather straps"
+        ],
+        "bunny_suit": [
+          "bunny suit neckline dipping low",
+          "cleavage emphasized by corset",
+          "fishnet stockings"
+        ],
+        "cheerleader": [
+          "cheerleader crop top exposing midriff",
+          "bare shoulders",
+          "pleated mini skirt"
+        ],
+        "evening_dress": [
+          "backless evening gown revealing spine",
+          "high leg slit showing thigh"
+        ],
+        "street_casual": [
+          "off-shoulder t-shirt slipping",
+          "bare collarbone and shoulder",
+          "denim shorts"
+        ],
+        "party_club": [
+          "deep V-neck bodycon dress",
+          "cleavage visible",
+          "short hemline riding up"
+        ],
+        "knit_sweater": [
+          "backless knit sweater showing bare back",
+          "sweater slipping off one shoulder"
         ]
       }
     },
@@ -505,22 +723,134 @@
           "sideboob exposed",
           "skirt pulled high on hips showing panties"
         ],
+        "hanfu": [
+          "hanfu robe opened wide at chest",
+          "silk falling off shoulders",
+          "breasts bare waist covered"
+        ],
+        "modern_chinese": [
+          "modern qipao unzipped",
+          "open chest showing bare breasts",
+          "short skirt still on"
+        ],
+        "kimono": [
+          "kimono wide open at chest",
+          "silk robe falling off shoulders",
+          "breasts bare waist covered"
+        ],
+        "yukata": [
+          "yukata untied and open at chest",
+          "bare breasts exposed",
+          "yukata gathered at hips"
+        ],
+        "furisode": [
+          "furisode pulled down to waist",
+          "bare upper body",
+          "silk sleeves cascading at sides"
+        ],
         "jk_seifuku": [
           "sailor top unbuttoned wide showing lace bra",
           "pleated skirt lifted showing panties"
+        ],
+        "blazer_uniform": [
+          "school blouse fully open",
+          "bare breasts exposed",
+          "pleated skirt still on"
+        ],
+        "gym_uniform": [
+          "gym t-shirt pulled up above breasts",
+          "underboob visible",
+          "bloomers on"
+        ],
+        "hanbok": [
+          "jeogori removed",
+          "bare chest above chima skirt",
+          "hanbok gathered at waist"
+        ],
+        "korean_school": [
+          "blouse pulled open",
+          "bra pushed up above breasts",
+          "tight skirt hitched up"
         ],
         "ol_suit": [
           "blouse fully unbuttoned hanging open over black lace bra",
           "tight pencil skirt hitched up"
         ],
-        "kimono": [
-          "kimono wide open at chest",
-          "silk robe falling off shoulders showing bra"
+        "nurse_uniform": [
+          "nurse uniform unzipped to waist",
+          "bare breasts exposed",
+          "white skirt on hips"
+        ],
+        "maid_dress": [
+          "maid dress pulled down to waist",
+          "bare breasts exposed",
+          "frilly apron framing hips"
+        ],
+        "waitress_uniform": [
+          "waitress shirt opened wide",
+          "bra unclasped",
+          "skirt hitched up showing panties"
+        ],
+        "lingerie_lace": [
+          "bra unhooked hanging loose",
+          "bare breasts exposed",
+          "lace panties on"
         ],
         "silk_robe": [
           "silk nightgown falling open",
           "sheer lace bra exposed underneath",
           "robe sliding down"
+        ],
+        "camisole_slip": [
+          "slip dress pulled down to waist",
+          "topless with satin slip on hips"
+        ],
+        "bikini_micro": [
+          "bikini top removed and held in hand",
+          "topless",
+          "tiny bikini bottoms still on"
+        ],
+        "one_piece_swimsuit": [
+          "swimsuit top pulled down to waist",
+          "bare breasts exposed",
+          "swimsuit gathered at hips"
+        ],
+        "latex_catsuit": [
+          "latex bodysuit unzipped to navel",
+          "bare breasts bursting from glossy rubber"
+        ],
+        "leather_corset": [
+          "corset cups pulled down",
+          "bare breasts exposed above leather laces"
+        ],
+        "bunny_suit": [
+          "bunny corset pulled down",
+          "bare breasts exposed",
+          "bunny ears and fishnets on"
+        ],
+        "cheerleader": [
+          "cheerleader top lifted above breasts",
+          "bare breasts",
+          "mini skirt still on"
+        ],
+        "evening_dress": [
+          "evening gown bodice pulled down",
+          "topless with dress pooled at waist"
+        ],
+        "street_casual": [
+          "t-shirt lifted to neck",
+          "bare breasts exposed",
+          "denim shorts unbuttoned"
+        ],
+        "party_club": [
+          "bodycon dress pulled down to waist",
+          "bare breasts exposed",
+          "dress tight on hips"
+        ],
+        "knit_sweater": [
+          "chunky knit sweater lifted above breasts",
+          "bare chest",
+          "sweater bunched at chest"
         ]
       }
     },
@@ -541,11 +871,57 @@
           "bare breasts exposed",
           "silk dress gathered at hips"
         ],
+        "hanfu": [
+          "hanfu discarded except thin silk sash",
+          "topless",
+          "only silk panties remaining"
+        ],
+        "modern_chinese": [
+          "modern qipao removed",
+          "just lace panties and silk stockings",
+          "topless"
+        ],
+        "kimono": [
+          "kimono bunched at waist",
+          "upper body completely bare",
+          "silk robe framing hips"
+        ],
+        "yukata": [
+          "yukata loose around hips",
+          "topless",
+          "bare breasts",
+          "only underwear remaining"
+        ],
+        "furisode": [
+          "furisode dropped to floor",
+          "topless with only silk panties and tabi socks"
+        ],
         "jk_seifuku": [
           "topless",
-          "sailor uniform shirt pulled down",
+          "sailor uniform shirt removed",
           "bare breasts",
           "pleated skirt still on"
+        ],
+        "blazer_uniform": [
+          "topless",
+          "blazer and shirt removed",
+          "only pleated miniskirt and thigh-high socks"
+        ],
+        "gym_uniform": [
+          "topless",
+          "gym t-shirt discarded",
+          "only navy bloomers remaining",
+          "bare chest"
+        ],
+        "hanbok": [
+          "topless",
+          "jeogori removed",
+          "only silk undergarments and stockings remaining"
+        ],
+        "korean_school": [
+          "topless",
+          "blouse removed",
+          "tight pencil skirt and black pantyhose"
         ],
         "ol_suit": [
           "blouse completely removed",
@@ -554,15 +930,89 @@
           "tight pencil skirt still on",
           "black stockings"
         ],
-        "kimono": [
-          "kimono bunched at waist",
-          "upper body completely bare",
-          "silk robe framing hips"
+        "nurse_uniform": [
+          "topless",
+          "nurse dress undone at waist",
+          "bare breasts",
+          "white thigh-high stockings"
+        ],
+        "maid_dress": [
+          "topless",
+          "maid dress pulled down",
+          "bare breasts",
+          "white stockings and apron at waist"
+        ],
+        "waitress_uniform": [
+          "topless",
+          "waitress blouse removed",
+          "only fitted skirt and stockings"
+        ],
+        "lingerie_lace": [
+          "topless",
+          "only black lace panties and garter belt remaining",
+          "thigh-high stockings"
         ],
         "silk_robe": [
           "topless",
           "satin robe gathered around waist",
           "bare breasts completely exposed"
+        ],
+        "camisole_slip": [
+          "topless",
+          "slip dress pulled down to ankles",
+          "only tiny lace panties remaining"
+        ],
+        "bikini_micro": [
+          "topless",
+          "bikini top removed",
+          "only micro string bikini bottoms remaining"
+        ],
+        "one_piece_swimsuit": [
+          "swimsuit peeled down to thighs",
+          "topless",
+          "bare breasts and torso"
+        ],
+        "latex_catsuit": [
+          "latex catsuit stripped to waist",
+          "topless",
+          "bare breasts over glossy latex pants"
+        ],
+        "leather_corset": [
+          "topless",
+          "corset removed",
+          "only leather garter straps and thigh-high stockings"
+        ],
+        "bunny_suit": [
+          "topless",
+          "bunny bodice pulled down",
+          "only fishnet tights and high heels"
+        ],
+        "cheerleader": [
+          "topless",
+          "cheerleader crop top discarded",
+          "only pleated skirt and knee socks"
+        ],
+        "evening_dress": [
+          "evening dress fallen to hips",
+          "topless",
+          "bare breasts",
+          "silk fabric gathered at waist"
+        ],
+        "street_casual": [
+          "topless",
+          "t-shirt removed",
+          "only denim shorts unbuttoned and sneakers"
+        ],
+        "party_club": [
+          "bodycon dress bunched at waist",
+          "topless",
+          "bare breasts",
+          "dress tight on thighs"
+        ],
+        "knit_sweater": [
+          "topless",
+          "knit sweater pulled off",
+          "only lace panties and knee-high socks"
         ]
       }
     },
@@ -583,11 +1033,57 @@
           "fully bare body",
           "bare skin"
         ],
+        "hanfu": [
+          "completely nude",
+          "flowing hanfu draped over screen in background",
+          "bare skin glowing"
+        ],
+        "modern_chinese": [
+          "fully bare body",
+          "modern qipao tossed aside on chair",
+          "completely naked"
+        ],
+        "kimono": [
+          "kimono spread on tatami floor as backdrop",
+          "completely nude body",
+          "bare skin glowing"
+        ],
+        "yukata": [
+          "completely naked",
+          "summer yukata pooled on floor",
+          "fully nude body",
+          "bare skin"
+        ],
+        "furisode": [
+          "furisode spread across bed",
+          "completely naked body lying on silk",
+          "bare skin glowing"
+        ],
         "jk_seifuku": [
           "fully nude",
           "sailor uniform and skirt tossed aside on desk",
           "completely bare skin",
           "loose socks"
+        ],
+        "blazer_uniform": [
+          "completely naked",
+          "school blazer and skirt discarded on chair",
+          "fully bare skin"
+        ],
+        "gym_uniform": [
+          "completely naked",
+          "gym clothes scattered beside gym mat",
+          "fully nude body"
+        ],
+        "hanbok": [
+          "fully nude body",
+          "silk hanbok draped over wooden chest",
+          "completely naked"
+        ],
+        "korean_school": [
+          "completely naked",
+          "uniform discarded on bed",
+          "fully bare glowing skin"
         ],
         "ol_suit": [
           "all clothes removed",
@@ -595,14 +1091,85 @@
           "completely naked body",
           "black high heels"
         ],
-        "kimono": [
-          "kimono spread on tatami floor as backdrop",
-          "completely nude body",
+        "nurse_uniform": [
+          "fully nude",
+          "white nurse uniform hung on medical screen",
+          "completely naked body"
+        ],
+        "maid_dress": [
+          "completely naked",
+          "maid dress and apron tossed aside on sofa",
+          "fully bare body"
+        ],
+        "waitress_uniform": [
+          "completely nude",
+          "waitress uniform discarded on counter",
           "bare skin glowing"
+        ],
+        "lingerie_lace": [
+          "completely naked",
+          "lace lingerie set scattered on bed sheets",
+          "fully bare skin"
         ],
         "silk_robe": [
           "completely naked on bed sheets",
           "silk nightie cast aside on floor"
+        ],
+        "camisole_slip": [
+          "completely nude",
+          "silk slip dress tossed beside bed",
+          "fully bare body"
+        ],
+        "bikini_micro": [
+          "completely naked",
+          "micro bikini discarded on beach towel",
+          "fully bare sun-kissed skin"
+        ],
+        "one_piece_swimsuit": [
+          "fully nude body",
+          "wet swimsuit tossed on poolside deck",
+          "completely naked"
+        ],
+        "latex_catsuit": [
+          "completely naked",
+          "glossy latex catsuit peeled off on floor",
+          "bare skin glowing"
+        ],
+        "leather_corset": [
+          "completely nude",
+          "leather corset and straps discarded on bed",
+          "fully bare skin"
+        ],
+        "bunny_suit": [
+          "completely naked",
+          "bunny suit discarded on chair",
+          "bare skin glowing",
+          "bunny ears on head"
+        ],
+        "cheerleader": [
+          "completely naked",
+          "cheerleader uniform tossed on bleachers",
+          "fully nude body"
+        ],
+        "evening_dress": [
+          "completely nude",
+          "silk evening gown pooled at feet",
+          "fully bare glowing body"
+        ],
+        "street_casual": [
+          "completely naked",
+          "clothes scattered on bedroom floor",
+          "fully bare skin"
+        ],
+        "party_club": [
+          "completely naked",
+          "club mini dress tossed aside on bed",
+          "fully bare body"
+        ],
+        "knit_sweater": [
+          "completely naked",
+          "chunky knit sweater discarded beside pillow",
+          "bare skin glowing"
         ]
       }
     },
@@ -623,11 +1190,62 @@
           "bare pussy visible",
           "silk qipao cast aside"
         ],
+        "hanfu": [
+          "intimate close-up",
+          "spread legs on silk bed",
+          "bare pussy visible",
+          "hanfu open underneath"
+        ],
+        "modern_chinese": [
+          "erotic close-up",
+          "legs spread wide",
+          "bare pussy displayed",
+          "qipao cast aside"
+        ],
+        "kimono": [
+          "erotic close-up",
+          "spread legs on tatami",
+          "bare pussy visible",
+          "kimono open underneath"
+        ],
+        "yukata": [
+          "erotic close-up",
+          "spread legs",
+          "bare pussy visible",
+          "yukata untied and open"
+        ],
+        "furisode": [
+          "intimate macro detail",
+          "spread legs on silk futon",
+          "bare pussy visible"
+        ],
         "jk_seifuku": [
           "erotic macro detail",
           "spread legs",
           "bare pussy visible",
           "sailor uniform tossed aside"
+        ],
+        "blazer_uniform": [
+          "erotic close-up",
+          "spread legs on desk",
+          "bare pussy visible",
+          "uniform discarded"
+        ],
+        "gym_uniform": [
+          "erotic close-up",
+          "legs spread wide on gym mat",
+          "bare pussy visible"
+        ],
+        "hanbok": [
+          "erotic close-up",
+          "spread legs on traditional bedding",
+          "bare pussy visible"
+        ],
+        "korean_school": [
+          "intimate close-up",
+          "spread legs",
+          "bare pussy visible",
+          "uniform cast aside"
         ],
         "ol_suit": [
           "intimate close-up",
@@ -635,13 +1253,346 @@
           "bare pussy visible",
           "pencil skirt and stockings discarded"
         ],
-        "kimono": [
+        "nurse_uniform": [
           "erotic close-up",
-          "spread legs on tatami",
+          "spread legs on examination bed",
+          "bare pussy visible"
+        ],
+        "maid_dress": [
+          "erotic close-up",
+          "spread legs on sofa",
           "bare pussy visible",
-          "kimono open underneath"
+          "maid apron cast aside"
+        ],
+        "waitress_uniform": [
+          "intimate close-up",
+          "spread legs on booth seat",
+          "bare pussy visible"
+        ],
+        "lingerie_lace": [
+          "erotic close-up",
+          "spread legs on bed",
+          "bare pussy visible",
+          "lingerie discarded"
+        ],
+        "silk_robe": [
+          "erotic close-up",
+          "spread legs on silk sheets",
+          "bare pussy visible",
+          "robe spread open"
+        ],
+        "camisole_slip": [
+          "intimate close-up",
+          "legs spread wide",
+          "bare pussy visible",
+          "slip dress cast aside"
+        ],
+        "bikini_micro": [
+          "erotic close-up",
+          "spread legs on sunbed",
+          "bare pussy visible",
+          "bikini removed"
+        ],
+        "one_piece_swimsuit": [
+          "erotic close-up",
+          "spread legs on pool edge",
+          "bare pussy visible"
+        ],
+        "latex_catsuit": [
+          "erotic close-up",
+          "spread legs",
+          "bare pussy visible",
+          "latex suit peeled open"
+        ],
+        "leather_corset": [
+          "erotic close-up",
+          "spread legs on leather sofa",
+          "bare pussy visible"
+        ],
+        "bunny_suit": [
+          "erotic close-up",
+          "spread legs",
+          "bare pussy visible",
+          "bunny costume cast aside"
+        ],
+        "cheerleader": [
+          "erotic close-up",
+          "spread legs on locker room bench",
+          "bare pussy visible"
+        ],
+        "evening_dress": [
+          "erotic close-up",
+          "spread legs on hotel bed",
+          "bare pussy visible",
+          "evening dress discarded"
+        ],
+        "street_casual": [
+          "intimate close-up",
+          "legs spread wide open",
+          "bare pussy displayed"
+        ],
+        "party_club": [
+          "erotic close-up",
+          "spread legs in VIP room",
+          "bare pussy visible",
+          "dress pulled off"
+        ],
+        "knit_sweater": [
+          "erotic close-up",
+          "spread legs on futon",
+          "bare pussy visible",
+          "sweater tossed aside"
         ]
       }
+    }
+  },
+  "sfw_exposure_tiers": [
+    {
+      "id": "collar_cutout",
+      "name_zh": "领口镂空 (轻度)",
+      "tags": [
+        "longitudinal cutout neckline exposing collarbones and upper chest"
+      ]
+    },
+    {
+      "id": "off_shoulder",
+      "name_zh": "露肩 (轻中度)",
+      "tags": [
+        "off-shoulder cut",
+        "bare shoulders and upper scapula exposed"
+      ]
+    },
+    {
+      "id": "subtle_cleavage",
+      "name_zh": "乳沟浅露 (中度)",
+      "tags": [
+        "plunging neckline",
+        "subtle cleavage line visible"
+      ]
+    },
+    {
+      "id": "high_slit",
+      "name_zh": "高开衩露腿 (中度)",
+      "tags": [
+        "high side slit to upper thigh exposing long bare leg"
+      ]
+    },
+    {
+      "id": "waist_cutouts",
+      "name_zh": "腰部镂空 (重度)",
+      "tags": [
+        "side waist cutouts from ribs to hip bone"
+      ]
+    },
+    {
+      "id": "crop_midriff",
+      "name_zh": "露腰露腹 (重度)",
+      "tags": [
+        "crop cut exposing flat toned midriff and navel"
+      ]
+    },
+    {
+      "id": "multipoint_cutout",
+      "name_zh": "大面积镂空 (极重)",
+      "tags": [
+        "multi-point openwork cutouts across shoulders, back, and waist"
+      ]
+    },
+    {
+      "id": "plunging_backless",
+      "name_zh": "极致大露背 (极重)",
+      "tags": [
+        "plunging backless design down to lower spine and waist"
+      ]
+    },
+    {
+      "id": "open_sides",
+      "name_zh": "侧缝全开 (极限)",
+      "tags": [
+        "open side seams from underarm to hip, skin exposed at sides"
+      ]
+    }
+  ],
+  "cloth_transparency_tiers": [
+    {
+      "id": "sheer_chiffon",
+      "name_zh": "薄纱微透 (轻度)",
+      "tags": [
+        "sheer chiffon fabric with gentle skin silhouette visible"
+      ]
+    },
+    {
+      "id": "semi_translucent",
+      "name_zh": "半透朦胧 (轻中度)",
+      "tags": [
+        "semi-translucent fabric creating hazy skin contours"
+      ]
+    },
+    {
+      "id": "backlit_translucent",
+      "name_zh": "逆光透影 (中度)",
+      "tags": [
+        "backlit translucent fabric outlining body curves"
+      ]
+    },
+    {
+      "id": "high_translucent",
+      "name_zh": "通透显影 (重度)",
+      "tags": [
+        "highly translucent fabric clearly revealing silhouette underneath"
+      ]
+    },
+    {
+      "id": "ultra_gossamer",
+      "name_zh": "极致透薄 (极重)",
+      "tags": [
+        "ultra-thin gossamer fabric with glowing body contours"
+      ]
+    }
+  ],
+  "lingerie_wardrobe": [
+    {
+      "id": "sheer_mesh",
+      "name_zh": "薄透透视",
+      "tags": [
+        "sheer mesh babydoll nightie",
+        "translucent lace cups",
+        "gauzy sheer lingerie"
+      ]
+    },
+    {
+      "id": "lace_cutout",
+      "name_zh": "蕾丝镂空",
+      "tags": [
+        "intricate floral lace lingerie set",
+        "cutout lace teddy",
+        "scalloped lace trim"
+      ]
+    },
+    {
+      "id": "three_point",
+      "name_zh": "三点式",
+      "tags": [
+        "micro triangle bra set",
+        "string halter bikini underwear",
+        "strappy three-point set"
+      ]
+    },
+    {
+      "id": "bodystocking",
+      "name_zh": "连体连袜",
+      "tags": [
+        "full bodystocking",
+        "sheer seamless body tights",
+        "crotchless bodystocking"
+      ]
+    },
+    {
+      "id": "crotchless_free",
+      "name_zh": "开裆免脱",
+      "tags": [
+        "open-gusset lace panties",
+        "crotchless lingerie teddy",
+        "convenient open cutout"
+      ]
+    },
+    {
+      "id": "garter_stockings",
+      "name_zh": "吊袜袜装",
+      "tags": [
+        "satin garter belt set",
+        "sheer thigh-high stockings with lace top",
+        "attached garter straps"
+      ]
+    },
+    {
+      "id": "corset_cincher",
+      "name_zh": "束身束缚",
+      "tags": [
+        "boned underbust corset",
+        "laced waist cincher",
+        "tightly cinched satin bustier"
+      ]
+    },
+    {
+      "id": "cosplay_maid_bunny",
+      "name_zh": "制服角色",
+      "tags": [
+        "erotic maid lingerie costume",
+        "satin bunny suit lingerie",
+        "nurse roleplay lingerie"
+      ]
+    },
+    {
+      "id": "oriental_cheongsam",
+      "name_zh": "国风旗袍",
+      "tags": [
+        "sheer silk erotic qipao",
+        "mandarin collar open-chest lingerie",
+        "high slit sheer cheongsam"
+      ]
+    },
+    {
+      "id": "leather_latex",
+      "name_zh": "皮装乳胶",
+      "tags": [
+        "glossy black latex lingerie",
+        "strappy leather harness bra",
+        "shiny vinyl undergarment"
+      ]
+    }
+  ],
+  "extension_policy": {
+    "L2": {
+      "exposure_ids": [
+        "collar_cutout",
+        "off_shoulder",
+        "subtle_cleavage",
+        "high_slit"
+      ],
+      "transparency_ids": [
+        "sheer_chiffon",
+        "semi_translucent"
+      ]
+    },
+    "L3": {
+      "exposure_ids": [
+        "high_slit",
+        "waist_cutouts",
+        "crop_midriff",
+        "multipoint_cutout",
+        "plunging_backless",
+        "open_sides"
+      ],
+      "transparency_ids": [
+        "semi_translucent",
+        "backlit_translucent",
+        "high_translucent"
+      ]
+    },
+    "L4": {
+      "exposure_ids": [
+        "multipoint_cutout",
+        "plunging_backless",
+        "open_sides"
+      ],
+      "transparency_ids": [
+        "backlit_translucent",
+        "high_translucent",
+        "ultra_gossamer"
+      ],
+      "wardrobe_ids": [
+        "sheer_mesh",
+        "lace_cutout",
+        "three_point",
+        "bodystocking",
+        "crotchless_free",
+        "garter_stockings",
+        "corset_cincher",
+        "cosplay_maid_bunny",
+        "oriental_cheongsam",
+        "leather_latex"
+      ]
     }
   }
 }

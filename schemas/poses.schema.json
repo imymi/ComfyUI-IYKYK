@@ -1,0 +1,14 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "PosesDataset",
+  "type": "object",
+  "required": [
+    "pose_categories"
+  ],
+  "properties": {
+    "pose_categories": {
+      "type": "array",
+      "minItems": 5
+    }
+  }
+}

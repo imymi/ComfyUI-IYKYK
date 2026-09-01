@@ -131,6 +131,71 @@
         "coral glossy lips",
         "warm golden shimmer on lids"
       ]
+    },
+    {
+      "id": "sweet_peach_milk",
+      "name_zh": "甜妹蜜桃草莓妆 (Sweet Peach Milk Tea Glow)",
+      "tags": [
+        "peach blush blended across apple cheeks",
+        "shimmering pink eyeshadow",
+        "glossy plump lip tint",
+        "curled lashes",
+        "nose tip highlight"
+      ]
+    },
+    {
+      "id": "drunken_milky_youth",
+      "name_zh": "奶醉幼态妆 (Drunken Milky Blush & Aegyo Sal)",
+      "tags": [
+        "milky translucent base",
+        "under-eye drunken blush",
+        "downturned doe-eyed eyeliner",
+        "defined puffy aegyo sal highlights",
+        "plump gradient pout"
+      ]
+    },
+    {
+      "id": "clear_water_bare",
+      "name_zh": "清透白开水妆 (Clear Dewy Water Bare Makeup)",
+      "tags": [
+        "low-saturation clear glass skin",
+        "soft apricot neutral eyeshadow",
+        "minimal subtle eyeliner",
+        "sheer nude lip gloss",
+        "clean aesthetic look"
+      ]
+    },
+    {
+      "id": "chinese_vermilion",
+      "name_zh": "古风黛眉朱唇 (Classical Chinese Vermilion & Willow Brow)",
+      "tags": [
+        "delicate arched willow brows",
+        "slender winged phoenix eyeliner",
+        "crimson vermilion lip stain",
+        "subtle rouge gradient on outer eyes",
+        "forehead huadian flower mark"
+      ]
+    },
+    {
+      "id": "pure_desire_white_peach",
+      "name_zh": "白桃纯欲妆 (Pure Desire White Peach Glam)",
+      "tags": [
+        "diffused under-eye flush",
+        "hydrated dewy jelly lips",
+        "soft pearl highlighter on inner eye corners",
+        "youthful innocent charm"
+      ]
+    },
+    {
+      "id": "asian_hybrid_contour",
+      "name_zh": "网感亚裔混血妆 (Asian Hybrid Sculpted Glam)",
+      "tags": [
+        "sculpted eye socket contouring",
+        "sharp cat-eye eyeliner",
+        "radiant cheekbone highlighter",
+        "nude peach satin lips",
+        "fluffy defined brows"
+      ]
     }
   ]
 }

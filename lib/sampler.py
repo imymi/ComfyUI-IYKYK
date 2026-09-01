@@ -50,94 +50,142 @@ def _is_auto(val: Any) -> bool:
     return s in ("auto", "自动", "自动 (auto)", "auto (自动)", "自动联动裸露等级 (auto link nudity)", "自动联动裸露等级")
 
 
-# 8 大情境亲和度映射表（基于项目 24 场景与 15 专项规范）
+# 全量 14 大情境亲和度映射表（基于项目 24 场景分类与 15 槽位交叉规范）
 CONTEXT_AFFINITY = {
     "school": {
         "clothing": ["jk_seifuku", "blazer_uniform", "gym_uniform", "korean_school"],
         "characters": ["jk_schoolgirl", "strict_teacher"],
-        "makeup": ["natural_pure", "cute_peachy"],
+        "makeup": ["natural_pure", "cute_peachy", "sweet_peach_milk", "clear_water_bare"],
         "hairstyles": ["twin_tails", "high_ponytail", "long_straight_black", "braided_twins", "bob_cut"],
-        "props": ["glasses_reading", "smartphone_recording", "sex_toy_vibrator"],
         "headwear_jewelry": ["ribbon_bow", "gold_collarbone_chain"],
+        "props": ["glasses_reading", "smartphone_recording", "sex_toy_vibrator", "plush_doll_teddy"],
+        "liquids": ["sweat_glistening", "none"],
     },
     "office": {
-        "clothing": ["ol_suit", "evening_dress", "street_casual"],
+        "clothing": ["ol_suit", "knit_sweater", "evening_dress", "street_casual"],
         "characters": ["ol_subordinate", "female_boss", "strict_teacher"],
-        "makeup": ["mature_wife", "sultry_smoky", "natural_pure"],
+        "makeup": ["mature_wife", "sultry_smoky", "natural_pure", "asian_hybrid_contour"],
         "hairstyles": ["low_ponytail", "collarbone_lob", "big_wavy_curls", "messy_bun"],
-        "props": ["glasses_reading", "wine_glass_bottle", "smartphone_recording"],
         "headwear_jewelry": ["pearl_necklace", "gold_collarbone_chain", "leather_choker"],
-    },
-    "domestic": {
-        "clothing": ["silk_robe", "camisole_slip", "lingerie_lace", "knit_sweater", "street_casual"],
-        "characters": ["married_housewife", "neighbor_girlfriend"],
-        "makeup": ["mature_wife", "natural_pure", "climax_flush"],
-        "hairstyles": ["messy_bedhead", "messy_bun", "long_straight_black", "hair_over_breast"],
-        "props": ["cute_cat_on_bed", "pillow_clutching", "wine_glass_bottle", "rose_petals_candles"],
-        "headwear_jewelry": ["gold_collarbone_chain", "ribbon_bow"],
-    },
-    "onsen_bath": {
-        "clothing": ["yukata", "kimono", "one_piece_swimsuit", "bikini_micro"],
-        "characters": ["married_housewife", "neighbor_girlfriend", "gravure_idol"],
-        "makeup": ["wet_dewy", "natural_pure", "climax_flush"],
-        "hairstyles": ["wet_hair_face", "messy_bun", "low_ponytail"],
-        "liquids": ["wet_water_drops", "sweat_glistening"],
-        "props": ["wine_glass_bottle", "ice_cubes"],
-        "headwear_jewelry": ["gold_collarbone_chain", "pearl_necklace"],
-    },
-    "nightlife": {
-        "clothing": ["party_club", "bunny_suit", "lingerie_lace", "latex_catsuit"],
-        "characters": ["hostess_cabaret", "gravure_idol"],
-        "makeup": ["sultry_smoky", "climax_flush", "ruined_crying"],
-        "hairstyles": ["big_wavy_curls", "twin_tails", "hime_cut", "hair_in_mouth"],
-        "props": ["wine_glass_bottle", "sex_toy_vibrator", "smartphone_recording"],
-        "headwear_jewelry": ["leather_choker", "body_chain", "bunny_ears"],
-    },
-    "bondage_sm": {
-        "clothing": ["latex_catsuit", "leather_corset", "lingerie_lace", "panties_only"],
-        "characters": ["french_maid", "ol_subordinate", "female_boss"],
-        "makeup": ["submissive_marked", "ruined_crying", "climax_flush"],
-        "hairstyles": ["messy_bedhead", "twin_tails", "hair_in_mouth"],
-        "tattoos": ["lewd_womb_pubic", "barcode_serial_number", "tally_marks_inner_thigh"],
-        "props": ["bondage_rope_collar", "sex_toy_vibrator", "ice_cubes"],
-        "headwear_jewelry": ["leather_choker", "lace_blindfold", "nipple_rings", "body_chain"],
-    },
-    "traditional": {
-        "clothing": ["kimono", "yukata", "qipao", "hanfu", "furisode", "modern_chinese"],
-        "characters": ["married_housewife", "neighbor_girlfriend"],
-        "makeup": ["vintage_retro", "natural_pure", "mature_wife"],
-        "hairstyles": ["long_straight_black", "hime_cut", "low_ponytail"],
-        "tattoos": ["japanese_irezumi_dragon", "cherry_blossom_shoulder"],
-        "props": ["wine_glass_bottle", "rose_petals_candles"],
-        "headwear_jewelry": ["pearl_necklace", "gold_collarbone_chain"],
+        "props": ["glasses_reading", "wine_glass_bottle", "smartphone_recording", "digital_camera_record"],
+        "liquids": ["sweat_glistening", "none"],
     },
     "medical": {
         "clothing": ["nurse_uniform"],
         "characters": ["kind_nurse"],
-        "makeup": ["natural_pure", "cute_peachy"],
-        "hairstyles": ["low_ponytail", "bob_cut", "twin_tails"],
-        "props": ["glasses_reading", "smartphone_recording"],
+        "makeup": ["natural_pure", "cute_peachy", "clear_water_bare"],
+        "hairstyles": ["low_ponytail", "bob_cut", "twin_tails", "messy_bun"],
         "headwear_jewelry": ["nurse_cap"],
+        "props": ["glasses_reading", "smartphone_recording"],
+        "liquids": ["sweat_glistening", "body_oil_lube"],
+    },
+    "onsen_bath": {
+        "clothing": ["yukata", "kimono", "one_piece_swimsuit", "bikini_micro"],
+        "characters": ["married_housewife", "neighbor_girlfriend", "gravure_idol"],
+        "makeup": ["wet_dewy", "natural_pure", "climax_flush", "drunken_milky_youth"],
+        "hairstyles": ["wet_hair_face", "messy_bun", "low_ponytail"],
+        "headwear_jewelry": ["gold_collarbone_chain", "pearl_necklace", "ankle_bracelet"],
+        "props": ["wine_glass_bottle", "ice_cubes", "rose_petals_candles"],
+        "liquids": ["wet_water_drops", "sweat_glistening"],
+    },
+    "bondage_sm": {
+        "clothing": ["latex_catsuit", "leather_corset", "lingerie_lace"],
+        "characters": ["french_maid", "ol_subordinate", "female_boss"],
+        "makeup": ["submissive_marked", "ruined_crying", "climax_flush", "gothic_dark"],
+        "hairstyles": ["messy_bedhead", "twin_tails", "hair_in_mouth"],
+        "headwear_jewelry": ["leather_choker", "lace_blindfold", "nipple_rings", "body_chain"],
+        "tattoos": ["lewd_womb_pubic", "barcode_serial_number", "tally_marks_inner_thigh"],
+        "props": ["bondage_rope_collar", "sex_toy_vibrator", "ice_cubes"],
+        "liquids": ["saliva_drool", "sweat_glistening", "cum_splatter", "body_oil_lube"],
+    },
+    "traditional": {
+        "clothing": ["kimono", "yukata", "furisode", "qipao", "hanfu", "modern_chinese", "hanbok"],
+        "characters": ["married_housewife", "neighbor_girlfriend"],
+        "makeup": ["vintage_retro", "chinese_vermilion", "natural_pure", "mature_wife"],
+        "hairstyles": ["long_straight_black", "hime_cut", "low_ponytail", "braided_twins"],
+        "headwear_jewelry": ["pearl_necklace", "gold_collarbone_chain", "ribbon_bow"],
+        "tattoos": ["japanese_irezumi_dragon", "cherry_blossom_shoulder"],
+        "props": ["oriental_fan_umbrella", "wine_glass_bottle", "flower_bouquet_petals"],
+        "liquids": ["sweat_glistening", "none"],
+    },
+    "nightlife": {
+        "clothing": ["bunny_suit", "party_club", "lingerie_lace", "latex_catsuit", "evening_dress"],
+        "characters": ["hostess_cabaret", "gravure_idol"],
+        "makeup": ["sultry_smoky", "climax_flush", "ruined_crying", "gothic_dark"],
+        "hairstyles": ["big_wavy_curls", "twin_tails", "hime_cut", "hair_in_mouth"],
+        "headwear_jewelry": ["leather_choker", "body_chain", "bunny_ears", "cat_ears"],
+        "props": ["wine_glass_bottle", "sex_toy_vibrator", "smartphone_recording", "digital_camera_record"],
+        "liquids": ["sweat_glistening", "saliva_drool"],
+    },
+    "domestic": {
+        "clothing": ["silk_robe", "camisole_slip", "knit_sweater", "street_casual", "lingerie_lace"],
+        "characters": ["married_housewife", "neighbor_girlfriend"],
+        "makeup": ["mature_wife", "natural_pure", "climax_flush", "pure_desire_white_peach"],
+        "hairstyles": ["messy_bedhead", "messy_bun", "long_straight_black", "hair_over_breast"],
+        "headwear_jewelry": ["gold_collarbone_chain", "ribbon_bow", "ankle_bracelet"],
+        "props": ["cute_cat_on_bed", "pillow_clutching", "game_controller", "wine_glass_bottle", "rose_petals_candles"],
+        "liquids": ["sweat_glistening", "saliva_drool"],
+    },
+    "transit": {
+        "clothing": ["jk_seifuku", "blazer_uniform", "ol_suit", "street_casual", "knit_sweater"],
+        "characters": ["jk_schoolgirl", "ol_subordinate", "neighbor_girlfriend"],
+        "makeup": ["natural_pure", "cute_peachy", "climax_flush"],
+        "hairstyles": ["low_ponytail", "high_ponytail", "long_straight_black", "collarbone_lob"],
+        "headwear_jewelry": ["gold_collarbone_chain", "ribbon_bow"],
+        "props": ["smartphone_recording", "glasses_reading"],
+        "liquids": ["sweat_glistening", "none"],
+    },
+    "outdoor": {
+        "clothing": ["bikini_micro", "one_piece_swimsuit", "street_casual", "gym_uniform", "cheerleader"],
+        "characters": ["gravure_idol", "neighbor_girlfriend"],
+        "makeup": ["natural_pure", "cute_peachy", "wet_dewy", "sun_kissed"],
+        "hairstyles": ["high_ponytail", "twin_tails", "space_buns", "messy_bun"],
+        "headwear_jewelry": ["ribbon_bow", "gold_collarbone_chain", "ankle_bracelet"],
+        "props": ["camera_tripod_flash", "oriental_fan_umbrella", "smartphone_recording", "flower_bouquet_petals"],
+        "liquids": ["wet_water_drops", "sweat_glistening"],
+    },
+    "dining": {
+        "clothing": ["maid_dress", "waitress_uniform", "street_casual", "qipao", "kimono"],
+        "characters": ["french_maid", "neighbor_girlfriend", "ol_subordinate", "married_housewife"],
+        "makeup": ["cute_peachy", "natural_pure", "mature_wife", "sweet_peach_milk"],
+        "hairstyles": ["messy_bun", "collarbone_lob", "twin_tails", "bob_cut"],
+        "headwear_jewelry": ["maid_headdress", "pearl_necklace", "gold_collarbone_chain"],
+        "props": ["wine_glass_bottle", "glasses_reading", "smartphone_recording"],
+        "liquids": ["none", "sweat_glistening"],
+    },
+    "adult": {
+        "clothing": ["bunny_suit", "maid_dress", "latex_catsuit", "leather_corset", "bikini_micro", "lingerie_lace"],
+        "characters": ["hostess_cabaret", "gravure_idol", "french_maid"],
+        "makeup": ["sultry_smoky", "climax_flush", "ruined_crying", "submissive_marked"],
+        "hairstyles": ["twin_tails", "big_wavy_curls", "wet_hair_face", "hair_in_mouth"],
+        "headwear_jewelry": ["bunny_ears", "cat_ears", "maid_headdress", "lace_blindfold", "leather_choker", "nipple_rings", "body_chain"],
+        "tattoos": ["lewd_womb_pubic", "barcode_serial_number", "tally_marks_inner_thigh", "butterfly_lower_back"],
+        "props": ["sex_toy_vibrator", "camera_tripod_flash", "bondage_rope_collar", "ice_cubes"],
+        "liquids": ["pussy_juice", "cum_splatter", "body_oil_lube", "saliva_drool"],
+    },
+    "special": {
+        "clothing": ["latex_catsuit", "leather_corset", "lingerie_lace"],
+        "characters": ["female_boss", "kind_nurse", "strict_teacher"],
+        "makeup": ["submissive_marked", "sultry_smoky", "ruined_crying", "gothic_dark"],
+        "hairstyles": ["hime_cut", "long_straight_black", "messy_bedhead"],
+        "headwear_jewelry": ["leather_choker", "lace_blindfold", "body_chain"],
+        "tattoos": ["barcode_serial_number", "snake_coiling", "spine_vertical_script"],
+        "props": ["bondage_rope_collar", "camera_tripod_flash", "sex_toy_vibrator"],
+        "liquids": ["saliva_drool", "sweat_glistening", "cum_splatter"],
+    },
+    "generic": {
+        "clothing": ["street_casual", "knit_sweater", "camisole_slip", "silk_robe"],
+        "characters": ["neighbor_girlfriend", "married_housewife", "jk_schoolgirl"],
+        "makeup": ["natural_pure", "cute_peachy", "mature_wife", "pure_desire_white_peach"],
+        "hairstyles": ["long_straight_black", "high_ponytail", "low_ponytail", "collarbone_lob"],
+        "headwear_jewelry": ["gold_collarbone_chain", "ribbon_bow", "pearl_necklace"],
+        "props": ["smartphone_recording", "cute_cat_on_bed", "pillow_clutching"],
+        "liquids": ["none", "sweat_glistening"],
     },
 }
 
-# 14 大情境映射至 8 大亲和度矩阵
-CONTEXT_PARENT_MAPPING = {
-    "school": "school",
-    "office": "office",
-    "medical": "medical",
-    "onsen_bath": "onsen_bath",
-    "bondage_sm": "bondage_sm",
-    "traditional": "traditional",
-    "nightlife": "nightlife",
-    "domestic": "domestic",
-    "transit": "office",      # 通勤/电车 -> 职场/校园通勤装
-    "outdoor": "domestic",    # 户外/海滩 -> 休闲/居家
-    "dining": "nightlife",     # 居酒屋/餐厅 -> 聚会/夜生活
-    "adult": "nightlife",      # 摄影棚/成人 -> 夜生活/风俗
-    "special": "bondage_sm",   # 特殊密室 -> SM
-    "generic": "domestic",     # 通用 -> 居家日常
-}
+# 14 大情境直通映射表
+CONTEXT_PARENT_MAPPING = {k: k for k in CONTEXT_AFFINITY.keys()}
 
 
 class DataSampler:
@@ -198,33 +246,50 @@ class DataSampler:
     # ─── 情境推断核心 ───
 
     def detect_context(self, scene_name: str, theme_name: str) -> str:
-        """根据当前场景与主题关键词，推断最匹配的核心情境（使用精准词边界与关键词）。"""
+        """根据当前场景与主题关键词，推断最匹配的核心情境（支持全部 14 大情境）。"""
         text = f"{scene_name} {theme_name}".lower()
 
-        # 1. 校园 / 学生
-        if any(k in text for k in ["校", "教", "课", "学", "书", "体育", "操场", "走廊", "初恋", "制服", "补习", "学生", "少女"]) or re.search(r"\b(school|classroom|student|teacher|uniform|jk|seifuku|blackboard|gymnasium)\b", text):
+        # 1. SM / 调教 / 拘束（优先于常规词判定）
+        if any(k in text for k in ["调教", "束缚", "绳缚", "紧缚", "地牢", "惩罚", "拘束", "手铐", "项圈", "皮衣", "乳胶", "sm"]) or re.search(r"\b(sm|bondage|shibari|kinbaku|dungeon|collar|handcuffs|latex|restrained|dominant|submissive)\b", text):
+            return "bondage_sm"
+        # 2. 校园 / 学生
+        if any(k in text for k in ["校", "教室", "课堂", "课桌", "黑板", "学园", "学院", "体育馆", "操场", "走廊", "初恋", "制服", "补习", "学生", "少女"]) or re.search(r"\b(school|classroom|student|teacher|uniform|jk|seifuku|blackboard|gymnasium)\b", text):
             return "school"
-        # 2. 职场 / 办公室
+        # 3. 职场 / 办公室
         if any(k in text for k in ["办公", "职场", "会议", "经理", "秘书", "加班", "公司", "商务", "西装", "包臀裙", "白领", "总裁"]) or re.search(r"\b(office|business|corporate|meeting|secretary|executive|cubicle|ol)\b", text):
             return "office"
-        # 3. 医疗 / 诊所
+        # 4. 医疗 / 诊所
         if any(k in text for k in ["医", "诊", "护士", "病房", "手术", "药", "体检", "针筒", "病床", "白大褂"]) or re.search(r"\b(hospital|clinic|nurse|medical|doctor|examination|ward|patient)\b", text):
             return "medical"
-        # 4. 温泉 / 浴室
-        if any(k in text for k in ["温泉", "浴", "风吕", "泳", "桑拿", "水", "海滩", "沙滩", "泳衣", "比基尼", "湿身", "浴缸"]) or re.search(r"\b(onsen|bath|shower|rotenburo|sento|sauna|soapland|jacuzzi|bathtub)\b", text):
+        # 5. 温泉 / 浴室
+        if any(k in text for k in ["温泉", "风吕", "桑拿", "水疗", "浴缸", "澡堂", "泡汤", "浴室", "淋浴"]) or re.search(r"\b(onsen|bath|shower|rotenburo|sento|sauna|soapland|jacuzzi|bathtub)\b", text):
             return "onsen_bath"
-        # 5. SM / 调教 / 密室
-        if any(k in text for k in ["调教", "束缚", "绳", "地牢", "密室", "监禁", "强制", "手铐", "项圈", "皮衣", "乳胶", "惩罚"]) or re.search(r"\b(sm|bondage|shibari|kinbaku|dungeon|collar|handcuffs|latex|restrained|dominant|submissive)\b", text):
-            return "bondage_sm"
         # 6. 和风 / 传统
-        if any(k in text for k in ["和室", "茶室", "庭院", "古风", "和服", "旗袍", "汉服", "祭典", "榻榻米", "国风", "神社", "振袖"]) or re.search(r"\b(kimono|yukata|qipao|hanfu|tatami|shrine|temple|washitsu|ryokan)\b", text):
+        if any(k in text for k in ["和室", "茶室", "庭院", "古风", "和服", "旗袍", "汉服", "祭典", "榻榻米", "国风", "神社", "鸟居", "振袖"]) or re.search(r"\b(kimono|yukata|qipao|hanfu|tatami|shrine|temple|washitsu|ryokan)\b", text):
             return "traditional"
-        # 7. 夜店 / 风俗 / 酒店
-        if any(k in text for k in ["情人旅馆", "酒店", "夜店", "风俗", "酒吧", "歌舞伎町", "包厢", "派对", "醉", "兔女郎", "夜总会", "陪酒", "夜市"]) or re.search(r"\b(nightclub|club|bar|cabaret|hostess|karaoke|pub|drunk|party)\b", text):
+        # 7. 电车 / 通勤
+        if any(k in text for k in ["电车", "地铁", "车厢", "列车", "公交", "新干线", "站台", "通勤", "巴士", "车座"]) or re.search(r"\b(transit|subway|train|bus|shinkansen|commuter|carriage|cabin)\b", text):
+            return "transit"
+        # 8. 户外 / 自然 / 海滩
+        if any(k in text for k in ["海滩", "沙滩", "泳池", "比基尼", "公园", "森林", "树林", "草丛", "河堤", "户外", "露天", "野外", "山路"]) or re.search(r"\b(outdoor|beach|pool|forest|riverbank|park|mountain|nature|trail)\b", text):
+            return "outdoor"
+        # 9. 餐饮 / 咖啡厅 / 居酒屋
+        if any(k in text for k in ["咖啡", "下午茶", "餐厅", "居酒屋", "屋台", "拉面", "茶屋", "甜品", "蛋糕", "餐馆", "女仆咖啡"]) or re.search(r"\b(dining|cafe|restaurant|izakaya|yatai|tea room|bistro)\b", text):
+            return "dining"
+        # 10. 夜店 / 酒吧 / 歌舞伎町
+        if any(k in text for k in ["夜店", "酒吧", "歌舞伎町", "包厢", "派对", "微醺", "醉", "兔女郎", "夜总会", "陪酒", "夜市", "俱乐部"]) or re.search(r"\b(nightclub|club|bar|cabaret|hostess|karaoke|pub|drunk|party)\b", text):
             return "nightlife"
-        # 8. 居家 / 人妻
-        if any(k in text for k in ["家", "卧", "客", "厨", "公寓", "人妻", "少妇", "同居", "阳台", "睡衣", "围裙", "居家", "被窝", "床上"]) or re.search(r"\b(bedroom|living room|kitchen|apartment|home|housewife|bed|futon)\b", text):
+        # 11. 居家 / 卧室 / 人妻
+        if any(k in text for k in ["家", "卧", "客", "厨", "公寓", "人妻", "少妇", "同居", "阳台", "睡衣", "围裙", "居家", "被窝", "床上", "沙发"]) or re.search(r"\b(bedroom|living room|kitchen|apartment|home|housewife|bed|futon|sofa)\b", text):
             return "domestic"
+        # 12. 风俗 / 成人私密影棚
+        if any(k in text for k in ["风俗", "泡泡浴", "摄影棚", "私密影棚", "试衣间", "情人旅馆", "成人"]) or re.search(r"\b(adult|soapland|love hotel|photo studio|erotic studio|dressing room)\b", text):
+            return "adult"
+        # 13. 特殊密室 / 废墟
+        if any(k in text for k in ["密室", "废墟", "实验室", "地下室", "暗黑", "遗迹", "高科技"]) or re.search(r"\b(special|ruins|laboratory|secret room|dark room|dungeon|sci-fi)\b", text):
+            return "special"
+
+        return "generic"
 
         return "generic"
 
@@ -440,33 +505,123 @@ class DataSampler:
         # 2. 检查联动配置
         linkages = data.get("clothing_nudity_linkage", {})
         linkage_data = linkages.get(nudity_level_code, {})
+        style_overrides = linkage_data.get("style_overrides", {})
 
-        if _is_auto(state) or _is_none(state) or state == "自动联动裸露等级 (Auto Link Nudity)":
-            style_overrides = linkage_data.get("style_overrides", {})
+        # 3. L1 / L5 / L6 快速返回严格纯净词（绝不接入任何扩展）
+        if nudity_level_code in ("L1", "L5", "L6"):
             if c_id in style_overrides:
-                return style_overrides[c_id]
-            gen_tags = linkage_data.get("general_tags", [])
-            chosen_gen = self._pick(gen_tags, rng, min(2, len(gen_tags)))
-            chosen_style_tags = self._pick(base_style_tags, rng, min(2, len(base_style_tags)))
-            return chosen_style_tags + chosen_gen
-
-        states = data.get("clothing_states", [])
-        if _is_random(state):
-            chosen_state = self._pick_one(states, rng)
-        else:
+                return list(style_overrides[c_id])
+            if _is_auto(state) or _is_none(state) or state == "自动联动裸露等级 (Auto Link Nudity)":
+                gen_tags = linkage_data.get("general_tags", [])
+                chosen_gen = self._pick(gen_tags, rng, min(2, len(gen_tags)))
+                chosen_style_tags = self._pick(base_style_tags, rng, min(2, len(base_style_tags)))
+                return chosen_style_tags + chosen_gen
+            states = data.get("clothing_states", [])
             chosen_state = next((s for s in states
                                  if s.get("name_zh", "") == state
                                  or s.get("id", "") == state
                                  or state in s.get("name_zh", "")
                                  or s.get("name_zh", "") in state), None)
+            state_tags = self._flatten_tags(chosen_state) if chosen_state else []
+            chosen_style_tags = self._pick(base_style_tags, rng, min(2, len(base_style_tags)))
+            return chosen_style_tags + self._pick(state_tags, rng, min(2, len(state_tags)))
 
-        state_tags = self._flatten_tags(chosen_state) if chosen_state else []
-        chosen_style_tags = self._pick(base_style_tags, rng, min(2, len(base_style_tags)))
-        return chosen_style_tags + self._pick(state_tags, rng, min(2, len(state_tags)))
+        # 4. L2 / L3 / L4 基础款式与状态标签生成
+        if _is_auto(state) or _is_none(state) or state == "自动联动裸露等级 (Auto Link Nudity)":
+            if c_id in style_overrides:
+                base_result = list(style_overrides[c_id])
+            else:
+                gen_tags = linkage_data.get("general_tags", [])
+                chosen_gen = self._pick(gen_tags, rng, min(2, len(gen_tags)))
+                chosen_style_tags = self._pick(base_style_tags, rng, min(2, len(base_style_tags)))
+                base_result = chosen_style_tags + chosen_gen
+        else:
+            states = data.get("clothing_states", [])
+            if _is_random(state):
+                if nudity_level_code == "L2":
+                    allowed_state_ids = {"normal", "unbuttoned", "slipping_off", "disheveled", "wet_clinging", "sweat_soaked"}
+                elif nudity_level_code == "L3":
+                    allowed_state_ids = {"unbuttoned", "slipping_off", "lifted_up", "pulled_down", "wet_clinging", "torn_shredded"}
+                elif nudity_level_code == "L4":
+                    allowed_state_ids = {"only_lingerie", "pulled_down", "lifted_up", "torn_shredded", "slipping_off"}
+                else:
+                    allowed_state_ids = set()
+
+                pool = [s for s in states if s.get("id") in allowed_state_ids] if allowed_state_ids else states
+                chosen_state = self._pick_one(pool if pool else states, rng)
+            else:
+                chosen_state = next((s for s in states
+                                     if s.get("name_zh", "") == state
+                                     or s.get("id", "") == state
+                                     or state in s.get("name_zh", "")
+                                     or s.get("name_zh", "") in state), None)
+
+            state_tags = self._flatten_tags(chosen_state) if chosen_state else []
+            chosen_style_tags = self._pick(base_style_tags, rng, min(2, len(base_style_tags)))
+            base_result = chosen_style_tags + self._pick(state_tags, rng, min(2, len(state_tags)))
+
+        # 5. 统一应用服装 9/5/10 扩展流水线（所有 L2/L3/L4 均通过此流水线）
+        return self._apply_clothing_extensions(base_result, nudity_level_code, c_id, rng, data)
+
+    def _apply_clothing_extensions(
+        self,
+        base_tags: List[str],
+        nudity_level_code: Optional[str],
+        clothing_id: str,
+        rng: Random,
+        data: Dict[str, Any]
+    ) -> List[str]:
+        """为服装基础标签受控应用 9/5/10 扩展库（严格根据 clothing.json 中的 extension_policy 数据驱动采样）。"""
+        if nudity_level_code in ("L1", "L5", "L6") or not nudity_level_code:
+            return list(base_tags)
+
+        policy = data.get("extension_policy", {}).get(nudity_level_code, {})
+        if not policy:
+            return list(base_tags)
+
+        result_tags = list(base_tags)
+
+        allowed_exp_ids = set(policy.get("exposure_ids", []))
+        allowed_trans_ids = set(policy.get("transparency_ids", []))
+        allowed_wardrobe_ids = set(policy.get("wardrobe_ids", []))
+
+        all_exp_tiers = [t for t in data.get("sfw_exposure_tiers", []) if t.get("id") in allowed_exp_ids]
+        all_trans_tiers = [t for t in data.get("cloth_transparency_tiers", []) if t.get("id") in allowed_trans_ids]
+        all_wardrobe = [t for t in data.get("lingerie_wardrobe", []) if t.get("id") in allowed_wardrobe_ids]
+
+        if nudity_level_code == "L2":
+            if all_exp_tiers and rng.random() < 0.7:
+                picked = self._pick_one(all_exp_tiers, rng)
+                result_tags.extend(picked.get("tags", [])[:1])
+            if all_trans_tiers and rng.random() < 0.5:
+                picked = self._pick_one(all_trans_tiers, rng)
+                result_tags.extend(picked.get("tags", [])[:1])
+
+        elif nudity_level_code == "L3":
+            if all_exp_tiers and rng.random() < 0.7:
+                picked = self._pick_one(all_exp_tiers, rng)
+                result_tags.extend(picked.get("tags", [])[:1])
+            if all_trans_tiers and rng.random() < 0.6:
+                picked = self._pick_one(all_trans_tiers, rng)
+                result_tags.extend(picked.get("tags", [])[:1])
+
+        elif nudity_level_code == "L4":
+            if all_wardrobe and (clothing_id == "lingerie_lace" or rng.random() < 0.6):
+                picked = self._pick_one(all_wardrobe, rng)
+                result_tags.extend(picked.get("tags", [])[:2])
+            else:
+                if all_exp_tiers and rng.random() < 0.6:
+                    picked = self._pick_one(all_exp_tiers, rng)
+                    result_tags.extend(picked.get("tags", [])[:1])
+                if all_trans_tiers and rng.random() < 0.5:
+                    picked = self._pick_one(all_trans_tiers, rng)
+                    result_tags.extend(picked.get("tags", [])[:1])
+
+        return result_tags
 
     # ─── 槽位 5: 光影氛围 ───
 
-    def sample_lighting(self, preset: str, rng: Random) -> List[str]:
+    def sample_lighting(self, preset: str, rng: Random, nudity_level_code: Optional[str] = None) -> List[str]:
         data = self._load("lighting")
 
         if not _is_auto(preset) and not _is_random(preset):
@@ -487,7 +642,9 @@ class DataSampler:
         techniques = data.get("professional_lighting", [])
         if techniques:
             tech = self._pick_one(techniques, rng)
-            tags = tech.get("tags", []) + tech.get("erotic_tags", [])
+            tags = list(tech.get("tags", []))
+            if nudity_level_code != "L1":
+                tags.extend(tech.get("erotic_tags", []))
             if tags:
                 result.extend(self._pick(tags, rng, min(2, len(tags))))
 
@@ -501,7 +658,7 @@ class DataSampler:
 
     # ─── 槽位 6: 姿势动作 ───
 
-    def sample_pose(self, category: str, rng: Random) -> List[str]:
+    def sample_pose(self, category: str, rng: Random, nudity_level_code: Optional[str] = None) -> List[str]:
         data = self._load("poses")
         categories = data.get("pose_categories", [])
         if not categories:
@@ -523,6 +680,10 @@ class DataSampler:
             all_tags.extend(sub.get("tags", []))
         if not all_tags:
             all_tags = self._flatten_tags(cat)
+
+        if nudity_level_code == "L1":
+            banned_in_l1 = ["skirt lifted", "skirt hiked", "skirt pulled", "skirt riding", "bra", "panties", "breasts", "pussy", "nude", "naked", "undressed", "cock sliding", "penetrated", "face-fucked", "cum dripping", "dripping on", "cupping breasts"]
+            all_tags = [t for t in all_tags if not any(b in t.lower() for b in banned_in_l1)]
 
         return self._pick(all_tags, rng, min(rng.randint(1, 2), max(1, len(all_tags)))) if all_tags else []
 
@@ -747,8 +908,64 @@ class DataSampler:
         if not chosen or chosen.get("id") == "none":
             return []
 
+        if chosen.get("items"):
+            items = chosen["items"]
+            picked_item = self._pick_one(items, rng)
+            item_tags = self._flatten_tags(picked_item)
+            return self._pick(item_tags, rng, min(2, len(item_tags))) if item_tags else []
+
         tags = self._flatten_tags(chosen)
         return self._pick(tags, rng, min(2, len(tags))) if tags else []
+
+    # ─── 服装扩展梯度采样辅助方法 ───
+
+    def list_sfw_exposure_tiers(self) -> List[str]:
+        data = self._load("clothing")
+        return [t.get("name_zh", t.get("id", "")) for t in data.get("sfw_exposure_tiers", [])]
+
+    def list_cloth_transparency_tiers(self) -> List[str]:
+        data = self._load("clothing")
+        return [t.get("name_zh", t.get("id", "")) for t in data.get("cloth_transparency_tiers", [])]
+
+    def list_lingerie_wardrobe(self) -> List[str]:
+        data = self._load("clothing")
+        return [t.get("name_zh", t.get("id", "")) for t in data.get("lingerie_wardrobe", [])]
+
+    def sample_sfw_exposure(self, tier: str, rng: Random) -> List[str]:
+        if _is_none(tier):
+            return []
+        data = self._load("clothing")
+        tiers = data.get("sfw_exposure_tiers", [])
+        if not tiers:
+            return []
+        chosen = next((t for t in tiers if t.get("name_zh", "") == tier or t.get("id", "") == tier or tier in t.get("name_zh", "")), None)
+        if not chosen and _is_random(tier):
+            chosen = self._pick_one(tiers, rng)
+        return list(chosen.get("tags", [])) if chosen else []
+
+    def sample_cloth_transparency(self, tier: str, rng: Random) -> List[str]:
+        if _is_none(tier):
+            return []
+        data = self._load("clothing")
+        tiers = data.get("cloth_transparency_tiers", [])
+        if not tiers:
+            return []
+        chosen = next((t for t in tiers if t.get("name_zh", "") == tier or t.get("id", "") == tier or tier in t.get("name_zh", "")), None)
+        if not chosen and _is_random(tier):
+            chosen = self._pick_one(tiers, rng)
+        return list(chosen.get("tags", [])) if chosen else []
+
+    def sample_lingerie_wardrobe(self, cat: str, rng: Random) -> List[str]:
+        if _is_none(cat):
+            return []
+        data = self._load("clothing")
+        wardrobe = data.get("lingerie_wardrobe", [])
+        if not wardrobe:
+            return []
+        chosen = next((w for w in wardrobe if w.get("name_zh", "") == cat or w.get("id", "") == cat or cat in w.get("name_zh", "")), None)
+        if not chosen and _is_random(cat):
+            chosen = self._pick_one(wardrobe, rng)
+        return self._pick(chosen.get("tags", []), rng, min(2, len(chosen.get("tags", [])))) if chosen else []
 
     # ─── 槽位 14: 人格角色卡 ───
 

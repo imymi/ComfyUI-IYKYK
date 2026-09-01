@@ -4,10 +4,153 @@
 
 ---
 
+## [v1.1.0-rc6] - 2026-09-02
+
+> 💡 **审查与架构声明**：  
+> 本版本的全面架构审查、数据驱动 `extension_policy`（24/24 扩展逐 ID 100% 可达）、Draft-7 全量 19 运行时 Schema 强门禁、运行时清单与真隔离发布烟测、Span 级受保护语法字节保留及发布自动化测试套件方案均出自 **GPT-5.6 Sol**。
+
+### 🌟 核心改进与技术落实
+
+#### 1. 数据驱动 `extension_policy` 与 24/24 扩展逐 ID 100% 可达 (`data/clothing.json`, `lib/sampler.py`)
+- **单一事实来源与 ID 修正**：
+  - 在 `clothing.json` 中配置单一事实来源 `extension_policy`，明确划分 L2/L3/L4 的露肤、透度与情趣衣柜启用 tier ID；
+  - 修正 7 个 tier ID 拼写差异，使 9 档露肤、5 档透肉、10 类情趣衣柜扩展在自动链路中 **24/24 逐 ID 100% 稳定可达**；
+  - 采样器完全转为数据驱动，删除 Python 中硬编码的 ID 集合；
+  - 自动化测试实测断言 `hit_tier_ids == set(all_24_tier_ids)`；L1、L5、L6 各自 1000 种子扩展命中数均为 0（零污染）。
+
+#### 2. 标准 Draft-7 递归校验器与全量 19 运行时 Schema 覆盖 (`scripts/validate_data.py`, `schemas/`)
+- **真·Draft-7 深度递归校验与强门禁**：
+  - 覆盖全部 19 个运行时数据文件的 Schema 定义，包含 `pattern`, `enum`, `minItems`, `maxItems`, `uniqueItems`, `required`, `properties`；
+  - 缺失任意一个 Schema 或出现任何校验违规时 `--strict` 立即非零退出；
+  - 负向测试覆盖：空 Schema 目录拦截、非法 scene ID pattern 拦截、Rule 10 缺少字段拦截、必需 Rule ID 替换拦截等 14 项变异测试全部通过。
+
+#### 3. 运行时清单与真隔离发布烟测 (`lib/runtime_manifest.py`, `scripts/build_release.py`)
+- **零源码泄漏的独立沙箱验证**：
+  - 新增 `lib/runtime_manifest.py` 统一定义 `RUNTIME_DATA_FILES`（19 个文件）并打包入库；
+  - 烟测采用 `python3 -I` 与解压沙箱目录 `cwd`，断言已加载模块路径严格位于解压沙箱内，项目源码路径 0 泄漏；
+  - 支持从 `/private/tmp` 或任何空临时目录独立执行烟测并稳定通过。
+
+#### 4. Rule 9～12 规则目录项与真实 tags 逐项精确匹配 (`data/conflict_rules.json`, `tests/test_catalog_rule_reachability.py`)
+- **结构化区分 catalog terms 与 custom aliases**：
+  - 规则数据显式区分为 `catalog_terms`（必须 100% 存在于数据文件 `tags` 中）与 `custom_aliases`；
+  - 测试直接递归提取数据文件的 `tags` 集合逐项精确断言，杜绝精选白名单跳过问题；
+  - 真正从 `DataSampler` 采样进入 `ConflictResolver` 验证端到端消解。
+
+#### 5. Span 级受保护语法字节保留与栈式嵌套校验 (`lib/assembler.py`, `lib/conflict_resolver.py`)
+- **受保护结构 100% 字节级不可变**：
+  - 建立受保护 span 识别机制，`<lora:model  v2:0.5>`, `"quoted  phrase, x"`, `<lora:spinning room:1.0>`, `"spinning room"`, `escaped\,  comma` 经 `finalize_prompt` 100% 原样保留；
+  - 普通文本中的 `spinning room` 正确替换为 `drunken stupor`；
+  - 引入栈式括号校验器 `validate_brackets_stack`，严防 `([)]` 等交叉嵌套假绿。
+
+#### 6. 多规则冲突消解引擎全面扩展至 17 大物理与视觉自洽消解规则 (`data/conflict_rules.json`, `lib/conflict_resolver.py`, `tests/test_conflict_engine_matrix.py`)
+- **全 15 槽位深度交叉复核与 5 大新增规则落地**：
+  - **景别特写 × 下肢足部自洽 (Rule 13 `framing_lower_body_coherence`)**：面部/极致特写时自动剔除高跟鞋、大腿袜、吊袜带、膝靴等下半身足部干扰词条，防止构图注意力割裂与背景畸形肢体；
+  - **饰品遮挡 × 视线面部动作自洽 (Rule 14 `accessory_occlusion_gaze_coherence`)**：蒙眼布/遮眼/闭眼状态下自动剔除直视镜头、眨眼等矛盾动作，消除布条上强行画眼睛的视觉伪影；
+  - **胶片风格 × 光影色彩互斥 (Rule 15 `monochrome_film_chroma_coherence`)**：黑白/单色胶片下消解彩虹/高饱和 RGB 霓虹色彩，保留明暗反差与影调反差；
+  - **服装款式 × 解构状态互斥 (Rule 16 `clothing_style_state_coherence`)**：连体泳衣/死库水禁止解纽扣/掀裙；牛仔裤/长裤禁止裙开衩与裙摆飘动；
+  - **多手持道具唯一性消解 (Rule 17 `handheld_props_single_holder`)**：同时出现多个手持道具动作时仅保留首个主手持动作，彻底消除 AI 生成 3 只手以上的多肢体异常。
+
+#### 7. 核心情境亲和度矩阵全面扩展至 14 大情境与全槽位交叉复核 (`lib/sampler.py`, `tests/test_context_affinity_matrix.py`)
+- **全量 14 大情境作为一等公民完整覆盖**：
+  - 将原仅有 8 类的亲和度矩阵扩展至全部 14 大标准情境：`school` (校园), `office` (职场), `medical` (医疗), `onsen_bath` (温泉/浴室), `bondage_sm` (束缚/调教), `traditional` (和风/传统), `transit` (通勤/电车), `outdoor` (户外/海滩), `dining` (餐饮/咖啡厅), `nightlife` (夜店/酒吧), `domestic` (居家/人妻), `adult` (风俗/私密影棚), `special` (特殊密室/废墟), `generic` (通用/日常)；
+  - 彻底消除父级回退，每个情境均享有专属的第一级亲和度映射（涵盖服装、角色、妆容、发型、头饰首饰、道具、纹身、液体效果等全槽位）；
+  - 矩阵中所有引用的槽位 ID 经自动化交叉复核验证，与对应数据文件真实 ID **100% 逐项精确存在**（0 无效 ID）；
+  - 优化 `detect_context` 关键词匹配与优先级（解决“调教”误触发“教”导致的校园误判）。
+
+#### 8. 发布工程自动化测试门禁与全量 88 项测试矩阵 (`tests/test_release_build.py`, `tests/test_context_affinity_matrix.py`)
+- **发布自动化与全量测试套件**：
+  - 新增 `test_release_build.py` 自动化测试，验证版本不一致阻断且源码零篡改、双构建 SHA256 绝对一致、临时目录隔离烟测通过；
+  - 新增 `test_context_affinity_matrix.py` 覆盖 14 大情境亲和度矩阵及加权采样依从性测试；
+  - 全量测试套件增至 **88 项单元测试全部通过（100% Pass，0 失败 0 错误）**。
+
+---
+
+## [v1.1.0-rc5] - 2026-09-02
+
+> 💡 **审查与架构声明**：  
+> 本版本的全面架构审查、默认自动联动扩展流水线修复、保护语法与 250 词边界加固、严格 Schema 校验器设计、测试规则直读与构建零源码修改方案均出自 **GPT-5.6 Sol**。
+
+### 🌟 核心改进与技术落实
+
+#### 1. 默认服装自动联动（Auto Link Nudity）扩展流水线统一 (`lib/sampler.py`)
+- **彻底消除提前返回缺陷**：
+  - 抽取统一的 `_apply_clothing_extensions()` 流水线，消除 `Auto Link Nudity` 在基础 override 处提前 return 的缺陷；
+  - 确保默认下拉状态下，L2、L3、L4 均能稳定受控采样 9 档露肤、5 档透度与 10 类情趣衣柜扩展标签；
+  - 全部 24 个扩展 tier（包含 `open_sides` 侧缝全开）通过稳定 ID 映射 100% 在自动链路中可达；
+  - L1、L5、L6 严格保持 0 命中（1000 种子 0 污染）。
+
+#### 2. 受保护语法全链路保护与 250 词边界原子性截断 (`lib/assembler.py`, `lib/conflict_resolver.py`)
+- **字节级原样保留**：
+  - 彻底移除 `sanitize_prompt()` 中全局逗号正则 `re.sub(r",(\S)", ...)`，保留 `<lora:name,v2:0.5>`、转义逗号 `tag\,with comma`、双引号及括号；
+  - 词数预算以 `PromptFragment` 序列为单位严格计算，结构化片段原子性整块纳入或跳过，**杜绝字符串级切词破坏括号语法闭合**。
+
+#### 3. 严格 Schema 校验器与 19 个运行时数据文件门禁 (`scripts/validate_data.py`, `schemas/`)
+- **Draft-7 递归校验与领域规则强门禁**：
+  - 补齐/完善全部 19 个运行时文件的 Schema 约束与 Draft-7 递归校验引擎；
+  - 纳入 4 个负向变异测试（Rule 9 缺失、服装类别重复、L2 联动清空、扩展 tier 重复）并实现 100% 拦截；
+  - 统一 `RUNTIME_DATA_FILES` 单一事实来源，测试专用数据 `scene_context_expectations.json` 移入 `tests/fixtures/`。
+
+#### 4. Rule 9~12 规则可达性直接枚举与真实消解 (`tests/test_catalog_rule_reachability.py`)
+- **测试直接消费配置**：
+  - 测试直接遍历 `self.rules[id]` 数组，确保配置空或缺失时必定报错；
+  - 真实词库目录可达性 100% 覆盖。
+
+#### 5. 构建脚本只读验证与源码零修改 (`scripts/build_release.py`)
+- **确定性构建零漂移**：
+  - 构建脚本对 `js/version.js` 改为只读校验，版本不一致直接中止构建；
+  - 新增独立的开发辅助同步脚本 `scripts/sync_version.py`；
+  - 确保构建前后 `git status --porcelain` 绝对一致。
+
+---
+
+## [v1.1.0-rc4] - 2026-09-02
+
+> 💡 **审查与架构声明**：  
+> 本版本的全面架构审查、嵌套道具两级采样修复、规则与实际词库全量对齐、服装扩展数据接入、测试正则退格符修复、Schema 负向测试安全隔离与可达性测试套件均出自 **GPT-5.6 Sol**。
+
+### 🌟 核心改进与技术落实
+
+#### 1. 嵌套道具两级安全采样 (`lib/sampler.py`)
+- **多条目道具互斥抽取**：
+  - 修复 `props.json` 中采用 `items` 嵌套结构的 4 大分类（数码微单、团扇/油纸伞、鲜花花束、毛绒玩偶）采样为空的缺陷；
+  - 实现两级随机采样：先根据 RNG 选取单个子项（如团扇与油纸伞二选一），再从中选取 tags，**杜绝同一采样中混拼冲突道具**；
+  - 保证 15 个道具分类全部 100% 输出有效非空 tags 且确定性复现。
+
+#### 2. Rule 9~12 规则与真实词库全量对齐 (`data/conflict_rules.json`, `lib/conflict_resolver.py`)
+- **真实词库单点事实来源**：
+  - 剔除合成短语假阳性，将 Rule 9~12 的触发词与禁用词逐项与 `poses.json`、`props.json`、`expressions.json`、`lighting.json`、`makeup.json`、`scenes.json` 真实 tags 精准对齐；
+  - 移除 Python 中硬编码的 `busy_patterns`，直接以 JSON 规则配置作为单一事实来源；
+  - 真实消解：双手忙姿态（背手、四肢着地、抓床单等）与真实手持道具（手机录像、手柄、微单、团扇等）互斥；害羞与掠夺挑逗眼神互斥；日光与夜景互斥；裸肌与蹭花唇膏/晕妆互斥。
+
+#### 3. 服装扩展数据（9档露肤/5档透肉/10类衣柜）接入运行链路 (`lib/sampler.py`)
+- **扩展梯度可达性打通**：
+  - 新增 `list_sfw_exposure_tiers`、`sample_sfw_exposure`；
+  - 新增 `list_cloth_transparency_tiers`、`sample_cloth_transparency`；
+  - 新增 `list_lingerie_wardrobe`、`sample_lingerie_wardrobe`；
+  - 新增 `test_props_and_extensions_reachability.py` 验证 100% 可达与确定性。
+
+#### 4. 测试套件加固与正则退格符修复 (`tests/test_nudity_levels.py`)
+- **测试真实有效性恢复**：
+  - 将 34 处包含退格符 `\x08` 的正则字符串全面修复为真正的 raw regex `r"\b...\b"`；
+  - 新增 `test_regex_fails_on_injected_violation` 自检：断言人为注入违规词时正则必定捕获报错；
+  - 新增 `test_no_c0_control_characters_in_source`：扫描源文件中是否存在非法 C0 控制字符。
+
+#### 5. JSON Schema 负向测试安全临时隔离 (`tests/test_schema_negatives.py`)
+- **真实数据零污染防护**：
+  - 负向拦截测试改用 `tempfile.TemporaryDirectory` 复制临时目录进行变异测试，绝不修改真实 `data/scenes.json`；
+  - 每次测试运行前后断言真实数据文件 SHA256 绝对不变。
+
+#### 6. 前端 UI 默认值隔离与一键还原修复 (`js/iykyk_ui.js`)
+- **节点默认值隔离**：
+  - 将 3 个节点的默认值按 ComfyUI 节点类独立隔离存储（`NODE_DEFAULTS`），彻底修复点击「恢复默认选项」导致下拉框变空白的 Bug；
+  - 增加下拉选项合法性校验与安全回退保障。
+
+---
+
 ## [v1.1.0-rc3] - 2026-09-01
 
 > 💡 **审查与架构声明**：  
-> 本版本的全面架构审查、数据质量复评、JSON Schema 体系设计、全量自动化测试矩阵（31 项）及全部技术修改方案均出自 **GPT-5.6 Sol** (Architecture Review, Data Quality Auditing & Technical Solutions proposed by GPT-5.6 Sol)。
+> 本版本的全面架构审查、数据质量复评、JSON Schema 体系设计、全量自动化测试矩阵及全部技术修改方案均出自 **GPT-5.6 Sol**。
 
 ### 🌟 核心改进与技术落实
 
