@@ -150,8 +150,14 @@ cd /path/to/ComfyUI/custom_nodes
 git clone https://github.com/imymi/ComfyUI-IYKYK.git
 ```
 
-### 方法 2：ComfyUI Manager 安装
-在 ComfyUI Manager 中搜索 `ComfyUI-IYKYK` 并点击 Install。
+### 方法 2：ComfyUI Manager 安装（通过 Git URL）
+1. 打开 ComfyUI 界面上的 **Manager** 面板；
+2. 点击 **`Install via Git URL`**（通过 Git URL 安装）；
+3. 在输入框中粘贴本仓库地址：
+   ```text
+   https://github.com/imymi/ComfyUI-IYKYK.git
+   ```
+4. 点击 **OK**，等待安装完成后点击 **Restart** 重启 ComfyUI 即可。
 
 ### 方法 3：手动下载发布包
 从 [Releases](https://github.com/imymi/ComfyUI-IYKYK/releases) 下载最新的 `ComfyUI-IYKYK-v1.1.0-rc6.zip`，解压至 `ComfyUI/custom_nodes/ComfyUI-IYKYK`。
