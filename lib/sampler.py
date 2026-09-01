@@ -7,13 +7,26 @@ sampler.py — 完整 15 槽位数据采样与情境自洽引擎
 3. 裸露等级 × 服装状态强力联动（L1 包裹 → L6 特写脱法咬合）
 4. 槽位情境亲和度加权采样（自动杜绝场景与服装/道具/角色错位冲突）
 5. 保证用户显式选择 100% 优先（若用户指定，则允许 Cosplay/反差角色扮演）
+6. 显式 DataLoadError 错误诊断，杜绝静默失败
 """
 from __future__ import annotations
 
 import json
-import random
+import re
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
+from random import Random
+from typing import Any, Dict, List, Optional, Sequence, Tuple
+
+
+try:
+    from .models import SampleResult
+except (ImportError, ValueError):
+    from lib.models import SampleResult
+
+
+class DataLoadError(Exception):
+    """当必需的数据文件缺失或 JSON 解析失败时抛出。"""
+    pass
 
 
 def _is_none(val: Any) -> bool:
@@ -108,6 +121,24 @@ CONTEXT_AFFINITY = {
     },
 }
 
+# 14 大情境映射至 8 大亲和度矩阵
+CONTEXT_PARENT_MAPPING = {
+    "school": "school",
+    "office": "office",
+    "medical": "medical",
+    "onsen_bath": "onsen_bath",
+    "bondage_sm": "bondage_sm",
+    "traditional": "traditional",
+    "nightlife": "nightlife",
+    "domestic": "domestic",
+    "transit": "office",      # 通勤/电车 -> 职场/校园通勤装
+    "outdoor": "domestic",    # 户外/海滩 -> 休闲/居家
+    "dining": "nightlife",     # 居酒屋/餐厅 -> 聚会/夜生活
+    "adult": "nightlife",      # 摄影棚/成人 -> 夜生活/风俗
+    "special": "bondage_sm",   # 特殊密室 -> SM
+    "generic": "domestic",     # 通用 -> 居家日常
+}
+
 
 class DataSampler:
     """从 data/ 目录加载所有分类数据，提供各槽位精准/情境加权采样与列举接口。"""
@@ -119,20 +150,31 @@ class DataSampler:
     def _load(self, name: str) -> Any:
         if name not in self._cache:
             p = self.data_dir / f"{name}.json"
-            if p.is_file():
+            if not p.is_file():
+                raise DataLoadError(f"Missing required data file: {p}")
+            try:
                 self._cache[name] = json.loads(p.read_text(encoding="utf-8"))
-            else:
-                self._cache[name] = {}
+            except json.JSONDecodeError as e:
+                raise DataLoadError(f"Invalid JSON in {p} (line {e.lineno}, col {e.colno}): {e.msg}") from e
         return self._cache[name]
 
     @staticmethod
-    def _pick(items: List[Any], rng: random.Random, count: int = 1) -> List[Any]:
-        if not items:
+    def _get_affinity_ids(context: Optional[str], slot_key: str) -> List[str]:
+        if not context:
             return []
-        return rng.sample(items, min(count, len(items)))
+        resolved_ctx = CONTEXT_PARENT_MAPPING.get(context, context)
+        if resolved_ctx in CONTEXT_AFFINITY:
+            return CONTEXT_AFFINITY[resolved_ctx].get(slot_key, [])
+        return []
 
     @staticmethod
-    def _pick_one(items: List[Any], rng: random.Random) -> Optional[Any]:
+    def _pick(items: Sequence[Any], rng: Random, count: int = 1) -> List[Any]:
+        if not items:
+            return []
+        return rng.sample(list(items), min(count, len(items)))
+
+    @staticmethod
+    def _pick_one(items: Sequence[Any], rng: Random) -> Optional[Any]:
         if not items:
             return None
         return rng.choice(items)
@@ -155,44 +197,44 @@ class DataSampler:
 
     # ─── 情境推断核心 ───
 
-    def detect_context(self, scene_name: str, theme_name: str) -> Optional[str]:
-        """根据当前场景与主题关键词，推断最匹配的核心情境。"""
+    def detect_context(self, scene_name: str, theme_name: str) -> str:
+        """根据当前场景与主题关键词，推断最匹配的核心情境（使用精准词边界与关键词）。"""
         text = f"{scene_name} {theme_name}".lower()
 
         # 1. 校园 / 学生
-        if any(k in text for k in ["校", "教", "课", "学", "书", "体育", "jk", "操场", "走廊", "电车", "初恋", "制服", "补习", "学生", "少女"]):
+        if any(k in text for k in ["校", "教", "课", "学", "书", "体育", "操场", "走廊", "初恋", "制服", "补习", "学生", "少女"]) or re.search(r"\b(school|classroom|student|teacher|uniform|jk|seifuku|blackboard|gymnasium)\b", text):
             return "school"
         # 2. 职场 / 办公室
-        if any(k in text for k in ["办公", "职场", "会议", "经理", "秘书", "ol", "加班", "公司", "商务", "西装", "包臀裙", "白领", "总裁"]):
+        if any(k in text for k in ["办公", "职场", "会议", "经理", "秘书", "加班", "公司", "商务", "西装", "包臀裙", "白领", "总裁"]) or re.search(r"\b(office|business|corporate|meeting|secretary|executive|cubicle|ol)\b", text):
             return "office"
         # 3. 医疗 / 诊所
-        if any(k in text for k in ["医", "诊", "护士", "病房", "手术", "药", "体检", "针筒", "病床", "白大褂"]):
+        if any(k in text for k in ["医", "诊", "护士", "病房", "手术", "药", "体检", "针筒", "病床", "白大褂"]) or re.search(r"\b(hospital|clinic|nurse|medical|doctor|examination|ward|patient)\b", text):
             return "medical"
         # 4. 温泉 / 浴室
-        if any(k in text for k in ["温泉", "浴", "风吕", "泳", "桑拿", "水", "海滩", "沙滩", "泳衣", "比基尼", "湿身", "浴缸"]):
+        if any(k in text for k in ["温泉", "浴", "风吕", "泳", "桑拿", "水", "海滩", "沙滩", "泳衣", "比基尼", "湿身", "浴缸"]) or re.search(r"\b(onsen|bath|shower|rotenburo|sento|sauna|soapland|jacuzzi|bathtub)\b", text):
             return "onsen_bath"
         # 5. SM / 调教 / 密室
-        if any(k in text for k in ["sm", "调教", "束缚", "绳", "地牢", "密室", "监禁", "强制", "奴", "手铐", "项圈", "皮衣", "乳胶", "惩罚"]):
+        if any(k in text for k in ["调教", "束缚", "绳", "地牢", "密室", "监禁", "强制", "手铐", "项圈", "皮衣", "乳胶", "惩罚"]) or re.search(r"\b(sm|bondage|shibari|kinbaku|dungeon|collar|handcuffs|latex|restrained|dominant|submissive)\b", text):
             return "bondage_sm"
         # 6. 和风 / 传统
-        if any(k in text for k in ["和室", "茶室", "庭院", "古风", "和服", "旗袍", "汉服", "祭典", "榻榻米", "国风", "神社", "振袖"]):
+        if any(k in text for k in ["和室", "茶室", "庭院", "古风", "和服", "旗袍", "汉服", "祭典", "榻榻米", "国风", "神社", "振袖"]) or re.search(r"\b(kimono|yukata|qipao|hanfu|tatami|shrine|temple|washitsu|ryokan)\b", text):
             return "traditional"
         # 7. 夜店 / 风俗 / 酒店
-        if any(k in text for k in ["情人旅馆", "酒店", "夜店", "风俗", "酒吧", "歌舞伎町", "包厢", "派对", "醉", "兔女郎", "夜总会", "陪酒", "夜市"]):
+        if any(k in text for k in ["情人旅馆", "酒店", "夜店", "风俗", "酒吧", "歌舞伎町", "包厢", "派对", "醉", "兔女郎", "夜总会", "陪酒", "夜市"]) or re.search(r"\b(nightclub|club|bar|cabaret|hostess|karaoke|pub|drunk|party)\b", text):
             return "nightlife"
         # 8. 居家 / 人妻
-        if any(k in text for k in ["家", "卧", "客", "厨", "公寓", "人妻", "少妇", "同居", "阳台", "睡衣", "围裙", "居家", "被窝", "床上"]):
+        if any(k in text for k in ["家", "卧", "客", "厨", "公寓", "人妻", "少妇", "同居", "阳台", "睡衣", "围裙", "居家", "被窝", "床上"]) or re.search(r"\b(bedroom|living room|kitchen|apartment|home|housewife|bed|futon)\b", text):
             return "domestic"
 
-        return None
+        return "generic"
 
     # ─── 槽位 1: 场景 + 主题 ───
 
-    def sample_scene(self, category: str, rng: random.Random) -> List[str]:
+    def sample_scene_result(self, category: str, rng: Random) -> Optional[SampleResult]:
         data = self._load("scenes")
         scenes = data.get("scenes", [])
         if not scenes:
-            return []
+            return None
 
         all_items: List[Dict] = []
         target_items: List[Dict] = []
@@ -200,92 +242,45 @@ class DataSampler:
         for scene_group in scenes:
             items = scene_group.get("items", [])
             for item in items:
-                sub = item.get("subcategory", "")
-                tags = item.get("tags", [])
-                if sub and sub not in ("章节", "内容") and tags and tags != ["内容"]:
-                    entry = {"subcategory": sub, "tags": tags}
-                    all_items.append(entry)
-                    if not _is_random(category) and (category in sub or sub in category):
-                        target_items.append(entry)
+                sub = item.get("label") or item.get("subcategory", "")
+                if sub and sub not in ("章节", "内容"):
+                    all_items.append(item)
+                    if not _is_random(category) and (category in sub or sub in category or category == item.get("id")):
+                        target_items.append(item)
 
         pool = target_items if target_items else all_items
         if not pool:
-            return []
+            return None
 
         chosen = self._pick_one(pool, rng)
         if not chosen:
-            return []
+            return None
 
-        raw_tags = chosen.get("tags", [])
-        cleaned_tags: List[str] = []
-        for t in raw_tags:
-            if isinstance(t, str) and t.strip():
-                for sep in [",", "/"]:
-                    if sep in t:
-                        cleaned_tags.extend([p.strip() for p in t.split(sep) if p.strip()])
-                        break
-                else:
-                    cleaned_tags.append(t.strip())
+        anchors = chosen.get("anchor_tags", [])
+        details = chosen.get("detail_tags", [])
 
-        if not cleaned_tags:
-            return []
+        if not anchors:
+            anchors = chosen.get("tags", ["room"])
 
-        # 场景内互斥子空间分组，保证单次采样只锁定单一物理空间锚点
-        mutex_sub_groups = [
-            ["indoor onsen", "private onsen", "ryokan bath"],
-            ["outdoor bath", "rotenburo", "open-air bath", "onsen with snow view", "onsen at night"],
-            ["onsen changing room", "changing room", "locker room"],
-            ["onsen washing area", "washing area"],
-            ["behind bushes", "riverbank", "embankment", "under bridge"],
-            ["park bench", "park playground", "park gazebo"],
-            ["empty lot", "construction site at night"],
-            ["park bathroom", "public restroom"],
-            ["izakaya booth", "izakaya private room", "izakaya back room"],
-            ["cafe booth", "coffee shop back booth", "cafe with sofa"],
-            ["yatai stall", "street food cart", "food stall with curtain"],
-            ["bar counter", "bar back room"],
-            ["love hotel restaurant", "love hotel dining room"],
-            ["beach at night", "seaside cave"],
-            ["poolside", "swimming pool at night"],
-            ["pool shower", "pool locker room"],
-            ["bedroom", "messy bed", "futon on floor"],
-            ["kitchen", "kitchen island", "kitchen counter"],
-            ["bathroom", "bathtub", "shower stall"]
-        ]
+        anchor = rng.choice(anchors) if anchors else "room"
+        sampled_tags = [anchor]
 
-        # 1. 随机选定一个核心锚点
-        anchor = rng.choice(cleaned_tags)
+        if details:
+            detail_count = min(rng.randint(1, 2), len(details))
+            sampled_tags.extend(rng.sample(details, detail_count))
 
-        # 2. 判定该锚点的互斥组并过滤候选
-        banned = set()
-        anchor_group = None
-        for grp in mutex_sub_groups:
-            if any(g in anchor.lower() for g in grp):
-                anchor_group = grp
-                break
+        return SampleResult(
+            tags=tuple(sampled_tags),
+            item_id=chosen.get("id", "scene_unknown"),
+            context_ids=tuple(chosen.get("context_ids", ("generic",))),
+            exclusive_group=chosen.get("exclusive_group")
+        )
 
-        if anchor_group:
-            for grp in mutex_sub_groups:
-                if grp != anchor_group and any(any(m in t.lower() for m in grp) for t in cleaned_tags):
-                    for item in grp:
-                        banned.add(item)
+    def sample_scene(self, category: str, rng: Random) -> List[str]:
+        res = self.sample_scene_result(category, rng)
+        return list(res.tags) if res else []
 
-        # 室内外基础互斥过滤
-        if any(m in anchor.lower() for m in ["outdoor", "rotenburo", "snow view", "riverbank", "embankment", "bushes"]):
-            banned.update(["indoor", "changing room", "locker room", "shower stall"])
-        elif any(m in anchor.lower() for m in ["indoor", "changing room", "bedroom", "kitchen"]):
-            banned.update(["outdoor", "snow view", "riverbank", "embankment", "under bridge"])
-
-        compatible = [t for t in cleaned_tags if t != anchor and not any(b in t.lower() for b in banned)]
-
-        sampled = [anchor]
-        if compatible:
-            extra_count = min(rng.randint(1, 2), len(compatible))
-            sampled.extend(rng.sample(compatible, extra_count))
-
-        return sampled
-
-    def sample_theme(self, theme: str, rng: random.Random) -> List[str]:
+    def sample_theme(self, theme: str, rng: Random) -> List[str]:
         if _is_none(theme):
             return []
         data = self._load("themes")
@@ -309,7 +304,7 @@ class DataSampler:
 
     # ─── 槽位 2: 景别 + 视角 + 画质/设备 ───
 
-    def sample_shot_type(self, shot_type: str, rng: random.Random) -> List[str]:
+    def sample_shot_type(self, shot_type: str, rng: Random) -> List[str]:
         if _is_none(shot_type):
             return []
         data = self._load("shot_types")
@@ -331,7 +326,7 @@ class DataSampler:
         tags = self._flatten_tags(chosen)
         return tags[:2] if tags else []
 
-    def sample_camera_angle(self, angle: str, rng: random.Random) -> List[str]:
+    def sample_camera_angle(self, angle: str, rng: Random) -> List[str]:
         if _is_none(angle):
             return []
         data = self._load("shot_types")
@@ -368,7 +363,7 @@ class DataSampler:
 
     # ─── 槽位 3: 裸露状态 ───
 
-    def sample_nudity(self, level: str | int, rng: random.Random) -> Tuple[List[str], str]:
+    def sample_nudity(self, level: str | int, rng: Random) -> Tuple[List[str], str]:
         """返回 (采样tags, 标准等级代码比如L1/L2/L3/L4/L5/L6)"""
         data = self._load("nudity_levels")
         levels = data.get("nudity_levels", [])
@@ -404,19 +399,16 @@ class DataSampler:
         sampled_tags = self._pick(tags, rng, min(rng.randint(2, 3), len(tags))) if tags else []
         return (sampled_tags, lvl_code)
 
-    # ─── 槽位 4: 服装款式与穿脱状态（与裸露等级精准咬合联动） ───
+    # ─── 槽位 4: 服装款式与穿脱状态 ───
 
     def sample_clothing_with_nudity_linkage(
         self,
         style: str,
         state: str,
         nudity_level_code: str,
-        rng: random.Random,
+        rng: Random,
         context: Optional[str] = None
     ) -> List[str]:
-        """
-        基于 04-服装专项 的【服装×裸露联动速查表】装配自洽的服装与脱法词。
-        """
         if _is_none(style):
             return []
         data = self._load("clothing")
@@ -425,9 +417,10 @@ class DataSampler:
             return []
 
         # 1. 确定服装款式对象
+        chosen_style = None
         if _is_random(style):
-            if context and context in CONTEXT_AFFINITY and rng.random() < 0.85:
-                aff_ids = CONTEXT_AFFINITY[context].get("clothing", [])
+            aff_ids = self._get_affinity_ids(context, "clothing")
+            if aff_ids and rng.random() < 0.85:
                 pool = [c for c in styles if c.get("id") in aff_ids]
                 chosen_style = self._pick_one(pool if pool else styles, rng)
             else:
@@ -448,19 +441,15 @@ class DataSampler:
         linkages = data.get("clothing_nudity_linkage", {})
         linkage_data = linkages.get(nudity_level_code, {})
 
-        # 如果状态为「自动联动裸露等级」或未指定
         if _is_auto(state) or _is_none(state) or state == "自动联动裸露等级 (Auto Link Nudity)":
-            # 检查是否有该款式专属的脱法覆盖
             style_overrides = linkage_data.get("style_overrides", {})
             if c_id in style_overrides:
                 return style_overrides[c_id]
-            # 通用联动
             gen_tags = linkage_data.get("general_tags", [])
             chosen_gen = self._pick(gen_tags, rng, min(2, len(gen_tags)))
             chosen_style_tags = self._pick(base_style_tags, rng, min(2, len(base_style_tags)))
             return chosen_style_tags + chosen_gen
 
-        # 如果用户显式选择了特定的服装状态（如解开纽扣、撕裂破损等）
         states = data.get("clothing_states", [])
         if _is_random(state):
             chosen_state = self._pick_one(states, rng)
@@ -477,7 +466,7 @@ class DataSampler:
 
     # ─── 槽位 5: 光影氛围 ───
 
-    def sample_lighting(self, preset: str, rng: random.Random) -> List[str]:
+    def sample_lighting(self, preset: str, rng: Random) -> List[str]:
         data = self._load("lighting")
 
         if not _is_auto(preset) and not _is_random(preset):
@@ -512,7 +501,7 @@ class DataSampler:
 
     # ─── 槽位 6: 姿势动作 ───
 
-    def sample_pose(self, category: str, rng: random.Random) -> List[str]:
+    def sample_pose(self, category: str, rng: Random) -> List[str]:
         data = self._load("poses")
         categories = data.get("pose_categories", [])
         if not categories:
@@ -539,7 +528,7 @@ class DataSampler:
 
     # ─── 槽位 7: 表情眼神 ───
 
-    def sample_expression(self, mood: str, rng: random.Random) -> List[str]:
+    def sample_expression(self, mood: str, rng: Random) -> List[str]:
         data = self._load("expressions")
         categories = data.get("emotions", [])
         if not categories:
@@ -560,7 +549,7 @@ class DataSampler:
 
     # ─── 槽位 8: 风格/胶片 ───
 
-    def sample_film(self, stock: str, rng: random.Random) -> List[str]:
+    def sample_film(self, stock: str, rng: Random) -> List[str]:
         if _is_none(stock):
             return []
         data = self._load("film_stocks")
@@ -592,7 +581,7 @@ class DataSampler:
 
     # ─── 槽位 9: 妆容细节 ───
 
-    def sample_makeup(self, makeup_style: str, rng: random.Random, context: Optional[str] = None) -> List[str]:
+    def sample_makeup(self, makeup_style: str, rng: Random, context: Optional[str] = None) -> List[str]:
         if _is_none(makeup_style):
             return []
         data = self._load("makeup")
@@ -601,8 +590,8 @@ class DataSampler:
             return []
 
         if _is_random(makeup_style):
-            if context and context in CONTEXT_AFFINITY and rng.random() < 0.85:
-                aff_ids = CONTEXT_AFFINITY[context].get("makeup", [])
+            aff_ids = self._get_affinity_ids(context, "makeup")
+            if aff_ids and rng.random() < 0.85:
                 pool = [m for m in styles if m.get("id") in aff_ids]
                 chosen = self._pick_one(pool if pool else styles, rng)
             else:
@@ -621,7 +610,7 @@ class DataSampler:
 
     # ─── 槽位 10: 发型与饰品 ───
 
-    def sample_hairstyle(self, hairstyle: str, rng: random.Random, context: Optional[str] = None) -> List[str]:
+    def sample_hairstyle(self, hairstyle: str, rng: Random, context: Optional[str] = None) -> List[str]:
         if _is_none(hairstyle):
             return []
         data = self._load("accessories")
@@ -630,8 +619,8 @@ class DataSampler:
             return []
 
         if _is_random(hairstyle):
-            if context and context in CONTEXT_AFFINITY and rng.random() < 0.85:
-                aff_ids = CONTEXT_AFFINITY[context].get("hairstyles", [])
+            aff_ids = self._get_affinity_ids(context, "hairstyles")
+            if aff_ids and rng.random() < 0.85:
                 pool = [h for h in styles if h.get("id") in aff_ids]
                 chosen = self._pick_one(pool if pool else styles, rng)
             else:
@@ -648,7 +637,7 @@ class DataSampler:
         tags = self._flatten_tags(chosen)
         return tags[:2] if tags else []
 
-    def sample_jewelry(self, jewelry_style: str, rng: random.Random, context: Optional[str] = None) -> List[str]:
+    def sample_jewelry(self, jewelry_style: str, rng: Random, context: Optional[str] = None) -> List[str]:
         if _is_none(jewelry_style):
             return []
         data = self._load("accessories")
@@ -657,8 +646,8 @@ class DataSampler:
             return []
 
         if _is_random(jewelry_style):
-            if context and context in CONTEXT_AFFINITY and rng.random() < 0.85:
-                aff_ids = CONTEXT_AFFINITY[context].get("headwear_jewelry", [])
+            aff_ids = self._get_affinity_ids(context, "headwear_jewelry")
+            if aff_ids and rng.random() < 0.85:
                 pool = [j for j in items if j.get("id") in aff_ids]
                 chosen = self._pick_one(pool if pool else items, rng)
             else:
@@ -677,7 +666,7 @@ class DataSampler:
 
     # ─── 槽位 11: 真实瑕疵细节 ───
 
-    def sample_imperfections(self, imp_type: str, rng: random.Random) -> List[str]:
+    def sample_imperfections(self, imp_type: str, rng: Random) -> List[str]:
         if _is_none(imp_type):
             return []
         data = self._load("imperfections")
@@ -701,7 +690,7 @@ class DataSampler:
 
     # ─── 槽位 12: 纹身标记与皮肤融合 ───
 
-    def sample_tattoo(self, tattoo_style: str, rng: random.Random, context: Optional[str] = None) -> List[str]:
+    def sample_tattoo(self, tattoo_style: str, rng: Random, context: Optional[str] = None) -> List[str]:
         if _is_none(tattoo_style):
             return []
         data = self._load("tattoos")
@@ -710,8 +699,8 @@ class DataSampler:
             return []
 
         if _is_random(tattoo_style):
-            if context and context in CONTEXT_AFFINITY and rng.random() < 0.85:
-                aff_ids = CONTEXT_AFFINITY[context].get("tattoos", [])
+            aff_ids = self._get_affinity_ids(context, "tattoos")
+            if aff_ids and rng.random() < 0.85:
                 pool = [t for t in tattoos if t.get("id") in aff_ids]
                 chosen = self._pick_one(pool if pool else tattoos, rng)
             else:
@@ -728,22 +717,11 @@ class DataSampler:
             return []
 
         tags = self._flatten_tags(chosen)
-        if not tags:
-            return []
-
-        fusion_words = [
-            "realistic tattoo",
-            "ink embedded in dermis",
-            "tattoo beneath skin surface",
-            "follows body contours",
-            "slightly faded edges",
-            "pores visible through ink",
-        ]
-        return tags + self._pick(fusion_words, rng, 3)
+        return tags
 
     # ─── 槽位 13: 道具宠物 ───
 
-    def sample_prop(self, prop_style: str, rng: random.Random, context: Optional[str] = None) -> List[str]:
+    def sample_prop(self, prop_style: str, rng: Random, context: Optional[str] = None) -> List[str]:
         if _is_none(prop_style):
             return []
         data = self._load("props")
@@ -752,8 +730,8 @@ class DataSampler:
             return []
 
         if _is_random(prop_style):
-            if context and context in CONTEXT_AFFINITY and rng.random() < 0.85:
-                aff_ids = CONTEXT_AFFINITY[context].get("props", [])
+            aff_ids = self._get_affinity_ids(context, "props")
+            if aff_ids and rng.random() < 0.85:
                 pool = [p for p in props if p.get("id") in aff_ids]
                 chosen = self._pick_one(pool if pool else props, rng)
             else:
@@ -774,7 +752,7 @@ class DataSampler:
 
     # ─── 槽位 14: 人格角色卡 ───
 
-    def sample_character(self, character_role: str, rng: random.Random, context: Optional[str] = None) -> List[str]:
+    def sample_character(self, character_role: str, rng: Random, context: Optional[str] = None) -> List[str]:
         if _is_none(character_role):
             return []
         data = self._load("characters")
@@ -783,8 +761,8 @@ class DataSampler:
             return []
 
         if _is_random(character_role):
-            if context and context in CONTEXT_AFFINITY and rng.random() < 0.85:
-                aff_ids = CONTEXT_AFFINITY[context].get("characters", [])
+            aff_ids = self._get_affinity_ids(context, "characters")
+            if aff_ids and rng.random() < 0.85:
                 pool = [c for c in chars if c.get("id") in aff_ids]
                 chosen = self._pick_one(pool if pool else chars, rng)
             else:
@@ -805,7 +783,7 @@ class DataSampler:
 
     # ─── 槽位 15: 液体体液系统 ───
 
-    def sample_liquid(self, liquid_effect: str, rng: random.Random, context: Optional[str] = None) -> List[str]:
+    def sample_liquid(self, liquid_effect: str, rng: Random, context: Optional[str] = None) -> List[str]:
         if _is_none(liquid_effect):
             return []
         data = self._load("nudity_levels")
@@ -814,8 +792,8 @@ class DataSampler:
             return []
 
         if _is_random(liquid_effect):
-            if context and context in CONTEXT_AFFINITY and "liquids" in CONTEXT_AFFINITY[context] and rng.random() < 0.85:
-                aff_ids = CONTEXT_AFFINITY[context].get("liquids", [])
+            aff_ids = self._get_affinity_ids(context, "liquids")
+            if aff_ids and rng.random() < 0.85:
                 pool = [l for l in liquids if l.get("id") in aff_ids]
                 chosen = self._pick_one(pool if pool else liquids, rng)
             else:
@@ -836,7 +814,7 @@ class DataSampler:
 
     # ─── 风格配方与预设 ───
 
-    def get_style_recipe(self, recipe_name: str, rng: random.Random = None) -> Optional[Dict[str, Any]]:
+    def get_style_recipe(self, recipe_name: str, rng: Optional[Random] = None) -> Optional[Dict[str, Any]]:
         if _is_none(recipe_name):
             return None
         data = self._load("style_recipes")
@@ -844,7 +822,9 @@ class DataSampler:
         if not recipes:
             return None
         if _is_random(recipe_name):
-            return (rng or random).choice(recipes)
+            if rng is None:
+                rng = Random(42)
+            return rng.choice(recipes)
         return next((r for r in recipes
                      if r.get("style_name") == recipe_name
                      or r.get("name_zh") == recipe_name
@@ -852,7 +832,7 @@ class DataSampler:
                      or recipe_name in str(r.get("style_name", ""))
                      or str(r.get("style_name", "")) in recipe_name), None)
 
-    def get_preset(self, preset_id: str, rng: random.Random) -> Optional[Dict[str, Any]]:
+    def get_preset(self, preset_id: str, rng: Random) -> Optional[Dict[str, Any]]:
         if _is_none(preset_id):
             return None
         data = self._load("presets")

@@ -1,7 +1,9 @@
 {
   "recipes": [
     {
+      "id": "recipe_av_cover",
       "style_name": "AV封面",
+      "name_zh": "AV封面",
       "style_recipe": "85mm portrait lens, gravure idol photography, photorealistic",
       "exposure_mode": "half_nude",
       "lighting_palette": "ring light, soft studio lighting, neutral white",
@@ -11,7 +13,9 @@
       "focus_detail": "tack-sharp focus on eyes, high-fidelity skin texture, studio light catching reflection"
     },
     {
+      "id": "recipe_cctv_surveillance",
       "style_name": "监控纪实",
+      "name_zh": "监控纪实",
       "style_recipe": "CCTV footage, security camera style, surveillance camera view",
       "exposure_mode": "half_covered",
       "lighting_palette": "harsh fluorescent ceiling light, cool white 6500K",
@@ -21,7 +25,9 @@
       "focus_detail": "overhead static camera angle, grainy scanlines, low resolution artifacts, digital timestamp watermark"
     },
     {
+      "id": "recipe_phone_selfie",
       "style_name": "手机私密",
+      "name_zh": "手机私密",
       "style_recipe": "phone camera selfie, mobile photography snapshot",
       "exposure_mode": "upper",
       "lighting_palette": "warm lamp light, glow from phone screen, 2700K",
@@ -31,7 +37,9 @@
       "focus_detail": "handheld phone selfie perspective, mirror reflection lens flare, soft background blur"
     },
     {
+      "id": "recipe_90s_hk_cinema",
       "style_name": "复古港风",
+      "name_zh": "复古港风",
       "style_recipe": "35mm film camera photography, 1990s Hong Kong cinematic look",
       "exposure_mode": "half_covered",
       "lighting_palette": "warm golden environmental light, neon refraction",
@@ -41,7 +49,9 @@
       "focus_detail": "warm analog film grain, cinematic color grading, Kodak Gold 200 tones, realistic skin texture"
     },
     {
+      "id": "recipe_neon_desire",
       "style_name": "霓虹欲望",
+      "name_zh": "霓虹欲望",
       "style_recipe": "anamorphic lens cinematic photography, cyberpunk night style",
       "exposure_mode": "half_nude",
       "lighting_palette": "vibrant neon ambient, pink and blue rim light",
@@ -51,34 +61,40 @@
       "focus_detail": "cinematic depth of field, anamorphic purple neon lens flare, water droplets on glistening skin"
     },
     {
+      "id": "recipe_monochrome_noir",
       "style_name": "黑白艺术",
+      "name_zh": "黑白艺术",
       "style_recipe": "medium format monochrome photography, classic film noir style",
       "exposure_mode": "both",
       "lighting_palette": "high contrast side light, chiaroscuro shadows",
       "pose_direction": "crouching on floor, arms wrapping knees, stretched spine",
       "makeup_direction": "completely bare face, natural skin textures",
       "expression_gaze": "empty gaze, staring into space, neutral face",
-      "focus_detail": "dramatic chiaroscuro shadows, fine analog film grain, sharp contrast outline of body"
+      "focus_detail": "Ilford HP5 monochrome film grain, deep shadows, fine gray gradient, high microcontrast"
     },
     {
-      "style_name": "日常素人",
-      "style_recipe": "candid DSLR photography, casual lifestyle snapshot",
+      "id": "recipe_morning_sunlight",
+      "style_name": "晨光人妻",
+      "name_zh": "晨光人妻",
+      "style_recipe": "50mm prime lens, soft natural window light portrait",
       "exposure_mode": "half_covered",
-      "lighting_palette": "natural sunlight through window, daylight",
-      "pose_direction": "standing in kitchen, oversized knit sweater slipping off shoulder",
-      "makeup_direction": "no-makeup look, clean skin, ponytail",
-      "expression_gaze": "casual smile, looking at glass, relaxed mood",
-      "focus_detail": "natural depth of field, soft background bokeh, realistic everyday lighting, coarse knit texture"
+      "lighting_palette": "golden morning sun ray through sheer curtain, warm 3200K",
+      "pose_direction": "sitting on edge of unmade bed, hugging pillow, looking back",
+      "makeup_direction": "morning dewy skin, natural flush, gentle lips",
+      "expression_gaze": "shy affectionate smile, sleepy morning eyes",
+      "focus_detail": "dust motes in sunbeam, soft lens halation, sheer curtain texture, peach fuzz skin detail"
     },
     {
-      "style_name": "SM束缚",
-      "style_recipe": "50mm lens photography, dramatic cinematic art portrait",
-      "exposure_mode": "half_nude",
-      "lighting_palette": "single hard spotlight, dramatic shadows, warm candle glow",
-      "pose_direction": "kneening pose, bound in ropes over strappy harness lingerie",
-      "makeup_direction": "tear-streaked face, smudged eyeliner",
-      "expression_gaze": "gazing up, pleading eyes, parted lips",
-      "focus_detail": "shallow focus, high-fidelity rope texture contrast on skin, glistening sweat"
+      "id": "recipe_japanese_aesthetic",
+      "style_name": "日式唯美",
+      "name_zh": "日式唯美",
+      "style_recipe": "Japanese aesthetic photography, muted pastel tones, calm mood",
+      "exposure_mode": "upper",
+      "lighting_palette": "diffused overcast daylight, pale cool tones",
+      "pose_direction": "kneeling on tatami floor, resting chin on hands",
+      "makeup_direction": "subtle Japanese makeup, light pink blush, sheer gloss",
+      "expression_gaze": "gentle direct gaze at camera, tranquil calm mood",
+      "focus_detail": "tatami straw texture, shoji screen soft shadows, creamy bokeh background"
     }
   ]
 }

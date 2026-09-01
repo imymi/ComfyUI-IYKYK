@@ -1,0 +1,978 @@
+{
+  "scene_bedroom": {
+    "label": "卧室私密",
+    "category": "室内私密场景",
+    "expected_context": "domestic",
+    "exclusive_group": "domestic",
+    "anchor_count": 3,
+    "detail_count": 9
+  },
+  "scene_love_hotel_pink_room": {
+    "label": "情人旅馆",
+    "category": "室内私密场景",
+    "expected_context": "domestic",
+    "exclusive_group": "domestic",
+    "anchor_count": 3,
+    "detail_count": 7
+  },
+  "scene_walk_in_closet": {
+    "label": "更私密居家",
+    "category": "室内私密场景",
+    "expected_context": "domestic",
+    "exclusive_group": "domestic",
+    "anchor_count": 3,
+    "detail_count": 12
+  },
+  "scene_honeymoon_suite": {
+    "label": "豪华酒店",
+    "category": "室内私密场景",
+    "expected_context": "domestic",
+    "exclusive_group": "domestic",
+    "anchor_count": 3,
+    "detail_count": 8
+  },
+  "scene_bathroom": {
+    "label": "家庭浴室",
+    "category": "洗浴/温泉场景（日本AV核心！）",
+    "expected_context": "onsen_bath",
+    "exclusive_group": "bathroom",
+    "anchor_count": 3,
+    "detail_count": 8
+  },
+  "scene_hot_spring": {
+    "label": "温泉旅馆",
+    "category": "洗浴/温泉场景（日本AV核心！）",
+    "expected_context": "onsen_bath",
+    "exclusive_group": "onsen_indoor",
+    "anchor_count": 3,
+    "detail_count": 9
+  },
+  "scene_public_bath": {
+    "label": "钱汤/公共浴场",
+    "category": "洗浴/温泉场景（日本AV核心！）",
+    "expected_context": "onsen_bath",
+    "exclusive_group": "onsen_bath",
+    "anchor_count": 3,
+    "detail_count": 6
+  },
+  "scene_soapland_bath": {
+    "label": "特殊洗浴",
+    "category": "洗浴/温泉场景（日本AV核心！）",
+    "expected_context": "onsen_bath",
+    "exclusive_group": "onsen_bath",
+    "anchor_count": 3,
+    "detail_count": 5
+  },
+  "scene_classroom": {
+    "label": "教室",
+    "category": "学校场景（JAV核心主题）",
+    "expected_context": "school",
+    "exclusive_group": "school",
+    "anchor_count": 3,
+    "detail_count": 9
+  },
+  "scene_library": {
+    "label": "图书馆/自习室",
+    "category": "学校场景（JAV核心主题）",
+    "expected_context": "school",
+    "exclusive_group": "school",
+    "anchor_count": 3,
+    "detail_count": 6
+  },
+  "scene_gym_storage_room": {
+    "label": "体育相关",
+    "category": "学校场景（JAV核心主题）",
+    "expected_context": "school",
+    "exclusive_group": "school",
+    "anchor_count": 3,
+    "detail_count": 7
+  },
+  "scene_nurse_office": {
+    "label": "学校保健室",
+    "category": "学校场景（JAV核心主题）",
+    "expected_context": "school",
+    "exclusive_group": "school",
+    "anchor_count": 3,
+    "detail_count": 11
+  },
+  "scene_office": {
+    "label": "办公室",
+    "category": "职场空间（OL/职女系列）",
+    "expected_context": "office",
+    "exclusive_group": "office",
+    "anchor_count": 3,
+    "detail_count": 9
+  },
+  "scene_copy_room": {
+    "label": "办公室死角",
+    "category": "职场空间（OL/职女系列）",
+    "expected_context": "office",
+    "exclusive_group": "office",
+    "anchor_count": 3,
+    "detail_count": 9
+  },
+  "scene_elevator": {
+    "label": "职场其他",
+    "category": "职场空间（OL/职女系列）",
+    "expected_context": "office",
+    "exclusive_group": "office",
+    "anchor_count": 3,
+    "detail_count": 5
+  },
+  "scene_train_interior": {
+    "label": "电车/地铁",
+    "category": "公共交通/交通工具场景",
+    "expected_context": "transit",
+    "exclusive_group": "transit",
+    "anchor_count": 3,
+    "detail_count": 9
+  },
+  "scene_car_backseat": {
+    "label": "车内",
+    "category": "公共交通/交通工具场景",
+    "expected_context": "transit",
+    "exclusive_group": "transit",
+    "anchor_count": 3,
+    "detail_count": 7
+  },
+  "scene_bus_interior": {
+    "label": "巴士",
+    "category": "公共交通/交通工具场景",
+    "expected_context": "transit",
+    "exclusive_group": "transit",
+    "anchor_count": 3,
+    "detail_count": 3
+  },
+  "scene_ferry_cabin": {
+    "label": "其他交通",
+    "category": "公共交通/交通工具场景",
+    "expected_context": "transit",
+    "exclusive_group": "transit",
+    "anchor_count": 3,
+    "detail_count": 2
+  },
+  "scene_convenience_store": {
+    "label": "便利店/超市",
+    "category": "商业/服务场所",
+    "expected_context": "generic",
+    "exclusive_group": "convenience_store",
+    "anchor_count": 3,
+    "detail_count": 6
+  },
+  "scene_restaurant_private_room": {
+    "label": "餐饮娱乐",
+    "category": "商业/服务场所",
+    "expected_context": "dining",
+    "exclusive_group": "dining_room",
+    "anchor_count": 3,
+    "detail_count": 9
+  },
+  "scene_manga_cafe_booth": {
+    "label": "漫画喫茶/网吧",
+    "category": "商业/服务场所",
+    "expected_context": "generic",
+    "exclusive_group": "generic",
+    "anchor_count": 3,
+    "detail_count": 3
+  },
+  "scene_fitting_room": {
+    "label": "商场/店铺",
+    "category": "商业/服务场所",
+    "expected_context": "generic",
+    "exclusive_group": "generic",
+    "anchor_count": 3,
+    "detail_count": 5
+  },
+  "scene_av_studio": {
+    "label": "摄影棚",
+    "category": "AV拍摄/制作场景（日本特有！）",
+    "expected_context": "adult",
+    "exclusive_group": "adult",
+    "anchor_count": 3,
+    "detail_count": 9
+  },
+  "scene_audition_room": {
+    "label": "面试/试镜",
+    "category": "AV拍摄/制作场景（日本特有！）",
+    "expected_context": "adult",
+    "exclusive_group": "adult",
+    "anchor_count": 3,
+    "detail_count": 6
+  },
+  "scene_dressing_room": {
+    "label": "化妆间",
+    "category": "AV拍摄/制作场景（日本特有！）",
+    "expected_context": "adult",
+    "exclusive_group": "adult",
+    "anchor_count": 3,
+    "detail_count": 5
+  },
+  "scene_jav_cover_style": {
+    "label": "AV封面设计元素",
+    "category": "AV拍摄/制作场景（日本特有！）",
+    "expected_context": "adult",
+    "exclusive_group": "adult",
+    "anchor_count": 3,
+    "detail_count": 27
+  },
+  "scene_soapland_room": {
+    "label": "风俗店",
+    "category": "日式风俗/夜生活",
+    "expected_context": "nightlife",
+    "exclusive_group": "nightlife",
+    "anchor_count": 3,
+    "detail_count": 9
+  },
+  "scene_underground_club": {
+    "label": "夜店/俱乐部",
+    "category": "日式风俗/夜生活",
+    "expected_context": "nightlife",
+    "exclusive_group": "nightlife",
+    "anchor_count": 3,
+    "detail_count": 6
+  },
+  "scene_peep_show_booth": {
+    "label": "风俗窥视室",
+    "category": "日式风俗/夜生活",
+    "expected_context": "nightlife",
+    "exclusive_group": "nightlife",
+    "anchor_count": 3,
+    "detail_count": 6
+  },
+  "scene_tatami_room": {
+    "label": "和室",
+    "category": "和风传统空间",
+    "expected_context": "traditional",
+    "exclusive_group": "washitsu",
+    "anchor_count": 3,
+    "detail_count": 6
+  },
+  "scene_shrine": {
+    "label": "寺庙/神社",
+    "category": "和风传统空间",
+    "expected_context": "traditional",
+    "exclusive_group": "shrine",
+    "anchor_count": 3,
+    "detail_count": 9
+  },
+  "scene_tea_ceremony_room": {
+    "label": "茶室/料亭",
+    "category": "和风传统空间",
+    "expected_context": "traditional",
+    "exclusive_group": "traditional",
+    "anchor_count": 3,
+    "detail_count": 5
+  },
+  "scene_zen_garden": {
+    "label": "和风户外",
+    "category": "和风传统空间",
+    "expected_context": "traditional",
+    "exclusive_group": "traditional",
+    "anchor_count": 3,
+    "detail_count": 6
+  },
+  "scene_hospital_room": {
+    "label": "医院",
+    "category": "医疗/护理场景",
+    "expected_context": "medical",
+    "exclusive_group": "medical",
+    "anchor_count": 3,
+    "detail_count": 9
+  },
+  "scene_clinic": {
+    "label": "诊所",
+    "category": "医疗/护理场景",
+    "expected_context": "medical",
+    "exclusive_group": "medical",
+    "anchor_count": 3,
+    "detail_count": 5
+  },
+  "scene_massage_parlor": {
+    "label": "特殊",
+    "category": "医疗/护理场景",
+    "expected_context": "medical",
+    "exclusive_group": "medical",
+    "anchor_count": 3,
+    "detail_count": 3
+  },
+  "scene_apartment_building": {
+    "label": "公寓/团地",
+    "category": "居住/社区场景",
+    "expected_context": "domestic",
+    "exclusive_group": "domestic",
+    "anchor_count": 3,
+    "detail_count": 9
+  },
+  "scene_house": {
+    "label": "一户建",
+    "category": "居住/社区场景",
+    "expected_context": "domestic",
+    "exclusive_group": "domestic",
+    "anchor_count": 3,
+    "detail_count": 13
+  },
+  "scene_neighbor_s_house": {
+    "label": "近邻",
+    "category": "居住/社区场景",
+    "expected_context": "domestic",
+    "exclusive_group": "domestic",
+    "anchor_count": 3,
+    "detail_count": 4
+  },
+  "scene_park_at_night": {
+    "label": "公园/野外",
+    "category": "户外/露出场景",
+    "expected_context": "outdoor",
+    "exclusive_group": "outdoor",
+    "anchor_count": 3,
+    "detail_count": 9
+  },
+  "scene_beach_at_night": {
+    "label": "海边/泳池",
+    "category": "户外/露出场景",
+    "expected_context": "outdoor",
+    "exclusive_group": "beach",
+    "anchor_count": 3,
+    "detail_count": 6
+  },
+  "scene_camping_tent": {
+    "label": "山林/露营",
+    "category": "户外/露出场景",
+    "expected_context": "outdoor",
+    "exclusive_group": "outdoor",
+    "anchor_count": 3,
+    "detail_count": 5
+  },
+  "scene_rooftop_at_night": {
+    "label": "都市露出",
+    "category": "户外/露出场景",
+    "expected_context": "outdoor",
+    "exclusive_group": "outdoor",
+    "anchor_count": 3,
+    "detail_count": 6
+  },
+  "scene_locked_room": {
+    "label": "监禁",
+    "category": "监禁/密室场景",
+    "expected_context": "bondage_sm",
+    "exclusive_group": "bondage_sm",
+    "anchor_count": 3,
+    "detail_count": 7
+  },
+  "scene_basement": {
+    "label": "地下室",
+    "category": "监禁/密室场景",
+    "expected_context": "bondage_sm",
+    "exclusive_group": "bondage_sm",
+    "anchor_count": 3,
+    "detail_count": 4
+  },
+  "scene_abandoned_building": {
+    "label": "废弃建筑",
+    "category": "监禁/密室场景",
+    "expected_context": "bondage_sm",
+    "exclusive_group": "bondage_sm",
+    "anchor_count": 3,
+    "detail_count": 5
+  },
+  "scene_public_restroom": {
+    "label": "公共厕所",
+    "category": "公共场所/街头系列",
+    "expected_context": "generic",
+    "exclusive_group": "public_restroom",
+    "anchor_count": 3,
+    "detail_count": 9
+  },
+  "scene_elevator_2": {
+    "label": "电梯",
+    "category": "公共场所/街头系列",
+    "expected_context": "generic",
+    "exclusive_group": "elevator",
+    "anchor_count": 3,
+    "detail_count": 9
+  },
+  "scene_building_rooftop": {
+    "label": "天台/大厦楼顶",
+    "category": "公共场所/街头系列",
+    "expected_context": "generic",
+    "exclusive_group": "generic",
+    "anchor_count": 3,
+    "detail_count": 9
+  },
+  "scene_staircase": {
+    "label": "楼梯/逃生梯",
+    "category": "公共场所/街头系列",
+    "expected_context": "generic",
+    "exclusive_group": "generic",
+    "anchor_count": 3,
+    "detail_count": 8
+  },
+  "scene_parking_lot": {
+    "label": "停车场",
+    "category": "公共场所/街头系列",
+    "expected_context": "generic",
+    "exclusive_group": "generic",
+    "anchor_count": 3,
+    "detail_count": 8
+  },
+  "scene_back_alley": {
+    "label": "街头/巷子",
+    "category": "公共场所/街头系列",
+    "expected_context": "generic",
+    "exclusive_group": "generic",
+    "anchor_count": 3,
+    "detail_count": 9
+  },
+  "scene_vending_machine_area": {
+    "label": "自动贩卖机旁",
+    "category": "公共场所/街头系列",
+    "expected_context": "generic",
+    "exclusive_group": "generic",
+    "anchor_count": 3,
+    "detail_count": 2
+  },
+  "scene_atm_corner": {
+    "label": "ATM/银行",
+    "category": "公共场所/街头系列",
+    "expected_context": "generic",
+    "exclusive_group": "generic",
+    "anchor_count": 3,
+    "detail_count": 3
+  },
+  "scene_apartment_balcony": {
+    "label": "屋顶阳台",
+    "category": "公共场所/街头系列",
+    "expected_context": "generic",
+    "exclusive_group": "generic",
+    "anchor_count": 3,
+    "detail_count": 4
+  },
+  "scene_basement_storage": {
+    "label": "地下室/储藏",
+    "category": "公共场所/街头系列",
+    "expected_context": "generic",
+    "exclusive_group": "generic",
+    "anchor_count": 3,
+    "detail_count": 5
+  },
+  "scene_office_building_lobby": {
+    "label": "写字楼大堂",
+    "category": "都市建筑/写字楼系列",
+    "expected_context": "office",
+    "exclusive_group": "office",
+    "anchor_count": 3,
+    "detail_count": 4
+  },
+  "scene_meeting_room": {
+    "label": "会议室",
+    "category": "都市建筑/写字楼系列",
+    "expected_context": "office",
+    "exclusive_group": "office",
+    "anchor_count": 3,
+    "detail_count": 5
+  },
+  "scene_break_room": {
+    "label": "休息室/茶水间",
+    "category": "都市建筑/写字楼系列",
+    "expected_context": "office",
+    "exclusive_group": "office",
+    "anchor_count": 3,
+    "detail_count": 6
+  },
+  "scene_office_bathroom": {
+    "label": "卫生间（职场）",
+    "category": "都市建筑/写字楼系列",
+    "expected_context": "office",
+    "exclusive_group": "office",
+    "anchor_count": 3,
+    "detail_count": 5
+  },
+  "scene_office_parking_garage": {
+    "label": "停车场（职场）",
+    "category": "都市建筑/写字楼系列",
+    "expected_context": "office",
+    "exclusive_group": "office",
+    "anchor_count": 3,
+    "detail_count": 4
+  },
+  "scene_office_building_rooftop": {
+    "label": "大厦天台",
+    "category": "都市建筑/写字楼系列",
+    "expected_context": "office",
+    "exclusive_group": "office",
+    "anchor_count": 3,
+    "detail_count": 3
+  },
+  "scene_cleaning_closet": {
+    "label": "清洁间/杂物间",
+    "category": "都市建筑/写字楼系列",
+    "expected_context": "office",
+    "exclusive_group": "office",
+    "anchor_count": 3,
+    "detail_count": 5
+  },
+  "scene_manga_cafe_booth_2": {
+    "label": "漫画网吧/漫画喫茶",
+    "category": "娱乐场所系列",
+    "expected_context": "nightlife",
+    "exclusive_group": "manga_cafe",
+    "anchor_count": 3,
+    "detail_count": 7
+  },
+  "scene_arcade": {
+    "label": "游戏中心/ arcade",
+    "category": "娱乐场所系列",
+    "expected_context": "nightlife",
+    "exclusive_group": "arcade",
+    "anchor_count": 3,
+    "detail_count": 5
+  },
+  "scene_bowling_alley": {
+    "label": "保龄球/泳池",
+    "category": "娱乐场所系列",
+    "expected_context": "nightlife",
+    "exclusive_group": "nightlife",
+    "anchor_count": 3,
+    "detail_count": 8
+  },
+  "scene_karaoke_room": {
+    "label": "卡拉OK/练歌房",
+    "category": "娱乐场所系列",
+    "expected_context": "nightlife",
+    "exclusive_group": "nightlife",
+    "anchor_count": 3,
+    "detail_count": 5
+  },
+  "scene_billiard_hall": {
+    "label": "撞球厅/桌球",
+    "category": "娱乐场所系列",
+    "expected_context": "nightlife",
+    "exclusive_group": "nightlife",
+    "anchor_count": 3,
+    "detail_count": 4
+  },
+  "scene_movie_theater": {
+    "label": "电影院",
+    "category": "娱乐场所系列",
+    "expected_context": "nightlife",
+    "exclusive_group": "nightlife",
+    "anchor_count": 3,
+    "detail_count": 6
+  },
+  "scene_pachinko_parlor": {
+    "label": "赌场/柏青哥",
+    "category": "娱乐场所系列",
+    "expected_context": "nightlife",
+    "exclusive_group": "nightlife",
+    "anchor_count": 3,
+    "detail_count": 4
+  },
+  "scene_aquarium": {
+    "label": "动物园/水族馆",
+    "category": "娱乐场所系列",
+    "expected_context": "nightlife",
+    "exclusive_group": "nightlife",
+    "anchor_count": 3,
+    "detail_count": 5
+  },
+  "scene_amusement_park": {
+    "label": "游乐园",
+    "category": "娱乐场所系列",
+    "expected_context": "nightlife",
+    "exclusive_group": "nightlife",
+    "anchor_count": 3,
+    "detail_count": 7
+  },
+  "scene_shrine_gate_torii": {
+    "label": "神社/寺庙广场",
+    "category": "娱乐场所系列",
+    "expected_context": "nightlife",
+    "exclusive_group": "nightlife",
+    "anchor_count": 3,
+    "detail_count": 6
+  },
+  "scene_izakaya_booth": {
+    "label": "居酒屋/包厢",
+    "category": "餐饮/包厢系列",
+    "expected_context": "dining",
+    "exclusive_group": "izakaya",
+    "anchor_count": 3,
+    "detail_count": 5
+  },
+  "scene_restaurant_private_room_2": {
+    "label": "餐厅包间",
+    "category": "餐饮/包厢系列",
+    "expected_context": "dining",
+    "exclusive_group": "restaurant",
+    "anchor_count": 3,
+    "detail_count": 4
+  },
+  "scene_ramen_shop_booth": {
+    "label": "拉面店/小吃",
+    "category": "餐饮/包厢系列",
+    "expected_context": "dining",
+    "exclusive_group": "dining",
+    "anchor_count": 3,
+    "detail_count": 5
+  },
+  "scene_cafe_booth": {
+    "label": "咖啡厅/奶茶",
+    "category": "餐饮/包厢系列",
+    "expected_context": "dining",
+    "exclusive_group": "dining",
+    "anchor_count": 3,
+    "detail_count": 4
+  },
+  "scene_bar_counter": {
+    "label": "酒吧/夜店",
+    "category": "餐饮/包厢系列",
+    "expected_context": "dining",
+    "exclusive_group": "dining",
+    "anchor_count": 3,
+    "detail_count": 7
+  },
+  "scene_love_hotel_restaurant": {
+    "label": "情侣酒店内餐厅",
+    "category": "餐饮/包厢系列",
+    "expected_context": "dining",
+    "exclusive_group": "dining",
+    "anchor_count": 3,
+    "detail_count": 1
+  },
+  "scene_yatai_stall": {
+    "label": "路边摊/屋台",
+    "category": "餐饮/包厢系列",
+    "expected_context": "dining",
+    "exclusive_group": "dining",
+    "anchor_count": 3,
+    "detail_count": 3
+  },
+  "scene_vending_machine_corner": {
+    "label": "自动贩卖机旁角落",
+    "category": "餐饮/包厢系列",
+    "expected_context": "dining",
+    "exclusive_group": "dining",
+    "anchor_count": 3,
+    "detail_count": 1
+  },
+  "scene_airport_terminal": {
+    "label": "机场/候机室",
+    "category": "交通枢纽/旅途系列",
+    "expected_context": "transit",
+    "exclusive_group": "transit",
+    "anchor_count": 3,
+    "detail_count": 5
+  },
+  "scene_airplane_cabin": {
+    "label": "机舱/飞机内",
+    "category": "交通枢纽/旅途系列",
+    "expected_context": "transit",
+    "exclusive_group": "transit",
+    "anchor_count": 3,
+    "detail_count": 7
+  },
+  "scene_shinkansen": {
+    "label": "新干线/电车",
+    "category": "交通枢纽/旅途系列",
+    "expected_context": "transit",
+    "exclusive_group": "transit",
+    "anchor_count": 3,
+    "detail_count": 7
+  },
+  "scene_taxi_backseat": {
+    "label": "出租车/包车",
+    "category": "交通枢纽/旅途系列",
+    "expected_context": "transit",
+    "exclusive_group": "transit",
+    "anchor_count": 3,
+    "detail_count": 6
+  },
+  "scene_ferry_cabin_2": {
+    "label": "渡轮/船",
+    "category": "交通枢纽/旅途系列",
+    "expected_context": "transit",
+    "exclusive_group": "transit",
+    "anchor_count": 3,
+    "detail_count": 5
+  },
+  "scene_train_station_platform": {
+    "label": "机场/车站",
+    "category": "交通枢纽/旅途系列",
+    "expected_context": "transit",
+    "exclusive_group": "transit",
+    "anchor_count": 3,
+    "detail_count": 5
+  },
+  "scene_airport_baggage_claim": {
+    "label": "行李转盘/大厅",
+    "category": "交通枢纽/旅途系列",
+    "expected_context": "transit",
+    "exclusive_group": "transit",
+    "anchor_count": 3,
+    "detail_count": 3
+  },
+  "scene_highway_bus": {
+    "label": "长途巴士",
+    "category": "交通枢纽/旅途系列",
+    "expected_context": "transit",
+    "exclusive_group": "transit",
+    "anchor_count": 3,
+    "detail_count": 7
+  },
+  "scene_school_corridor": {
+    "label": "教学楼走廊",
+    "category": "学校/教育设施系列",
+    "expected_context": "school",
+    "exclusive_group": "school",
+    "anchor_count": 3,
+    "detail_count": 6
+  },
+  "scene_music_room": {
+    "label": "音乐室/美术室",
+    "category": "学校/教育设施系列",
+    "expected_context": "school",
+    "exclusive_group": "school",
+    "anchor_count": 3,
+    "detail_count": 5
+  },
+  "scene_gymnasium": {
+    "label": "体育馆/武道场",
+    "category": "学校/教育设施系列",
+    "expected_context": "school",
+    "exclusive_group": "school",
+    "anchor_count": 3,
+    "detail_count": 10
+  },
+  "scene_school_swimming_pool": {
+    "label": "泳池/更衣室",
+    "category": "学校/教育设施系列",
+    "expected_context": "school",
+    "exclusive_group": "school",
+    "anchor_count": 3,
+    "detail_count": 5
+  },
+  "scene_school_rooftop": {
+    "label": "学校天台",
+    "category": "学校/教育设施系列",
+    "expected_context": "school",
+    "exclusive_group": "school",
+    "anchor_count": 3,
+    "detail_count": 3
+  },
+  "scene_school_nurse_office": {
+    "label": "保健室",
+    "category": "学校/教育设施系列",
+    "expected_context": "school",
+    "exclusive_group": "school",
+    "anchor_count": 3,
+    "detail_count": 4
+  },
+  "scene_home_economics_room": {
+    "label": "家政教室",
+    "category": "学校/教育设施系列",
+    "expected_context": "school",
+    "exclusive_group": "school",
+    "anchor_count": 3,
+    "detail_count": 3
+  },
+  "scene_school_library": {
+    "label": "图书室/自习室",
+    "category": "学校/教育设施系列",
+    "expected_context": "school",
+    "exclusive_group": "school",
+    "anchor_count": 3,
+    "detail_count": 3
+  },
+  "scene_club_room": {
+    "label": "部活室/社团室",
+    "category": "学校/教育设施系列",
+    "expected_context": "school",
+    "exclusive_group": "school",
+    "anchor_count": 3,
+    "detail_count": 4
+  },
+  "scene_school_toilet": {
+    "label": "厕所（学校）",
+    "category": "学校/教育设施系列",
+    "expected_context": "school",
+    "exclusive_group": "school",
+    "anchor_count": 3,
+    "detail_count": 4
+  },
+  "scene_adult_video_store": {
+    "label": "成人录像厅",
+    "category": "成人场所/特殊行业系列",
+    "expected_context": "adult",
+    "exclusive_group": "adult",
+    "anchor_count": 3,
+    "detail_count": 3
+  },
+  "scene_rental_studio": {
+    "label": "个人工作室/出租房",
+    "category": "成人场所/特殊行业系列",
+    "expected_context": "adult",
+    "exclusive_group": "adult",
+    "anchor_count": 3,
+    "detail_count": 5
+  },
+  "scene_temple": {
+    "label": "和尚/尼姑庵",
+    "category": "成人场所/特殊行业系列",
+    "expected_context": "adult",
+    "exclusive_group": "adult",
+    "anchor_count": 3,
+    "detail_count": 4
+  },
+  "scene_cemetery_at_night": {
+    "label": "墓地/灵园",
+    "category": "成人场所/特殊行业系列",
+    "expected_context": "adult",
+    "exclusive_group": "adult",
+    "anchor_count": 3,
+    "detail_count": 4
+  },
+  "scene_funeral_hall": {
+    "label": "墓地/殡仪馆",
+    "category": "成人场所/特殊行业系列",
+    "expected_context": "adult",
+    "exclusive_group": "adult",
+    "anchor_count": 3,
+    "detail_count": 3
+  },
+  "scene_psychiatric_ward": {
+    "label": "精神病院/疗养院",
+    "category": "成人场所/特殊行业系列",
+    "expected_context": "adult",
+    "exclusive_group": "adult",
+    "anchor_count": 3,
+    "detail_count": 5
+  },
+  "scene_institution": {
+    "label": "孤儿院/福利院",
+    "category": "成人场所/特殊行业系列",
+    "expected_context": "adult",
+    "exclusive_group": "adult",
+    "anchor_count": 3,
+    "detail_count": 4
+  },
+  "scene_kabukicho": {
+    "label": "红灯区街道",
+    "category": "成人场所/特殊行业系列",
+    "expected_context": "adult",
+    "exclusive_group": "adult",
+    "anchor_count": 3,
+    "detail_count": 6
+  },
+  "scene_sex_shop_interior": {
+    "label": "羞耻诊所/体验店",
+    "category": "成人场所/特殊行业系列",
+    "expected_context": "adult",
+    "exclusive_group": "adult",
+    "anchor_count": 3,
+    "detail_count": 4
+  },
+  "scene_utility_room": {
+    "label": "配电室/管道",
+    "category": "特殊空间/不可能空间",
+    "expected_context": "generic",
+    "exclusive_group": "generic",
+    "anchor_count": 3,
+    "detail_count": 5
+  },
+  "scene_glass_room": {
+    "label": "透明空间",
+    "category": "特殊空间/不可能空间",
+    "expected_context": "generic",
+    "exclusive_group": "generic",
+    "anchor_count": 3,
+    "detail_count": 5
+  },
+  "scene_construction_scaffolding": {
+    "label": "高处以次充好",
+    "category": "特殊空间/不可能空间",
+    "expected_context": "generic",
+    "exclusive_group": "generic",
+    "anchor_count": 3,
+    "detail_count": 4
+  },
+  "scene_locker": {
+    "label": "狭窄空间",
+    "category": "特殊空间/不可能空间",
+    "expected_context": "generic",
+    "exclusive_group": "generic",
+    "anchor_count": 3,
+    "detail_count": 6
+  },
+  "scene_bathtub": {
+    "label": "水中空间",
+    "category": "特殊空间/不可能空间",
+    "expected_context": "generic",
+    "exclusive_group": "generic",
+    "anchor_count": 3,
+    "detail_count": 7
+  },
+  "scene_room_full_of_mirrors": {
+    "label": "镜面空间",
+    "category": "特殊空间/不可能空间",
+    "expected_context": "generic",
+    "exclusive_group": "generic",
+    "anchor_count": 3,
+    "detail_count": 4
+  },
+  "scene_interrogation_room": {
+    "label": "警察/审讯",
+    "category": "其他日本AV常见场景",
+    "expected_context": "generic",
+    "exclusive_group": "generic",
+    "anchor_count": 3,
+    "detail_count": 5
+  },
+  "scene_chapel": {
+    "label": "教堂/忏悔",
+    "category": "其他日本AV常见场景",
+    "expected_context": "generic",
+    "exclusive_group": "generic",
+    "anchor_count": 3,
+    "detail_count": 7
+  },
+  "scene_judo_dojo": {
+    "label": "体育/竞技",
+    "category": "其他日本AV常见场景",
+    "expected_context": "generic",
+    "exclusive_group": "generic",
+    "anchor_count": 3,
+    "detail_count": 6
+  },
+  "scene_ryokan_room": {
+    "label": "温泉旅行",
+    "category": "其他日本AV常见场景",
+    "expected_context": "generic",
+    "exclusive_group": "generic",
+    "anchor_count": 3,
+    "detail_count": 4
+  },
+  "scene_student_home": {
+    "label": "家庭访问",
+    "category": "其他日本AV常见场景",
+    "expected_context": "generic",
+    "exclusive_group": "generic",
+    "anchor_count": 3,
+    "detail_count": 4
+  },
+  "scene_magic_mirror_bus_interior": {
+    "label": "マジックミラー号",
+    "category": "魔术镜号/特殊车辆（JAV独有）",
+    "expected_context": "adult",
+    "exclusive_group": "adult",
+    "anchor_count": 3,
+    "detail_count": 10
+  },
+  "scene_av_editing_room": {
+    "label": "映像編集室",
+    "category": "影像编辑室/导演审片室（AV制作场景）",
+    "expected_context": "adult",
+    "exclusive_group": "adult",
+    "anchor_count": 3,
+    "detail_count": 12
+  }
+}

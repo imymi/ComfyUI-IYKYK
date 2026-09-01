@@ -1,0 +1,12 @@
+source_md/
+tests/
+schemas/
+scripts/
+.git/
+.github/
+__pycache__/
+*.pyc
+*.pyo
+.DS_Store
+.pytest_cache/
+*.zip

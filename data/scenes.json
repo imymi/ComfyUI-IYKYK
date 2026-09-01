@@ -4,7 +4,29 @@
       "category": "室内私密场景",
       "items": [
         {
+          "id": "scene_bedroom",
+          "label": "卧室私密",
           "subcategory": "卧室私密",
+          "context_ids": [
+            "domestic"
+          ],
+          "anchor_tags": [
+            "bedroom",
+            "hotel room",
+            "love hotel"
+          ],
+          "detail_tags": [
+            "tatami room",
+            "futon on floor",
+            "messy bed",
+            "unmade sheets",
+            "pillow fight aftermath",
+            "morning after bed",
+            "single apartment",
+            "cheap apartment",
+            "1K apartment"
+          ],
+          "exclusive_group": "domestic",
           "tags": [
             "bedroom",
             "hotel room",
@@ -22,7 +44,27 @@
           "atmosphere": "私密空间、事后氛围、慵懒感"
         },
         {
+          "id": "scene_love_hotel_pink_room",
+          "label": "情人旅馆",
           "subcategory": "情人旅馆",
+          "context_ids": [
+            "domestic"
+          ],
+          "anchor_tags": [
+            "love hotel pink room",
+            "rotating bed",
+            "ceiling mirror"
+          ],
+          "detail_tags": [
+            "love hotel bathroom",
+            "heart-shaped bed",
+            "neon-lit love hotel room",
+            "love hotel lobby",
+            "love hotel corridor",
+            "love hotel elevator",
+            "love hotel vending machine area"
+          ],
+          "exclusive_group": "domestic",
           "tags": [
             "love hotel pink room",
             "rotating bed",
@@ -38,7 +80,32 @@
           "atmosphere": "日本特产、暧昧灯光、偷情感"
         },
         {
+          "id": "scene_walk_in_closet",
+          "label": "更私密居家",
           "subcategory": "更私密居家",
+          "context_ids": [
+            "domestic"
+          ],
+          "anchor_tags": [
+            "walk-in closet",
+            "vanity table",
+            "master bathroom"
+          ],
+          "detail_tags": [
+            "guest bedroom",
+            "attic bedroom",
+            "basement game room",
+            "home gym",
+            "yoga mat",
+            "home office desk",
+            "kitchen island",
+            "pantry",
+            "laundry basket",
+            "drying rack",
+            "genkan entrance",
+            "shoe cabinet"
+          ],
+          "exclusive_group": "domestic",
           "tags": [
             "walk-in closet",
             "vanity table",
@@ -59,7 +126,28 @@
           "atmosphere": "日常偷情、家庭禁忌、私密感强"
         },
         {
+          "id": "scene_honeymoon_suite",
+          "label": "豪华酒店",
           "subcategory": "豪华酒店",
+          "context_ids": [
+            "domestic"
+          ],
+          "anchor_tags": [
+            "honeymoon suite",
+            "bridal suite",
+            "capsule hotel"
+          ],
+          "detail_tags": [
+            "rotating bed",
+            "ceiling mirror",
+            "open bathroom",
+            "hotel balcony night",
+            "penthouse suite",
+            "hotel pool after hours",
+            "hotel corridor late night",
+            "business hotel room"
+          ],
+          "exclusive_group": "domestic",
           "tags": [
             "honeymoon suite",
             "bridal suite",
@@ -81,7 +169,28 @@
       "category": "洗浴/温泉场景（日本AV核心！）",
       "items": [
         {
+          "id": "scene_bathroom",
+          "label": "家庭浴室",
           "subcategory": "家庭浴室",
+          "context_ids": [
+            "onsen_bath"
+          ],
+          "anchor_tags": [
+            "bathroom",
+            "shower room",
+            "bathtub"
+          ],
+          "detail_tags": [
+            "wet bathroom floor",
+            "steamy shower",
+            "bubble bath",
+            "bathroom mirror fogged",
+            "shower curtain",
+            "bathroom stool",
+            "washing area",
+            "unit bath"
+          ],
+          "exclusive_group": "bathroom",
           "tags": [
             "bathroom",
             "shower room",
@@ -98,7 +207,29 @@
           "atmosphere": "湿身诱惑、雾气朦胧、日常私密"
         },
         {
+          "id": "scene_hot_spring",
+          "label": "温泉旅馆",
           "subcategory": "温泉旅馆",
+          "context_ids": [
+            "onsen_bath"
+          ],
+          "anchor_tags": [
+            "hot spring",
+            "onsen",
+            "outdoor bath"
+          ],
+          "detail_tags": [
+            "rotenburo",
+            "indoor onsen",
+            "private onsen",
+            "ryokan bath",
+            "open-air bath",
+            "onsen with snow view",
+            "onsen at night",
+            "onsen changing room",
+            "onsen washing area"
+          ],
+          "exclusive_group": "onsen_indoor",
           "tags": [
             "hot spring",
             "onsen",
@@ -116,7 +247,26 @@
           "atmosphere": "和风情色、露天入浴、混浴禁忌"
         },
         {
+          "id": "scene_public_bath",
+          "label": "钱汤/公共浴场",
           "subcategory": "钱汤/公共浴场",
+          "context_ids": [
+            "onsen_bath"
+          ],
+          "anchor_tags": [
+            "public bath",
+            "sento",
+            "coin bath"
+          ],
+          "detail_tags": [
+            "neighborhood bathhouse",
+            "public bath changing room",
+            "sauna",
+            "jacuzzi",
+            "cold bath",
+            "electric bath"
+          ],
+          "exclusive_group": "onsen_bath",
           "tags": [
             "public bath",
             "sento",
@@ -131,7 +281,25 @@
           "atmosphere": "公共裸露、日常风情、昭和感"
         },
         {
+          "id": "scene_soapland_bath",
+          "label": "特殊洗浴",
           "subcategory": "特殊洗浴",
+          "context_ids": [
+            "onsen_bath"
+          ],
+          "anchor_tags": [
+            "soapland bath",
+            "mat play room",
+            "nuru gel room"
+          ],
+          "detail_tags": [
+            "body wash room",
+            "bubble bath service",
+            "lotion bath",
+            "inflatable pool",
+            "air mattress bath"
+          ],
+          "exclusive_group": "onsen_bath",
           "tags": [
             "soapland bath",
             "mat play room",
@@ -150,7 +318,29 @@
       "category": "学校场景（JAV核心主题）",
       "items": [
         {
+          "id": "scene_classroom",
+          "label": "教室",
           "subcategory": "教室",
+          "context_ids": [
+            "school"
+          ],
+          "anchor_tags": [
+            "classroom",
+            "empty classroom",
+            "after school classroom"
+          ],
+          "detail_tags": [
+            "teacher desk",
+            "student desk",
+            "blackboard",
+            "chalkboard",
+            "classroom window",
+            "classroom door",
+            "podium",
+            "school corridor",
+            "hallway"
+          ],
+          "exclusive_group": "school",
           "tags": [
             "classroom",
             "empty classroom",
@@ -168,7 +358,26 @@
           "atmosphere": "校园禁忌、师生恋、课后独处"
         },
         {
+          "id": "scene_library",
+          "label": "图书馆/自习室",
           "subcategory": "图书馆/自习室",
+          "context_ids": [
+            "school"
+          ],
+          "anchor_tags": [
+            "library",
+            "library stacks",
+            "reading room"
+          ],
+          "detail_tags": [
+            "study room",
+            "library after hours",
+            "school library",
+            "private study booth",
+            "bookshelf alley",
+            "library desk"
+          ],
+          "exclusive_group": "school",
           "tags": [
             "library",
             "library stacks",
@@ -183,7 +392,27 @@
           "atmosphere": "安静中偷情、知性诱惑"
         },
         {
+          "id": "scene_gym_storage_room",
+          "label": "体育相关",
           "subcategory": "体育相关",
+          "context_ids": [
+            "school"
+          ],
+          "anchor_tags": [
+            "gym storage room",
+            "equipment room",
+            "locker room"
+          ],
+          "detail_tags": [
+            "school shower",
+            "gym stage",
+            "sports equipment storage",
+            "behind gym",
+            "basketball court at night",
+            "judo room",
+            "kendo room"
+          ],
+          "exclusive_group": "school",
           "tags": [
             "gym storage room",
             "equipment room",
@@ -199,7 +428,31 @@
           "atmosphere": "运动后、汗味、偷偷的"
         },
         {
-          "subcategory": "特殊场所",
+          "id": "scene_nurse_office",
+          "label": "学校保健室",
+          "subcategory": "学校保健室",
+          "context_ids": [
+            "school"
+          ],
+          "anchor_tags": [
+            "nurse office",
+            "school infirmary",
+            "nurse bed"
+          ],
+          "detail_tags": [
+            "rooftop",
+            "school rooftop",
+            "rooftop at sunset",
+            "behind school",
+            "club room",
+            "music room",
+            "art room",
+            "science lab",
+            "home economics room",
+            "school toilet",
+            "janitor closet"
+          ],
+          "exclusive_group": "school",
           "tags": [
             "nurse office",
             "school infirmary",
@@ -224,7 +477,29 @@
       "category": "职场空间（OL/职女系列）",
       "items": [
         {
+          "id": "scene_office",
+          "label": "办公室",
           "subcategory": "办公室",
+          "context_ids": [
+            "office"
+          ],
+          "anchor_tags": [
+            "office",
+            "open office",
+            "cubicle"
+          ],
+          "detail_tags": [
+            "boss desk",
+            "personal desk",
+            "after-hours office",
+            "overtime office",
+            "office at night",
+            "empty office floor",
+            "meeting room",
+            "conference room",
+            "reception desk"
+          ],
+          "exclusive_group": "office",
           "tags": [
             "office",
             "open office",
@@ -242,7 +517,29 @@
           "atmosphere": "加班独处、职场潜规则、权力关系"
         },
         {
+          "id": "scene_copy_room",
+          "label": "办公室死角",
           "subcategory": "办公室死角",
+          "context_ids": [
+            "office"
+          ],
+          "anchor_tags": [
+            "copy room",
+            "supply closet",
+            "break room"
+          ],
+          "detail_tags": [
+            "office kitchen",
+            "office pantry",
+            "server room",
+            "document storage",
+            "archive room",
+            "under desk",
+            "office balcony",
+            "smoking area",
+            "emergency stairwell"
+          ],
+          "exclusive_group": "office",
           "tags": [
             "copy room",
             "supply closet",
@@ -260,7 +557,25 @@
           "atmosphere": "偷情快速、见缝插针"
         },
         {
+          "id": "scene_elevator",
+          "label": "职场其他",
           "subcategory": "职场其他",
+          "context_ids": [
+            "office"
+          ],
+          "anchor_tags": [
+            "elevator",
+            "parking lot",
+            "office building lobby"
+          ],
+          "detail_tags": [
+            "office building rooftop",
+            "business hotel room",
+            "hotel during business trip",
+            "taxi after drinking party",
+            "izakaya private room after work"
+          ],
+          "exclusive_group": "office",
           "tags": [
             "elevator",
             "parking lot",
@@ -279,7 +594,29 @@
       "category": "公共交通/交通工具场景",
       "items": [
         {
+          "id": "scene_train_interior",
+          "label": "电车/地铁",
           "subcategory": "电车/地铁",
+          "context_ids": [
+            "transit"
+          ],
+          "anchor_tags": [
+            "train interior",
+            "crowded train",
+            "train seat"
+          ],
+          "detail_tags": [
+            "train door area",
+            "last train",
+            "empty train at night",
+            "subway car",
+            "train handrail",
+            "train priority seat",
+            "train corner",
+            "train floor",
+            "train window"
+          ],
+          "exclusive_group": "transit",
           "tags": [
             "train interior",
             "crowded train",
@@ -297,7 +634,27 @@
           "atmosphere": "痴汉、满员电车、终电"
         },
         {
+          "id": "scene_car_backseat",
+          "label": "车内",
           "subcategory": "车内",
+          "context_ids": [
+            "transit"
+          ],
+          "anchor_tags": [
+            "car backseat",
+            "parked car",
+            "car interior"
+          ],
+          "detail_tags": [
+            "taxi backseat",
+            "car passenger seat",
+            "car at night",
+            "car in parking lot",
+            "car in empty lot",
+            "car hood at night",
+            "van interior"
+          ],
+          "exclusive_group": "transit",
           "tags": [
             "car backseat",
             "parked car",
@@ -313,7 +670,23 @@
           "atmosphere": "车震、送回家路上、PAPA活"
         },
         {
+          "id": "scene_bus_interior",
+          "label": "巴士",
           "subcategory": "巴士",
+          "context_ids": [
+            "transit"
+          ],
+          "anchor_tags": [
+            "bus interior",
+            "tour bus",
+            "highway bus"
+          ],
+          "detail_tags": [
+            "last bus",
+            "bus back seat",
+            "bus at night"
+          ],
+          "exclusive_group": "transit",
           "tags": [
             "bus interior",
             "tour bus",
@@ -325,7 +698,22 @@
           "atmosphere": "长途巴士、夜行巴士"
         },
         {
+          "id": "scene_ferry_cabin",
+          "label": "其他交通",
           "subcategory": "其他交通",
+          "context_ids": [
+            "transit"
+          ],
+          "anchor_tags": [
+            "ferry cabin",
+            "train sleeper",
+            "private jet cabin"
+          ],
+          "detail_tags": [
+            "limousine backseat",
+            "RV interior"
+          ],
+          "exclusive_group": "transit",
           "tags": [
             "ferry cabin",
             "train sleeper",
@@ -341,7 +729,26 @@
       "category": "商业/服务场所",
       "items": [
         {
+          "id": "scene_convenience_store",
+          "label": "便利店/超市",
           "subcategory": "便利店/超市",
+          "context_ids": [
+            "generic"
+          ],
+          "anchor_tags": [
+            "convenience store",
+            "konbini",
+            "convenience store back room"
+          ],
+          "detail_tags": [
+            "supermarket aisle",
+            "store at night",
+            "24-hour store",
+            "convenience store parking lot",
+            "store bathroom",
+            "supermarket stockroom"
+          ],
+          "exclusive_group": "convenience_store",
           "tags": [
             "convenience store",
             "konbini",
@@ -356,7 +763,29 @@
           "atmosphere": "日常场景中的异常、深夜便利店"
         },
         {
+          "id": "scene_restaurant_private_room",
+          "label": "餐饮娱乐",
           "subcategory": "餐饮娱乐",
+          "context_ids": [
+            "dining"
+          ],
+          "anchor_tags": [
+            "restaurant private room",
+            "izakaya back room",
+            "karaoke room"
+          ],
+          "detail_tags": [
+            "karaoke booth",
+            "bar counter",
+            "hostess club",
+            "kyabakura",
+            "snack bar",
+            "nightclub VIP",
+            "restaurant bathroom",
+            "bar bathroom",
+            "family restaurant booth"
+          ],
+          "exclusive_group": "dining_room",
           "tags": [
             "restaurant private room",
             "izakaya back room",
@@ -374,7 +803,23 @@
           "atmosphere": "日本特有、二次会/三次会后"
         },
         {
+          "id": "scene_manga_cafe_booth",
+          "label": "漫画喫茶/网吧",
           "subcategory": "漫画喫茶/网吧",
+          "context_ids": [
+            "generic"
+          ],
+          "anchor_tags": [
+            "manga cafe booth",
+            "internet cafe private room",
+            "net cafe"
+          ],
+          "detail_tags": [
+            "manga cafe shower room",
+            "comic book store back area",
+            "private booth"
+          ],
+          "exclusive_group": "generic",
           "tags": [
             "manga cafe booth",
             "internet cafe private room",
@@ -386,7 +831,25 @@
           "atmosphere": "半私密空间、熬夜、廉价过夜"
         },
         {
+          "id": "scene_fitting_room",
+          "label": "商场/店铺",
           "subcategory": "商场/店铺",
+          "context_ids": [
+            "generic"
+          ],
+          "anchor_tags": [
+            "fitting room",
+            "fitting room stall",
+            "department store bathroom"
+          ],
+          "detail_tags": [
+            "boutique back room",
+            "drugstore aisle",
+            "adult goods shop",
+            "DVD shop adult section",
+            "Don Quijote late night"
+          ],
+          "exclusive_group": "generic",
           "tags": [
             "fitting room",
             "fitting room stall",
@@ -405,7 +868,29 @@
       "category": "AV拍摄/制作场景（日本特有！）",
       "items": [
         {
+          "id": "scene_av_studio",
+          "label": "摄影棚",
           "subcategory": "摄影棚",
+          "context_ids": [
+            "adult"
+          ],
+          "anchor_tags": [
+            "AV studio",
+            "photo studio",
+            "filming set"
+          ],
+          "detail_tags": [
+            "white backdrop studio",
+            "camera equipment visible",
+            "studio lighting rig",
+            "boom mic visible",
+            "director's chair",
+            "monitor screen showing live feed",
+            "clapperboard",
+            "studio floor marks",
+            "green screen studio"
+          ],
+          "exclusive_group": "adult",
           "tags": [
             "AV studio",
             "photo studio",
@@ -423,12 +908,31 @@
           "atmosphere": "AV拍摄现场、幕后感、制作中"
         },
         {
+          "id": "scene_audition_room",
+          "label": "面试/试镜",
           "subcategory": "面试/试镜",
+          "context_ids": [
+            "adult"
+          ],
+          "anchor_tags": [
+            "audition room",
+            "casting room",
+            "audition sofa"
+          ],
+          "detail_tags": [
+            "interview room",
+            "application form on table",
+            "camera on tripod",
+            "audition lighting",
+            "studio reception area",
+            "waiting room"
+          ],
+          "exclusive_group": "adult",
           "tags": [
             "audition room",
             "casting room",
-            "interview room",
             "audition sofa",
+            "interview room",
             "application form on table",
             "camera on tripod",
             "audition lighting",
@@ -438,7 +942,25 @@
           "atmosphere": "面试潜规则、素人试镜"
         },
         {
+          "id": "scene_dressing_room",
+          "label": "化妆间",
           "subcategory": "化妆间",
+          "context_ids": [
+            "adult"
+          ],
+          "anchor_tags": [
+            "dressing room",
+            "makeup room",
+            "dressing room mirror"
+          ],
+          "detail_tags": [
+            "costume rack",
+            "dressing table",
+            "wig stand",
+            "makeup brushes visible",
+            "backstage area"
+          ],
+          "exclusive_group": "adult",
           "tags": [
             "dressing room",
             "makeup room",
@@ -452,7 +974,47 @@
           "atmosphere": "换装、补妆、台前幕后"
         },
         {
+          "id": "scene_jav_cover_style",
+          "label": "AV封面设计元素",
           "subcategory": "AV封面设计元素",
+          "context_ids": [
+            "adult"
+          ],
+          "anchor_tags": [
+            "JAV cover style",
+            "DVD package design",
+            "gravure cover layout"
+          ],
+          "detail_tags": [
+            "promotional still",
+            "cover girl pose",
+            "title text area",
+            "warning label",
+            "mosaic censorship mark",
+            "publisher logo",
+            "age restriction icon",
+            "rental version label",
+            "sample image watermark",
+            "S1 cover style",
+            "Moodzy cover style",
+            "triple panel layout",
+            "before-after comparison",
+            "main visual with inset thumbnails",
+            "glamour cover lighting",
+            "high-key cover photography",
+            "初撮り debut cover aesthetic",
+            "完全主観 POV series label",
+            "衝撃 title treatment",
+            "絶頂 climax face on cover",
+            "解禁 debut announcement banner",
+            "引退 retirement final cover",
+            "専属 exclusive contract label",
+            "cover barcode",
+            "price tag",
+            "DVD case visible",
+            "Blu-ray box packaging"
+          ],
+          "exclusive_group": "adult",
           "tags": [
             "JAV cover style",
             "DVD package design",
@@ -493,7 +1055,29 @@
       "category": "日式风俗/夜生活",
       "items": [
         {
+          "id": "scene_soapland_room",
+          "label": "风俗店",
           "subcategory": "风俗店",
+          "context_ids": [
+            "nightlife"
+          ],
+          "anchor_tags": [
+            "soapland room",
+            "soapland reception",
+            "pink salon booth"
+          ],
+          "detail_tags": [
+            "fashion health room",
+            "delivery health hotel",
+            "image club room",
+            "SM club",
+            "M性感",
+            "oppai pub",
+            "host club",
+            "kyabakura booth",
+            "girls bar counter"
+          ],
+          "exclusive_group": "nightlife",
           "tags": [
             "soapland room",
             "soapland reception",
@@ -511,7 +1095,26 @@
           "atmosphere": "日本风俗业特有场景"
         },
         {
+          "id": "scene_underground_club",
+          "label": "夜店/俱乐部",
           "subcategory": "夜店/俱乐部",
+          "context_ids": [
+            "nightlife"
+          ],
+          "anchor_tags": [
+            "underground club",
+            "nightclub VIP room",
+            "party room"
+          ],
+          "detail_tags": [
+            "club toilet",
+            "club back alley",
+            "after-party hotel",
+            "champagne room",
+            "strip club private booth",
+            "pole dance stage"
+          ],
+          "exclusive_group": "nightlife",
           "tags": [
             "underground club",
             "nightclub VIP room",
@@ -526,7 +1129,26 @@
           "atmosphere": "夜生活、派对后"
         },
         {
-          "subcategory": "特殊场所",
+          "id": "scene_peep_show_booth",
+          "label": "风俗窥视室",
+          "subcategory": "风俗窥视室",
+          "context_ids": [
+            "nightlife"
+          ],
+          "anchor_tags": [
+            "peep show booth",
+            "adult theater",
+            "love hotel district street"
+          ],
+          "detail_tags": [
+            "red light district",
+            "kabukicho alley",
+            "soapland street",
+            "yoshiwara",
+            "susukino",
+            "nakasu"
+          ],
+          "exclusive_group": "nightlife",
           "tags": [
             "peep show booth",
             "adult theater",
@@ -546,7 +1168,26 @@
       "category": "和风传统空间",
       "items": [
         {
+          "id": "scene_tatami_room",
+          "label": "和室",
           "subcategory": "和室",
+          "context_ids": [
+            "traditional"
+          ],
+          "anchor_tags": [
+            "tatami room",
+            "shoji screen room",
+            "tokonoma alcove"
+          ],
+          "detail_tags": [
+            "fusuma sliding door",
+            "tatami floor",
+            "zabuton cushion",
+            "kotatsu table",
+            "futon on tatami",
+            "chabudai table"
+          ],
+          "exclusive_group": "washitsu",
           "tags": [
             "tatami room",
             "shoji screen room",
@@ -561,7 +1202,29 @@
           "atmosphere": "日本传统居住空间"
         },
         {
+          "id": "scene_shrine",
+          "label": "寺庙/神社",
           "subcategory": "寺庙/神社",
+          "context_ids": [
+            "traditional"
+          ],
+          "anchor_tags": [
+            "shrine",
+            "temple",
+            "torii gate"
+          ],
+          "detail_tags": [
+            "shrine maiden quarters",
+            "shrine office",
+            "temple garden",
+            "shrine at night",
+            "honden",
+            "haiden",
+            "shrine corridor",
+            "temple bell tower",
+            "graveyard at temple"
+          ],
+          "exclusive_group": "shrine",
           "tags": [
             "shrine",
             "temple",
@@ -579,7 +1242,25 @@
           "atmosphere": "巫女、宗教禁忌、神圣亵渎"
         },
         {
+          "id": "scene_tea_ceremony_room",
+          "label": "茶室/料亭",
           "subcategory": "茶室/料亭",
+          "context_ids": [
+            "traditional"
+          ],
+          "anchor_tags": [
+            "tea ceremony room",
+            "tea house",
+            "ryotei private room"
+          ],
+          "detail_tags": [
+            "kaiseki room",
+            "traditional inn room",
+            "onsen ryokan hallway",
+            "ryokan lobby",
+            "yukata dressing room"
+          ],
+          "exclusive_group": "traditional",
           "tags": [
             "tea ceremony room",
             "tea house",
@@ -593,7 +1274,26 @@
           "atmosphere": "和风优雅、传统情色"
         },
         {
+          "id": "scene_zen_garden",
+          "label": "和风户外",
           "subcategory": "和风户外",
+          "context_ids": [
+            "traditional"
+          ],
+          "anchor_tags": [
+            "zen garden",
+            "koi pond",
+            "bamboo grove"
+          ],
+          "detail_tags": [
+            "cherry blossom viewing spot",
+            "wisteria tunnel",
+            "Japanese garden",
+            "stone lantern garden",
+            "maple tree garden",
+            "moss garden"
+          ],
+          "exclusive_group": "traditional",
           "tags": [
             "zen garden",
             "koi pond",
@@ -613,7 +1313,29 @@
       "category": "医疗/护理场景",
       "items": [
         {
+          "id": "scene_hospital_room",
+          "label": "医院",
           "subcategory": "医院",
+          "context_ids": [
+            "medical"
+          ],
+          "anchor_tags": [
+            "hospital room",
+            "examination room",
+            "doctor office"
+          ],
+          "detail_tags": [
+            "nurse station",
+            "hospital bed",
+            "hospital corridor",
+            "waiting room",
+            "ICU",
+            "recovery room",
+            "operating room",
+            "hospital bathroom",
+            "hospital shower"
+          ],
+          "exclusive_group": "medical",
           "tags": [
             "hospital room",
             "examination room",
@@ -631,7 +1353,25 @@
           "atmosphere": "护士/医患、检查、体检"
         },
         {
+          "id": "scene_clinic",
+          "label": "诊所",
           "subcategory": "诊所",
+          "context_ids": [
+            "medical"
+          ],
+          "anchor_tags": [
+            "clinic",
+            "dental clinic",
+            "dentist chair"
+          ],
+          "detail_tags": [
+            "gynecology clinic",
+            "health check room",
+            "medical exam table",
+            "clinic waiting room",
+            "small clinic at night"
+          ],
+          "exclusive_group": "medical",
           "tags": [
             "clinic",
             "dental clinic",
@@ -645,7 +1385,23 @@
           "atmosphere": "小诊所、私密检查"
         },
         {
+          "id": "scene_massage_parlor",
+          "label": "特殊",
           "subcategory": "特殊",
+          "context_ids": [
+            "medical"
+          ],
+          "anchor_tags": [
+            "massage parlor",
+            "chiropractic clinic",
+            "acupuncture room"
+          ],
+          "detail_tags": [
+            "physical therapy room",
+            "massage table",
+            "treatment room"
+          ],
+          "exclusive_group": "medical",
           "tags": [
             "massage parlor",
             "chiropractic clinic",
@@ -662,7 +1418,29 @@
       "category": "居住/社区场景",
       "items": [
         {
+          "id": "scene_apartment_building",
+          "label": "公寓/团地",
           "subcategory": "公寓/团地",
+          "context_ids": [
+            "domestic"
+          ],
+          "anchor_tags": [
+            "apartment building",
+            "danchi",
+            "apartment corridor"
+          ],
+          "detail_tags": [
+            "apartment elevator",
+            "apartment stairs",
+            "apartment entrance",
+            "apartment balcony",
+            "neighbor's apartment",
+            "apartment rooftop",
+            "mail room",
+            "garbage area",
+            "bicycle parking"
+          ],
+          "exclusive_group": "domestic",
           "tags": [
             "apartment building",
             "danchi",
@@ -680,7 +1458,33 @@
           "atmosphere": "邻居偷情、团地妻、公寓生活"
         },
         {
+          "id": "scene_house",
+          "label": "一户建",
           "subcategory": "一户建",
+          "context_ids": [
+            "domestic"
+          ],
+          "anchor_tags": [
+            "house",
+            "living room",
+            "kitchen"
+          ],
+          "detail_tags": [
+            "kitchen counter",
+            "dining table",
+            "laundry room",
+            "genkan",
+            "hallway",
+            "stairwell",
+            "children's room",
+            "master bedroom",
+            "bathroom",
+            "garage",
+            "garden",
+            "backyard",
+            "balcony"
+          ],
+          "exclusive_group": "domestic",
           "tags": [
             "house",
             "living room",
@@ -702,7 +1506,24 @@
           "atmosphere": "家庭场景、主妇、家庭禁忌"
         },
         {
+          "id": "scene_neighbor_s_house",
+          "label": "近邻",
           "subcategory": "近邻",
+          "context_ids": [
+            "domestic"
+          ],
+          "anchor_tags": [
+            "neighbor's house",
+            "next door",
+            "apartment next door"
+          ],
+          "detail_tags": [
+            "neighbor's bedroom",
+            "wall between apartments",
+            "balcony next to each other",
+            "fence between houses"
+          ],
+          "exclusive_group": "domestic",
           "tags": [
             "neighbor's house",
             "next door",
@@ -720,7 +1541,29 @@
       "category": "户外/露出场景",
       "items": [
         {
+          "id": "scene_park_at_night",
+          "label": "公园/野外",
           "subcategory": "公园/野外",
+          "context_ids": [
+            "outdoor"
+          ],
+          "anchor_tags": [
+            "park at night",
+            "park bench",
+            "park bathroom"
+          ],
+          "detail_tags": [
+            "behind bushes",
+            "park playground",
+            "park gazebo",
+            "riverbank",
+            "under bridge",
+            "embankment",
+            "empty lot",
+            "construction site at night",
+            "street corner at night"
+          ],
+          "exclusive_group": "outdoor",
           "tags": [
             "park at night",
             "park bench",
@@ -738,7 +1581,26 @@
           "atmosphere": "野外露出、夜间公园"
         },
         {
+          "id": "scene_beach_at_night",
+          "label": "海边/泳池",
           "subcategory": "海边/泳池",
+          "context_ids": [
+            "outdoor"
+          ],
+          "anchor_tags": [
+            "beach at night",
+            "beach shower",
+            "beach cabana"
+          ],
+          "detail_tags": [
+            "seaside cave",
+            "poolside",
+            "swimming pool at night",
+            "pool shower",
+            "pool locker room",
+            "water park after hours"
+          ],
+          "exclusive_group": "beach",
           "tags": [
             "beach at night",
             "beach shower",
@@ -753,7 +1615,25 @@
           "atmosphere": "泳装、湿身、夏季"
         },
         {
+          "id": "scene_camping_tent",
+          "label": "山林/露营",
           "subcategory": "山林/露营",
+          "context_ids": [
+            "outdoor"
+          ],
+          "anchor_tags": [
+            "camping tent",
+            "mountain cabin",
+            "forest clearing"
+          ],
+          "detail_tags": [
+            "hiking trail rest area",
+            "mountain restroom",
+            "campfire area",
+            "outdoor hot spring",
+            "forest bath"
+          ],
+          "exclusive_group": "outdoor",
           "tags": [
             "camping tent",
             "mountain cabin",
@@ -767,7 +1647,26 @@
           "atmosphere": "野外情侣、帐篷内"
         },
         {
+          "id": "scene_rooftop_at_night",
+          "label": "都市露出",
           "subcategory": "都市露出",
+          "context_ids": [
+            "outdoor"
+          ],
+          "anchor_tags": [
+            "rooftop at night",
+            "rooftop pool",
+            "balcony at night"
+          ],
+          "detail_tags": [
+            "fire escape stairs",
+            "back alley",
+            "parking lot rooftop",
+            "skybridge",
+            "observation deck at night",
+            "helipad"
+          ],
+          "exclusive_group": "outdoor",
           "tags": [
             "rooftop at night",
             "rooftop pool",
@@ -787,7 +1686,27 @@
       "category": "监禁/密室场景",
       "items": [
         {
+          "id": "scene_locked_room",
+          "label": "监禁",
           "subcategory": "监禁",
+          "context_ids": [
+            "bondage_sm"
+          ],
+          "anchor_tags": [
+            "locked room",
+            "basement room",
+            "warehouse"
+          ],
+          "detail_tags": [
+            "abandoned factory",
+            "soundproof room",
+            "hidden room",
+            "secret room",
+            "underground room",
+            "sealed room",
+            "windowless room"
+          ],
+          "exclusive_group": "bondage_sm",
           "tags": [
             "locked room",
             "basement room",
@@ -803,12 +1722,29 @@
           "atmosphere": "监禁、调教、密室"
         },
         {
+          "id": "scene_basement",
+          "label": "地下室",
           "subcategory": "地下室",
+          "context_ids": [
+            "bondage_sm"
+          ],
+          "anchor_tags": [
+            "basement",
+            "underground room",
+            "basement bathroom"
+          ],
+          "detail_tags": [
+            "basement with chains",
+            "underground parking",
+            "wine cellar converted",
+            "underground storage"
+          ],
+          "exclusive_group": "bondage_sm",
           "tags": [
             "basement",
             "underground room",
-            "basement with chains",
             "basement bathroom",
+            "basement with chains",
             "underground parking",
             "wine cellar converted",
             "underground storage"
@@ -816,7 +1752,25 @@
           "atmosphere": "地下、不见天日"
         },
         {
+          "id": "scene_abandoned_building",
+          "label": "废弃建筑",
           "subcategory": "废弃建筑",
+          "context_ids": [
+            "bondage_sm"
+          ],
+          "anchor_tags": [
+            "abandoned building",
+            "abandoned school",
+            "abandoned hospital"
+          ],
+          "detail_tags": [
+            "abandoned factory",
+            "abandoned house",
+            "ruins",
+            "construction site interior",
+            "condemned building"
+          ],
+          "exclusive_group": "bondage_sm",
           "tags": [
             "abandoned building",
             "abandoned school",
@@ -835,7 +1789,29 @@
       "category": "公共场所/街头系列",
       "items": [
         {
+          "id": "scene_public_restroom",
+          "label": "公共厕所",
           "subcategory": "公共厕所",
+          "context_ids": [
+            "generic"
+          ],
+          "anchor_tags": [
+            "public restroom",
+            "station bathroom",
+            "mall toilet"
+          ],
+          "detail_tags": [
+            "gas station toilet",
+            "park bathroom",
+            "public toilet with graffiti",
+            "toilet stall",
+            "toilet with broken lock",
+            "crowded bathroom",
+            "bathroom with no doors",
+            "bathroom with O-24h sign",
+            "restroom at train station"
+          ],
+          "exclusive_group": "public_restroom",
           "tags": [
             "public restroom",
             "station bathroom",
@@ -853,7 +1829,29 @@
           "atmosphere": "暴露风险、偷窥、尴尬感"
         },
         {
+          "id": "scene_elevator_2",
+          "label": "电梯",
           "subcategory": "电梯",
+          "context_ids": [
+            "generic"
+          ],
+          "anchor_tags": [
+            "elevator",
+            "building elevator",
+            "office elevator"
+          ],
+          "detail_tags": [
+            "hotel elevator",
+            "apartment elevator",
+            "crowded elevator",
+            "stuck in elevator",
+            "elevator at night",
+            "service elevator",
+            "freight elevator",
+            "elevator intercom",
+            "elevator mirror"
+          ],
+          "exclusive_group": "elevator",
           "tags": [
             "elevator",
             "building elevator",
@@ -871,7 +1869,29 @@
           "atmosphere": "密闭空间、强制接触、监控感"
         },
         {
-          "subcategory": "天台/屋顶",
+          "id": "scene_building_rooftop",
+          "label": "天台/大厦楼顶",
+          "subcategory": "天台/大厦楼顶",
+          "context_ids": [
+            "generic"
+          ],
+          "anchor_tags": [
+            "building rooftop",
+            "office rooftop",
+            "hotel rooftop"
+          ],
+          "detail_tags": [
+            "apartment rooftop",
+            "school rooftop",
+            "parking garage rooftop",
+            "rooftop at sunset",
+            "rooftop at night",
+            "rooftop with city view",
+            "rooftop with antenna",
+            "rooftop water tower",
+            "construction rooftop"
+          ],
+          "exclusive_group": "generic",
           "tags": [
             "building rooftop",
             "office rooftop",
@@ -889,7 +1909,28 @@
           "atmosphere": "都市夜景、露出、高处恐惧"
         },
         {
+          "id": "scene_staircase",
+          "label": "楼梯/逃生梯",
           "subcategory": "楼梯/逃生梯",
+          "context_ids": [
+            "generic"
+          ],
+          "anchor_tags": [
+            "staircase",
+            "emergency stairwell",
+            "fire escape stairs"
+          ],
+          "detail_tags": [
+            "outdoor stairs",
+            "apartment stairs",
+            "school stairs",
+            "stairs between floors",
+            "spiral staircase",
+            "stairs with window",
+            "dark stairwell",
+            "stairs at night"
+          ],
+          "exclusive_group": "generic",
           "tags": [
             "staircase",
             "emergency stairwell",
@@ -906,7 +1947,28 @@
           "atmosphere": "追逐、上下关系、幽暗感"
         },
         {
+          "id": "scene_parking_lot",
+          "label": "停车场",
           "subcategory": "停车场",
+          "context_ids": [
+            "generic"
+          ],
+          "anchor_tags": [
+            "parking lot",
+            "underground parking",
+            "parking garage"
+          ],
+          "detail_tags": [
+            "parking structure",
+            "outdoor parking",
+            "parking attendant booth",
+            "parking ticket machine",
+            "parking at night",
+            "parking structure level",
+            "disabled parking space",
+            "valet area"
+          ],
+          "exclusive_group": "generic",
           "tags": [
             "parking lot",
             "underground parking",
@@ -923,7 +1985,29 @@
           "atmosphere": "车内/车旁、隐蔽、监控"
         },
         {
+          "id": "scene_back_alley",
+          "label": "街头/巷子",
           "subcategory": "街头/巷子",
+          "context_ids": [
+            "generic"
+          ],
+          "anchor_tags": [
+            "back alley",
+            "narrow alley",
+            "street corner"
+          ],
+          "detail_tags": [
+            "side street",
+            "dark street",
+            "street with neon signs",
+            "narrow passage between buildings",
+            "construction site",
+            "under elevated highway",
+            "under bridge",
+            "underground passage",
+            "pedestrian walkway"
+          ],
+          "exclusive_group": "generic",
           "tags": [
             "back alley",
             "narrow alley",
@@ -941,7 +2025,22 @@
           "atmosphere": "野外露出、危险感、追逐"
         },
         {
+          "id": "scene_vending_machine_area",
+          "label": "自动贩卖机旁",
           "subcategory": "自动贩卖机旁",
+          "context_ids": [
+            "generic"
+          ],
+          "anchor_tags": [
+            "vending machine area",
+            "drink machine corner",
+            "vending machine at night"
+          ],
+          "detail_tags": [
+            "between vending machines",
+            "vending machine with bench"
+          ],
+          "exclusive_group": "generic",
           "tags": [
             "vending machine area",
             "drink machine corner",
@@ -952,7 +2051,23 @@
           "atmosphere": "狭窄空间、等待"
         },
         {
+          "id": "scene_atm_corner",
+          "label": "ATM/银行",
           "subcategory": "ATM/银行",
+          "context_ids": [
+            "generic"
+          ],
+          "anchor_tags": [
+            "ATM corner",
+            "bank ATM",
+            "ATM in lobby"
+          ],
+          "detail_tags": [
+            "ATM at night",
+            "bank branch interior",
+            "bank after hours"
+          ],
+          "exclusive_group": "generic",
           "tags": [
             "ATM corner",
             "bank ATM",
@@ -964,7 +2079,24 @@
           "atmosphere": "金钱交易、羞耻感"
         },
         {
+          "id": "scene_apartment_balcony",
+          "label": "屋顶阳台",
           "subcategory": "屋顶阳台",
+          "context_ids": [
+            "generic"
+          ],
+          "anchor_tags": [
+            "apartment balcony",
+            "hotel balcony",
+            "building balcony"
+          ],
+          "detail_tags": [
+            "balcony at night",
+            "balcony with view",
+            "balcony with laundry",
+            "balcony overlooking street"
+          ],
+          "exclusive_group": "generic",
           "tags": [
             "apartment balcony",
             "hotel balcony",
@@ -977,7 +2109,25 @@
           "atmosphere": "都市露出、邻居偷窥、暧昧感"
         },
         {
+          "id": "scene_basement_storage",
+          "label": "地下室/储藏",
           "subcategory": "地下室/储藏",
+          "context_ids": [
+            "generic"
+          ],
+          "anchor_tags": [
+            "basement storage",
+            "underground storage room",
+            "building basement"
+          ],
+          "detail_tags": [
+            "underground parking level",
+            "storage closet",
+            "utility room",
+            "electrical room",
+            "boiler room"
+          ],
+          "exclusive_group": "generic",
           "tags": [
             "basement storage",
             "underground storage room",
@@ -996,7 +2146,24 @@
       "category": "都市建筑/写字楼系列",
       "items": [
         {
+          "id": "scene_office_building_lobby",
+          "label": "写字楼大堂",
           "subcategory": "写字楼大堂",
+          "context_ids": [
+            "office"
+          ],
+          "anchor_tags": [
+            "office building lobby",
+            "corporate lobby",
+            "lobby security desk"
+          ],
+          "detail_tags": [
+            "lobby waiting area",
+            "lobby seating",
+            "revolving door",
+            "lobby elevator bank"
+          ],
+          "exclusive_group": "office",
           "tags": [
             "office building lobby",
             "corporate lobby",
@@ -1009,7 +2176,25 @@
           "atmosphere": "职场上下关系、权力感"
         },
         {
+          "id": "scene_meeting_room",
+          "label": "会议室",
           "subcategory": "会议室",
+          "context_ids": [
+            "office"
+          ],
+          "anchor_tags": [
+            "meeting room",
+            "conference room",
+            "boardroom"
+          ],
+          "detail_tags": [
+            "small meeting room",
+            "room with large table",
+            "room with projector",
+            "room with blinds closed",
+            "meeting room after hours"
+          ],
+          "exclusive_group": "office",
           "tags": [
             "meeting room",
             "conference room",
@@ -1023,7 +2208,26 @@
           "atmosphere": "职场潜规则、会议室外遇"
         },
         {
+          "id": "scene_break_room",
+          "label": "休息室/茶水间",
           "subcategory": "休息室/茶水间",
+          "context_ids": [
+            "office"
+          ],
+          "anchor_tags": [
+            "break room",
+            "office kitchen",
+            "copy room"
+          ],
+          "detail_tags": [
+            "supply closet",
+            "lounge sofa",
+            "nap room",
+            "rest area",
+            "smoking area",
+            "vending machine room"
+          ],
+          "exclusive_group": "office",
           "tags": [
             "break room",
             "office kitchen",
@@ -1038,7 +2242,25 @@
           "atmosphere": "快速偷情、短暂接触"
         },
         {
+          "id": "scene_office_bathroom",
+          "label": "卫生间（职场）",
           "subcategory": "卫生间（职场）",
+          "context_ids": [
+            "office"
+          ],
+          "anchor_tags": [
+            "office bathroom",
+            "floor bathroom",
+            "executive bathroom"
+          ],
+          "detail_tags": [
+            "bathroom with mirror",
+            "bathroom with hand dryer",
+            "gender-separated toilet",
+            "toilet with lock",
+            "office toilet at night"
+          ],
+          "exclusive_group": "office",
           "tags": [
             "office bathroom",
             "floor bathroom",
@@ -1052,7 +2274,24 @@
           "atmosphere": "职场暴露、羞耻"
         },
         {
+          "id": "scene_office_parking_garage",
+          "label": "停车场（职场）",
           "subcategory": "停车场（职场）",
+          "context_ids": [
+            "office"
+          ],
+          "anchor_tags": [
+            "office parking garage",
+            "underground office parking",
+            "parking basement"
+          ],
+          "detail_tags": [
+            "parking attendant",
+            "parking space",
+            "private parking",
+            "company parking lot"
+          ],
+          "exclusive_group": "office",
           "tags": [
             "office parking garage",
             "underground office parking",
@@ -1065,7 +2304,23 @@
           "atmosphere": "下班后、职场外遇"
         },
         {
+          "id": "scene_office_building_rooftop",
+          "label": "大厦天台",
           "subcategory": "大厦天台",
+          "context_ids": [
+            "office"
+          ],
+          "anchor_tags": [
+            "office building rooftop",
+            "corporate rooftop",
+            "rooftop garden"
+          ],
+          "detail_tags": [
+            "rooftop terrace",
+            "rooftop HVAC area",
+            "rooftop overlooking city"
+          ],
+          "exclusive_group": "office",
           "tags": [
             "office building rooftop",
             "corporate rooftop",
@@ -1077,7 +2332,25 @@
           "atmosphere": "都市夜景、职场禁忌"
         },
         {
+          "id": "scene_cleaning_closet",
+          "label": "清洁间/杂物间",
           "subcategory": "清洁间/杂物间",
+          "context_ids": [
+            "office"
+          ],
+          "anchor_tags": [
+            "cleaning closet",
+            "janitor room",
+            "utility closet"
+          ],
+          "detail_tags": [
+            "mop closet",
+            "building maintenance room",
+            "electrical room",
+            "server room",
+            "telecom room"
+          ],
+          "exclusive_group": "office",
           "tags": [
             "cleaning closet",
             "janitor room",
@@ -1096,7 +2369,27 @@
       "category": "娱乐场所系列",
       "items": [
         {
+          "id": "scene_manga_cafe_booth_2",
+          "label": "漫画网吧/漫画喫茶",
           "subcategory": "漫画网吧/漫画喫茶",
+          "context_ids": [
+            "nightlife"
+          ],
+          "anchor_tags": [
+            "manga cafe booth",
+            "net cafe private room",
+            "internet cafe"
+          ],
+          "detail_tags": [
+            "manga cafe shower",
+            "capsule hotel",
+            "capsule room",
+            "net cafe with shower",
+            "manga cafe sleeping pod",
+            "24h manga cafe",
+            "smoking area booth"
+          ],
+          "exclusive_group": "manga_cafe",
           "tags": [
             "manga cafe booth",
             "net cafe private room",
@@ -1112,7 +2405,25 @@
           "atmosphere": "半私密、熬夜、廉价过夜"
         },
         {
+          "id": "scene_arcade",
+          "label": "游戏中心/ arcade",
           "subcategory": "游戏中心/ arcade",
+          "context_ids": [
+            "nightlife"
+          ],
+          "anchor_tags": [
+            "arcade",
+            "game center",
+            "crane game area"
+          ],
+          "detail_tags": [
+            "rhythm game corner",
+            "arcade dark corner",
+            "game center back area",
+            "UFO catcher",
+            "prize counter"
+          ],
+          "exclusive_group": "arcade",
           "tags": [
             "arcade",
             "game center",
@@ -1126,7 +2437,28 @@
           "atmosphere": "街头、追逐、暧昧"
         },
         {
+          "id": "scene_bowling_alley",
+          "label": "保龄球/泳池",
           "subcategory": "保龄球/泳池",
+          "context_ids": [
+            "nightlife"
+          ],
+          "anchor_tags": [
+            "bowling alley",
+            "bowling lane",
+            "swimming pool"
+          ],
+          "detail_tags": [
+            "poolside",
+            "pool locker room",
+            "indoor pool",
+            "public pool",
+            "water park",
+            "pool shower area",
+            "pool ladder",
+            "diving board"
+          ],
+          "exclusive_group": "nightlife",
           "tags": [
             "bowling alley",
             "bowling lane",
@@ -1143,7 +2475,25 @@
           "atmosphere": "泳装、湿身、夏季"
         },
         {
+          "id": "scene_karaoke_room",
+          "label": "卡拉OK/练歌房",
           "subcategory": "卡拉OK/练歌房",
+          "context_ids": [
+            "nightlife"
+          ],
+          "anchor_tags": [
+            "karaoke room",
+            "karaoke booth",
+            "private karaoke room"
+          ],
+          "detail_tags": [
+            "karaoke after hours",
+            "karaoke table",
+            "karaoke with drinks",
+            "karaoke room couch",
+            "karaoke room mirror"
+          ],
+          "exclusive_group": "nightlife",
           "tags": [
             "karaoke room",
             "karaoke booth",
@@ -1157,7 +2507,24 @@
           "atmosphere": "酒后、封闭空间、二次会"
         },
         {
+          "id": "scene_billiard_hall",
+          "label": "撞球厅/桌球",
           "subcategory": "撞球厅/桌球",
+          "context_ids": [
+            "nightlife"
+          ],
+          "anchor_tags": [
+            "billiard hall",
+            "pool hall",
+            "snooker room"
+          ],
+          "detail_tags": [
+            "billiard table",
+            "pool table",
+            "bar attached to billiards",
+            "back room of billiard hall"
+          ],
+          "exclusive_group": "nightlife",
           "tags": [
             "billiard hall",
             "pool hall",
@@ -1170,7 +2537,26 @@
           "atmosphere": "暗、技不如人、筹码"
         },
         {
+          "id": "scene_movie_theater",
+          "label": "电影院",
           "subcategory": "电影院",
+          "context_ids": [
+            "nightlife"
+          ],
+          "anchor_tags": [
+            "movie theater",
+            "cinema",
+            "theater back row"
+          ],
+          "detail_tags": [
+            "cinema seat",
+            "theater restroom",
+            "cinema lobby",
+            "midnight screening",
+            "couples seat",
+            "VIP screening room"
+          ],
+          "exclusive_group": "nightlife",
           "tags": [
             "movie theater",
             "cinema",
@@ -1185,7 +2571,24 @@
           "atmosphere": "暗、公共、背后"
         },
         {
+          "id": "scene_pachinko_parlor",
+          "label": "赌场/柏青哥",
           "subcategory": "赌场/柏青哥",
+          "context_ids": [
+            "nightlife"
+          ],
+          "anchor_tags": [
+            "pachinko parlor",
+            "casino",
+            "slot machine area"
+          ],
+          "detail_tags": [
+            "pachinko machine",
+            "casino VIP room",
+            "gambling den",
+            "back room of pachinko hall"
+          ],
+          "exclusive_group": "nightlife",
           "tags": [
             "pachinko parlor",
             "casino",
@@ -1198,7 +2601,25 @@
           "atmosphere": "日本特有、输赢筹码"
         },
         {
+          "id": "scene_aquarium",
+          "label": "动物园/水族馆",
           "subcategory": "动物园/水族馆",
+          "context_ids": [
+            "nightlife"
+          ],
+          "anchor_tags": [
+            "aquarium",
+            "zoo",
+            "aquarium back area"
+          ],
+          "detail_tags": [
+            "behind tank",
+            "underwater tunnel",
+            "petting zoo",
+            "late night aquarium",
+            "zoo after hours"
+          ],
+          "exclusive_group": "nightlife",
           "tags": [
             "aquarium",
             "zoo",
@@ -1212,7 +2633,27 @@
           "atmosphere": "动物/海洋、幽暗、浪漫"
         },
         {
+          "id": "scene_amusement_park",
+          "label": "游乐园",
           "subcategory": "游乐园",
+          "context_ids": [
+            "nightlife"
+          ],
+          "anchor_tags": [
+            "amusement park",
+            "theme park",
+            "roller coaster queue"
+          ],
+          "detail_tags": [
+            "haunted house",
+            "park bench",
+            "park at night",
+            "ferris wheel",
+            "carousel",
+            "park restroom",
+            "park dark corner"
+          ],
+          "exclusive_group": "nightlife",
           "tags": [
             "amusement park",
             "theme park",
@@ -1228,7 +2669,26 @@
           "atmosphere": "追逐、浪漫、夜间"
         },
         {
+          "id": "scene_shrine_gate_torii",
+          "label": "神社/寺庙广场",
           "subcategory": "神社/寺庙广场",
+          "context_ids": [
+            "nightlife"
+          ],
+          "anchor_tags": [
+            "shrine gate torii",
+            "shrine courtyard",
+            "temple main hall"
+          ],
+          "detail_tags": [
+            "temple garden",
+            "offering box area",
+            "shrine at night",
+            "temple bell",
+            "prayer hall",
+            "between torii gates"
+          ],
+          "exclusive_group": "nightlife",
           "tags": [
             "shrine gate torii",
             "shrine courtyard",
@@ -1248,7 +2708,25 @@
       "category": "餐饮/包厢系列",
       "items": [
         {
+          "id": "scene_izakaya_booth",
+          "label": "居酒屋/包厢",
           "subcategory": "居酒屋/包厢",
+          "context_ids": [
+            "dining"
+          ],
+          "anchor_tags": [
+            "izakaya booth",
+            "izakaya private room",
+            "izakaya back room"
+          ],
+          "detail_tags": [
+            "izakaya counter",
+            "izakaya at night",
+            "izakaya after closing",
+            "izakaya with tategaku seat",
+            "pub booth"
+          ],
+          "exclusive_group": "izakaya",
           "tags": [
             "izakaya booth",
             "izakaya private room",
@@ -1262,7 +2740,24 @@
           "atmosphere": "酒后、包厢、日本特有"
         },
         {
+          "id": "scene_restaurant_private_room_2",
+          "label": "餐厅包间",
           "subcategory": "餐厅包间",
+          "context_ids": [
+            "dining"
+          ],
+          "anchor_tags": [
+            "restaurant private room",
+            "kaiseki private room",
+            "private dining room"
+          ],
+          "detail_tags": [
+            "hotel restaurant booth",
+            "booth seating",
+            "restaurant with lockable door",
+            "dinner party room"
+          ],
+          "exclusive_group": "restaurant",
           "tags": [
             "restaurant private room",
             "kaiseki private room",
@@ -1275,7 +2770,25 @@
           "atmosphere": "商务/约会、封闭"
         },
         {
+          "id": "scene_ramen_shop_booth",
+          "label": "拉面店/小吃",
           "subcategory": "拉面店/小吃",
+          "context_ids": [
+            "dining"
+          ],
+          "anchor_tags": [
+            "ramen shop booth",
+            "ramen counter",
+            "izakaya stall"
+          ],
+          "detail_tags": [
+            "food stall at night",
+            "street food stall",
+            "yatai",
+            "late night ramen",
+            "open kitchen counter"
+          ],
+          "exclusive_group": "dining",
           "tags": [
             "ramen shop booth",
             "ramen counter",
@@ -1289,7 +2802,24 @@
           "atmosphere": "夜间、暴露、食欲"
         },
         {
+          "id": "scene_cafe_booth",
+          "label": "咖啡厅/奶茶",
           "subcategory": "咖啡厅/奶茶",
+          "context_ids": [
+            "dining"
+          ],
+          "anchor_tags": [
+            "cafe booth",
+            "coffee shop back booth",
+            "cafe with sofa"
+          ],
+          "detail_tags": [
+            "cafe at night",
+            "quiet cafe",
+            "cafe restroom",
+            "cafe delivery entrance"
+          ],
+          "exclusive_group": "dining",
           "tags": [
             "cafe booth",
             "coffee shop back booth",
@@ -1302,7 +2832,27 @@
           "atmosphere": "约会、等待、日常感"
         },
         {
+          "id": "scene_bar_counter",
+          "label": "酒吧/夜店",
           "subcategory": "酒吧/夜店",
+          "context_ids": [
+            "dining"
+          ],
+          "anchor_tags": [
+            "bar counter",
+            "bar back room",
+            "bar restroom"
+          ],
+          "detail_tags": [
+            "nightclub dance floor",
+            "club VIP booth",
+            "club bathroom",
+            "club dark room",
+            "club smoking area",
+            "hostess bar",
+            "host club"
+          ],
+          "exclusive_group": "dining",
           "tags": [
             "bar counter",
             "bar back room",
@@ -1318,7 +2868,21 @@
           "atmosphere": "酒后、夜间、欲望"
         },
         {
+          "id": "scene_love_hotel_restaurant",
+          "label": "情侣酒店内餐厅",
           "subcategory": "情侣酒店内餐厅",
+          "context_ids": [
+            "dining"
+          ],
+          "anchor_tags": [
+            "love hotel restaurant",
+            "love hotel dining room",
+            "love hotel room service"
+          ],
+          "detail_tags": [
+            "love hotel lobby restaurant"
+          ],
+          "exclusive_group": "dining",
           "tags": [
             "love hotel restaurant",
             "love hotel dining room",
@@ -1328,7 +2892,23 @@
           "atmosphere": "转场前、期待感"
         },
         {
+          "id": "scene_yatai_stall",
+          "label": "路边摊/屋台",
           "subcategory": "路边摊/屋台",
+          "context_ids": [
+            "dining"
+          ],
+          "anchor_tags": [
+            "yatai stall",
+            "street food cart",
+            "late night yatai"
+          ],
+          "detail_tags": [
+            "food stall with curtain",
+            "yatai customer seat",
+            "yatai vendor area"
+          ],
+          "exclusive_group": "dining",
           "tags": [
             "yatai stall",
             "street food cart",
@@ -1340,7 +2920,21 @@
           "atmosphere": "夜间、暧昧、街头"
         },
         {
+          "id": "scene_vending_machine_corner",
+          "label": "自动贩卖机旁角落",
           "subcategory": "自动贩卖机旁角落",
+          "context_ids": [
+            "dining"
+          ],
+          "anchor_tags": [
+            "vending machine corner",
+            "vending machine alcove",
+            "area between machines"
+          ],
+          "detail_tags": [
+            "vending machine at night"
+          ],
+          "exclusive_group": "dining",
           "tags": [
             "vending machine corner",
             "vending machine alcove",
@@ -1355,7 +2949,25 @@
       "category": "交通枢纽/旅途系列",
       "items": [
         {
+          "id": "scene_airport_terminal",
+          "label": "机场/候机室",
           "subcategory": "机场/候机室",
+          "context_ids": [
+            "transit"
+          ],
+          "anchor_tags": [
+            "airport terminal",
+            "airport lounge",
+            "airport restroom"
+          ],
+          "detail_tags": [
+            "airport boarding gate",
+            "airport observation deck",
+            "airport VIP lounge",
+            "airport parking garage",
+            "airport hotel adjacent"
+          ],
+          "exclusive_group": "transit",
           "tags": [
             "airport terminal",
             "airport lounge",
@@ -1369,7 +2981,27 @@
           "atmosphere": "旅途、时差、异域感"
         },
         {
+          "id": "scene_airplane_cabin",
+          "label": "机舱/飞机内",
           "subcategory": "机舱/飞机内",
+          "context_ids": [
+            "transit"
+          ],
+          "anchor_tags": [
+            "airplane cabin",
+            "economy class",
+            "business class seat"
+          ],
+          "detail_tags": [
+            "airplane lavatory",
+            "airplane cockpit",
+            "airplane row",
+            "red-eye flight",
+            "aisle seat",
+            "window seat",
+            "overhead bin"
+          ],
+          "exclusive_group": "transit",
           "tags": [
             "airplane cabin",
             "economy class",
@@ -1385,7 +3017,27 @@
           "atmosphere": "密闭、高空、禁忌"
         },
         {
+          "id": "scene_shinkansen",
+          "label": "新干线/电车",
           "subcategory": "新干线/电车",
+          "context_ids": [
+            "transit"
+          ],
+          "anchor_tags": [
+            "shinkansen",
+            "bullet train",
+            "train seat"
+          ],
+          "detail_tags": [
+            "train restroom",
+            "train between cars",
+            "train aisle",
+            "train platform",
+            "last train",
+            "crowded train",
+            "train car door area"
+          ],
+          "exclusive_group": "transit",
           "tags": [
             "shinkansen",
             "bullet train",
@@ -1401,7 +3053,26 @@
           "atmosphere": "痴汉、终电、偷拍"
         },
         {
+          "id": "scene_taxi_backseat",
+          "label": "出租车/包车",
           "subcategory": "出租车/包车",
+          "context_ids": [
+            "transit"
+          ],
+          "anchor_tags": [
+            "taxi backseat",
+            "taxi interior",
+            "hired car"
+          ],
+          "detail_tags": [
+            "private car",
+            "driver front seat",
+            "car parked",
+            "car on road",
+            "car window",
+            "car rearview mirror"
+          ],
+          "exclusive_group": "transit",
           "tags": [
             "taxi backseat",
             "taxi interior",
@@ -1416,7 +3087,25 @@
           "atmosphere": "车内私密、接送暧昧"
         },
         {
+          "id": "scene_ferry_cabin_2",
+          "label": "渡轮/船",
           "subcategory": "渡轮/船",
+          "context_ids": [
+            "transit"
+          ],
+          "anchor_tags": [
+            "ferry cabin",
+            "ship cabin",
+            "boat deck"
+          ],
+          "detail_tags": [
+            "ferry bunk bed",
+            "cruise ship balcony",
+            "small boat cabin",
+            "ferry restroom",
+            "dock area"
+          ],
+          "exclusive_group": "transit",
           "tags": [
             "ferry cabin",
             "ship cabin",
@@ -1430,7 +3119,25 @@
           "atmosphere": "旅途、孤立、浪漫"
         },
         {
+          "id": "scene_train_station_platform",
+          "label": "机场/车站",
           "subcategory": "机场/车站",
+          "context_ids": [
+            "transit"
+          ],
+          "anchor_tags": [
+            "train station platform",
+            "station underpass",
+            "station restroom"
+          ],
+          "detail_tags": [
+            "station lockers",
+            "station vending area",
+            "station stairs",
+            "station overpass",
+            "station late night"
+          ],
+          "exclusive_group": "transit",
           "tags": [
             "train station platform",
             "station underpass",
@@ -1444,7 +3151,23 @@
           "atmosphere": "终电、痴汉、暴露"
         },
         {
+          "id": "scene_airport_baggage_claim",
+          "label": "行李转盘/大厅",
           "subcategory": "行李转盘/大厅",
+          "context_ids": [
+            "transit"
+          ],
+          "anchor_tags": [
+            "airport baggage claim",
+            "airport main hall",
+            "station ticket gate"
+          ],
+          "detail_tags": [
+            "ticket gate area",
+            "station waiting area",
+            "station concourse"
+          ],
+          "exclusive_group": "transit",
           "tags": [
             "airport baggage claim",
             "airport main hall",
@@ -1456,7 +3179,27 @@
           "atmosphere": "被看/偷窥、等待"
         },
         {
+          "id": "scene_highway_bus",
+          "label": "长途巴士",
           "subcategory": "长途巴士",
+          "context_ids": [
+            "transit"
+          ],
+          "anchor_tags": [
+            "highway bus",
+            "tour bus",
+            "bus restroom"
+          ],
+          "detail_tags": [
+            "bus back seat",
+            "overnight bus",
+            "bus stop",
+            "bus aisle",
+            "express bus",
+            "highway rest area",
+            "service area parking"
+          ],
+          "exclusive_group": "transit",
           "tags": [
             "highway bus",
             "tour bus",
@@ -1477,7 +3220,26 @@
       "category": "学校/教育设施系列",
       "items": [
         {
+          "id": "scene_school_corridor",
+          "label": "教学楼走廊",
           "subcategory": "教学楼走廊",
+          "context_ids": [
+            "school"
+          ],
+          "anchor_tags": [
+            "school corridor",
+            "hallway",
+            "hallway after class"
+          ],
+          "detail_tags": [
+            "hallway at night",
+            "hallway with lockers",
+            "hallway stairway",
+            "school stairwell",
+            "school entrance hall",
+            "shoe lockers area (genkan)"
+          ],
+          "exclusive_group": "school",
           "tags": [
             "school corridor",
             "hallway",
@@ -1492,7 +3254,25 @@
           "atmosphere": "校园、追逐、暴露"
         },
         {
+          "id": "scene_music_room",
+          "label": "音乐室/美术室",
           "subcategory": "音乐室/美术室",
+          "context_ids": [
+            "school"
+          ],
+          "anchor_tags": [
+            "music room",
+            "art room",
+            "music instrument storage"
+          ],
+          "detail_tags": [
+            "practice room",
+            "art supply room",
+            "pottery studio",
+            "studio with model stand",
+            "studio with backdrop"
+          ],
+          "exclusive_group": "school",
           "tags": [
             "music room",
             "art room",
@@ -1506,7 +3286,30 @@
           "atmosphere": "艺术、裸体、模特"
         },
         {
+          "id": "scene_gymnasium",
+          "label": "体育馆/武道场",
           "subcategory": "体育馆/武道场",
+          "context_ids": [
+            "school"
+          ],
+          "anchor_tags": [
+            "gymnasium",
+            "gym floor",
+            "gymnasium bleachers"
+          ],
+          "detail_tags": [
+            "gym equipment area",
+            "gym storage",
+            "gym shower room",
+            "gym locker room",
+            "judo dojo",
+            "kendo dojo",
+            "karate dojo",
+            "wrestling arena",
+            "dance studio",
+            "dance practice room"
+          ],
+          "exclusive_group": "school",
           "tags": [
             "gymnasium",
             "gym floor",
@@ -1525,7 +3328,25 @@
           "atmosphere": "运动、制服、汗"
         },
         {
+          "id": "scene_school_swimming_pool",
+          "label": "泳池/更衣室",
           "subcategory": "泳池/更衣室",
+          "context_ids": [
+            "school"
+          ],
+          "anchor_tags": [
+            "school swimming pool",
+            "pool changing room",
+            "pool shower"
+          ],
+          "detail_tags": [
+            "pool deck",
+            "school poolside",
+            "competitive pool",
+            "indoor pool",
+            "swimming club room"
+          ],
+          "exclusive_group": "school",
           "tags": [
             "school swimming pool",
             "pool changing room",
@@ -1539,7 +3360,23 @@
           "atmosphere": "泳装、更衣、偷窥"
         },
         {
-          "subcategory": "天台/屋顶",
+          "id": "scene_school_rooftop",
+          "label": "学校天台",
+          "subcategory": "学校天台",
+          "context_ids": [
+            "school"
+          ],
+          "anchor_tags": [
+            "school rooftop",
+            "school roof access",
+            "rooftop fence"
+          ],
+          "detail_tags": [
+            "rooftop antenna area",
+            "school rooftop door",
+            "school roof garden"
+          ],
+          "exclusive_group": "school",
           "tags": [
             "school rooftop",
             "school roof access",
@@ -1551,7 +3388,24 @@
           "atmosphere": "校园禁忌、露出、羞耻"
         },
         {
+          "id": "scene_school_nurse_office",
+          "label": "保健室",
           "subcategory": "保健室",
+          "context_ids": [
+            "school"
+          ],
+          "anchor_tags": [
+            "school nurse office",
+            "nurse bed",
+            "nurse curtain"
+          ],
+          "detail_tags": [
+            "health room",
+            "medical office",
+            "school infirmary bed",
+            "medicine cabinet"
+          ],
+          "exclusive_group": "school",
           "tags": [
             "school nurse office",
             "nurse bed",
@@ -1564,7 +3418,23 @@
           "atmosphere": "校园、检查、护士"
         },
         {
+          "id": "scene_home_economics_room",
+          "label": "家政教室",
           "subcategory": "家政教室",
+          "context_ids": [
+            "school"
+          ],
+          "anchor_tags": [
+            "home economics room",
+            "cooking classroom",
+            "kitchen practice room"
+          ],
+          "detail_tags": [
+            "cooking lab",
+            "home ec kitchen",
+            "classroom with stove"
+          ],
+          "exclusive_group": "school",
           "tags": [
             "home economics room",
             "cooking classroom",
@@ -1576,7 +3446,23 @@
           "atmosphere": "厨房、食物、性联想"
         },
         {
+          "id": "scene_school_library",
+          "label": "图书室/自习室",
           "subcategory": "图书室/自习室",
+          "context_ids": [
+            "school"
+          ],
+          "anchor_tags": [
+            "school library",
+            "library study room",
+            "library stack area"
+          ],
+          "detail_tags": [
+            "library back shelf",
+            "study room booth",
+            "reading room"
+          ],
+          "exclusive_group": "school",
           "tags": [
             "school library",
             "library study room",
@@ -1588,7 +3474,24 @@
           "atmosphere": "安静、偷情、知性"
         },
         {
+          "id": "scene_club_room",
+          "label": "部活室/社团室",
           "subcategory": "部活室/社团室",
+          "context_ids": [
+            "school"
+          ],
+          "anchor_tags": [
+            "club room",
+            "culture club room",
+            "sports club room"
+          ],
+          "detail_tags": [
+            "after school club",
+            "club activity room",
+            "band room",
+            "art club room"
+          ],
+          "exclusive_group": "school",
           "tags": [
             "club room",
             "culture club room",
@@ -1601,7 +3504,24 @@
           "atmosphere": "课后、封闭、独占"
         },
         {
+          "id": "scene_school_toilet",
+          "label": "厕所（学校）",
           "subcategory": "厕所（学校）",
+          "context_ids": [
+            "school"
+          ],
+          "anchor_tags": [
+            "school toilet",
+            "toilet stall",
+            "toilet with lock broken"
+          ],
+          "detail_tags": [
+            "toilet at night",
+            "toilet with graffiti",
+            "student toilet",
+            "staff toilet"
+          ],
+          "exclusive_group": "school",
           "tags": [
             "school toilet",
             "toilet stall",
@@ -1619,7 +3539,23 @@
       "category": "成人场所/特殊行业系列",
       "items": [
         {
+          "id": "scene_adult_video_store",
+          "label": "成人录像厅",
           "subcategory": "成人录像厅",
+          "context_ids": [
+            "adult"
+          ],
+          "anchor_tags": [
+            "adult video store",
+            "DVD shop",
+            "video rental back shelf"
+          ],
+          "detail_tags": [
+            "adult goods corner",
+            "video store corner",
+            "猥褻DVD区"
+          ],
+          "exclusive_group": "adult",
           "tags": [
             "adult video store",
             "DVD shop",
@@ -1631,7 +3567,25 @@
           "atmosphere": "选购、羞耻、暴露"
         },
         {
+          "id": "scene_rental_studio",
+          "label": "个人工作室/出租房",
           "subcategory": "个人工作室/出租房",
+          "context_ids": [
+            "adult"
+          ],
+          "anchor_tags": [
+            "rental studio",
+            "photo studio rental",
+            "dance practice studio"
+          ],
+          "detail_tags": [
+            "recording studio",
+            "private studio",
+            "art model studio",
+            "massage studio",
+            "studio with props"
+          ],
+          "exclusive_group": "adult",
           "tags": [
             "rental studio",
             "photo studio rental",
@@ -1645,7 +3599,24 @@
           "atmosphere": "模特、艺术、摄影"
         },
         {
+          "id": "scene_temple",
+          "label": "和尚/尼姑庵",
           "subcategory": "和尚/尼姑庵",
+          "context_ids": [
+            "adult"
+          ],
+          "anchor_tags": [
+            "temple",
+            "monastery",
+            "nun's quarters"
+          ],
+          "detail_tags": [
+            "meditation hall",
+            "temple residence",
+            "shrine keeper's house",
+            "Shinto priest quarters"
+          ],
+          "exclusive_group": "adult",
           "tags": [
             "temple",
             "monastery",
@@ -1658,7 +3629,24 @@
           "atmosphere": "宗教禁忌、尼僧、圣俗"
         },
         {
+          "id": "scene_cemetery_at_night",
+          "label": "墓地/灵园",
           "subcategory": "墓地/灵园",
+          "context_ids": [
+            "adult"
+          ],
+          "anchor_tags": [
+            "cemetery at night",
+            "grave area",
+            "tomb stone"
+          ],
+          "detail_tags": [
+            "graveyard",
+            "memorial park",
+            "cemetery bench",
+            "under cherry tree at cemetery"
+          ],
+          "exclusive_group": "adult",
           "tags": [
             "cemetery at night",
             "grave area",
@@ -1671,7 +3659,23 @@
           "atmosphere": "禁忌、恐怖、死亡边缘"
         },
         {
+          "id": "scene_funeral_hall",
+          "label": "墓地/殡仪馆",
           "subcategory": "墓地/殡仪馆",
+          "context_ids": [
+            "adult"
+          ],
+          "anchor_tags": [
+            "funeral hall",
+            "Buddhist altar room",
+            "butsuma"
+          ],
+          "detail_tags": [
+            "household altar",
+            "altars with incense",
+            "memorial tablet room"
+          ],
+          "exclusive_group": "adult",
           "tags": [
             "funeral hall",
             "Buddhist altar room",
@@ -1683,7 +3687,25 @@
           "atmosphere": "禁忌、死者的联想"
         },
         {
+          "id": "scene_psychiatric_ward",
+          "label": "精神病院/疗养院",
           "subcategory": "精神病院/疗养院",
+          "context_ids": [
+            "adult"
+          ],
+          "anchor_tags": [
+            "psychiatric ward",
+            "asylum room",
+            "mental institution"
+          ],
+          "detail_tags": [
+            "treatment room",
+            "padded room",
+            "hospital hallway",
+            "ward common room",
+            "medical facility bed"
+          ],
+          "exclusive_group": "adult",
           "tags": [
             "psychiatric ward",
             "asylum room",
@@ -1697,7 +3719,24 @@
           "atmosphere": "支配、无力、药物"
         },
         {
+          "id": "scene_institution",
+          "label": "孤儿院/福利院",
           "subcategory": "孤儿院/福利院",
+          "context_ids": [
+            "adult"
+          ],
+          "anchor_tags": [
+            "institution",
+            "group home",
+            "dormitory room"
+          ],
+          "detail_tags": [
+            "group shower room",
+            "common room",
+            "sleeping quarters",
+            "care facility"
+          ],
+          "exclusive_group": "adult",
           "tags": [
             "institution",
             "group home",
@@ -1710,7 +3749,26 @@
           "atmosphere": "禁忌、脆弱、支配"
         },
         {
+          "id": "scene_kabukicho",
+          "label": "红灯区街道",
           "subcategory": "红灯区街道",
+          "context_ids": [
+            "adult"
+          ],
+          "anchor_tags": [
+            "Kabukicho",
+            "Susukino",
+            "Nakasu"
+          ],
+          "detail_tags": [
+            "soapland street",
+            "delivery health area",
+            "pink salon district",
+            "red light district alley",
+            "prostitution area",
+            "street walker area"
+          ],
+          "exclusive_group": "adult",
           "tags": [
             "Kabukicho",
             "Susukino",
@@ -1725,7 +3783,24 @@
           "atmosphere": "日本特有、选择、交易"
         },
         {
+          "id": "scene_sex_shop_interior",
+          "label": "羞耻诊所/体验店",
           "subcategory": "羞耻诊所/体验店",
+          "context_ids": [
+            "adult"
+          ],
+          "anchor_tags": [
+            "sex shop interior",
+            "adult shop fitting room",
+            "love hotel lobby shop"
+          ],
+          "detail_tags": [
+            "genital waxing salon",
+            "intimate grooming salon",
+            "adult toy store",
+            "bondage equipment shop"
+          ],
+          "exclusive_group": "adult",
           "tags": [
             "sex shop interior",
             "adult shop fitting room",
@@ -1743,7 +3818,25 @@
       "category": "特殊空间/不可能空间",
       "items": [
         {
+          "id": "scene_utility_room",
+          "label": "配电室/管道",
           "subcategory": "配电室/管道",
+          "context_ids": [
+            "generic"
+          ],
+          "anchor_tags": [
+            "utility room",
+            "electrical room",
+            "breaker room"
+          ],
+          "detail_tags": [
+            "fuse box room",
+            "HVAC room",
+            "boiler room",
+            "water heater closet",
+            "storage space under stairs"
+          ],
+          "exclusive_group": "generic",
           "tags": [
             "utility room",
             "electrical room",
@@ -1757,7 +3850,25 @@
           "atmosphere": "幽闭、支配、暴露"
         },
         {
+          "id": "scene_glass_room",
+          "label": "透明空间",
           "subcategory": "透明空间",
+          "context_ids": [
+            "generic"
+          ],
+          "anchor_tags": [
+            "glass room",
+            "transparent booth",
+            "glass-walled room"
+          ],
+          "detail_tags": [
+            "showroom",
+            "greenhouse",
+            "conservatory",
+            "tent with transparent wall",
+            "transparent dressing room"
+          ],
+          "exclusive_group": "generic",
           "tags": [
             "glass room",
             "transparent booth",
@@ -1771,7 +3882,24 @@
           "atmosphere": "暴露狂、被观看、玻璃隔间"
         },
         {
+          "id": "scene_construction_scaffolding",
+          "label": "高处以次充好",
           "subcategory": "高处以次充好",
+          "context_ids": [
+            "generic"
+          ],
+          "anchor_tags": [
+            "construction scaffolding",
+            "window washing platform",
+            "building maintenance lift"
+          ],
+          "detail_tags": [
+            "gondola",
+            "crane basket",
+            "high rise construction",
+            "rooftop AC unit"
+          ],
+          "exclusive_group": "generic",
           "tags": [
             "construction scaffolding",
             "window washing platform",
@@ -1784,7 +3912,26 @@
           "atmosphere": "高处恐惧、露出、危险"
         },
         {
+          "id": "scene_locker",
+          "label": "狭窄空间",
           "subcategory": "狭窄空间",
+          "context_ids": [
+            "generic"
+          ],
+          "anchor_tags": [
+            "locker",
+            "storage locker",
+            "phone booth"
+          ],
+          "detail_tags": [
+            "closet",
+            "small storage room",
+            "packing box",
+            "cardboard box",
+            "tent inside",
+            "sleeping bag"
+          ],
+          "exclusive_group": "generic",
           "tags": [
             "locker",
             "storage locker",
@@ -1799,7 +3946,27 @@
           "atmosphere": "幽闭、SM、狭窄"
         },
         {
+          "id": "scene_bathtub",
+          "label": "水中空间",
           "subcategory": "水中空间",
+          "context_ids": [
+            "generic"
+          ],
+          "anchor_tags": [
+            "bathtub",
+            "onsen",
+            "pool"
+          ],
+          "detail_tags": [
+            "river",
+            "lake",
+            "beach shallows",
+            "bathtub with bath bomb",
+            "bathtub with candle",
+            "shared bath",
+            "miso soup consistency"
+          ],
+          "exclusive_group": "generic",
           "tags": [
             "bathtub",
             "onsen",
@@ -1815,7 +3982,24 @@
           "atmosphere": "浮力、湿身、润滑、漂浮"
         },
         {
+          "id": "scene_room_full_of_mirrors",
+          "label": "镜面空间",
           "subcategory": "镜面空间",
+          "context_ids": [
+            "generic"
+          ],
+          "anchor_tags": [
+            "room full of mirrors",
+            "mirror maze",
+            "mirrored wall"
+          ],
+          "detail_tags": [
+            "gym mirror wall",
+            "dance studio mirror",
+            "mirrored ceiling",
+            "hall of mirrors"
+          ],
+          "exclusive_group": "generic",
           "tags": [
             "room full of mirrors",
             "mirror maze",
@@ -1833,7 +4017,25 @@
       "category": "其他日本AV常见场景",
       "items": [
         {
+          "id": "scene_interrogation_room",
+          "label": "警察/审讯",
           "subcategory": "警察/审讯",
+          "context_ids": [
+            "generic"
+          ],
+          "anchor_tags": [
+            "interrogation room",
+            "police box",
+            "police station"
+          ],
+          "detail_tags": [
+            "holding cell",
+            "detention room",
+            "police car backseat",
+            "prison cell",
+            "prison visiting room"
+          ],
+          "exclusive_group": "generic",
           "tags": [
             "interrogation room",
             "police box",
@@ -1847,7 +4049,27 @@
           "atmosphere": "审讯、制服、权力"
         },
         {
+          "id": "scene_chapel",
+          "label": "教堂/忏悔",
           "subcategory": "教堂/忏悔",
+          "context_ids": [
+            "generic"
+          ],
+          "anchor_tags": [
+            "chapel",
+            "church interior",
+            "confessional booth"
+          ],
+          "detail_tags": [
+            "church sacristy",
+            "convent room",
+            "church at night",
+            "monastery",
+            "stained glass window",
+            "altar",
+            "cross on wall"
+          ],
+          "exclusive_group": "generic",
           "tags": [
             "chapel",
             "church interior",
@@ -1863,7 +4085,26 @@
           "atmosphere": "修女、宗教禁忌、神圣亵渎"
         },
         {
+          "id": "scene_judo_dojo",
+          "label": "体育/竞技",
           "subcategory": "体育/竞技",
+          "context_ids": [
+            "generic"
+          ],
+          "anchor_tags": [
+            "judo dojo",
+            "kendo dojo",
+            "boxing gym"
+          ],
+          "detail_tags": [
+            "gym locker room",
+            "gym shower",
+            "sports club",
+            "swimming club",
+            "tennis court at night",
+            "marathon aid station"
+          ],
+          "exclusive_group": "generic",
           "tags": [
             "judo dojo",
             "kendo dojo",
@@ -1878,7 +4119,24 @@
           "atmosphere": "运动系、部活、汗"
         },
         {
+          "id": "scene_ryokan_room",
+          "label": "温泉旅行",
           "subcategory": "温泉旅行",
+          "context_ids": [
+            "generic"
+          ],
+          "anchor_tags": [
+            "ryokan room",
+            "onsen trip",
+            "yukata in ryokan"
+          ],
+          "detail_tags": [
+            "ryokan dinner room",
+            "ryokan corridor at night",
+            "hot spring town street",
+            "ryokan lobby"
+          ],
+          "exclusive_group": "generic",
           "tags": [
             "ryokan room",
             "onsen trip",
@@ -1891,7 +4149,24 @@
           "atmosphere": "旅行、温泉街"
         },
         {
+          "id": "scene_student_home",
+          "label": "家庭访问",
           "subcategory": "家庭访问",
+          "context_ids": [
+            "generic"
+          ],
+          "anchor_tags": [
+            "student home",
+            "home tutor",
+            "private lesson at home"
+          ],
+          "detail_tags": [
+            "piano lesson room",
+            "cram school",
+            "juku classroom",
+            "study desk"
+          ],
+          "exclusive_group": "generic",
           "tags": [
             "student home",
             "home tutor",
@@ -1909,7 +4184,30 @@
       "category": "魔术镜号/特殊车辆（JAV独有）",
       "items": [
         {
+          "id": "scene_magic_mirror_bus_interior",
+          "label": "マジックミラー号",
           "subcategory": "マジックミラー号",
+          "context_ids": [
+            "adult"
+          ],
+          "anchor_tags": [
+            "magic mirror bus interior",
+            "one-way mirror van",
+            "magic mirror号"
+          ],
+          "detail_tags": [
+            "observation side of mirror",
+            "filming compartment",
+            "van with hidden camera",
+            "passenger seat facing mirror",
+            "mirror room on wheels",
+            "mobile AV studio",
+            "street pickup van",
+            "curtains drawn",
+            "tinted windows",
+            "surveillance monitors inside"
+          ],
+          "exclusive_group": "adult",
           "tags": [
             "magic mirror bus interior",
             "one-way mirror van",
@@ -1933,7 +4231,32 @@
       "category": "影像编辑室/导演审片室（AV制作场景）",
       "items": [
         {
+          "id": "scene_av_editing_room",
+          "label": "映像編集室",
           "subcategory": "映像編集室",
+          "context_ids": [
+            "adult"
+          ],
+          "anchor_tags": [
+            "AV editing room",
+            "video editing suite",
+            "director's office"
+          ],
+          "detail_tags": [
+            "editing monitor screens",
+            "timeline visible",
+            "raw footage playing",
+            "preview monitor",
+            "editing desk",
+            "mixing board",
+            "sound booth window",
+            "studio control room",
+            "post-production room",
+            "director reviewing footage",
+            "playback on big screen",
+            "editing timeline showing sex scene"
+          ],
+          "exclusive_group": "adult",
           "tags": [
             "AV editing room",
             "video editing suite",

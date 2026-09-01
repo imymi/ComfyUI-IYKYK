@@ -1,0 +1,26 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "StyleRecipesSchema",
+  "type": "object",
+  "required": ["recipes"],
+  "properties": {
+    "recipes": {
+      "type": "array",
+      "minItems": 8,
+      "items": {
+        "type": "object",
+        "required": ["id", "style_name", "lighting_palette", "style_recipe", "focus_detail"],
+        "properties": {
+          "id": { "type": "string", "minLength": 1 },
+          "style_name": { "type": "string", "minLength": 1 },
+          "name_zh": { "type": "string" },
+          "director_reference": { "type": "string" },
+          "lighting_palette": { "type": "string", "minLength": 1 },
+          "style_recipe": { "type": "string", "minLength": 1 },
+          "focus_detail": { "type": "string", "minLength": 1 },
+          "atmosphere_core": { "type": "string" }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,39 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "comfyui-iykyk"
+version = "1.1.0-rc2"
+description = "ComfyUI-IYKYK: East Asian Portrait & Aesthetics Prompt Generator & Multi-Rule Conflict Resolver"
+readme = "README.md"
+requires-python = ">=3.9"
+authors = [
+    { name = "imymi" }
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: End Users/Desktop",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest",
+    "pytest-cov",
+    "ruff",
+    "jsonschema",
+]
+
+[project.urls]
+Repository = "https://github.com/imymi/ComfyUI-IYKYK"
+Documentation = "https://github.com/imymi/ComfyUI-IYKYK#readme"
+"Bug Tracker" = "https://github.com/imymi/ComfyUI-IYKYK/issues"
+
+[tool.comfy]
+PublisherId = "imymi"
+DisplayName = "ComfyUI-IYKYK"

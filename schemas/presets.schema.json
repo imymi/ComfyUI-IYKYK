@@ -1,0 +1,24 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "PresetsSchema",
+  "type": "object",
+  "required": ["presets"],
+  "properties": {
+    "presets": {
+      "type": "array",
+      "minItems": 77,
+      "items": {
+        "type": "object",
+        "required": ["id", "name_zh", "positive"],
+        "properties": {
+          "id": { "type": "string", "minLength": 1 },
+          "name_zh": { "type": "string", "minLength": 1 },
+          "positive": { "type": "string", "minLength": 1 },
+          "style_zh": { "type": "string" },
+          "category": { "type": "string" },
+          "description_zh": { "type": "string" }
+        }
+      }
+    }
+  }
+}

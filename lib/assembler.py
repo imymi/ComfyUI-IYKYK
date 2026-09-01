@@ -1,312 +1,356 @@
 """
-assembler.py — 完整 15 槽位装配与情境联动引擎
+assembler.py — 结构化流水线装配与统一 Finalize 引擎
 
-严格遵循 nsfw-prompt-templates-asian 规范定义的 15 步装配流水线与冲突消解规则：
- 1. 场景+主题 (01-场景主题.md)
- 2. 景别+视角+设备 (02-景别构图.md)
- 3. 裸露状态 (03-裸露液体.md)
- 4. 服装款式与状态 (04-服装专项.md) — 裸露等级强联动
- 5. 光影氛围 (05-光影氛围.md)
- 6. 姿势动作 (06-姿势动作.md)
- 7. 表情眼神 (07-表情眼神.md)
- 8. 风格/胶片 (08-风格胶片.md)
- 9. 妆容细节 (09-妆容专项.md)
-10. 发型饰品 (10-发型饰品.md)
-11. 真实瑕疵与皮肤 (11-瑕疵细节.md)
-12. 纹身标记与皮肤融合 (12-纹身标记.md)
-13. 道具宠物 (13-道具宠物.md)
-14. 人格纵深/角色卡 (14-人格卡片.md)
-15. 液体系统 (03-裸露液体.md)
-16. 画质强化 (02-景别构图.md)
+1. 严格按 16 步骤流水线顺序装配 PromptFragment 结构体列表
+2. 提供强化的顶层逗号解析器 split_top_level_tags：
+   - 保护权重括号 (), [], <>, ""
+   - 支持反斜杠转义逗号 \\, 与转义双引号 \\"
+3. 提供三入口统一公共流水线 finalize_prompt：
+   - 空片段规范化
+   - 结构化冲突消解 (ConflictResolver)
+   - 首见保序去重
+   - 严谨的 250 词边界管理（结构化片段原子保护、普通片段单词边界截断、单结构超长校验 PromptValidationError）
+   - 最终格式清洗与非空安全保障
 """
 from __future__ import annotations
 
-import random
-from typing import Any, Dict, List, Optional
+import re
+from pathlib import Path
+from random import Random
+from typing import Any, Dict, List, Optional, Sequence
 
-try:
-    from .sampler import DataSampler, _is_none, _is_random, _is_auto
-    from .conflict_resolver import ConflictResolver, sanitize_prompt
-except (ImportError, ValueError):
-    from lib.sampler import DataSampler, _is_none, _is_random, _is_auto
-    from lib.conflict_resolver import ConflictResolver, sanitize_prompt
+from .conflict_resolver import ConflictResolver, sanitize_prompt
+from .models import PromptFragment
+
+MAX_PROMPT_WORDS = 250
 
 
-# 15 个槽位的严格装配顺序
-SLOT_ORDER = [
-    "scene_theme",      # 1. 场景+主题
-    "shot_angle",       # 2. 景别+视角
-    "nudity",           # 3. 裸露状态
-    "clothing",         # 4. 服装款式与状态
-    "lighting",         # 5. 光影氛围
-    "pose",             # 6. 姿势动作
-    "expression",       # 7. 表情眼神
-    "film_style",       # 8. 风格/胶片
-    "makeup",           # 9. 妆容细节
-    "accessories",      # 10. 发型饰品
-    "imperfections",    # 11. 瑕疵细节
-    "tattoo",           # 12. 纹身标记
-    "props",            # 13. 道具宠物
-    "character",        # 14. 人格设定
-    "liquids",          # 15. 液体系统
-    "quality",          # 16. 画质强化
+class PromptValidationError(Exception):
+    """当单个不可拆分的结构化片段超出词数预算时抛出。"""
+    pass
+
+
+SLOT_PIPELINE_ORDER = [
+    ("scene_theme", 1),
+    ("shot_type", 2),
+    ("camera_angle", 3),
+    ("character", 4),
+    ("nudity", 5),
+    ("clothing", 6),
+    ("lighting", 7),
+    ("pose", 8),
+    ("expression", 9),
+    ("makeup", 10),
+    ("hairstyle", 11),
+    ("jewelry", 12),
+    ("imperfections", 13),
+    ("tattoo", 14),
+    ("props", 15),
+    ("liquids", 16),
+    ("film", 17),
+    ("quality", 18),
 ]
 
 
-class PromptAssembler:
-    """15 槽位装配引擎。"""
+def split_top_level_tags(text: str) -> List[str]:
+    """
+    按顶层逗号拆分提示词文本，严格忽略被 (), [], <>, "" 包裹的内部逗号，
+    支持反斜杠转义逗号 \\, 与转义引号 \\"，完整保护 ComfyUI 权重与语法。
+    """
+    if not text or not text.strip():
+        return []
 
-    def __init__(self, data_dir: str):
-        self.sampler = DataSampler(data_dir)
+    tags: List[str] = []
+    current: List[str] = []
+    paren_depth = 0
+    bracket_depth = 0
+    angle_depth = 0
+    in_quote = False
+    escaped = False
+
+    for char in text:
+        if escaped:
+            current.append(char)
+            escaped = False
+            continue
+
+        if char == '\\':
+            escaped = True
+            current.append(char)
+            continue
+
+        if char == '"':
+            in_quote = not in_quote
+            current.append(char)
+        elif in_quote:
+            current.append(char)
+        elif char == '(':
+            paren_depth += 1
+            current.append(char)
+        elif char == ')':
+            paren_depth = max(0, paren_depth - 1)
+            current.append(char)
+        elif char == '[':
+            bracket_depth += 1
+            current.append(char)
+        elif char == ']':
+            bracket_depth = max(0, bracket_depth - 1)
+            current.append(char)
+        elif char == '<':
+            angle_depth += 1
+            current.append(char)
+        elif char == '>':
+            angle_depth = max(0, angle_depth - 1)
+            current.append(char)
+        elif char == ',' and paren_depth == 0 and bracket_depth == 0 and angle_depth == 0:
+            tag = "".join(current).strip()
+            if tag:
+                tags.append(tag)
+            current = []
+        else:
+            current.append(char)
+
+    if current:
+        tag = "".join(current).strip()
+        if tag:
+            tags.append(tag)
+
+    return tags
+
+
+def finalize_prompt(
+    fragments: Sequence[PromptFragment],
+    *,
+    data_dir: str | Path,
+    rng: Optional[Random] = None,
+    max_words: int = MAX_PROMPT_WORDS
+) -> str:
+    """
+    三入口统一公共流水线：
+    1. 标准化空白与空片段
+    2. 基于 PromptFragment 进行冲突消解
+    3. 保留首次出现顺序的去重
+    4. 严谨的 250 词边界管理（结构化片段原子保护、普通片段单词边界截断）
+    5. 格式清洗与标点规范化
+    """
+    if rng is None:
+        rng = Random(42)
+
+    # 1. 过滤空片段
+    valid_frags: List[PromptFragment] = []
+    for f in fragments:
+        t = f.text.strip().strip(",")
+        if t:
+            valid_frags.append(
+                PromptFragment(
+                    text=t,
+                    source_slot=f.source_slot,
+                    source_item_id=f.source_item_id,
+                    context_ids=f.context_ids,
+                    order=f.order,
+                )
+            )
+
+    if not valid_frags:
+        return "best quality, masterpiece"
+
+    # 2. 结构化冲突消解
+    resolver = ConflictResolver(data_dir)
+    resolved_frags = resolver.resolve_fragments(valid_frags, rng)
+
+    # 3. 按稳定 key 去重（保留首次出现顺序）
+    seen_keys = set()
+    deduped_frags: List[PromptFragment] = []
+    for f in resolved_frags:
+        key = f.text.lower().strip()
+        if key not in seen_keys:
+            seen_keys.add(key)
+            deduped_frags.append(f)
+
+    # 4. 严谨的 250 词边界管理
+    accepted_texts: List[str] = []
+    current_word_count = 0
+
+    for f in deduped_frags:
+        frag_text = f.text.strip().strip(",")
+        if not frag_text:
+            continue
+        frag_words = len(frag_text.split())
+        is_structural = any(c in frag_text for c in "()[]<>\"")
+
+        # 单个结构化片段超长检查
+        if is_structural and frag_words > max_words:
+            raise PromptValidationError(
+                f"Single structural fragment exceeds {max_words} words limit: '{frag_text[:50]}...'"
+            )
+
+        if current_word_count + frag_words <= max_words:
+            accepted_texts.append(frag_text)
+            current_word_count += frag_words
+        else:
+            # 超出当前预算
+            if not is_structural:
+                remaining = max_words - current_word_count
+                if remaining > 0:
+                    words = frag_text.split()[:remaining]
+                    accepted_texts.append(" ".join(words))
+                    current_word_count += len(words)
+            else:
+                # 结构化片段不能破坏，跳过当前片段，继续检查后续是否有较短片段可装入
+                continue
+
+    # 5. 渲染为字符串并最终清洗
+    raw_prompt = ", ".join(accepted_texts)
+    sanitized = sanitize_prompt(raw_prompt)
+
+    # 最终防御性验证
+    final_words = len(sanitized.split())
+    if final_words > max_words:
+        # 极少数情况下逗号规范化后词数可能有微小漂移，进行纯单词边界安全截断
+        sanitized = " ".join(sanitized.split()[:max_words]).rstrip(",")
+
+    return sanitized
+
+
+class PromptAssembler:
+    """15 槽位流水线组装器。"""
+
+    def __init__(self, data_dir: str | Path):
+        self.data_dir = Path(data_dir)
         self.resolver = ConflictResolver(data_dir)
 
-    def assemble(
+    def assemble_to_fragments(self, slots: Dict[str, List[Any]]) -> List[PromptFragment]:
+        """按流水线顺序将槽位数据转换为 PromptFragment 列表，完整透传已有 PromptFragment 的结构化元数据。"""
+        fragments: List[PromptFragment] = []
+        order = 0
+
+        for slot_name, _ in SLOT_PIPELINE_ORDER:
+            items = slots.get(slot_name, [])
+            if isinstance(items, list):
+                for item in items:
+                    if isinstance(item, PromptFragment):
+                        fragments.append(
+                            PromptFragment(
+                                text=item.text,
+                                source_slot=item.source_slot or slot_name,
+                                source_item_id=item.source_item_id,
+                                context_ids=item.context_ids,
+                                exclusive_group=item.exclusive_group,
+                                order=order,
+                            )
+                        )
+                        order += 1
+                    elif str(item).strip():
+                        sub_tags = split_top_level_tags(str(item))
+                        for st in sub_tags:
+                            fragments.append(
+                                PromptFragment(
+                                    text=st,
+                                    source_slot=slot_name,
+                                    order=order,
+                                )
+                            )
+                            order += 1
+
+        # 处理可能在 SLOT_PIPELINE_ORDER 外的其他槽位
+        for slot_name, items in slots.items():
+            if slot_name not in [s[0] for s in SLOT_PIPELINE_ORDER]:
+                if isinstance(items, list):
+                    for item in items:
+                        if isinstance(item, PromptFragment):
+                            fragments.append(
+                                PromptFragment(
+                                    text=item.text,
+                                    source_slot=item.source_slot or slot_name,
+                                    source_item_id=item.source_item_id,
+                                    context_ids=item.context_ids,
+                                    exclusive_group=item.exclusive_group,
+                                    order=order,
+                                )
+                            )
+                            order += 1
+                        elif str(item).strip():
+                            sub_tags = split_top_level_tags(str(item))
+                            for st in sub_tags:
+                                fragments.append(
+                                    PromptFragment(
+                                        text=st,
+                                        source_slot=slot_name,
+                                        order=order,
+                                    )
+                                )
+                                order += 1
+
+        return fragments
+
+    def assemble(self, slots: Dict[str, List[str]], rng: Optional[Random] = None) -> str:
+        """主组装接口：组装各槽位并执行统一 finalize。"""
+        if rng is None:
+            rng = Random(42)
+
+        fragments = self.assemble_to_fragments(slots)
+        return finalize_prompt(fragments, data_dir=self.data_dir, rng=rng, max_words=MAX_PROMPT_WORDS)
+
+    def assemble_preset(
         self,
-        seed: Optional[int] = None,
-        preset: str = "无 (None)",
-        style_recipe: str = "无 (None)",
-        scene_category: str = "随机 (Random)",
-        theme: str = "无 (None)",
-        shot_type: str = "自动 (Auto)",
-        camera_angle: str = "自动 (Auto)",
-        nudity_level: str = "随机 (Random)",
-        clothing_style: str = "随机 (Random)",
-        clothing_state: str = "自动联动裸露等级 (Auto Link Nudity)",
-        lighting_preset: str = "自动 (Auto)",
-        pose_category: str = "随机 (Random)",
-        expression: str = "随机 (Random)",
-        film_stock: str = "无 (None)",
-        makeup_style: str = "无 (None)",
-        hairstyle: str = "随机 (Random)",
-        jewelry_style: str = "无 (None)",
-        imperfection_type: str = "随机 (Random)",
-        tattoo_style: str = "无 (None)",
-        prop_style: str = "无 (None)",
-        character_role: str = "无 (None)",
-        liquid_effect: str = "无 (None)",
-        quality_tier: str = "高清写真 (High)",
-        custom_scene_override: str = "",
-    ) -> Dict[str, Any]:
-        """
-        执行完整 15 槽位流水线装配（含情境自洽、裸露与服装深度联动与冲突消解）。
-        """
-        # 1. 确定随机生成器
-        if seed is not None and seed >= 0:
-            rng = random.Random(seed)
+        preset: Dict[str, Any],
+        style_recipe: Optional[Dict[str, Any]],
+        quality_tier: str,
+        rng: Optional[Random] = None
+    ) -> str:
+        """预设模板与风格配方组装接口，统一接入 finalize_prompt。"""
+        if rng is None:
+            rng = Random(42)
+
+        fragments: List[PromptFragment] = []
+        order = 0
+
+        # 1. 预设核心 Prompt
+        raw_preset_prompt = preset.get("positive", preset.get("prompt", ""))
+        for t in split_top_level_tags(raw_preset_prompt):
+            fragments.append(
+                PromptFragment(
+                    text=t,
+                    source_slot="preset_core",
+                    order=order,
+                )
+            )
+            order += 1
+
+        # 2. 风格配方叠加
+        if style_recipe:
+            for k in ["lighting_palette", "style_recipe", "focus_detail"]:
+                val = style_recipe.get(k, "")
+                if val:
+                    for t in split_top_level_tags(str(val)):
+                        fragments.append(
+                            PromptFragment(
+                                text=t,
+                                source_slot=f"recipe_{k}",
+                                order=order,
+                            )
+                        )
+                        order += 1
+
+        # 3. 画质等级锚点
+        q_str = str(quality_tier or "").lower()
+        if "cctv" in q_str or "监控" in q_str:
+            q_tags = ["CCTV footage", "security camera", "low resolution", "grainy"]
+        elif "phone" in q_str or "手机" in q_str:
+            q_tags = ["phone camera", "selfie", "amateur photo", "slightly blurry"]
+        elif "masterpiece" in q_str or "顶尖" in q_str:
+            q_tags = ["masterpiece", "best quality", "ultra detailed", "8k", "photorealistic"]
         else:
-            rng = random.Random()
+            q_tags = ["best quality", "detailed", "photorealistic"]
 
-        # ── 风格配方读取 ──
-        recipe = None
-        if not _is_none(style_recipe):
-            recipe = self.sampler.get_style_recipe(style_recipe, rng)
+        for qt in q_tags:
+            fragments.append(
+                PromptFragment(
+                    text=qt,
+                    source_slot="quality",
+                    order=order,
+                )
+            )
+            order += 1
 
-        # ── 预设模板模式：直接输出或叠加配方 ──
-        if not _is_none(preset):
-            p = None
-            if not _is_random(preset):
-                p = self.sampler.get_preset(preset, rng)
-            else:
-                p = self.sampler.get_preset("Random", rng)
-
-            if p:
-                positive = p.get("positive", "")
-                desc = f"【预设模板】{p.get('name_zh', '')} - {p.get('description_zh', '')}"
-
-                # 如果同时叠加了风格配方，将配方的光影、胶片与画质词注入预设
-                if recipe:
-                    overlay_tags = []
-                    if recipe.get("lighting_palette"):
-                        overlay_tags.append(recipe["lighting_palette"])
-                    if recipe.get("style_recipe"):
-                        overlay_tags.append(recipe["style_recipe"])
-                    if recipe.get("focus_detail"):
-                        overlay_tags.append(recipe["focus_detail"])
-
-                    if overlay_tags:
-                        positive = f"{positive}, {', '.join(overlay_tags)}"
-                        positive = sanitize_prompt(positive)
-                        desc = f"{desc} | 【叠加配方】{recipe.get('name_zh', recipe.get('style_name', ''))}"
-
-                return {
-                    "positive": positive,
-                    "negative": self.sampler.get_negative_prompt(),
-                    "description_zh": desc,
-                    "slots": {"preset": [p.get("name_zh", preset)]},
-                }
-
-        # ── 情境推断（Context Anchor） ──
-        context = None
-        if not _is_random(scene_category) or not _is_none(theme):
-            context = self.sampler.detect_context(scene_category, theme)
-        elif not _is_random(clothing_style) and not _is_none(clothing_style):
-            context = self.sampler.detect_context(clothing_style, "")
-        elif not _is_random(character_role) and not _is_none(character_role):
-            context = self.sampler.detect_context(character_role, "")
-
-        # ── 逐槽位装配 ──
-        slots: Dict[str, List[str]] = {}
-
-        # 槽位 1: 场景+主题 (01-场景主题)
-        if custom_scene_override and custom_scene_override.strip():
-            slots["scene_theme"] = [custom_scene_override.strip()]
-            if not context:
-                context = self.sampler.detect_context(custom_scene_override, "")
-        else:
-            scene_tags = self.sampler.sample_scene(scene_category, rng)
-            theme_tags = self.sampler.sample_theme(theme, rng)
-            slots["scene_theme"] = scene_tags + theme_tags
-            if not context:
-                context = self.sampler.detect_context(", ".join(scene_tags), ", ".join(theme_tags))
-
-        # 槽位 2: 景别+视角 (02-景别构图)
-        shot_tags = self.sampler.sample_shot_type(shot_type, rng)
-        angle_tags = self.sampler.sample_camera_angle(camera_angle, rng)
-        slots["shot_angle"] = shot_tags + angle_tags
-
-        # 槽位 3: 裸露状态 (03-裸露液体)
-        if recipe and recipe.get("exposure_mode"):
-            exposure_map = {
-                "none": "L1", "half_covered": "L2",
-                "half_nude": "L3", "upper": "L4",
-                "lower": "L4", "both": "L5",
-            }
-            mapped_l = exposure_map.get(recipe["exposure_mode"], nudity_level)
-            nudity_tags, nudity_code = self.sampler.sample_nudity(mapped_l, rng)
-        else:
-            nudity_tags, nudity_code = self.sampler.sample_nudity(nudity_level, rng)
-        slots["nudity"] = nudity_tags
-
-        # 槽位 4: 服装款式与穿脱状态 (04-服装专项，基于裸露等级精准咬合)
-        c_tags = self.sampler.sample_clothing_with_nudity_linkage(
-            style=clothing_style,
-            state=clothing_state,
-            nudity_level_code=nudity_code,
-            rng=rng,
-            context=context,
-        )
-        slots["clothing"] = c_tags
-
-        # 槽位 5: 光影氛围 (05-光影氛围)
-        if recipe and recipe.get("lighting_palette"):
-            slots["lighting"] = [recipe["lighting_palette"]]
-        else:
-            slots["lighting"] = self.sampler.sample_lighting(lighting_preset, rng)
-
-        # 槽位 6: 姿势动作 (06-姿势动作)
-        if recipe and recipe.get("pose_direction"):
-            slots["pose"] = [recipe["pose_direction"]]
-        else:
-            slots["pose"] = self.sampler.sample_pose(pose_category, rng)
-
-        # 槽位 7: 表情眼神 (07-表情眼神)
-        if recipe and recipe.get("expression_gaze"):
-            slots["expression"] = [recipe["expression_gaze"]]
-        else:
-            slots["expression"] = self.sampler.sample_expression(expression, rng)
-
-        # 槽位 8: 风格/胶片 (08-风格胶片)
-        film_tags = []
-        if recipe and recipe.get("style_recipe"):
-            film_tags.append(recipe["style_recipe"])
-        custom_film = self.sampler.sample_film(film_stock, rng)
-        if custom_film:
-            film_tags.extend(custom_film)
-        slots["film_style"] = film_tags
-
-        # 槽位 9: 妆容细节 (09-妆容专项，情境自洽)
-        if recipe and recipe.get("makeup_direction"):
-            slots["makeup"] = [recipe["makeup_direction"]]
-        else:
-            slots["makeup"] = self.sampler.sample_makeup(makeup_style, rng, context=context)
-
-        # 槽位 10: 发型饰品 (10-发型饰品，情境自洽)
-        hair_tags = self.sampler.sample_hairstyle(hairstyle, rng, context=context)
-        jew_tags = self.sampler.sample_jewelry(jewelry_style, rng, context=context)
-        slots["accessories"] = hair_tags + jew_tags
-
-        # 槽位 11: 真实瑕疵与皮肤细节 (11-瑕疵细节)
-        slots["imperfections"] = self.sampler.sample_imperfections(imperfection_type, rng)
-
-        # 槽位 12: 纹身标记与皮肤融合 (12-纹身标记，情境自洽)
-        slots["tattoo"] = self.sampler.sample_tattoo(tattoo_style, rng, context=context)
-
-        # 槽位 13: 道具宠物 (13-道具宠物，情境自洽)
-        slots["props"] = self.sampler.sample_prop(prop_style, rng, context=context)
-
-        # 槽位 14: 人格角色设定 (14-人格卡片，情境自洽)
-        slots["character"] = self.sampler.sample_character(character_role, rng, context=context)
-
-        # 槽位 15: 液体体液系统 (03-裸露液体，情境自洽)
-        slots["liquids"] = self.sampler.sample_liquid(liquid_effect, rng, context=context)
-
-        # 槽位 16: 画质强化 (02-景别构图)
-        if recipe and recipe.get("focus_detail"):
-            slots["quality"] = [recipe["focus_detail"]]
-        else:
-            slots["quality"] = self.sampler.sample_quality_tags(quality_tier)
-
-        # ── 冲突检测与自动消解（7大规则库） ──
-        slots = self.resolver.resolve(slots)
-
-        # ── 按 15 槽位严格顺序拼装 ──
-        parts: List[str] = []
-        for slot_name in SLOT_ORDER:
-            tags = slots.get(slot_name, [])
-            if tags:
-                for tag in tags:
-                    tag_str = str(tag).strip()
-                    if tag_str:
-                        parts.append(tag_str)
-
-        positive = sanitize_prompt(", ".join(parts))
-
-        # 词数控制：上限 250 词
-        words = positive.split()
-        if len(words) > 260:
-            positive = " ".join(words[:250])
-            positive = sanitize_prompt(positive)
-
-        # 负面提示词
-        negative = self.sampler.get_negative_prompt()
-
-        # ── 中文场景描述合成 ──
-        desc_items = []
-        if custom_scene_override and custom_scene_override.strip():
-            desc_items.append(f"场景: {custom_scene_override.strip()}")
-        elif not _is_random(scene_category):
-            desc_items.append(f"场景: {scene_category}")
-
-        if not _is_none(theme) and not _is_random(theme):
-            desc_items.append(f"主题: {theme}")
-        if not _is_none(clothing_style) and not _is_random(clothing_style):
-            desc_items.append(f"服装: {clothing_style}")
-        if not _is_none(clothing_state) and not _is_random(clothing_state) and not _is_auto(clothing_state):
-            desc_items.append(f"状态: {clothing_state}")
-        else:
-            desc_items.append(f"裸露: {nudity_code}")
-        if not _is_none(hairstyle) and not _is_random(hairstyle):
-            desc_items.append(f"发型: {hairstyle}")
-        if not _is_none(makeup_style) and not _is_random(makeup_style):
-            desc_items.append(f"妆容: {makeup_style}")
-        if not _is_random(pose_category):
-            desc_items.append(f"姿势: {pose_category}")
-        if not _is_random(expression):
-            desc_items.append(f"表情: {expression}")
-        if not _is_none(film_stock) and not _is_random(film_stock):
-            desc_items.append(f"胶片: {film_stock}")
-        if not _is_none(prop_style) and not _is_random(prop_style):
-            desc_items.append(f"道具: {prop_style}")
-        if not _is_none(character_role) and not _is_random(character_role):
-            desc_items.append(f"角色: {character_role}")
-        if not _is_none(liquid_effect) and not _is_random(liquid_effect):
-            desc_items.append(f"体液: {liquid_effect}")
-
-        description_zh = " | ".join(desc_items) if desc_items else f"🎲 15槽位抽卡 ({nudity_code})"
-
-        return {
-            "positive": positive,
-            "negative": negative,
-            "description_zh": description_zh,
-            "slots": {k: v for k, v in slots.items() if v},
-        }
+        return finalize_prompt(fragments, data_dir=self.data_dir, rng=rng, max_words=MAX_PROMPT_WORDS)

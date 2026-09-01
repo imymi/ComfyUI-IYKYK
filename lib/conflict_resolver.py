@@ -1,5 +1,5 @@
 """
-conflict_resolver.py — 提示词冲突检测与消解引擎
+conflict_resolver.py — 结构化提示词冲突检测与消解引擎
 
 严格实现 8 大多规则冲突消解：
 1. 裸露与内衣/衣物状态互斥（私处暴露自动剔除内裤，全裸自动剔除穿着描述）
@@ -8,20 +8,22 @@ conflict_resolver.py — 提示词冲突检测与消解引擎
 4. 视线方向唯一性（消解直视与移开视线互斥）
 5. 液体微量法则与安全渲染（自动添加微量量词，拦截闭眼精液白内障）
 6. 设备与画质等级兼容（监控/手机自拍自动过滤 8k/单反/写真标签）
-7. 纹身 6 词真皮层融合（自动绑定真皮层物理融合词）
-8. 空间与环境自洽互斥（禁止多个独立场所/室内外冲突并存，如温泉与餐厅/街头屋台并存、野外草丛与室内房间并存）
+7. 纹身真皮层融合（仅针对纹身槽位或显式纹身词条，杜绝 pink/drink/link 误触发）
+8. 空间与环境自洽互斥（按片段顺序锁定主场所，禁止多个独立场所/室内外冲突并存）
 """
 from __future__ import annotations
 
 import json
-import random
 import re
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
+from random import Random
+from typing import Any, Dict, List, Optional, Sequence
+
+from .models import PromptFragment
 
 
 class ConflictResolver:
-    """提示词冲突检测与消解引擎。"""
+    """基于 PromptFragment 的结构化提示词冲突检测与消解引擎。"""
 
     def __init__(self, data_dir: str | Path):
         self.data_dir = Path(data_dir)
@@ -37,73 +39,123 @@ class ConflictResolver:
                 self._rules_cache = []
         return self._rules_cache
 
-    def resolve(self, slots: Dict[str, List[str]]) -> Dict[str, List[str]]:
+    def resolve_fragments(
+        self,
+        fragments: Sequence[PromptFragment],
+        rng: Optional[Random] = None
+    ) -> List[PromptFragment]:
         """
-        对 15 槽位已采样的 tags 执行多遍冲突检测与修正。
+        核心方法：对结构化 PromptFragment 列表执行 8 大冲突消解。
         """
+        if rng is None:
+            rng = Random(42)
+
+        frags = list(fragments)
         rules = self._load_rules()
 
-        # 1. 空间与环境自洽互斥（最优先：先确定物理空间自洽）
-        self._resolve_spatial_environment(slots, rules)
+        # 1. 空间与环境自洽互斥
+        frags = self._resolve_spatial_fragments(frags, rules, rng)
 
         # 2. 裸露与内衣状态互斥
-        self._resolve_nudity_clothing(slots, rules)
+        frags = self._resolve_nudity_clothing_fragments(frags, rules, rng)
 
         # 3. 材质穿透伪影消解
-        self._resolve_material_penetration(slots, rules)
+        frags = self._resolve_material_penetration_fragments(frags, rules, rng)
 
         # 4. 视线与镜头角度几何匹配
-        self._resolve_gaze_angle(slots, rules)
+        frags = self._resolve_gaze_angle_fragments(frags, rules, rng)
 
         # 5. 视线方向互斥消解
-        self._resolve_gaze_mutual_exclusion(slots, rules)
+        frags = self._resolve_gaze_mutual_exclusion_fragments(frags, rules, rng)
 
         # 6. 液体微量与安全法则
-        self._resolve_liquids(slots, rules)
+        frags = self._resolve_liquids_fragments(frags, rules, rng)
 
         # 7. 设备与画质兼容
-        self._resolve_device_quality(slots, rules)
+        frags = self._resolve_device_quality_fragments(frags, rules, rng)
 
-        # 8. 纹身真皮层融合
-        self._resolve_tattoo_fusion(slots, rules)
+        # 8. 纹身真皮层融合（严格基于纹身槽位或显式纹身标记）
+        frags = self._resolve_tattoo_fusion_fragments(frags, rules, rng)
 
-        return slots
+        return frags
 
-    def _all_text(self, slots: Dict[str, List[str]]) -> str:
-        parts = []
-        for tags in slots.values():
+    def resolve(
+        self,
+        slots: Dict[str, List[str]],
+        rng: Optional[Random] = None
+    ) -> Dict[str, List[str]]:
+        """
+        兼容接口：接收槽位字典并返回消解后的槽位字典。
+        """
+        if rng is None:
+            rng = Random(42)
+
+        fragments: List[PromptFragment] = []
+        order = 0
+        for slot_name, tags in slots.items():
             if isinstance(tags, list):
-                parts.extend([str(t).lower() for t in tags])
-        return " ".join(parts)
+                for t in tags:
+                    if str(t).strip():
+                        fragments.append(
+                            PromptFragment(
+                                text=str(t).strip(),
+                                source_slot=slot_name,
+                                order=order,
+                            )
+                        )
+                        order += 1
 
-    def _remove_matching(self, slots: Dict[str, List[str]], banned_substring: str):
-        banned = banned_substring.lower().strip()
-        if not banned:
-            return
-        for key in list(slots.keys()):
-            slots[key] = [t for t in slots[key] if banned not in t.lower()]
+        resolved_frags = self.resolve_fragments(fragments, rng)
 
-    @staticmethod
-    def _add_unique(slots: Dict[str, List[str]], slot_name: str, tag: str):
-        if slot_name not in slots:
-            slots[slot_name] = []
-        if tag.lower() not in [t.lower() for t in slots[slot_name]]:
-            slots[slot_name].append(tag)
+        # 重建 slots 字典
+        new_slots: Dict[str, List[str]] = {k: [] for k in slots.keys()}
+        for f in resolved_frags:
+            if f.source_slot not in new_slots:
+                new_slots[f.source_slot] = []
+            new_slots[f.source_slot].append(f.text)
+
+        return new_slots
 
     # ─── 规则 1: 空间与环境自洽互斥 ───
 
-    def _resolve_spatial_environment(self, slots: Dict[str, List[str]], rules: List[Dict]):
+    def _resolve_spatial_fragments(
+        self,
+        frags: List[PromptFragment],
+        rules: List[Dict],
+        rng: Random
+    ) -> List[PromptFragment]:
         rule = next((r for r in rules if r.get("id") == "spatial_environmental_mutual_exclusion"), None)
         deprecated_map = rule.get("deprecated_tags", {}) if rule else {"spinning room": "drunken stupor"}
 
-        # 1. 替换废弃或有歧义的词条（如 spinning room -> drunken stupor）
-        for key in list(slots.keys()):
-            for i, tag in enumerate(slots[key]):
-                for old_w, new_w in deprecated_map.items():
-                    if old_w.lower() in tag.lower():
-                        slots[key][i] = re.sub(rf"\b{re.escape(old_w)}\b", new_w, tag, flags=re.IGNORECASE)
+        # 0. 优先读取 exclusive_group 结构化互斥
+        groups_by_order: List[str] = []
+        for f in frags:
+            if f.exclusive_group and f.exclusive_group not in groups_by_order:
+                groups_by_order.append(f.exclusive_group)
 
-        # 2. 场所集群互斥（温泉 vs 餐饮/包厢 vs 校园 vs 职场 vs 交通工具 vs 纯野外）
+        if len(groups_by_order) > 1:
+            dominant_group = groups_by_order[0]
+            frags = [f for f in frags if f.exclusive_group is None or f.exclusive_group == dominant_group]
+
+        # 1. 替换废弃或歧义词条
+        cleaned_frags: List[PromptFragment] = []
+        for f in frags:
+            txt = f.text
+            for old_w, new_w in deprecated_map.items():
+                if re.search(rf"\b{re.escape(old_w)}\b", txt, flags=re.IGNORECASE):
+                    txt = re.sub(rf"\b{re.escape(old_w)}\b", new_w, txt, flags=re.IGNORECASE)
+            cleaned_frags.append(
+                PromptFragment(
+                    text=txt,
+                    source_slot=f.source_slot,
+                    source_item_id=f.source_item_id,
+                    context_ids=f.context_ids,
+                    order=f.order,
+                )
+            )
+        frags = cleaned_frags
+
+        # 2. 场所集群互斥（按 order 确定首个声明的主场所）
         venue_clusters = {
             "onsen": [
                 "onsen", "hot spring", "rotenburo", "ryokan bath", "public bath", "sento", "sauna", "jacuzzi", "soapland bath"
@@ -128,36 +180,37 @@ class ConflictResolver:
             ],
         }
 
-        # 收集所有已出现的场所标签位置
-        active_venues = []
+        # 扫描出现的场所及其首现 order
+        active_venues: List[Tuple[int, str]] = []
         for vname, vtags in venue_clusters.items():
-            for key in ["scene_theme", "character", "props"]:
-                for t in slots.get(key, []):
-                    if any(vt in t.lower() for vt in vtags):
-                        active_venues.append(vname)
-                        break
+            for f in frags:
+                if any(re.search(rf"\b{re.escape(vt)}\b", f.text, flags=re.IGNORECASE) or vt.lower() in f.text.lower() for vt in vtags):
+                    active_venues.append((f.order, vname))
+                    break
 
-        # 如果同时激活了多个大类场所，以 scene_theme 中最早出现的场所为准
-        if len(set(active_venues)) > 1:
-            dominant_venue = active_venues[0]
-            banned_venues = [v for v in set(active_venues) if v != dominant_venue]
-            banned_tags_all = []
+        if len(set(v for _, v in active_venues)) > 1:
+            active_venues.sort(key=lambda x: x[0])
+            dominant_venue = active_venues[0][1]
+            banned_venues = [v for _, v in active_venues if v != dominant_venue]
+            banned_tags_all: List[str] = []
             for bv in banned_venues:
                 banned_tags_all.extend(venue_clusters[bv])
-            for b in banned_tags_all:
-                self._remove_matching(slots, b)
 
-        # 3. 餐饮子场所去重（如果出现多个餐饮细分点，保留第一个）
+            frags = [
+                f for f in frags
+                if not any(bt.lower() in f.text.lower() for bt in banned_tags_all)
+            ]
+
+        # 3. 餐饮细分子场所去重（如果出现多个餐饮点，保留第一个）
         dining_tags = venue_clusters["dining"]
-        found_dining = []
-        for key in list(slots.keys()):
-            for t in slots[key]:
-                if any(dt in t.lower() for dt in dining_tags):
-                    found_dining.append(t)
-        if len(found_dining) > 1:
-            first_dining = found_dining[0]
-            for extra in found_dining[1:]:
-                self._remove_matching(slots, extra)
+        found_dining_indices = [
+            i for i, f in enumerate(frags)
+            if any(dt.lower() in f.text.lower() for dt in dining_tags)
+        ]
+        if len(found_dining_indices) > 1:
+            keep_idx = found_dining_indices[0]
+            drop_indices = set(found_dining_indices[1:])
+            frags = [f for i, f in enumerate(frags) if i not in drop_indices]
 
         # 4. 室内外物理互斥
         outdoor_exclusive = [
@@ -171,39 +224,51 @@ class ConflictResolver:
             "classroom", "cafe booth", "elevator", "dressing room", "shower stall", "spinning room"
         ]
 
-        all_txt = self._all_text(slots)
-        has_outdoor = any(m in all_txt for m in outdoor_exclusive)
-        has_indoor = any(m in all_txt for m in indoor_exclusive)
+        has_outdoor = any(any(m.lower() in f.text.lower() for m in outdoor_exclusive) for f in frags)
+        has_indoor = any(any(m.lower() in f.text.lower() for m in indoor_exclusive) for f in frags)
 
         if has_outdoor and has_indoor:
-            # 检查 scene_theme 中的倾向
-            scene_txt = " ".join(slots.get("scene_theme", [])).lower()
-            if any(m in scene_txt for m in outdoor_exclusive):
-                # 确定为室外场景：清理室内标签
-                for item in indoor_exclusive:
-                    self._remove_matching(slots, item)
+            # 找到首个声明是室外还是室内
+            first_outdoor_order = min((f.order for f in frags if any(m.lower() in f.text.lower() for m in outdoor_exclusive)), default=9999)
+            first_indoor_order = min((f.order for f in frags if any(m.lower() in f.text.lower() for m in indoor_exclusive)), default=9999)
+
+            if first_outdoor_order < first_indoor_order:
+                # 室外为主：剔除室内冲突项
+                frags = [f for f in frags if not any(m.lower() in f.text.lower() for m in indoor_exclusive)]
             else:
-                # 确定为室内场景：清理室外标签
-                for item in outdoor_exclusive:
-                    self._remove_matching(slots, item)
+                # 室内为主：剔除室外冲突项
+                frags = [f for f in frags if not any(m.lower() in f.text.lower() for m in outdoor_exclusive)]
 
-        # 5. 温泉内部子空间细化互斥
-        all_txt = self._all_text(slots)
-        if "indoor onsen" in all_txt or "private onsen" in all_txt:
-            for b in ["outdoor bath", "rotenburo", "open-air bath", "snow view", "changing room", "locker room"]:
-                self._remove_matching(slots, b)
-        elif any(k in all_txt for k in ["outdoor bath", "rotenburo", "open-air bath", "snow view"]):
-            for b in ["indoor onsen", "changing room", "locker room", "indoor bath"]:
-                self._remove_matching(slots, b)
-        elif "changing room" in all_txt or "locker room" in all_txt:
-            for b in ["indoor onsen", "outdoor bath", "rotenburo", "snow view", "soaking in tub", "steaming water"]:
-                self._remove_matching(slots, b)
+        # 5. 温泉内部细分子空间互斥
+        all_text = " ".join(f.text.lower() for f in frags)
+        if "indoor onsen" in all_text or "private onsen" in all_text:
+            frags = [
+                f for f in frags
+                if not any(b.lower() in f.text.lower() for b in ["outdoor bath", "rotenburo", "open-air bath", "snow view", "changing room", "locker room"])
+            ]
+        elif any(k.lower() in all_text for k in ["outdoor bath", "rotenburo", "open-air bath", "snow view"]):
+            frags = [
+                f for f in frags
+                if not any(b.lower() in f.text.lower() for b in ["indoor onsen", "changing room", "locker room", "indoor bath"])
+            ]
+        elif "changing room" in all_text or "locker room" in all_text:
+            frags = [
+                f for f in frags
+                if not any(b.lower() in f.text.lower() for b in ["indoor onsen", "outdoor bath", "rotenburo", "snow view", "soaking in tub", "steaming water"])
+            ]
 
-    # ─── 规则 2: 裸露与内衣/衣物状态互斥 ───
+        return frags
 
-    def _resolve_nudity_clothing(self, slots: Dict[str, List[str]], rules: List[Dict]):
+    # ─── 规则 2: 裸露与内衣状态互斥 ───
+
+    def _resolve_nudity_clothing_fragments(
+        self,
+        frags: List[PromptFragment],
+        rules: List[Dict],
+        rng: Random
+    ) -> List[PromptFragment]:
         rule = next((r for r in rules if r.get("id") == "nudity_clothing_conflicts"), None)
-        all_txt = self._all_text(slots)
+        all_text = " ".join(f.text.lower() for f in frags)
 
         conflicts = rule.get("conflicts", []) if rule else [
             {"trigger": ["pussy visible", "exposed vagina", "spread pussy"], "ban": ["panties showing", "wearing panties", "wearing underwear"]},
@@ -212,33 +277,72 @@ class ConflictResolver:
             {"trigger": ["no panties", "pussy visible"], "ban": ["cameltoe"]},
         ]
 
+        banned_set: set[str] = set()
         for item in conflicts:
             triggers = item.get("trigger", [])
             bans = item.get("ban", [])
-            if any(tr.lower() in all_txt for tr in triggers):
+            if any(tr.lower() in all_text for tr in triggers):
                 for b in bans:
-                    self._remove_matching(slots, b)
+                    banned_set.add(b.lower())
+
+        if banned_set:
+            frags = [
+                f for f in frags
+                if not any(b in f.text.lower() for b in banned_set)
+            ]
+        return frags
 
     # ─── 规则 3: 材质穿透伪影消解 ───
 
-    def _resolve_material_penetration(self, slots: Dict[str, List[str]], rules: List[Dict]):
+    def _resolve_material_penetration_fragments(
+        self,
+        frags: List[PromptFragment],
+        rules: List[Dict],
+        rng: Random
+    ) -> List[PromptFragment]:
         rule = next((r for r in rules if r.get("id") == "material_penetration"), None)
         banned_words = rule.get("banned_words", ["sheer", "see-through", "transparent fabric"]) if rule else ["sheer", "see-through", "transparent"]
         replacements = rule.get("replacements", ["unbuttoned", "lifted up", "slipping off shoulder", "wet dress clinging tightly to skin"]) if rule else ["unbuttoned", "lifted up"]
 
-        all_txt = self._all_text(slots)
         had_banned = False
-        for word in banned_words:
-            if word.lower() in all_txt:
-                self._remove_matching(slots, word)
-                had_banned = True
+        cleaned: List[PromptFragment] = []
+        for f in frags:
+            txt = f.text
+            for bw in banned_words:
+                if re.search(rf"\b{re.escape(bw)}\b", txt, flags=re.IGNORECASE):
+                    txt = re.sub(rf"\b{re.escape(bw)}\b", "", txt, flags=re.IGNORECASE).strip()
+                    had_banned = True
+            if txt:
+                cleaned.append(
+                    PromptFragment(
+                        text=txt,
+                        source_slot=f.source_slot,
+                        source_item_id=f.source_item_id,
+                        context_ids=f.context_ids,
+                        order=f.order,
+                    )
+                )
 
         if had_banned and replacements:
-            self._add_unique(slots, "clothing", random.choice(replacements))
+            rep = rng.choice(replacements)
+            cleaned.append(
+                PromptFragment(
+                    text=rep,
+                    source_slot="clothing",
+                    order=max((f.order for f in cleaned), default=0) + 1,
+                )
+            )
+
+        return cleaned
 
     # ─── 规则 4: 视线与镜头角度几何匹配 ───
 
-    def _resolve_gaze_angle(self, slots: Dict[str, List[str]], rules: List[Dict]):
+    def _resolve_gaze_angle_fragments(
+        self,
+        frags: List[PromptFragment],
+        rules: List[Dict],
+        rng: Random
+    ) -> List[PromptFragment]:
         rule = next((r for r in rules if r.get("id") == "gaze_angle_geometry"), None)
         mappings = rule.get("mappings", []) if rule else [
             {"angles": ["low angle", "from below", "worm eye view"], "required_gaze": "looking down at camera", "banned_gaze": ["looking up"]},
@@ -246,80 +350,136 @@ class ConflictResolver:
             {"angles": ["point of view", "pov"], "required_gaze": "direct eye contact with camera", "banned_gaze": []},
         ]
 
-        all_txt = self._all_text(slots)
+        all_text = " ".join(f.text.lower() for f in frags)
+        banned_set: set[str] = set()
+        required_list: List[str] = []
+
         for m in mappings:
             angles = m.get("angles", [])
             req = m.get("required_gaze", "")
             bans = m.get("banned_gaze", [])
-
-            if any(a.lower() in all_txt for a in angles):
+            if any(a.lower() in all_text for a in angles):
                 for b in bans:
-                    self._remove_matching(slots, b)
-                if req and req.lower() not in all_txt:
-                    self._add_unique(slots, "expression", req)
+                    banned_set.add(b.lower())
+                if req and req.lower() not in all_text:
+                    required_list.append(req)
+
+        if banned_set:
+            frags = [f for f in frags if not any(b in f.text.lower() for b in banned_set)]
+
+        for req in required_list:
+            frags.append(
+                PromptFragment(
+                    text=req,
+                    source_slot="expression",
+                    order=max((f.order for f in frags), default=0) + 1,
+                )
+            )
+
+        return frags
 
     # ─── 规则 5: 视线方向互斥 ───
 
-    def _resolve_gaze_mutual_exclusion(self, slots: Dict[str, List[str]], rules: List[Dict]):
+    def _resolve_gaze_mutual_exclusion_fragments(
+        self,
+        frags: List[PromptFragment],
+        rules: List[Dict],
+        rng: Random
+    ) -> List[PromptFragment]:
         rule = next((r for r in rules if r.get("id") == "gaze_mutual_exclusion"), None)
         pairs = rule.get("exclusive_pairs", [["direct eye contact", "looking away"]]) if rule else [["direct eye contact", "looking away"]]
 
-        all_txt = self._all_text(slots)
+        all_text = " ".join(f.text.lower() for f in frags)
         for p in pairs:
-            if len(p) >= 2 and p[0].lower() in all_txt and p[1].lower() in all_txt:
-                self._remove_matching(slots, p[1])
+            if len(p) >= 2 and p[0].lower() in all_text and p[1].lower() in all_text:
+                # 保留前者，剔除后者
+                frags = [f for f in frags if p[1].lower() not in f.text.lower()]
+
+        return frags
 
     # ─── 规则 6: 液体微量与安全法则 ───
 
-    def _resolve_liquids(self, slots: Dict[str, List[str]], rules: List[Dict]):
+    def _resolve_liquids_fragments(
+        self,
+        frags: List[PromptFragment],
+        rules: List[Dict],
+        rng: Random
+    ) -> List[PromptFragment]:
         rule = next((r for r in rules if r.get("id") == "liquid_restrictions"), None)
-        banned_combos = rule.get("banned_combos", []) if rule else []
-
-        for key in list(slots.keys()):
-            for i, tag in enumerate(slots[key]):
-                for item in banned_combos:
-                    for tr in item.get("trigger", []):
-                        if tr.lower() in tag.lower():
-                            slots[key][i] = tag.lower().replace(tr.lower(), item.get("replace", ""))
-
-        all_txt = self._all_text(slots)
         liquid_words = ["cum", "semen", "saliva", "drool", "pussy juice", "breast milk"]
         modifiers = ["single drop of", "thin streak of", "faint trace of", "few drops of", "glistening beads of"]
 
-        has_liquid = any(lw in all_txt for lw in liquid_words)
-        has_mod = any(m in all_txt for m in modifiers)
+        all_text = " ".join(f.text.lower() for f in frags)
+        has_liquid = any(re.search(rf"\b{re.escape(lw)}\b", all_text, flags=re.IGNORECASE) for lw in liquid_words)
+        has_mod = any(m in all_text for m in modifiers)
 
         if has_liquid and not has_mod:
-            mod = random.choice(modifiers)
-            for key in ["liquids", "props", "imperfections"]:
-                if key in slots and slots[key]:
-                    for i, tag in enumerate(slots[key]):
-                        if any(lw in tag.lower() for lw in liquid_words):
-                            slots[key][i] = f"{mod} {tag}"
-                            break
+            mod = rng.choice(modifiers)
+            modified = False
+            result: List[PromptFragment] = []
+            for f in frags:
+                if not modified and f.source_slot in ("liquids", "props", "imperfections") and any(re.search(rf"\b{re.escape(lw)}\b", f.text, flags=re.IGNORECASE) for lw in liquid_words):
+                    result.append(
+                        PromptFragment(
+                            text=f"{mod} {f.text}",
+                            source_slot=f.source_slot,
+                            source_item_id=f.source_item_id,
+                            context_ids=f.context_ids,
+                            order=f.order,
+                        )
+                    )
+                    modified = True
+                else:
+                    result.append(f)
+            frags = result
+
+        return frags
 
     # ─── 规则 7: 设备与画质兼容 ───
 
-    def _resolve_device_quality(self, slots: Dict[str, List[str]], rules: List[Dict]):
+    def _resolve_device_quality_fragments(
+        self,
+        frags: List[PromptFragment],
+        rules: List[Dict],
+        rng: Random
+    ) -> List[PromptFragment]:
         rule = next((r for r in rules if r.get("id") == "device_quality_compatibility"), None)
         constraints = rule.get("device_constraints", []) if rule else []
 
-        all_txt = self._all_text(slots)
+        all_text = " ".join(f.text.lower() for f in frags)
+        banned_tags_all: List[str] = []
         for c in constraints:
             devices = c.get("devices", [])
             banned_tags = c.get("banned_tags", [])
-            if any(d.lower() in all_txt for d in devices):
-                for bt in banned_tags:
-                    self._remove_matching(slots, bt)
+            if any(re.search(rf"\b{re.escape(d)}\b", all_text, flags=re.IGNORECASE) for d in devices):
+                banned_tags_all.extend(banned_tags)
+
+        if banned_tags_all:
+            frags = [
+                f for f in frags
+                if not any(re.search(rf"\b{re.escape(bt)}\b", f.text, flags=re.IGNORECASE) for bt in banned_tags_all)
+            ]
+
+        return frags
 
     # ─── 规则 8: 纹身真皮层融合 ───
 
-    def _resolve_tattoo_fusion(self, slots: Dict[str, List[str]], rules: List[Dict]):
-        all_txt = self._all_text(slots)
-        tattoo_indicators = ["tattoo", "tattooed", "ink", "irezumi", "tally marks", "crest ink"]
+    def _resolve_tattoo_fusion_fragments(
+        self,
+        frags: List[PromptFragment],
+        rules: List[Dict],
+        rng: Random
+    ) -> List[PromptFragment]:
+        """
+        严格作用于 source_slot == 'tattoo' 或明确属于纹身 ID 的条目。
+        绝对禁止使用模糊子串 'ink' 搜索整段 Prompt，避免 pink/drink/link 产生误判。
+        """
+        has_explicit_tattoo = any(
+            f.source_slot == "tattoo" and f.text.strip()
+            for f in frags
+        )
 
-        has_tattoo = any(ind in all_txt for ind in tattoo_indicators)
-        if has_tattoo:
+        if has_explicit_tattoo:
             fusion_words = [
                 "realistic tattoo",
                 "ink embedded in dermis",
@@ -328,14 +488,25 @@ class ConflictResolver:
                 "slightly faded edges",
                 "pores visible through ink",
             ]
+            all_text = " ".join(f.text.lower() for f in frags)
+            max_order = max((f.order for f in frags), default=0)
+
             for fw in fusion_words:
-                if fw.lower() not in all_txt:
-                    self._add_unique(slots, "tattoo", fw)
+                if fw.lower() not in all_text:
+                    max_order += 1
+                    frags.append(
+                        PromptFragment(
+                            text=fw,
+                            source_slot="tattoo",
+                            order=max_order,
+                        )
+                    )
+
+        return frags
 
 
 def sanitize_prompt(prompt: str) -> str:
     """清理最终 prompt 中的格式问题。"""
-    # 替换 deprecated 词条
     prompt = re.sub(r"\bspinning room\b", "drunken stupor", prompt, flags=re.IGNORECASE)
     prompt = re.sub(r",\s*,+", ",", prompt)
     prompt = prompt.strip(", \n\t")

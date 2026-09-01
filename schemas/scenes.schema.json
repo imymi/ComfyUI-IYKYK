@@ -1,0 +1,65 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "ScenesSchema",
+  "type": "object",
+  "required": ["scenes"],
+  "properties": {
+    "scenes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["category", "items"],
+        "properties": {
+          "category": { "type": "string", "minLength": 1 },
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["id", "label", "context_ids", "anchor_tags", "detail_tags", "exclusive_group"],
+              "properties": {
+                "id": { "type": "string", "pattern": "^scene_[a-z0-9_]+$" },
+                "label": { "type": "string", "minLength": 1 },
+                "subcategory": { "type": "string" },
+                "context_ids": {
+                  "type": "array",
+                  "minItems": 1,
+                  "items": {
+                    "type": "string",
+                    "enum": [
+                      "school",
+                      "office",
+                      "medical",
+                      "onsen_bath",
+                      "bondage_sm",
+                      "traditional",
+                      "nightlife",
+                      "domestic",
+                      "transit",
+                      "outdoor",
+                      "dining",
+                      "adult",
+                      "special",
+                      "generic"
+                    ]
+                  }
+                },
+                "anchor_tags": {
+                  "type": "array",
+                  "minItems": 1,
+                  "items": { "type": "string", "minLength": 1 }
+                },
+                "detail_tags": {
+                  "type": "array",
+                  "items": { "type": "string", "minLength": 1 }
+                },
+                "exclusive_group": { "type": "string", "minLength": 1 },
+                "tags": { "type": "array", "items": { "type": "string" } },
+                "atmosphere": { "type": "string" }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
