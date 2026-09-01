@@ -159,28 +159,28 @@ class DataSampler:
         text = f"{scene_name} {theme_name}".lower()
 
         # 1. 校园 / 学生
-        if any(k in text for k in ["校", "教", "课", "学", "书", "体育", "jk", "操场", "走廊", "电车", "初恋"]):
+        if any(k in text for k in ["校", "教", "课", "学", "书", "体育", "jk", "操场", "走廊", "电车", "初恋", "制服", "补习", "学生", "少女"]):
             return "school"
         # 2. 职场 / 办公室
-        if any(k in text for k in ["办公", "职场", "会议", "经理", "秘书", "ol", "加班", "公司", "商务"]):
+        if any(k in text for k in ["办公", "职场", "会议", "经理", "秘书", "ol", "加班", "公司", "商务", "西装", "包臀裙", "白领", "总裁"]):
             return "office"
         # 3. 医疗 / 诊所
-        if any(k in text for k in ["医", "诊", "护士", "病房", "手术", "药"]):
+        if any(k in text for k in ["医", "诊", "护士", "病房", "手术", "药", "体检", "针筒", "病床", "白大褂"]):
             return "medical"
         # 4. 温泉 / 浴室
-        if any(k in text for k in ["温泉", "浴", "风吕", "泳", "桑拿", "水", "海滩", "沙滩"]):
+        if any(k in text for k in ["温泉", "浴", "风吕", "泳", "桑拿", "水", "海滩", "沙滩", "泳衣", "比基尼", "湿身", "浴缸"]):
             return "onsen_bath"
         # 5. SM / 调教 / 密室
-        if any(k in text for k in ["sm", "调教", "束缚", "绳", "地牢", "密室", "监禁", "强制", "奴"]):
+        if any(k in text for k in ["sm", "调教", "束缚", "绳", "地牢", "密室", "监禁", "强制", "奴", "手铐", "项圈", "皮衣", "乳胶", "惩罚"]):
             return "bondage_sm"
         # 6. 和风 / 传统
-        if any(k in text for k in ["和室", "茶室", "庭院", "古风", "和服", "旗袍", "汉服", "祭典"]):
+        if any(k in text for k in ["和室", "茶室", "庭院", "古风", "和服", "旗袍", "汉服", "祭典", "榻榻米", "国风", "神社", "振袖"]):
             return "traditional"
         # 7. 夜店 / 风俗 / 酒店
-        if any(k in text for k in ["情人旅馆", "酒店", "夜店", "风俗", "酒吧", "歌舞伎町", "包厢", "派对", "醉"]):
+        if any(k in text for k in ["情人旅馆", "酒店", "夜店", "风俗", "酒吧", "歌舞伎町", "包厢", "派对", "醉", "兔女郎", "夜总会", "陪酒", "夜市"]):
             return "nightlife"
         # 8. 居家 / 人妻
-        if any(k in text for k in ["家", "卧", "客", "厨", "公寓", "人妻", "少妇", "同居", "阳台"]):
+        if any(k in text for k in ["家", "卧", "客", "厨", "公寓", "人妻", "少妇", "同居", "阳台", "睡衣", "围裙", "居家", "被窝", "床上"]):
             return "domestic"
 
         return None

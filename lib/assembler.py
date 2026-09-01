@@ -96,30 +96,44 @@ class PromptAssembler:
         else:
             rng = random.Random()
 
-        # ── 预设模板模式：直接输出 ──
-        if not _is_none(preset) and not _is_random(preset):
-            p = self.sampler.get_preset(preset, rng)
-            if p:
-                return {
-                    "positive": p.get("positive", ""),
-                    "negative": self.sampler.get_negative_prompt(),
-                    "description_zh": f"【预设模板】{p.get('name_zh', '')} - {p.get('description_zh', '')}",
-                    "slots": {"preset": [preset]},
-                }
-        elif _is_random(preset) and not _is_none(preset):
-            p = self.sampler.get_preset("Random", rng)
-            if p:
-                return {
-                    "positive": p.get("positive", ""),
-                    "negative": self.sampler.get_negative_prompt(),
-                    "description_zh": f"【随机预设】{p.get('name_zh', '')} - {p.get('description_zh', '')}",
-                    "slots": {"preset": [p.get("name_zh", "")]},
-                }
-
         # ── 风格配方读取 ──
         recipe = None
         if not _is_none(style_recipe):
             recipe = self.sampler.get_style_recipe(style_recipe, rng)
+
+        # ── 预设模板模式：直接输出或叠加配方 ──
+        if not _is_none(preset):
+            p = None
+            if not _is_random(preset):
+                p = self.sampler.get_preset(preset, rng)
+            else:
+                p = self.sampler.get_preset("Random", rng)
+
+            if p:
+                positive = p.get("positive", "")
+                desc = f"【预设模板】{p.get('name_zh', '')} - {p.get('description_zh', '')}"
+
+                # 如果同时叠加了风格配方，将配方的光影、胶片与画质词注入预设
+                if recipe:
+                    overlay_tags = []
+                    if recipe.get("lighting_palette"):
+                        overlay_tags.append(recipe["lighting_palette"])
+                    if recipe.get("style_recipe"):
+                        overlay_tags.append(recipe["style_recipe"])
+                    if recipe.get("focus_detail"):
+                        overlay_tags.append(recipe["focus_detail"])
+
+                    if overlay_tags:
+                        positive = f"{positive}, {', '.join(overlay_tags)}"
+                        positive = sanitize_prompt(positive)
+                        desc = f"{desc} | 【叠加配方】{recipe.get('name_zh', recipe.get('style_name', ''))}"
+
+                return {
+                    "positive": positive,
+                    "negative": self.sampler.get_negative_prompt(),
+                    "description_zh": desc,
+                    "slots": {"preset": [p.get("name_zh", preset)]},
+                }
 
         # ── 情境推断（Context Anchor） ──
         context = None
