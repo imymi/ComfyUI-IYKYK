@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "comfyui-iykyk"
-version = "1.1.0-rc2"
+version = "1.1.0-rc3"
 description = "ComfyUI-IYKYK: East Asian Portrait & Aesthetics Prompt Generator & Multi-Rule Conflict Resolver"
 readme = "README.md"
 requires-python = ">=3.9"

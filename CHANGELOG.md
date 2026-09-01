@@ -4,10 +4,10 @@
 
 ---
 
-## [v1.1.0-rc2] - 2026-09-01
+## [v1.1.0-rc3] - 2026-09-01
 
 > 💡 **审查与架构声明**：  
-> 本版本的全面架构审查、数据质量复评、JSON Schema 体系设计、全量自动化测试矩阵（31 项）及全部技术修改方案均出自 **gpt5.6sol** (Architecture Review, Data Quality Auditing & Technical Solutions proposed by gpt5.6sol)。
+> 本版本的全面架构审查、数据质量复评、JSON Schema 体系设计、全量自动化测试矩阵（31 项）及全部技术修改方案均出自 **GPT-5.6 Sol** (Architecture Review, Data Quality Auditing & Technical Solutions proposed by GPT-5.6 Sol)。
 
 ### 🌟 核心改进与技术落实
 
