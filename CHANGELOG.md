@@ -7,7 +7,7 @@
 ## [v1.0.0] - 2026-09-01
 
 ### 🚀 核心特性发布
-- **项目正式发布**：基于开源项目 [ShuaiHui/nsfw-prompt-templates-asian](https://github.com/ShuaiHui/nsfw-prompt-templates-asian) 深度重构，专为 ComfyUI 打造的东亚成人写真与人像提示词生成套件。
+- **项目正式发布**：基于开源项目 [ShuaiHui/nsfw-prompt-templates-asian](https://github.com/ShuaiHui/nsfw-prompt-templates-asian) 深度重构，由人类开发者与 AI (Google DeepMind Antigravity / Gemini) 协同构建，专为 ComfyUI 打造的东亚成人写真与人像提示词生成套件。
 - **15 槽位装配流水线**：
   - 完整实现 15 大维度：`场景主题`、`景别视角`、`裸露等级`、`服装款式与状态`、`光影氛围`、`姿势动作`、`表情眼神`、`风格胶片`、`妆容细节`、`发型饰品`、`真实微瑕`、`纹身标记`、`道具宠物`、`角色设定`、`液体系统`、`画质强化`。
   - 按视觉认知层次与扩散模型注意力机制递进组装，词数精准控制在 150~250 词最优区间。

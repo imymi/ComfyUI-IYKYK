@@ -5,6 +5,9 @@
 > 📌 **项目溯源与致谢**  
 > 本项目核心架构与词库规范基于开源项目 [ShuaiHui/nsfw-prompt-templates-asian](https://github.com/ShuaiHui/nsfw-prompt-templates-asian) 深度开发。我们将其定义的 **15 槽位装配流水线**、**7 大冲突消解规则**、**8 大情境亲和矩阵**、**77 套经典预设模板** 与 **服装×裸露联动规范** 完整重构并封装为纯原生、零外部依赖的 ComfyUI 自定义节点套件。
 
+> 🤖 **AI 辅助开发声明 (AI-Assisted Development Statement)**  
+> 本项目的代码架构、数据清洗与重构、冲突消解算法、情境亲和引擎及 ComfyUI 原生节点实现由人类开发者与 AI (Google DeepMind Antigravity / Gemini) 协同开发完成。
+
 ---
 
 ## ✨ 核心特性
@@ -114,5 +117,6 @@ git clone https://github.com/imymi/ComfyUI-IYKYK.git
 ## 📄 鸣谢与开源协议
 
 - 本项目基于 [ShuaiHui/nsfw-prompt-templates-asian](https://github.com/ShuaiHui/nsfw-prompt-templates-asian) 词库与生成理论开发。
+- 本项目代码由开发者与 AI (Antigravity / Gemini) 协同构建。
 - 本插件基于 **MIT License** 开源。
 - ⚠️ **免责声明**：本项目仅供技术交流与艺术创作用途，使用者须遵守所在国家/地区法律法规，**未满 18 岁禁止使用**。
