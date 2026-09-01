@@ -264,6 +264,42 @@
         "slightly faded edges",
         "pores visible through ink"
       ]
+    },
+    {
+      "id": "spatial_environmental_mutual_exclusion",
+      "description": "空间与环境自洽互斥：禁止多个独立场所/室内外冲突并存（如温泉与餐饮/街头屋台并存、室内温泉与露天雪景并存、野外草丛与室内房间并存）",
+      "deprecated_tags": {
+        "spinning room": "drunken stupor"
+      },
+      "venue_clusters": {
+        "onsen": [
+          "onsen", "hot spring", "rotenburo", "ryokan bath", "public bath", "sento", "sauna", "jacuzzi", "soapland bath"
+        ],
+        "dining": [
+          "cafe booth", "coffee shop", "yatai stall", "street food cart", "ramen shop", "izakaya", "bar counter", "love hotel restaurant", "food stall with curtain"
+        ],
+        "school": [
+          "classroom", "blackboard", "student desk", "teacher desk", "school library", "gym storage", "infirmary"
+        ],
+        "office": [
+          "office cubicle", "conference room", "executive desk", "office elevator", "break room", "corporate office"
+        ],
+        "transport": [
+          "subway car", "train seat", "train door", "train interior", "airplane cabin", "car backseat", "bus interior", "shinkansen"
+        ],
+        "outdoor": [
+          "riverbank", "embankment", "behind bushes", "under bridge", "park at night", "beach at night", "forest clearing", "mountain trail", "seaside cave"
+        ],
+        "bedroom": [
+          "bedroom", "love hotel room", "tatami futon", "messy bed", "hotel room bed"
+        ]
+      },
+      "outdoor_exclusive": [
+        "outdoor bath", "rotenburo", "open-air bath", "onsen with snow view", "snow view", "riverbank", "embankment", "under bridge", "behind bushes", "park at night", "beach at night", "forest clearing", "mountain trail", "seaside cave", "outdoor hot spring"
+      ],
+      "indoor_exclusive": [
+        "indoor onsen", "private onsen", "onsen changing room", "changing room", "locker room", "bathroom", "shower room", "bedroom", "living room", "kitchen", "office cubicle", "classroom", "cafe booth", "elevator", "dressing room", "shower stall", "spinning room"
+      ]
     }
   ]
 }

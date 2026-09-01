@@ -1,14 +1,15 @@
 """
-conflict_resolver.py — 冲突检测与自动消解引擎
+conflict_resolver.py — 提示词冲突检测与消解引擎
 
-严格实现 nsfw-prompt-templates-asian 项目定义的全部规则与限制：
-1. 裸露×内衣状态互斥消解（私处暴露时内裤清除，全裸时清除穿着词）
-2. 材质穿透伪影消解（禁止 sheer/see-through，转为物理状态）
-3. 视线×镜头角度几何匹配（仰拍必下看，俯拍必上看，POV必对视）
-4. 视线方向唯一性（禁止同时对视与回避）
-5. 液体微量与安全法则（禁止闭眼精液白内障效果，强制微量词）
-6. 设备×画质等级兼容（监控/手机不匹配8K专业写真词）
-7. 纹身 6 词真皮层融合（彻底解决贴纸漂浮感）
+严格实现 8 大多规则冲突消解：
+1. 裸露与内衣/衣物状态互斥（私处暴露自动剔除内裤，全裸自动剔除穿着描述）
+2. 材质穿透伪影消解（剔除 sheer/see-through 等崩图词，替换为真实物理脱法）
+3. 视线与镜头角度几何匹配（仰拍强制俯视、俯拍强制仰视、POV 强制直视）
+4. 视线方向唯一性（消解直视与移开视线互斥）
+5. 液体微量法则与安全渲染（自动添加微量量词，拦截闭眼精液白内障）
+6. 设备与画质等级兼容（监控/手机自拍自动过滤 8k/单反/写真标签）
+7. 纹身 6 词真皮层融合（自动绑定真皮层物理融合词）
+8. 空间与环境自洽互斥（禁止多个独立场所/室内外冲突并存，如温泉与餐厅/街头屋台并存、野外草丛与室内房间并存）
 """
 from __future__ import annotations
 
@@ -16,66 +17,69 @@ import json
 import random
 import re
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Tuple
 
 
 class ConflictResolver:
-    """检测并自动修正提示词冲突与限制。"""
+    """提示词冲突检测与消解引擎。"""
 
-    def __init__(self, data_dir: Optional[str | Path] = None):
-        self._data_dir = Path(data_dir) if data_dir else None
-        self._rules: Optional[Dict[str, Any]] = None
+    def __init__(self, data_dir: str | Path):
+        self.data_dir = Path(data_dir)
+        self._rules_cache: Optional[List[Dict[str, Any]]] = None
 
-    def _load_rules(self) -> Dict[str, Any]:
-        if self._rules is None:
-            if self._data_dir:
-                p = self._data_dir / "conflict_rules.json"
-                if p.is_file():
-                    self._rules = json.loads(p.read_text(encoding="utf-8"))
-                    return self._rules
-            self._rules = {"rules": []}
-        return self._rules
+    def _load_rules(self) -> List[Dict[str, Any]]:
+        if self._rules_cache is None:
+            p = self.data_dir / "conflict_rules.json"
+            if p.is_file():
+                data = json.loads(p.read_text(encoding="utf-8"))
+                self._rules_cache = data.get("rules", [])
+            else:
+                self._rules_cache = []
+        return self._rules_cache
 
     def resolve(self, slots: Dict[str, List[str]]) -> Dict[str, List[str]]:
-        """执行完整冲突消解流水线。"""
-        rules_data = self._load_rules()
-        rules = rules_data.get("rules", [])
+        """
+        对 15 槽位已采样的 tags 执行多遍冲突检测与修正。
+        """
+        rules = self._load_rules()
 
-        # 1. 裸露与内衣状态互斥
+        # 1. 空间与环境自洽互斥（最优先：先确定物理空间自洽）
+        self._resolve_spatial_environment(slots, rules)
+
+        # 2. 裸露与内衣状态互斥
         self._resolve_nudity_clothing(slots, rules)
 
-        # 2. 材质穿透伪影消解
+        # 3. 材质穿透伪影消解
         self._resolve_material_penetration(slots, rules)
 
-        # 3. 视线与镜头角度几何匹配
+        # 4. 视线与镜头角度几何匹配
         self._resolve_gaze_angle(slots, rules)
 
-        # 4. 视线方向互斥
+        # 5. 视线方向互斥消解
         self._resolve_gaze_mutual_exclusion(slots, rules)
 
-        # 5. 液体微量与安全法则
+        # 6. 液体微量与安全法则
         self._resolve_liquids(slots, rules)
 
-        # 6. 设备与画质兼容
+        # 7. 设备与画质兼容
         self._resolve_device_quality(slots, rules)
 
-        # 7. 纹身真皮层融合
+        # 8. 纹身真皮层融合
         self._resolve_tattoo_fusion(slots, rules)
 
         return slots
 
-    # ─── 内部辅助工具 ───
-
-    @staticmethod
-    def _all_text(slots: Dict[str, List[str]]) -> str:
+    def _all_text(self, slots: Dict[str, List[str]]) -> str:
         parts = []
         for tags in slots.values():
-            parts.extend(tags)
-        return ", ".join(parts).lower()
+            if isinstance(tags, list):
+                parts.extend([str(t).lower() for t in tags])
+        return " ".join(parts)
 
-    @staticmethod
-    def _remove_matching(slots: Dict[str, List[str]], banned_substring: str):
-        banned = banned_substring.lower()
+    def _remove_matching(self, slots: Dict[str, List[str]], banned_substring: str):
+        banned = banned_substring.lower().strip()
+        if not banned:
+            return
         for key in list(slots.keys()):
             slots[key] = [t for t in slots[key] if banned not in t.lower()]
 
@@ -86,7 +90,116 @@ class ConflictResolver:
         if tag.lower() not in [t.lower() for t in slots[slot_name]]:
             slots[slot_name].append(tag)
 
-    # ─── 规则 1: 裸露与内衣/衣物状态互斥 ───
+    # ─── 规则 1: 空间与环境自洽互斥 ───
+
+    def _resolve_spatial_environment(self, slots: Dict[str, List[str]], rules: List[Dict]):
+        rule = next((r for r in rules if r.get("id") == "spatial_environmental_mutual_exclusion"), None)
+        deprecated_map = rule.get("deprecated_tags", {}) if rule else {"spinning room": "drunken stupor"}
+
+        # 1. 替换废弃或有歧义的词条（如 spinning room -> drunken stupor）
+        for key in list(slots.keys()):
+            for i, tag in enumerate(slots[key]):
+                for old_w, new_w in deprecated_map.items():
+                    if old_w.lower() in tag.lower():
+                        slots[key][i] = re.sub(rf"\b{re.escape(old_w)}\b", new_w, tag, flags=re.IGNORECASE)
+
+        # 2. 场所集群互斥（温泉 vs 餐饮/包厢 vs 校园 vs 职场 vs 交通工具 vs 纯野外）
+        venue_clusters = {
+            "onsen": [
+                "onsen", "hot spring", "rotenburo", "ryokan bath", "public bath", "sento", "sauna", "jacuzzi", "soapland bath"
+            ],
+            "dining": [
+                "cafe booth", "coffee shop", "yatai stall", "street food cart", "ramen shop", "izakaya", "bar counter", "love hotel restaurant", "food stall with curtain"
+            ],
+            "school": [
+                "classroom", "blackboard", "student desk", "teacher desk", "school library", "gym storage", "infirmary"
+            ],
+            "office": [
+                "office cubicle", "conference room", "executive desk", "office elevator", "break room", "corporate office"
+            ],
+            "transport": [
+                "subway car", "train seat", "train door", "train interior", "airplane cabin", "car backseat", "bus interior", "shinkansen"
+            ],
+            "outdoor": [
+                "riverbank", "embankment", "behind bushes", "under bridge", "park at night", "beach at night", "forest clearing", "mountain trail", "seaside cave"
+            ],
+            "bedroom": [
+                "bedroom", "love hotel room", "tatami futon", "messy bed", "hotel room bed"
+            ],
+        }
+
+        # 收集所有已出现的场所标签位置
+        active_venues = []
+        for vname, vtags in venue_clusters.items():
+            for key in ["scene_theme", "character", "props"]:
+                for t in slots.get(key, []):
+                    if any(vt in t.lower() for vt in vtags):
+                        active_venues.append(vname)
+                        break
+
+        # 如果同时激活了多个大类场所，以 scene_theme 中最早出现的场所为准
+        if len(set(active_venues)) > 1:
+            dominant_venue = active_venues[0]
+            banned_venues = [v for v in set(active_venues) if v != dominant_venue]
+            banned_tags_all = []
+            for bv in banned_venues:
+                banned_tags_all.extend(venue_clusters[bv])
+            for b in banned_tags_all:
+                self._remove_matching(slots, b)
+
+        # 3. 餐饮子场所去重（如果出现多个餐饮细分点，保留第一个）
+        dining_tags = venue_clusters["dining"]
+        found_dining = []
+        for key in list(slots.keys()):
+            for t in slots[key]:
+                if any(dt in t.lower() for dt in dining_tags):
+                    found_dining.append(t)
+        if len(found_dining) > 1:
+            first_dining = found_dining[0]
+            for extra in found_dining[1:]:
+                self._remove_matching(slots, extra)
+
+        # 4. 室内外物理互斥
+        outdoor_exclusive = [
+            "outdoor bath", "rotenburo", "open-air bath", "onsen with snow view", "snow view",
+            "riverbank", "embankment", "under bridge", "behind bushes", "park at night",
+            "beach at night", "forest clearing", "mountain trail", "seaside cave", "outdoor hot spring"
+        ]
+        indoor_exclusive = [
+            "indoor onsen", "private onsen", "onsen changing room", "changing room", "locker room",
+            "bathroom", "shower room", "bedroom", "living room", "kitchen", "office cubicle",
+            "classroom", "cafe booth", "elevator", "dressing room", "shower stall", "spinning room"
+        ]
+
+        all_txt = self._all_text(slots)
+        has_outdoor = any(m in all_txt for m in outdoor_exclusive)
+        has_indoor = any(m in all_txt for m in indoor_exclusive)
+
+        if has_outdoor and has_indoor:
+            # 检查 scene_theme 中的倾向
+            scene_txt = " ".join(slots.get("scene_theme", [])).lower()
+            if any(m in scene_txt for m in outdoor_exclusive):
+                # 确定为室外场景：清理室内标签
+                for item in indoor_exclusive:
+                    self._remove_matching(slots, item)
+            else:
+                # 确定为室内场景：清理室外标签
+                for item in outdoor_exclusive:
+                    self._remove_matching(slots, item)
+
+        # 5. 温泉内部子空间细化互斥
+        all_txt = self._all_text(slots)
+        if "indoor onsen" in all_txt or "private onsen" in all_txt:
+            for b in ["outdoor bath", "rotenburo", "open-air bath", "snow view", "changing room", "locker room"]:
+                self._remove_matching(slots, b)
+        elif any(k in all_txt for k in ["outdoor bath", "rotenburo", "open-air bath", "snow view"]):
+            for b in ["indoor onsen", "changing room", "locker room", "indoor bath"]:
+                self._remove_matching(slots, b)
+        elif "changing room" in all_txt or "locker room" in all_txt:
+            for b in ["indoor onsen", "outdoor bath", "rotenburo", "snow view", "soaking in tub", "steaming water"]:
+                self._remove_matching(slots, b)
+
+    # ─── 规则 2: 裸露与内衣/衣物状态互斥 ───
 
     def _resolve_nudity_clothing(self, slots: Dict[str, List[str]], rules: List[Dict]):
         rule = next((r for r in rules if r.get("id") == "nudity_clothing_conflicts"), None)
@@ -106,7 +219,7 @@ class ConflictResolver:
                 for b in bans:
                     self._remove_matching(slots, b)
 
-    # ─── 规则 2: 材质穿透伪影消解 ───
+    # ─── 规则 3: 材质穿透伪影消解 ───
 
     def _resolve_material_penetration(self, slots: Dict[str, List[str]], rules: List[Dict]):
         rule = next((r for r in rules if r.get("id") == "material_penetration"), None)
@@ -123,7 +236,7 @@ class ConflictResolver:
         if had_banned and replacements:
             self._add_unique(slots, "clothing", random.choice(replacements))
 
-    # ─── 规则 3: 视线与镜头角度几何匹配 ───
+    # ─── 规则 4: 视线与镜头角度几何匹配 ───
 
     def _resolve_gaze_angle(self, slots: Dict[str, List[str]], rules: List[Dict]):
         rule = next((r for r in rules if r.get("id") == "gaze_angle_geometry"), None)
@@ -145,7 +258,7 @@ class ConflictResolver:
                 if req and req.lower() not in all_txt:
                     self._add_unique(slots, "expression", req)
 
-    # ─── 规则 4: 视线方向互斥 ───
+    # ─── 规则 5: 视线方向互斥 ───
 
     def _resolve_gaze_mutual_exclusion(self, slots: Dict[str, List[str]], rules: List[Dict]):
         rule = next((r for r in rules if r.get("id") == "gaze_mutual_exclusion"), None)
@@ -154,16 +267,14 @@ class ConflictResolver:
         all_txt = self._all_text(slots)
         for p in pairs:
             if len(p) >= 2 and p[0].lower() in all_txt and p[1].lower() in all_txt:
-                # 优先保留 direct eye contact
                 self._remove_matching(slots, p[1])
 
-    # ─── 规则 5: 液体微量与安全法则 ───
+    # ─── 规则 6: 液体微量与安全法则 ───
 
     def _resolve_liquids(self, slots: Dict[str, List[str]], rules: List[Dict]):
         rule = next((r for r in rules if r.get("id") == "liquid_restrictions"), None)
         banned_combos = rule.get("banned_combos", []) if rule else []
 
-        # 检查并替换闭眼精液白内障伪影等
         for key in list(slots.keys()):
             for i, tag in enumerate(slots[key]):
                 for item in banned_combos:
@@ -171,7 +282,6 @@ class ConflictResolver:
                         if tr.lower() in tag.lower():
                             slots[key][i] = tag.lower().replace(tr.lower(), item.get("replace", ""))
 
-        # 液体微量修饰词
         all_txt = self._all_text(slots)
         liquid_words = ["cum", "semen", "saliva", "drool", "pussy juice", "breast milk"]
         modifiers = ["single drop of", "thin streak of", "faint trace of", "few drops of", "glistening beads of"]
@@ -188,7 +298,7 @@ class ConflictResolver:
                             slots[key][i] = f"{mod} {tag}"
                             break
 
-    # ─── 规则 6: 设备与画质兼容 ───
+    # ─── 规则 7: 设备与画质兼容 ───
 
     def _resolve_device_quality(self, slots: Dict[str, List[str]], rules: List[Dict]):
         rule = next((r for r in rules if r.get("id") == "device_quality_compatibility"), None)
@@ -202,7 +312,7 @@ class ConflictResolver:
                 for bt in banned_tags:
                     self._remove_matching(slots, bt)
 
-    # ─── 规则 7: 纹身真皮层融合 ───
+    # ─── 规则 8: 纹身真皮层融合 ───
 
     def _resolve_tattoo_fusion(self, slots: Dict[str, List[str]], rules: List[Dict]):
         all_txt = self._all_text(slots)
@@ -225,6 +335,8 @@ class ConflictResolver:
 
 def sanitize_prompt(prompt: str) -> str:
     """清理最终 prompt 中的格式问题。"""
+    # 替换 deprecated 词条
+    prompt = re.sub(r"\bspinning room\b", "drunken stupor", prompt, flags=re.IGNORECASE)
     prompt = re.sub(r",\s*,+", ",", prompt)
     prompt = prompt.strip(", \n\t")
     prompt = re.sub(r"\s{2,}", " ", prompt)

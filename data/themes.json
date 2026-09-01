@@ -1,587 +1,7 @@
 {
   "themes": [
     {
-      "theme_zh": "职场空间（OL/职女系列）",
-      "tags": [
-        "office",
-        "open office",
-        "cubicle",
-        "boss desk",
-        "personal desk",
-        "after-hours office",
-        "overtime office",
-        "office at night",
-        "empty office floor",
-        "meeting room",
-        "conference room",
-        "reception desk",
-        "copy room",
-        "supply closet",
-        "break room",
-        "office kitchen",
-        "office pantry",
-        "server room",
-        "document storage",
-        "archive room",
-        "under desk",
-        "office balcony",
-        "smoking area",
-        "emergency stairwell",
-        "elevator",
-        "parking lot",
-        "office building lobby",
-        "office building rooftop",
-        "business hotel room",
-        "hotel during business trip",
-        "taxi after drinking party",
-        "izakaya private room after work"
-      ],
-      "name_zh": "职场空间（OL/职女系列）"
-    },
-    {
-      "theme_zh": "公共场所/街头系列",
-      "tags": [
-        "public restroom",
-        "station bathroom",
-        "mall toilet",
-        "gas station toilet",
-        "park bathroom",
-        "public toilet with graffiti",
-        "toilet stall",
-        "toilet with broken lock",
-        "crowded bathroom",
-        "bathroom with no doors",
-        "bathroom with O-24h sign",
-        "restroom at train station",
-        "elevator",
-        "building elevator",
-        "office elevator",
-        "hotel elevator",
-        "apartment elevator",
-        "crowded elevator",
-        "stuck in elevator",
-        "elevator at night",
-        "service elevator",
-        "freight elevator",
-        "elevator intercom",
-        "elevator mirror",
-        "building rooftop",
-        "office rooftop",
-        "hotel rooftop",
-        "apartment rooftop",
-        "school rooftop",
-        "parking garage rooftop",
-        "rooftop at sunset",
-        "rooftop at night",
-        "rooftop with city view",
-        "rooftop with antenna",
-        "rooftop water tower",
-        "construction rooftop",
-        "staircase",
-        "emergency stairwell",
-        "fire escape stairs",
-        "outdoor stairs",
-        "apartment stairs",
-        "school stairs",
-        "stairs between floors",
-        "spiral staircase",
-        "stairs with window",
-        "dark stairwell",
-        "stairs at night",
-        "parking lot",
-        "underground parking",
-        "parking garage",
-        "parking structure",
-        "outdoor parking",
-        "parking attendant booth",
-        "parking ticket machine",
-        "parking at night",
-        "parking structure level",
-        "disabled parking space",
-        "valet area",
-        "back alley",
-        "narrow alley",
-        "street corner",
-        "side street",
-        "dark street",
-        "street with neon signs",
-        "narrow passage between buildings",
-        "construction site",
-        "under elevated highway",
-        "under bridge",
-        "underground passage",
-        "pedestrian walkway",
-        "vending machine area",
-        "drink machine corner",
-        "vending machine at night",
-        "between vending machines",
-        "vending machine with bench",
-        "ATM corner",
-        "bank ATM",
-        "ATM in lobby",
-        "ATM at night",
-        "bank branch interior",
-        "bank after hours",
-        "apartment balcony",
-        "hotel balcony",
-        "building balcony",
-        "balcony at night",
-        "balcony with view",
-        "balcony with laundry",
-        "balcony overlooking street",
-        "basement storage",
-        "underground storage room",
-        "building basement",
-        "underground parking level",
-        "storage closet",
-        "utility room",
-        "electrical room",
-        "boiler room"
-      ],
-      "name_zh": "公共场所/街头系列"
-    },
-    {
-      "theme_zh": "都市建筑/写字楼系列",
-      "tags": [
-        "office building lobby",
-        "corporate lobby",
-        "lobby security desk",
-        "lobby waiting area",
-        "lobby seating",
-        "revolving door",
-        "lobby elevator bank",
-        "meeting room",
-        "conference room",
-        "boardroom",
-        "small meeting room",
-        "room with large table",
-        "room with projector",
-        "room with blinds closed",
-        "meeting room after hours",
-        "break room",
-        "office kitchen",
-        "copy room",
-        "supply closet",
-        "lounge sofa",
-        "nap room",
-        "rest area",
-        "smoking area",
-        "vending machine room",
-        "office bathroom",
-        "floor bathroom",
-        "executive bathroom",
-        "bathroom with mirror",
-        "bathroom with hand dryer",
-        "gender-separated toilet",
-        "toilet with lock",
-        "office toilet at night",
-        "office parking garage",
-        "underground office parking",
-        "parking basement",
-        "parking attendant",
-        "parking space",
-        "private parking",
-        "company parking lot",
-        "office building rooftop",
-        "corporate rooftop",
-        "rooftop garden",
-        "rooftop terrace",
-        "rooftop HVAC area",
-        "rooftop overlooking city",
-        "cleaning closet",
-        "janitor room",
-        "utility closet",
-        "mop closet",
-        "building maintenance room",
-        "electrical room",
-        "server room",
-        "telecom room"
-      ],
-      "name_zh": "都市建筑/写字楼系列"
-    },
-    {
-      "theme_zh": "娱乐场所系列",
-      "tags": [
-        "manga cafe booth",
-        "net cafe private room",
-        "internet cafe",
-        "manga cafe shower",
-        "capsule hotel",
-        "capsule room",
-        "net cafe with shower",
-        "manga cafe sleeping pod",
-        "24h manga cafe",
-        "smoking area booth",
-        "arcade",
-        "game center",
-        "crane game area",
-        "rhythm game corner",
-        "arcade dark corner",
-        "game center back area",
-        "UFO catcher",
-        "prize counter",
-        "bowling alley",
-        "bowling lane",
-        "swimming pool",
-        "poolside",
-        "pool locker room",
-        "indoor pool",
-        "public pool",
-        "water park",
-        "pool shower area",
-        "pool ladder",
-        "diving board",
-        "karaoke room",
-        "karaoke booth",
-        "private karaoke room",
-        "karaoke after hours",
-        "karaoke table",
-        "karaoke with drinks",
-        "karaoke room couch",
-        "karaoke room mirror",
-        "billiard hall",
-        "pool hall",
-        "snooker room",
-        "billiard table",
-        "pool table",
-        "bar attached to billiards",
-        "back room of billiard hall",
-        "movie theater",
-        "cinema",
-        "theater back row",
-        "cinema seat",
-        "theater restroom",
-        "cinema lobby",
-        "midnight screening",
-        "couples seat",
-        "VIP screening room",
-        "pachinko parlor",
-        "casino",
-        "slot machine area",
-        "pachinko machine",
-        "casino VIP room",
-        "gambling den",
-        "back room of pachinko hall",
-        "aquarium",
-        "zoo",
-        "aquarium back area",
-        "behind tank",
-        "underwater tunnel",
-        "petting zoo",
-        "late night aquarium",
-        "zoo after hours",
-        "amusement park",
-        "theme park",
-        "roller coaster queue",
-        "haunted house",
-        "park bench",
-        "park at night",
-        "ferris wheel",
-        "carousel",
-        "park restroom",
-        "park dark corner",
-        "shrine gate torii",
-        "shrine courtyard",
-        "temple main hall",
-        "temple garden",
-        "offering box area",
-        "shrine at night",
-        "temple bell",
-        "prayer hall",
-        "between torii gates"
-      ],
-      "name_zh": "娱乐场所系列"
-    },
-    {
-      "theme_zh": "餐饮/包厢系列",
-      "tags": [
-        "izakaya booth",
-        "izakaya private room",
-        "izakaya back room",
-        "izakaya counter",
-        "izakaya at night",
-        "izakaya after closing",
-        "izakaya with tategaku seat",
-        "pub booth",
-        "restaurant private room",
-        "kaiseki private room",
-        "private dining room",
-        "hotel restaurant booth",
-        "booth seating",
-        "restaurant with lockable door",
-        "dinner party room",
-        "ramen shop booth",
-        "ramen counter",
-        "izakaya stall",
-        "food stall at night",
-        "street food stall",
-        "yatai",
-        "late night ramen",
-        "open kitchen counter",
-        "cafe booth",
-        "coffee shop back booth",
-        "cafe with sofa",
-        "cafe at night",
-        "quiet cafe",
-        "cafe restroom",
-        "cafe delivery entrance",
-        "bar counter",
-        "bar back room",
-        "bar restroom",
-        "nightclub dance floor",
-        "club VIP booth",
-        "club bathroom",
-        "club dark room",
-        "club smoking area",
-        "hostess bar",
-        "host club",
-        "love hotel restaurant",
-        "love hotel dining room",
-        "love hotel room service",
-        "love hotel lobby restaurant",
-        "yatai stall",
-        "street food cart",
-        "late night yatai",
-        "food stall with curtain",
-        "yatai customer seat",
-        "yatai vendor area",
-        "vending machine corner",
-        "vending machine alcove",
-        "area between machines",
-        "vending machine at night"
-      ],
-      "name_zh": "餐饮/包厢系列"
-    },
-    {
-      "theme_zh": "交通枢纽/旅途系列",
-      "tags": [
-        "airport terminal",
-        "airport lounge",
-        "airport restroom",
-        "airport boarding gate",
-        "airport observation deck",
-        "airport VIP lounge",
-        "airport parking garage",
-        "airport hotel adjacent",
-        "airplane cabin",
-        "economy class",
-        "business class seat",
-        "airplane lavatory",
-        "airplane cockpit",
-        "airplane row",
-        "red-eye flight",
-        "aisle seat",
-        "window seat",
-        "overhead bin",
-        "shinkansen",
-        "bullet train",
-        "train seat",
-        "train restroom",
-        "train between cars",
-        "train aisle",
-        "train platform",
-        "last train",
-        "crowded train",
-        "train car door area",
-        "taxi backseat",
-        "taxi interior",
-        "hired car",
-        "private car",
-        "driver front seat",
-        "car parked",
-        "car on road",
-        "car window",
-        "car rearview mirror",
-        "ferry cabin",
-        "ship cabin",
-        "boat deck",
-        "ferry bunk bed",
-        "cruise ship balcony",
-        "small boat cabin",
-        "ferry restroom",
-        "dock area",
-        "train station platform",
-        "station underpass",
-        "station restroom",
-        "station lockers",
-        "station vending area",
-        "station stairs",
-        "station overpass",
-        "station late night",
-        "airport baggage claim",
-        "airport main hall",
-        "station ticket gate",
-        "ticket gate area",
-        "station waiting area",
-        "station concourse",
-        "highway bus",
-        "tour bus",
-        "bus restroom",
-        "bus back seat",
-        "overnight bus",
-        "bus stop",
-        "bus aisle",
-        "express bus",
-        "highway rest area",
-        "service area parking"
-      ],
-      "name_zh": "交通枢纽/旅途系列"
-    },
-    {
-      "theme_zh": "学校/教育设施系列",
-      "tags": [
-        "school corridor",
-        "hallway",
-        "hallway after class",
-        "hallway at night",
-        "hallway with lockers",
-        "hallway stairway",
-        "school stairwell",
-        "school entrance hall",
-        "shoe lockers area (genkan)",
-        "music room",
-        "art room",
-        "music instrument storage",
-        "practice room",
-        "art supply room",
-        "pottery studio",
-        "studio with model stand",
-        "studio with backdrop",
-        "gymnasium",
-        "gym floor",
-        "gymnasium bleachers",
-        "gym equipment area",
-        "gym storage",
-        "gym shower room",
-        "gym locker room",
-        "judo dojo",
-        "kendo dojo",
-        "karate dojo",
-        "wrestling arena",
-        "dance studio",
-        "dance practice room",
-        "school swimming pool",
-        "pool changing room",
-        "pool shower",
-        "pool deck",
-        "school poolside",
-        "competitive pool",
-        "indoor pool",
-        "swimming club room",
-        "school rooftop",
-        "school roof access",
-        "rooftop fence",
-        "rooftop antenna area",
-        "school rooftop door",
-        "school roof garden",
-        "school nurse office",
-        "nurse bed",
-        "nurse curtain",
-        "health room",
-        "medical office",
-        "school infirmary bed",
-        "medicine cabinet",
-        "home economics room",
-        "cooking classroom",
-        "kitchen practice room",
-        "cooking lab",
-        "home ec kitchen",
-        "classroom with stove",
-        "school library",
-        "library study room",
-        "library stack area",
-        "library back shelf",
-        "study room booth",
-        "reading room",
-        "club room",
-        "culture club room",
-        "sports club room",
-        "after school club",
-        "club activity room",
-        "band room",
-        "art club room",
-        "school toilet",
-        "toilet stall",
-        "toilet with lock broken",
-        "toilet at night",
-        "toilet with graffiti",
-        "student toilet",
-        "staff toilet"
-      ],
-      "name_zh": "学校/教育设施系列"
-    },
-    {
-      "theme_zh": "成人场所/特殊行业系列",
-      "tags": [
-        "adult video store",
-        "DVD shop",
-        "video rental back shelf",
-        "adult goods corner",
-        "video store corner",
-        "猥褻DVD区",
-        "rental studio",
-        "photo studio rental",
-        "dance practice studio",
-        "recording studio",
-        "private studio",
-        "art model studio",
-        "massage studio",
-        "studio with props",
-        "temple",
-        "monastery",
-        "nun's quarters",
-        "meditation hall",
-        "temple residence",
-        "shrine keeper's house",
-        "Shinto priest quarters",
-        "cemetery at night",
-        "grave area",
-        "tomb stone",
-        "graveyard",
-        "memorial park",
-        "cemetery bench",
-        "under cherry tree at cemetery",
-        "funeral hall",
-        "Buddhist altar room",
-        "butsuma",
-        "household altar",
-        "altars with incense",
-        "memorial tablet room",
-        "psychiatric ward",
-        "asylum room",
-        "mental institution",
-        "treatment room",
-        "padded room",
-        "hospital hallway",
-        "ward common room",
-        "medical facility bed",
-        "institution",
-        "group home",
-        "dormitory room",
-        "group shower room",
-        "common room",
-        "sleeping quarters",
-        "care facility",
-        "Kabukicho",
-        "Susukino",
-        "Nakasu",
-        "soapland street",
-        "delivery health area",
-        "pink salon district",
-        "red light district alley",
-        "prostitution area",
-        "street walker area",
-        "sex shop interior",
-        "adult shop fitting room",
-        "love hotel lobby shop",
-        "genital waxing salon",
-        "intimate grooming salon",
-        "adult toy store",
-        "bondage equipment shop"
-      ],
-      "name_zh": "成人场所/特殊行业系列"
-    },
-    {
+      "name_zh": "人妻/出轨系列",
       "theme_zh": "人妻/出轨系列",
       "tags": [
         "married woman",
@@ -600,10 +20,10 @@
         "PTA mom",
         "apartment wife",
         "delivery affair"
-      ],
-      "name_zh": "人妻/出轨系列"
+      ]
     },
     {
+      "name_zh": "OL/职场系列",
       "theme_zh": "OL/职场系列",
       "tags": [
         "office lady",
@@ -621,10 +41,10 @@
         "subordinate",
         "transfer employee",
         "workplace harassment"
-      ],
-      "name_zh": "OL/职场系列"
+      ]
     },
     {
+      "name_zh": "教师/学生系列",
       "theme_zh": "教师/学生系列",
       "tags": [
         "female teacher",
@@ -641,10 +61,10 @@
         "class president",
         "school trip room",
         "club advisor"
-      ],
-      "name_zh": "教师/学生系列"
+      ]
     },
     {
+      "name_zh": "护士/医疗系列",
       "theme_zh": "护士/医疗系列",
       "tags": [
         "nurse",
@@ -660,10 +80,10 @@
         "night shift nurse",
         "health check",
         "injection"
-      ],
-      "name_zh": "护士/医疗系列"
+      ]
     },
     {
+      "name_zh": "女仆/制服系列",
       "theme_zh": "女仆/制服系列",
       "tags": [
         "maid",
@@ -682,10 +102,10 @@
         "elevator girl",
         "receptionist",
         "convenience store clerk"
-      ],
-      "name_zh": "女仆/制服系列"
+      ]
     },
     {
+      "name_zh": "熟女/人母系列",
       "theme_zh": "熟女/人母系列",
       "tags": [
         "mature woman",
@@ -703,10 +123,10 @@
         "widow",
         "remarried mother",
         "mother-in-law"
-      ],
-      "name_zh": "熟女/人母系列"
+      ]
     },
     {
+      "name_zh": "素人/女友系列",
       "theme_zh": "素人/女友系列",
       "tags": [
         "amateur girl",
@@ -722,10 +142,10 @@
         "matching app girl",
         "papa katsu girl",
         "compensated dating"
-      ],
-      "name_zh": "素人/女友系列"
+      ]
     },
     {
+      "name_zh": "痴汉/NTR系列",
       "theme_zh": "痴汉/NTR系列",
       "tags": [
         "chikan",
@@ -743,10 +163,10 @@
         "peeping tom",
         "hidden camera",
         "blackmail"
-      ],
-      "name_zh": "痴汉/NTR系列"
+      ]
     },
     {
+      "name_zh": "凌辱/调教系列",
       "theme_zh": "凌辱/调教系列",
       "tags": [
         "submissive",
@@ -766,10 +186,10 @@
         "slave training",
         "pet play",
         "humiliation"
-      ],
-      "name_zh": "凌辱/调教系列"
+      ]
     },
     {
+      "name_zh": "温泉/旅行系列",
       "theme_zh": "温泉/旅行系列",
       "tags": [
         "onsen trip",
@@ -784,10 +204,10 @@
         "hotel one night stand",
         "mixed bathing",
         "hot spring town"
-      ],
-      "name_zh": "温泉/旅行系列"
+      ]
     },
     {
+      "name_zh": "姐妹/亲属系列",
       "theme_zh": "姐妹/亲属系列",
       "tags": [
         "twin sisters",
@@ -801,10 +221,10 @@
         "family resemblance",
         "forbidden family",
         "brother's wife"
-      ],
-      "name_zh": "姐妹/亲属系列"
+      ]
     },
     {
+      "name_zh": "偶像/艺人系列",
       "theme_zh": "偶像/艺人系列",
       "tags": [
         "idol girl",
@@ -818,10 +238,10 @@
         "underground idol",
         "local idol",
         "gravure DVD shoot"
-      ],
-      "name_zh": "偶像/艺人系列"
+      ]
     },
     {
+      "name_zh": "风俗/夜生活系列",
       "theme_zh": "风俗/夜生活系列",
       "tags": [
         "hostess",
@@ -837,10 +257,10 @@
         "fashion health",
         "oppai pub girl",
         "girls bar"
-      ],
-      "name_zh": "风俗/夜生活系列"
+      ]
     },
     {
+      "name_zh": "特殊状态系列",
       "theme_zh": "特殊状态系列",
       "tags": [
         "drunk girl",
@@ -858,10 +278,10 @@
         "aphrodisiac",
         "time stop",
         "invisible man"
-      ],
-      "name_zh": "特殊状态系列"
+      ]
     },
     {
+      "name_zh": "多人系列",
       "theme_zh": "多人系列",
       "tags": [
         "threesome",
@@ -877,10 +297,10 @@
         "group sex",
         "reverse gangbang",
         "harem"
-      ],
-      "name_zh": "多人系列"
+      ]
     },
     {
+      "name_zh": "魔术镜系列（JAV独有）",
       "theme_zh": "魔术镜系列（JAV独有）",
       "tags": [
         "magic mirror room",
@@ -890,14 +310,13 @@
         "two-way mirror",
         "mirror room interview",
         "magic mirror bus",
-        "magic mirror号",
         "voyeur through mirror",
         "camera behind mirror",
         "observed from other side"
-      ],
-      "name_zh": "魔术镜系列（JAV独有）"
+      ]
     },
     {
+      "name_zh": "同居/出差NTR系列",
       "theme_zh": "同居/出差NTR系列",
       "tags": [
         "shared hotel room",
@@ -910,10 +329,10 @@
         "no choice but same room",
         "futon side by side",
         "sleeping next to forbidden partner"
-      ],
-      "name_zh": "同居/出差NTR系列"
+      ]
     },
     {
+      "name_zh": "AV面试/试镜系列",
       "theme_zh": "AV面试/试镜系列",
       "tags": [
         "AV audition",
@@ -929,10 +348,10 @@
         "amateur debut",
         "first gravure shoot",
         "being convinced to pose nude"
-      ],
-      "name_zh": "AV面试/试镜系列"
+      ]
     },
     {
+      "name_zh": "逆NTR/逆强暴系列",
       "theme_zh": "逆NTR/逆强暴系列",
       "tags": [
         "female dominant",
@@ -947,10 +366,10 @@
         "overpowered by woman",
         "forced to cum inside",
         "woman taking control"
-      ],
-      "name_zh": "逆NTR/逆强暴系列"
+      ]
     },
     {
+      "name_zh": "女同/百合系列",
       "theme_zh": "女同/百合系列",
       "tags": [
         "lesbian",
@@ -964,10 +383,10 @@
         "two girls exploring each other",
         "gentle female love",
         "experienced woman teaching younger"
-      ],
-      "name_zh": "女同/百合系列"
+      ]
     },
     {
+      "name_zh": "紧缚/和式SM系列",
       "theme_zh": "紧缚/和式SM系列",
       "tags": [
         "shibari",
@@ -983,10 +402,10 @@
         "bound and helpless",
         "tsuri suspension",
         "floor rope tie"
-      ],
-      "name_zh": "紧缚/和式SM系列"
+      ]
     },
     {
+      "name_zh": "寝取/被寝取系列",
       "theme_zh": "寝取/被寝取系列",
       "tags": [
         "netorare victim watching",
@@ -1000,10 +419,10 @@
         "jealousy and arousal mixed",
         "forbidden watching",
         "hiding while partner cheats"
-      ],
-      "name_zh": "寝取/被寝取系列"
+      ]
     },
     {
+      "name_zh": "媚药/迷奸系列",
       "theme_zh": "媚药/迷奸系列",
       "tags": [
         "aphrodisiac",
@@ -1018,10 +437,10 @@
         "spiked drink at party",
         "aphrodisiac taking effect",
         "helpless arousal"
-      ],
-      "name_zh": "媚药/迷奸系列"
+      ]
     },
     {
+      "name_zh": "胁迫/敲诈系列",
       "theme_zh": "胁迫/敲诈系列",
       "tags": [
         "blackmail",
@@ -1036,10 +455,10 @@
         "extortion",
         "teacher threatening student",
         "boss threatening employee"
-      ],
-      "name_zh": "胁迫/敲诈系列"
+      ]
     },
     {
+      "name_zh": "泥醉/酒后系列",
       "theme_zh": "泥醉/酒后系列",
       "tags": [
         "drunk after party",
@@ -1054,12 +473,12 @@
         "beer drunk",
         "unconscious from alcohol",
         "vomiting",
-        "spinning room",
+        "drunken stupor",
         "hungover morning"
-      ],
-      "name_zh": "泥醉/酒后系列"
+      ]
     },
     {
+      "name_zh": "中出/怀孕系列",
       "theme_zh": "中出/怀孕系列",
       "tags": [
         "creampie",
@@ -1078,10 +497,10 @@
         "ovulation day",
         "unprotected sex",
         "raw dogging"
-      ],
-      "name_zh": "中出/怀孕系列"
+      ]
     },
     {
+      "name_zh": "口交深喉系列",
       "theme_zh": "口交深喉系列",
       "tags": [
         "irrumatio",
@@ -1101,10 +520,10 @@
         "messy face",
         "ruined makeup",
         "cum from nose"
-      ],
-      "name_zh": "口交深喉系列"
+      ]
     },
     {
+      "name_zh": "颜射系列",
       "theme_zh": "颜射系列",
       "tags": [
         "bukkake",
@@ -1123,10 +542,10 @@
         "sperm drenched",
         "cum-soaked face",
         "sticky white mess"
-      ],
-      "name_zh": "颜射系列"
+      ]
     },
     {
+      "name_zh": "痴女系列",
       "theme_zh": "痴女系列",
       "tags": [
         "nympho",
@@ -1144,13 +563,11 @@
         "nymphomaniac",
         "relentless sexual appetite",
         "wears men out",
-        "pussy always wet",
-        "02-景别构图.md",
-        "[场景 1个] + [主题/角色 1个] + [景别 1个] + [视角 1个] + [设备 1个] + [裸露/服装 1-2个] = 场景设定"
-      ],
-      "name_zh": "痴女系列"
+        "pussy always wet"
+      ]
     },
     {
+      "name_zh": "放置/野外系列（JAV经典暴露主题）",
       "theme_zh": "放置/野外系列（JAV经典暴露主题）",
       "tags": [
         "exhibitionism",
@@ -1181,13 +598,13 @@
         "train station flashing",
         "crowded place flashing",
         "street corner flashing",
-        "暴露狂",
-        "户外露出",
-        "公共 sexo"
-      ],
-      "name_zh": "放置/野外系列（JAV经典暴露主题）"
+        "exhibitionism",
+        "outdoor exposure",
+        "public arousal"
+      ]
     },
     {
+      "name_zh": "露出/偷窥系列",
       "theme_zh": "露出/偷窥系列",
       "tags": [
         "voyeurism",
@@ -1213,10 +630,10 @@
         "caught being watched",
         "unaware victim",
         "hidden angle shot"
-      ],
-      "name_zh": "露出/偷窥系列"
+      ]
     },
     {
+      "name_zh": "睡眠/无意识系列",
       "theme_zh": "睡眠/无意识系列",
       "tags": [
         "sleep sex",
@@ -1241,10 +658,10 @@
         "fainted",
         "ko",
         "knocked out"
-      ],
-      "name_zh": "睡眠/无意识系列"
+      ]
     },
     {
+      "name_zh": "幻想/梦境系列",
       "theme_zh": "幻想/梦境系列",
       "tags": [
         "fantasy",
@@ -1269,10 +686,10 @@
         "race play fantasy",
         "age play fantasy",
         "pet play fantasy"
-      ],
-      "name_zh": "幻想/梦境系列"
+      ]
     },
     {
+      "name_zh": "恋足/特殊部位系列",
       "theme_zh": "恋足/特殊部位系列",
       "tags": [
         "foot fetish",
@@ -1298,50 +715,11 @@
         "barefoot in heels",
         "stocking feet in heels",
         "foot smell worship",
-        "smelly socks",
-        "ass fetish",
-        "butt worship",
-        "spanking",
-        "anal worship",
-        "butt play",
-        "butt job",
-        "rimming",
-        "ass licking",
-        "ass kissing",
-        "butt slapping",
-        "butt print",
-        "butt focus",
-        "big butt",
-        "small butt",
-        "round butt",
-        "butt shaking",
-        "butt bouncing",
-        "anal beads",
-        "butt plug",
-        "anal teasing",
-        "ass worship",
-        "breast fetish",
-        "breast worship",
-        "nipple worship",
-        "nipple sucking",
-        "titty fuck",
-        "breast feeding fantasy",
-        "lactating",
-        "lactation fetish",
-        "nursing",
-        "tit worship",
-        "big breast",
-        "small breast",
-        "perfect breast",
-        "nipple pinch",
-        "nipple clamp",
-        "breast squeeze",
-        "breast massage",
-        "nipple torture"
-      ],
-      "name_zh": "恋足/特殊部位系列"
+        "smelly socks"
+      ]
     },
     {
+      "name_zh": "SM/支配与臣服系列",
       "theme_zh": "SM/支配与臣服系列",
       "tags": [
         "bondage",
@@ -1369,71 +747,11 @@
         "locked in cage",
         "locked in room",
         "imprisoned",
-        "bound and gagged",
-        "dominance",
-        "dominant",
-        "rough sex",
-        "power play",
-        "forced",
-        "non-consent",
-        "coerced",
-        "intimidated",
-        "scared",
-        "pleading",
-        "begging",
-        "reluctant",
-        "resistance",
-        "fighting back",
-        "scratching",
-        "biting",
-        "struggling",
-        "crying",
-        "verbal humiliation",
-        "degradation",
-        "humiliation kink",
-        "verbal abuse",
-        "name calling",
-        "put down",
-        "power exchange",
-        "owner and pet",
-        "master and slave",
-        "dom and sub",
-        "switch",
-        "pain play",
-        "whipping",
-        "caning",
-        "flogging",
-        "spanking",
-        "hand spanking",
-        "belt spanking",
-        "paddle",
-        "crop",
-        "whip",
-        "cane",
-        "sting",
-        "bruise",
-        "marking",
-        "scratching",
-        "biting",
-        "hair pulling",
-        "ear pulling",
-        "nipple pinch",
-        "testicle torture",
-        "CBT",
-        "golden shower",
-        "watersports",
-        "WAM",
-        "wet and messy",
-        "food play",
-        "chocolate body",
-        "whipped cream body",
-        "cake frosting",
-        "sauce",
-        "honey"
-      ],
-      "name_zh": "SM/支配与臣服系列"
+        "bound and gagged"
+      ]
     },
     {
+      "name_zh": "身体改造/特殊状态系列",
       "theme_zh": "身体改造/特殊状态系列",
       "tags": [
         "tattoo",
@@ -1457,47 +775,11 @@
         "nipple ring",
         "body modification",
         "stretched ears",
-        "corset piercings",
-        "pregnant",
-        "pregnant sex",
-        "pregnant blowjob",
-        "pregnant cowgirl",
-        "labor fantasy",
-        "maternity",
-        "expecting mother",
-        "baby bump",
-        "pregnant belly",
-        "pregnant and sexy",
-        "pregnant nurse",
-        "pregnant teacher",
-        "pregnant OL",
-        "pregnant student",
-        "pregnant wife",
-        "pregnant maid",
-        "pregnant in uniform",
-        "pregnant and naked",
-        "孕ませ",
-        "pregnant breeding",
-        "lactation",
-        "breast milk",
-        "nursing fantasy",
-        "lactating sex",
-        "breast milk sex",
-        "breast milk blowjob",
-        "lactation fetish",
-        "nursing mother",
-        "breastfeeding",
-        "milk sex",
-        "lactation during sex",
-        "milk and cum",
-        "lactation reward",
-        "lactating mommy",
-        "breast milk reward",
-        "lactation fetish"
-      ],
-      "name_zh": "身体改造/特殊状态系列"
+        "corset piercings"
+      ]
     },
     {
+      "name_zh": "食物/食用系列",
       "theme_zh": "食物/食用系列",
       "tags": [
         "food play",
@@ -1520,10 +802,10 @@
         "food and sex",
         "eating while having sex",
         "food fetish"
-      ],
-      "name_zh": "食物/食用系列"
+      ]
     },
     {
+      "name_zh": "远程/影像系列",
       "theme_zh": "远程/影像系列",
       "tags": [
         "video call sex",
@@ -1546,10 +828,10 @@
         "selfie during sex",
         "mirror reflection shot",
         "reverse mirror shot"
-      ],
-      "name_zh": "远程/影像系列"
+      ]
     },
     {
+      "name_zh": "角色扮演/职业扮演系列",
       "theme_zh": "角色扮演/职业扮演系列",
       "tags": [
         "role play",
@@ -1588,13 +870,11 @@
         "full body suit",
         "face covered",
         "masked",
-        "面具",
         "ballgag",
         "hood",
         "gas mask",
         "helmet"
-      ],
-      "name_zh": "角色扮演/职业扮演系列"
+      ]
     }
   ]
 }

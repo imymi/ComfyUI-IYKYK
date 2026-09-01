@@ -3,9 +3,10 @@ sampler.py — 完整 15 槽位数据采样与情境自洽引擎
 
 严格实现 nsfw-prompt-templates-asian 项目规范：
 1. 场景与主题情境识别（校园、职场、居家、温泉、夜店、SM、和风、医疗）
-2. 裸露等级 × 服装状态强力联动（L1 包裹 → L6 特写脱法咬合）
-3. 槽位情境亲和度加权采样（自动杜绝场景与服装/道具/角色错位冲突）
-4. 保证用户显式选择 100% 优先（若用户指定，则允许 Cosplay/反差角色扮演）
+2. 空间与物理环境自洽（单一场景锚点定位，杜绝跨场所/室内外冲突并存）
+3. 裸露等级 × 服装状态强力联动（L1 包裹 → L6 特写脱法咬合）
+4. 槽位情境亲和度加权采样（自动杜绝场景与服装/道具/角色错位冲突）
+5. 保证用户显式选择 100% 优先（若用户指定，则允许 Cosplay/反差角色扮演）
 """
 from __future__ import annotations
 
@@ -216,18 +217,73 @@ class DataSampler:
             return []
 
         raw_tags = chosen.get("tags", [])
-        result: List[str] = []
+        cleaned_tags: List[str] = []
         for t in raw_tags:
-            if isinstance(t, str):
+            if isinstance(t, str) and t.strip():
                 for sep in [",", "/"]:
                     if sep in t:
-                        parts = [p.strip() for p in t.split(sep) if p.strip()]
-                        result.extend(parts)
+                        cleaned_tags.extend([p.strip() for p in t.split(sep) if p.strip()])
                         break
                 else:
-                    if t.strip():
-                        result.append(t.strip())
-        return self._pick(result, rng, min(rng.randint(2, 3), len(result))) if result else []
+                    cleaned_tags.append(t.strip())
+
+        if not cleaned_tags:
+            return []
+
+        # 场景内互斥子空间分组，保证单次采样只锁定单一物理空间锚点
+        mutex_sub_groups = [
+            ["indoor onsen", "private onsen", "ryokan bath"],
+            ["outdoor bath", "rotenburo", "open-air bath", "onsen with snow view", "onsen at night"],
+            ["onsen changing room", "changing room", "locker room"],
+            ["onsen washing area", "washing area"],
+            ["behind bushes", "riverbank", "embankment", "under bridge"],
+            ["park bench", "park playground", "park gazebo"],
+            ["empty lot", "construction site at night"],
+            ["park bathroom", "public restroom"],
+            ["izakaya booth", "izakaya private room", "izakaya back room"],
+            ["cafe booth", "coffee shop back booth", "cafe with sofa"],
+            ["yatai stall", "street food cart", "food stall with curtain"],
+            ["bar counter", "bar back room"],
+            ["love hotel restaurant", "love hotel dining room"],
+            ["beach at night", "seaside cave"],
+            ["poolside", "swimming pool at night"],
+            ["pool shower", "pool locker room"],
+            ["bedroom", "messy bed", "futon on floor"],
+            ["kitchen", "kitchen island", "kitchen counter"],
+            ["bathroom", "bathtub", "shower stall"]
+        ]
+
+        # 1. 随机选定一个核心锚点
+        anchor = rng.choice(cleaned_tags)
+
+        # 2. 判定该锚点的互斥组并过滤候选
+        banned = set()
+        anchor_group = None
+        for grp in mutex_sub_groups:
+            if any(g in anchor.lower() for g in grp):
+                anchor_group = grp
+                break
+
+        if anchor_group:
+            for grp in mutex_sub_groups:
+                if grp != anchor_group and any(any(m in t.lower() for m in grp) for t in cleaned_tags):
+                    for item in grp:
+                        banned.add(item)
+
+        # 室内外基础互斥过滤
+        if any(m in anchor.lower() for m in ["outdoor", "rotenburo", "snow view", "riverbank", "embankment", "bushes"]):
+            banned.update(["indoor", "changing room", "locker room", "shower stall"])
+        elif any(m in anchor.lower() for m in ["indoor", "changing room", "bedroom", "kitchen"]):
+            banned.update(["outdoor", "snow view", "riverbank", "embankment", "under bridge"])
+
+        compatible = [t for t in cleaned_tags if t != anchor and not any(b in t.lower() for b in banned)]
+
+        sampled = [anchor]
+        if compatible:
+            extra_count = min(rng.randint(1, 2), len(compatible))
+            sampled.extend(rng.sample(compatible, extra_count))
+
+        return sampled
 
     def sample_theme(self, theme: str, rng: random.Random) -> List[str]:
         if _is_none(theme):
