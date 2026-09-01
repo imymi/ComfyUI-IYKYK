@@ -1,0 +1,678 @@
+{
+  "professional_lighting": [
+    {
+      "name": "发丝光 / 轮廓光（Rim Light / Hair Light / Kicker）",
+      "tags": [
+        "rim light",
+        "hair light",
+        "kicker light",
+        "edge lighting",
+        "backlit hair glow",
+        "golden hair rim",
+        "silver rim light",
+        "halo effect around hair",
+        "light catching hair strands",
+        "backlight outlining body",
+        "light wrapping around curves",
+        "glowing hair edges",
+        "wispy hair illuminated",
+        "light leaking through hair",
+        "translucent ear glow from backlight",
+        "backlight spray",
+        "glowing edges",
+        "golden outline on body"
+      ],
+      "erotic_tags": [
+        "backlit nude outline",
+        "light wrapping around breasts",
+        "rim light on hip curve",
+        "golden edge on wet skin",
+        "hair catching backlight"
+      ]
+    },
+    {
+      "name": "侧逆光（Back Side Light / Edge Light）",
+      "tags": [
+        "back side light",
+        "135 degree light",
+        "side backlight",
+        "edge light from behind",
+        "asymmetric rim glow",
+        "one side rim one side shadow",
+        "diagonal backlight",
+        "quarter back light",
+        "three-quarter back illumination",
+        "side kicker",
+        "shoulder edge glow",
+        "asymmetric outline light"
+      ],
+      "erotic_tags": [
+        "side backlight on breast curve",
+        "asymmetric body rim",
+        "one side glowing one shadow",
+        "edge light on thigh"
+      ]
+    },
+    {
+      "name": "伦勃朗光（Rembrandt Lighting）",
+      "tags": [
+        "Rembrandt lighting",
+        "45 degree side light",
+        "triangle of light on cheek",
+        "dramatic side lighting",
+        "painterly light",
+        "Dutch Golden Age lighting",
+        "chiaroscuro portrait",
+        "shadow triangle under eye",
+        "classical portrait light",
+        "Caravaggio-style lighting",
+        "tenebrism",
+        "Baroque lighting",
+        "Old Master light"
+      ],
+      "erotic_tags": [
+        "Rembrandt light on face",
+        "one breast illuminated one in shadow",
+        "dramatic body chiaroscuro",
+        "painterly nude",
+        "Old Master body study"
+      ]
+    },
+    {
+      "name": "蝴蝶光 / 派拉蒙光（Butterfly / Paramount Lighting）",
+      "tags": [
+        "butterfly lighting",
+        "Paramount lighting",
+        "overhead beauty light",
+        "nose shadow under",
+        "glamorous studio light",
+        "classic Hollywood lighting",
+        "beauty portrait light",
+        "top-down glamour",
+        "shadow under nose bridge",
+        "cheekbone highlight",
+        "forehead glow",
+        "glamour shadow"
+      ],
+      "erotic_tags": [
+        "butterfly light on face",
+        "overhead light emphasizing cleavage",
+        "glamorous body studio lighting",
+        "Hollywood glamour nude"
+      ]
+    },
+    {
+      "name": "分割光（Split Lighting）",
+      "tags": [
+        "split lighting",
+        "half face lit",
+        "90 degree side light",
+        "extreme side lighting",
+        "half shadow portrait",
+        "light and dark division",
+        "face split by shadow",
+        "body half-lit",
+        "one side in complete shadow",
+        "dramatic left-right contrast",
+        "chiaroscuro split"
+      ],
+      "erotic_tags": [
+        "split light on body",
+        "one breast in light one in darkness",
+        "half-lit nude",
+        "shadow dividing body",
+        "dramatic body split"
+      ]
+    },
+    {
+      "name": "环形光（Loop Lighting）",
+      "tags": [
+        "loop lighting",
+        "30 degree light",
+        "soft nose shadow",
+        "natural portrait light",
+        "gentle side light",
+        "subtle face shadow",
+        "flattering face light",
+        "soft cheek shadow",
+        "natural dimension light",
+        "classic portrait loop"
+      ],
+      "erotic_tags": [
+        "soft loop light on face",
+        "gentle body dimension",
+        "flattering nude lighting",
+        "natural skin dimension"
+      ]
+    },
+    {
+      "name": "短照明（Short Lighting）",
+      "tags": [
+        "short lighting",
+        "face turned away from light",
+        "shadow side to camera",
+        "slimming light",
+        "narrow face lighting",
+        "shadow toward camera",
+        "face narrowing effect"
+      ],
+      "erotic_tags": [
+        "short lighting slimming face",
+        "shadow side creating mystery",
+        "dramatic body short light"
+      ]
+    },
+    {
+      "name": "宽照明（Broad Lighting）",
+      "tags": [
+        "broad lighting",
+        "face turned toward light",
+        "lit side to camera",
+        "full face lighting",
+        "bright face toward camera",
+        "open face illumination"
+      ],
+      "erotic_tags": [
+        "broad lighting on face",
+        "full body illumination",
+        "open bright body study"
+      ]
+    },
+    {
+      "name": "柔光箱 / 包围柔光（Soft Box / Beauty Dish）",
+      "tags": [
+        "soft box lighting",
+        "broad light",
+        "wrap-around soft light",
+        "beauty dish",
+        "soft diffused studio light",
+        "large source soft light",
+        "even illumination",
+        "minimal shadows",
+        "flattering flat light",
+        "luminous skin",
+        "angelic glow",
+        "beauty editorial light",
+        "magazine cover lighting"
+      ],
+      "erotic_tags": [
+        "soft glowing skin",
+        "angelic nude lighting",
+        "luminous body",
+        "even skin illumination",
+        "beauty editorial nude"
+      ]
+    },
+    {
+      "name": "硬光 / 直射光（Hard Light）",
+      "tags": [
+        "hard light",
+        "direct light",
+        "focused beam",
+        "sharp shadow",
+        "high contrast",
+        "bare bulb",
+        "harsh sun",
+        "spotlight",
+        "strong directional",
+        "intense shadow edge",
+        "crisp shadow",
+        "dramatic hard light"
+      ],
+      "erotic_tags": [
+        "hard light emphasizing body texture",
+        "harsh shadow on curves",
+        "high contrast nude",
+        "dramatic skin texture"
+      ]
+    },
+    {
+      "name": "底光 / 恐怖光（Under Lighting / Uplighting）",
+      "tags": [
+        "under lighting",
+        "uplighting",
+        "light from below",
+        "chin lit from under",
+        "eerie glow",
+        "unnatural angle",
+        "flashlight from below",
+        "candle under face",
+        "light rising",
+        "under chin shadow",
+        "nose shadow upward"
+      ],
+      "erotic_tags": [
+        "under lighting on body",
+        "light from below illuminating breasts",
+        "eerie sexy glow",
+        "candle under chin",
+        "flashlight on body"
+      ]
+    },
+    {
+      "name": "剪影光（Silhouette Lighting）",
+      "tags": [
+        "silhouette lighting",
+        "full silhouette",
+        "backlit figure",
+        "dark outline",
+        "body contour silhouette",
+        "window silhouette",
+        "doorway figure",
+        "standing figure in light",
+        "pure silhouette",
+        "complete shadow figure"
+      ],
+      "erotic_tags": [
+        "nude silhouette",
+        "body contour in backlight",
+        "standing figure in doorway light",
+        "window light silhouette",
+        "breast silhouette outline"
+      ]
+    }
+  ],
+  "cinematic_lighting": [
+    {
+      "name": "经典电影光",
+      "tags": [
+        "cinematic lighting",
+        "volumetric light",
+        "atmosphere fog with light",
+        "light shafts through dust",
+        "volumetric rays",
+        "god rays",
+        "Tyndall effect",
+        "atmospheric haze",
+        "fog machine with backlight",
+        "mist catching light",
+        "cinematic practical light",
+        "motivated lighting"
+      ]
+    },
+    {
+      "name": "黑色电影",
+      "tags": [
+        "film noir lighting",
+        "venetian blind shadows",
+        "slatted shadow pattern",
+        "noir chiaroscuro",
+        "detective movie light",
+        "shadow bars across body",
+        "high contrast noir",
+        "blind shadow stripes on skin",
+        "jail-bar shadows",
+        "dramatic noir",
+        "low key noir",
+        "deep shadow"
+      ]
+    },
+    {
+      "name": "霓虹灯光",
+      "tags": [
+        "neon rim light",
+        "colored side light",
+        "pink and blue split lighting",
+        "neon reflection on skin",
+        "magenta and cyan",
+        "colored gel lighting",
+        "RGB lighting on body",
+        "disco ball light fragments",
+        "UV blacklight",
+        "neon glow on wet skin",
+        "love hotel neon glow",
+        "hostess club lighting",
+        "red light district ambiance",
+        "neon sign reflection on skin",
+        "colored tube light"
+      ]
+    },
+    {
+      "name": "自然电影光",
+      "tags": [
+        "magic hour light",
+        "golden hour window",
+        "afternoon slant light",
+        "morning backlight",
+        "twilight blue",
+        "candlelit dinner ambiance",
+        "fireplace warm glow",
+        "moonbeam through window",
+        "storm flash illumination",
+        "twilight ambient",
+        "dusk glow"
+      ]
+    }
+  ],
+  "special_effects": [
+    {
+      "name": "透射光",
+      "tags": [
+        "backlit ears",
+        "light through earlobes",
+        "translucent fingers",
+        "light through thin fabric",
+        "glow through sheet",
+        "silhouette through curtain",
+        "light through sheer lingerie",
+        "veins visible in backlight",
+        "light through fingers covering face",
+        "light through shower curtain",
+        "light through wet hair",
+        "translucent skin glow"
+      ]
+    },
+    {
+      "name": "反射光",
+      "tags": [
+        "light reflecting off wet skin",
+        "specular highlights on body",
+        "mirror reflection glow",
+        "water surface bounce",
+        "glossy lip shine",
+        "eye catchlight",
+        "light bounce from white sheet",
+        "reflected neon on body",
+        "chrome reflection",
+        "glass reflection adding depth",
+        "oil on body reflection",
+        "sweat specular highlight"
+      ]
+    },
+    {
+      "name": "光影纹理",
+      "tags": [
+        "lace shadow pattern on skin",
+        "curtain shadow stripes",
+        "tree leaf shadow dapple",
+        "window frame shadow grid",
+        "jewelry shadow pattern",
+        "chain link shadow",
+        "mesh shadow on body",
+        "fabric texture shadow",
+        "venetian blind stripes",
+        "bamboo blind shadows",
+        "lattice shadow pattern",
+        "chain necklace shadow",
+        "hair shadow on face"
+      ]
+    },
+    {
+      "name": "光雾交互",
+      "tags": [
+        "light through steam",
+        "backlit shower spray",
+        "dusty light rays",
+        "fog machine atmosphere",
+        "breath visible in cold light",
+        "smoke catching light",
+        "perfume mist illuminated",
+        "condensation droplets catching light",
+        "vapor rising in backlight",
+        "haze with light shafts",
+        "incense smoke in light beam",
+        "dust motes in sunbeam"
+      ]
+    }
+  ],
+  "erotic_lighting": [
+    {
+      "name": "暧昧氛围光",
+      "tags": [
+        "red-tinted room",
+        "pink ambient light",
+        "under-sheet glow",
+        "phone screen glow on face",
+        "lava lamp light",
+        "red light district ambiance",
+        "candlelit bedroom",
+        "warm lamp glow on naked skin",
+        "bedside lamp intimacy",
+        "dimmed overhead",
+        "night light only",
+        "single candle flame",
+        "warm orange pool of light",
+        "intimate soft glow"
+      ]
+    },
+    {
+      "name": "轮廓 / 剪影",
+      "tags": [
+        "dark silhouette",
+        "backlit nude outline",
+        "body contour in rim light",
+        "hip curve highlighted",
+        "breast silhouette",
+        "standing figure in doorway light",
+        "window light silhouette",
+        "body outline glow",
+        "light defining curves",
+        "dark room with single backlight",
+        "golden body rim",
+        "edge light on wet skin"
+      ]
+    },
+    {
+      "name": "湿润反光",
+      "tags": [
+        "sweat glistening under warm light",
+        "wet skin specular highlights",
+        "oil on body catching light",
+        "cum glistening on skin",
+        "body moisture in rim light",
+        "glistening afterglow",
+        "wet hair shine",
+        "lip gloss reflection",
+        "skin sheen from perspiration",
+        "dewy wet glow",
+        "wet skin catching light",
+        "body oil reflection"
+      ]
+    },
+    {
+      "name": "私密偷光感",
+      "tags": [
+        "peeking light from under door",
+        "hallway light leaking in",
+        "fridge light in dark kitchen",
+        "laptop screen glow",
+        "TV flicker on body",
+        "alarm clock glow",
+        "flashlight beam",
+        "candle carried in dark",
+        "match strike illumination",
+        "lighter flame on face",
+        "screen glow on naked skin",
+        "phone light under sheets"
+      ]
+    }
+  ],
+  "color_temperature_table": [
+    {
+      "color_temp": "烛光暖",
+      "value": "~2700K",
+      "keywords": [
+        "warm candlelight",
+        "amber glow",
+        "golden skin tones",
+        "intimate warmth"
+      ],
+      "mood": "亲密/暧昧/浪漫",
+      "scene": "情人旅馆/卧室/和室"
+    },
+    {
+      "color_temp": "钨丝灯",
+      "value": "~3000K",
+      "keywords": [
+        "tungsten light",
+        "warm bulb glow",
+        "yellowish indoor light",
+        "cozy"
+      ],
+      "mood": "温馨/居家/慵懒",
+      "scene": "公寓/居酒屋/夜间室内"
+    },
+    {
+      "color_temp": "晨昏金光",
+      "value": "~4000K",
+      "keywords": [
+        "golden hour light",
+        "sunset warmth",
+        "warm afternoon glow"
+      ],
+      "mood": "温柔/怀旧/忧伤",
+      "scene": "窗边/阳台/日落"
+    },
+    {
+      "color_temp": "中性白",
+      "value": "~4500K",
+      "keywords": [
+        "neutral white",
+        "balanced light",
+        "natural indoor"
+      ],
+      "mood": "日常/真实/中立",
+      "scene": "办公室/教室/商场"
+    },
+    {
+      "color_temp": "日光",
+      "value": "~5500K",
+      "keywords": [
+        "natural daylight",
+        "bright sunlight",
+        "clear and crisp"
+      ],
+      "mood": "自然/清新/真实",
+      "scene": "户外/窗边/海边"
+    },
+    {
+      "color_temp": "阴天柔",
+      "value": "~6000K",
+      "keywords": [
+        "overcast soft light",
+        "cloudy diffusion",
+        "flat and gentle"
+      ],
+      "mood": "忧郁/孤独/安静",
+      "scene": "雨天窗边/室内"
+    },
+    {
+      "color_temp": "冷白荧光",
+      "value": "~6500K",
+      "keywords": [
+        "cold fluorescent",
+        "clinical white",
+        "sterile",
+        "harsh"
+      ],
+      "mood": "疏离/不安/压抑",
+      "scene": "医院/诊所/监禁/公厕"
+    },
+    {
+      "color_temp": "月光冷",
+      "value": "~7000K",
+      "keywords": [
+        "moonlight blue",
+        "cool night",
+        "silver-blue ambient"
+      ],
+      "mood": "神秘/孤独/冷艳",
+      "scene": "夜间户外/天台/海边"
+    },
+    {
+      "color_temp": "霓虹混合",
+      "value": "混合",
+      "keywords": [
+        "neon pink and blue",
+        "colored light",
+        "mixed temperature"
+      ],
+      "mood": "欲望/夜店/混乱",
+      "scene": "夜店/风俗店/情人旅馆"
+    },
+    {
+      "color_temp": "UV/黑光",
+      "value": "特殊",
+      "keywords": [
+        "blacklight glow",
+        "UV reactive",
+        "neon teeth",
+        "white glowing"
+      ],
+      "mood": "狂野/迷幻/夜店",
+      "scene": "夜店/派对/特殊"
+    }
+  ],
+  "preset_combos": [
+    {
+      "name": "油画古典",
+      "main_light": "Rembrandt lighting",
+      "modifier_light": "chiaroscuro, deep shadow",
+      "atmosphere": "candlelight",
+      "effect": "巴洛克油画感"
+    },
+    {
+      "name": "日系清新",
+      "main_light": "soft window light",
+      "modifier_light": "loop lighting, diffused",
+      "atmosphere": "bright airy",
+      "effect": "清纯唯美"
+    },
+    {
+      "name": "逆光发丝",
+      "main_light": "backlight, rim light",
+      "modifier_light": "hair glow, edge light",
+      "atmosphere": "golden hour",
+      "effect": "仙女感"
+    },
+    {
+      "name": "电影暗调",
+      "main_light": "split lighting",
+      "modifier_light": "volumetric haze",
+      "atmosphere": "single practical",
+      "effect": "戏剧张力"
+    },
+    {
+      "name": "情人旅馆霓虹",
+      "main_light": "neon side light",
+      "modifier_light": "colored rim, RGB",
+      "atmosphere": "love hotel glow, pink ambiance",
+      "effect": "暧昧诱惑"
+    },
+    {
+      "name": "温泉暧昧",
+      "main_light": "moonlight",
+      "modifier_light": "backlit steam",
+      "atmosphere": "warm water glow",
+      "effect": "情欲朦胧"
+    },
+    {
+      "name": "卧室私密",
+      "main_light": "bedside lamp",
+      "modifier_light": "rim light on body",
+      "atmosphere": "candlelight",
+      "effect": "亲密感"
+    },
+    {
+      "name": "影棚商业",
+      "main_light": "beauty dish",
+      "modifier_light": "hair light, fill",
+      "atmosphere": "soft even",
+      "effect": "杂志大片"
+    },
+    {
+      "name": "偷窥私密",
+      "main_light": "screen glow",
+      "modifier_light": "under door light",
+      "atmosphere": "dark ambient",
+      "effect": "禁忌感"
+    },
+    {
+      "name": "雨天湿润",
+      "main_light": "overcast diffused",
+      "modifier_light": "rim light through rain",
+      "atmosphere": "moody grey",
+      "effect": "忧郁美感"
+    }
+  ]
+}

@@ -1,0 +1,24 @@
+{
+  "default": "low quality, worst quality, blurry, jpeg artifacts, watermark, deformed, bad anatomy, bad mouth, bad teeth, weird tongue, distorted lips, extra limbs, extra fingers, mutated hands, bad proportions, ugly, disfigured, cropped, out of frame",
+  "common_patterns": [
+    "low quality",
+    "worst quality",
+    "blurry",
+    "jpeg artifacts",
+    "watermark",
+    "deformed",
+    "bad anatomy",
+    "extra limbs",
+    "extra fingers",
+    "mutated hands",
+    "bad proportions",
+    "ugly",
+    "disfigured",
+    "cropped",
+    "out of frame",
+    "bad mouth",
+    "bad teeth",
+    "weird tongue",
+    "distorted lips"
+  ]
+}

@@ -1,0 +1,269 @@
+{
+  "rules": [
+    {
+      "id": "nudity_clothing_conflicts",
+      "description": "裸露与内衣状态互斥冲突：私处暴露时内裤不能存在，全裸时不能有穿着描述",
+      "conflicts": [
+        {
+          "trigger": [
+            "pussy visible",
+            "exposed vagina",
+            "spread pussy",
+            "bare pussy"
+          ],
+          "ban": [
+            "panties showing",
+            "visible panties",
+            "wearing panties",
+            "wearing underwear",
+            "lace panties on"
+          ]
+        },
+        {
+          "trigger": [
+            "topless",
+            "bare breasts",
+            "exposed breasts",
+            "uncovered breasts"
+          ],
+          "ban": [
+            "wearing bra",
+            "bra on",
+            "wearing blouse",
+            "wearing shirt"
+          ]
+        },
+        {
+          "trigger": [
+            "completely naked",
+            "full nude",
+            "bare body",
+            "no clothes"
+          ],
+          "ban": [
+            "wearing blazer",
+            "wearing skirt",
+            "wearing uniform",
+            "wearing dress",
+            "wearing sweater"
+          ]
+        },
+        {
+          "trigger": [
+            "no panties",
+            "pussy visible",
+            "bare pussy"
+          ],
+          "ban": [
+            "cameltoe"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "material_penetration",
+      "description": "材质穿透伪影：禁止 sheer/see-through/transparent，替换为物理状态",
+      "banned_words": [
+        "sheer",
+        "see-through",
+        "transparent fabric",
+        "see through",
+        "sheer fabric",
+        "translucent dress"
+      ],
+      "replacements": [
+        "unbuttoned",
+        "lifted up",
+        "slipping off shoulder",
+        "wet dress clinging tightly to skin"
+      ]
+    },
+    {
+      "id": "gaze_angle_geometry",
+      "description": "视线与镜头角度几何匹配（铁律）",
+      "mappings": [
+        {
+          "angles": [
+            "low angle",
+            "from below",
+            "worm eye view",
+            "looking up from below"
+          ],
+          "required_gaze": "looking down at camera",
+          "banned_gaze": [
+            "looking up at camera",
+            "looking up"
+          ]
+        },
+        {
+          "angles": [
+            "high angle",
+            "from above",
+            "overhead",
+            "bird eye view",
+            "top-down"
+          ],
+          "required_gaze": "looking up at camera",
+          "banned_gaze": [
+            "looking down at camera",
+            "looking down"
+          ]
+        },
+        {
+          "angles": [
+            "point of view",
+            "pov",
+            "selfie"
+          ],
+          "required_gaze": "direct eye contact with camera",
+          "banned_gaze": []
+        }
+      ]
+    },
+    {
+      "id": "gaze_mutual_exclusion",
+      "description": "视线方向唯一性：禁止同时出现对视与回避",
+      "exclusive_pairs": [
+        [
+          "direct eye contact",
+          "looking away"
+        ],
+        [
+          "looking at camera",
+          "eyes averted"
+        ],
+        [
+          "locking eyes",
+          "looking away shyly"
+        ]
+      ]
+    },
+    {
+      "id": "liquid_restrictions",
+      "description": "液体微量法则与渲染安全",
+      "liquid_words": [
+        "cum",
+        "semen",
+        "saliva",
+        "drool",
+        "pussy juice",
+        "breast milk",
+        "fluid",
+        "sweat"
+      ],
+      "modifiers": [
+        "subtle trace of",
+        "single drop of",
+        "thin streak of",
+        "fine perspiration",
+        "few drops of",
+        "glistening beads of"
+      ],
+      "banned_combos": [
+        {
+          "trigger": [
+            "cum on closed eyes",
+            "semen in eyes"
+          ],
+          "replace": "cum on cheek"
+        },
+        {
+          "trigger": [
+            "pure white paint-like cum",
+            "thick opaque white paint"
+          ],
+          "replace": "translucent slightly viscous fluid"
+        },
+        {
+          "trigger": [
+            "milky opaque pussy juice"
+          ],
+          "replace": "clear glistening moisture trail"
+        }
+      ]
+    },
+    {
+      "id": "device_quality_compatibility",
+      "description": "设备与画质等级兼容性（手机/监控不匹配8k专业写真词）",
+      "device_constraints": [
+        {
+          "devices": [
+            "cctv",
+            "surveillance",
+            "security camera"
+          ],
+          "banned_tags": [
+            "masterpiece",
+            "8k",
+            "ultra detailed",
+            "professional photography",
+            "studio lighting",
+            "bokeh background",
+            "film grain"
+          ]
+        },
+        {
+          "devices": [
+            "phone camera",
+            "selfie",
+            "iphone photo",
+            "smartphone"
+          ],
+          "banned_tags": [
+            "85mm lens",
+            "dslr photo",
+            "full frame camera",
+            "studio softbox",
+            "medium format"
+          ]
+        },
+        {
+          "devices": [
+            "35mm film",
+            "analog camera",
+            "film photography"
+          ],
+          "banned_tags": [
+            "8k",
+            "ultrahd",
+            "digital rendering",
+            "cgi"
+          ]
+        },
+        {
+          "devices": [
+            "webcam",
+            "hidden spy camera",
+            "pinhole camera"
+          ],
+          "banned_tags": [
+            "masterpiece",
+            "8k",
+            "sharp focus",
+            "professional photography"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "tattoo_dermal_fusion",
+      "description": "纹身必须附带6词真皮层皮肤融合，防止贴纸感",
+      "tattoo_indicators": [
+        "tattoo",
+        "tattooed",
+        "ink",
+        "irezumi",
+        "tally marks",
+        "body art"
+      ],
+      "fusion_tags": [
+        "realistic tattoo",
+        "ink embedded in dermis",
+        "tattoo beneath skin surface",
+        "follows body contours",
+        "slightly faded edges",
+        "pores visible through ink"
+      ]
+    }
+  ]
+}

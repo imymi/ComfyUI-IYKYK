@@ -1,0 +1,62 @@
+{
+  "categories": [
+    {
+      "id": "none",
+      "name_zh": "无特定细节 (Default Clean)",
+      "tags": []
+    },
+    {
+      "id": "beauty_mark_mole",
+      "name_zh": "💄 泪痣/唇角美人痣/锁骨痣",
+      "tags": [
+        "delicate beauty mark near eye",
+        "small dark mole on collarbone",
+        "tiny freckle on cheek"
+      ]
+    },
+    {
+      "id": "natural_skin_pores",
+      "name_zh": "🧬 真实皮肤毛孔微肌理",
+      "tags": [
+        "visible fine skin pores",
+        "natural skin texture",
+        "authentic realistic skin surface"
+      ]
+    },
+    {
+      "id": "bra_strap_lines",
+      "name_zh": "👙 内衣勒痕/肩带印记/晒痕",
+      "tags": [
+        "bra strap indent marks on shoulders",
+        "elastic pressure line on skin",
+        "subtle bikini tan lines"
+      ]
+    },
+    {
+      "id": "dewy_flush_veins",
+      "name_zh": "🩸 皮肤潮红/透光淡蓝血管",
+      "tags": [
+        "rosy flushed chest and neck",
+        "faint blue veins visible on inner breast",
+        "subtle subsurface scattering"
+      ]
+    },
+    {
+      "id": "manicured_nails",
+      "name_zh": "💅 美甲与手指关节细节",
+      "tags": [
+        "delicate manicured fingernails with red polish",
+        "subtle knuckle creases",
+        "slender fingers"
+      ]
+    },
+    {
+      "id": "collarbone_arch",
+      "name_zh": "✨ 锁骨深陷/足弓骨感特写",
+      "tags": [
+        "prominent defined collarbone hollow",
+        "delicate arched foot with tense tendons"
+      ]
+    }
+  ]
+}

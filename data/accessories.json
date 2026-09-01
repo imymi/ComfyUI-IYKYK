@@ -1,0 +1,242 @@
+{
+  "hairstyles": [
+    {
+      "id": "long_straight_black",
+      "name_zh": "黑长直散发 (Long Straight Black Hair)",
+      "tags": [
+        "long straight black hair",
+        "pin-straight hair",
+        "silky smooth hair flowing over shoulders"
+      ]
+    },
+    {
+      "id": "big_wavy_curls",
+      "name_zh": "大波浪卷发 (Big Voluminous Waves)",
+      "tags": [
+        "big loose waves",
+        "voluminous bouncy curls",
+        "glamorous wavy hair",
+        "rich texture"
+      ]
+    },
+    {
+      "id": "twin_tails",
+      "name_zh": "双马尾 (Twin Tails / Pigtails)",
+      "tags": [
+        "twin tails",
+        "pigtails tied high",
+        "long twin ponytails framing face",
+        "cute ribbons"
+      ]
+    },
+    {
+      "id": "high_ponytail",
+      "name_zh": "高马尾 (High Ponytail)",
+      "tags": [
+        "high ponytail",
+        "hair pulled up tight",
+        "sleek high ponytail swaying",
+        "exposed neck"
+      ]
+    },
+    {
+      "id": "low_ponytail",
+      "name_zh": "低马尾 (Low Ponytail)",
+      "tags": [
+        "low ponytail gathered at nape",
+        "loose elegant ponytail",
+        "loose side strands framing face"
+      ]
+    },
+    {
+      "id": "messy_bun",
+      "name_zh": "丸子头 (Messy Top Knot Bun)",
+      "tags": [
+        "messy bun",
+        "hair in a high bun",
+        "loose tendrils escaping",
+        "casual top knot"
+      ]
+    },
+    {
+      "id": "space_buns",
+      "name_zh": "双丸子头 (Space Buns)",
+      "tags": [
+        "space buns on top of head",
+        "twin buns",
+        "playful anime hair buns"
+      ]
+    },
+    {
+      "id": "bob_cut",
+      "name_zh": "齐下巴短发 (Chin Length Bob Cut)",
+      "tags": [
+        "chin length bob",
+        "sleek modern bob",
+        "hair curving around jawline"
+      ]
+    },
+    {
+      "id": "collarbone_lob",
+      "name_zh": "齐肩锁骨发 (Collarbone Length Lob)",
+      "tags": [
+        "collarbone length hair",
+        "soft layered lob",
+        "gentle wavy ends"
+      ]
+    },
+    {
+      "id": "hime_cut",
+      "name_zh": "日系公主切 (Hime Cut)",
+      "tags": [
+        "hime cut",
+        "princess cut with blunt side pieces framing cheeks",
+        "straight bangs",
+        "long black hair"
+      ]
+    },
+    {
+      "id": "braided_twins",
+      "name_zh": "麻花双辫 (Braided Twin Pigtails)",
+      "tags": [
+        "twin braids",
+        "braided pigtails resting on shoulders",
+        "neat woven braids"
+      ]
+    },
+    {
+      "id": "wet_hair_face",
+      "name_zh": "湿发贴脸 (Wet Hair Clinging to Face)",
+      "tags": [
+        "wet hair clinging to face and neck",
+        "damp strands sticking to sweaty skin",
+        "soaked heavy hair"
+      ]
+    },
+    {
+      "id": "messy_bedhead",
+      "name_zh": "凌乱事后散发 (Messy Disheveled Bedhead)",
+      "tags": [
+        "messy disheveled hair",
+        "tousled bedhead hair",
+        "hair spread across pillow",
+        "tangled locks"
+      ]
+    },
+    {
+      "id": "hair_over_breast",
+      "name_zh": "发丝遮乳/纯欲 (Hair Draped Over Breasts)",
+      "tags": [
+        "long hair draped over bare chest",
+        "strands partially covering breasts",
+        "hair cascading over torso"
+      ]
+    },
+    {
+      "id": "hair_in_mouth",
+      "name_zh": "嘴咬发丝 (Strand of Hair in Mouth)",
+      "tags": [
+        "strand of hair between parted lips",
+        "biting hair sensually",
+        "hair falling across eyes"
+      ]
+    }
+  ],
+  "headwear_jewelry": [
+    {
+      "id": "cat_ears",
+      "name_zh": "猫耳发箍 (Cat Ear Headband)",
+      "tags": [
+        "fluffy cat ear headband",
+        "neko ears with pink inner"
+      ]
+    },
+    {
+      "id": "bunny_ears",
+      "name_zh": "兔耳发箍 (Bunny Ears Headband)",
+      "tags": [
+        "tall satin bunny ears headband",
+        "playboy bunny ears"
+      ]
+    },
+    {
+      "id": "maid_headdress",
+      "name_zh": "女仆蕾丝头饰 (Maid Lace Headdress)",
+      "tags": [
+        "white ruffled maid headband",
+        "lace maid headdress"
+      ]
+    },
+    {
+      "id": "nurse_cap",
+      "name_zh": "护士帽 (Nurse Cap)",
+      "tags": [
+        "white nurse cap with red cross logo"
+      ]
+    },
+    {
+      "id": "ribbon_bow",
+      "name_zh": "丝带蝴蝶结 (Silk Ribbon Bow)",
+      "tags": [
+        "red ribbon bow in hair",
+        "cute side hair bow clip"
+      ]
+    },
+    {
+      "id": "lace_blindfold",
+      "name_zh": "蕾丝眼罩 (Lace Blindfold)",
+      "tags": [
+        "black lace blindfold covering eyes",
+        "sheer patterned eye mask"
+      ]
+    },
+    {
+      "id": "leather_choker",
+      "name_zh": "皮质项圈Choker (Leather O-ring Choker)",
+      "tags": [
+        "black leather choker with metal O-ring",
+        "tight neck collar"
+      ]
+    },
+    {
+      "id": "gold_collarbone_chain",
+      "name_zh": "细金锁骨链 (Dainty Collarbone Chain)",
+      "tags": [
+        "thin delicate gold chain resting on collarbone",
+        "pendant in collarbone hollow"
+      ]
+    },
+    {
+      "id": "pearl_necklace",
+      "name_zh": "珍珠项链 (Pearl Strand Necklace)",
+      "tags": [
+        "single strand white pearl necklace",
+        "pearls resting on skin"
+      ]
+    },
+    {
+      "id": "body_chain",
+      "name_zh": "性感身体链/乳链 (Body Chain Harness)",
+      "tags": [
+        "delicate gold body chain across bare chest and waist",
+        "cross-torso body jewelry"
+      ]
+    },
+    {
+      "id": "nipple_rings",
+      "name_zh": "乳环饰品 (Nipple Piercing Jewelry)",
+      "tags": [
+        "small barbell nipple rings",
+        "silver piercing flush against areola"
+      ]
+    },
+    {
+      "id": "ankle_bracelet",
+      "name_zh": "细金脚链 (Delicate Anklet)",
+      "tags": [
+        "thin gold anklet around bare ankle",
+        "tiny dangling charm on ankle"
+      ]
+    }
+  ]
+}

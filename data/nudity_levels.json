@@ -1,0 +1,741 @@
+{
+  "nudity_levels": [
+    {
+      "level": "L1",
+      "name_zh": "包裹感（全遮/暗示）",
+      "tags": [
+        "fully clothed",
+        "dressed",
+        "clothed body",
+        "modest outfit",
+        "tight dress showing silhouette",
+        "form-fitting clothes",
+        "body outline visible through fabric",
+        "figure visible under clothes",
+        "clothes clinging to body",
+        "fabric hugging curves",
+        "nothing exposed",
+        "everything covered",
+        "dressed to the nines"
+      ]
+    },
+    {
+      "level": "L2",
+      "name_zh": "差分裸露（1-2处泄露）",
+      "tags": [
+        "cleavage visible through collar",
+        "collarbone exposed",
+        "midriff showing between top and skirt",
+        "ankle visible",
+        "shoulder slipping out of neckline",
+        "bare arm from sleeve rolled up",
+        "low neckline revealing upper chest",
+        "skirt slit revealing thigh",
+        "one button undone showing bra edge",
+        "backless dress showing spine",
+        "bare feet with otherwise fully dressed",
+        "wrist exposed from pushed sleeve"
+      ]
+    },
+    {
+      "level": "L3",
+      "name_zh": "半裸诱惑（关键部位半遮）",
+      "tags": [
+        "topless with skirt still on",
+        "bra removed blouse still open",
+        "panties only",
+        "all top removed",
+        "breasts bare waist covered",
+        "shirt open showing bare breasts",
+        "bra pushed up above breasts",
+        "dress pulled down to waist",
+        "bare chest with pants on",
+        "one breast covered one exposed",
+        "topless bottom still dressed",
+        "bikini top removed bottom still on",
+        "tank top raised showing breasts"
+      ]
+    },
+    {
+      "level": "L4",
+      "name_zh": "极简遮挡（只剩碎片衣物）",
+      "tags": [
+        "only panties remaining",
+        "just stockings and heels",
+        "garter belt only",
+        "nothing but thigh-highs",
+        "socks only",
+        "completely naked except socks",
+        "only underwear left",
+        "bra and panties only",
+        "just a towel around waist",
+        "sheet barely covering",
+        "ribbon on body",
+        "collar only",
+        "jewelry only",
+        "naked with only shoes on",
+        "completely bare except wristwatch"
+      ]
+    },
+    {
+      "level": "L5",
+      "name_zh": "完全裸露（一览无余）",
+      "tags": [
+        "nude",
+        "naked",
+        "fully nude",
+        "completely naked",
+        "bare everything",
+        "full frontal nudity",
+        "full body naked",
+        "all clothes removed",
+        "stripped bare",
+        "unclothed",
+        "nothing on",
+        "birthday suit",
+        "every inch of skin visible",
+        "body fully exposed",
+        "bare skin",
+        "naked body",
+        "no clothing at all",
+        "completely unclothed"
+      ]
+    },
+    {
+      "level": "L6",
+      "name_zh": "展示性裸露（主动打开/暴露）",
+      "tags": [
+        "legs spread wide open",
+        "pussy fully displayed",
+        "spreading labia",
+        "fingers pulling apart labia",
+        "vaginal opening exposed",
+        "squatting showing everything",
+        "presenting genitals to camera",
+        "opening herself up",
+        "displaying pussy",
+        "legs over head exposed",
+        "bent over showing anus",
+        "ass cheeks spread apart",
+        "lying with legs open wide",
+        "missionary spread",
+        "self-touching",
+        "masturbating",
+        "fingers inside"
+      ]
+    }
+  ],
+  "clothing_states": [
+    {
+      "name_zh": "解开型（主动/缓慢诱惑）",
+      "tags": [
+        "unbuttoned shirt",
+        "open blouse",
+        "dress unzipped",
+        "coat open",
+        "shirt unbuttoned from top",
+        "sweater pulled down to waist",
+        "zipper down",
+        "buttons undone",
+        "cardigan open",
+        "robe untied",
+        "one button undone at a time",
+        "slow zipper pull",
+        "lace-up loosened"
+      ]
+    },
+    {
+      "name_zh": "滑落型（被动/失控/意外）",
+      "tags": [
+        "bra slipping off",
+        "towel slipping off shoulder",
+        "dress slipping off",
+        "shirt sliding down arms",
+        "strap falling off shoulder",
+        "slip dress falling",
+        "underwear sliding down",
+        "towel loosely wrapped",
+        "robe slipping off",
+        "sleeve falling down",
+        "skirt sliding off hips",
+        "belt coming undone",
+        "shoe falling off heel"
+      ]
+    },
+    {
+      "name_zh": "掀起型（主动撩拨/快速暴露）",
+      "tags": [
+        "shirt lifted to show breasts",
+        "crop top pulled up",
+        "skirt lifted",
+        "dress pulled up to waist",
+        "tank top raised",
+        "shirt raised",
+        "cleavage exposed by lifting",
+        "panties pulled to side",
+        "underwear pulled aside",
+        "fabric bunched at waist",
+        "skirt hem gathered in fist",
+        "blanket lifted to reveal",
+        "curtain pulled aside"
+      ]
+    },
+    {
+      "name_zh": "撕毁型（粗暴/支配/SM）",
+      "tags": [
+        "torn dress",
+        "ripped stockings",
+        "torn shirt",
+        "clothes torn off",
+        "ripped lingerie",
+        "torn sleeve",
+        "ripped seam",
+        "destroyed clothing",
+        "dress hanging in tatters",
+        "only sleeve remaining",
+        "lingerie destroyed",
+        "only bra remaining",
+        "panties torn off",
+        "clothes half on",
+        "outfit ruined",
+        "barely holding together",
+        "buttons popping off from force",
+        "fabric ripping sound implied",
+        "collar grabbed and torn",
+        "skirt ripped at seam"
+      ]
+    },
+    {
+      "name_zh": "风吹型（自然暴露/意外春光）",
+      "tags": [
+        "wind blowing skirt up",
+        "dress lifting in breeze",
+        "hair and fabric flying",
+        "skirt caught by sudden gust",
+        "hem flipping up revealing thigh",
+        "wind pressing fabric tight against body showing silhouette",
+        "wind blowing shirt open",
+        "coat flapping wide",
+        "dress plastered to body by wind",
+        "every curve outlined",
+        "wind blowing hair across face obscuring view",
+        "parasol blown away",
+        "hat flying off",
+        "ribbon untying in wind",
+        "fan blowing upskirt",
+        "hem fluttering in draft",
+        "fabric rippling"
+      ]
+    },
+    {
+      "name_zh": "打湿型（水/雨/液体浸透）",
+      "tags": [
+        "wet clothes clinging to body",
+        "soaked dress showing skin beneath",
+        "rain-soaked white shirt",
+        "wet fabric transparent on breasts",
+        "drenched and dripping",
+        "clothes heavy with water",
+        "wet t-shirt clinging to nipples",
+        "soaked through revealing outline",
+        "shower-wet clothes stuck to skin",
+        "drenched hair and dress",
+        "splashed by puddle",
+        "soaked from rain",
+        "wet from pool",
+        "clothes dripping water onto floor",
+        "puddle forming at feet",
+        "wet socks",
+        "wet shoes squelching",
+        "soaked underwear visible through skirt",
+        "wet dress clinging to ass",
+        "wet skirt stuck between thighs"
+      ]
+    },
+    {
+      "name_zh": "汗湿型（运动/性爱/高温）",
+      "tags": [
+        "sweat-soaked top",
+        "clothes damp from heat",
+        "perspiration staining fabric",
+        "shirt sticking to back from sweat",
+        "sports bra soaked through",
+        "sweat patches visible under arms",
+        "damp collar from exertion",
+        "clothes clinging from body heat",
+        "fabric darkened by sweat",
+        "gym clothes drenched",
+        "workout outfit sweat-stained",
+        "after-sex clothes thrown on hastily still damp",
+        "thigh-highs soaked with sweat",
+        "stockings damp and clinging",
+        "sweat running through clothes",
+        "fabric glued to skin by moisture"
+      ]
+    },
+    {
+      "name_zh": "凌乱型（事后/仓促/生活感）",
+      "tags": [
+        "clothes wrinkled from sleep",
+        "shirt inside-out",
+        "buttoned wrong",
+        "dress on backwards",
+        "collar askew",
+        "hem tucked into underwear",
+        "one shoe on one off",
+        "stockings rolled unevenly",
+        "bra on over shirt",
+        "sweater inside-out",
+        "jacket half-on",
+        "shirt untucked on one side",
+        "zipper half-up",
+        "belt dangling",
+        "post-sex outfit hastily thrown on",
+        "mismatched clothes",
+        "pajama top with skirt",
+        "nightgown with heels",
+        "robe over nothing",
+        "hair still messy from pillow",
+        "one earring missing",
+        "makeup half-done"
+      ]
+    },
+    {
+      "name_zh": "破旧型（时间/磨损/痕迹）",
+      "tags": [
+        "faded fabric",
+        "worn thin from washing",
+        "threadbare at elbows",
+        "pilling sweater",
+        "stretched-out neckline",
+        "fraying hem",
+        "faded bra elastic",
+        "stretched-out panties",
+        "worn-out lace",
+        "old tank top with holes",
+        "thinning fabric showing skin through",
+        "yellowed white shirt",
+        "dingy fabric",
+        "old cotton worn soft",
+        "threadbare stockings",
+        "laddered tights",
+        "run in stocking",
+        "patched knee",
+        "mended seam visible",
+        "safety pin holding together",
+        "vintage worn lingerie",
+        "retro faded colors",
+        "well-loved garment"
+      ]
+    },
+    {
+      "name_zh": "遮挡失败型（意外暴露/想遮遮不住）",
+      "tags": [
+        "hand trying to cover breasts but too small",
+        "arm across chest not enough",
+        "grabbing torn fabric to cover",
+        "clutching towel that's too short",
+        "crossing legs but skirt still shows everything",
+        "turning away but seen",
+        "bent over and skirt rides up",
+        "reaching up and shirt lifts",
+        "squatting and panties visible",
+        "sitting and legs accidentally open",
+        "leaning forward and cleavage spills out",
+        "stretching and top lifts",
+        "bending to pick up and ass exposed",
+        "tripping and clothes fly",
+        "wind blowing hand-held skirt",
+        "one hand on breast one on crotch",
+        "desperately covering with both hands",
+        "embarrassed exposure"
+      ]
+    }
+  ],
+  "liquid_systems": [
+    {
+      "name_zh": "精液（Cum）",
+      "attributes": {
+        "量词（必选其一）": [
+          "single drop",
+          "thin streak",
+          "faint trace",
+          "one droplet",
+          "barely visible trace",
+          "wispy thin line",
+          "minuscule amount",
+          "tiny globule",
+          "micro droplet",
+          "fine thread"
+        ],
+        "质地（选 1-2 个）": [
+          "translucent milky fluid",
+          "slightly yellowish tint",
+          "egg-white viscosity",
+          "almost transparent",
+          "watery consistency",
+          "thin enough to see skin color through",
+          "sticky viscosity",
+          "stringy texture when pulled",
+          "viscous gel-like consistency",
+          "surface tension holding droplet shape",
+          "semi-transparent opalescent sheen"
+        ],
+        "皮肤接触真实感（必选 2-3 个）": [
+          "cum conforming to skin texture",
+          "fluid settling into wrinkle lines",
+          "specular highlights on droplet surface",
+          "light refracting through thin layer",
+          "cum thinning at edges where it meets skin",
+          "gradual opacity fade at borders",
+          "glistening wet catch rim light",
+          "translucent showing skin color beneath",
+          "caustics effect in droplet",
+          "tiny rainbow refractions in fluid",
+          "light bending through fluid layer",
+          "glossy wet surface reflection",
+          "fluid following skin pore pattern",
+          "meniscus curve at droplet edge"
+        ],
+        "粘性/拉丝（选 1 个）": [
+          "sticky thread connecting surfaces",
+          "stretchy strand before breaking",
+          "viscous string pulling between points",
+          "elastic fluid trail",
+          "glue-like consistency when stretched",
+          "spiderweb-thin thread"
+        ],
+        "物理行为（选 1 个）": [
+          "viscous drop slowly sliding down",
+          "surface tension holding droplet shape",
+          "cum stretching in thin thread before breaking",
+          "droplet pooling in skin crease",
+          "gravity pulling fluid downward",
+          "droplet hanging before falling",
+          "fluid accumulating at lowest point",
+          "thin film coating skin surface"
+        ],
+        "颜射负面提示": [
+          "cum covering entire face",
+          "opaque white mask",
+          "paint-like coating",
+          "cum in eyes",
+          "cum blocking nose",
+          "cum on eyelashes",
+          "evenly distributed facial",
+          "symmetrical splatter"
+        ]
+      }
+    },
+    {
+      "name_zh": "乳液/母乳（Breast Milk）",
+      "attributes": {
+        "量词（必选其一）": [
+          "few drops",
+          "single droplet",
+          "faint trickle",
+          "thin line",
+          "barely leaking"
+        ],
+        "质地（选 1 个）": [
+          "thin watery milk",
+          "translucent white",
+          "slightly bluish tint"
+        ],
+        "皮肤接触（选 2 个）": [
+          "milk droplet conforming to nipple shape",
+          "thin stream following breast curve",
+          "translucent fluid catching light",
+          "wet trail on warm skin"
+        ],
+        "负面提示": [
+          "pure white",
+          "opaque",
+          "paint-like",
+          "massive spray",
+          "flooding",
+          "random placement"
+        ]
+      }
+    },
+    {
+      "name_zh": "淫水/爱液（Pussy Juice/Vaginal Fluid）",
+      "attributes": {
+        "质地描述（必须包含颜色限定词）": [
+          "clear slippery fluid",
+          "thin transparent liquid",
+          "colorless clear lubricant",
+          "water-clear fluid",
+          "not white",
+          "not milky",
+          "no white tint",
+          "transparent like water",
+          "clear not opaque"
+        ],
+        "量感（必选）": [
+          "subtle wetness",
+          "thin sheen",
+          "faint glistening",
+          "slight dampness",
+          "barely moist",
+          "light wetness",
+          "minimal fluid",
+          "just a hint of moisture"
+        ],
+        "位置（只选 1 处）": [
+          "subtle wetness on inner labia",
+          "glistening faintly thin wet trail running down inner thigh slight dampness spreading on panties faint glistening on mons pubis"
+        ],
+        "与精液混合（少量）": [
+          "thin white cum mixed with clear wetness",
+          "subtle mixed fluids on thigh",
+          "faint creampie leaking"
+        ]
+      }
+    },
+    {
+      "name_zh": "尿液（Urine/Piss）",
+      "attributes": {
+        "质地描述": [
+          "clear yellow fluid",
+          "pale straw color",
+          "transparent liquid",
+          "slightly darker when concentrated",
+          "very thin and watery",
+          "less viscous than other fluids",
+          "natural yellow tint",
+          "not fluorescent"
+        ],
+        "表面交互": [
+          "urine splashing where it hits hard floor",
+          "urine soaking into fabric creating dark halo",
+          "steam rising from warm urine on cold surface",
+          "urine mixing with bath water diluting",
+          "bubbles forming in puddle",
+          "urine running along tile grout"
+        ],
+        "位置": [
+          "urine running down inner thighs in thin streams",
+          "urine soaking through panties from crotch outward",
+          "puddle forming under standing figure",
+          "urine dripping from hem of skirt",
+          "urine trail on floor"
+        ],
+        "光线": [
+          "urine catching light as thin transparent layer",
+          "golden tint under warm light",
+          "steam visible in backlight",
+          "urine soaking through fabric creating visible outline of skin beneath"
+        ]
+      }
+    },
+    {
+      "name_zh": "汗液（Sweat）",
+      "attributes": {
+        "描述": [
+          "sweat beads forming on skin",
+          "perspiration sheen",
+          "body glistening",
+          "thin moisture layer",
+          "damp skin glow",
+          "individual droplets visible",
+          "continuous wet sheen",
+          "afterglow perspiration"
+        ],
+        "流动动态": [
+          "sweat bead rolling down temple",
+          "droplet tracing jawline then dripping from chin",
+          "sweat running down spine in single stream",
+          "beads collecting in collarbone hollow then overflowing",
+          "sweat tracing between breasts following gravity"
+        ],
+        "位置": [
+          "sweat on forehead and temples",
+          "sweat running down neck",
+          "droplets between breasts",
+          "sheen on stomach",
+          "sweat on lower back",
+          "damp inner thighs",
+          "sweat dripping from chin tip",
+          "glistening collarbone"
+        ],
+        "光线": [
+          "sweat catching rim light as tiny sparkles",
+          "body sheen from moisture layer",
+          "specular highlights on droplets",
+          "skin glow from thin moisture",
+          "backlight showing sweat beads"
+        ]
+      }
+    },
+    {
+      "name_zh": "唾液（Saliva）",
+      "attributes": {
+        "描述": [
+          "saliva string stretching between lips",
+          "thin drool thread",
+          "transparent sticky strand",
+          "glossy wet mouth",
+          "saliva trail",
+          "stretchy spit connecting surfaces",
+          "watery and clear"
+        ],
+        "流动动态": [
+          "saliva dripping from corner of relaxed mouth",
+          "thin strand stretching from lower lip then breaking",
+          "drool pooling at chin",
+          "saliva trail from mouth to skin",
+          "spit string connecting tongue to lip"
+        ],
+        "位置": [
+          "drool from corner of mouth",
+          "saliva on chin",
+          "spit trail on body",
+          "wet kiss mark with saliva",
+          "saliva mixed with cum on tongue",
+          "drool on pillow",
+          "saliva dripping onto partner"
+        ],
+        "光线": [
+          "saliva string catching light as thin bright line",
+          "glossy mouth reflecting light",
+          "drool glistening on chin",
+          "transparent strand visible only by light refraction",
+          "colorless transparent saliva",
+          "water-clear drool",
+          "no white tint in saliva",
+          "clear fluid not opaque"
+        ]
+      }
+    },
+    {
+      "name_zh": "泡沫/泡泡（Foam/Bubbles）",
+      "attributes": {
+        "泡沫质地（蓬松轻盈）": [
+          "fluffy white foam",
+          "airy soap bubbles",
+          "dense bath foam",
+          "creamy lather",
+          "soft suds",
+          "frothy bubbles",
+          "cloud-like foam texture",
+          "whipped cream-like foam",
+          "voluminous bubble clusters"
+        ],
+        "泡泡外观（虹彩透明）": [
+          "iridescent soap bubbles",
+          "rainbow sheen on bubble surface",
+          "translucent bubble walls",
+          "thin soap film",
+          "bubbles with oil-slick colors",
+          "prismatic bubble reflections",
+          "light passing through bubbles",
+          "shimmering bubble clusters"
+        ],
+        "泡沫状态（蓬松堆积）": [
+          "foam piled on chest",
+          "bubbles clinging to shoulders",
+          "foam covering breasts like soft clouds",
+          "bath foam overflowing",
+          "bubble bath mounds",
+          "foam sitting on skin surface",
+          "froth y layer on water",
+          "foam clinging to curves"
+        ],
+        "泡泡动态（轻盈漂浮）": [
+          "bubbles floating on water surface",
+          "foam slowly dissipating",
+          "bubbles popping gently",
+          "foam sliding down skin in soft sheets",
+          "bubbles clustering together",
+          "foam rising with steam"
+        ],
+        "位置（洗浴场景）": [
+          "foam covering chest and shoulders",
+          "fluffy white bubbles bubble bath foam piled on breasts",
+          "soft iridescent sheen soap suds on wet skin",
+          "rainbow reflections on bubbles bath foam overflowing from tub",
+          "frothy white mounds bubbles clinging to arms and legs",
+          "translucent spheres"
+        ],
+        "光线（虹彩效果）": [
+          "bubbles catching light with rainbow sheen",
+          "iridescent soap film showing oil-slick colors",
+          "prismatic reflections in bubble walls",
+          "light passing through translucent bubbles",
+          "foam edges glistening with soft white glow",
+          "rainbow refractions on bubble surfaces"
+        ],
+        "正确使用示例": [
+          "fluffy white bath foam covering chest",
+          "iridescent bubbles on shoulders",
+          "soap bubbles with rainbow sheen",
+          "foam clinging to wet skin",
+          "soft cloud-like lather",
+          "translucent bubble walls catching light"
+        ]
+      }
+    }
+  ],
+  "liquid_effects": [
+    {
+      "id": "none",
+      "name_zh": "无特殊液体 (No Liquid Effect)",
+      "tags": []
+    },
+    {
+      "id": "sweat_glistening",
+      "name_zh": "💦 微汗晶莹 (Fine Perspiration & Sweat Sheen)",
+      "tags": [
+        "fine perspiration glistening on skin",
+        "beads of sweat rolling down chest",
+        "dewy sweaty sheen"
+      ]
+    },
+    {
+      "id": "wet_water_drops",
+      "name_zh": "🚿 沐浴水珠 (Water Droplets & Shower Wetness)",
+      "tags": [
+        "water droplets running down skin",
+        "freshly showered wet skin glistening",
+        "trickling water streams"
+      ]
+    },
+    {
+      "id": "saliva_drool",
+      "name_zh": "👄 唾液拉丝 (Saliva String & Wet Lips)",
+      "tags": [
+        "saliva string between parted lips",
+        "wet glistening chin",
+        "sloppy kiss moisture trail"
+      ]
+    },
+    {
+      "id": "pussy_juice",
+      "name_zh": "🌊 爱液湿润 (Female Arousal Fluids)",
+      "tags": [
+        "glistening pussy juice on inner thighs",
+        "wet slick moisture trail dripping",
+        "aroused lubrication"
+      ]
+    },
+    {
+      "id": "cum_splatter",
+      "name_zh": "🥛 颜射/精液残留 (Cum Splatter & Semen Residual)",
+      "tags": [
+        "traces of white cum on skin",
+        "drops of semen dripping on stomach",
+        "milky white fluid glistening"
+      ]
+    },
+    {
+      "id": "body_oil_lube",
+      "name_zh": "🧴 按摩精油 (Massage Oil / Lube Sheen)",
+      "tags": [
+        "slick massage oil glistening across body",
+        "glossy lubricated skin surface",
+        "shiny oil sheen"
+      ]
+    }
+  ]
+}

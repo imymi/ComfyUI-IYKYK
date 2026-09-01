@@ -1,0 +1,647 @@
+{
+  "categories": [
+    {
+      "id": "qipao",
+      "name_zh": "旗袍 (Qipao/Cheongsam)",
+      "tags": [
+        "silk qipao",
+        "high slit cheongsam",
+        "traditional Chinese dress",
+        "form-fitting silk",
+        "mandarin collar",
+        "embroidered flowers"
+      ]
+    },
+    {
+      "id": "hanfu",
+      "name_zh": "汉服/古风 (Hanfu)",
+      "tags": [
+        "flowing hanfu",
+        "traditional silk robe",
+        "wide sleeves",
+        "tulle fabric",
+        "embroidered ribbons",
+        "delicate gauze"
+      ]
+    },
+    {
+      "id": "modern_chinese",
+      "name_zh": "新中式/改良国风",
+      "tags": [
+        "modern modified qipao",
+        "short silk cheongsam",
+        "hollow chest detail",
+        "sheer sleeves",
+        "modern Chinese style"
+      ]
+    },
+    {
+      "id": "kimono",
+      "name_zh": "和服 (Kimono)",
+      "tags": [
+        "formal silk kimono",
+        "patterned obi sash",
+        "traditional Japanese kimono",
+        "loose collar",
+        "layered fabric"
+      ]
+    },
+    {
+      "id": "yukata",
+      "name_zh": "浴衣 (Yukata)",
+      "tags": [
+        "cotton summer yukata",
+        "loose yukata robe",
+        "untied obi sash",
+        "open collar yukata",
+        "onsen bath yukata"
+      ]
+    },
+    {
+      "id": "furisode",
+      "name_zh": "振袖 (Furisode)",
+      "tags": [
+        "formal furisode kimono",
+        "long swinging sleeves",
+        "ornate floral embroidery",
+        "golden obi sash"
+      ]
+    },
+    {
+      "id": "jk_seifuku",
+      "name_zh": "水手服 (JK Sailor Suit)",
+      "tags": [
+        "Japanese school uniform",
+        "sailor collar",
+        "pleated mini skirt",
+        "sailor scarf",
+        "white short sleeve shirt",
+        "navy blue skirt"
+      ]
+    },
+    {
+      "id": "blazer_uniform",
+      "name_zh": "西装校服 (Blazer Uniform)",
+      "tags": [
+        "school blazer",
+        "plaid pleated skirt",
+        "collared shirt",
+        "school necktie",
+        "knee-high socks"
+      ]
+    },
+    {
+      "id": "gym_uniform",
+      "name_zh": "体育服/死库水 (Gym Bloomer / Sukumizu)",
+      "tags": [
+        "navy blue bloomers",
+        "white gym t-shirt",
+        "retro Japanese gym uniform",
+        "classic sukumizu swimsuit",
+        "name tag on chest"
+      ]
+    },
+    {
+      "id": "hanbok",
+      "name_zh": "韩服 (Hanbok)",
+      "tags": [
+        "traditional Korean hanbok",
+        "jeogori jacket",
+        "chima billowing skirt",
+        "vivid colorful ribbons"
+      ]
+    },
+    {
+      "id": "korean_school",
+      "name_zh": "韩系校服 (Korean Uniform)",
+      "tags": [
+        "fitted school uniform",
+        "tight pencil skirt",
+        "white slim shirt",
+        "yellow jacket",
+        "korean schoolgirl"
+      ]
+    },
+    {
+      "id": "ol_suit",
+      "name_zh": "职场OL西装 (Office Lady Suit)",
+      "tags": [
+        "fitted black blazer",
+        "white button-down blouse",
+        "tight pencil skirt",
+        "sheer black pantyhose",
+        "high heels",
+        "office badge"
+      ]
+    },
+    {
+      "id": "nurse_uniform",
+      "name_zh": "护士服 (Nurse Uniform)",
+      "tags": [
+        "white nurse dress",
+        "nurse cap with red cross",
+        "short pink nurse dress",
+        "white stockings",
+        "stethoscope around neck"
+      ]
+    },
+    {
+      "id": "maid_dress",
+      "name_zh": "女仆装 (Maid Dress)",
+      "tags": [
+        "French maid dress",
+        "frilly white apron",
+        "black dress",
+        "lace headpiece",
+        "white thigh-high stockings",
+        "petticoat"
+      ]
+    },
+    {
+      "id": "waitress_uniform",
+      "name_zh": "餐厅服务员/女仆咖啡",
+      "tags": [
+        "cute waitress uniform",
+        "short apron",
+        "buttoned vest",
+        "bow tie",
+        "fitted skirt"
+      ]
+    },
+    {
+      "id": "lingerie_lace",
+      "name_zh": "蕾丝情趣内衣 (Lace Lingerie)",
+      "tags": [
+        "black lace bra",
+        "matching lace panties",
+        "strappy lingerie set",
+        "garter belt",
+        "sheer lace cups",
+        "underwire support"
+      ]
+    },
+    {
+      "id": "silk_robe",
+      "name_zh": "丝绸睡袍/晨袍 (Silk Robe)",
+      "tags": [
+        "satin nightgown",
+        "silk robe slipping off shoulder",
+        "loose bathrobe",
+        "untied belt",
+        "semi-transparent nightie"
+      ]
+    },
+    {
+      "id": "camisole_slip",
+      "name_zh": "吊带睡裙 (Camisole Slip)",
+      "tags": [
+        "thin strap silk slip",
+        "lace trim camisole",
+        "short satin nightdress",
+        "backless slip dress"
+      ]
+    },
+    {
+      "id": "bikini_micro",
+      "name_zh": "微型比基尼 (Micro Bikini)",
+      "tags": [
+        "string bikini",
+        "micro triangle bikini top",
+        "tiny bikini bottoms",
+        "tie sides",
+        "minimal fabric coverage"
+      ]
+    },
+    {
+      "id": "one_piece_swimsuit",
+      "name_zh": "高叉连体泳衣 (High-leg Swimsuit)",
+      "tags": [
+        "high-cut one-piece swimsuit",
+        "deep plunging neckline",
+        "tight backless swimsuit",
+        "high leg opening"
+      ]
+    },
+    {
+      "id": "latex_catsuit",
+      "name_zh": "乳胶紧身衣 (Latex Catsuit)",
+      "tags": [
+        "glossy black latex catsuit",
+        "shiny PVC bodysuit",
+        "form-fitting rubber suit",
+        "zipper down front"
+      ]
+    },
+    {
+      "id": "leather_corset",
+      "name_zh": "皮革束腰/胸衣 (Leather Corset)",
+      "tags": [
+        "black leather corset",
+        "laced up tight",
+        "strappy leather harness",
+        "buckles and studs",
+        "push-up cups"
+      ]
+    },
+    {
+      "id": "bunny_suit",
+      "name_zh": "兔女郎装 (Bunny Girl Suit)",
+      "tags": [
+        "satin bunny suit",
+        "bunny ears headband",
+        "fluffy white tail",
+        "white collar and bow tie",
+        "fishnet stockings"
+      ]
+    },
+    {
+      "id": "cheerleader",
+      "name_zh": "啦啦队服 (Cheerleader)",
+      "tags": [
+        "sleeveless cheerleader crop top",
+        "mini pleated skirt",
+        "pompoms",
+        "vivid team colors"
+      ]
+    },
+    {
+      "id": "evening_dress",
+      "name_zh": "露背晚礼服 (Backless Evening Gown)",
+      "tags": [
+        "elegant backless evening dress",
+        "high side slit",
+        "silk floor-length gown",
+        "deep V-neck"
+      ]
+    },
+    {
+      "id": "street_casual",
+      "name_zh": "街头随性/日常T恤",
+      "tags": [
+        "oversized graphic t-shirt",
+        "denim shorts",
+        "off-shoulder sweatshirt",
+        "casual crop top"
+      ]
+    },
+    {
+      "id": "party_club",
+      "name_zh": "夜店紧身包臀裙 (Club Mini Dress)",
+      "tags": [
+        "bodycon mini dress",
+        "metallic glitter fabric",
+        "spaghetti strap tight dress",
+        "cutout side details"
+      ]
+    },
+    {
+      "id": "knit_sweater",
+      "name_zh": "露背毛衣/童贞杀 (Knit Sweater)",
+      "tags": [
+        "virgin killer knit sweater",
+        "backless chunky knit",
+        "oversized knitted sweater slipping off"
+      ]
+    }
+  ],
+  "clothing_states": [
+    {
+      "id": "auto_link",
+      "name_zh": "自动联动裸露等级 (Auto Link Nudity)",
+      "tags": []
+    },
+    {
+      "id": "normal",
+      "name_zh": "整齐穿着 (Normal Wearing)",
+      "tags": [
+        "neatly dressed",
+        "crisp clothing"
+      ]
+    },
+    {
+      "id": "unbuttoned",
+      "name_zh": "解开纽扣 (Unbuttoned)",
+      "tags": [
+        "blouse unbuttoned",
+        "buttons undone revealing cleavage",
+        "shirt open at chest"
+      ]
+    },
+    {
+      "id": "slipping_off",
+      "name_zh": "吊带滑落/半脱 (Slipping Off)",
+      "tags": [
+        "strap slipping off shoulder",
+        "dress sliding down",
+        "sweater falling off one shoulder"
+      ]
+    },
+    {
+      "id": "lifted_up",
+      "name_zh": "裙摆掀起 (Skirt Lifted Up)",
+      "tags": [
+        "skirt hiked up to waist",
+        "skirt pulled up revealing panties",
+        "dress hitched up"
+      ]
+    },
+    {
+      "id": "pulled_down",
+      "name_zh": "内衣拉下 (Pulled Down)",
+      "tags": [
+        "bra pulled down exposing breasts",
+        "panties pulled to one side",
+        "waistband pulled low"
+      ]
+    },
+    {
+      "id": "wet_clinging",
+      "name_zh": "湿身紧贴透光 (Wet & Clinging)",
+      "tags": [
+        "wet clothes clinging tightly to skin",
+        "translucent wet fabric",
+        "fabric soaked through outline visible"
+      ]
+    },
+    {
+      "id": "sweat_soaked",
+      "name_zh": "汗湿透光 (Sweat-soaked)",
+      "tags": [
+        "sweat-soaked shirt sticking to body",
+        "damp fabric clinging to curves",
+        "perspiration on chest"
+      ]
+    },
+    {
+      "id": "torn_shredded",
+      "name_zh": "撕裂破损 (Torn & Shredded)",
+      "tags": [
+        "torn clothing",
+        "ripped stockings",
+        "shredded fabric edges",
+        "torn seams"
+      ]
+    },
+    {
+      "id": "disheveled",
+      "name_zh": "衣衫不整/凌乱 (Disheveled/Messy)",
+      "tags": [
+        "messy disheveled clothing",
+        "crooked collar",
+        "untucked shirt",
+        "rumpled fabric"
+      ]
+    },
+    {
+      "id": "only_lingerie",
+      "name_zh": "仅剩内衣/丝袜 (Only Lingerie)",
+      "tags": [
+        "only lace panties remaining",
+        "topless with thigh-high stockings",
+        "bare chest with garter"
+      ]
+    },
+    {
+      "id": "discarded",
+      "name_zh": "脱掉散落一旁 (Discarded on Floor)",
+      "tags": [
+        "clothes discarded on floor",
+        "dress tossed aside",
+        "clothes scattered beside bed"
+      ]
+    }
+  ],
+  "clothing_nudity_linkage": {
+    "L1": {
+      "description": "L1 包裹暗示 (Wrapped/Suggestive)",
+      "general_tags": [
+        "neatly dressed",
+        "form-fitting clothing",
+        "body curves outlined through fabric",
+        "tight clinging fabric"
+      ],
+      "state_name": "整齐穿着/紧身勾勒",
+      "style_overrides": {
+        "qipao": [
+          "tight-fitting silk qipao",
+          "high mandarin collar",
+          "silk hugging silhouette curves"
+        ],
+        "jk_seifuku": [
+          "neatly worn sailor uniform",
+          "tucked white shirt",
+          "crisp pleated skirt"
+        ],
+        "ol_suit": [
+          "fitted black blazer",
+          "buttoned-up white blouse",
+          "tight pencil skirt"
+        ],
+        "kimono": [
+          "formal Japanese kimono",
+          "tightly tied obi sash",
+          "elegant traditional robe"
+        ],
+        "one_piece_swimsuit": [
+          "tight one-piece swimsuit",
+          "compression fabric hugging body curves"
+        ],
+        "silk_robe": [
+          "silk robe tightly wrapped with sash tied",
+          "satin slip hugging silhouette"
+        ]
+      }
+    },
+    "L2": {
+      "description": "L2 差分微露 (1-2 Subtle Peeks)",
+      "general_tags": [
+        "collar unbuttoned",
+        "strap slipping off shoulder",
+        "high slit showing bare leg",
+        "subtle cleavage peeking",
+        "collarbone exposed"
+      ],
+      "state_name": "解开1-2颗扣/香肩滑落",
+      "style_overrides": {
+        "qipao": [
+          "silk qipao with high thigh slit",
+          "bare leg exposed to upper thigh",
+          "mandarin collar unbuttoned"
+        ],
+        "jk_seifuku": [
+          "sailor collar loosened",
+          "collarbone visible",
+          "pleated miniskirt swaying"
+        ],
+        "ol_suit": [
+          "blouse unbuttoned from top, 2 buttons undone",
+          "cleavage peeking",
+          "black pantyhose"
+        ],
+        "kimono": [
+          "kimono collar loose at neck",
+          "bare nape and shoulder revealed",
+          "loosened obi sash"
+        ],
+        "silk_robe": [
+          "silk robe slipping off one shoulder",
+          "thin strap slipping down"
+        ]
+      }
+    },
+    "L3": {
+      "description": "L3 半裸诱惑 (Half Nude / Underboob / Cleavage)",
+      "general_tags": [
+        "shirt open at chest revealing lace bra",
+        "underboob visible",
+        "sideboob peeking",
+        "dress bunched at waist",
+        "skirt hitched up showing panties"
+      ],
+      "state_name": "纽扣全解/南半球外露/内衣若现",
+      "style_overrides": {
+        "qipao": [
+          "qipao hollow cutout",
+          "sideboob exposed",
+          "skirt pulled high on hips showing panties"
+        ],
+        "jk_seifuku": [
+          "sailor top unbuttoned wide showing lace bra",
+          "pleated skirt lifted showing panties"
+        ],
+        "ol_suit": [
+          "blouse fully unbuttoned hanging open over black lace bra",
+          "tight pencil skirt hitched up"
+        ],
+        "kimono": [
+          "kimono wide open at chest",
+          "silk robe falling off shoulders showing bra"
+        ],
+        "silk_robe": [
+          "silk nightgown falling open",
+          "sheer lace bra exposed underneath",
+          "robe sliding down"
+        ]
+      }
+    },
+    "L4": {
+      "description": "L4 重点暴露 (Topless / Panties Only)",
+      "general_tags": [
+        "topless",
+        "bare breasts exposed",
+        "shirt pulled down to waist",
+        "skirt remaining on hips",
+        "only lace panties remaining"
+      ],
+      "state_name": "上衣脱掉/下身仅穿内裤/重点暴露",
+      "style_overrides": {
+        "qipao": [
+          "qipao pulled down to waist",
+          "topless",
+          "bare breasts exposed",
+          "silk dress gathered at hips"
+        ],
+        "jk_seifuku": [
+          "topless",
+          "sailor uniform shirt pulled down",
+          "bare breasts",
+          "pleated skirt still on"
+        ],
+        "ol_suit": [
+          "blouse completely removed",
+          "topless",
+          "bare chest",
+          "tight pencil skirt still on",
+          "black stockings"
+        ],
+        "kimono": [
+          "kimono bunched at waist",
+          "upper body completely bare",
+          "silk robe framing hips"
+        ],
+        "silk_robe": [
+          "topless",
+          "satin robe gathered around waist",
+          "bare breasts completely exposed"
+        ]
+      }
+    },
+    "L5": {
+      "description": "L5 极致全裸 (Full Nude)",
+      "general_tags": [
+        "completely naked",
+        "fully bare body",
+        "clothes discarded on floor",
+        "dress tossed aside beside bed",
+        "bare skin glowing"
+      ],
+      "state_name": "全部脱下/衣物散落一旁/极致全裸",
+      "style_overrides": {
+        "qipao": [
+          "completely naked",
+          "silk qipao discarded on floor",
+          "fully bare body",
+          "bare skin"
+        ],
+        "jk_seifuku": [
+          "fully nude",
+          "sailor uniform and skirt tossed aside on desk",
+          "completely bare skin",
+          "loose socks"
+        ],
+        "ol_suit": [
+          "all clothes removed",
+          "blazer and blouse discarded on chair",
+          "completely naked body",
+          "black high heels"
+        ],
+        "kimono": [
+          "kimono spread on tatami floor as backdrop",
+          "completely nude body",
+          "bare skin glowing"
+        ],
+        "silk_robe": [
+          "completely naked on bed sheets",
+          "silk nightie cast aside on floor"
+        ]
+      }
+    },
+    "L6": {
+      "description": "L6 特写全见 (Erotic Explicit)",
+      "general_tags": [
+        "erotic close-up",
+        "spread legs",
+        "bare pussy visible",
+        "crotch close-up",
+        "all clothes removed and discarded nearby"
+      ],
+      "state_name": "大张双腿/私处特写全见",
+      "style_overrides": {
+        "qipao": [
+          "erotic close-up",
+          "spread legs",
+          "bare pussy visible",
+          "silk qipao cast aside"
+        ],
+        "jk_seifuku": [
+          "erotic macro detail",
+          "spread legs",
+          "bare pussy visible",
+          "sailor uniform tossed aside"
+        ],
+        "ol_suit": [
+          "intimate close-up",
+          "spread legs",
+          "bare pussy visible",
+          "pencil skirt and stockings discarded"
+        ],
+        "kimono": [
+          "erotic close-up",
+          "spread legs on tatami",
+          "bare pussy visible",
+          "kimono open underneath"
+        ]
+      }
+    }
+  }
+}

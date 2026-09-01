@@ -1,0 +1,585 @@
+{
+  "film_stocks": [
+    {
+      "id": "kodak_portra_400",
+      "name_zh": "Kodak Portra 400 (暖调人像·奶油肤色)",
+      "series": "🟡 暖调人像系",
+      "tags": [
+        "warm skin tones",
+        "fine grain",
+        "soft contrast",
+        "pastel colors",
+        "soft light",
+        "creamy skin",
+        "natural warmth",
+        "gentle highlight",
+        "pink undertones"
+      ],
+      "scenarios": "卧室私密、情人旅馆、素人日常"
+    },
+    {
+      "id": "kodak_gold_200",
+      "name_zh": "Kodak Gold 200 (暖金复古·温馨生活)",
+      "series": "🟡 暖调人像系",
+      "tags": [
+        "warm nostalgic tones",
+        "slightly grainy",
+        "golden cast",
+        "snapshot feel",
+        "warm highlights",
+        "yellow bias",
+        "home movie aesthetic",
+        "intimate warmth",
+        "faded warmth"
+      ],
+      "scenarios": "日常偷拍、家庭感、温馨时刻"
+    },
+    {
+      "id": "kodak_ektar_100",
+      "name_zh": "Kodak Ektar 100 (高饱和锐利·商业写真)",
+      "series": "🔴 高饱和鲜艳系",
+      "tags": [
+        "vivid saturated colors",
+        "rich reds",
+        "deep blues",
+        "ultra sharp",
+        "magazine quality",
+        "punchy contrast",
+        "high saturation",
+        "clean skin tones"
+      ],
+      "scenarios": "AV封面、商业写真、色彩浓烈"
+    },
+    {
+      "id": "fujifilm_superia_400",
+      "name_zh": "Fujifilm Superia 400 (日系生活·平民随拍)",
+      "series": "🟡 暖调人像系",
+      "tags": [
+        "warm color cast",
+        "everyday snapshot",
+        "consumer film look",
+        "soft colors",
+        "relaxed mood",
+        "casual warmth",
+        "faded contrast",
+        "nostalgic snapshot"
+      ],
+      "scenarios": "素人感、日常记录"
+    },
+    {
+      "id": "cinestill_800t",
+      "name_zh": "Cinestill 800T (霓虹夜景·电影光晕)",
+      "series": "🟡 暖调人像系",
+      "tags": [
+        "tungsten balanced",
+        "blue-ish shadows",
+        "cinematic halation",
+        "warm highlights",
+        "film with halation effect",
+        "night scene ready",
+        "cool tones",
+        "Hollywood cinema look"
+      ],
+      "scenarios": "夜景、霓虹、风俗街"
+    },
+    {
+      "id": "kodak_max_400",
+      "name_zh": "Kodak Max 400 (全能随拍·自然通透)",
+      "series": "🔴 高饱和鲜艳系",
+      "tags": [
+        "slightly washed out",
+        "soft contrast",
+        "vivid colors",
+        "everyday film",
+        "affordable consumer look",
+        "casual snapshot",
+        "natural skin tones"
+      ],
+      "scenarios": "素人感、随意感"
+    },
+    {
+      "id": "fujifilm_velvia_50",
+      "name_zh": "Fujifilm Velvia 50 (极致鲜艳·高反差冲击)",
+      "series": "🔴 高饱和鲜艳系",
+      "tags": [
+        "vivid saturated colors",
+        "rich greens",
+        "deep reds",
+        "punchy",
+        "high contrast",
+        "vivid saturation",
+        "Velvia punch",
+        "landscape colors"
+      ],
+      "scenarios": "户外露出、泳池、制服"
+    },
+    {
+      "id": "fujifilm_pro_400h",
+      "name_zh": "Fujifilm Pro 400H (唯美柔光·仙气粉青)",
+      "series": "🔴 高饱和鲜艳系",
+      "tags": [
+        "soft pastel",
+        "low contrast",
+        "dreamy",
+        "ethereal skin",
+        "airy colors",
+        "professional negative",
+        "delicate tones",
+        "soft highlight"
+      ],
+      "scenarios": "唯美写真、韩系通透"
+    },
+    {
+      "id": "fujifilm_classic_chrome",
+      "name_zh": "Fujifilm Classic Chrome (低饱和冷淡·纪实街拍)",
+      "series": "🟤 低饱和纪实系",
+      "tags": [
+        "muted colors",
+        "documentary tone",
+        "desaturated",
+        "journalistic",
+        "flat contrast",
+        "greyish",
+        "subdued",
+        "real-world feel"
+      ],
+      "scenarios": "街拍、OL职场、纪实偷拍"
+    },
+    {
+      "id": "fujifilm_classic_negative",
+      "name_zh": "Fujifilm Classic Negative (90年代昭和·复古胶卷)",
+      "series": "🟤 低饱和纪实系",
+      "tags": [
+        "retro muted",
+        "faded warmth",
+        "90s film look",
+        "vintage cast",
+        "slightly desaturated",
+        "nostalgic mood",
+        "retro skin tones",
+        "warm shadows"
+      ],
+      "scenarios": "昭和复古、和室、怀旧"
+    },
+    {
+      "id": "kodak_tmax_400",
+      "name_zh": "Kodak T-MAX 400 (专业黑白·细腻灰阶)",
+      "series": "🟤 低饱和纪实系",
+      "tags": [
+        "fine grain B&W",
+        "smooth tonal range",
+        "professional monochrome",
+        "neutral grey",
+        "clean blacks",
+        "documentary quality",
+        "realistic tones"
+      ],
+      "scenarios": "专业黑白人像、纪实风格"
+    },
+    {
+      "id": "fujifilm_acros_100",
+      "name_zh": "Fujifilm Acros 100 (和风黑白·丝滑质感)",
+      "series": "🟤 低饱和纪实系",
+      "tags": [
+        "rich tonal B&W",
+        "fine grain",
+        "smooth gradation",
+        "deep blacks",
+        "yellow filter tones",
+        "cool blacks",
+        "silky tones"
+      ],
+      "scenarios": "艺术裸体、和风黑白"
+    },
+    {
+      "id": "kodak_trix_400",
+      "name_zh": "Kodak Tri-X 400 (硬派粗粒·高反差黑白)",
+      "series": "⚫ 黑白/单色系",
+      "tags": [
+        "high contrast B&W",
+        "gritty grain",
+        "deep blacks",
+        "street photography",
+        "punchy contrast",
+        "classic B&W film",
+        "documentary feel",
+        "raw tone"
+      ],
+      "scenarios": "街头、监禁、硬派压抑"
+    },
+    {
+      "id": "ilford_hp5_plus",
+      "name_zh": "Ilford HP5 Plus (经典英伦·纪实黑白)",
+      "series": "⚫ 黑白/单色系",
+      "tags": [
+        "versatile B&W",
+        "natural contrast",
+        "fine grain",
+        "pushable",
+        "documentary feel",
+        "natural skin tones in B&W",
+        "classic monochrome"
+      ],
+      "scenarios": "日常黑白、纪实"
+    },
+    {
+      "id": "ilford_delta_3200",
+      "name_zh": "Ilford Delta 3200 (极暗光高感·强烈噪点)",
+      "series": "⚫ 黑白/单色系",
+      "tags": [
+        "ultra high speed",
+        "grain visible",
+        "pushed development",
+        "gritty detail",
+        "dark scene ready",
+        "high ISO film look"
+      ],
+      "scenarios": "暗光场景、粗粒黑白"
+    },
+    {
+      "id": "kodak_double_x",
+      "name_zh": "Kodak Double-X (50年代好莱坞·电影黑白)",
+      "series": "⚫ 黑白/单色系",
+      "tags": [
+        "cinematic B&W",
+        "classic Hollywood B&W",
+        "punchy contrast",
+        "theatrical",
+        "cinematic film stock",
+        "1950s cinema look"
+      ],
+      "scenarios": "电影感黑白、复古戏剧"
+    },
+    {
+      "id": "sepia_tone",
+      "name_zh": "Sepia Tone (复古暖棕·老照片)",
+      "series": "⚫ 黑白/单色系",
+      "tags": [
+        "warm brown monochrome",
+        "vintage antique tone",
+        "old photograph",
+        "nostalgic warmth",
+        "aged paper tone",
+        "Victorian feel"
+      ],
+      "scenarios": "复古怀旧、年代感"
+    },
+    {
+      "id": "fujifilm_ektachrome_e100",
+      "name_zh": "Fujifilm Ektachrome E100 (冷调正片·科技质感)",
+      "series": "🔵 冷调/特殊系",
+      "tags": [
+        "cool blue cast",
+        "slide film",
+        "vivid but cool",
+        "clinical tone",
+        "clean",
+        "professional slide",
+        "precise colors"
+      ],
+      "scenarios": "医疗场景、科技感"
+    },
+    {
+      "id": "fujifilm_provia_100f",
+      "name_zh": "Fujifilm Provia 100F (真实自然·标准中性反转片)",
+      "series": "🔵 冷调/特殊系",
+      "tags": [
+        "neutral color",
+        "balanced contrast",
+        "clean skin",
+        "natural",
+        "vivid but accurate",
+        "professional slide",
+        "slight warmth"
+      ],
+      "scenarios": "自然人像、真实记录"
+    },
+    {
+      "id": "lomography_color",
+      "name_zh": "Lomography Color (实验偏色·艺术交叉冲印)",
+      "series": "🔵 冷调/特殊系",
+      "tags": [
+        "experimental colors",
+        "unpredictable hues",
+        "vivid unusual tones",
+        "playful",
+        "artistic",
+        "cross-processed look",
+        "shifted colors"
+      ],
+      "scenarios": "艺术写真、创意风格"
+    },
+    {
+      "id": "cinestill_50d",
+      "name_zh": "Cinestill 50D (日光电影感·高端杂志)",
+      "series": "🔵 冷调/特殊系",
+      "tags": [
+        "daylight balanced",
+        "fine grain",
+        "clean highlights",
+        "cinematic",
+        "soft contrast",
+        "natural skin",
+        "Hollywood look"
+      ],
+      "scenarios": "日光电影感、高端写真"
+    },
+    {
+      "id": "expired_film",
+      "name_zh": "Expired Film (过期褪色胶片·破损记忆)",
+      "series": "🔵 冷调/特殊系",
+      "tags": [
+        "faded colors",
+        "shifted hues",
+        "foggy",
+        "low contrast",
+        "washed out",
+        "unpredictable color cast",
+        "degraded grain",
+        "vintage feel"
+      ],
+      "scenarios": "复古、年代感、破损记忆"
+    }
+  ],
+  "cinema_lenses": [
+    {
+      "id": "cooke_s4",
+      "name_zh": "Cooke S4 / 安琴 (暖柔电影感·奶油焦外)",
+      "tags": [
+        "creamy bokeh",
+        "warm skin tones",
+        "soft rendering",
+        "organic glow",
+        "smooth focus roll-off",
+        "gentle highlight bloom",
+        "flattering skin"
+      ]
+    },
+    {
+      "id": "arri_signature",
+      "name_zh": "ARRI Signature / 蔡司 (现代锐利·高分辨率细节)",
+      "tags": [
+        "clean sharp rendering",
+        "neutral color",
+        "precise detail",
+        "clinical beauty",
+        "large format look",
+        "cinematic clean",
+        "distortion-free"
+      ]
+    },
+    {
+      "id": "panavision_anamorphic",
+      "name_zh": "Panavision 宽银幕变形镜头 (好莱坞大片·蓝色拉丝耀斑)",
+      "tags": [
+        "anamorphic flare",
+        "oval bokeh",
+        "widescreen",
+        "classic Hollywood",
+        "blue streak flare",
+        "anamorphic squeeze",
+        "cinematic letterbox feel"
+      ]
+    },
+    {
+      "id": "leica_noctilux",
+      "name_zh": "Leica Noctilux 夜神 (梦幻奢华·极浅景深德味)",
+      "tags": [
+        "dreamy bokeh",
+        "3D depth",
+        "micro-contrast",
+        "jewel-like colors",
+        "shallow DOF",
+        "glow on highlights",
+        "soft magical bokeh"
+      ]
+    },
+    {
+      "id": "canon_85_12",
+      "name_zh": "Canon 85mm f/1.2L 红圈 (顶级人像·唯美柔美)",
+      "tags": [
+        "warm skin",
+        "creamy bokeh",
+        "professional portrait",
+        "soft out of focus",
+        "flattering",
+        "smooth bokeh",
+        "gentle rendering"
+      ]
+    },
+    {
+      "id": "helios_44_2",
+      "name_zh": "Helios 44-2 八羽怪 (复古旋转焦外·氛围感)",
+      "tags": [
+        "swirly bokeh",
+        "dreamy soft focus",
+        "vintage look",
+        "warm tones",
+        "soft glow",
+        "helios swirl",
+        "art-house feel"
+      ]
+    },
+    {
+      "id": "arri_dna",
+      "name_zh": "ARRI DNA (终极电影质感·大师导演视角)",
+      "tags": [
+        "legendary cinema look",
+        "organic rendering",
+        "imperceptible sharpness",
+        "smooth falloff",
+        "ultimate cinematic",
+        "warm skin",
+        "natural beauty"
+      ]
+    }
+  ],
+  "weather_moods": [
+    {
+      "id": "sunny",
+      "name_zh": "☀️ 晴天暖阳 (Sunny Day)",
+      "tags": [
+        "sunny day",
+        "bright sunlight",
+        "summer heat",
+        "golden afternoon",
+        "sweating in heat",
+        "harsh sunlight",
+        "bright shadows",
+        "hot day"
+      ]
+    },
+    {
+      "id": "rainy",
+      "name_zh": "🌧️ 湿润雨天 (Rainy Day)",
+      "tags": [
+        "rainy day",
+        "heavy rain",
+        "rain-soaked",
+        "dripping wet",
+        "rain on window",
+        "rain streaming down body",
+        "raindrops on skin",
+        "wet street reflections"
+      ]
+    },
+    {
+      "id": "overcast",
+      "name_zh": "🌫️ 阴天/晨雾 (Overcast & Fog)",
+      "tags": [
+        "overcast sky",
+        "foggy morning",
+        "misty",
+        "hazy light",
+        "moody grey sky",
+        "cloudy",
+        "flat light",
+        "diffused grey",
+        "atmospheric fog"
+      ]
+    },
+    {
+      "id": "snowy",
+      "name_zh": "❄️ 寒冷雪景 (Snowy Day)",
+      "tags": [
+        "snowy day",
+        "snowing outside",
+        "winter cold",
+        "frozen breath",
+        "flushed cheeks from cold",
+        "icy air",
+        "white landscape",
+        "cold atmosphere"
+      ]
+    },
+    {
+      "id": "night",
+      "name_zh": "🌙 昏暗夜晚 (Night Atmosphere)",
+      "tags": [
+        "night time",
+        "moonlit",
+        "city lights through window",
+        "neon glow outside",
+        "candle-lit room",
+        "dim interior",
+        "warm lamp light"
+      ]
+    },
+    {
+      "id": "sunset",
+      "name_zh": "🌇 黄昏夕阳 (Golden Hour / Sunset)",
+      "tags": [
+        "sunset",
+        "golden hour",
+        "dusk",
+        "twilight",
+        "pink sky",
+        "blue hour",
+        "warm sunset light",
+        "orange sky",
+        "magic hour"
+      ]
+    },
+    {
+      "id": "special",
+      "name_zh": "✨ 丁达尔光效/蒸汽 (Atmosphere & Steam)",
+      "tags": [
+        "steam",
+        "foggy room",
+        "haze",
+        "smoke",
+        "dust in light beam",
+        "god rays",
+        "shaft of light",
+        "dramatic lighting",
+        "candlelight"
+      ]
+    }
+  ],
+  "photography_styles": [
+    {
+      "id": "photo_styles",
+      "name_zh": "📷 摄影风格",
+      "tags": [
+        "cinematic film still",
+        "fashion editorial",
+        "boudoir photography",
+        "polaroid snapshot",
+        "vintage photo",
+        "candid shot",
+        "professional photography",
+        "documentary style",
+        "raw documentary",
+        "street photography style",
+        "night photography",
+        "golden hour portrait",
+        "studio portrait",
+        "editorial fashion",
+        "high fashion photography"
+      ]
+    },
+    {
+      "id": "erotic_styles",
+      "name_zh": "🔞 私密情色写真",
+      "tags": [
+        "private photo",
+        "leaked selfie",
+        "amateur photo",
+        "bedroom selfie",
+        "bathroom mirror selfie",
+        "hotel room photo",
+        "JAV screenshot",
+        "gravure idol",
+        "softcore",
+        "pin-up",
+        "nude art photography",
+        "erotic photography",
+        "intimate photography",
+        "sensual photography",
+        "boudoir shot",
+        "intimate portrait",
+        "tasteful erotic"
+      ]
+    }
+  ]
+}

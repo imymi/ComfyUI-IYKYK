@@ -1,0 +1,99 @@
+{
+  "characters": [
+    {
+      "id": "none",
+      "name_zh": "无特定身份 (General Girl)",
+      "tags": []
+    },
+    {
+      "id": "jk_schoolgirl",
+      "name_zh": "清纯女高/JK学妹 (High School Girl)",
+      "tags": [
+        "innocent Japanese high school girl",
+        "youthful student aura",
+        "sweet schoolgirl demeanor"
+      ]
+    },
+    {
+      "id": "ol_subordinate",
+      "name_zh": "职场新人OL/下属 (Office Lady Subordinate)",
+      "tags": [
+        "young office lady",
+        "subordinate in corporate office",
+        "diligent workplace demeanor"
+      ]
+    },
+    {
+      "id": "female_boss",
+      "name_zh": "高冷职场女上司 (Strict Female Boss)",
+      "tags": [
+        "mature female executive",
+        "confident dominant demeanor",
+        "authoritative office lady"
+      ]
+    },
+    {
+      "id": "married_housewife",
+      "name_zh": "温柔少妇/出轨人妻 (Lonely Housewife)",
+      "tags": [
+        "elegant married Japanese housewife",
+        "gentle mature demeanor",
+        "secret yearning housewife"
+      ]
+    },
+    {
+      "id": "strict_teacher",
+      "name_zh": "黑丝女教师/家庭教师 (Female Tutor/Teacher)",
+      "tags": [
+        "intellectual female teacher",
+        "glasses wearing tutor",
+        "strict yet alluring educator"
+      ]
+    },
+    {
+      "id": "kind_nurse",
+      "name_zh": "白衣天使小护士 (Young Hospital Nurse)",
+      "tags": [
+        "caring young hospital nurse",
+        "soft-spoken clinical demeanor",
+        "gentle medical nurse"
+      ]
+    },
+    {
+      "id": "french_maid",
+      "name_zh": "听话女仆/专属侍女 (Obedient Maid)",
+      "tags": [
+        "submissive French maid",
+        "polite devoted servant",
+        "bowing respectful demeanor"
+      ]
+    },
+    {
+      "id": "gravure_idol",
+      "name_zh": "写真偶像/女优 (Gravure Idol / Model)",
+      "tags": [
+        "glamorous gravure idol",
+        "confident bikini model",
+        "photogenic performer aura"
+      ]
+    },
+    {
+      "id": "hostess_cabaret",
+      "name_zh": "歌舞伎町陪酒女/风俗娘 (Cabaret Hostess)",
+      "tags": [
+        "glamorous cabaret club hostess",
+        "charming nightlife entertainer",
+        "seductive hostess"
+      ]
+    },
+    {
+      "id": "neighbor_girlfriend",
+      "name_zh": "邻家素人/合租女友 (Next-door Girlfriend)",
+      "tags": [
+        "sweet amateur girlfriend",
+        "approachable girl next door",
+        "natural casual charm"
+      ]
+    }
+  ]
+}

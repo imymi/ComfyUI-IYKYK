@@ -1,0 +1,169 @@
+{
+  "shot_types": [
+    {
+      "id": "extreme_close_up",
+      "name_zh": "大特写 ECU (局部细节/唇/乳/私处)",
+      "tags": [
+        "extreme close-up",
+        "macro detail shot",
+        "body part filling frame",
+        "shallow depth of field"
+      ]
+    },
+    {
+      "id": "close_up",
+      "name_zh": "近景 CU (面部表情/眼神)",
+      "tags": [
+        "close-up",
+        "face shot filling frame",
+        "portrait framing",
+        "focused on facial expression"
+      ]
+    },
+    {
+      "id": "medium_close_up",
+      "name_zh": "中近景 MCU (胸部以上/手部互动)",
+      "tags": [
+        "medium close-up",
+        "chest-up shot",
+        "upper body framing",
+        "hands interacting with body"
+      ]
+    },
+    {
+      "id": "medium_shot",
+      "name_zh": "中景 MS (腰部以上/半身动作)",
+      "tags": [
+        "medium shot",
+        "waist-up framing",
+        "half-body portrait",
+        "pose and environment balanced"
+      ]
+    },
+    {
+      "id": "medium_long_shot",
+      "name_zh": "中全景 MLS (膝盖以上/3/4全身)",
+      "tags": [
+        "medium long shot",
+        "knee-up shot",
+        "three-quarter body framing"
+      ]
+    },
+    {
+      "id": "full_body_shot",
+      "name_zh": "全景 LS (全身展示/环境氛围)",
+      "tags": [
+        "full body shot",
+        "wide shot",
+        "entire figure visible head to toe",
+        "environmental background"
+      ]
+    },
+    {
+      "id": "erotic_close_up",
+      "name_zh": "情色局部特写 (胸/臀/双腿间)",
+      "tags": [
+        "erotic close-up",
+        "breast and cleavage focus",
+        "crotch and inner thigh detail",
+        "sensual macro framing"
+      ]
+    }
+  ],
+  "camera_angles": [
+    {
+      "id": "eye_level",
+      "name_zh": "平视 (自然视线·中立)",
+      "tags": [
+        "eye level angle",
+        "straight-on camera",
+        "neutral perspective"
+      ]
+    },
+    {
+      "id": "low_angle",
+      "name_zh": "仰视 (由下至上·崇拜感/高大)",
+      "tags": [
+        "low angle shot",
+        "looking up from below",
+        "towering perspective"
+      ]
+    },
+    {
+      "id": "high_angle",
+      "name_zh": "俯视 (由上至下·掌控感/无助)",
+      "tags": [
+        "high angle shot",
+        "looking down from above",
+        "submissive angle"
+      ]
+    },
+    {
+      "id": "overhead_birds_eye",
+      "name_zh": "鸟瞰 (正上方顶视·上帝视角)",
+      "tags": [
+        "overhead top-down shot",
+        "directly above bed",
+        "bird eye view"
+      ]
+    },
+    {
+      "id": "worms_eye",
+      "name_zh": "蛙眼 (贴地极端仰拍)",
+      "tags": [
+        "worm eye view",
+        "extreme low angle ground level",
+        "floor level perspective"
+      ]
+    },
+    {
+      "id": "dutch_angle",
+      "name_zh": "斜角 (倾斜构图·不安张力)",
+      "tags": [
+        "dutch angle",
+        "tilted frame",
+        "canted angle",
+        "dynamic dramatic composition"
+      ]
+    },
+    {
+      "id": "over_the_shoulder",
+      "name_zh": "过肩视角 OTS (双人互动前景)",
+      "tags": [
+        "over the shoulder shot",
+        "OTS perspective",
+        "partner silhouette in foreground"
+      ]
+    },
+    {
+      "id": "pov_first_person",
+      "name_zh": "POV 主观第一人称视角 (代入感)",
+      "tags": [
+        "point of view",
+        "POV perspective",
+        "first person view",
+        "looking directly at camera"
+      ]
+    },
+    {
+      "id": "voyeur_peeping",
+      "name_zh": "偷窥视角 (门缝/窗帘后偷拍)",
+      "tags": [
+        "voyeur angle",
+        "peeping through door gap",
+        "hidden camera angle",
+        "foreground frame obstruction"
+      ]
+    },
+    {
+      "id": "between_legs_angle",
+      "name_zh": "情色特殊视角 (双腿间/裙底仰拍)",
+      "tags": [
+        "between legs angle",
+        "upskirt perspective",
+        "looking up from floor",
+        "crotch level view"
+      ]
+    }
+  ]
+}

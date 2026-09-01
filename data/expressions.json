@@ -1,0 +1,562 @@
+{
+  "emotions": [
+    {
+      "name": "😳 害羞/羞涩",
+      "tags": [
+        "shy expression",
+        "blushing cheeks",
+        "looking away",
+        "embarrassed smile",
+        "covering face",
+        "downcast eyes",
+        "timid look",
+        "coy smile",
+        "nervous lip bite",
+        "flustered face",
+        "rosy flush on cheeks",
+        "ears turning red",
+        "can't hold eye contact"
+      ]
+    },
+    {
+      "name": "😏 魅惑/诱惑",
+      "tags": [
+        "sultry gaze",
+        "bedroom eyes",
+        "seductive smile",
+        "half-closed eyes",
+        "licking lips",
+        "biting lower lip",
+        "intense stare",
+        "come-hither look",
+        "fuck-me eyes",
+        "smoldering gaze",
+        "knowing smirk",
+        "sultry pout"
+      ]
+    },
+    {
+      "name": "😵 愉悦/高潮",
+      "tags": [
+        "ecstatic expression",
+        "pleasure face",
+        "arched eyebrows",
+        "open mouth moaning",
+        "gasping",
+        "biting lip in pleasure",
+        "euphoric expression",
+        "eyes squeezed shut in pleasure",
+        "cross-eyed from ecstasy",
+        "mouth wide moaning"
+      ]
+    },
+    {
+      "name": "🙇 服从/顺从",
+      "tags": [
+        "submissive look",
+        "pleading eyes",
+        "teary eyes",
+        "helpless expression",
+        "obedient face",
+        "awaiting command",
+        "vulnerable expression",
+        "worship face",
+        "devoted look",
+        "please-have-mercy face"
+      ]
+    },
+    {
+      "name": "😜 俏皮/调皮",
+      "tags": [
+        "playful smile",
+        "winking",
+        "tongue out",
+        "teasing grin",
+        "mischievous look",
+        "laughing",
+        "bright smile",
+        "cheeky expression",
+        "naughty smile",
+        "sly grin",
+        "sticking tongue out playfully"
+      ]
+    },
+    {
+      "name": "😖 痛苦/折磨（SM·凌辱专用）",
+      "tags": [
+        "pained expression",
+        "grimacing",
+        "wincing",
+        "face contorted in pain",
+        "biting lip to endure",
+        "furrowed brows",
+        "pained but enduring",
+        "tears forming from pain",
+        "sharp intake breath face",
+        "whimpering expression",
+        "pained yet aroused",
+        "suffering face"
+      ]
+    },
+    {
+      "name": "😱 惊恐/被抓（偷拍·暴露专用）",
+      "tags": [
+        "shocked expression",
+        "caught off guard",
+        "eyes wide in panic",
+        "frozen in fear",
+        "deer in headlights",
+        "panicked face",
+        "gasping in shock",
+        "hand to mouth in surprise",
+        "horrified realization",
+        "caught red-handed face"
+      ]
+    },
+    {
+      "name": "😴 恍惚/失神",
+      "tags": [
+        "dazed expression",
+        "glazed eyes",
+        "unfocused gaze",
+        "clouded vision",
+        "intoxicated look",
+        "trance-like stare",
+        "dizzy with pleasure",
+        "mind blank expression",
+        "post-orgasm stupor",
+        "blank but satisfied"
+      ]
+    },
+    {
+      "name": "😰 隐忍/克制",
+      "tags": [
+        "biting back moans",
+        "hand over mouth to silence",
+        "trying to stay quiet",
+        "holding back face",
+        "tensed jaw",
+        "veins on neck from restraint",
+        "struggling to keep composure",
+        "barely holding together",
+        "expression of someone trying not to make noise"
+      ]
+    },
+    {
+      "name": "🥱 冷淡/无聊（风俗·被动专用）",
+      "tags": [
+        "bored expression",
+        "deadpan face",
+        "looking away uninterested",
+        "unimpressed look",
+        "going through the motions",
+        "blank stare",
+        "flat expression",
+        "emotionally detached",
+        "mechanical compliance",
+        "empty inside face"
+      ]
+    },
+    {
+      "name": "🔀 反差/矛盾（复合情绪）",
+      "tags": [
+        "innocent face but aroused body",
+        "shy smile but legs spread",
+        "embarrassed pleasure",
+        "reluctant enjoyment",
+        "trying to resist but moaning",
+        "ashamed of own desire",
+        "good girl face doing bad things",
+        "virgin look but whore body"
+      ]
+    }
+  ],
+  "gaze_rules": [
+    {
+      "name": "★ 勾引眼神（最通用，95% 场景可用）",
+      "tags": [
+        "looking up through lower lashes",
+        "seductive sidelong glance",
+        "making eye contact with camera then breaking away shyly",
+        "glancing back over shoulder with inviting gaze",
+        "peeking with one eye",
+        "batting eyelashes",
+        "coy look"
+      ]
+    },
+    {
+      "name": "★ 迷离失神（高潮必备）",
+      "tags": [
+        "eyes half-lidded",
+        "glassy unfocused gaze",
+        "heavy eyelids",
+        "pupils dilated",
+        "dazed expression",
+        "gaze drifted beyond camera",
+        "eyes losing focus",
+        "looking at nothing",
+        "vacant stare",
+        "blank glassy eyes"
+      ]
+    },
+    {
+      "name": "★ 羞耻回避（暴露/偷拍场景）",
+      "tags": [
+        "shy averted gaze",
+        "looking away in embarrassment",
+        "eyes squeezed shut in shame but face flushed",
+        "face hiding behind hands but eyes peeking through fingers",
+        "hiding eyes with arm",
+        "eyes downcast but body exposed",
+        "can't hold eye contact",
+        "blushing and avoiding gaze"
+      ]
+    },
+    {
+      "name": "乞求哀怨（服从/调教场景）",
+      "tags": [
+        "puppy eyes pleading for mercy",
+        "desperate watery eyes looking up",
+        "pleading upward gaze",
+        "helpless begging eyes",
+        "submissive downcast eyes",
+        "pleading through lashes",
+        "begging without words",
+        "please-have-mercy gaze"
+      ]
+    },
+    {
+      "name": "放空虚无（高潮后/药物/催眠场景）",
+      "tags": [
+        "empty hollow eyes",
+        "no thoughts behind gaze",
+        "eyes rolled back showing whites",
+        "blank exhausted stare",
+        "post-orgasm glaze",
+        "used and satisfied emptiness",
+        "soulless submissive gaze",
+        "broken surrender eyes"
+      ]
+    },
+    {
+      "name": "惊恐被抓（偷拍/暴露/凌辱场景）",
+      "tags": [
+        "eyes wide in panic",
+        "frozen fear",
+        "deer-in-headlights stare",
+        "wide open shocked eyes",
+        "panicked desperate gaze",
+        "horrified frozen face",
+        "eyes screaming in fear",
+        "caught-red-handed terrified eyes"
+      ]
+    },
+    {
+      "name": "挑逗诱惑（主动 / 放荡场景）",
+      "tags": [
+        "eye-fucking the viewer",
+        "predatory inviting gaze",
+        "devouring hungry stare",
+        "wanton greedy eyes",
+        "smoldering intensity",
+        "challenging dominant gaze",
+        "lustful stare",
+        "insatiable wanting eyes"
+      ]
+    },
+    {
+      "name": "湿润含泪（情绪加成，非主角）",
+      "tags": [
+        "watery glistening eyes",
+        "glassy dewy gaze",
+        "glistening wet lashes",
+        "tears welling up",
+        "red-rimmed aroused eyes",
+        "teary but pleasure-filled",
+        "mascara-smudged eyes (after context)"
+      ]
+    }
+  ],
+  "mouth_actions": [
+    {
+      "name": "闭合状态",
+      "tags": [
+        "lips gently closed",
+        "soft relaxed mouth",
+        "neutral expression",
+        "pursed lips",
+        "tight-lipped",
+        "lips pressed together",
+        "smiling with closed lips",
+        "slight smirk",
+        "pout"
+      ]
+    },
+    {
+      "name": "张开状态",
+      "tags": [
+        "mouth slightly open",
+        "lips parted",
+        "mouth agape",
+        "open mouth breathing",
+        "gasping mouth",
+        "moaning mouth",
+        "jaw dropped open",
+        "panting heavily",
+        "mouth open wide"
+      ]
+    },
+    {
+      "name": "咬唇/含唇",
+      "tags": [
+        "biting lower lip",
+        "biting upper lip",
+        "biting both lips",
+        "lip bite in pleasure",
+        "nervous lip bite",
+        "teasing lip bite",
+        "lips caught between teeth",
+        "chewing on lip"
+      ]
+    },
+    {
+      "name": "舌头状态",
+      "tags": [
+        "tongue out",
+        "tongue tip visible between lips",
+        "tongue licking lips",
+        "tongue touching upper lip",
+        "tongue pressed against teeth",
+        "tongue hanging out panting",
+        "tongue curled",
+        "tongue flat out"
+      ]
+    },
+    {
+      "name": "唾液/湿润",
+      "tags": [
+        "drool from corner of mouth",
+        "saliva string from lips",
+        "wet glossy lips",
+        "drool on chin",
+        "saliva dripping",
+        "mouth glistening wet",
+        "spit trail",
+        "foamy saliva"
+      ]
+    }
+  ],
+  "progression_phases": [
+    {
+      "phase": "第一阶段：挑逗/前戏（Anticipation）",
+      "description": "画面情绪：期待、试探、暧昧、将触未触",
+      "stages": [
+        {
+          "stage_name": "眼神勾搭",
+          "expression": "knowing smile, subtle smirk",
+          "gaze": "making eye contact from across room, seductive glance",
+          "mouth": "slight lip bite, wetting lips",
+          "body": "leaning forward slightly, body angled toward"
+        },
+        {
+          "stage_name": "言语挑逗",
+          "expression": "teasing grin, playful expression",
+          "gaze": "looking up through lashes, batting eyelashes",
+          "mouth": "tongue touching lip tip, whispering",
+          "body": "leaning in close, hand on arm"
+        },
+        {
+          "stage_name": "肢体接近",
+          "expression": "anticipatory blush, nervous excitement",
+          "gaze": "gaze dropping to lips then back to eyes",
+          "mouth": "lips parted slightly, breath caught",
+          "body": "bodies inches apart, hand reaching"
+        },
+        {
+          "stage_name": "初吻",
+          "expression": "eyes closing softly, surrender face",
+          "gaze": "heavy eyelids closing, just before kiss",
+          "mouth": "lips just touching, barely there",
+          "body": "tilting head, hand on neck"
+        }
+      ]
+    },
+    {
+      "phase": "第二阶段：爱抚/探索（Foreplay）",
+      "description": "画面情绪：放松、发现、逐渐升温、皮肤饥渴",
+      "stages": [
+        {
+          "stage_name": "脱衣中",
+          "expression": "shy but willing, embarrassed smile",
+          "gaze": "peeking through lashes, shy but watching",
+          "mouth": "nervous lip bite, soft smile",
+          "body": "stepping out of clothes, one arm covering"
+        },
+        {
+          "stage_name": "被抚摸",
+          "expression": "eyes fluttering, soft pleasure",
+          "gaze": "heavy-lidded, gaze drifting",
+          "mouth": "soft gasp, lips parted",
+          "body": "back arching into touch, head tilting back"
+        },
+        {
+          "stage_name": "手探索",
+          "expression": "curious focus, discovering",
+          "gaze": "watching her own hands on his body",
+          "mouth": "tongue on lip, concentrated",
+          "body": "hands exploring, fingers trailing"
+        },
+        {
+          "stage_name": "口交开始",
+          "expression": "devoted obedience, eager to please",
+          "gaze": "looking up through lashes, submissive gaze",
+          "mouth": "mouth open, tongue extended",
+          "body": "kneeling, leaning forward, hands on thighs"
+        }
+      ]
+    },
+    {
+      "phase": "第三阶段：进入/抽插（Penetration）",
+      "description": "画面情绪：冲击、被占有、物理感受主导",
+      "stages": [
+        {
+          "stage_name": "刚进入",
+          "expression": "sharp intake of breath, shocked by sensation",
+          "gaze": "eyes wide then squeezing shut, overwhelmed",
+          "mouth": "mouth open in gasp, silent scream",
+          "body": "body tensing, fingers gripping sheets"
+        },
+        {
+          "stage_name": "浅入慢插",
+          "expression": "teasing patience, building pleasure",
+          "gaze": "watching his face, connected gaze",
+          "mouth": "soft moans, barely audible",
+          "body": "slow rolling hips, gentle rhythm"
+        },
+        {
+          "stage_name": "深入重插",
+          "expression": "face contorted with pleasure, losing control",
+          "gaze": "eyes rolling back, squeezing shut",
+          "mouth": "loud moaning, mouth wide open",
+          "body": "body jolting, grabbing for support"
+        },
+        {
+          "stage_name": "速度加快",
+          "expression": "face overwhelmed, can't keep composure",
+          "gaze": "eyes going blank, losing focus",
+          "mouth": "panting, breathless moaning",
+          "body": "hips meeting thrusts, involuntary movement"
+        }
+      ]
+    },
+    {
+      "phase": "第四阶段：高潮/崩溃（Climax）",
+      "description": "画面情绪：失控、极致、崩溃、灵魂出窍",
+      "stages": [
+        {
+          "stage_name": "接近高潮",
+          "expression": "face tightening, building to peak",
+          "gaze": "eyes squeezing shut, focused inward",
+          "mouth": "biting lip hard, holding back scream",
+          "body": "body rigid, toes curling, nails digging"
+        },
+        {
+          "stage_name": "高潮中",
+          "expression": "face contorted in ecstasy, beyond words",
+          "gaze": "eyes rolled back showing whites, crossed",
+          "mouth": "mouth open wide in silent scream, tongue out",
+          "body": "back arched extreme, whole body spasming"
+        },
+        {
+          "stage_name": "高潮顶点",
+          "expression": "face completely broken by pleasure, mind gone",
+          "gaze": "eyes blank and unfocused, no one home",
+          "mouth": "drooling, tongue out, no control",
+          "body": "body shaking uncontrollably, limbs jerking"
+        },
+        {
+          "stage_name": "高潮余波",
+          "expression": "face going slack, twitching",
+          "gaze": "eyes half-open, glassy and dazed",
+          "mouth": "panting with mouth open, catching breath",
+          "body": "body going limp, still twitching"
+        }
+      ]
+    },
+    {
+      "phase": "第五阶段：射精/释放（Ejaculation）",
+      "description": "画面情绪：占有、标记、释放、热液冲击",
+      "stages": [
+        {
+          "stage_name": "即将射精",
+          "expression": "face tensing, about to finish",
+          "gaze": "eyes locked on target, focused",
+          "mouth": "gritting teeth, holding back",
+          "body": "body pulling back, aiming"
+        },
+        {
+          "stage_name": "颜射中",
+          "expression": "face receiving, eyes squeezed shut",
+          "gaze": "eyes closed tight, flinching",
+          "mouth": "mouth open to receive / tongue out",
+          "body": "face turned up, offering face"
+        },
+        {
+          "stage_name": "中出中",
+          "expression": "face melting, feeling warmth inside",
+          "gaze": "eyes going blank, overwhelmed",
+          "mouth": "mouth open, gasping",
+          "body": "body accepting, legs trembling"
+        },
+        {
+          "stage_name": "口内射精",
+          "expression": "cheeks bulging, struggling to contain",
+          "gaze": "looking up, teary, pleading",
+          "mouth": "mouth full, cheeks puffed",
+          "body": "staying still, not swallowing yet"
+        }
+      ]
+    },
+    {
+      "phase": "第六阶段：事后/余韵（Afterglow）",
+      "description": "画面情绪：虚空、满足、疲惫、亲密、凌乱",
+      "stages": [
+        {
+          "stage_name": "刚结束",
+          "expression": "face completely relaxed, used satisfaction",
+          "gaze": "half-open glassy eyes, unfocused",
+          "mouth": "lips slightly parted, catching breath",
+          "body": "limbs splayed, boneless relaxation"
+        },
+        {
+          "stage_name": "疲惫躺倒",
+          "expression": "exhausted content face, can't move",
+          "gaze": "eyes closed, peaceful or vacant",
+          "mouth": "soft breathing, lips closed",
+          "body": "sprawled on bed, sheets tangled"
+        },
+        {
+          "stage_name": "亲密余韵",
+          "expression": "soft smile, satisfied, drowsy",
+          "gaze": "looking at partner with warm gaze",
+          "mouth": "small smile, content sigh",
+          "body": "cuddling, head on chest, spooning"
+        },
+        {
+          "stage_name": "凌乱事后",
+          "expression": "ruined makeup face, mascara smudged",
+          "gaze": "tired but alive, dazed but aware",
+          "mouth": "dried saliva, smeared lipstick",
+          "body": "hair messy, clothes ruined, cum on skin"
+        },
+        {
+          "stage_name": "空虚/疏离",
+          "expression": "empty face, hollow satisfaction",
+          "gaze": "staring at ceiling, distant gaze",
+          "mouth": "mouth slightly open, nothing to say",
+          "body": "lying apart, alone in same bed"
+        }
+      ]
+    }
+  ]
+}

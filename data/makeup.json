@@ -1,0 +1,136 @@
+{
+  "categories": [
+    {
+      "id": "natural_pure",
+      "name_zh": "清纯伪素颜 (Natural Clean Beauty)",
+      "tags": [
+        "natural makeup",
+        "pure face",
+        "clean beauty",
+        "minimal makeup",
+        "barely-there foundation",
+        "hydrated skin",
+        "sheer lip balm"
+      ]
+    },
+    {
+      "id": "cute_peachy",
+      "name_zh": "甜美果汁妆 (Kawaii Peachy Glow)",
+      "tags": [
+        "kawaii makeup",
+        "peachy eyeshadow",
+        "aegyo sal",
+        "glossy pink lips",
+        "rosy cheek flush",
+        "dewy glass skin"
+      ]
+    },
+    {
+      "id": "mature_wife",
+      "name_zh": "人妻轻熟妆 (Mature Elegant Glam)",
+      "tags": [
+        "wife makeup",
+        "mature beauty",
+        "soft glam",
+        "warm brown eyeshadow",
+        "creamy satin foundation",
+        "rosewood matte lips"
+      ]
+    },
+    {
+      "id": "sultry_smoky",
+      "name_zh": "魅惑烟熏妆 (Sultry Smoky Glam)",
+      "tags": [
+        "glamorous sultry makeup",
+        "smoky eye makeup",
+        "winged black eyeliner",
+        "bold crimson lipstick",
+        "sculpted cheekbones",
+        "full coverage matte"
+      ]
+    },
+    {
+      "id": "ruined_crying",
+      "name_zh": "被弄花/泪痕残妆 (Ruined Post-Sex Makeup)",
+      "tags": [
+        "ruined makeup",
+        "smudged eyeliner",
+        "tear tracks down cheeks",
+        "smeared lipstick on cheek",
+        "watery red-rimmed eyes",
+        "melting foundation"
+      ]
+    },
+    {
+      "id": "climax_flush",
+      "name_zh": "高潮潮红妆 (Climax Pleasure Flush)",
+      "tags": [
+        "pleasure flush on cheeks",
+        "heated red face",
+        "sweat glistening on skin",
+        "bitten swollen red lips",
+        "parted glossed lips",
+        "heavy sleepy eyelids"
+      ]
+    },
+    {
+      "id": "submissive_marked",
+      "name_zh": "被支配顺从妆 (Submissive Marked Look)",
+      "tags": [
+        "submissive makeup",
+        "finger mark on cheek",
+        "grab redness on face",
+        "smudged kohl eyeliner",
+        "transferred lipstick on lips",
+        "swollen bruised lip"
+      ]
+    },
+    {
+      "id": "wet_dewy",
+      "name_zh": "浴室湿身妆 (Wet Skin & Glistening)",
+      "tags": [
+        "wet skin look",
+        "water droplets on face",
+        "dewy foundation",
+        "natural rosy flush from warm bath",
+        "glossy wet lips",
+        "clean lashes"
+      ]
+    },
+    {
+      "id": "gothic_dark",
+      "name_zh": "哥特暗黑妆 (Gothic Dark Aesthetic)",
+      "tags": [
+        "gothic makeup",
+        "pale matte porcelain skin",
+        "dark charcoal smoky eyes",
+        "dark berry lipstick",
+        "sharp contour",
+        "dramatic black lashes"
+      ]
+    },
+    {
+      "id": "vintage_retro",
+      "name_zh": "昭和复古名伶 (Vintage Retro Red Lip)",
+      "tags": [
+        "retro makeup",
+        "classic vintage red lip",
+        "defined arched brow",
+        "soft powder finish",
+        "cat eye liner",
+        "faded golden glam"
+      ]
+    },
+    {
+      "id": "sun_kissed",
+      "name_zh": "夏日晒斑日晒妆 (Sun-kissed Bronze)",
+      "tags": [
+        "sun-kissed cheeks",
+        "freckles across nose bridge",
+        "bronzer glow",
+        "coral glossy lips",
+        "warm golden shimmer on lids"
+      ]
+    }
+  ]
+}
