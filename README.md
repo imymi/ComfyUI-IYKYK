@@ -101,7 +101,7 @@
 
 ```bash
 cd /path/to/ComfyUI/custom_nodes
-git clone https://github.com/JacobYang/ComfyUI-IYKYK.git
+git clone https://github.com/imymi/ComfyUI-IYKYK.git
 ```
 
 ### 方法 2：手动下载
