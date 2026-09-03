@@ -47,6 +47,8 @@ def make_clean_git_repo(target_dir: Path) -> Path:
         "GIT_COMMITTER_DATE": "2026-01-01T00:00:00Z",
     }
     subprocess.run(["git", "init"], cwd=target_dir, check=True, capture_output=True, env=env)
+    subprocess.run(["git", "config", "--local", "user.name", "Release Tester"], cwd=target_dir, check=True, capture_output=True)
+    subprocess.run(["git", "config", "--local", "user.email", "tester@example.com"], cwd=target_dir, check=True, capture_output=True)
     subprocess.run(["git", "add", "-A"], cwd=target_dir, check=True, capture_output=True, env=env)
     subprocess.run(["git", "commit", "-m", "Initial clean snapshot for test"], cwd=target_dir, check=True, capture_output=True, env=env)
     return target_dir
