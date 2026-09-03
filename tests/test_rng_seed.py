@@ -75,16 +75,17 @@ class TestRNGSeedReproducibility(unittest.TestCase):
         for seed in [7, 42, 100, 2026, 99999]:
             run1 = self.browser.browse(
                 prompt_seed=seed,
-                预设模板="01 温泉旅馆·初夜",
+                预设模板="C01 (教室后排露出)",
                 风格配方="随机 (Random)",
                 画质等级="高清写真 (High)",
             )
             run2 = self.browser.browse(
                 prompt_seed=seed,
-                预设模板="01 温泉旅馆·初夜",
+                预设模板="C01 (教室后排露出)",
                 风格配方="随机 (Random)",
                 画质等级="高清写真 (High)",
             )
+
             self.assertEqual(run1[0], run2[0], f"Preset prompt mismatch at seed {seed}")
 
 

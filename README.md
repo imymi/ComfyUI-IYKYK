@@ -1,10 +1,10 @@
 # ComfyUI-IYKYK
 
 <p align="center">
-  <img src="https://img.shields.io/badge/version-1.1.0--rc6-blue.svg?style=flat-square" alt="Version">
+  <img src="https://img.shields.io/badge/version-1.1.0--rc7-blue.svg?style=flat-square" alt="Version">
   <img src="https://img.shields.io/badge/ComfyUI-Extension-orange.svg?style=flat-square" alt="ComfyUI">
   <img src="https://img.shields.io/badge/Python-3.9+-green.svg?style=flat-square" alt="Python">
-  <img src="https://img.shields.io/badge/Tests-88%20passed%20(100%25)-brightgreen.svg?style=flat-square" alt="Tests">
+  <img src="https://img.shields.io/badge/Tests-passing%20(100%25)-brightgreen.svg?style=flat-square" alt="Tests">
   <img src="https://img.shields.io/badge/Schema-Draft--7%20Strict-blueviolet.svg?style=flat-square" alt="Draft-7">
   <img src="https://img.shields.io/badge/License-Apache--2.0-lightgrey.svg?style=flat-square" alt="License">
 </p>
@@ -78,8 +78,8 @@ graph TD
 2. **16 步视觉认知装配流水线**：
    严格遵循扩散模型自粗至细、自外至内的注意力机制层层递进：
    `场景空间` → `景别视角` → `角色设定` → `裸露状态` → `服装穿脱` → `光影氛围` → `姿势动作` → `表情眼神` → `妆容细节` → `发型饰品` → `微瑕质感` → `纹身标记` → `道具环境` → `液体系统` → `胶片影调` → `画质锚点`。
-3. **18 项内部调度槽位 (`SLOT_PIPELINE_ORDER`)**：
-   底层通过 `PromptFragment` 数据结构承载 18 个细分装配槽位、权重与空间互斥组（`exclusive_group`）。
+3. **18 核心 + 2 辅助调度槽位 (`SLOT_ORDER`, `AUXILIARY_SLOT_ORDER`)**：
+   底层通过 `PromptFragment` 数据结构承载 18 个细分核心装配槽位与 2 个辅助槽位（`style_recipe`, `custom`），严格保证 `custom` 处于流水线最末尾消费。
 
 ---
 
@@ -91,12 +91,12 @@ graph TD
 | :--- | :--- | :--- |
 | **Rule 1** | **空间环境自洽互斥**<br>`spatial_environmental_mutual_exclusion` | 全部 122 个场景子分类绑定唯一 `exclusive_group`，按片段顺序锁定首个主场景，杜绝“温泉与餐厅并存”、“室内温泉与露天雪景并存”等跨空间矛盾。 |
 | **Rule 2** | **裸露与内衣状态互斥**<br>`nudity_clothing_conflicts` | 严格划分 L1～L6 裸露等级：私处暴露时自动剔除内裤，全裸（L5/L6）时自动剔除穿着描述并将衣物转换为散落背景描述。 |
-| **Rule 3** | **材质穿透伪影消解**<br>`material_penetration` | 自动拦截易崩图词条（如 `sheer`, `see-through`），智能替换为真实物理脱法（如解纽扣、滑落、湿身紧贴）。 |
+| **Rule 3** | **材质穿透伪影消解**<br>`material_penetration` | 自动拦截服装易崩图词条（如 `sheer`, `see-through`），智能替换为真实物理脱法（如解纽扣、滑落、湿身紧贴），严格限定服装作用域，杜绝误杀妆容、光照与场景词条。 |
 | **Rule 4** | **视线与镜头角度几何对齐**<br>`gaze_angle_geometry` | 仰拍（低角度）强制俯视下看镜头，俯拍（高角度）强制仰视上看镜头，POV 视角强制直视镜头。 |
 | **Rule 5** | **视线方向唯一性**<br>`gaze_mutual_exclusion` | 消解“直视镜头（direct eye contact）”与“移开视线/看向他处（looking away）”之间的方向互斥。 |
 | **Rule 6** | **液体微量与安全法则**<br>`liquid_restrictions` | 自动添加微量修饰词（如 `faint trace of`, `thin streak of`），杜绝眼部液体引发白内障畸形。 |
 | **Rule 7** | **设备与画质兼容性**<br>`device_quality_compatibility` | 监控（CCTV）/手机自拍模式下自动过滤 8K、单反、摄影写真等高保真冲突词。 |
-| **Rule 8** | **纹身真皮层融合**<br>`tattoo_fusion` | 严格作用于纹身槽位，自动注入 6 词真皮层融合描述，杜绝 `pink`/`drink`/`link` 等子串误触发。 |
+| **Rule 8** | **纹身真皮层融合**<br>`tattoo_dermal_fusion` | 严格作用于纹身槽位，自动注入 6 词真皮层融合描述，杜绝 `pink`/`drink`/`link` 等子串误触发。 |
 | **Rule 9** | **姿势手部占用与道具互斥**<br>`pose_hand_occupation` | 双手抱头、双手被绑、双手撑地等占用姿势下，自动剔除手持手机/相机/扇子/酒杯等动作，根除多手伪影。 |
 | **Rule 10** | **情绪表情与眼神方向一致**<br>`emotion_gaze_affinity` | 消解害羞与直视对视、冷淡与挑逗眨眼等割裂人设。 |
 | **Rule 11** | **环境光照与黑夜白昼自洽**<br>`environmental_lighting_coherence` | 场景主锚点优先：夜景场所与深夜天气下自动过滤日光/阳光透过窗户等日间光照词条。 |
@@ -185,22 +185,23 @@ clothing.json
 
 | 端口/参数 | 类型 | 说明 |
 | :--- | :--- | :--- |
-| `scene` | 下拉菜单 | 场景大类选择（包含 24 细分类别，支持指定或随机） |
-| `theme` | 下拉菜单 | 剧情主题风格 |
-| `shot_type` / `camera_angle` | 下拉菜单 | 景别构图与拍摄视角 |
-| `nudity_level` | 下拉菜单 | 6 级裸露控制（L1 包裹暗示 → L6 特写全见） |
-| `clothing_style` / `clothing_state` | 下拉菜单 | 服装款式与穿脱解构状态（支持自动联动） |
-| `hairstyle` / `jewelry` | 下拉菜单 | 发型发色与头饰首饰 |
-| `makeup` / `pose` / `expression` | 下拉菜单 | 妆容细节、姿势动作与情绪表情 |
-| `lighting_preset` / `film_stock` | 下拉菜单 | 专业摄影光影预设与胶片质感 |
-| `liquid_effect` / `tattoo_style` | 下拉菜单 | 液体水珠系统与纹身标记 |
-| `prop_style` / `character_role` | 下拉菜单 | 场景互动道具与人物角色卡 |
-| `imperfections` / `quality_tier` | 下拉菜单 | 真实皮肤微瑕质感与画质等级 |
-| `custom_tags` | 多行文本 | 用户自定义额外提示词（支持权重语法与 LoRA） |
+| `预设模板` / `风格配方` | 下拉菜单 | 77 套经典手写预设模板与风格配方选择（指定预设时优先装配） |
+| `场景大类` / `剧情主题` | 下拉菜单 | 场景大类（24 细分类别）与剧情主题风格（支持指定或随机） |
+| `景别构图` / `拍摄视角` | 下拉菜单 | 景别构图与拍摄视角 |
+| `裸露等级` | 下拉菜单 | 6 级裸露控制（L1 包裹暗示 → L6 特写全见） |
+| `服装款式` / `服装状态` | 下拉菜单 | 服装款式与穿脱解构状态（支持自动联动裸露等级） |
+| `发型发色` / `饰品头饰` | 下拉菜单 | 发型发色与头饰首饰 |
+| `妆容细节` / `姿势动作` / `情绪表情` | 下拉菜单 | 妆容细节、姿势动作与情绪表情 |
+| `光影预设` / `胶片风格` | 下拉菜单 | 专业摄影光影预设与胶片质感 |
+| `液体效果` / `纹身标记` | 下拉菜单 | 液体水珠系统与真皮层融合纹身标记 |
+| `道具物件` / `角色设定` | 下拉菜单 | 场景互动道具与人物角色卡 |
+| `真实微瑕` / `画质等级` | 下拉菜单 | 真实皮肤微瑕质感与画质等级 |
 | `prompt_seed` | 整数控件 | **-1 为动态随机抽卡**；**>=0 为确定性复现种子** |
 | **输出: 正面提示词 (STRING)** | 输出 | 经装配、消解与安全截断的高质量英文 Prompt |
 | **输出: 负面提示词 (STRING)** | 输出 | 通用清洗防崩负面词 |
 | **输出: 中文场景描述 (STRING)** | 输出 | 当前画面配置的中文概要说明 |
+
+> 💡 **自定义词条输入说明**：如需叠加输入外部自定义提示词（含 LoRA、权重语法与额外 Tag），请使用套件内的 **`IYKYKCustomSlotCombiner`**（🧩 IYKYK 自定义槽位拼装器节点），其提供专用的 **`自定义追加`** 端口并在底层严格接入末尾消费的 `custom` 辅助槽位。
 
 ---
 
@@ -210,11 +211,14 @@ clothing.json
 ---
 
 ### 3. 🧩 IYKYK 自定义槽位拼装器 (`IYKYKCustomSlotCombiner`)
-支持多节点连线或自由输入各槽位文本，底层统一执行 17 大冲突消解与 16 步画质强化装配流水线。
+支持多节点连线或自由输入各槽位文本（提供专用的 **`自定义追加`** 输入端口），底层统一执行 17 大冲突消解与 16 步画质强化装配流水线。
 
 ---
 
 ## 🚀 详细安装指南
+
+> [!IMPORTANT]
+> **分发与运行方式说明**：本项目为 ComfyUI 原生自定义节点套件，标准安装与运行方式为通过 ComfyUI Manager、Git Clone 或解压 Release ZIP 至 `ComfyUI/custom_nodes/` 目录。`pyproject.toml` 仅用于开发依赖环境管理 (`pip install -e ".[dev]"`) 与代码静态治理（Ruff, Pytest, Schema 生成），项目不以 pip wheel/sdist 形式对外分发运行。
 
 ### 方法 1：ComfyUI Manager 安装（通过 Git URL）
 
@@ -242,7 +246,7 @@ git clone https://github.com/imymi/ComfyUI-IYKYK.git
 
 ### 方法 3：手动下载发布包
 
-1. 前往 GitHub [Releases](https://github.com/imymi/ComfyUI-IYKYK/releases) 页面下载最新的发布包 `ComfyUI-IYKYK-v1.1.0-rc6.zip`；
+1. 前往 GitHub [Releases](https://github.com/imymi/ComfyUI-IYKYK/releases) 页面下载最新的发布包 `ComfyUI-IYKYK-v1.1.0-rc7.zip`；
 2. 解压到 `ComfyUI/custom_nodes/ComfyUI-IYKYK` 目录下；
 3. 重启 ComfyUI。
 
@@ -255,30 +259,39 @@ git clone https://github.com/imymi/ComfyUI-IYKYK.git
 本项目建立了极其严格的工程质量门禁与持续集成验证：
 
 ```bash
+# 0. 执行 Schema 契约防漂移只读比对 (0 写盘、0 漂移)
+python3 scripts/generate_rule_schemas.py --check
+
 # 1. 执行 Draft-7 递归 Schema 强门禁校验
 python3 scripts/validate_data.py --strict
 
-# 2. 执行全量 88 项单元测试与集成测试
+# 2. 执行全仓库代码规范 Ruff 校验
+ruff check .
+
+# 3. 执行全量自动化单元测试与集成测试
 python3 -m unittest discover -s tests -v
 
-# 3. 隔离沙箱构建与确定性发布包打包
-python3 scripts/build_release.py
+# 4. 独立沙箱方案 A 不可变构建与确定性发布包检验 (38 个运行时文件)
+python3 scripts/build_release.py --mode verify
 ```
 
 ```text
 ----------------------------------------------------------------------
-Ran 88 tests in ~50s
+Ran tests in ~230s
 OK
 ```
 
+- ✅ `test_selection_contracts.py`: 22+1 槽位四态契约、全 UI 选项 1:1 精确映射、All-None 纯净度、服装状态真实联动与全链路 Provenance 断言
+- ✅ `test_lexer_and_spans.py`: PromptAtom 全链路流转、六大 Span 权限矩阵、嵌套黑盒受控保护与合法转义逗号 `escaped\,` 字节级保留
+- ✅ `test_conflict_engine_ssot.py`: 17 条规则单一契约 SSOT、L1～L6 逐级强制存在、黑盒后代括号整块免删、Fail-Closed 与 match_mode 精确匹配
+- ✅ `test_slot_pipeline_integrity.py`: 18 槽位契约单向依赖、全槽位别名单数规范化、Tag 级保序去重与 Resolver 实例复用
+- ✅ `test_schema_negatives.py`: 两阶段全局 Alias 防冲突与 15 项 Draft-7 负向变异拦截测试
 - ✅ `test_context_affinity_matrix.py`: 14 大情境直通映射与全槽位 ID 100% 存在性验证
-- ✅ `test_conflict_engine_matrix.py`: 17 大冲突规则与 15 槽位级联矩阵测试
 - ✅ `test_catalog_rule_reachability.py`: 规则 catalog terms 100% 精确覆盖与端到端消解
 - ✅ `test_props_and_extensions_reachability.py`: 24/24 扩展逐 ID 100% 可达与 L1/L5/L6 零污染
-- ✅ `test_schema_negatives.py`: 14 项 Draft-7 负向变异与严格拦截测试
-- ✅ `test_finalize_boundaries.py`: Span 级受保护语法保留与栈式括号嵌套测试
-- ✅ `test_nudity_levels.py`: 28 服装 × 6 裸露等级全矩阵脱法测试
-- ✅ `test_release_build.py`: 零源码泄漏的真隔离沙箱烟测与确定性构建
+- ✅ `test_finalize_boundaries.py`: 250 词唯一硬边界与嵌套栈式语法校验
+- ✅ `test_nudity_levels.py`: 28 服装 × 6 裸露等级全矩阵脱法与 L1 零暴露
+- ✅ `test_release_build.py`: 方案 A 不可变版本目录、原子指针 CURRENT.json、多步故障注入保护旧 generation 逐字节不变、Schema 只读检查与并发隔离构建
 
 ---
 

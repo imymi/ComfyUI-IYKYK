@@ -4,7 +4,82 @@
 
 ---
 
+## [v1.1.0-rc7] - 2026-09-02
+
+### 🌟 终验复审整改与架构重构 (8 项复核修订落地)
+
+#### 1. `lib/atomizer.py` 独立无循环依赖模块 (修订 1)
+- 提取原子切分与顶层标签聚合逻辑至纯净模块 `lib/atomizer.py`；
+- 形成 `lexer -> atomizer -> conflict_resolver -> assembler` 单向无环依赖架构；
+- 保证任意模块可单独导入与执行，彻底杜绝隐藏循环依赖。
+
+#### 2. 权威 18 槽位顺序 `SLOT_ORDER` 与别名规范化 (修订 2)
+- 建立 `lib/slot_contract.py` 权威契约，固化以 `scene_theme` 开始、`quality` 结束的 18 槽位顺序；
+- 实现 `normalize_slot_name()` 规范化映射，完整补齐 `poses -> pose`, `lighting_palette -> lighting`, `scene -> scene_theme`, `theme -> scene_theme`, `hairstyles -> hairstyle`, `expressions -> expression`, `film_stock -> film`, `accessories -> jewelry`, `tattoos -> tattoo`, `prop -> props`, `liquid -> liquids`, `recipe -> style_recipe`；
+- 任何未知非空槽位传入装配器时 Fail-Closed 抛出 `PromptValidationError`；
+- 抽取权威公共生成器 `iter_normalized_slot_fragments()`，默认分配 `TagProvenance`，支持 `style_recipe` 辅助槽位。
+
+#### 3. `PromptTag` 容器驱动 Tag 级保序去重与黑盒免疫 (修订 3)
+- 引入不可变 `@dataclass(frozen=True)` `PromptTag` 容器封装 tag 级别对象，持有 `atoms: Tuple[PromptAtom, ...]`；
+- 移除非法字符级尾随逗号剥离，精准识别并 100% 字节级保留合法末尾转义逗号 `escaped\,`；
+- 对普通 Plain 标签按跨槽位首次出现的全局顺序保序去重；
+- 对包含 LoRA (`<lora:...>`) 与 Quoted (`"..."`) 的黑盒 Tag 实施绝对免去重保护；
+- 嵌套黑盒保护：对内嵌 LoRA 或 Quoted 的括号结构赋予 `contains_blackbox=True` 并在所有 17 条规则中整块免删 (`can_delete_atom=False`)。
+
+#### 4. Python 契约单源生成 Schema 与 L1～L6 逐级强校验 (修订 4 - 方案 A)
+- 以 `lib/rule_contract.py` 为全系统单一事实来源 (SSOT)，强类型建模 `PatternSpec`, `ReplacementRule`, `PairRule`, `LevelRule` 等；
+- 显式在 Schema 中将 `L1`～`L6` 加入 `level_rules` 对象的 `required` 约束，抽取权威单一源校验函数 `validate_rule_document()`，逐级校验存在性与非空；
+- 脚本 `scripts/generate_rule_schemas.py` 接入 `argparse` 实现只读 `--check` 模式（0 写盘、0 漂移，CI 独立步骤检测）；
+- 全量 17 规则迁移为 Typed PatternSpec，明确携带 `match_mode` (`exact`, `word`, `phrase`, `regex`)，禁止解析器猜测；
+- 递归应用 `additionalProperties: false`，配合 8 维强类型深度负向变异测试；
+- `tests/test_catalog_rule_reachability.py` 彻底消除模糊子串检查，实现 100% 精确匹配遍历覆盖。
+
+#### 5. Exact Selector 真实 457 项 UI 选项探针与 Catalog 隔离治理 (修订 5)
+- `ExactCatalogIndex` 严格单 catalog 命名空间隔离，加固为 `existing is not item` 即无条件 Fail-Closed 抛出 `CatalogIndexingError`；
+- 彻底清理 `_match_item` 中 40 行模糊死代码及 `sampler.py` 中 13 处模糊包含回退；
+- `sample_quality_tags` 字典全等映射，未知画质 Fail-Fast 抛出 `DataSelectionError`；
+- `tests/test_selection_contracts.py` 全面落地：
+  - 逐项调用全部 457 个 UI 下拉选项对应的真实 `sampler.sample_*` 方法（457/457 真实调用全部成功，0 失败）；
+  - 服装状态探针修复：使用有效款式与 L3 真实进入 Explicit 分支，断言 `state_id` 匹配且 `provenance.kind == "clothing_state"`；
+  - 全选择器与服装状态 `valid+XYZ` / `XYZ+valid` 前后缀严格负向变异测试；
+  - 4 state × 6 nudity = 24 组合全矩阵测试；
+  - 122 场景在 100 种子下的真实遍历断言。
+
+#### 6. 方案 A 不可变版本目录与原子指针发布协议 (修订 6)
+- 重构 `scripts/build_release.py`：
+  - 在独立带有 PID 与 UUID 的临时 generation 目录中构建 3 个二进制一致的 ZIP、SHA256SUMS 与 MANIFEST；
+  - 全量文件校验、烟测与 `os.fsync` 物理刷盘后，原子重命名为不可变版本目录 `output_dir / f"v{version}-{mode}-{archive_sha12}"`；
+  - 原子写入更新 `output_dir / "CURRENT.json"` 指针文件，指向该不可变版本目录，严禁在根目录平铺镜像产物（彻底消除旧版本被覆盖污染的竞态隐患）；
+- 多步故障注入测试：在打包、烟测、重命名、指针更新各关键阶段注入故障，断言已有旧发布 `v1.0.0` 全量文件逐字节 SHA256 绝对不变；
+- 校验 `SOURCE_DATE_EPOCH` 合法 ZIP 时间戳范围 (1980-01-01 至 2107-12-31)，对齐 2 秒偶数精度；
+- 并发安全：多进程构建使用独立临时目录，互不干扰或混合。
+
+#### 7. 纯函数式 `_generate_structured` 与全链路 Provenance 贯通 (修订 7)
+- `lib/models.py` 定义不可变 `@dataclass(frozen=True)` `GenerationResult`；
+- 贯通全链路 Provenance：
+  - `scene_frags` 真实透传 `scene_res.provenance`；
+  - 新增 `sample_film_result`, `sample_jewelry_result`, `sample_tattoo_result` 结构化采样，各槽位 Atom 携带权威 `TagProvenance`；
+  - 规则 11 纹身融合生成的 Atom 附带 `rule_id="tattoo_dermal_fusion"` 与父来源 `parent_ids`；
+- `PromptAssembler` 实例复用 `ConflictResolver`，全局单次解析规则文件，消除高频重复 IO；
+- `nodes.py` 抽取无状态纯函数 `_generate_structured(sampler, assembler, inputs, rng) -> GenerationResult`；节点入口纯调用委托，消灭一切节点实例与类级可变状态。
+
+#### 8. 开发依赖规范化与包隔离 (修订 8)
+- `pyproject.toml` 收窄 setuptools 配置，不声明多余包查找，明确声明仅用于本地开发环境工具治理 (`pip install -e ".[dev]"`)，并在 README 澄清非 pip wheel 分发运行；
+- 创建 `scripts/__init__.py` 确立脚本包边界；
+- 顶层 `validate_data.py` 改造为纯 `runpy.run_path` 转发代理，消除命名空间污染。
+
+#### 9. 全面测试套件与反例门禁全部通过 (`tests/`)
+- 全量自动化单元测试 100% 通过；
+- 14 项终验复审强制反例全量覆盖并验证通过；
+- 代码规范 `ruff check .` 全仓库 0 错误 0 警告；
+- 格式检查 `git diff --check` 0 警告；
+- 契约防漂移 `scripts/generate_rule_schemas.py --check` 0 漂移；
+- 严格数据校验 `validate_data.py --strict` 19 个运行时文件 0 错误 0 警告通过。
+
+---
+
 ## [v1.1.0-rc6] - 2026-09-02
+
 
 > 💡 **审查与架构声明**：  
 > 本版本的全面架构审查、数据驱动 `extension_policy`（24/24 扩展逐 ID 100% 可达）、Draft-7 全量 19 运行时 Schema 强门禁、运行时清单与真隔离发布烟测、Span 级受保护语法字节保留及发布自动化测试套件方案均出自 **GPT-5.6 Sol**。

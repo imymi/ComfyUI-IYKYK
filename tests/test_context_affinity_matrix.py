@@ -43,7 +43,7 @@ class TestContextAffinityMatrix(unittest.TestCase):
         cls.tattoo_ids = {t["id"] for t in tattoos_doc["categories"]}
 
         nudity_doc = json.loads((DATA_DIR / "nudity_levels.json").read_text(encoding="utf-8"))
-        cls.liquid_ids = {l["id"] for l in nudity_doc["liquid_effects"]}
+        cls.liquid_ids = {liq["id"] for liq in nudity_doc["liquid_effects"]}
 
     def test_all_14_contexts_exist_in_matrix(self):
         """测试全部 14 个核心情境均在亲和度矩阵中作为一等公民完整存在"""

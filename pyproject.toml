@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "comfyui-iykyk"
-version = "1.1.0-rc6"
+version = "1.1.0-rc7"
 description = "ComfyUI Advanced Japanese/Asian Themed Realistic & SFW/NSFW Prompt Generator with Hierarchical Context Flow"
 readme = "README.md"
 requires-python = ">=3.9"
@@ -23,11 +23,24 @@ classifiers = [
 
 [project.optional-dependencies]
 dev = [
-    "pytest",
-    "pytest-cov",
-    "ruff",
-    "jsonschema",
+    "pytest>=7.0",
+    "pytest-cov>=4.0",
+    "ruff>=0.1.0",
+    "jsonschema>=4.23,<5.0",
 ]
+
+[tool.ruff]
+line-length = 120
+target-version = "py39"
+
+[tool.ruff.lint]
+select = ["E", "F", "W"]
+ignore = ["E501"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["E402", "F401", "F841"]
+"validate_data.py" = ["E402"]
+"scripts/*" = ["E402"]
 
 [project.urls]
 Repository = "https://github.com/imymi/ComfyUI-IYKYK"
@@ -37,3 +50,9 @@ Documentation = "https://github.com/imymi/ComfyUI-IYKYK#readme"
 [tool.comfy]
 PublisherId = "imymi"
 DisplayName = "ComfyUI-IYKYK"
+
+# 本项目为 ComfyUI 自定义节点，分发形式为 Git Clone 或 Release ZIP 解压至 custom_nodes/。
+# pyproject.toml 仅用于本地开发依赖环境治理 (pip install -e ".[dev]") 与工具配置，
+# 不提供亦不支持作为独立 Python 库/Wheel 运行分发。
+[tool.setuptools]
+packages = []

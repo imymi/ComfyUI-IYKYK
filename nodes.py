@@ -16,15 +16,15 @@ from __future__ import annotations
 import hashlib
 import random
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Tuple
 
-try:
-    from .lib.assembler import PromptAssembler, finalize_prompt, split_top_level_tags
-    from .lib.models import PromptFragment
+if __package__:
+    from .lib.assembler import PromptAssembler, assemble_result, split_top_level_tags
+    from .lib.models import GenerationResult, PromptFragment, TagProvenance
     from .lib.sampler import DataSampler, _is_none
-except (ImportError, ValueError):
-    from lib.assembler import PromptAssembler, finalize_prompt, split_top_level_tags
-    from lib.models import PromptFragment
+else:
+    from lib.assembler import PromptAssembler, assemble_result, split_top_level_tags
+    from lib.models import GenerationResult, PromptFragment, TagProvenance
     from lib.sampler import DataSampler, _is_none
 
 DATA_DIR = Path(__file__).parent / "data"
@@ -51,6 +51,352 @@ def _compute_is_changed(prompt_seed: int, inputs: Dict[str, Any]) -> Any:
         hasher.update(f"{key}:{inputs[key]}".encode("utf-8"))
 
     return hasher.hexdigest()
+
+
+def _generate_structured(
+    sampler: DataSampler,
+    assembler: PromptAssembler,
+    inputs: Dict[str, Any],
+    rng: random.Random
+) -> GenerationResult:
+    """提示词生成纯函数流水线 (修订 7 纯函数与丰富 Provenance 契约)。
+
+    不变量：
+    - 无副作用、无类/实例级可变状态存储；
+    - 统一返回不可变 GenerationResult 对象，携带 positive, negative, description, atoms 与 rules_applied。
+    """
+    预设模板 = inputs.get("预设模板", "无 (None)")
+    风格配方 = inputs.get("风格配方", "无 (None)")
+    场景大类 = inputs.get("场景大类", "随机 (Random)")
+    剧情主题 = inputs.get("剧情主题", "随机 (Random)")
+    景别构图 = inputs.get("景别构图", "自动 (Auto)")
+    拍摄视角 = inputs.get("拍摄视角", "自动 (Auto)")
+    裸露等级 = inputs.get("裸露等级", "随机 (Random)")
+    服装款式 = inputs.get("服装款式", "随机 (Random)")
+    服装状态 = inputs.get("服装状态", "自动联动裸露等级 (Auto Link Nudity)")
+    发型发色 = inputs.get("发型发色", "随机 (Random)")
+    饰品头饰 = inputs.get("饰品头饰", "无 (None)")
+    妆容细节 = inputs.get("妆容细节", "无 (None)")
+    姿势动作 = inputs.get("姿势动作", "随机 (Random)")
+    情绪表情 = inputs.get("情绪表情", "随机 (Random)")
+    光影预设 = inputs.get("光影预设", "自动 (Auto)")
+    胶片风格 = inputs.get("胶片风格", "无 (None)")
+    液体效果 = inputs.get("液体效果", "无 (None)")
+    纹身标记 = inputs.get("纹身标记", "无 (None)")
+    道具物件 = inputs.get("道具物件", "无 (None)")
+    角色设定 = inputs.get("角色设定", "无 (None)")
+    真实微瑕 = inputs.get("真实微瑕", "无 (None)")
+    画质等级 = inputs.get("画质等级", "高清写真 (High)")
+
+    # 1. 检查是否使用预设模板
+    if not _is_none(预设模板):
+        preset = sampler.get_preset(预设模板, rng)
+        if preset:
+            recipe = sampler.get_style_recipe(风格配方, rng) if not _is_none(风格配方) else None
+            assembly_res = assembler.assemble_preset(preset, recipe, 画质等级, rng=rng)
+            neg = sampler.get_negative_prompt()
+            desc = f"【预设模板】{preset.get('id', '')} {preset.get('name_zh', '')}"
+            if recipe:
+                desc += f" | 【叠加配方】{recipe.get('style_name', recipe.get('name_zh', ''))}"
+            return GenerationResult(
+                positive=assembly_res.prompt,
+                negative=neg,
+                description=desc,
+                atoms=assembly_res.accepted_atoms,
+                rules_applied=assembly_res.rules_applied,
+                source_atoms=assembly_res.source_atoms,
+            )
+
+    # 2. 采样 15 槽位
+    # 槽位 1: 场景 + 主题
+    scene_res = sampler.sample_scene_result(场景大类, rng)
+    slots: Dict[str, List[Any]] = {}
+
+    slots["scene_theme"] = [
+        PromptFragment(
+            text=t,
+            source_slot="scene_theme",
+            source_item_id=scene_res.item_id,
+            context_ids=scene_res.context_ids,
+            exclusive_group=scene_res.exclusive_group,
+            provenance=scene_res.provenance,
+        )
+        for t in (scene_res.tags if scene_res else ())
+    ]
+
+    theme_res = sampler.sample_theme_result(剧情主题, rng)
+    if theme_res:
+        slots["scene_theme"].extend([
+            PromptFragment(
+                text=t.text,
+                source_slot="scene_theme",
+                source_item_id=theme_res.theme_id,
+                context_ids=(),
+                exclusive_group=None,
+                provenance=t.provenance,
+            )
+            for t in theme_res.tags
+        ])
+
+    primary_context = scene_res.context_ids[0] if (scene_res and scene_res.context_ids) else "generic"
+    context = primary_context if primary_context != "generic" else sampler.detect_context(场景大类, 剧情主题)
+
+    # 槽位 2: 景别 + 视角
+    shot_res = sampler.sample_shot_type_result(景别构图, rng)
+    slots["shot_type"] = [
+        PromptFragment(
+            text=t,
+            source_slot="shot_type",
+            source_item_id=shot_res.item_id,
+            provenance=shot_res.provenance,
+        )
+        for t in (shot_res.tags if shot_res else ())
+    ]
+
+    angle_res = sampler.sample_camera_angle_result(拍摄视角, rng)
+    slots["camera_angle"] = [
+        PromptFragment(
+            text=t,
+            source_slot="camera_angle",
+            source_item_id=angle_res.item_id,
+            provenance=angle_res.provenance,
+        )
+        for t in (angle_res.tags if angle_res else ())
+    ]
+
+    # 槽位 3 & 4: 裸露等级与服装穿脱联动
+    nudity_res, lvl_code = sampler.sample_nudity_result(裸露等级, rng)
+    slots["nudity"] = [
+        PromptFragment(
+            text=t,
+            source_slot="nudity",
+            source_item_id=nudity_res.item_id,
+            provenance=nudity_res.provenance,
+        )
+        for t in (nudity_res.tags if nudity_res else ())
+    ]
+    clothing_res = sampler.sample_clothing_result(
+        服装款式, 服装状态, lvl_code, rng, context=context
+    )
+    slots["clothing"] = [
+        PromptFragment(
+            text=t.text,
+            source_slot="clothing",
+            source_item_id=t.provenance.item_id,
+            context_ids=(),
+            exclusive_group=None,
+            provenance=t.provenance,
+        )
+        for t in clothing_res.all_tags
+    ]
+
+    # 槽位 5: 光影氛围
+    lighting_res = sampler.sample_lighting_result(光影预设, rng, nudity_level_code=lvl_code)
+    slots["lighting"] = [
+        PromptFragment(
+            text=t,
+            source_slot="lighting",
+            source_item_id=lighting_res.item_id,
+            provenance=lighting_res.provenance,
+        )
+        for t in (lighting_res.tags if lighting_res else ())
+    ]
+
+    # 槽位 6: 姿势动作
+    pose_res = sampler.sample_pose_result(姿势动作, rng, nudity_level_code=lvl_code)
+    slots["pose"] = [
+        PromptFragment(
+            text=t,
+            source_slot="pose",
+            source_item_id=pose_res.item_id,
+            provenance=pose_res.provenance,
+        )
+        for t in (pose_res.tags if pose_res else ())
+    ]
+
+    # 槽位 7: 表情眼神
+    expression_res = sampler.sample_expression_result(情绪表情, rng)
+    slots["expression"] = [
+        PromptFragment(
+            text=t,
+            source_slot="expression",
+            source_item_id=expression_res.item_id,
+            provenance=expression_res.provenance,
+        )
+        for t in (expression_res.tags if expression_res else ())
+    ]
+
+    # 槽位 8: 风格胶片
+    film_res = sampler.sample_film_result(胶片风格, rng)
+    slots["film"] = [
+        PromptFragment(
+            text=t,
+            source_slot="film",
+            source_item_id=film_res.item_id,
+            provenance=film_res.provenance,
+        )
+        for t in (film_res.tags if film_res else ())
+    ]
+
+    # 槽位 9: 妆容细节
+    makeup_res = sampler.sample_makeup_result(妆容细节, rng, context=context)
+    slots["makeup"] = [
+        PromptFragment(
+            text=t,
+            source_slot="makeup",
+            source_item_id=makeup_res.item_id,
+            provenance=makeup_res.provenance,
+        )
+        for t in (makeup_res.tags if makeup_res else ())
+    ]
+
+    # 槽位 10: 发型与饰品
+    hairstyle_res = sampler.sample_hairstyle_result(发型发色, rng, context=context)
+    slots["hairstyle"] = [
+        PromptFragment(
+            text=t,
+            source_slot="hairstyle",
+            source_item_id=hairstyle_res.item_id,
+            provenance=hairstyle_res.provenance,
+        )
+        for t in (hairstyle_res.tags if hairstyle_res else ())
+    ]
+    jewelry_res = sampler.sample_jewelry_result(饰品头饰, rng, context=context)
+    slots["jewelry"] = [
+        PromptFragment(
+            text=t,
+            source_slot="jewelry",
+            source_item_id=jewelry_res.item_id,
+            provenance=jewelry_res.provenance,
+        )
+        for t in (jewelry_res.tags if jewelry_res else ())
+    ]
+
+    # 槽位 11: 真实微瑕
+    imperfection_res = sampler.sample_imperfections_result(真实微瑕, rng)
+    slots["imperfections"] = [
+        PromptFragment(
+            text=t,
+            source_slot="imperfections",
+            source_item_id=imperfection_res.item_id,
+            provenance=imperfection_res.provenance,
+        )
+        for t in (imperfection_res.tags if imperfection_res else ())
+    ]
+
+    # 槽位 12: 纹身标记（仅在显式配置时生效）
+    tattoo_res = sampler.sample_tattoo_result(纹身标记, rng, context=context)
+    slots["tattoo"] = [
+        PromptFragment(
+            text=t,
+            source_slot="tattoo",
+            source_item_id=tattoo_res.item_id,
+            provenance=tattoo_res.provenance,
+        )
+        for t in (tattoo_res.tags if tattoo_res else ())
+    ]
+
+    # 槽位 13: 道具物件
+    prop_res = sampler.sample_prop_result(道具物件, rng, context=context)
+    slots["props"] = [
+        PromptFragment(
+            text=t,
+            source_slot="props",
+            source_item_id=prop_res.item_id,
+            provenance=prop_res.provenance,
+        )
+        for t in (prop_res.tags if prop_res else ())
+    ]
+
+    # 槽位 14: 人格角色
+    character_res = sampler.sample_character_result(角色设定, rng, context=context)
+    slots["character"] = [
+        PromptFragment(
+            text=t,
+            source_slot="character",
+            source_item_id=character_res.item_id,
+            provenance=character_res.provenance,
+        )
+        for t in (character_res.tags if character_res else ())
+    ]
+
+    # 槽位 15: 液体体液
+    liquid_res = sampler.sample_liquid_result(液体效果, rng, context=context)
+    slots["liquids"] = [
+        PromptFragment(
+            text=t,
+            source_slot="liquids",
+            source_item_id=liquid_res.item_id,
+            provenance=liquid_res.provenance,
+        )
+        for t in (liquid_res.tags if liquid_res else ())
+    ]
+
+    # 画质强化锚点
+    quality_res = sampler.sample_quality_result(画质等级)
+    slots["quality"] = [
+        PromptFragment(
+            text=t,
+            source_slot="quality",
+            source_item_id=quality_res.item_id,
+            provenance=quality_res.provenance,
+        )
+        for t in (quality_res.tags if quality_res else ())
+    ]
+
+    # 3. 叠加风格配方
+    recipe = sampler.get_style_recipe(风格配方, rng) if not _is_none(风格配方) else None
+    if recipe:
+        recipe_id = recipe.get("id", "recipe_custom")
+        for k in ["lighting_palette", "style_recipe", "focus_detail"]:
+            val = recipe.get(k, "")
+            if val:
+                for t in split_top_level_tags(str(val)):
+                    if t:
+                        slots.setdefault("style_recipe", []).append(
+                            PromptFragment(
+                                text=t,
+                                source_slot=f"recipe_{k}",
+                                source_item_id=recipe_id,
+                                provenance=TagProvenance(
+                                    item_id=recipe_id,
+                                    kind="style_recipe",
+                                    semantic_ids=(f"recipe:{recipe_id}",),
+                                ),
+                            )
+                        )
+
+    # 4. 组装、冲突消解与统一 Finalize
+    positive_prompt, atoms, rules_applied, source_atoms = assembler.assemble_result_with_sources(slots, rng=rng)
+    negative_prompt = sampler.get_negative_prompt()
+
+    # 5. 生成中文概要
+    desc_parts = []
+    if not _is_none(场景大类):
+        desc_parts.append(f"场景: {场景大类}")
+    if not _is_none(剧情主题):
+        desc_parts.append(f"主题: {剧情主题}")
+    if not _is_none(服装款式):
+        desc_parts.append(f"服装: {服装款式}")
+    desc_parts.append(f"裸露: {lvl_code}")
+    if not _is_none(发型发色):
+        desc_parts.append(f"发型: {发型发色}")
+    if not _is_none(妆容细节):
+        desc_parts.append(f"妆容: {妆容细节}")
+    if not _is_none(液体效果):
+        desc_parts.append(f"体液: {液体效果}")
+    if recipe:
+        desc_parts.append(f"配方: {recipe.get('style_name', recipe.get('name_zh', ''))}")
+
+    chinese_desc = " | ".join(desc_parts)
+    return GenerationResult(
+        positive=positive_prompt,
+        negative=negative_prompt,
+        description=chinese_desc,
+        atoms=atoms,
+        rules_applied=rules_applied,
+        source_atoms=source_atoms,
+    )
 
 
 # ═══════════════════════════════════════════════════════════════════════════
@@ -155,141 +501,36 @@ class IYKYKPromptGenerator:
         prompt_seed: int = -1,
     ) -> Tuple[str, str, str]:
         rng, _ = _get_rng(prompt_seed)
-
-        # 1. 检查是否使用预设模板
-        if not _is_none(预设模板):
-            preset = _sampler.get_preset(预设模板, rng)
-            if preset:
-                recipe = _sampler.get_style_recipe(风格配方, rng) if not _is_none(风格配方) else None
-                pos = _assembler.assemble_preset(preset, recipe, 画质等级, rng=rng)
-                neg = _sampler.get_negative_prompt()
-                desc = f"【预设模板】{preset.get('id', '')} {preset.get('name_zh', '')}"
-                if recipe:
-                    desc += f" | 【叠加配方】{recipe.get('style_name', recipe.get('name_zh', ''))}"
-                return (pos, neg, desc)
-
-        # 2. 采样 15 槽位
-        # 槽位 1: 场景 + 主题
-        scene_res = _sampler.sample_scene_result(场景大类, rng)
-        slots: Dict[str, List[Any]] = {}
-
-        if scene_res:
-            scene_frags: List[Any] = [
-                PromptFragment(
-                    text=t,
-                    source_slot="scene_theme",
-                    source_item_id=scene_res.item_id,
-                    context_ids=scene_res.context_ids,
-                    exclusive_group=scene_res.exclusive_group,
-                )
-                for t in scene_res.tags
-            ]
-            slots["scene_theme"] = scene_frags
-            primary_context = scene_res.context_ids[0] if scene_res.context_ids else "generic"
-        else:
-            slots["scene_theme"] = _sampler.sample_scene(场景大类, rng)
-            primary_context = "generic"
-
-        theme_tags = _sampler.sample_theme(剧情主题, rng)
-        slots["scene_theme"].extend(theme_tags)
-
-        context = primary_context if primary_context != "generic" else _sampler.detect_context(场景大类, 剧情主题)
-
-        # 槽位 2: 景别 + 视角
-        slots["shot_type"] = _sampler.sample_shot_type(景别构图, rng)
-        slots["camera_angle"] = _sampler.sample_camera_angle(拍摄视角, rng)
-
-        # 槽位 3 & 4: 裸露等级与服装穿脱联动
-        nudity_tags, lvl_code = _sampler.sample_nudity(裸露等级, rng)
-        slots["nudity"] = [
-            PromptFragment(
-                text=t,
-                source_slot="nudity",
-                source_item_id=lvl_code,
-            )
-            for t in nudity_tags
-        ]
-        clothing_tags = _sampler.sample_clothing_with_nudity_linkage(
-            服装款式, 服装状态, lvl_code, rng, context=context
+        res = _generate_structured(
+            sampler=_sampler,
+            assembler=_assembler,
+            inputs={
+                "预设模板": 预设模板,
+                "风格配方": 风格配方,
+                "场景大类": 场景大类,
+                "剧情主题": 剧情主题,
+                "景别构图": 景别构图,
+                "拍摄视角": 拍摄视角,
+                "裸露等级": 裸露等级,
+                "服装款式": 服装款式,
+                "服装状态": 服装状态,
+                "发型发色": 发型发色,
+                "饰品头饰": 饰品头饰,
+                "妆容细节": 妆容细节,
+                "姿势动作": 姿势动作,
+                "情绪表情": 情绪表情,
+                "光影预设": 光影预设,
+                "胶片风格": 胶片风格,
+                "液体效果": 液体效果,
+                "纹身标记": 纹身标记,
+                "道具物件": 道具物件,
+                "角色设定": 角色设定,
+                "真实微瑕": 真实微瑕,
+                "画质等级": 画质等级,
+            },
+            rng=rng,
         )
-        slots["clothing"] = [
-            PromptFragment(
-                text=t,
-                source_slot="clothing",
-                source_item_id=lvl_code,
-            )
-            for t in clothing_tags
-        ]
-
-        # 槽位 5: 光影氛围
-        slots["lighting"] = _sampler.sample_lighting(光影预设, rng, nudity_level_code=lvl_code)
-
-        # 槽位 6: 姿势动作
-        slots["pose"] = _sampler.sample_pose(姿势动作, rng, nudity_level_code=lvl_code)
-
-        # 槽位 7: 表情眼神
-        slots["expression"] = _sampler.sample_expression(情绪表情, rng)
-
-        # 槽位 8: 风格胶片
-        slots["film"] = _sampler.sample_film(胶片风格, rng)
-
-        # 槽位 9: 妆容细节
-        slots["makeup"] = _sampler.sample_makeup(妆容细节, rng, context=context)
-
-        # 槽位 10: 发型与饰品
-        slots["hairstyle"] = _sampler.sample_hairstyle(发型发色, rng, context=context)
-        slots["jewelry"] = _sampler.sample_jewelry(饰品头饰, rng, context=context)
-
-        # 槽位 11: 真实微瑕
-        slots["imperfections"] = _sampler.sample_imperfections(真实微瑕, rng)
-
-        # 槽位 12: 纹身标记（仅在显式配置时生效）
-        slots["tattoo"] = _sampler.sample_tattoo(纹身标记, rng, context=context)
-
-        # 槽位 13: 道具物件
-        slots["props"] = _sampler.sample_prop(道具物件, rng, context=context)
-
-        # 槽位 14: 人格角色
-        slots["character"] = _sampler.sample_character(角色设定, rng, context=context)
-
-        # 槽位 15: 液体体液
-        slots["liquids"] = _sampler.sample_liquid(液体效果, rng, context=context)
-
-        # 画质强化锚点
-        slots["quality"] = _sampler.sample_quality_tags(画质等级)
-
-        # 3. 叠加风格配方
-        recipe = _sampler.get_style_recipe(风格配方, rng) if not _is_none(风格配方) else None
-        if recipe:
-            for k in ["lighting_palette", "style_recipe", "focus_detail"]:
-                val = recipe.get(k, "")
-                if val:
-                    slots.setdefault("style_recipe", []).extend([t.strip() for t in str(val).split(",") if t.strip()])
-
-        # 4. 组装、冲突消解与统一 Finalize
-        positive_prompt = _assembler.assemble(slots, rng=rng)
-        negative_prompt = _sampler.get_negative_prompt()
-
-        # 5. 生成中文概要
-        desc_parts = []
-        if not _is_none(场景大类):
-            desc_parts.append(f"场景: {场景大类}")
-        if not _is_none(剧情主题):
-            desc_parts.append(f"主题: {剧情主题}")
-        if not _is_none(服装款式):
-            desc_parts.append(f"服装: {服装款式}")
-        desc_parts.append(f"裸露: {lvl_code}")
-        if not _is_none(发型发色):
-            desc_parts.append(f"发型: {发型发色}")
-        if not _is_none(妆容细节):
-            desc_parts.append(f"妆容: {妆容细节}")
-        if not _is_none(液体效果):
-            desc_parts.append(f"体液: {液体效果}")
-        if recipe:
-            desc_parts.append(f"配方: {recipe.get('style_name', recipe.get('name_zh', ''))}")
-
-        chinese_desc = " | ".join(desc_parts)
-        return (positive_prompt, negative_prompt, chinese_desc)
+        return (res.positive, res.negative, res.description)
 
 
 # ═══════════════════════════════════════════════════════════════════════════
@@ -332,6 +573,42 @@ class IYKYKPresetBrowser:
     def IS_CHANGED(cls, prompt_seed: int = -1, **kwargs) -> Any:
         return _compute_is_changed(prompt_seed, kwargs)
 
+    def browse_structured(
+        self,
+        预设模板: str,
+        风格配方: str,
+        画质等级: str,
+        prompt_seed: int = -1,
+    ) -> GenerationResult:
+        rng, _ = _get_rng(prompt_seed)
+        preset = _sampler.get_preset(预设模板, rng)
+        if not preset:
+            return GenerationResult(
+                positive="",
+                negative=_sampler.get_negative_prompt(),
+                description="未找到指定预设",
+                atoms=(),
+                rules_applied=(),
+                source_atoms=(),
+            )
+
+        recipe = _sampler.get_style_recipe(风格配方, rng) if not _is_none(风格配方) else None
+        assembly_res = _assembler.assemble_preset(preset, recipe, 画质等级, rng=rng)
+        neg = _sampler.get_negative_prompt()
+
+        desc = f"【预设模板】{preset.get('id', '')} {preset.get('name_zh', '')}"
+        if recipe:
+            desc += f" | 【叠加配方】{recipe.get('style_name', recipe.get('name_zh', ''))}"
+
+        return GenerationResult(
+            positive=assembly_res.prompt,
+            negative=neg,
+            description=desc,
+            atoms=assembly_res.accepted_atoms,
+            rules_applied=assembly_res.rules_applied,
+            source_atoms=assembly_res.source_atoms,
+        )
+
     def browse(
         self,
         预设模板: str,
@@ -339,20 +616,8 @@ class IYKYKPresetBrowser:
         画质等级: str,
         prompt_seed: int = -1,
     ) -> Tuple[str, str, str]:
-        rng, _ = _get_rng(prompt_seed)
-        preset = _sampler.get_preset(预设模板, rng)
-        if not preset:
-            return ("", _sampler.get_negative_prompt(), "未找到指定预设")
-
-        recipe = _sampler.get_style_recipe(风格配方, rng) if not _is_none(风格配方) else None
-        pos = _assembler.assemble_preset(preset, recipe, 画质等级, rng=rng)
-        neg = _sampler.get_negative_prompt()
-
-        desc = f"【预设模板】{preset.get('id', '')} {preset.get('name_zh', '')}"
-        if recipe:
-            desc += f" | 【叠加配方】{recipe.get('style_name', recipe.get('name_zh', ''))}"
-
-        return (pos, neg, desc)
+        res = self.browse_structured(预设模板, 风格配方, 画质等级, prompt_seed)
+        return (res.positive, res.negative, res.description)
 
 
 # ═══════════════════════════════════════════════════════════════════════════
@@ -400,7 +665,7 @@ class IYKYKCustomSlotCombiner:
     def IS_CHANGED(cls, prompt_seed: int = -1, **kwargs) -> Any:
         return _compute_is_changed(prompt_seed, kwargs)
 
-    def combine(self, prompt_seed: int = -1, **kwargs) -> Tuple[str, str, str]:
+    def combine_structured(self, prompt_seed: int = -1, **kwargs) -> GenerationResult:
         rng, _ = _get_rng(prompt_seed)
 
         slot_mapping = {
@@ -436,15 +701,27 @@ class IYKYKCustomSlotCombiner:
                             text=t,
                             source_slot=slot_name,
                             order=order,
+                            provenance=TagProvenance(kind="user_input", semantic_ids=(f"slot:{slot_name}",)),
                         )
                     )
                     order += 1
 
-        positive_prompt = finalize_prompt(fragments, data_dir=DATA_DIR, rng=rng)
+        assembly_res = assemble_result(fragments, DATA_DIR, rng=rng)
         negative_prompt = _sampler.get_negative_prompt()
         desc = f"已成功拼装 {active_count} 个自定义槽位"
 
-        return (positive_prompt, negative_prompt, desc)
+        return GenerationResult(
+            positive=assembly_res.prompt,
+            negative=negative_prompt,
+            description=desc,
+            atoms=assembly_res.accepted_atoms,
+            rules_applied=assembly_res.rules_applied,
+            source_atoms=assembly_res.source_atoms,
+        )
+
+    def combine(self, prompt_seed: int = -1, **kwargs) -> Tuple[str, str, str]:
+        res = self.combine_structured(prompt_seed, **kwargs)
+        return (res.positive, res.negative, res.description)
 
 
 NODE_CLASS_MAPPINGS = {

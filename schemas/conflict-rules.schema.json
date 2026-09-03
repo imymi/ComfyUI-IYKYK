@@ -1,32 +1,4478 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "title": "ConflictRulesDataset",
+  "title": "ConflictRulesConfiguration",
+  "description": "ComfyUI-IYKYK 17 大冲突消解规则权威配置 Schema (单源由 Python 契约生成)",
   "type": "object",
   "required": [
     "rules"
   ],
+  "additionalProperties": false,
   "properties": {
     "rules": {
       "type": "array",
       "minItems": 17,
       "maxItems": 17,
       "items": {
-        "type": "object",
-        "required": [
-          "id",
-          "description"
-        ],
-        "properties": {
-          "id": {
-            "type": "string",
-            "minLength": 1
+        "anyOf": [
+          {
+            "type": "object",
+            "required": [
+              "description",
+              "id",
+              "indoor_exclusive",
+              "outdoor_exclusive",
+              "venue_clusters"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "id": {
+                "const": "spatial_environmental_mutual_exclusion"
+              },
+              "description": {
+                "type": "string",
+                "minLength": 1
+              },
+              "venue_clusters": {
+                "type": "object",
+                "minProperties": 1,
+                "propertyNames": {
+                  "pattern": "\\S"
+                },
+                "additionalProperties": {
+                  "type": "array",
+                  "minItems": 1,
+                  "items": {
+                    "type": "object",
+                    "required": [
+                      "pattern",
+                      "match_mode"
+                    ],
+                    "additionalProperties": false,
+                    "properties": {
+                      "pattern": {
+                        "type": "string",
+                        "minLength": 1,
+                        "pattern": "\\S"
+                      },
+                      "match_mode": {
+                        "type": "string",
+                        "enum": [
+                          "exact",
+                          "word",
+                          "phrase",
+                          "regex"
+                        ]
+                      }
+                    },
+                    "allOf": [
+                      {
+                        "if": {
+                          "properties": {
+                            "match_mode": {
+                              "const": "word"
+                            }
+                          }
+                        },
+                        "then": {
+                          "properties": {
+                            "pattern": {
+                              "pattern": "^[^\\s\\-/]+$"
+                            }
+                          }
+                        }
+                      },
+                      {
+                        "if": {
+                          "properties": {
+                            "match_mode": {
+                              "const": "regex"
+                            }
+                          }
+                        },
+                        "then": {
+                          "properties": {
+                            "pattern": {
+                              "format": "regex"
+                            }
+                          }
+                        }
+                      }
+                    ]
+                  }
+                }
+              },
+              "outdoor_exclusive": {
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                  "type": "object",
+                  "required": [
+                    "pattern",
+                    "match_mode"
+                  ],
+                  "additionalProperties": false,
+                  "properties": {
+                    "pattern": {
+                      "type": "string",
+                      "minLength": 1,
+                      "pattern": "\\S"
+                    },
+                    "match_mode": {
+                      "type": "string",
+                      "enum": [
+                        "exact",
+                        "word",
+                        "phrase",
+                        "regex"
+                      ]
+                    }
+                  },
+                  "allOf": [
+                    {
+                      "if": {
+                        "properties": {
+                          "match_mode": {
+                            "const": "word"
+                          }
+                        }
+                      },
+                      "then": {
+                        "properties": {
+                          "pattern": {
+                            "pattern": "^[^\\s\\-/]+$"
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "if": {
+                        "properties": {
+                          "match_mode": {
+                            "const": "regex"
+                          }
+                        }
+                      },
+                      "then": {
+                        "properties": {
+                          "pattern": {
+                            "format": "regex"
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              },
+              "indoor_exclusive": {
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                  "type": "object",
+                  "required": [
+                    "pattern",
+                    "match_mode"
+                  ],
+                  "additionalProperties": false,
+                  "properties": {
+                    "pattern": {
+                      "type": "string",
+                      "minLength": 1,
+                      "pattern": "\\S"
+                    },
+                    "match_mode": {
+                      "type": "string",
+                      "enum": [
+                        "exact",
+                        "word",
+                        "phrase",
+                        "regex"
+                      ]
+                    }
+                  },
+                  "allOf": [
+                    {
+                      "if": {
+                        "properties": {
+                          "match_mode": {
+                            "const": "word"
+                          }
+                        }
+                      },
+                      "then": {
+                        "properties": {
+                          "pattern": {
+                            "pattern": "^[^\\s\\-/]+$"
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "if": {
+                        "properties": {
+                          "match_mode": {
+                            "const": "regex"
+                          }
+                        }
+                      },
+                      "then": {
+                        "properties": {
+                          "pattern": {
+                            "format": "regex"
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              },
+              "deprecated_tags": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "required": [
+                    "banned",
+                    "replacement"
+                  ],
+                  "additionalProperties": false,
+                  "properties": {
+                    "banned": {
+                      "type": "object",
+                      "required": [
+                        "pattern",
+                        "match_mode"
+                      ],
+                      "additionalProperties": false,
+                      "properties": {
+                        "pattern": {
+                          "type": "string",
+                          "minLength": 1,
+                          "pattern": "\\S"
+                        },
+                        "match_mode": {
+                          "type": "string",
+                          "enum": [
+                            "exact",
+                            "word",
+                            "phrase"
+                          ]
+                        }
+                      },
+                      "allOf": [
+                        {
+                          "if": {
+                            "properties": {
+                              "match_mode": {
+                                "const": "word"
+                              }
+                            }
+                          },
+                          "then": {
+                            "properties": {
+                              "pattern": {
+                                "pattern": "^[^\\s\\-/]+$"
+                              }
+                            }
+                          }
+                        },
+                        {
+                          "if": {
+                            "properties": {
+                              "match_mode": {
+                                "const": "regex"
+                              }
+                            }
+                          },
+                          "then": {
+                            "properties": {
+                              "pattern": {
+                                "format": "regex"
+                              }
+                            }
+                          }
+                        }
+                      ]
+                    },
+                    "replacement": {
+                      "type": "string",
+                      "minLength": 1
+                    }
+                  }
+                }
+              }
+            }
           },
-          "description": {
-            "type": "string",
-            "minLength": 1
+          {
+            "type": "object",
+            "required": [
+              "description",
+              "id",
+              "level_rules"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "id": {
+                "const": "nudity_clothing_conflicts"
+              },
+              "description": {
+                "type": "string",
+                "minLength": 1
+              },
+              "level_rules": {
+                "type": "object",
+                "required": [
+                  "L1",
+                  "L2",
+                  "L3",
+                  "L4",
+                  "L5",
+                  "L6"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                  "L1": {
+                    "type": "object",
+                    "required": [
+                      "name_zh",
+                      "banned_patterns"
+                    ],
+                    "additionalProperties": false,
+                    "properties": {
+                      "name_zh": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "banned_patterns": {
+                        "type": "array",
+                        "minItems": 1,
+                        "items": {
+                          "type": "object",
+                          "required": [
+                            "pattern",
+                            "match_mode"
+                          ],
+                          "additionalProperties": false,
+                          "properties": {
+                            "pattern": {
+                              "type": "string",
+                              "minLength": 1,
+                              "pattern": "\\S"
+                            },
+                            "match_mode": {
+                              "type": "string",
+                              "enum": [
+                                "exact",
+                                "word",
+                                "phrase",
+                                "regex"
+                              ]
+                            }
+                          },
+                          "allOf": [
+                            {
+                              "if": {
+                                "properties": {
+                                  "match_mode": {
+                                    "const": "word"
+                                  }
+                                }
+                              },
+                              "then": {
+                                "properties": {
+                                  "pattern": {
+                                    "pattern": "^[^\\s\\-/]+$"
+                                  }
+                                }
+                              }
+                            },
+                            {
+                              "if": {
+                                "properties": {
+                                  "match_mode": {
+                                    "const": "regex"
+                                  }
+                                }
+                              },
+                              "then": {
+                                "properties": {
+                                  "pattern": {
+                                    "format": "regex"
+                                  }
+                                }
+                              }
+                            }
+                          ]
+                        }
+                      }
+                    }
+                  },
+                  "L2": {
+                    "type": "object",
+                    "required": [
+                      "name_zh",
+                      "banned_patterns"
+                    ],
+                    "additionalProperties": false,
+                    "properties": {
+                      "name_zh": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "banned_patterns": {
+                        "type": "array",
+                        "minItems": 1,
+                        "items": {
+                          "type": "object",
+                          "required": [
+                            "pattern",
+                            "match_mode"
+                          ],
+                          "additionalProperties": false,
+                          "properties": {
+                            "pattern": {
+                              "type": "string",
+                              "minLength": 1,
+                              "pattern": "\\S"
+                            },
+                            "match_mode": {
+                              "type": "string",
+                              "enum": [
+                                "exact",
+                                "word",
+                                "phrase",
+                                "regex"
+                              ]
+                            }
+                          },
+                          "allOf": [
+                            {
+                              "if": {
+                                "properties": {
+                                  "match_mode": {
+                                    "const": "word"
+                                  }
+                                }
+                              },
+                              "then": {
+                                "properties": {
+                                  "pattern": {
+                                    "pattern": "^[^\\s\\-/]+$"
+                                  }
+                                }
+                              }
+                            },
+                            {
+                              "if": {
+                                "properties": {
+                                  "match_mode": {
+                                    "const": "regex"
+                                  }
+                                }
+                              },
+                              "then": {
+                                "properties": {
+                                  "pattern": {
+                                    "format": "regex"
+                                  }
+                                }
+                              }
+                            }
+                          ]
+                        }
+                      }
+                    }
+                  },
+                  "L3": {
+                    "type": "object",
+                    "required": [
+                      "name_zh",
+                      "banned_patterns"
+                    ],
+                    "additionalProperties": false,
+                    "properties": {
+                      "name_zh": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "banned_patterns": {
+                        "type": "array",
+                        "minItems": 1,
+                        "items": {
+                          "type": "object",
+                          "required": [
+                            "pattern",
+                            "match_mode"
+                          ],
+                          "additionalProperties": false,
+                          "properties": {
+                            "pattern": {
+                              "type": "string",
+                              "minLength": 1,
+                              "pattern": "\\S"
+                            },
+                            "match_mode": {
+                              "type": "string",
+                              "enum": [
+                                "exact",
+                                "word",
+                                "phrase",
+                                "regex"
+                              ]
+                            }
+                          },
+                          "allOf": [
+                            {
+                              "if": {
+                                "properties": {
+                                  "match_mode": {
+                                    "const": "word"
+                                  }
+                                }
+                              },
+                              "then": {
+                                "properties": {
+                                  "pattern": {
+                                    "pattern": "^[^\\s\\-/]+$"
+                                  }
+                                }
+                              }
+                            },
+                            {
+                              "if": {
+                                "properties": {
+                                  "match_mode": {
+                                    "const": "regex"
+                                  }
+                                }
+                              },
+                              "then": {
+                                "properties": {
+                                  "pattern": {
+                                    "format": "regex"
+                                  }
+                                }
+                              }
+                            }
+                          ]
+                        }
+                      }
+                    }
+                  },
+                  "L4": {
+                    "type": "object",
+                    "required": [
+                      "name_zh",
+                      "banned_patterns"
+                    ],
+                    "additionalProperties": false,
+                    "properties": {
+                      "name_zh": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "banned_patterns": {
+                        "type": "array",
+                        "minItems": 1,
+                        "items": {
+                          "type": "object",
+                          "required": [
+                            "pattern",
+                            "match_mode"
+                          ],
+                          "additionalProperties": false,
+                          "properties": {
+                            "pattern": {
+                              "type": "string",
+                              "minLength": 1,
+                              "pattern": "\\S"
+                            },
+                            "match_mode": {
+                              "type": "string",
+                              "enum": [
+                                "exact",
+                                "word",
+                                "phrase",
+                                "regex"
+                              ]
+                            }
+                          },
+                          "allOf": [
+                            {
+                              "if": {
+                                "properties": {
+                                  "match_mode": {
+                                    "const": "word"
+                                  }
+                                }
+                              },
+                              "then": {
+                                "properties": {
+                                  "pattern": {
+                                    "pattern": "^[^\\s\\-/]+$"
+                                  }
+                                }
+                              }
+                            },
+                            {
+                              "if": {
+                                "properties": {
+                                  "match_mode": {
+                                    "const": "regex"
+                                  }
+                                }
+                              },
+                              "then": {
+                                "properties": {
+                                  "pattern": {
+                                    "format": "regex"
+                                  }
+                                }
+                              }
+                            }
+                          ]
+                        }
+                      }
+                    }
+                  },
+                  "L5": {
+                    "type": "object",
+                    "required": [
+                      "name_zh",
+                      "banned_patterns"
+                    ],
+                    "additionalProperties": false,
+                    "properties": {
+                      "name_zh": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "banned_patterns": {
+                        "type": "array",
+                        "minItems": 1,
+                        "items": {
+                          "type": "object",
+                          "required": [
+                            "pattern",
+                            "match_mode"
+                          ],
+                          "additionalProperties": false,
+                          "properties": {
+                            "pattern": {
+                              "type": "string",
+                              "minLength": 1,
+                              "pattern": "\\S"
+                            },
+                            "match_mode": {
+                              "type": "string",
+                              "enum": [
+                                "exact",
+                                "word",
+                                "phrase",
+                                "regex"
+                              ]
+                            }
+                          },
+                          "allOf": [
+                            {
+                              "if": {
+                                "properties": {
+                                  "match_mode": {
+                                    "const": "word"
+                                  }
+                                }
+                              },
+                              "then": {
+                                "properties": {
+                                  "pattern": {
+                                    "pattern": "^[^\\s\\-/]+$"
+                                  }
+                                }
+                              }
+                            },
+                            {
+                              "if": {
+                                "properties": {
+                                  "match_mode": {
+                                    "const": "regex"
+                                  }
+                                }
+                              },
+                              "then": {
+                                "properties": {
+                                  "pattern": {
+                                    "format": "regex"
+                                  }
+                                }
+                              }
+                            }
+                          ]
+                        }
+                      }
+                    }
+                  },
+                  "L6": {
+                    "type": "object",
+                    "required": [
+                      "name_zh",
+                      "banned_patterns"
+                    ],
+                    "additionalProperties": false,
+                    "properties": {
+                      "name_zh": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "banned_patterns": {
+                        "type": "array",
+                        "minItems": 1,
+                        "items": {
+                          "type": "object",
+                          "required": [
+                            "pattern",
+                            "match_mode"
+                          ],
+                          "additionalProperties": false,
+                          "properties": {
+                            "pattern": {
+                              "type": "string",
+                              "minLength": 1,
+                              "pattern": "\\S"
+                            },
+                            "match_mode": {
+                              "type": "string",
+                              "enum": [
+                                "exact",
+                                "word",
+                                "phrase",
+                                "regex"
+                              ]
+                            }
+                          },
+                          "allOf": [
+                            {
+                              "if": {
+                                "properties": {
+                                  "match_mode": {
+                                    "const": "word"
+                                  }
+                                }
+                              },
+                              "then": {
+                                "properties": {
+                                  "pattern": {
+                                    "pattern": "^[^\\s\\-/]+$"
+                                  }
+                                }
+                              }
+                            },
+                            {
+                              "if": {
+                                "properties": {
+                                  "match_mode": {
+                                    "const": "regex"
+                                  }
+                                }
+                              },
+                              "then": {
+                                "properties": {
+                                  "pattern": {
+                                    "format": "regex"
+                                  }
+                                }
+                              }
+                            }
+                          ]
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              "conflicts": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "required": [
+                    "trigger",
+                    "ban"
+                  ],
+                  "additionalProperties": false,
+                  "properties": {
+                    "trigger": {
+                      "type": "array",
+                      "minItems": 1,
+                      "items": {
+                        "type": "object",
+                        "required": [
+                          "pattern",
+                          "match_mode"
+                        ],
+                        "additionalProperties": false,
+                        "properties": {
+                          "pattern": {
+                            "type": "string",
+                            "minLength": 1,
+                            "pattern": "\\S"
+                          },
+                          "match_mode": {
+                            "type": "string",
+                            "enum": [
+                              "exact",
+                              "word",
+                              "phrase",
+                              "regex"
+                            ]
+                          }
+                        },
+                        "allOf": [
+                          {
+                            "if": {
+                              "properties": {
+                                "match_mode": {
+                                  "const": "word"
+                                }
+                              }
+                            },
+                            "then": {
+                              "properties": {
+                                "pattern": {
+                                  "pattern": "^[^\\s\\-/]+$"
+                                }
+                              }
+                            }
+                          },
+                          {
+                            "if": {
+                              "properties": {
+                                "match_mode": {
+                                  "const": "regex"
+                                }
+                              }
+                            },
+                            "then": {
+                              "properties": {
+                                "pattern": {
+                                  "format": "regex"
+                                }
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    },
+                    "ban": {
+                      "type": "array",
+                      "minItems": 1,
+                      "items": {
+                        "type": "object",
+                        "required": [
+                          "pattern",
+                          "match_mode"
+                        ],
+                        "additionalProperties": false,
+                        "properties": {
+                          "pattern": {
+                            "type": "string",
+                            "minLength": 1,
+                            "pattern": "\\S"
+                          },
+                          "match_mode": {
+                            "type": "string",
+                            "enum": [
+                              "exact",
+                              "word",
+                              "phrase",
+                              "regex"
+                            ]
+                          }
+                        },
+                        "allOf": [
+                          {
+                            "if": {
+                              "properties": {
+                                "match_mode": {
+                                  "const": "word"
+                                }
+                              }
+                            },
+                            "then": {
+                              "properties": {
+                                "pattern": {
+                                  "pattern": "^[^\\s\\-/]+$"
+                                }
+                              }
+                            }
+                          },
+                          {
+                            "if": {
+                              "properties": {
+                                "match_mode": {
+                                  "const": "regex"
+                                }
+                              }
+                            },
+                            "then": {
+                              "properties": {
+                                "pattern": {
+                                  "format": "regex"
+                                }
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          {
+            "type": "object",
+            "required": [
+              "banned_words",
+              "description",
+              "id",
+              "replacements",
+              "target_provenance_kinds",
+              "target_slots"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "id": {
+                "const": "material_penetration"
+              },
+              "description": {
+                "type": "string",
+                "minLength": 1
+              },
+              "banned_words": {
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                  "type": "object",
+                  "required": [
+                    "pattern",
+                    "match_mode"
+                  ],
+                  "additionalProperties": false,
+                  "properties": {
+                    "pattern": {
+                      "type": "string",
+                      "minLength": 1,
+                      "pattern": "\\S"
+                    },
+                    "match_mode": {
+                      "type": "string",
+                      "enum": [
+                        "exact",
+                        "word",
+                        "phrase",
+                        "regex"
+                      ]
+                    }
+                  },
+                  "allOf": [
+                    {
+                      "if": {
+                        "properties": {
+                          "match_mode": {
+                            "const": "word"
+                          }
+                        }
+                      },
+                      "then": {
+                        "properties": {
+                          "pattern": {
+                            "pattern": "^[^\\s\\-/]+$"
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "if": {
+                        "properties": {
+                          "match_mode": {
+                            "const": "regex"
+                          }
+                        }
+                      },
+                      "then": {
+                        "properties": {
+                          "pattern": {
+                            "format": "regex"
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              },
+              "replacements": {
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "target_slots": {
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                  "type": "string",
+                  "enum": [
+                    "camera_angle",
+                    "character",
+                    "clothing",
+                    "custom",
+                    "expression",
+                    "film",
+                    "hairstyle",
+                    "imperfections",
+                    "jewelry",
+                    "lighting",
+                    "liquids",
+                    "makeup",
+                    "nudity",
+                    "pose",
+                    "props",
+                    "quality",
+                    "scene_theme",
+                    "shot_type",
+                    "style_recipe",
+                    "tattoo"
+                  ]
+                }
+              },
+              "target_provenance_kinds": {
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                  "type": "string",
+                  "enum": [
+                    "base_clothing",
+                    "clothing_state",
+                    "clothing_extension",
+                    "user_input",
+                    "resolver_generated",
+                    "scene_anchor",
+                    "scene_detail",
+                    "quality_default"
+                  ]
+                }
+              }
+            }
+          },
+          {
+            "type": "object",
+            "required": [
+              "description",
+              "id",
+              "one_piece_banned_states",
+              "one_piece_triggers"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "id": {
+                "const": "clothing_style_state_coherence"
+              },
+              "description": {
+                "type": "string",
+                "minLength": 1
+              },
+              "name_zh": {
+                "type": "string",
+                "minLength": 1
+              },
+              "one_piece_triggers": {
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                  "type": "object",
+                  "required": [
+                    "pattern",
+                    "match_mode"
+                  ],
+                  "additionalProperties": false,
+                  "properties": {
+                    "pattern": {
+                      "type": "string",
+                      "minLength": 1,
+                      "pattern": "\\S"
+                    },
+                    "match_mode": {
+                      "type": "string",
+                      "enum": [
+                        "exact",
+                        "word",
+                        "phrase",
+                        "regex"
+                      ]
+                    }
+                  },
+                  "allOf": [
+                    {
+                      "if": {
+                        "properties": {
+                          "match_mode": {
+                            "const": "word"
+                          }
+                        }
+                      },
+                      "then": {
+                        "properties": {
+                          "pattern": {
+                            "pattern": "^[^\\s\\-/]+$"
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "if": {
+                        "properties": {
+                          "match_mode": {
+                            "const": "regex"
+                          }
+                        }
+                      },
+                      "then": {
+                        "properties": {
+                          "pattern": {
+                            "format": "regex"
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              },
+              "one_piece_banned_states": {
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                  "type": "object",
+                  "required": [
+                    "pattern",
+                    "match_mode"
+                  ],
+                  "additionalProperties": false,
+                  "properties": {
+                    "pattern": {
+                      "type": "string",
+                      "minLength": 1,
+                      "pattern": "\\S"
+                    },
+                    "match_mode": {
+                      "type": "string",
+                      "enum": [
+                        "exact",
+                        "word",
+                        "phrase",
+                        "regex"
+                      ]
+                    }
+                  },
+                  "allOf": [
+                    {
+                      "if": {
+                        "properties": {
+                          "match_mode": {
+                            "const": "word"
+                          }
+                        }
+                      },
+                      "then": {
+                        "properties": {
+                          "pattern": {
+                            "pattern": "^[^\\s\\-/]+$"
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "if": {
+                        "properties": {
+                          "match_mode": {
+                            "const": "regex"
+                          }
+                        }
+                      },
+                      "then": {
+                        "properties": {
+                          "pattern": {
+                            "format": "regex"
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              },
+              "pants_triggers": {
+                "type": "array",
+                "minItems": 0,
+                "items": {
+                  "type": "object",
+                  "required": [
+                    "pattern",
+                    "match_mode"
+                  ],
+                  "additionalProperties": false,
+                  "properties": {
+                    "pattern": {
+                      "type": "string",
+                      "minLength": 1,
+                      "pattern": "\\S"
+                    },
+                    "match_mode": {
+                      "type": "string",
+                      "enum": [
+                        "exact",
+                        "word",
+                        "phrase",
+                        "regex"
+                      ]
+                    }
+                  },
+                  "allOf": [
+                    {
+                      "if": {
+                        "properties": {
+                          "match_mode": {
+                            "const": "word"
+                          }
+                        }
+                      },
+                      "then": {
+                        "properties": {
+                          "pattern": {
+                            "pattern": "^[^\\s\\-/]+$"
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "if": {
+                        "properties": {
+                          "match_mode": {
+                            "const": "regex"
+                          }
+                        }
+                      },
+                      "then": {
+                        "properties": {
+                          "pattern": {
+                            "format": "regex"
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              },
+              "pants_banned_states": {
+                "type": "array",
+                "minItems": 0,
+                "items": {
+                  "type": "object",
+                  "required": [
+                    "pattern",
+                    "match_mode"
+                  ],
+                  "additionalProperties": false,
+                  "properties": {
+                    "pattern": {
+                      "type": "string",
+                      "minLength": 1,
+                      "pattern": "\\S"
+                    },
+                    "match_mode": {
+                      "type": "string",
+                      "enum": [
+                        "exact",
+                        "word",
+                        "phrase",
+                        "regex"
+                      ]
+                    }
+                  },
+                  "allOf": [
+                    {
+                      "if": {
+                        "properties": {
+                          "match_mode": {
+                            "const": "word"
+                          }
+                        }
+                      },
+                      "then": {
+                        "properties": {
+                          "pattern": {
+                            "pattern": "^[^\\s\\-/]+$"
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "if": {
+                        "properties": {
+                          "match_mode": {
+                            "const": "regex"
+                          }
+                        }
+                      },
+                      "then": {
+                        "properties": {
+                          "pattern": {
+                            "format": "regex"
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          {
+            "type": "object",
+            "required": [
+              "description",
+              "id",
+              "mappings"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "id": {
+                "const": "gaze_angle_geometry"
+              },
+              "description": {
+                "type": "string",
+                "minLength": 1
+              },
+              "mappings": {
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                  "type": "object",
+                  "required": [
+                    "angles",
+                    "banned_gaze"
+                  ],
+                  "additionalProperties": false,
+                  "properties": {
+                    "angles": {
+                      "type": "array",
+                      "minItems": 1,
+                      "items": {
+                        "type": "object",
+                        "required": [
+                          "pattern",
+                          "match_mode"
+                        ],
+                        "additionalProperties": false,
+                        "properties": {
+                          "pattern": {
+                            "type": "string",
+                            "minLength": 1,
+                            "pattern": "\\S"
+                          },
+                          "match_mode": {
+                            "type": "string",
+                            "enum": [
+                              "exact",
+                              "word",
+                              "phrase",
+                              "regex"
+                            ]
+                          }
+                        },
+                        "allOf": [
+                          {
+                            "if": {
+                              "properties": {
+                                "match_mode": {
+                                  "const": "word"
+                                }
+                              }
+                            },
+                            "then": {
+                              "properties": {
+                                "pattern": {
+                                  "pattern": "^[^\\s\\-/]+$"
+                                }
+                              }
+                            }
+                          },
+                          {
+                            "if": {
+                              "properties": {
+                                "match_mode": {
+                                  "const": "regex"
+                                }
+                              }
+                            },
+                            "then": {
+                              "properties": {
+                                "pattern": {
+                                  "format": "regex"
+                                }
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    },
+                    "banned_gaze": {
+                      "type": "array",
+                      "minItems": 0,
+                      "items": {
+                        "type": "object",
+                        "required": [
+                          "pattern",
+                          "match_mode"
+                        ],
+                        "additionalProperties": false,
+                        "properties": {
+                          "pattern": {
+                            "type": "string",
+                            "minLength": 1,
+                            "pattern": "\\S"
+                          },
+                          "match_mode": {
+                            "type": "string",
+                            "enum": [
+                              "exact",
+                              "word",
+                              "phrase",
+                              "regex"
+                            ]
+                          }
+                        },
+                        "allOf": [
+                          {
+                            "if": {
+                              "properties": {
+                                "match_mode": {
+                                  "const": "word"
+                                }
+                              }
+                            },
+                            "then": {
+                              "properties": {
+                                "pattern": {
+                                  "pattern": "^[^\\s\\-/]+$"
+                                }
+                              }
+                            }
+                          },
+                          {
+                            "if": {
+                              "properties": {
+                                "match_mode": {
+                                  "const": "regex"
+                                }
+                              }
+                            },
+                            "then": {
+                              "properties": {
+                                "pattern": {
+                                  "format": "regex"
+                                }
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          {
+            "type": "object",
+            "required": [
+              "description",
+              "exclusive_pairs",
+              "id"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "id": {
+                "const": "gaze_mutual_exclusion"
+              },
+              "description": {
+                "type": "string",
+                "minLength": 1
+              },
+              "exclusive_pairs": {
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                  "type": "array",
+                  "minItems": 2,
+                  "maxItems": 2,
+                  "items": {
+                    "type": "object",
+                    "required": [
+                      "pattern",
+                      "match_mode"
+                    ],
+                    "additionalProperties": false,
+                    "properties": {
+                      "pattern": {
+                        "type": "string",
+                        "minLength": 1,
+                        "pattern": "\\S"
+                      },
+                      "match_mode": {
+                        "type": "string",
+                        "enum": [
+                          "exact",
+                          "word",
+                          "phrase",
+                          "regex"
+                        ]
+                      }
+                    },
+                    "allOf": [
+                      {
+                        "if": {
+                          "properties": {
+                            "match_mode": {
+                              "const": "word"
+                            }
+                          }
+                        },
+                        "then": {
+                          "properties": {
+                            "pattern": {
+                              "pattern": "^[^\\s\\-/]+$"
+                            }
+                          }
+                        }
+                      },
+                      {
+                        "if": {
+                          "properties": {
+                            "match_mode": {
+                              "const": "regex"
+                            }
+                          }
+                        },
+                        "then": {
+                          "properties": {
+                            "pattern": {
+                              "format": "regex"
+                            }
+                          }
+                        }
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          {
+            "type": "object",
+            "required": [
+              "catalog_banned_gaze_actions",
+              "catalog_occlusion_triggers",
+              "custom_banned_gaze_actions",
+              "custom_occlusion_triggers",
+              "description",
+              "id"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "id": {
+                "const": "accessory_occlusion_gaze_coherence"
+              },
+              "description": {
+                "type": "string",
+                "minLength": 1
+              },
+              "name_zh": {
+                "type": "string",
+                "minLength": 1
+              },
+              "catalog_occlusion_triggers": {
+                "type": "array",
+                "minItems": 0,
+                "items": {
+                  "type": "object",
+                  "required": [
+                    "pattern",
+                    "match_mode"
+                  ],
+                  "additionalProperties": false,
+                  "properties": {
+                    "pattern": {
+                      "type": "string",
+                      "minLength": 1,
+                      "pattern": "\\S"
+                    },
+                    "match_mode": {
+                      "type": "string",
+                      "enum": [
+                        "exact",
+                        "word",
+                        "phrase",
+                        "regex"
+                      ]
+                    }
+                  },
+                  "allOf": [
+                    {
+                      "if": {
+                        "properties": {
+                          "match_mode": {
+                            "const": "word"
+                          }
+                        }
+                      },
+                      "then": {
+                        "properties": {
+                          "pattern": {
+                            "pattern": "^[^\\s\\-/]+$"
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "if": {
+                        "properties": {
+                          "match_mode": {
+                            "const": "regex"
+                          }
+                        }
+                      },
+                      "then": {
+                        "properties": {
+                          "pattern": {
+                            "format": "regex"
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              },
+              "custom_occlusion_triggers": {
+                "type": "array",
+                "minItems": 0,
+                "items": {
+                  "type": "object",
+                  "required": [
+                    "pattern",
+                    "match_mode"
+                  ],
+                  "additionalProperties": false,
+                  "properties": {
+                    "pattern": {
+                      "type": "string",
+                      "minLength": 1,
+                      "pattern": "\\S"
+                    },
+                    "match_mode": {
+                      "type": "string",
+                      "enum": [
+                        "exact",
+                        "word",
+                        "phrase",
+                        "regex"
+                      ]
+                    }
+                  },
+                  "allOf": [
+                    {
+                      "if": {
+                        "properties": {
+                          "match_mode": {
+                            "const": "word"
+                          }
+                        }
+                      },
+                      "then": {
+                        "properties": {
+                          "pattern": {
+                            "pattern": "^[^\\s\\-/]+$"
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "if": {
+                        "properties": {
+                          "match_mode": {
+                            "const": "regex"
+                          }
+                        }
+                      },
+                      "then": {
+                        "properties": {
+                          "pattern": {
+                            "format": "regex"
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              },
+              "catalog_banned_gaze_actions": {
+                "type": "array",
+                "minItems": 0,
+                "items": {
+                  "type": "object",
+                  "required": [
+                    "pattern",
+                    "match_mode"
+                  ],
+                  "additionalProperties": false,
+                  "properties": {
+                    "pattern": {
+                      "type": "string",
+                      "minLength": 1,
+                      "pattern": "\\S"
+                    },
+                    "match_mode": {
+                      "type": "string",
+                      "enum": [
+                        "exact",
+                        "word",
+                        "phrase",
+                        "regex"
+                      ]
+                    }
+                  },
+                  "allOf": [
+                    {
+                      "if": {
+                        "properties": {
+                          "match_mode": {
+                            "const": "word"
+                          }
+                        }
+                      },
+                      "then": {
+                        "properties": {
+                          "pattern": {
+                            "pattern": "^[^\\s\\-/]+$"
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "if": {
+                        "properties": {
+                          "match_mode": {
+                            "const": "regex"
+                          }
+                        }
+                      },
+                      "then": {
+                        "properties": {
+                          "pattern": {
+                            "format": "regex"
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              },
+              "custom_banned_gaze_actions": {
+                "type": "array",
+                "minItems": 0,
+                "items": {
+                  "type": "object",
+                  "required": [
+                    "pattern",
+                    "match_mode"
+                  ],
+                  "additionalProperties": false,
+                  "properties": {
+                    "pattern": {
+                      "type": "string",
+                      "minLength": 1,
+                      "pattern": "\\S"
+                    },
+                    "match_mode": {
+                      "type": "string",
+                      "enum": [
+                        "exact",
+                        "word",
+                        "phrase",
+                        "regex"
+                      ]
+                    }
+                  },
+                  "allOf": [
+                    {
+                      "if": {
+                        "properties": {
+                          "match_mode": {
+                            "const": "word"
+                          }
+                        }
+                      },
+                      "then": {
+                        "properties": {
+                          "pattern": {
+                            "pattern": "^[^\\s\\-/]+$"
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "if": {
+                        "properties": {
+                          "match_mode": {
+                            "const": "regex"
+                          }
+                        }
+                      },
+                      "then": {
+                        "properties": {
+                          "pattern": {
+                            "format": "regex"
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "allOf": [
+              {
+                "anyOf": [
+                  {
+                    "properties": {
+                      "catalog_occlusion_triggers": {
+                        "minItems": 1
+                      }
+                    }
+                  },
+                  {
+                    "properties": {
+                      "custom_occlusion_triggers": {
+                        "minItems": 1
+                      }
+                    }
+                  }
+                ]
+              },
+              {
+                "anyOf": [
+                  {
+                    "properties": {
+                      "catalog_banned_gaze_actions": {
+                        "minItems": 1
+                      }
+                    }
+                  },
+                  {
+                    "properties": {
+                      "custom_banned_gaze_actions": {
+                        "minItems": 1
+                      }
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "object",
+            "required": [
+              "catalog_banned_lower_body",
+              "catalog_close_up_triggers",
+              "custom_banned_lower_body",
+              "custom_close_up_triggers",
+              "description",
+              "id"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "id": {
+                "const": "framing_lower_body_coherence"
+              },
+              "description": {
+                "type": "string",
+                "minLength": 1
+              },
+              "name_zh": {
+                "type": "string",
+                "minLength": 1
+              },
+              "catalog_close_up_triggers": {
+                "type": "array",
+                "minItems": 0,
+                "items": {
+                  "type": "object",
+                  "required": [
+                    "pattern",
+                    "match_mode"
+                  ],
+                  "additionalProperties": false,
+                  "properties": {
+                    "pattern": {
+                      "type": "string",
+                      "minLength": 1,
+                      "pattern": "\\S"
+                    },
+                    "match_mode": {
+                      "type": "string",
+                      "enum": [
+                        "exact",
+                        "word",
+                        "phrase",
+                        "regex"
+                      ]
+                    }
+                  },
+                  "allOf": [
+                    {
+                      "if": {
+                        "properties": {
+                          "match_mode": {
+                            "const": "word"
+                          }
+                        }
+                      },
+                      "then": {
+                        "properties": {
+                          "pattern": {
+                            "pattern": "^[^\\s\\-/]+$"
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "if": {
+                        "properties": {
+                          "match_mode": {
+                            "const": "regex"
+                          }
+                        }
+                      },
+                      "then": {
+                        "properties": {
+                          "pattern": {
+                            "format": "regex"
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              },
+              "custom_close_up_triggers": {
+                "type": "array",
+                "minItems": 0,
+                "items": {
+                  "type": "object",
+                  "required": [
+                    "pattern",
+                    "match_mode"
+                  ],
+                  "additionalProperties": false,
+                  "properties": {
+                    "pattern": {
+                      "type": "string",
+                      "minLength": 1,
+                      "pattern": "\\S"
+                    },
+                    "match_mode": {
+                      "type": "string",
+                      "enum": [
+                        "exact",
+                        "word",
+                        "phrase",
+                        "regex"
+                      ]
+                    }
+                  },
+                  "allOf": [
+                    {
+                      "if": {
+                        "properties": {
+                          "match_mode": {
+                            "const": "word"
+                          }
+                        }
+                      },
+                      "then": {
+                        "properties": {
+                          "pattern": {
+                            "pattern": "^[^\\s\\-/]+$"
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "if": {
+                        "properties": {
+                          "match_mode": {
+                            "const": "regex"
+                          }
+                        }
+                      },
+                      "then": {
+                        "properties": {
+                          "pattern": {
+                            "format": "regex"
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              },
+              "catalog_banned_lower_body": {
+                "type": "array",
+                "minItems": 0,
+                "items": {
+                  "type": "object",
+                  "required": [
+                    "pattern",
+                    "match_mode"
+                  ],
+                  "additionalProperties": false,
+                  "properties": {
+                    "pattern": {
+                      "type": "string",
+                      "minLength": 1,
+                      "pattern": "\\S"
+                    },
+                    "match_mode": {
+                      "type": "string",
+                      "enum": [
+                        "exact",
+                        "word",
+                        "phrase",
+                        "regex"
+                      ]
+                    }
+                  },
+                  "allOf": [
+                    {
+                      "if": {
+                        "properties": {
+                          "match_mode": {
+                            "const": "word"
+                          }
+                        }
+                      },
+                      "then": {
+                        "properties": {
+                          "pattern": {
+                            "pattern": "^[^\\s\\-/]+$"
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "if": {
+                        "properties": {
+                          "match_mode": {
+                            "const": "regex"
+                          }
+                        }
+                      },
+                      "then": {
+                        "properties": {
+                          "pattern": {
+                            "format": "regex"
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              },
+              "custom_banned_lower_body": {
+                "type": "array",
+                "minItems": 0,
+                "items": {
+                  "type": "object",
+                  "required": [
+                    "pattern",
+                    "match_mode"
+                  ],
+                  "additionalProperties": false,
+                  "properties": {
+                    "pattern": {
+                      "type": "string",
+                      "minLength": 1,
+                      "pattern": "\\S"
+                    },
+                    "match_mode": {
+                      "type": "string",
+                      "enum": [
+                        "exact",
+                        "word",
+                        "phrase",
+                        "regex"
+                      ]
+                    }
+                  },
+                  "allOf": [
+                    {
+                      "if": {
+                        "properties": {
+                          "match_mode": {
+                            "const": "word"
+                          }
+                        }
+                      },
+                      "then": {
+                        "properties": {
+                          "pattern": {
+                            "pattern": "^[^\\s\\-/]+$"
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "if": {
+                        "properties": {
+                          "match_mode": {
+                            "const": "regex"
+                          }
+                        }
+                      },
+                      "then": {
+                        "properties": {
+                          "pattern": {
+                            "format": "regex"
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "allOf": [
+              {
+                "anyOf": [
+                  {
+                    "properties": {
+                      "catalog_close_up_triggers": {
+                        "minItems": 1
+                      }
+                    }
+                  },
+                  {
+                    "properties": {
+                      "custom_close_up_triggers": {
+                        "minItems": 1
+                      }
+                    }
+                  }
+                ]
+              },
+              {
+                "anyOf": [
+                  {
+                    "properties": {
+                      "catalog_banned_lower_body": {
+                        "minItems": 1
+                      }
+                    }
+                  },
+                  {
+                    "properties": {
+                      "custom_banned_lower_body": {
+                        "minItems": 1
+                      }
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "object",
+            "required": [
+              "banned_combos",
+              "description",
+              "id",
+              "liquid_words",
+              "modifiers"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "id": {
+                "const": "liquid_restrictions"
+              },
+              "description": {
+                "type": "string",
+                "minLength": 1
+              },
+              "liquid_words": {
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                  "type": "object",
+                  "required": [
+                    "pattern",
+                    "match_mode"
+                  ],
+                  "additionalProperties": false,
+                  "properties": {
+                    "pattern": {
+                      "type": "string",
+                      "minLength": 1,
+                      "pattern": "\\S"
+                    },
+                    "match_mode": {
+                      "type": "string",
+                      "enum": [
+                        "exact",
+                        "word",
+                        "phrase",
+                        "regex"
+                      ]
+                    }
+                  },
+                  "allOf": [
+                    {
+                      "if": {
+                        "properties": {
+                          "match_mode": {
+                            "const": "word"
+                          }
+                        }
+                      },
+                      "then": {
+                        "properties": {
+                          "pattern": {
+                            "pattern": "^[^\\s\\-/]+$"
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "if": {
+                        "properties": {
+                          "match_mode": {
+                            "const": "regex"
+                          }
+                        }
+                      },
+                      "then": {
+                        "properties": {
+                          "pattern": {
+                            "format": "regex"
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              },
+              "modifiers": {
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "banned_combos": {
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                  "type": "object",
+                  "required": [
+                    "trigger",
+                    "replace"
+                  ],
+                  "additionalProperties": false,
+                  "properties": {
+                    "trigger": {
+                      "type": "array",
+                      "minItems": 1,
+                      "items": {
+                        "type": "object",
+                        "required": [
+                          "pattern",
+                          "match_mode"
+                        ],
+                        "additionalProperties": false,
+                        "properties": {
+                          "pattern": {
+                            "type": "string",
+                            "minLength": 1,
+                            "pattern": "\\S"
+                          },
+                          "match_mode": {
+                            "type": "string",
+                            "enum": [
+                              "exact",
+                              "word",
+                              "phrase",
+                              "regex"
+                            ]
+                          }
+                        },
+                        "allOf": [
+                          {
+                            "if": {
+                              "properties": {
+                                "match_mode": {
+                                  "const": "word"
+                                }
+                              }
+                            },
+                            "then": {
+                              "properties": {
+                                "pattern": {
+                                  "pattern": "^[^\\s\\-/]+$"
+                                }
+                              }
+                            }
+                          },
+                          {
+                            "if": {
+                              "properties": {
+                                "match_mode": {
+                                  "const": "regex"
+                                }
+                              }
+                            },
+                            "then": {
+                              "properties": {
+                                "pattern": {
+                                  "format": "regex"
+                                }
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    },
+                    "replace": {
+                      "type": "string",
+                      "minLength": 1
+                    }
+                  }
+                }
+              }
+            }
+          },
+          {
+            "type": "object",
+            "required": [
+              "description",
+              "device_constraints",
+              "id"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "id": {
+                "const": "device_quality_compatibility"
+              },
+              "description": {
+                "type": "string",
+                "minLength": 1
+              },
+              "device_constraints": {
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                  "type": "object",
+                  "required": [
+                    "devices",
+                    "banned_tags"
+                  ],
+                  "additionalProperties": false,
+                  "properties": {
+                    "devices": {
+                      "type": "array",
+                      "minItems": 1,
+                      "items": {
+                        "type": "object",
+                        "required": [
+                          "pattern",
+                          "match_mode"
+                        ],
+                        "additionalProperties": false,
+                        "properties": {
+                          "pattern": {
+                            "type": "string",
+                            "minLength": 1,
+                            "pattern": "\\S"
+                          },
+                          "match_mode": {
+                            "type": "string",
+                            "enum": [
+                              "exact",
+                              "word",
+                              "phrase",
+                              "regex"
+                            ]
+                          }
+                        },
+                        "allOf": [
+                          {
+                            "if": {
+                              "properties": {
+                                "match_mode": {
+                                  "const": "word"
+                                }
+                              }
+                            },
+                            "then": {
+                              "properties": {
+                                "pattern": {
+                                  "pattern": "^[^\\s\\-/]+$"
+                                }
+                              }
+                            }
+                          },
+                          {
+                            "if": {
+                              "properties": {
+                                "match_mode": {
+                                  "const": "regex"
+                                }
+                              }
+                            },
+                            "then": {
+                              "properties": {
+                                "pattern": {
+                                  "format": "regex"
+                                }
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    },
+                    "banned_tags": {
+                      "type": "array",
+                      "minItems": 1,
+                      "items": {
+                        "type": "object",
+                        "required": [
+                          "pattern",
+                          "match_mode"
+                        ],
+                        "additionalProperties": false,
+                        "properties": {
+                          "pattern": {
+                            "type": "string",
+                            "minLength": 1,
+                            "pattern": "\\S"
+                          },
+                          "match_mode": {
+                            "type": "string",
+                            "enum": [
+                              "exact",
+                              "word",
+                              "phrase",
+                              "regex"
+                            ]
+                          }
+                        },
+                        "allOf": [
+                          {
+                            "if": {
+                              "properties": {
+                                "match_mode": {
+                                  "const": "word"
+                                }
+                              }
+                            },
+                            "then": {
+                              "properties": {
+                                "pattern": {
+                                  "pattern": "^[^\\s\\-/]+$"
+                                }
+                              }
+                            }
+                          },
+                          {
+                            "if": {
+                              "properties": {
+                                "match_mode": {
+                                  "const": "regex"
+                                }
+                              }
+                            },
+                            "then": {
+                              "properties": {
+                                "pattern": {
+                                  "format": "regex"
+                                }
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          {
+            "type": "object",
+            "required": [
+              "description",
+              "fusion_tags",
+              "id",
+              "tattoo_indicators"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "id": {
+                "const": "tattoo_dermal_fusion"
+              },
+              "description": {
+                "type": "string",
+                "minLength": 1
+              },
+              "tattoo_indicators": {
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                  "type": "object",
+                  "required": [
+                    "pattern",
+                    "match_mode"
+                  ],
+                  "additionalProperties": false,
+                  "properties": {
+                    "pattern": {
+                      "type": "string",
+                      "minLength": 1,
+                      "pattern": "\\S"
+                    },
+                    "match_mode": {
+                      "type": "string",
+                      "enum": [
+                        "exact",
+                        "word",
+                        "phrase",
+                        "regex"
+                      ]
+                    }
+                  },
+                  "allOf": [
+                    {
+                      "if": {
+                        "properties": {
+                          "match_mode": {
+                            "const": "word"
+                          }
+                        }
+                      },
+                      "then": {
+                        "properties": {
+                          "pattern": {
+                            "pattern": "^[^\\s\\-/]+$"
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "if": {
+                        "properties": {
+                          "match_mode": {
+                            "const": "regex"
+                          }
+                        }
+                      },
+                      "then": {
+                        "properties": {
+                          "pattern": {
+                            "format": "regex"
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              },
+              "fusion_tags": {
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            }
+          },
+          {
+            "type": "object",
+            "required": [
+              "catalog_busy_pose_triggers",
+              "catalog_handheld_patterns",
+              "custom_busy_pose_triggers",
+              "custom_handheld_patterns",
+              "description",
+              "id"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "id": {
+                "const": "pose_hand_occupation"
+              },
+              "description": {
+                "type": "string",
+                "minLength": 1
+              },
+              "catalog_busy_pose_triggers": {
+                "type": "array",
+                "minItems": 0,
+                "items": {
+                  "type": "object",
+                  "required": [
+                    "pattern",
+                    "match_mode"
+                  ],
+                  "additionalProperties": false,
+                  "properties": {
+                    "pattern": {
+                      "type": "string",
+                      "minLength": 1,
+                      "pattern": "\\S"
+                    },
+                    "match_mode": {
+                      "type": "string",
+                      "enum": [
+                        "exact",
+                        "word",
+                        "phrase",
+                        "regex"
+                      ]
+                    }
+                  },
+                  "allOf": [
+                    {
+                      "if": {
+                        "properties": {
+                          "match_mode": {
+                            "const": "word"
+                          }
+                        }
+                      },
+                      "then": {
+                        "properties": {
+                          "pattern": {
+                            "pattern": "^[^\\s\\-/]+$"
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "if": {
+                        "properties": {
+                          "match_mode": {
+                            "const": "regex"
+                          }
+                        }
+                      },
+                      "then": {
+                        "properties": {
+                          "pattern": {
+                            "format": "regex"
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              },
+              "custom_busy_pose_triggers": {
+                "type": "array",
+                "minItems": 0,
+                "items": {
+                  "type": "object",
+                  "required": [
+                    "pattern",
+                    "match_mode"
+                  ],
+                  "additionalProperties": false,
+                  "properties": {
+                    "pattern": {
+                      "type": "string",
+                      "minLength": 1,
+                      "pattern": "\\S"
+                    },
+                    "match_mode": {
+                      "type": "string",
+                      "enum": [
+                        "exact",
+                        "word",
+                        "phrase",
+                        "regex"
+                      ]
+                    }
+                  },
+                  "allOf": [
+                    {
+                      "if": {
+                        "properties": {
+                          "match_mode": {
+                            "const": "word"
+                          }
+                        }
+                      },
+                      "then": {
+                        "properties": {
+                          "pattern": {
+                            "pattern": "^[^\\s\\-/]+$"
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "if": {
+                        "properties": {
+                          "match_mode": {
+                            "const": "regex"
+                          }
+                        }
+                      },
+                      "then": {
+                        "properties": {
+                          "pattern": {
+                            "format": "regex"
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              },
+              "catalog_handheld_patterns": {
+                "type": "array",
+                "minItems": 0,
+                "items": {
+                  "type": "object",
+                  "required": [
+                    "pattern",
+                    "match_mode"
+                  ],
+                  "additionalProperties": false,
+                  "properties": {
+                    "pattern": {
+                      "type": "string",
+                      "minLength": 1,
+                      "pattern": "\\S"
+                    },
+                    "match_mode": {
+                      "type": "string",
+                      "enum": [
+                        "exact",
+                        "word",
+                        "phrase",
+                        "regex"
+                      ]
+                    }
+                  },
+                  "allOf": [
+                    {
+                      "if": {
+                        "properties": {
+                          "match_mode": {
+                            "const": "word"
+                          }
+                        }
+                      },
+                      "then": {
+                        "properties": {
+                          "pattern": {
+                            "pattern": "^[^\\s\\-/]+$"
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "if": {
+                        "properties": {
+                          "match_mode": {
+                            "const": "regex"
+                          }
+                        }
+                      },
+                      "then": {
+                        "properties": {
+                          "pattern": {
+                            "format": "regex"
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              },
+              "custom_handheld_patterns": {
+                "type": "array",
+                "minItems": 0,
+                "items": {
+                  "type": "object",
+                  "required": [
+                    "pattern",
+                    "match_mode"
+                  ],
+                  "additionalProperties": false,
+                  "properties": {
+                    "pattern": {
+                      "type": "string",
+                      "minLength": 1,
+                      "pattern": "\\S"
+                    },
+                    "match_mode": {
+                      "type": "string",
+                      "enum": [
+                        "exact",
+                        "word",
+                        "phrase",
+                        "regex"
+                      ]
+                    }
+                  },
+                  "allOf": [
+                    {
+                      "if": {
+                        "properties": {
+                          "match_mode": {
+                            "const": "word"
+                          }
+                        }
+                      },
+                      "then": {
+                        "properties": {
+                          "pattern": {
+                            "pattern": "^[^\\s\\-/]+$"
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "if": {
+                        "properties": {
+                          "match_mode": {
+                            "const": "regex"
+                          }
+                        }
+                      },
+                      "then": {
+                        "properties": {
+                          "pattern": {
+                            "format": "regex"
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "allOf": [
+              {
+                "anyOf": [
+                  {
+                    "properties": {
+                      "catalog_busy_pose_triggers": {
+                        "minItems": 1
+                      }
+                    }
+                  },
+                  {
+                    "properties": {
+                      "custom_busy_pose_triggers": {
+                        "minItems": 1
+                      }
+                    }
+                  }
+                ]
+              },
+              {
+                "anyOf": [
+                  {
+                    "properties": {
+                      "catalog_handheld_patterns": {
+                        "minItems": 1
+                      }
+                    }
+                  },
+                  {
+                    "properties": {
+                      "custom_handheld_patterns": {
+                        "minItems": 1
+                      }
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "object",
+            "required": [
+              "description",
+              "handheld_patterns",
+              "id"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "id": {
+                "const": "handheld_props_single_holder"
+              },
+              "description": {
+                "type": "string",
+                "minLength": 1
+              },
+              "name_zh": {
+                "type": "string",
+                "minLength": 1
+              },
+              "handheld_patterns": {
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                  "type": "object",
+                  "required": [
+                    "pattern",
+                    "match_mode"
+                  ],
+                  "additionalProperties": false,
+                  "properties": {
+                    "pattern": {
+                      "type": "string",
+                      "minLength": 1,
+                      "pattern": "\\S"
+                    },
+                    "match_mode": {
+                      "type": "string",
+                      "enum": [
+                        "exact",
+                        "word",
+                        "phrase",
+                        "regex"
+                      ]
+                    }
+                  },
+                  "allOf": [
+                    {
+                      "if": {
+                        "properties": {
+                          "match_mode": {
+                            "const": "word"
+                          }
+                        }
+                      },
+                      "then": {
+                        "properties": {
+                          "pattern": {
+                            "pattern": "^[^\\s\\-/]+$"
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "if": {
+                        "properties": {
+                          "match_mode": {
+                            "const": "regex"
+                          }
+                        }
+                      },
+                      "then": {
+                        "properties": {
+                          "pattern": {
+                            "format": "regex"
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          {
+            "type": "object",
+            "required": [
+              "conflicts",
+              "description",
+              "id"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "id": {
+                "const": "emotion_gaze_affinity"
+              },
+              "description": {
+                "type": "string",
+                "minLength": 1
+              },
+              "conflicts": {
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                  "type": "object",
+                  "required": [
+                    "catalog_emotion_triggers",
+                    "custom_emotion_triggers",
+                    "catalog_banned_gaze",
+                    "custom_banned_gaze"
+                  ],
+                  "additionalProperties": false,
+                  "properties": {
+                    "catalog_emotion_triggers": {
+                      "type": "array",
+                      "minItems": 0,
+                      "items": {
+                        "type": "object",
+                        "required": [
+                          "pattern",
+                          "match_mode"
+                        ],
+                        "additionalProperties": false,
+                        "properties": {
+                          "pattern": {
+                            "type": "string",
+                            "minLength": 1,
+                            "pattern": "\\S"
+                          },
+                          "match_mode": {
+                            "type": "string",
+                            "enum": [
+                              "exact",
+                              "word",
+                              "phrase",
+                              "regex"
+                            ]
+                          }
+                        },
+                        "allOf": [
+                          {
+                            "if": {
+                              "properties": {
+                                "match_mode": {
+                                  "const": "word"
+                                }
+                              }
+                            },
+                            "then": {
+                              "properties": {
+                                "pattern": {
+                                  "pattern": "^[^\\s\\-/]+$"
+                                }
+                              }
+                            }
+                          },
+                          {
+                            "if": {
+                              "properties": {
+                                "match_mode": {
+                                  "const": "regex"
+                                }
+                              }
+                            },
+                            "then": {
+                              "properties": {
+                                "pattern": {
+                                  "format": "regex"
+                                }
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    },
+                    "custom_emotion_triggers": {
+                      "type": "array",
+                      "minItems": 0,
+                      "items": {
+                        "type": "object",
+                        "required": [
+                          "pattern",
+                          "match_mode"
+                        ],
+                        "additionalProperties": false,
+                        "properties": {
+                          "pattern": {
+                            "type": "string",
+                            "minLength": 1,
+                            "pattern": "\\S"
+                          },
+                          "match_mode": {
+                            "type": "string",
+                            "enum": [
+                              "exact",
+                              "word",
+                              "phrase",
+                              "regex"
+                            ]
+                          }
+                        },
+                        "allOf": [
+                          {
+                            "if": {
+                              "properties": {
+                                "match_mode": {
+                                  "const": "word"
+                                }
+                              }
+                            },
+                            "then": {
+                              "properties": {
+                                "pattern": {
+                                  "pattern": "^[^\\s\\-/]+$"
+                                }
+                              }
+                            }
+                          },
+                          {
+                            "if": {
+                              "properties": {
+                                "match_mode": {
+                                  "const": "regex"
+                                }
+                              }
+                            },
+                            "then": {
+                              "properties": {
+                                "pattern": {
+                                  "format": "regex"
+                                }
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    },
+                    "catalog_banned_gaze": {
+                      "type": "array",
+                      "minItems": 0,
+                      "items": {
+                        "type": "object",
+                        "required": [
+                          "pattern",
+                          "match_mode"
+                        ],
+                        "additionalProperties": false,
+                        "properties": {
+                          "pattern": {
+                            "type": "string",
+                            "minLength": 1,
+                            "pattern": "\\S"
+                          },
+                          "match_mode": {
+                            "type": "string",
+                            "enum": [
+                              "exact",
+                              "word",
+                              "phrase",
+                              "regex"
+                            ]
+                          }
+                        },
+                        "allOf": [
+                          {
+                            "if": {
+                              "properties": {
+                                "match_mode": {
+                                  "const": "word"
+                                }
+                              }
+                            },
+                            "then": {
+                              "properties": {
+                                "pattern": {
+                                  "pattern": "^[^\\s\\-/]+$"
+                                }
+                              }
+                            }
+                          },
+                          {
+                            "if": {
+                              "properties": {
+                                "match_mode": {
+                                  "const": "regex"
+                                }
+                              }
+                            },
+                            "then": {
+                              "properties": {
+                                "pattern": {
+                                  "format": "regex"
+                                }
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    },
+                    "custom_banned_gaze": {
+                      "type": "array",
+                      "minItems": 0,
+                      "items": {
+                        "type": "object",
+                        "required": [
+                          "pattern",
+                          "match_mode"
+                        ],
+                        "additionalProperties": false,
+                        "properties": {
+                          "pattern": {
+                            "type": "string",
+                            "minLength": 1,
+                            "pattern": "\\S"
+                          },
+                          "match_mode": {
+                            "type": "string",
+                            "enum": [
+                              "exact",
+                              "word",
+                              "phrase",
+                              "regex"
+                            ]
+                          }
+                        },
+                        "allOf": [
+                          {
+                            "if": {
+                              "properties": {
+                                "match_mode": {
+                                  "const": "word"
+                                }
+                              }
+                            },
+                            "then": {
+                              "properties": {
+                                "pattern": {
+                                  "pattern": "^[^\\s\\-/]+$"
+                                }
+                              }
+                            }
+                          },
+                          {
+                            "if": {
+                              "properties": {
+                                "match_mode": {
+                                  "const": "regex"
+                                }
+                              }
+                            },
+                            "then": {
+                              "properties": {
+                                "pattern": {
+                                  "format": "regex"
+                                }
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  },
+                  "allOf": [
+                    {
+                      "anyOf": [
+                        {
+                          "properties": {
+                            "catalog_emotion_triggers": {
+                              "minItems": 1
+                            }
+                          }
+                        },
+                        {
+                          "properties": {
+                            "custom_emotion_triggers": {
+                              "minItems": 1
+                            }
+                          }
+                        }
+                      ]
+                    },
+                    {
+                      "anyOf": [
+                        {
+                          "properties": {
+                            "catalog_banned_gaze": {
+                              "minItems": 1
+                            }
+                          }
+                        },
+                        {
+                          "properties": {
+                            "custom_banned_gaze": {
+                              "minItems": 1
+                            }
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          {
+            "type": "object",
+            "required": [
+              "catalog_banned_night_elements",
+              "catalog_daylight_triggers",
+              "custom_banned_night_elements",
+              "custom_daylight_triggers",
+              "description",
+              "id"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "id": {
+                "const": "environmental_lighting_coherence"
+              },
+              "description": {
+                "type": "string",
+                "minLength": 1
+              },
+              "catalog_daylight_triggers": {
+                "type": "array",
+                "minItems": 0,
+                "items": {
+                  "type": "object",
+                  "required": [
+                    "pattern",
+                    "match_mode"
+                  ],
+                  "additionalProperties": false,
+                  "properties": {
+                    "pattern": {
+                      "type": "string",
+                      "minLength": 1,
+                      "pattern": "\\S"
+                    },
+                    "match_mode": {
+                      "type": "string",
+                      "enum": [
+                        "exact",
+                        "word",
+                        "phrase",
+                        "regex"
+                      ]
+                    }
+                  },
+                  "allOf": [
+                    {
+                      "if": {
+                        "properties": {
+                          "match_mode": {
+                            "const": "word"
+                          }
+                        }
+                      },
+                      "then": {
+                        "properties": {
+                          "pattern": {
+                            "pattern": "^[^\\s\\-/]+$"
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "if": {
+                        "properties": {
+                          "match_mode": {
+                            "const": "regex"
+                          }
+                        }
+                      },
+                      "then": {
+                        "properties": {
+                          "pattern": {
+                            "format": "regex"
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              },
+              "custom_daylight_triggers": {
+                "type": "array",
+                "minItems": 0,
+                "items": {
+                  "type": "object",
+                  "required": [
+                    "pattern",
+                    "match_mode"
+                  ],
+                  "additionalProperties": false,
+                  "properties": {
+                    "pattern": {
+                      "type": "string",
+                      "minLength": 1,
+                      "pattern": "\\S"
+                    },
+                    "match_mode": {
+                      "type": "string",
+                      "enum": [
+                        "exact",
+                        "word",
+                        "phrase",
+                        "regex"
+                      ]
+                    }
+                  },
+                  "allOf": [
+                    {
+                      "if": {
+                        "properties": {
+                          "match_mode": {
+                            "const": "word"
+                          }
+                        }
+                      },
+                      "then": {
+                        "properties": {
+                          "pattern": {
+                            "pattern": "^[^\\s\\-/]+$"
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "if": {
+                        "properties": {
+                          "match_mode": {
+                            "const": "regex"
+                          }
+                        }
+                      },
+                      "then": {
+                        "properties": {
+                          "pattern": {
+                            "format": "regex"
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              },
+              "catalog_banned_night_elements": {
+                "type": "array",
+                "minItems": 0,
+                "items": {
+                  "type": "object",
+                  "required": [
+                    "pattern",
+                    "match_mode"
+                  ],
+                  "additionalProperties": false,
+                  "properties": {
+                    "pattern": {
+                      "type": "string",
+                      "minLength": 1,
+                      "pattern": "\\S"
+                    },
+                    "match_mode": {
+                      "type": "string",
+                      "enum": [
+                        "exact",
+                        "word",
+                        "phrase",
+                        "regex"
+                      ]
+                    }
+                  },
+                  "allOf": [
+                    {
+                      "if": {
+                        "properties": {
+                          "match_mode": {
+                            "const": "word"
+                          }
+                        }
+                      },
+                      "then": {
+                        "properties": {
+                          "pattern": {
+                            "pattern": "^[^\\s\\-/]+$"
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "if": {
+                        "properties": {
+                          "match_mode": {
+                            "const": "regex"
+                          }
+                        }
+                      },
+                      "then": {
+                        "properties": {
+                          "pattern": {
+                            "format": "regex"
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              },
+              "custom_banned_night_elements": {
+                "type": "array",
+                "minItems": 0,
+                "items": {
+                  "type": "object",
+                  "required": [
+                    "pattern",
+                    "match_mode"
+                  ],
+                  "additionalProperties": false,
+                  "properties": {
+                    "pattern": {
+                      "type": "string",
+                      "minLength": 1,
+                      "pattern": "\\S"
+                    },
+                    "match_mode": {
+                      "type": "string",
+                      "enum": [
+                        "exact",
+                        "word",
+                        "phrase",
+                        "regex"
+                      ]
+                    }
+                  },
+                  "allOf": [
+                    {
+                      "if": {
+                        "properties": {
+                          "match_mode": {
+                            "const": "word"
+                          }
+                        }
+                      },
+                      "then": {
+                        "properties": {
+                          "pattern": {
+                            "pattern": "^[^\\s\\-/]+$"
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "if": {
+                        "properties": {
+                          "match_mode": {
+                            "const": "regex"
+                          }
+                        }
+                      },
+                      "then": {
+                        "properties": {
+                          "pattern": {
+                            "format": "regex"
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "allOf": [
+              {
+                "anyOf": [
+                  {
+                    "properties": {
+                      "catalog_daylight_triggers": {
+                        "minItems": 1
+                      }
+                    }
+                  },
+                  {
+                    "properties": {
+                      "custom_daylight_triggers": {
+                        "minItems": 1
+                      }
+                    }
+                  }
+                ]
+              },
+              {
+                "anyOf": [
+                  {
+                    "properties": {
+                      "catalog_banned_night_elements": {
+                        "minItems": 1
+                      }
+                    }
+                  },
+                  {
+                    "properties": {
+                      "custom_banned_night_elements": {
+                        "minItems": 1
+                      }
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "object",
+            "required": [
+              "catalog_banned_chroma",
+              "catalog_monochrome_triggers",
+              "custom_banned_chroma",
+              "custom_monochrome_triggers",
+              "description",
+              "id"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "id": {
+                "const": "monochrome_film_chroma_coherence"
+              },
+              "description": {
+                "type": "string",
+                "minLength": 1
+              },
+              "name_zh": {
+                "type": "string",
+                "minLength": 1
+              },
+              "catalog_monochrome_triggers": {
+                "type": "array",
+                "minItems": 0,
+                "items": {
+                  "type": "object",
+                  "required": [
+                    "pattern",
+                    "match_mode"
+                  ],
+                  "additionalProperties": false,
+                  "properties": {
+                    "pattern": {
+                      "type": "string",
+                      "minLength": 1,
+                      "pattern": "\\S"
+                    },
+                    "match_mode": {
+                      "type": "string",
+                      "enum": [
+                        "exact",
+                        "word",
+                        "phrase",
+                        "regex"
+                      ]
+                    }
+                  },
+                  "allOf": [
+                    {
+                      "if": {
+                        "properties": {
+                          "match_mode": {
+                            "const": "word"
+                          }
+                        }
+                      },
+                      "then": {
+                        "properties": {
+                          "pattern": {
+                            "pattern": "^[^\\s\\-/]+$"
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "if": {
+                        "properties": {
+                          "match_mode": {
+                            "const": "regex"
+                          }
+                        }
+                      },
+                      "then": {
+                        "properties": {
+                          "pattern": {
+                            "format": "regex"
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              },
+              "custom_monochrome_triggers": {
+                "type": "array",
+                "minItems": 0,
+                "items": {
+                  "type": "object",
+                  "required": [
+                    "pattern",
+                    "match_mode"
+                  ],
+                  "additionalProperties": false,
+                  "properties": {
+                    "pattern": {
+                      "type": "string",
+                      "minLength": 1,
+                      "pattern": "\\S"
+                    },
+                    "match_mode": {
+                      "type": "string",
+                      "enum": [
+                        "exact",
+                        "word",
+                        "phrase",
+                        "regex"
+                      ]
+                    }
+                  },
+                  "allOf": [
+                    {
+                      "if": {
+                        "properties": {
+                          "match_mode": {
+                            "const": "word"
+                          }
+                        }
+                      },
+                      "then": {
+                        "properties": {
+                          "pattern": {
+                            "pattern": "^[^\\s\\-/]+$"
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "if": {
+                        "properties": {
+                          "match_mode": {
+                            "const": "regex"
+                          }
+                        }
+                      },
+                      "then": {
+                        "properties": {
+                          "pattern": {
+                            "format": "regex"
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              },
+              "catalog_banned_chroma": {
+                "type": "array",
+                "minItems": 0,
+                "items": {
+                  "type": "object",
+                  "required": [
+                    "pattern",
+                    "match_mode"
+                  ],
+                  "additionalProperties": false,
+                  "properties": {
+                    "pattern": {
+                      "type": "string",
+                      "minLength": 1,
+                      "pattern": "\\S"
+                    },
+                    "match_mode": {
+                      "type": "string",
+                      "enum": [
+                        "exact",
+                        "word",
+                        "phrase",
+                        "regex"
+                      ]
+                    }
+                  },
+                  "allOf": [
+                    {
+                      "if": {
+                        "properties": {
+                          "match_mode": {
+                            "const": "word"
+                          }
+                        }
+                      },
+                      "then": {
+                        "properties": {
+                          "pattern": {
+                            "pattern": "^[^\\s\\-/]+$"
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "if": {
+                        "properties": {
+                          "match_mode": {
+                            "const": "regex"
+                          }
+                        }
+                      },
+                      "then": {
+                        "properties": {
+                          "pattern": {
+                            "format": "regex"
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              },
+              "custom_banned_chroma": {
+                "type": "array",
+                "minItems": 0,
+                "items": {
+                  "type": "object",
+                  "required": [
+                    "pattern",
+                    "match_mode"
+                  ],
+                  "additionalProperties": false,
+                  "properties": {
+                    "pattern": {
+                      "type": "string",
+                      "minLength": 1,
+                      "pattern": "\\S"
+                    },
+                    "match_mode": {
+                      "type": "string",
+                      "enum": [
+                        "exact",
+                        "word",
+                        "phrase",
+                        "regex"
+                      ]
+                    }
+                  },
+                  "allOf": [
+                    {
+                      "if": {
+                        "properties": {
+                          "match_mode": {
+                            "const": "word"
+                          }
+                        }
+                      },
+                      "then": {
+                        "properties": {
+                          "pattern": {
+                            "pattern": "^[^\\s\\-/]+$"
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "if": {
+                        "properties": {
+                          "match_mode": {
+                            "const": "regex"
+                          }
+                        }
+                      },
+                      "then": {
+                        "properties": {
+                          "pattern": {
+                            "format": "regex"
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "allOf": [
+              {
+                "anyOf": [
+                  {
+                    "properties": {
+                      "catalog_monochrome_triggers": {
+                        "minItems": 1
+                      }
+                    }
+                  },
+                  {
+                    "properties": {
+                      "custom_monochrome_triggers": {
+                        "minItems": 1
+                      }
+                    }
+                  }
+                ]
+              },
+              {
+                "anyOf": [
+                  {
+                    "properties": {
+                      "catalog_banned_chroma": {
+                        "minItems": 1
+                      }
+                    }
+                  },
+                  {
+                    "properties": {
+                      "custom_banned_chroma": {
+                        "minItems": 1
+                      }
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "object",
+            "required": [
+              "catalog_banned_makeup_smudge",
+              "catalog_no_makeup_triggers",
+              "custom_banned_makeup_smudge",
+              "custom_no_makeup_triggers",
+              "description",
+              "id"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "id": {
+                "const": "makeup_details_coherence"
+              },
+              "description": {
+                "type": "string",
+                "minLength": 1
+              },
+              "catalog_no_makeup_triggers": {
+                "type": "array",
+                "minItems": 0,
+                "items": {
+                  "type": "object",
+                  "required": [
+                    "pattern",
+                    "match_mode"
+                  ],
+                  "additionalProperties": false,
+                  "properties": {
+                    "pattern": {
+                      "type": "string",
+                      "minLength": 1,
+                      "pattern": "\\S"
+                    },
+                    "match_mode": {
+                      "type": "string",
+                      "enum": [
+                        "exact",
+                        "word",
+                        "phrase",
+                        "regex"
+                      ]
+                    }
+                  },
+                  "allOf": [
+                    {
+                      "if": {
+                        "properties": {
+                          "match_mode": {
+                            "const": "word"
+                          }
+                        }
+                      },
+                      "then": {
+                        "properties": {
+                          "pattern": {
+                            "pattern": "^[^\\s\\-/]+$"
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "if": {
+                        "properties": {
+                          "match_mode": {
+                            "const": "regex"
+                          }
+                        }
+                      },
+                      "then": {
+                        "properties": {
+                          "pattern": {
+                            "format": "regex"
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              },
+              "custom_no_makeup_triggers": {
+                "type": "array",
+                "minItems": 0,
+                "items": {
+                  "type": "object",
+                  "required": [
+                    "pattern",
+                    "match_mode"
+                  ],
+                  "additionalProperties": false,
+                  "properties": {
+                    "pattern": {
+                      "type": "string",
+                      "minLength": 1,
+                      "pattern": "\\S"
+                    },
+                    "match_mode": {
+                      "type": "string",
+                      "enum": [
+                        "exact",
+                        "word",
+                        "phrase",
+                        "regex"
+                      ]
+                    }
+                  },
+                  "allOf": [
+                    {
+                      "if": {
+                        "properties": {
+                          "match_mode": {
+                            "const": "word"
+                          }
+                        }
+                      },
+                      "then": {
+                        "properties": {
+                          "pattern": {
+                            "pattern": "^[^\\s\\-/]+$"
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "if": {
+                        "properties": {
+                          "match_mode": {
+                            "const": "regex"
+                          }
+                        }
+                      },
+                      "then": {
+                        "properties": {
+                          "pattern": {
+                            "format": "regex"
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              },
+              "catalog_banned_makeup_smudge": {
+                "type": "array",
+                "minItems": 0,
+                "items": {
+                  "type": "object",
+                  "required": [
+                    "pattern",
+                    "match_mode"
+                  ],
+                  "additionalProperties": false,
+                  "properties": {
+                    "pattern": {
+                      "type": "string",
+                      "minLength": 1,
+                      "pattern": "\\S"
+                    },
+                    "match_mode": {
+                      "type": "string",
+                      "enum": [
+                        "exact",
+                        "word",
+                        "phrase",
+                        "regex"
+                      ]
+                    }
+                  },
+                  "allOf": [
+                    {
+                      "if": {
+                        "properties": {
+                          "match_mode": {
+                            "const": "word"
+                          }
+                        }
+                      },
+                      "then": {
+                        "properties": {
+                          "pattern": {
+                            "pattern": "^[^\\s\\-/]+$"
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "if": {
+                        "properties": {
+                          "match_mode": {
+                            "const": "regex"
+                          }
+                        }
+                      },
+                      "then": {
+                        "properties": {
+                          "pattern": {
+                            "format": "regex"
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              },
+              "custom_banned_makeup_smudge": {
+                "type": "array",
+                "minItems": 0,
+                "items": {
+                  "type": "object",
+                  "required": [
+                    "pattern",
+                    "match_mode"
+                  ],
+                  "additionalProperties": false,
+                  "properties": {
+                    "pattern": {
+                      "type": "string",
+                      "minLength": 1,
+                      "pattern": "\\S"
+                    },
+                    "match_mode": {
+                      "type": "string",
+                      "enum": [
+                        "exact",
+                        "word",
+                        "phrase",
+                        "regex"
+                      ]
+                    }
+                  },
+                  "allOf": [
+                    {
+                      "if": {
+                        "properties": {
+                          "match_mode": {
+                            "const": "word"
+                          }
+                        }
+                      },
+                      "then": {
+                        "properties": {
+                          "pattern": {
+                            "pattern": "^[^\\s\\-/]+$"
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "if": {
+                        "properties": {
+                          "match_mode": {
+                            "const": "regex"
+                          }
+                        }
+                      },
+                      "then": {
+                        "properties": {
+                          "pattern": {
+                            "format": "regex"
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "allOf": [
+              {
+                "anyOf": [
+                  {
+                    "properties": {
+                      "catalog_no_makeup_triggers": {
+                        "minItems": 1
+                      }
+                    }
+                  },
+                  {
+                    "properties": {
+                      "custom_no_makeup_triggers": {
+                        "minItems": 1
+                      }
+                    }
+                  }
+                ]
+              },
+              {
+                "anyOf": [
+                  {
+                    "properties": {
+                      "catalog_banned_makeup_smudge": {
+                        "minItems": 1
+                      }
+                    }
+                  },
+                  {
+                    "properties": {
+                      "custom_banned_makeup_smudge": {
+                        "minItems": 1
+                      }
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "allOf": [
+        {
+          "contains": {
+            "type": "object",
+            "required": [
+              "id"
+            ],
+            "properties": {
+              "id": {
+                "const": "spatial_environmental_mutual_exclusion"
+              }
+            }
+          }
+        },
+        {
+          "contains": {
+            "type": "object",
+            "required": [
+              "id"
+            ],
+            "properties": {
+              "id": {
+                "const": "nudity_clothing_conflicts"
+              }
+            }
+          }
+        },
+        {
+          "contains": {
+            "type": "object",
+            "required": [
+              "id"
+            ],
+            "properties": {
+              "id": {
+                "const": "material_penetration"
+              }
+            }
+          }
+        },
+        {
+          "contains": {
+            "type": "object",
+            "required": [
+              "id"
+            ],
+            "properties": {
+              "id": {
+                "const": "clothing_style_state_coherence"
+              }
+            }
+          }
+        },
+        {
+          "contains": {
+            "type": "object",
+            "required": [
+              "id"
+            ],
+            "properties": {
+              "id": {
+                "const": "gaze_angle_geometry"
+              }
+            }
+          }
+        },
+        {
+          "contains": {
+            "type": "object",
+            "required": [
+              "id"
+            ],
+            "properties": {
+              "id": {
+                "const": "gaze_mutual_exclusion"
+              }
+            }
+          }
+        },
+        {
+          "contains": {
+            "type": "object",
+            "required": [
+              "id"
+            ],
+            "properties": {
+              "id": {
+                "const": "accessory_occlusion_gaze_coherence"
+              }
+            }
+          }
+        },
+        {
+          "contains": {
+            "type": "object",
+            "required": [
+              "id"
+            ],
+            "properties": {
+              "id": {
+                "const": "framing_lower_body_coherence"
+              }
+            }
+          }
+        },
+        {
+          "contains": {
+            "type": "object",
+            "required": [
+              "id"
+            ],
+            "properties": {
+              "id": {
+                "const": "liquid_restrictions"
+              }
+            }
+          }
+        },
+        {
+          "contains": {
+            "type": "object",
+            "required": [
+              "id"
+            ],
+            "properties": {
+              "id": {
+                "const": "device_quality_compatibility"
+              }
+            }
+          }
+        },
+        {
+          "contains": {
+            "type": "object",
+            "required": [
+              "id"
+            ],
+            "properties": {
+              "id": {
+                "const": "tattoo_dermal_fusion"
+              }
+            }
+          }
+        },
+        {
+          "contains": {
+            "type": "object",
+            "required": [
+              "id"
+            ],
+            "properties": {
+              "id": {
+                "const": "pose_hand_occupation"
+              }
+            }
+          }
+        },
+        {
+          "contains": {
+            "type": "object",
+            "required": [
+              "id"
+            ],
+            "properties": {
+              "id": {
+                "const": "handheld_props_single_holder"
+              }
+            }
+          }
+        },
+        {
+          "contains": {
+            "type": "object",
+            "required": [
+              "id"
+            ],
+            "properties": {
+              "id": {
+                "const": "emotion_gaze_affinity"
+              }
+            }
+          }
+        },
+        {
+          "contains": {
+            "type": "object",
+            "required": [
+              "id"
+            ],
+            "properties": {
+              "id": {
+                "const": "environmental_lighting_coherence"
+              }
+            }
+          }
+        },
+        {
+          "contains": {
+            "type": "object",
+            "required": [
+              "id"
+            ],
+            "properties": {
+              "id": {
+                "const": "monochrome_film_chroma_coherence"
+              }
+            }
+          }
+        },
+        {
+          "contains": {
+            "type": "object",
+            "required": [
+              "id"
+            ],
+            "properties": {
+              "id": {
+                "const": "makeup_details_coherence"
+              }
+            }
           }
         }
-      }
+      ]
     }
   }
 }

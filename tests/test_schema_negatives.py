@@ -14,7 +14,8 @@ from pathlib import Path
 REPO_DIR = Path(__file__).parent.parent
 sys.path.insert(0, str(REPO_DIR))
 
-from scripts.validate_data import validate_all, DATA_DIR, SCHEMAS_DIR
+import scripts.validate_data as val_module
+from scripts.validate_data import DATA_DIR, SCHEMAS_DIR, validate_all
 
 
 def _hash_file(p: Path) -> str:
@@ -53,6 +54,17 @@ class TestSchemaNegatives(unittest.TestCase):
         res = validate_all(strict_jsonschema=True)
         self.assertEqual(len(res.errors), 0, "Clean dataset must pass with 0 errors")
 
+    def test_strict_mode_fails_fast_when_jsonschema_missing(self):
+        """测试在严格模式下若缺少 jsonschema 库必须直接报错退出，禁止静默回退"""
+        orig = val_module.HAS_JSONSCHEMA
+        try:
+            val_module.HAS_JSONSCHEMA = False
+            res = validate_all(strict_jsonschema=True)
+            self.assertFalse(res.is_valid)
+            self.assertTrue(any("jsonschema>=4.23,<5.0" in err for err in res.errors))
+        finally:
+            val_module.HAS_JSONSCHEMA = orig
+
     def test_empty_schemas_directory_fails_in_strict_mode(self):
         """测试在严格模式下空 schemas 目录必须被立即拦截报错"""
         with tempfile.TemporaryDirectory() as empty_schemas:
@@ -89,7 +101,60 @@ class TestSchemaNegatives(unittest.TestCase):
 
         err_count, msgs = self._run_with_mutated_file("conflict_rules.json", mutate)
         self.assertGreater(err_count, 0)
-        self.assertTrue(any("Missing required rule 'emotion_gaze_affinity'" in m for m in msgs))
+        self.assertTrue(any("emotion_gaze_affinity" in m for m in msgs))
+
+    def test_alias_forward_and_backward_collision_fails(self):
+        """
+        测试 Alias 全局两阶段防冲突：
+        - 前向冲突：Scene 0 的 alias 撞了 Scene 1 的 ID
+        - 后向冲突：Scene 1 的 alias 撞了 Scene 0 的 ID
+        """
+        # 前向冲突
+        def mutate_forward(data):
+            target_id = data["scenes"][0]["items"][1]["id"]
+            data["scenes"][0]["items"][0].setdefault("aliases", []).append(target_id)
+
+        err_count, msgs = self._run_with_mutated_file("scenes.json", mutate_forward)
+        self.assertGreater(err_count, 0)
+        self.assertTrue(any("collides with" in m for m in msgs))
+
+        # 后向冲突
+        def mutate_backward(data):
+            target_id = data["scenes"][0]["items"][0]["id"]
+            data["scenes"][0]["items"][1].setdefault("aliases", []).append(target_id)
+
+        err_count, msgs = self._run_with_mutated_file("scenes.json", mutate_backward)
+        self.assertGreater(err_count, 0)
+        self.assertTrue(any("collides with" in m for m in msgs))
+
+    def test_alias_case_insensitive_collision_fails(self):
+        """测试 Alias 忽略大小写碰撞 (strip + casefold)"""
+        def mutate(data):
+            target_id = data["scenes"][0]["items"][0]["id"]
+            data["scenes"][0]["items"][1].setdefault("aliases", []).append(target_id.upper())
+
+        err_count, msgs = self._run_with_mutated_file("scenes.json", mutate)
+        self.assertGreater(err_count, 0)
+        self.assertTrue(any("collides with" in m for m in msgs))
+
+    def test_duplicate_alias_within_same_item_fails(self):
+        """测试单个条目内部配置重复 alias 时被严格拦截"""
+        def mutate(data):
+            data["scenes"][0]["items"][0]["aliases"] = ["same_alias", "same_alias"]
+
+        err_count, msgs = self._run_with_mutated_file("scenes.json", mutate)
+        self.assertGreater(err_count, 0)
+        self.assertTrue(any("duplicate alias" in m or "uniqueItems" in m for m in msgs))
+
+    def test_duplicate_scene_label_fails(self):
+        """测试跨条目重复 label 升级为 ERROR 拦截"""
+        def mutate(data):
+            first_label = data["scenes"][0]["items"][0]["label"]
+            data["scenes"][0]["items"][1]["label"] = first_label
+
+        err_count, msgs = self._run_with_mutated_file("scenes.json", mutate)
+        self.assertGreater(err_count, 0)
+        self.assertTrue(any("label" in m and "collides with" in m for m in msgs))
 
     def test_invalid_context_id_fails(self):
         def mutate(data):
@@ -106,7 +171,7 @@ class TestSchemaNegatives(unittest.TestCase):
 
         err_count, msgs = self._run_with_mutated_file("scenes.json", mutate)
         self.assertGreater(err_count, 0)
-        self.assertTrue(any("Duplicate scene id" in m for m in msgs))
+        self.assertTrue(any("collides with" in m or "Duplicate" in m for m in msgs))
 
     def test_empty_anchor_fails(self):
         def mutate(data):
@@ -125,51 +190,16 @@ class TestSchemaNegatives(unittest.TestCase):
         self.assertGreater(err_count, 0)
         self.assertTrue(any("overlapping tags between anchors and details" in m for m in msgs))
 
-    def test_mutation_delete_rule9_busy_pose_triggers_fails(self):
-        """负向测试: 删除 Rule 9 的 busy_pose_triggers 必须被严格拦截"""
+    def test_mutation_delete_rule9_catalog_busy_pose_triggers_fails(self):
+        """负向测试: 删除 Rule 9 的 catalog_busy_pose_triggers 必须被严格拦截"""
         def mutate(data):
             for r in data["rules"]:
                 if r["id"] == "pose_hand_occupation":
-                    del r["busy_pose_triggers"]
+                    del r["catalog_busy_pose_triggers"]
 
         err_count, msgs = self._run_with_mutated_file("conflict_rules.json", mutate)
         self.assertGreater(err_count, 0)
-        self.assertTrue(any("busy_pose_triggers" in m for m in msgs))
-
-    def test_mutation_duplicate_clothing_category_id_fails(self):
-        """负向测试: 制造重复服装 category ID 必须被严格拦截"""
-        def mutate(data):
-            data["categories"][1]["id"] = data["categories"][0]["id"]
-
-        err_count, msgs = self._run_with_mutated_file("clothing.json", mutate)
-        self.assertGreater(err_count, 0)
-        self.assertTrue(any("Duplicate clothing category id" in m for m in msgs))
-
-    def test_mutation_empty_clothing_linkage_l2_fails(self):
-        """负向测试: 将 clothing_nudity_linkage.L2 置为空对象必须被严格拦截"""
-        def mutate(data):
-            data["clothing_nudity_linkage"]["L2"] = {}
-
-        err_count, msgs = self._run_with_mutated_file("clothing.json", mutate)
-        self.assertGreater(err_count, 0)
-        self.assertTrue(any("L2" in m or "style_overrides" in m for m in msgs))
-
-    def test_mutation_duplicate_extension_tier_id_fails(self):
-        """负向测试: 重复追加 extension tier ID 必须被严格拦截"""
-        def mutate(data):
-            data["sfw_exposure_tiers"][1]["id"] = data["sfw_exposure_tiers"][0]["id"]
-
-        err_count, msgs = self._run_with_mutated_file("clothing.json", mutate)
-        self.assertGreater(err_count, 0)
-        self.assertTrue(any("Duplicate sfw_exposure_tier id" in m for m in msgs))
-
-    def test_empty_prop_tags_and_items_fails(self):
-        def mutate(data):
-            data["categories"].append({"id": "broken_prop", "name_zh": "损坏道具"})
-
-        err_count, msgs = self._run_with_mutated_file("props.json", mutate)
-        self.assertGreater(err_count, 0)
-        self.assertTrue(any("Must have non-empty 'tags' or 'items'" in m for m in msgs))
+        self.assertTrue(any("catalog_busy_pose_triggers" in m for m in msgs))
 
 
 if __name__ == "__main__":

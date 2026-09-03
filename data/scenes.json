@@ -41,7 +41,8 @@
             "cheap apartment",
             "1K apartment"
           ],
-          "atmosphere": "私密空间、事后氛围、慵懒感"
+          "atmosphere": "私密空间、事后氛围、慵懒感",
+          "aliases": []
         },
         {
           "id": "scene_love_hotel_pink_room",
@@ -77,7 +78,8 @@
             "love hotel elevator",
             "love hotel vending machine area"
           ],
-          "atmosphere": "日本特产、暧昧灯光、偷情感"
+          "atmosphere": "日本特产、暧昧灯光、偷情感",
+          "aliases": []
         },
         {
           "id": "scene_walk_in_closet",
@@ -123,7 +125,8 @@
             "genkan entrance",
             "shoe cabinet"
           ],
-          "atmosphere": "日常偷情、家庭禁忌、私密感强"
+          "atmosphere": "日常偷情、家庭禁忌、私密感强",
+          "aliases": []
         },
         {
           "id": "scene_honeymoon_suite",
@@ -161,7 +164,8 @@
             "hotel corridor late night",
             "business hotel room"
           ],
-          "atmosphere": "奢华氛围、新婚/出轨主题、商务出差"
+          "atmosphere": "奢华氛围、新婚/出轨主题、商务出差",
+          "aliases": []
         }
       ]
     },
@@ -204,7 +208,8 @@
             "washing area",
             "unit bath"
           ],
-          "atmosphere": "湿身诱惑、雾气朦胧、日常私密"
+          "atmosphere": "湿身诱惑、雾气朦胧、日常私密",
+          "aliases": []
         },
         {
           "id": "scene_hot_spring",
@@ -244,7 +249,8 @@
             "onsen changing room",
             "onsen washing area"
           ],
-          "atmosphere": "和风情色、露天入浴、混浴禁忌"
+          "atmosphere": "和风情色、露天入浴、混浴禁忌",
+          "aliases": []
         },
         {
           "id": "scene_public_bath",
@@ -278,7 +284,8 @@
             "cold bath",
             "electric bath"
           ],
-          "atmosphere": "公共裸露、日常风情、昭和感"
+          "atmosphere": "公共裸露、日常风情、昭和感",
+          "aliases": []
         },
         {
           "id": "scene_soapland_bath",
@@ -310,7 +317,8 @@
             "inflatable pool",
             "air mattress bath"
           ],
-          "atmosphere": "风俗店洗浴、泡泡浴、润滑液"
+          "atmosphere": "风俗店洗浴、泡泡浴、润滑液",
+          "aliases": []
         }
       ]
     },
@@ -355,7 +363,8 @@
             "school corridor",
             "hallway"
           ],
-          "atmosphere": "校园禁忌、师生恋、课后独处"
+          "atmosphere": "校园禁忌、师生恋、课后独处",
+          "aliases": []
         },
         {
           "id": "scene_library",
@@ -389,7 +398,8 @@
             "bookshelf alley",
             "library desk"
           ],
-          "atmosphere": "安静中偷情、知性诱惑"
+          "atmosphere": "安静中偷情、知性诱惑",
+          "aliases": []
         },
         {
           "id": "scene_gym_storage_room",
@@ -425,7 +435,8 @@
             "judo room",
             "kendo room"
           ],
-          "atmosphere": "运动后、汗味、偷偷的"
+          "atmosphere": "运动后、汗味、偷偷的",
+          "aliases": []
         },
         {
           "id": "scene_nurse_office",
@@ -469,7 +480,8 @@
             "school toilet",
             "janitor closet"
           ],
-          "atmosphere": "校园各个角落的禁忌"
+          "atmosphere": "校园各个角落的禁忌",
+          "aliases": []
         }
       ]
     },
@@ -514,7 +526,8 @@
             "conference room",
             "reception desk"
           ],
-          "atmosphere": "加班独处、职场潜规则、权力关系"
+          "atmosphere": "加班独处、职场潜规则、权力关系",
+          "aliases": []
         },
         {
           "id": "scene_copy_room",
@@ -554,7 +567,8 @@
             "smoking area",
             "emergency stairwell"
           ],
-          "atmosphere": "偷情快速、见缝插针"
+          "atmosphere": "偷情快速、见缝插针",
+          "aliases": []
         },
         {
           "id": "scene_elevator",
@@ -586,7 +600,8 @@
             "taxi after drinking party",
             "izakaya private room after work"
           ],
-          "atmosphere": "下班后、出差、应酬后"
+          "atmosphere": "下班后、出差、应酬后",
+          "aliases": []
         }
       ]
     },
@@ -631,7 +646,8 @@
             "train floor",
             "train window"
           ],
-          "atmosphere": "痴汉、满员电车、终电"
+          "atmosphere": "痴汉、满员电车、终电",
+          "aliases": []
         },
         {
           "id": "scene_car_backseat",
@@ -667,7 +683,8 @@
             "car hood at night",
             "van interior"
           ],
-          "atmosphere": "车震、送回家路上、PAPA活"
+          "atmosphere": "车震、送回家路上、PAPA活",
+          "aliases": []
         },
         {
           "id": "scene_bus_interior",
@@ -695,7 +712,8 @@
             "bus back seat",
             "bus at night"
           ],
-          "atmosphere": "长途巴士、夜行巴士"
+          "atmosphere": "长途巴士、夜行巴士",
+          "aliases": []
         },
         {
           "id": "scene_ferry_cabin",
@@ -721,7 +739,8 @@
             "limousine backseat",
             "RV interior"
           ],
-          "atmosphere": "旅途激情"
+          "atmosphere": "旅途激情",
+          "aliases": []
         }
       ]
     },
@@ -760,7 +779,8 @@
             "store bathroom",
             "supermarket stockroom"
           ],
-          "atmosphere": "日常场景中的异常、深夜便利店"
+          "atmosphere": "日常场景中的异常、深夜便利店",
+          "aliases": []
         },
         {
           "id": "scene_restaurant_private_room",
@@ -800,7 +820,8 @@
             "bar bathroom",
             "family restaurant booth"
           ],
-          "atmosphere": "日本特有、二次会/三次会后"
+          "atmosphere": "日本特有、二次会/三次会后",
+          "aliases": []
         },
         {
           "id": "scene_manga_cafe_booth",
@@ -828,7 +849,8 @@
             "comic book store back area",
             "private booth"
           ],
-          "atmosphere": "半私密空间、熬夜、廉价过夜"
+          "atmosphere": "半私密空间、熬夜、廉价过夜",
+          "aliases": []
         },
         {
           "id": "scene_fitting_room",
@@ -860,7 +882,8 @@
             "DVD shop adult section",
             "Don Quijote late night"
           ],
-          "atmosphere": "试衣间、成人用品店"
+          "atmosphere": "试衣间、成人用品店",
+          "aliases": []
         }
       ]
     },
@@ -905,7 +928,8 @@
             "studio floor marks",
             "green screen studio"
           ],
-          "atmosphere": "AV拍摄现场、幕后感、制作中"
+          "atmosphere": "AV拍摄现场、幕后感、制作中",
+          "aliases": []
         },
         {
           "id": "scene_audition_room",
@@ -939,7 +963,8 @@
             "studio reception area",
             "waiting room"
           ],
-          "atmosphere": "面试潜规则、素人试镜"
+          "atmosphere": "面试潜规则、素人试镜",
+          "aliases": []
         },
         {
           "id": "scene_dressing_room",
@@ -971,7 +996,8 @@
             "makeup brushes visible",
             "backstage area"
           ],
-          "atmosphere": "换装、补妆、台前幕后"
+          "atmosphere": "换装、补妆、台前幕后",
+          "aliases": []
         },
         {
           "id": "scene_jav_cover_style",
@@ -1047,7 +1073,8 @@
             "DVD case visible",
             "Blu-ray box packaging"
           ],
-          "atmosphere": "封面美学、DVDパッケージ風、系列标识"
+          "atmosphere": "封面美学、DVDパッケージ風、系列标识",
+          "aliases": []
         }
       ]
     },
@@ -1092,7 +1119,8 @@
             "kyabakura booth",
             "girls bar counter"
           ],
-          "atmosphere": "日本风俗业特有场景"
+          "atmosphere": "日本风俗业特有场景",
+          "aliases": []
         },
         {
           "id": "scene_underground_club",
@@ -1126,7 +1154,8 @@
             "strip club private booth",
             "pole dance stage"
           ],
-          "atmosphere": "夜生活、派对后"
+          "atmosphere": "夜生活、派对后",
+          "aliases": []
         },
         {
           "id": "scene_peep_show_booth",
@@ -1160,7 +1189,8 @@
             "susukino",
             "nakasu"
           ],
-          "atmosphere": "红灯区、日本特有"
+          "atmosphere": "红灯区、日本特有",
+          "aliases": []
         }
       ]
     },
@@ -1199,7 +1229,8 @@
             "futon on tatami",
             "chabudai table"
           ],
-          "atmosphere": "日本传统居住空间"
+          "atmosphere": "日本传统居住空间",
+          "aliases": []
         },
         {
           "id": "scene_shrine",
@@ -1239,7 +1270,8 @@
             "temple bell tower",
             "graveyard at temple"
           ],
-          "atmosphere": "巫女、宗教禁忌、神圣亵渎"
+          "atmosphere": "巫女、宗教禁忌、神圣亵渎",
+          "aliases": []
         },
         {
           "id": "scene_tea_ceremony_room",
@@ -1271,7 +1303,8 @@
             "ryokan lobby",
             "yukata dressing room"
           ],
-          "atmosphere": "和风优雅、传统情色"
+          "atmosphere": "和风优雅、传统情色",
+          "aliases": []
         },
         {
           "id": "scene_zen_garden",
@@ -1305,7 +1338,8 @@
             "maple tree garden",
             "moss garden"
           ],
-          "atmosphere": "日本自然美学"
+          "atmosphere": "日本自然美学",
+          "aliases": []
         }
       ]
     },
@@ -1350,7 +1384,8 @@
             "hospital bathroom",
             "hospital shower"
           ],
-          "atmosphere": "护士/医患、检查、体检"
+          "atmosphere": "护士/医患、检查、体检",
+          "aliases": []
         },
         {
           "id": "scene_clinic",
@@ -1382,7 +1417,8 @@
             "clinic waiting room",
             "small clinic at night"
           ],
-          "atmosphere": "小诊所、私密检查"
+          "atmosphere": "小诊所、私密检查",
+          "aliases": []
         },
         {
           "id": "scene_massage_parlor",
@@ -1410,7 +1446,8 @@
             "massage table",
             "treatment room"
           ],
-          "atmosphere": "按摩、治疗、身体接触"
+          "atmosphere": "按摩、治疗、身体接触",
+          "aliases": []
         }
       ]
     },
@@ -1455,7 +1492,8 @@
             "garbage area",
             "bicycle parking"
           ],
-          "atmosphere": "邻居偷情、团地妻、公寓生活"
+          "atmosphere": "邻居偷情、团地妻、公寓生活",
+          "aliases": []
         },
         {
           "id": "scene_house",
@@ -1503,7 +1541,8 @@
             "backyard",
             "balcony"
           ],
-          "atmosphere": "家庭场景、主妇、家庭禁忌"
+          "atmosphere": "家庭场景、主妇、家庭禁忌",
+          "aliases": []
         },
         {
           "id": "scene_neighbor_s_house",
@@ -1533,7 +1572,8 @@
             "balcony next to each other",
             "fence between houses"
           ],
-          "atmosphere": "隣人、隔壁人妻"
+          "atmosphere": "隣人、隔壁人妻",
+          "aliases": []
         }
       ]
     },
@@ -1578,7 +1618,8 @@
             "construction site at night",
             "street corner at night"
           ],
-          "atmosphere": "野外露出、夜间公园"
+          "atmosphere": "野外露出、夜间公园",
+          "aliases": []
         },
         {
           "id": "scene_beach_at_night",
@@ -1612,7 +1653,8 @@
             "pool locker room",
             "water park after hours"
           ],
-          "atmosphere": "泳装、湿身、夏季"
+          "atmosphere": "泳装、湿身、夏季",
+          "aliases": []
         },
         {
           "id": "scene_camping_tent",
@@ -1644,7 +1686,8 @@
             "outdoor hot spring",
             "forest bath"
           ],
-          "atmosphere": "野外情侣、帐篷内"
+          "atmosphere": "野外情侣、帐篷内",
+          "aliases": []
         },
         {
           "id": "scene_rooftop_at_night",
@@ -1678,7 +1721,8 @@
             "observation deck at night",
             "helipad"
           ],
-          "atmosphere": "都市夜景、高处露出"
+          "atmosphere": "都市夜景、高处露出",
+          "aliases": []
         }
       ]
     },
@@ -1719,7 +1763,8 @@
             "sealed room",
             "windowless room"
           ],
-          "atmosphere": "监禁、调教、密室"
+          "atmosphere": "监禁、调教、密室",
+          "aliases": []
         },
         {
           "id": "scene_basement",
@@ -1749,7 +1794,8 @@
             "wine cellar converted",
             "underground storage"
           ],
-          "atmosphere": "地下、不见天日"
+          "atmosphere": "地下、不见天日",
+          "aliases": []
         },
         {
           "id": "scene_abandoned_building",
@@ -1781,7 +1827,8 @@
             "construction site interior",
             "condemned building"
           ],
-          "atmosphere": "废墟感、非法监禁"
+          "atmosphere": "废墟感、非法监禁",
+          "aliases": []
         }
       ]
     },
@@ -1826,7 +1873,8 @@
             "bathroom with O-24h sign",
             "restroom at train station"
           ],
-          "atmosphere": "暴露风险、偷窥、尴尬感"
+          "atmosphere": "暴露风险、偷窥、尴尬感",
+          "aliases": []
         },
         {
           "id": "scene_elevator_2",
@@ -1866,7 +1914,8 @@
             "elevator intercom",
             "elevator mirror"
           ],
-          "atmosphere": "密闭空间、强制接触、监控感"
+          "atmosphere": "密闭空间、强制接触、监控感",
+          "aliases": []
         },
         {
           "id": "scene_building_rooftop",
@@ -1906,7 +1955,8 @@
             "rooftop water tower",
             "construction rooftop"
           ],
-          "atmosphere": "都市夜景、露出、高处恐惧"
+          "atmosphere": "都市夜景、露出、高处恐惧",
+          "aliases": []
         },
         {
           "id": "scene_staircase",
@@ -1944,7 +1994,8 @@
             "dark stairwell",
             "stairs at night"
           ],
-          "atmosphere": "追逐、上下关系、幽暗感"
+          "atmosphere": "追逐、上下关系、幽暗感",
+          "aliases": []
         },
         {
           "id": "scene_parking_lot",
@@ -1982,7 +2033,8 @@
             "disabled parking space",
             "valet area"
           ],
-          "atmosphere": "车内/车旁、隐蔽、监控"
+          "atmosphere": "车内/车旁、隐蔽、监控",
+          "aliases": []
         },
         {
           "id": "scene_back_alley",
@@ -2022,7 +2074,8 @@
             "underground passage",
             "pedestrian walkway"
           ],
-          "atmosphere": "野外露出、危险感、追逐"
+          "atmosphere": "野外露出、危险感、追逐",
+          "aliases": []
         },
         {
           "id": "scene_vending_machine_area",
@@ -2048,7 +2101,8 @@
             "between vending machines",
             "vending machine with bench"
           ],
-          "atmosphere": "狭窄空间、等待"
+          "atmosphere": "狭窄空间、等待",
+          "aliases": []
         },
         {
           "id": "scene_atm_corner",
@@ -2076,7 +2130,8 @@
             "bank branch interior",
             "bank after hours"
           ],
-          "atmosphere": "金钱交易、羞耻感"
+          "atmosphere": "金钱交易、羞耻感",
+          "aliases": []
         },
         {
           "id": "scene_apartment_balcony",
@@ -2106,7 +2161,8 @@
             "balcony with laundry",
             "balcony overlooking street"
           ],
-          "atmosphere": "都市露出、邻居偷窥、暧昧感"
+          "atmosphere": "都市露出、邻居偷窥、暧昧感",
+          "aliases": []
         },
         {
           "id": "scene_basement_storage",
@@ -2138,7 +2194,8 @@
             "electrical room",
             "boiler room"
           ],
-          "atmosphere": "幽闭、支配、黑暗"
+          "atmosphere": "幽闭、支配、黑暗",
+          "aliases": []
         }
       ]
     },
@@ -2173,7 +2230,8 @@
             "revolving door",
             "lobby elevator bank"
           ],
-          "atmosphere": "职场上下关系、权力感"
+          "atmosphere": "职场上下关系、权力感",
+          "aliases": []
         },
         {
           "id": "scene_meeting_room",
@@ -2205,7 +2263,8 @@
             "room with blinds closed",
             "meeting room after hours"
           ],
-          "atmosphere": "职场潜规则、会议室外遇"
+          "atmosphere": "职场潜规则、会议室外遇",
+          "aliases": []
         },
         {
           "id": "scene_break_room",
@@ -2239,7 +2298,8 @@
             "smoking area",
             "vending machine room"
           ],
-          "atmosphere": "快速偷情、短暂接触"
+          "atmosphere": "快速偷情、短暂接触",
+          "aliases": []
         },
         {
           "id": "scene_office_bathroom",
@@ -2271,7 +2331,8 @@
             "toilet with lock",
             "office toilet at night"
           ],
-          "atmosphere": "职场暴露、羞耻"
+          "atmosphere": "职场暴露、羞耻",
+          "aliases": []
         },
         {
           "id": "scene_office_parking_garage",
@@ -2301,7 +2362,8 @@
             "private parking",
             "company parking lot"
           ],
-          "atmosphere": "下班后、职场外遇"
+          "atmosphere": "下班后、职场外遇",
+          "aliases": []
         },
         {
           "id": "scene_office_building_rooftop",
@@ -2329,7 +2391,8 @@
             "rooftop HVAC area",
             "rooftop overlooking city"
           ],
-          "atmosphere": "都市夜景、职场禁忌"
+          "atmosphere": "都市夜景、职场禁忌",
+          "aliases": []
         },
         {
           "id": "scene_cleaning_closet",
@@ -2361,7 +2424,8 @@
             "server room",
             "telecom room"
           ],
-          "atmosphere": "幽暗、支配、发现风险"
+          "atmosphere": "幽暗、支配、发现风险",
+          "aliases": []
         }
       ]
     },
@@ -2402,7 +2466,8 @@
             "24h manga cafe",
             "smoking area booth"
           ],
-          "atmosphere": "半私密、熬夜、廉价过夜"
+          "atmosphere": "半私密、熬夜、廉价过夜",
+          "aliases": []
         },
         {
           "id": "scene_arcade",
@@ -2434,7 +2499,8 @@
             "UFO catcher",
             "prize counter"
           ],
-          "atmosphere": "街头、追逐、暧昧"
+          "atmosphere": "街头、追逐、暧昧",
+          "aliases": []
         },
         {
           "id": "scene_bowling_alley",
@@ -2472,7 +2538,8 @@
             "pool ladder",
             "diving board"
           ],
-          "atmosphere": "泳装、湿身、夏季"
+          "atmosphere": "泳装、湿身、夏季",
+          "aliases": []
         },
         {
           "id": "scene_karaoke_room",
@@ -2504,7 +2571,8 @@
             "karaoke room couch",
             "karaoke room mirror"
           ],
-          "atmosphere": "酒后、封闭空间、二次会"
+          "atmosphere": "酒后、封闭空间、二次会",
+          "aliases": []
         },
         {
           "id": "scene_billiard_hall",
@@ -2534,7 +2602,8 @@
             "bar attached to billiards",
             "back room of billiard hall"
           ],
-          "atmosphere": "暗、技不如人、筹码"
+          "atmosphere": "暗、技不如人、筹码",
+          "aliases": []
         },
         {
           "id": "scene_movie_theater",
@@ -2568,7 +2637,8 @@
             "couples seat",
             "VIP screening room"
           ],
-          "atmosphere": "暗、公共、背后"
+          "atmosphere": "暗、公共、背后",
+          "aliases": []
         },
         {
           "id": "scene_pachinko_parlor",
@@ -2598,7 +2668,8 @@
             "gambling den",
             "back room of pachinko hall"
           ],
-          "atmosphere": "日本特有、输赢筹码"
+          "atmosphere": "日本特有、输赢筹码",
+          "aliases": []
         },
         {
           "id": "scene_aquarium",
@@ -2630,7 +2701,8 @@
             "late night aquarium",
             "zoo after hours"
           ],
-          "atmosphere": "动物/海洋、幽暗、浪漫"
+          "atmosphere": "动物/海洋、幽暗、浪漫",
+          "aliases": []
         },
         {
           "id": "scene_amusement_park",
@@ -2666,7 +2738,8 @@
             "park restroom",
             "park dark corner"
           ],
-          "atmosphere": "追逐、浪漫、夜间"
+          "atmosphere": "追逐、浪漫、夜间",
+          "aliases": []
         },
         {
           "id": "scene_shrine_gate_torii",
@@ -2700,7 +2773,8 @@
             "prayer hall",
             "between torii gates"
           ],
-          "atmosphere": "神圣亵渎、户外、夜晚"
+          "atmosphere": "神圣亵渎、户外、夜晚",
+          "aliases": []
         }
       ]
     },
@@ -2737,7 +2811,8 @@
             "izakaya with tategaku seat",
             "pub booth"
           ],
-          "atmosphere": "酒后、包厢、日本特有"
+          "atmosphere": "酒后、包厢、日本特有",
+          "aliases": []
         },
         {
           "id": "scene_restaurant_private_room_2",
@@ -2767,7 +2842,8 @@
             "restaurant with lockable door",
             "dinner party room"
           ],
-          "atmosphere": "商务/约会、封闭"
+          "atmosphere": "商务/约会、封闭",
+          "aliases": []
         },
         {
           "id": "scene_ramen_shop_booth",
@@ -2799,7 +2875,8 @@
             "late night ramen",
             "open kitchen counter"
           ],
-          "atmosphere": "夜间、暴露、食欲"
+          "atmosphere": "夜间、暴露、食欲",
+          "aliases": []
         },
         {
           "id": "scene_cafe_booth",
@@ -2829,7 +2906,8 @@
             "cafe restroom",
             "cafe delivery entrance"
           ],
-          "atmosphere": "约会、等待、日常感"
+          "atmosphere": "约会、等待、日常感",
+          "aliases": []
         },
         {
           "id": "scene_bar_counter",
@@ -2865,7 +2943,8 @@
             "hostess bar",
             "host club"
           ],
-          "atmosphere": "酒后、夜间、欲望"
+          "atmosphere": "酒后、夜间、欲望",
+          "aliases": []
         },
         {
           "id": "scene_love_hotel_restaurant",
@@ -2889,7 +2968,8 @@
             "love hotel room service",
             "love hotel lobby restaurant"
           ],
-          "atmosphere": "转场前、期待感"
+          "atmosphere": "转场前、期待感",
+          "aliases": []
         },
         {
           "id": "scene_yatai_stall",
@@ -2917,7 +2997,8 @@
             "yatai customer seat",
             "yatai vendor area"
           ],
-          "atmosphere": "夜间、暧昧、街头"
+          "atmosphere": "夜间、暧昧、街头",
+          "aliases": []
         },
         {
           "id": "scene_vending_machine_corner",
@@ -2941,7 +3022,8 @@
             "area between machines",
             "vending machine at night"
           ],
-          "atmosphere": "狭窄、隐蔽、短暂接触"
+          "atmosphere": "狭窄、隐蔽、短暂接触",
+          "aliases": []
         }
       ]
     },
@@ -2978,7 +3060,8 @@
             "airport parking garage",
             "airport hotel adjacent"
           ],
-          "atmosphere": "旅途、时差、异域感"
+          "atmosphere": "旅途、时差、异域感",
+          "aliases": []
         },
         {
           "id": "scene_airplane_cabin",
@@ -3014,7 +3097,8 @@
             "window seat",
             "overhead bin"
           ],
-          "atmosphere": "密闭、高空、禁忌"
+          "atmosphere": "密闭、高空、禁忌",
+          "aliases": []
         },
         {
           "id": "scene_shinkansen",
@@ -3050,7 +3134,8 @@
             "crowded train",
             "train car door area"
           ],
-          "atmosphere": "痴汉、终电、偷拍"
+          "atmosphere": "痴汉、终电、偷拍",
+          "aliases": []
         },
         {
           "id": "scene_taxi_backseat",
@@ -3084,7 +3169,8 @@
             "car window",
             "car rearview mirror"
           ],
-          "atmosphere": "车内私密、接送暧昧"
+          "atmosphere": "车内私密、接送暧昧",
+          "aliases": []
         },
         {
           "id": "scene_ferry_cabin_2",
@@ -3116,7 +3202,8 @@
             "ferry restroom",
             "dock area"
           ],
-          "atmosphere": "旅途、孤立、浪漫"
+          "atmosphere": "旅途、孤立、浪漫",
+          "aliases": []
         },
         {
           "id": "scene_train_station_platform",
@@ -3148,7 +3235,8 @@
             "station overpass",
             "station late night"
           ],
-          "atmosphere": "终电、痴汉、暴露"
+          "atmosphere": "终电、痴汉、暴露",
+          "aliases": []
         },
         {
           "id": "scene_airport_baggage_claim",
@@ -3176,7 +3264,8 @@
             "station waiting area",
             "station concourse"
           ],
-          "atmosphere": "被看/偷窥、等待"
+          "atmosphere": "被看/偷窥、等待",
+          "aliases": []
         },
         {
           "id": "scene_highway_bus",
@@ -3212,7 +3301,8 @@
             "highway rest area",
             "service area parking"
           ],
-          "atmosphere": "长时间、睡奸、胁迫"
+          "atmosphere": "长时间、睡奸、胁迫",
+          "aliases": []
         }
       ]
     },
@@ -3251,7 +3341,8 @@
             "school entrance hall",
             "shoe lockers area (genkan)"
           ],
-          "atmosphere": "校园、追逐、暴露"
+          "atmosphere": "校园、追逐、暴露",
+          "aliases": []
         },
         {
           "id": "scene_music_room",
@@ -3283,7 +3374,8 @@
             "studio with model stand",
             "studio with backdrop"
           ],
-          "atmosphere": "艺术、裸体、模特"
+          "atmosphere": "艺术、裸体、模特",
+          "aliases": []
         },
         {
           "id": "scene_gymnasium",
@@ -3325,7 +3417,8 @@
             "dance studio",
             "dance practice room"
           ],
-          "atmosphere": "运动、制服、汗"
+          "atmosphere": "运动、制服、汗",
+          "aliases": []
         },
         {
           "id": "scene_school_swimming_pool",
@@ -3357,7 +3450,8 @@
             "indoor pool",
             "swimming club room"
           ],
-          "atmosphere": "泳装、更衣、偷窥"
+          "atmosphere": "泳装、更衣、偷窥",
+          "aliases": []
         },
         {
           "id": "scene_school_rooftop",
@@ -3385,7 +3479,8 @@
             "school rooftop door",
             "school roof garden"
           ],
-          "atmosphere": "校园禁忌、露出、羞耻"
+          "atmosphere": "校园禁忌、露出、羞耻",
+          "aliases": []
         },
         {
           "id": "scene_school_nurse_office",
@@ -3415,7 +3510,8 @@
             "school infirmary bed",
             "medicine cabinet"
           ],
-          "atmosphere": "校园、检查、护士"
+          "atmosphere": "校园、检查、护士",
+          "aliases": []
         },
         {
           "id": "scene_home_economics_room",
@@ -3443,7 +3539,8 @@
             "home ec kitchen",
             "classroom with stove"
           ],
-          "atmosphere": "厨房、食物、性联想"
+          "atmosphere": "厨房、食物、性联想",
+          "aliases": []
         },
         {
           "id": "scene_school_library",
@@ -3471,7 +3568,8 @@
             "study room booth",
             "reading room"
           ],
-          "atmosphere": "安静、偷情、知性"
+          "atmosphere": "安静、偷情、知性",
+          "aliases": []
         },
         {
           "id": "scene_club_room",
@@ -3501,7 +3599,8 @@
             "band room",
             "art club room"
           ],
-          "atmosphere": "课后、封闭、独占"
+          "atmosphere": "课后、封闭、独占",
+          "aliases": []
         },
         {
           "id": "scene_school_toilet",
@@ -3531,7 +3630,8 @@
             "student toilet",
             "staff toilet"
           ],
-          "atmosphere": "暴露、羞耻、偷窥"
+          "atmosphere": "暴露、羞耻、偷窥",
+          "aliases": []
         }
       ]
     },
@@ -3564,7 +3664,8 @@
             "video store corner",
             "猥褻DVD区"
           ],
-          "atmosphere": "选购、羞耻、暴露"
+          "atmosphere": "选购、羞耻、暴露",
+          "aliases": []
         },
         {
           "id": "scene_rental_studio",
@@ -3596,7 +3697,8 @@
             "massage studio",
             "studio with props"
           ],
-          "atmosphere": "模特、艺术、摄影"
+          "atmosphere": "模特、艺术、摄影",
+          "aliases": []
         },
         {
           "id": "scene_temple",
@@ -3626,7 +3728,8 @@
             "shrine keeper's house",
             "Shinto priest quarters"
           ],
-          "atmosphere": "宗教禁忌、尼僧、圣俗"
+          "atmosphere": "宗教禁忌、尼僧、圣俗",
+          "aliases": []
         },
         {
           "id": "scene_cemetery_at_night",
@@ -3656,7 +3759,8 @@
             "cemetery bench",
             "under cherry tree at cemetery"
           ],
-          "atmosphere": "禁忌、恐怖、死亡边缘"
+          "atmosphere": "禁忌、恐怖、死亡边缘",
+          "aliases": []
         },
         {
           "id": "scene_funeral_hall",
@@ -3684,7 +3788,8 @@
             "altars with incense",
             "memorial tablet room"
           ],
-          "atmosphere": "禁忌、死者的联想"
+          "atmosphere": "禁忌、死者的联想",
+          "aliases": []
         },
         {
           "id": "scene_psychiatric_ward",
@@ -3716,7 +3821,8 @@
             "ward common room",
             "medical facility bed"
           ],
-          "atmosphere": "支配、无力、药物"
+          "atmosphere": "支配、无力、药物",
+          "aliases": []
         },
         {
           "id": "scene_institution",
@@ -3746,7 +3852,8 @@
             "sleeping quarters",
             "care facility"
           ],
-          "atmosphere": "禁忌、脆弱、支配"
+          "atmosphere": "禁忌、脆弱、支配",
+          "aliases": []
         },
         {
           "id": "scene_kabukicho",
@@ -3780,7 +3887,8 @@
             "prostitution area",
             "street walker area"
           ],
-          "atmosphere": "日本特有、选择、交易"
+          "atmosphere": "日本特有、选择、交易",
+          "aliases": []
         },
         {
           "id": "scene_sex_shop_interior",
@@ -3810,7 +3918,8 @@
             "adult toy store",
             "bondage equipment shop"
           ],
-          "atmosphere": "购买羞耻、服务、体验"
+          "atmosphere": "购买羞耻、服务、体验",
+          "aliases": []
         }
       ]
     },
@@ -3847,7 +3956,8 @@
             "water heater closet",
             "storage space under stairs"
           ],
-          "atmosphere": "幽闭、支配、暴露"
+          "atmosphere": "幽闭、支配、暴露",
+          "aliases": []
         },
         {
           "id": "scene_glass_room",
@@ -3879,7 +3989,8 @@
             "tent with transparent wall",
             "transparent dressing room"
           ],
-          "atmosphere": "暴露狂、被观看、玻璃隔间"
+          "atmosphere": "暴露狂、被观看、玻璃隔间",
+          "aliases": []
         },
         {
           "id": "scene_construction_scaffolding",
@@ -3909,7 +4020,8 @@
             "high rise construction",
             "rooftop AC unit"
           ],
-          "atmosphere": "高处恐惧、露出、危险"
+          "atmosphere": "高处恐惧、露出、危险",
+          "aliases": []
         },
         {
           "id": "scene_locker",
@@ -3943,7 +4055,8 @@
             "tent inside",
             "sleeping bag"
           ],
-          "atmosphere": "幽闭、SM、狭窄"
+          "atmosphere": "幽闭、SM、狭窄",
+          "aliases": []
         },
         {
           "id": "scene_bathtub",
@@ -3979,7 +4092,8 @@
             "shared bath",
             "miso soup consistency"
           ],
-          "atmosphere": "浮力、湿身、润滑、漂浮"
+          "atmosphere": "浮力、湿身、润滑、漂浮",
+          "aliases": []
         },
         {
           "id": "scene_room_full_of_mirrors",
@@ -4009,7 +4123,8 @@
             "mirrored ceiling",
             "hall of mirrors"
           ],
-          "atmosphere": "反射、被看、被包围"
+          "atmosphere": "反射、被看、被包围",
+          "aliases": []
         }
       ]
     },
@@ -4046,7 +4161,8 @@
             "prison cell",
             "prison visiting room"
           ],
-          "atmosphere": "审讯、制服、权力"
+          "atmosphere": "审讯、制服、权力",
+          "aliases": []
         },
         {
           "id": "scene_chapel",
@@ -4082,7 +4198,8 @@
             "altar",
             "cross on wall"
           ],
-          "atmosphere": "修女、宗教禁忌、神圣亵渎"
+          "atmosphere": "修女、宗教禁忌、神圣亵渎",
+          "aliases": []
         },
         {
           "id": "scene_judo_dojo",
@@ -4116,7 +4233,8 @@
             "tennis court at night",
             "marathon aid station"
           ],
-          "atmosphere": "运动系、部活、汗"
+          "atmosphere": "运动系、部活、汗",
+          "aliases": []
         },
         {
           "id": "scene_ryokan_room",
@@ -4146,7 +4264,8 @@
             "hot spring town street",
             "ryokan lobby"
           ],
-          "atmosphere": "旅行、温泉街"
+          "atmosphere": "旅行、温泉街",
+          "aliases": []
         },
         {
           "id": "scene_student_home",
@@ -4176,7 +4295,8 @@
             "juku classroom",
             "study desk"
           ],
-          "atmosphere": "家庭教师、补习"
+          "atmosphere": "家庭教师、补习",
+          "aliases": []
         }
       ]
     },
@@ -4223,7 +4343,8 @@
             "tinted windows",
             "surveillance monitors inside"
           ],
-          "atmosphere": "SOD名物、街头搭讪后车内拍摄、镜子一边拍摄一边被围观"
+          "atmosphere": "SOD名物、街头搭讪后车内拍摄、镜子一边拍摄一边被围观",
+          "aliases": []
         }
       ]
     },
@@ -4274,7 +4395,8 @@
             "playback on big screen",
             "editing timeline showing sex scene"
           ],
-          "atmosphere": "剪辑室、导演审片、AV制作现场"
+          "atmosphere": "剪辑室、导演审片、AV制作现场",
+          "aliases": []
         }
       ]
     }

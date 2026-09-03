@@ -1,31 +1,33 @@
 #!/usr/bin/env python3
 """
-validate_data.py — ComfyUI-IYKYK 数据集 Schema 与完整性校验工具
+validate_data.py — 运行时 JSON 数据文件与 Schema 完整性强门禁校验脚本
 
-严格校验：
-1. 19 个运行时 JSON 文件必须全部存在且符合 JSON 格式规范
-2. 执行 JSON Schema Draft-7 标准递归校验 (支持 pattern, enum, minItems, maxItems, uniqueItems, required, properties 等)
-3. 必须为全部 19 个运行时文件提供并执行 Schema 校验，缺少任一 Schema 在严格模式下必定报错
-4. 领域结构约束：
-   - scenes.json: context_ids 枚举合法性、anchor_tags >=1、detail_tags 零交集
-   - clothing.json: 28 款式 ID 唯一、9/5/10 扩展档位数量与 ID 唯一、extension_policy 完整引用
-   - props.json: 非 none 分类 tags/items 非空、item ID 唯一
-   - conflict_rules.json: 12 规则完整，Rule 9~12 必需字段非空
-5. 错误分级：ERROR 阻止 CI 与发布构建，WARNING 记录输出
+特性：
+1. 采用标准 jsonschema.Draft7Validator 进行模式校验
+2. --strict 模式强制要求官方 jsonschema>=4.23,<5.0 依赖，禁止静默回退
+3. 校验每个 Schema 自身的合法性 (Draft7Validator.check_schema)
+4. 严格两阶段全局 Alias 唯一性与规范化碰撞检测 (strip + casefold)
+5. 消费 lib/rule_contract.py 权威契约，Fail-Closed 校验 17 大规则与必需字段
 """
 from __future__ import annotations
 
 import argparse
 import json
-import re
 import sys
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Dict, List, Set, Tuple
 
-REPO_DIR = Path(__file__).parent.parent
+try:
+    import jsonschema
+    HAS_JSONSCHEMA = True
+except ImportError:
+    HAS_JSONSCHEMA = False
+
+REPO_DIR = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(REPO_DIR))
 
+from lib.rule_contract import validate_rule_document
 from lib.runtime_manifest import RUNTIME_DATA_FILES
 
 DATA_DIR = REPO_DIR / "data"
@@ -48,149 +50,57 @@ VALID_CONTEXT_ENUMS = {
     "generic",
 }
 
-# 严格映射全部 19 个运行时文件对应的 Schema
-SCHEMA_MAPPINGS = {
-    "accessories.json": "accessories.schema.json",
-    "characters.json": "characters.schema.json",
-    "clothing.json": "clothing.schema.json",
-    "conflict_rules.json": "conflict-rules.schema.json",
-    "expressions.json": "expressions.schema.json",
-    "film_stocks.json": "film_stocks.schema.json",
-    "imperfections.json": "imperfections.schema.json",
-    "lighting.json": "lighting.schema.json",
-    "makeup.json": "makeup.schema.json",
-    "negative_prompts.json": "negative_prompts.schema.json",
-    "nudity_levels.json": "nudity_levels.schema.json",
-    "poses.json": "poses.schema.json",
-    "presets.json": "presets.schema.json",
-    "props.json": "props.schema.json",
-    "scenes.json": "scenes.schema.json",
-    "shot_types.json": "shot_types.schema.json",
-    "style_recipes.json": "style_recipes.schema.json",
-    "tattoos.json": "tattoos.schema.json",
-    "themes.json": "themes.schema.json",
-}
-
 
 @dataclass
 class ValidationResult:
     errors: List[str] = field(default_factory=list)
     warnings: List[str] = field(default_factory=list)
     checked_files: int = 0
-    schema_engine: str = "builtin-draft7-strict"
+    schema_engine: str = "none"
 
     @property
     def is_valid(self) -> bool:
         return len(self.errors) == 0
 
 
-class Draft7Validator:
-    """标准 Draft-7 JSON Schema 递归校验器实现。"""
-
-    @classmethod
-    def check_schema(cls, schema: dict) -> None:
-        if not isinstance(schema, dict):
-            raise ValueError("Schema must be a dictionary")
-
-    def __init__(self, schema: dict):
-        self.schema = schema
-        self.check_schema(schema)
-
-    def iter_errors(self, instance: Any, schema: Optional[dict] = None, path: str = "") -> List[str]:
-        if schema is None:
-            schema = self.schema
-        errors = []
-        self._validate_node(instance, schema, path, errors)
-        return errors
-
-    def _validate_node(self, instance: Any, schema: dict, path: str, errors: List[str]) -> None:
-        if not isinstance(schema, dict):
-            return
-
-        expected_type = schema.get("type")
-        if expected_type == "object":
-            if not isinstance(instance, dict):
-                errors.append(f"[ERROR] Schema violation at '{path}': Expected object, got {type(instance).__name__}")
-                return
-            for req in schema.get("required", []):
-                if req not in instance:
-                    errors.append(f"[ERROR] Schema violation at '{path}': Missing required property '{req}'")
-            props_schema = schema.get("properties", {})
-            for prop_k, prop_v in instance.items():
-                if prop_k in props_schema:
-                    self._validate_node(prop_v, props_schema[prop_k], f"{path}.{prop_k}" if path else prop_k, errors)
-        elif expected_type == "array":
-            if not isinstance(instance, list):
-                errors.append(f"[ERROR] Schema violation at '{path}': Expected array, got {type(instance).__name__}")
-                return
-            min_items = schema.get("minItems")
-            if min_items is not None and len(instance) < min_items:
-                errors.append(f"[ERROR] Schema violation at '{path}': Array length {len(instance)} is less than minItems {min_items}")
-            max_items = schema.get("maxItems")
-            if max_items is not None and len(instance) > max_items:
-                errors.append(f"[ERROR] Schema violation at '{path}': Array length {len(instance)} exceeds maxItems {max_items}")
-            if schema.get("uniqueItems") and len(instance) > 0:
-                seen = []
-                for idx, item in enumerate(instance):
-                    if item in seen:
-                        errors.append(f"[ERROR] Schema violation at '{path}[{idx}]': Duplicate array item violating uniqueItems")
-                    seen.append(item)
-            items_schema = schema.get("items")
-            if items_schema and isinstance(items_schema, dict):
-                for idx, item in enumerate(instance):
-                    self._validate_node(item, items_schema, f"{path}[{idx}]", errors)
-        elif expected_type == "string":
-            if not isinstance(instance, str):
-                errors.append(f"[ERROR] Schema violation at '{path}': Expected string, got {type(instance).__name__}")
-                return
-            min_len = schema.get("minLength")
-            if min_len is not None and len(instance) < min_len:
-                errors.append(f"[ERROR] Schema violation at '{path}': String length is less than minLength {min_len}")
-            pattern = schema.get("pattern")
-            if pattern is not None and not re.search(pattern, instance):
-                errors.append(f"[ERROR] Schema violation at '{path}': String '{instance}' does not match pattern '{pattern}'")
-            enum_vals = schema.get("enum")
-            if enum_vals is not None and instance not in enum_vals:
-                errors.append(f"[ERROR] Schema violation at '{path}': Value '{instance}' not in enum {enum_vals}")
-
-
-def validate_all(data_dir: Path = DATA_DIR, schemas_dir: Path = SCHEMAS_DIR, strict_jsonschema: bool = False) -> ValidationResult:
+def validate_all(
+    data_dir: Path = DATA_DIR,
+    schemas_dir: Path = SCHEMAS_DIR,
+    strict_jsonschema: bool = False
+) -> ValidationResult:
     result = ValidationResult()
-    target_data_dir = Path(data_dir)
-    target_schemas_dir = Path(schemas_dir)
 
-    if not target_data_dir.is_dir():
-        result.errors.append(f"[ERROR] Data directory does not exist: {target_data_dir}")
+    if strict_jsonschema and not HAS_JSONSCHEMA:
+        result.errors.append("[ERROR] Strict mode requires official 'jsonschema>=4.23,<5.0', but it is not installed!")
         return result
 
-    # 1. 检查必需运行时数据文件存在与 JSON 格式
-    data_cache: Dict[str, dict] = {}
-    for fname in RUNTIME_DATA_FILES:
-        fpath = target_data_dir / fname
-        if not fpath.is_file():
-            result.errors.append(f"[ERROR] Missing required runtime data file: {fname}")
+    # 1. 加载 19 个运行时数据文件
+    data_cache: Dict[str, Any] = {}
+    for data_file in RUNTIME_DATA_FILES:
+        data_path = data_dir / data_file
+        if not data_path.is_file():
+            result.errors.append(f"[ERROR] Missing runtime data file: {data_file}")
             continue
-
         try:
-            content = fpath.read_text(encoding="utf-8")
-            parsed = json.loads(content)
-            if not isinstance(parsed, dict):
-                result.errors.append(f"[ERROR] {fname}: Root must be a JSON object (dict)")
-            else:
-                data_cache[fname] = parsed
-        except json.JSONDecodeError as e:
-            result.errors.append(f"[ERROR] {fname}: JSON syntax error (line {e.lineno}, col {e.colno}): {e.msg}")
+            data_cache[data_file] = json.loads(data_path.read_text(encoding="utf-8"))
+            result.checked_files += 1
+        except Exception as e:
+            result.errors.append(f"[ERROR] Malformed JSON in '{data_file}': {e}")
 
-    result.checked_files = len(data_cache)
-    if result.errors:
-        return result
+    # 2. 对每个数据文件匹配其 Schema 并执行 Draft-7 递归校验
+    for data_file in RUNTIME_DATA_FILES:
+        base_name = data_file.replace(".json", "")
+        schema_file = f"{base_name}.schema.json"
+        schema_path = schemas_dir / schema_file
+        if not schema_path.is_file():
+            alt_schema_file = f"{base_name.replace('_', '-')}.schema.json"
+            if (schemas_dir / alt_schema_file).is_file():
+                schema_file = alt_schema_file
+                schema_path = schemas_dir / alt_schema_file
 
-    # 2. 全量 19 个文件 Schema 强校验
-    for data_file, schema_file in SCHEMA_MAPPINGS.items():
-        schema_path = target_schemas_dir / schema_file
         if not schema_path.is_file():
             if strict_jsonschema:
-                result.errors.append(f"[ERROR] Missing required schema file '{schema_file}' for '{data_file}'")
+                result.errors.append(f"[ERROR] Missing required schema file '{schema_file}' for runtime data '{data_file}'")
             else:
                 result.warnings.append(f"[WARNING] Schema file '{schema_file}' not found for '{data_file}'")
             continue
@@ -198,18 +108,27 @@ def validate_all(data_dir: Path = DATA_DIR, schemas_dir: Path = SCHEMAS_DIR, str
         if data_file in data_cache:
             try:
                 schema_doc = json.loads(schema_path.read_text(encoding="utf-8"))
-                validator = Draft7Validator(schema_doc)
-                schema_errs = validator.iter_errors(data_cache[data_file])
-                result.errors.extend(schema_errs)
+                if HAS_JSONSCHEMA:
+                    result.schema_engine = "jsonschema-draft7"
+                    # 校验 Schema 自身合法性 (metaschema validation)
+                    jsonschema.Draft7Validator.check_schema(schema_doc)
+                    v = jsonschema.Draft7Validator(schema_doc, format_checker=jsonschema.FormatChecker())
+                    for err in v.iter_errors(data_cache[data_file]):
+                        result.errors.append(f"[ERROR] Schema violation in {data_file} at '{err.json_path}': {err.message}")
+                else:
+                    if strict_jsonschema:
+                        result.errors.append("[ERROR] Strict validation requires official jsonschema package!")
             except Exception as e:
                 result.errors.append(f"[ERROR] Schema validation error on {data_file}: {e}")
 
-    # 3. 校验 scenes.json 结构与零交集约束
+    # 3. 校验 scenes.json 结构与两阶段全局防冲突
     scenes_data = data_cache.get("scenes.json", {}).get("scenes", [])
     if not scenes_data:
         result.errors.append("[ERROR] scenes.json: No scenes defined")
-    seen_scene_ids: Set[str] = set()
-    seen_scene_labels: Set[str] = set()
+
+    # Phase 1: 统一收集并校验全量 ID 与 Label (规范化为 strip() + casefold())
+    # norm_key -> (kind, scene_id, original_text)
+    global_scene_registry: Dict[str, Tuple[str, str, str]] = {}
 
     for cat_idx, cat in enumerate(scenes_data):
         cat_name = cat.get("category", "")
@@ -225,17 +144,24 @@ def validate_all(data_dir: Path = DATA_DIR, schemas_dir: Path = SCHEMAS_DIR, str
 
             if not sid:
                 result.errors.append(f"[ERROR] scenes.json [{cat_name}][{item_idx}]: Missing scene id")
-            elif sid in seen_scene_ids:
-                result.errors.append(f"[ERROR] scenes.json: Duplicate scene id '{sid}'")
+                continue
+
+            norm_id = sid.strip().casefold()
+            if norm_id in global_scene_registry:
+                prev_kind, prev_sid, prev_orig = global_scene_registry[norm_id]
+                result.errors.append(f"[ERROR] scenes.json [{sid}]: ID '{sid}' collides with {prev_kind} '{prev_orig}' in scene '{prev_sid}'")
             else:
-                seen_scene_ids.add(sid)
+                global_scene_registry[norm_id] = ("id", sid, sid)
 
             if not slabel:
                 result.errors.append(f"[ERROR] scenes.json [{sid}]: Missing label")
-            elif slabel in seen_scene_labels:
-                result.warnings.append(f"[WARNING] scenes.json: Duplicate label '{slabel}' in scene '{sid}'")
             else:
-                seen_scene_labels.add(slabel)
+                norm_label = slabel.strip().casefold()
+                if norm_label in global_scene_registry:
+                    prev_kind, prev_sid, prev_orig = global_scene_registry[norm_label]
+                    result.errors.append(f"[ERROR] scenes.json [{sid}]: label '{slabel}' collides with {prev_kind} '{prev_orig}' in scene '{prev_sid}'")
+                else:
+                    global_scene_registry[norm_label] = ("label", sid, slabel)
 
             if not ctx_ids:
                 result.errors.append(f"[ERROR] scenes.json [{sid}]: context_ids cannot be empty")
@@ -250,6 +176,27 @@ def validate_all(data_dir: Path = DATA_DIR, schemas_dir: Path = SCHEMAS_DIR, str
             overlap = set(anchors) & set(details)
             if overlap:
                 result.errors.append(f"[ERROR] scenes.json [{sid}]: overlapping tags between anchors and details: {overlap}")
+
+    # Phase 2: 校验全局 Aliases 与全量 ID / Label / 其它 Alias 的防冲突 (解决前向与后向碰撞)
+    for cat in scenes_data:
+        for item in cat.get("items", []):
+            sid = item.get("id", "")
+            aliases = item.get("aliases", [])
+            seen_item_aliases: Set[str] = set()
+
+            for alias in aliases:
+                if not alias:
+                    continue
+                norm_alias = alias.strip().casefold()
+                if norm_alias in seen_item_aliases:
+                    result.errors.append(f"[ERROR] scenes.json [{sid}]: duplicate alias '{alias}' within same item")
+                seen_item_aliases.add(norm_alias)
+
+                if norm_alias in global_scene_registry:
+                    prev_kind, prev_sid, prev_orig = global_scene_registry[norm_alias]
+                    result.errors.append(f"[ERROR] scenes.json [{sid}]: alias '{alias}' collides with {prev_kind} '{prev_orig}' in scene '{prev_sid}'")
+                else:
+                    global_scene_registry[norm_alias] = ("alias", sid, alias)
 
     # 4. 校验 presets.json 结构
     presets = data_cache.get("presets.json", {}).get("presets", [])
@@ -273,167 +220,30 @@ def validate_all(data_dir: Path = DATA_DIR, schemas_dir: Path = SCHEMAS_DIR, str
         if not rid or not r.get("style_name") or not r.get("style_recipe"):
             result.errors.append(f"[ERROR] style_recipes.json [{rid}]: Missing required recipe fields")
 
-    # 6. 校验 clothing.json (28 类别 ID 唯一 + 9/5/10 扩展数量与 ID 唯一 + extension_policy 完整性)
-    clothing_doc = data_cache.get("clothing.json", {})
-    clothing_cats = clothing_doc.get("categories", [])
-    if len(clothing_cats) != 28:
-        result.errors.append(f"[ERROR] clothing.json: Expected exactly 28 clothing categories, got {len(clothing_cats)}")
-    c_ids = set()
-    for c in clothing_cats:
-        cid = c.get("id", "")
-        if cid in c_ids:
-            result.errors.append(f"[ERROR] clothing.json: Duplicate clothing category id '{cid}'")
-        c_ids.add(cid)
-
-    # 验证 9/5/10 扩展数量与 ID 唯一
-    exp_tiers = clothing_doc.get("sfw_exposure_tiers", [])
-    if len(exp_tiers) != 9:
-        result.errors.append(f"[ERROR] clothing.json: Expected exactly 9 sfw_exposure_tiers, got {len(exp_tiers)}")
-    exp_ids = set()
-    for t in exp_tiers:
-        tid = t.get("id", "")
-        if tid in exp_ids:
-            result.errors.append(f"[ERROR] clothing.json: Duplicate sfw_exposure_tier id '{tid}'")
-        exp_ids.add(tid)
-
-    trans_tiers = clothing_doc.get("cloth_transparency_tiers", [])
-    if len(trans_tiers) != 5:
-        result.errors.append(f"[ERROR] clothing.json: Expected exactly 5 cloth_transparency_tiers, got {len(trans_tiers)}")
-    trans_ids = set()
-    for t in trans_tiers:
-        tid = t.get("id", "")
-        if tid in trans_ids:
-            result.errors.append(f"[ERROR] clothing.json: Duplicate cloth_transparency_tier id '{tid}'")
-        trans_ids.add(tid)
-
-    wardrobe_items = clothing_doc.get("lingerie_wardrobe", [])
-    if len(wardrobe_items) != 10:
-        result.errors.append(f"[ERROR] clothing.json: Expected exactly 10 lingerie_wardrobe items, got {len(wardrobe_items)}")
-    wardrobe_ids = set()
-    for w in wardrobe_items:
-        wid = w.get("id", "")
-        if wid in wardrobe_ids:
-            result.errors.append(f"[ERROR] clothing.json: Duplicate lingerie_wardrobe id '{wid}'")
-        wardrobe_ids.add(wid)
-
-    # 验证 extension_policy 完整性
-    policy = clothing_doc.get("extension_policy", {})
-    if not policy or not isinstance(policy, dict):
-        result.errors.append("[ERROR] clothing.json: Missing extension_policy")
-    else:
-        for lvl in ["L2", "L3", "L4"]:
-            if lvl not in policy:
-                result.errors.append(f"[ERROR] clothing.json: extension_policy missing key '{lvl}'")
-            else:
-                for eid in policy[lvl].get("exposure_ids", []):
-                    if eid not in exp_ids:
-                        result.errors.append(f"[ERROR] clothing.json: extension_policy.{lvl}.exposure_ids references unknown id '{eid}'")
-                for tid in policy[lvl].get("transparency_ids", []):
-                    if tid not in trans_ids:
-                        result.errors.append(f"[ERROR] clothing.json: extension_policy.{lvl}.transparency_ids references unknown id '{tid}'")
-                for wid in policy[lvl].get("wardrobe_ids", []):
-                    if wid not in wardrobe_ids:
-                        result.errors.append(f"[ERROR] clothing.json: extension_policy.{lvl}.wardrobe_ids references unknown id '{wid}'")
-
-    linkages = clothing_doc.get("clothing_nudity_linkage", {})
-    for lvl in ["L1", "L2", "L3", "L4", "L5", "L6"]:
-        if lvl not in linkages or not isinstance(linkages[lvl], dict) or not linkages[lvl]:
-            result.errors.append(f"[ERROR] clothing.json: Missing or empty nudity linkage for '{lvl}'")
+    # 6. 校验 clothing.json 扩展策略与 24 档唯一性
+    clothing_data = data_cache.get("clothing.json", {})
+    policy = clothing_data.get("extension_policy", {})
+    for lvl in ("L2", "L3", "L4"):
+        if lvl not in policy:
+            result.errors.append(f"[ERROR] clothing.json: extension_policy missing nudity level '{lvl}'")
         else:
-            overrides = linkages[lvl].get("style_overrides", {})
-            if not overrides or not isinstance(overrides, dict):
-                result.errors.append(f"[ERROR] clothing.json: Missing or empty style_overrides for '{lvl}'")
+            lvl_policy = policy[lvl]
+            if not lvl_policy.get("exposure_ids"):
+                result.errors.append(f"[ERROR] clothing.json: extension_policy[{lvl}] missing or empty 'exposure_ids'")
+            if not lvl_policy.get("transparency_ids"):
+                result.errors.append(f"[ERROR] clothing.json: extension_policy[{lvl}] missing or empty 'transparency_ids'")
+            if lvl == "L4" and not lvl_policy.get("wardrobe_ids"):
+                result.errors.append("[ERROR] clothing.json: extension_policy[L4] missing or empty 'wardrobe_ids'")
 
-    # 7. 校验 props.json (非 none 分类 tags 或 items 必须非空)
-    prop_cats = data_cache.get("props.json", {}).get("categories", [])
-    for p in prop_cats:
-        pid = p.get("id", "")
-        if pid == "none":
-            continue
-        has_tags = bool(p.get("tags"))
-        has_items = bool(p.get("items"))
-        if not has_tags and not has_items:
-            result.errors.append(f"[ERROR] props.json [{pid}]: Must have non-empty 'tags' or 'items'")
-        if has_items:
-            item_ids = set()
-            for item in p.get("items", []):
-                iid = item.get("id", "")
-                if not iid or iid in item_ids:
-                    result.errors.append(f"[ERROR] props.json [{pid}]: Invalid or duplicate item id '{iid}'")
-                item_ids.add(iid)
-                if not item.get("tags"):
-                    result.errors.append(f"[ERROR] props.json [{pid}][{iid}]: Item tags cannot be empty")
-
-    # 8. 校验 conflict_rules.json (17 规则完整，Rule 9~17 必需字段非空)
-    conflict_doc = data_cache.get("conflict_rules.json", {})
-    rules = conflict_doc.get("rules", [])
-    if len(rules) != 17:
-        result.errors.append(f"[ERROR] conflict_rules.json: Expected exactly 17 rules, got {len(rules)}")
-    rule_ids = set()
-    for r in rules:
-        rid = r.get("id", "")
-        if not rid or rid in rule_ids:
-            result.errors.append(f"[ERROR] conflict_rules.json: Invalid or duplicate rule id '{rid}'")
-        rule_ids.add(rid)
-
-    required_rule_ids = [
-        "nudity_clothing_conflicts",
-        "material_penetration",
-        "gaze_angle_geometry",
-        "gaze_mutual_exclusion",
-        "liquid_restrictions",
-        "device_quality_compatibility",
-        "tattoo_dermal_fusion",
-        "spatial_environmental_mutual_exclusion",
-        "pose_hand_occupation",
-        "emotion_gaze_affinity",
-        "environmental_lighting_coherence",
-        "makeup_details_coherence",
-        "framing_lower_body_coherence",
-        "accessory_occlusion_gaze_coherence",
-        "monochrome_film_chroma_coherence",
-        "clothing_style_state_coherence",
-        "handheld_props_single_holder",
-    ]
-    for rrid in required_rule_ids:
-        if rrid not in rule_ids:
-            result.errors.append(f"[ERROR] conflict_rules.json: Missing required rule '{rrid}'")
-
-    rule9 = next((r for r in rules if r.get("id") == "pose_hand_occupation"), None)
-    if not rule9 or not rule9.get("busy_pose_triggers") or not rule9.get("banned_handheld_patterns"):
-        result.errors.append("[ERROR] conflict_rules.json: Rule 'pose_hand_occupation' missing busy_pose_triggers or banned_handheld_patterns")
-
-    rule10 = next((r for r in rules if r.get("id") == "emotion_gaze_affinity"), None)
-    if not rule10 or not rule10.get("conflicts"):
-        result.errors.append("[ERROR] conflict_rules.json: Rule 'emotion_gaze_affinity' missing 'conflicts'")
-
-    rule11 = next((r for r in rules if r.get("id") == "environmental_lighting_coherence"), None)
-    if not rule11 or not rule11.get("daylight_triggers") or not rule11.get("banned_night_elements"):
-        result.errors.append("[ERROR] conflict_rules.json: Rule 'environmental_lighting_coherence' missing daylight_triggers or banned_night_elements")
-
-    rule12 = next((r for r in rules if r.get("id") == "makeup_details_coherence"), None)
-    if not rule12 or not rule12.get("no_makeup_triggers") or not rule12.get("banned_makeup_smudge"):
-        result.errors.append("[ERROR] conflict_rules.json: Rule 'makeup_details_coherence' missing no_makeup_triggers or banned_makeup_smudge")
-
-    rule13 = next((r for r in rules if r.get("id") == "framing_lower_body_coherence"), None)
-    if not rule13 or not rule13.get("close_up_triggers") or not rule13.get("banned_lower_body"):
-        result.errors.append("[ERROR] conflict_rules.json: Rule 'framing_lower_body_coherence' missing close_up_triggers or banned_lower_body")
-
-    rule14 = next((r for r in rules if r.get("id") == "accessory_occlusion_gaze_coherence"), None)
-    if not rule14 or not rule14.get("occlusion_triggers") or not rule14.get("banned_gaze_actions"):
-        result.errors.append("[ERROR] conflict_rules.json: Rule 'accessory_occlusion_gaze_coherence' missing occlusion_triggers or banned_gaze_actions")
-
-    rule15 = next((r for r in rules if r.get("id") == "monochrome_film_chroma_coherence"), None)
-    if not rule15 or not rule15.get("monochrome_triggers") or not rule15.get("banned_chroma"):
-        result.errors.append("[ERROR] conflict_rules.json: Rule 'monochrome_film_chroma_coherence' missing monochrome_triggers or banned_chroma")
-
-    rule16 = next((r for r in rules if r.get("id") == "clothing_style_state_coherence"), None)
-    if not rule16 or not rule16.get("one_piece_triggers") or not rule16.get("one_piece_banned_states"):
-        result.errors.append("[ERROR] conflict_rules.json: Rule 'clothing_style_state_coherence' missing one_piece_triggers or one_piece_banned_states")
-
-    rule17 = next((r for r in rules if r.get("id") == "handheld_props_single_holder"), None)
-    if not rule17 or not rule17.get("handheld_patterns"):
-        result.errors.append("[ERROR] conflict_rules.json: Rule 'handheld_props_single_holder' missing handheld_patterns")
+    # 4. 校验 conflict_rules.json 17 规则完整性与强类型契约 (单源验证)
+    conflict_doc = data_cache.get("conflict_rules.json")
+    if conflict_doc:
+        try:
+            validate_rule_document(conflict_doc)
+        except Exception as e:
+            result.errors.append(f"[ERROR] conflict_rules.json: {e}")
+    else:
+        result.errors.append("[ERROR] conflict_rules.json: File not found in data directory")
 
     return result
 

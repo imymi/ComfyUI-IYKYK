@@ -8,8 +8,10 @@ import unittest
 from pathlib import Path
 from random import Random
 
+from lib.errors import DataSelectionError
 from lib.sampler import DataSampler
 from nodes import IYKYKPromptGenerator
+
 
 DATA_DIR = Path(__file__).parent.parent / "data"
 
@@ -47,10 +49,14 @@ class TestPropsAndExtensionsReachability(unittest.TestCase):
             )
 
     def test_invalid_prop_returns_empty_safely(self):
-        """测试未知道具名称与无道具时安全返回空列表，绝对不抛出 AttributeError"""
-        for invalid_name in ["not-a-real-prop", "unknown_123", "", "无 (None)"]:
-            res = self.sampler.sample_prop(invalid_name, Random(42))
-            self.assertEqual(res, [], f"Expected empty list for '{invalid_name}', got {res}")
+        """测试无道具选项时安全返回空列表，未知显式道具遵循 Fail-Fast 抛出 DataSelectionError"""
+        for none_name in ["", "无 (None)", "None"]:
+            res = self.sampler.sample_prop(none_name, Random(42))
+            self.assertEqual(res, [], f"Expected empty list for '{none_name}', got {res}")
+        for invalid_name in ["not-a-real-prop", "unknown_123"]:
+            with self.assertRaises(DataSelectionError):
+                self.sampler.sample_prop(invalid_name, Random(42))
+
 
     def test_prop_sampling_deterministic_per_seed(self):
         """测试同一 seed 下道具采样结果 100% 确定性复现"""
@@ -110,19 +116,19 @@ class TestPropsAndExtensionsReachability(unittest.TestCase):
             p_l2, _, _ = self.generator.generate(
                 预设模板="无 (None)",
                 风格配方="无 (None)",
-                场景大类="室内私密场景",
+                场景大类="随机 (Random)",
                 剧情主题="随机 (Random)",
-                景别构图="半身人像",
-                拍摄视角="平视视角",
+                景别构图="自动 (Auto)",
+                拍摄视角="自动 (Auto)",
                 裸露等级="L2 差分微露 (Partially Exposed)",
                 服装款式="随机 (Random)",
                 服装状态="自动联动裸露等级 (Auto Link Nudity)",
-                发型发色="黑长直",
+                发型发色="随机 (Random)",
                 饰品头饰="无 (None)",
                 妆容细节="无 (None)",
-                姿势动作="站姿",
-                情绪表情="微笑",
-                光影预设="柔光箱",
+                姿势动作="随机 (Random)",
+                情绪表情="随机 (Random)",
+                光影预设="自动 (Auto)",
                 胶片风格="无 (None)",
                 液体效果="无 (None)",
                 纹身标记="无 (None)",
@@ -142,19 +148,19 @@ class TestPropsAndExtensionsReachability(unittest.TestCase):
             p_l3, _, _ = self.generator.generate(
                 预设模板="无 (None)",
                 风格配方="无 (None)",
-                场景大类="室内私密场景",
+                场景大类="随机 (Random)",
                 剧情主题="随机 (Random)",
-                景别构图="半身人像",
-                拍摄视角="平视视角",
+                景别构图="自动 (Auto)",
+                拍摄视角="自动 (Auto)",
                 裸露等级="L3 半裸诱惑 (Half Nude)",
                 服装款式="随机 (Random)",
                 服装状态="自动联动裸露等级 (Auto Link Nudity)",
-                发型发色="黑长直",
+                发型发色="随机 (Random)",
                 饰品头饰="无 (None)",
                 妆容细节="无 (None)",
-                姿势动作="站姿",
-                情绪表情="微笑",
-                光影预设="柔光箱",
+                姿势动作="随机 (Random)",
+                情绪表情="随机 (Random)",
+                光影预设="自动 (Auto)",
                 胶片风格="无 (None)",
                 液体效果="无 (None)",
                 纹身标记="无 (None)",
@@ -174,19 +180,19 @@ class TestPropsAndExtensionsReachability(unittest.TestCase):
             p_l4, _, _ = self.generator.generate(
                 预设模板="无 (None)",
                 风格配方="无 (None)",
-                场景大类="室内私密场景",
+                场景大类="随机 (Random)",
                 剧情主题="随机 (Random)",
-                景别构图="半身人像",
-                拍摄视角="平视视角",
+                景别构图="自动 (Auto)",
+                拍摄视角="自动 (Auto)",
                 裸露等级="L4 重点暴露 (Topless / Bottomless)",
                 服装款式="随机 (Random)",
                 服装状态="自动联动裸露等级 (Auto Link Nudity)",
-                发型发色="黑长直",
+                发型发色="随机 (Random)",
                 饰品头饰="无 (None)",
                 妆容细节="无 (None)",
-                姿势动作="站姿",
-                情绪表情="微笑",
-                光影预设="柔光箱",
+                姿势动作="随机 (Random)",
+                情绪表情="随机 (Random)",
+                光影预设="自动 (Auto)",
                 胶片风格="无 (None)",
                 液体效果="无 (None)",
                 纹身标记="无 (None)",
@@ -219,26 +225,26 @@ class TestPropsAndExtensionsReachability(unittest.TestCase):
         """L1、L5、L6 在各自 1000 次随机生成中绝不命中任何服装扩展标签（1000 seeds 0 污染）"""
         for lvl_name in [
             "L1 包裹暗示 (Fully Clothed / Suggestive)",
-            "L5 全身赤裸 (Full Nudity / Explicit)",
-            "L6 极致特写 (Close-up / Uncensored)",
+            "L5 极致全裸 (Full Nude)",
+            "L6 特写全见 (Explicit Genital Close-up)",
         ]:
             for seed in range(1000):
                 p, _, _ = self.generator.generate(
                     预设模板="无 (None)",
                     风格配方="无 (None)",
-                    场景大类="室内私密场景",
+                    场景大类="随机 (Random)",
                     剧情主题="随机 (Random)",
-                    景别构图="半身人像",
-                    拍摄视角="平视视角",
+                    景别构图="自动 (Auto)",
+                    拍摄视角="自动 (Auto)",
                     裸露等级=lvl_name,
                     服装款式="随机 (Random)",
                     服装状态="自动联动裸露等级 (Auto Link Nudity)",
-                    发型发色="黑长直",
+                    发型发色="随机 (Random)",
                     饰品头饰="无 (None)",
                     妆容细节="无 (None)",
-                    姿势动作="站姿",
-                    情绪表情="微笑",
-                    光影预设="柔光箱",
+                    姿势动作="随机 (Random)",
+                    情绪表情="随机 (Random)",
+                    光影预设="自动 (Auto)",
                     胶片风格="无 (None)",
                     液体效果="无 (None)",
                     纹身标记="无 (None)",

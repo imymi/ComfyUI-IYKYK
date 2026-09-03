@@ -7,6 +7,7 @@ REPO_DIR = Path(__file__).parent.parent
 sys.path.insert(0, str(REPO_DIR))
 
 from lib.assembler import finalize_prompt, split_top_level_tags, PromptValidationError
+from lib.errors import PromptSyntaxError
 from lib.models import PromptFragment
 
 DATA_DIR = REPO_DIR / "data"
@@ -59,10 +60,10 @@ class TestFinalizeBoundaries(unittest.TestCase):
         tags3 = split_top_level_tags(text3)
         self.assertEqual(tags3, ["([<lora:test:1.0>, highly detailed:1.2])", "simple_tag"])
 
-        # 4. Trailing backslash safety
+        # 4. Trailing unescaped backslash: Fail-Closed
         text4 = "tag1, tag2\\"
-        tags4 = split_top_level_tags(text4)
-        self.assertEqual(tags4, ["tag1", "tag2\\"])
+        with self.assertRaises(PromptSyntaxError):
+            split_top_level_tags(text4)
 
     def test_protected_syntax_byte_identical_through_finalize(self):
         """测试 5 个复审指出的关键受保护语法样例在 finalize_prompt 全链路中 100% 字节级原样保留"""
@@ -100,17 +101,18 @@ class TestFinalizeBoundaries(unittest.TestCase):
         p250 = finalize_prompt(f250, data_dir=DATA_DIR)
         self.assertEqual(len(p250.split()), 250)
 
-        # 251 words -> trimmed to 250
+        # 251 words -> single atomic span exceeds 250 words limit -> raise PromptValidationError per Hard Constraint 2
         words_251 = ["word"] * 251
         f251 = [PromptFragment(text=" ".join(words_251), source_slot="custom")]
-        p251 = finalize_prompt(f251, data_dir=DATA_DIR)
-        self.assertEqual(len(p251.split()), 250)
+        with self.assertRaises(PromptValidationError):
+            finalize_prompt(f251, data_dir=DATA_DIR)
 
-        # 260 words -> trimmed to 250
+        # 260 words -> single atomic span exceeds 250 words limit -> raise PromptValidationError per Hard Constraint 2
         words_260 = ["word"] * 260
         f260 = [PromptFragment(text=" ".join(words_260), source_slot="custom")]
-        p260 = finalize_prompt(f260, data_dir=DATA_DIR)
-        self.assertEqual(len(p260.split()), 250)
+        with self.assertRaises(PromptValidationError):
+            finalize_prompt(f260, data_dir=DATA_DIR)
+
 
     def test_structural_fragment_boundary_does_not_break_brackets(self):
         """249 个词 + 超预算结构化片段时原子性跳过，不能生成残缺或未闭合的括号"""

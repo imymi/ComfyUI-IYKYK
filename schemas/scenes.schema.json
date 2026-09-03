@@ -53,6 +53,11 @@
                   "items": { "type": "string", "minLength": 1 }
                 },
                 "exclusive_group": { "type": "string", "minLength": 1 },
+                "aliases": {
+                  "type": "array",
+                  "uniqueItems": true,
+                  "items": { "type": "string", "minLength": 1 }
+                },
                 "tags": { "type": "array", "items": { "type": "string" } },
                 "atmosphere": { "type": "string" }
               }

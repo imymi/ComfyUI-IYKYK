@@ -19,9 +19,8 @@ from __future__ import annotations
 import argparse
 import json
 import re
-import sys
 from pathlib import Path
-from typing import Dict, List, Set, Tuple
+from typing import Dict, Set, Tuple
 
 REPO_DIR = Path(__file__).parent.parent
 DATA_DIR = REPO_DIR / "data"
@@ -144,14 +143,7 @@ def split_anchor_and_details(sub_name: str, tags: list[str]) -> Tuple[list[str],
     if len(tags) <= 1:
         return tags, []
 
-    # 识别明显的细节词汇
-    detail_keywords = [
-        "lighting", "light", "bed", "desk", "chair", "table", "door", "window",
-        "floor", "sheet", "pillow", "messy", "empty", "after", "poster",
-        "steam", "mist", "tub", "curtain", "mirror", "chains", "bars", "rack",
-        "counter", "booth", "seats", "shelf", "alcove", "screen", "tatami",
-        "futon", "atmosphere", "view", "rain", "night", "dark", "neon"
-    ]
+
 
     anchors = []
     details = []
@@ -261,12 +253,12 @@ def main():
 
     migrated_scenes, expectations, total_items, total_tags = generate_migration()
 
-    print(f"Migration Summary:")
+    print("Migration Summary:")
     print(f"  Categories: {len(migrated_scenes['scenes'])}")
     print(f"  Items:      {total_items}")
     print(f"  Total tags: {total_tags}")
-    print(f"  Anchor/Detail overlap: ZERO (Verified)")
-    print(f"  Duplicate tags: ZERO (Verified)")
+    print("  Anchor/Detail overlap: ZERO (Verified)")
+    print("  Duplicate tags: ZERO (Verified)")
 
     if args.write:
         scenes_file = DATA_DIR / "scenes.json"

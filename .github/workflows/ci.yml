@@ -30,9 +30,13 @@ jobs:
       run: |
         ruff check .
 
+    - name: Check Rule Schema Drift (Read-only)
+      run: |
+        python scripts/generate_rule_schemas.py --check
+
     - name: Validate Datasets & Schema
       run: |
-        python scripts/validate_data.py
+        python scripts/validate_data.py --strict
 
     - name: Run Full Test Suite
       run: |
@@ -41,14 +45,18 @@ jobs:
     - name: Double Build & Compare SHA256
       run: |
         mkdir -p /tmp/build_a /tmp/build_b
-        python scripts/build_release.py --output-dir /tmp/build_a
-        python scripts/build_release.py --output-dir /tmp/build_b
-        SHA_A=$(sha256sum /tmp/build_a/ComfyUI-IYKYK.zip | awk '{print $1}')
-        SHA_B=$(sha256sum /tmp/build_b/ComfyUI-IYKYK.zip | awk '{print $1}')
+        python scripts/build_release.py --mode verify --output-dir /tmp/build_a
+        python scripts/build_release.py --mode verify --output-dir /tmp/build_b
+        GEN_A=$(python -c "import json; print(json.load(open('/tmp/build_a/CURRENT.json'))['generation_dir'])")
+        GEN_B=$(python -c "import json; print(json.load(open('/tmp/build_b/CURRENT.json'))['generation_dir'])")
+        SHA_A=$(sha256sum "/tmp/build_a/$GEN_A/ComfyUI-IYKYK.zip" | awk '{print $1}')
+        SHA_B=$(sha256sum "/tmp/build_b/$GEN_B/ComfyUI-IYKYK.zip" | awk '{print $1}')
         echo "Build A SHA256: $SHA_A"
         echo "Build B SHA256: $SHA_B"
         if [ "$SHA_A" != "$SHA_B" ]; then
           echo "❌ Deterministic build verification failed! Hash mismatch."
           exit 1
         fi
+        test -f "/tmp/build_a/$GEN_A/MANIFEST.json"
+        test -f "/tmp/build_a/$GEN_A/SHA256SUMS.txt"
         echo "✅ Deterministic build verified: bit-for-bit identical across independent runs."

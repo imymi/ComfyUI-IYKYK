@@ -1,306 +1,356 @@
 """
-assembler.py — 结构化流水线装配与统一 Finalize 引擎
+assembler.py — 结构化流水线装配与统一 Finalize 引擎 (基于 PromptTag / PromptAtom 契约)
 
-1. 严格按 16 步骤流水线顺序装配 PromptFragment 结构体列表
-2. 提供强化的顶层逗号解析器 split_top_level_tags：
-   - 保护权重括号 (), [], <>, ""
-   - 支持反斜杠转义逗号 \\, 与转义双引号 \\"
-3. 提供三入口统一公共流水线 finalize_prompt：
-   - 空片段规范化
-   - 结构化冲突消解 (ConflictResolver)
-   - 首见保序去重
-   - 严谨的 250 词边界管理（结构化片段原子保护、普通片段单词边界截断、单结构超长校验 PromptValidationError）
-   - 最终格式清洗与非空安全保障
+1. 严格按 18 步骤流水线顺序 (SLOT_ORDER) 装配 PromptFragment 结构体列表
+2. 消费 lib/atomizer.py 进行无损双向转换，执行完整 Tag 级保序去重
+3. 严谨的 250 词边界管理（原子保护、超上限校验 PromptValidationError）
+4. 遇到未知非空槽位 Fail-Closed 抛出 PromptValidationError
 """
 from __future__ import annotations
 
-import re
 from pathlib import Path
 from random import Random
-from typing import Any, Dict, List, Optional, Sequence
+from typing import Any, Dict, Iterator, List, Optional, Sequence, Tuple
 
-from .conflict_resolver import ConflictResolver, sanitize_prompt, is_protected_fragment
-from .models import PromptFragment
+if __package__:
+    from .atomizer import PromptTag, atoms_to_tags, deduplicate_tags, fragments_to_atoms
+    from .conflict_resolver import ConflictResolver
+    from .errors import PromptValidationError
+    from .lexer import split_top_level_tags, validate_prompt_syntax
+    from .models import AssemblyResult, PromptAtom, PromptFragment, TagProvenance
+    from .slot_contract import AUXILIARY_SLOT_ORDER, SLOT_ORDER, normalize_slot_mapping
+else:
+    from lib.atomizer import PromptTag, atoms_to_tags, deduplicate_tags, fragments_to_atoms
+    from lib.conflict_resolver import ConflictResolver
+    from lib.errors import PromptValidationError
+    from lib.lexer import split_top_level_tags, validate_prompt_syntax
+    from lib.models import AssemblyResult, PromptAtom, PromptFragment, TagProvenance
+    from lib.slot_contract import AUXILIARY_SLOT_ORDER, SLOT_ORDER, normalize_slot_mapping
 
 MAX_PROMPT_WORDS = 250
 
 
-class PromptValidationError(Exception):
-    """当单个不可拆分的结构化片段超出词数预算时抛出。"""
-    pass
+def sanitize_prompt(prompt: str) -> str:
+    """兼容接口：严格恒等透传，100% 字节不变。"""
+    return prompt
 
 
-SLOT_PIPELINE_ORDER = [
-    ("scene_theme", 1),
-    ("shot_type", 2),
-    ("camera_angle", 3),
-    ("character", 4),
-    ("nudity", 5),
-    ("clothing", 6),
-    ("lighting", 7),
-    ("pose", 8),
-    ("expression", 9),
-    ("makeup", 10),
-    ("hairstyle", 11),
-    ("jewelry", 12),
-    ("imperfections", 13),
-    ("tattoo", 14),
-    ("props", 15),
-    ("liquids", 16),
-    ("film", 17),
-    ("quality", 18),
-]
+def render_tags(tags: Sequence[PromptTag]) -> str:
+    """按 tag 分组使用 ', ' 拼接完整 prompt。"""
+    return ", ".join(t.text for t in tags if t.text)
 
 
-def split_top_level_tags(text: str) -> List[str]:
-    """
-    按顶层逗号拆分提示词文本，严格忽略被 (), [], <>, "" 包裹的内部逗号，
-    支持反斜杠转义逗号 \\, 与转义引号 \\"，完整保护 ComfyUI 权重与语法。
-    """
-    if not text or not text.strip():
-        return []
-
-    tags: List[str] = []
-    current: List[str] = []
-    paren_depth = 0
-    bracket_depth = 0
-    angle_depth = 0
-    in_quote = False
-    escaped = False
-
-    for char in text:
-        if escaped:
-            current.append(char)
-            escaped = False
-            continue
-
-        if char == '\\':
-            escaped = True
-            current.append(char)
-            continue
-
-        if char == '"':
-            in_quote = not in_quote
-            current.append(char)
-        elif in_quote:
-            current.append(char)
-        elif char == '(':
-            paren_depth += 1
-            current.append(char)
-        elif char == ')':
-            paren_depth = max(0, paren_depth - 1)
-            current.append(char)
-        elif char == '[':
-            bracket_depth += 1
-            current.append(char)
-        elif char == ']':
-            bracket_depth = max(0, bracket_depth - 1)
-            current.append(char)
-        elif char == '<':
-            angle_depth += 1
-            current.append(char)
-        elif char == '>':
-            angle_depth = max(0, angle_depth - 1)
-            current.append(char)
-        elif char == ',' and paren_depth == 0 and bracket_depth == 0 and angle_depth == 0:
-            tag = "".join(current).strip()
-            if tag:
-                tags.append(tag)
-            current = []
-        else:
-            current.append(char)
-
-    if current:
-        tag = "".join(current).strip()
-        if tag:
-            tags.append(tag)
-
-    return tags
+def render_atoms(atoms: Sequence[PromptAtom]) -> str:
+    """按 tag 分组使用 ', ' 渲染 atom 序列重建 prompt。"""
+    tags = atoms_to_tags(atoms)
+    return render_tags(tags)
 
 
-def finalize_prompt(
-    fragments: Sequence[PromptFragment],
-    *,
+def assemble_result(
+    fragments: Sequence[PromptFragment | str] | PromptFragment | str,
     data_dir: str | Path,
     rng: Optional[Random] = None,
-    max_words: int = MAX_PROMPT_WORDS
-) -> str:
-    """
-    三入口统一公共流水线：
-    1. 标准化空白与空片段
-    2. 基于 PromptFragment 进行冲突消解
-    3. 保留首次出现顺序的去重
-    4. 严谨的 250 词边界管理（结构化片段原子保护、普通片段单词边界截断）
-    5. 格式清洗与标点规范化
-    """
+    max_words: int = MAX_PROMPT_WORDS,
+    resolver: Optional[ConflictResolver] = None
+) -> AssemblyResult:
+    """核心统一入口：执行原子化、冲突消解、去重与截断，返回强类型不可变 AssemblyResult。"""
+    if isinstance(max_words, bool) or not isinstance(max_words, int) or max_words < 0:
+        raise PromptValidationError(
+            f"max_words must be a non-negative integer, got {max_words!r} ({type(max_words).__name__})"
+        )
+
     if rng is None:
         rng = Random(42)
 
-    # 1. 过滤空片段
-    valid_frags: List[PromptFragment] = []
-    for f in fragments:
-        t = f.text if is_protected_fragment(f.text) else f.text.strip().strip(",")
-        if t:
-            valid_frags.append(
-                PromptFragment(
-                    text=t,
-                    source_slot=f.source_slot,
-                    source_item_id=f.source_item_id,
-                    context_ids=f.context_ids,
-                    exclusive_group=f.exclusive_group,
-                    order=f.order,
-                )
-            )
+    if isinstance(fragments, (str, PromptFragment)):
+        fragments = [fragments]
 
-    if not valid_frags:
-        return "best quality, masterpiece"
+    # 1. 拆解为原子 Span 序列，记录初始全量 source_atoms
+    is_fallback = False
+    tags, raw_atoms = fragments_to_atoms(fragments)
+    if not raw_atoms:
+        is_fallback = True
+        default_quality_fragments = [
+            PromptFragment(
+                text="best quality",
+                source_slot="quality",
+                source_item_id="quality_default",
+                order=0,
+                provenance=TagProvenance(
+                    item_id="quality_default",
+                    kind="quality",
+                    semantic_ids=("quality:quality_default",),
+                ),
+            ),
+            PromptFragment(
+                text="masterpiece",
+                source_slot="quality",
+                source_item_id="quality_default",
+                order=1,
+                provenance=TagProvenance(
+                    item_id="quality_default",
+                    kind="quality",
+                    semantic_ids=("quality:quality_default",),
+                ),
+            ),
+        ]
+        tags, raw_atoms = fragments_to_atoms(default_quality_fragments)
 
-    # 2. 结构化冲突消解
-    resolver = ConflictResolver(data_dir)
-    resolved_frags = resolver.resolve_fragments(valid_frags, rng)
+    source_atoms = tuple(raw_atoms)
 
-    # 3. 按稳定 key 去重（保留首次出现顺序）
-    seen_keys = set()
-    deduped_frags: List[PromptFragment] = []
-    for f in resolved_frags:
-        key = f.text.lower().strip()
-        if key not in seen_keys:
-            seen_keys.add(key)
-            deduped_frags.append(f)
+    if max_words == 0:
+        return AssemblyResult(
+            prompt="",
+            accepted_atoms=(),
+            source_atoms=source_atoms,
+            rules_applied=(),
+        )
 
-    # 4. 严谨的 250 词边界管理（以 PromptFragment 序列为单位计算预算）
-    accepted_texts: List[str] = []
+    # 2. 结构化冲突消解 (支持外部注入复用 Resolver，避免重复加载大型规则配置)
+    if resolver is None:
+        resolver = ConflictResolver(data_dir)
+    resolved_atoms, rules_applied = resolver.resolve_atoms_with_report(raw_atoms, rng)
+
+    # 3. 按 tag_order 汇聚为 PromptTag，并执行完整 Tag 级保序去重
+    resolved_tags = atoms_to_tags(resolved_atoms)
+    deduped_tags = deduplicate_tags(resolved_tags)
+
+    # 4. 严谨的词数原子预算管理 (硬约束)
+    accepted_atoms: List[PromptAtom] = []
+    accepted_tag_texts: List[str] = []
     current_word_count = 0
 
-    for f in deduped_frags:
-        is_structural = is_protected_fragment(f.text)
-        frag_text = f.text if is_structural else f.text.strip().strip(",")
-        if not frag_text:
+    for tag in deduped_tags:
+        tag_text = tag.text
+        if not tag_text:
             continue
-        frag_words = len(frag_text.split())
 
-        # 单个结构化片段超长检查
-        if is_structural and frag_words > max_words:
-            raise PromptValidationError(
-                f"Single structural fragment exceeds {max_words} words limit: '{frag_text[:50]}...'"
-            )
+        # 若非系统 fallback 自动生成的 tag，逐 atom 检查是否有单个 atom 超过总上限
+        if not is_fallback:
+            for a in tag.atoms:
+                atom_words = len(a.text.split())
+                if atom_words > max_words:
+                    raise PromptValidationError(
+                        f"Single atomic span exceeds {max_words} words limit ({atom_words} words): '{a.text[:50]}...'"
+                    )
 
-        if current_word_count + frag_words <= max_words:
-            accepted_texts.append(frag_text)
-            current_word_count += frag_words
+        tag_words = len(tag_text.split())
+        if current_word_count + tag_words <= max_words:
+            accepted_atoms.extend(tag.atoms)
+            accepted_tag_texts.append(tag_text)
+            current_word_count += tag_words
         else:
-            # 超出当前预算
-            if not is_structural:
-                remaining = max_words - current_word_count
-                if remaining > 0:
-                    words = frag_text.split()[:remaining]
-                    accepted_texts.append(" ".join(words))
-                    current_word_count += len(words)
-            else:
-                # 结构化片段必须保持原子性，绝不中途切断，跳过当前片段
-                continue
+            # 原子 tag 无法完整装入：整块跳过
+            continue
 
-    # 5. 由渲染器按 ", " 规范化拼接
-    raw_prompt = ", ".join(accepted_texts)
-    sanitized = sanitize_prompt(raw_prompt)
+    sanitized = ", ".join(accepted_tag_texts)
 
-    # 最终完整性与词数断言（绝不二次盲目截断字符串破坏语法）
+    # 5. 最终语法校验与词数断言
+    validate_prompt_syntax(sanitized)
+
     final_words = len(sanitized.split())
     if final_words > max_words:
         raise PromptValidationError(
             f"Rendered prompt word count {final_words} exceeds maximum allowed budget {max_words}"
         )
 
-    return sanitized
+    return AssemblyResult(
+        prompt=sanitized,
+        accepted_atoms=tuple(accepted_atoms),
+        source_atoms=source_atoms,
+        rules_applied=rules_applied,
+    )
+
+
+def assemble_prompt_result(
+    fragments: Sequence[PromptFragment | str] | PromptFragment | str,
+    data_dir: str | Path,
+    rng: Optional[Random] = None,
+    max_words: int = MAX_PROMPT_WORDS,
+    resolver: Optional[ConflictResolver] = None
+) -> Tuple[List[PromptAtom], str, Tuple[str, ...]]:
+    """兼容入口：执行原子化、冲突消解、去重与截断，返回 (accepted_atoms, prompt_str, rules_applied)。"""
+    res = assemble_result(fragments, data_dir, rng, max_words, resolver)
+    return list(res.accepted_atoms), res.prompt, res.rules_applied
+
+
+def assemble_prompt_atoms(
+    fragments: Sequence[PromptFragment | str],
+    data_dir: str | Path,
+    rng: Optional[Random] = None,
+    max_words: int = MAX_PROMPT_WORDS
+) -> Tuple[List[PromptAtom], str]:
+    """诊断接口：组装并返回采纳的原子序列与最终 Prompt 字符串。"""
+    atoms, prompt_str, _ = assemble_prompt_result(fragments, data_dir, rng, max_words)
+    return atoms, prompt_str
+
+
+def assemble_prompt(
+    fragments: Sequence[PromptFragment | str],
+    data_dir: str | Path,
+    rng: Optional[Random] = None,
+    max_words: int = MAX_PROMPT_WORDS
+) -> str:
+    """标准入口：组装并返回最终 Prompt 字符串。"""
+    _, prompt_str = assemble_prompt_atoms(fragments, data_dir, rng, max_words)
+    return prompt_str
+
+
+def finalize_prompt_atoms(
+    fragments: Sequence[PromptFragment | str],
+    data_dir: str | Path,
+    rng: Optional[Random] = None,
+    max_words: int = MAX_PROMPT_WORDS
+) -> List[PromptAtom]:
+    """诊断接口：获取装配最终采纳的 PromptAtom 序列。"""
+    atoms, _ = assemble_prompt_atoms(fragments, data_dir, rng, max_words)
+    return atoms
+
+
+def iter_normalized_slot_fragments(
+    slot_fragments: Dict[str, Any]
+) -> Iterator[PromptFragment]:
+    """统一遍历并归一化槽位片段，按 SLOT_ORDER + AUXILIARY_SLOT_ORDER 顺序输出。
+
+    对缺失 provenance 的项赋予默认 TagProvenance(kind="user_input")，绝不向外暴露 None。
+    若存在多个非空原始键归一化到同一规范槽位，抛出 PromptValidationError (Fail-Closed)。
+    若已知槽位的输入值形状非法（如 set, dict, int 或包含非法元素的列表），抛出 PromptValidationError (P2-1)。
+    """
+    norm_slots = normalize_slot_mapping(slot_fragments)
+
+    # 先验校验所有已知槽位值的形状与类型 (P2-1)，避免半消费后失败
+    for slot_name, raw_val in norm_slots.items():
+        if raw_val is None:
+            if slot_name in (SLOT_ORDER + AUXILIARY_SLOT_ORDER):
+                raise PromptValidationError(
+                    f"Slot {slot_name!r} explicitly provided as None (type NoneType). "
+                    "Expected str, PromptFragment, or list/tuple of str/PromptFragment."
+                )
+            continue
+        if isinstance(raw_val, (str, PromptFragment)):
+            continue
+        if isinstance(raw_val, (list, tuple)):
+            for idx, item in enumerate(raw_val):
+                if not isinstance(item, (str, PromptFragment)):
+                    raise PromptValidationError(
+                        f"Slot {slot_name!r} contains invalid element at index {idx}: "
+                        f"{item!r} ({type(item).__name__}). Expected str or PromptFragment."
+                    )
+        else:
+            raise PromptValidationError(
+                f"Invalid value shape for slot {slot_name!r}: {raw_val!r} ({type(raw_val).__name__}). "
+                "Expected str, PromptFragment, or list/tuple of str/PromptFragment."
+            )
+
+    for slot_name in (SLOT_ORDER + AUXILIARY_SLOT_ORDER):
+        items = norm_slots.get(slot_name)
+        if items is None:
+            continue
+
+        item_list = [items] if isinstance(items, (str, PromptFragment)) else list(items)
+        for item in item_list:
+            if isinstance(item, PromptFragment):
+                prov = item.provenance if item.provenance is not None else TagProvenance(kind="user_input", semantic_ids=(f"slot:{slot_name}",))
+                yield PromptFragment(
+                    text=item.text,
+                    source_slot=slot_name,
+                    source_item_id=item.source_item_id,
+                    context_ids=item.context_ids,
+                    exclusive_group=item.exclusive_group,
+                    order=item.order,
+                    provenance=prov,
+                )
+            elif isinstance(item, str):
+                for st in split_top_level_tags(item):
+                    if st:
+                        yield PromptFragment(
+                            text=st,
+                            source_slot=slot_name,
+                            provenance=TagProvenance(kind="user_input", semantic_ids=(f"slot:{slot_name}",))
+                        )
 
 
 class PromptAssembler:
-    """15 槽位流水线组装器。"""
+    """18 槽位流水线组装器。"""
 
     def __init__(self, data_dir: str | Path):
         self.data_dir = Path(data_dir)
         self.resolver = ConflictResolver(data_dir)
 
-    def assemble_to_fragments(self, slots: Dict[str, List[Any]]) -> List[PromptFragment]:
-        """按流水线顺序将槽位数据转换为 PromptFragment 列表，完整透传已有 PromptFragment 的结构化元数据。"""
+    @staticmethod
+    def iter_normalized_slot_fragments(slot_inputs: Dict[str, Any]):
+        return iter_normalized_slot_fragments(slot_inputs)
+
+    def assemble_slots(
+        self,
+        slot_fragments: Dict[str, List[Any]],
+        rng: Optional[Random] = None,
+        max_words: int = MAX_PROMPT_WORDS
+    ) -> AssemblyResult:
+        """从各槽位片段字典执行装配，返回强类型 AssemblyResult。"""
+        fragments = list(iter_normalized_slot_fragments(slot_fragments))
+        return assemble_result(fragments, self.data_dir, rng, max_words, resolver=self.resolver)
+
+    def assemble_result_with_sources(
+        self,
+        slot_fragments: Dict[str, List[Any]],
+        rng: Optional[Random] = None,
+        max_words: int = MAX_PROMPT_WORDS
+    ) -> Tuple[str, Tuple[PromptAtom, ...], Tuple[str, ...], Tuple[PromptAtom, ...]]:
+        """兼容接口：从各槽位片段字典执行装配，返回 (prompt_str, atoms, rules_applied, source_atoms)。"""
+        res = self.assemble_slots(slot_fragments, rng, max_words)
+        return res.prompt, res.accepted_atoms, res.rules_applied, res.source_atoms
+
+    def assemble_result(
+        self,
+        slot_fragments: Dict[str, List[Any]],
+        rng: Optional[Random] = None,
+        max_words: int = MAX_PROMPT_WORDS
+    ) -> Tuple[str, Tuple[PromptAtom, ...], Tuple[str, ...]]:
+        """从各槽位片段字典执行装配，返回 (prompt_str, atoms, rules_applied)。"""
+        res = self.assemble_slots(slot_fragments, rng, max_words)
+        return res.prompt, res.accepted_atoms, res.rules_applied
+
+    def assemble(
+        self,
+        slot_fragments: Dict[str, List[Any]] | Sequence[PromptFragment | str],
+        rng: Optional[Random] = None,
+        max_words: int = MAX_PROMPT_WORDS
+    ) -> str:
+        """从各槽位片段字典或片段列表执行装配，返回最终 Prompt 字符串。"""
+        if isinstance(slot_fragments, dict):
+            return self.assemble_slots(slot_fragments, rng, max_words).prompt
+        return assemble_result(slot_fragments, self.data_dir, rng, max_words, resolver=self.resolver).prompt
+
+    def assemble_to_fragments(
+        self,
+        slot_fragments: Dict[str, Any]
+    ) -> List[PromptFragment]:
+        """将槽位字典拆解为扁平化、原子化的 PromptFragment 列表，并赋予全局单调递增 order。"""
         fragments: List[PromptFragment] = []
-        order = 0
-
-        for slot_name, _ in SLOT_PIPELINE_ORDER:
-            items = slots.get(slot_name, [])
-            if isinstance(items, list):
-                for item in items:
-                    if isinstance(item, PromptFragment):
-                        fragments.append(
-                            PromptFragment(
-                                text=item.text,
-                                source_slot=item.source_slot or slot_name,
-                                source_item_id=item.source_item_id,
-                                context_ids=item.context_ids,
-                                exclusive_group=item.exclusive_group,
-                                order=order,
-                            )
-                        )
-                        order += 1
-                    elif str(item).strip():
-                        sub_tags = split_top_level_tags(str(item))
-                        for st in sub_tags:
-                            fragments.append(
-                                PromptFragment(
-                                    text=st,
-                                    source_slot=slot_name,
-                                    order=order,
-                                )
-                            )
-                            order += 1
-
-        # 处理可能在 SLOT_PIPELINE_ORDER 外的其他槽位
-        for slot_name, items in slots.items():
-            if slot_name not in [s[0] for s in SLOT_PIPELINE_ORDER]:
-                if isinstance(items, list):
-                    for item in items:
-                        if isinstance(item, PromptFragment):
-                            fragments.append(
-                                PromptFragment(
-                                    text=item.text,
-                                    source_slot=item.source_slot or slot_name,
-                                    source_item_id=item.source_item_id,
-                                    context_ids=item.context_ids,
-                                    exclusive_group=item.exclusive_group,
-                                    order=order,
-                                )
-                            )
-                            order += 1
-                        elif str(item).strip():
-                            sub_tags = split_top_level_tags(str(item))
-                            for st in sub_tags:
-                                fragments.append(
-                                    PromptFragment(
-                                        text=st,
-                                        source_slot=slot_name,
-                                        order=order,
-                                    )
-                                )
-                                order += 1
-
+        for order, frag in enumerate(iter_normalized_slot_fragments(slot_fragments)):
+            fragments.append(
+                PromptFragment(
+                    text=frag.text,
+                    source_slot=frag.source_slot,
+                    source_item_id=frag.source_item_id,
+                    context_ids=frag.context_ids,
+                    exclusive_group=frag.exclusive_group,
+                    order=order,
+                    provenance=frag.provenance if frag.provenance is not None else TagProvenance(kind="user_input"),
+                )
+            )
         return fragments
-
-    def assemble(self, slots: Dict[str, List[str]], rng: Optional[Random] = None) -> str:
-        """主组装接口：组装各槽位并执行统一 finalize。"""
-        if rng is None:
-            rng = Random(42)
-
-        fragments = self.assemble_to_fragments(slots)
-        return finalize_prompt(fragments, data_dir=self.data_dir, rng=rng, max_words=MAX_PROMPT_WORDS)
 
     def assemble_preset(
         self,
         preset: Dict[str, Any],
         style_recipe: Optional[Dict[str, Any]],
         quality_tier: str,
-        rng: Optional[Random] = None
-    ) -> str:
-        """预设模板与风格配方组装接口，统一接入 finalize_prompt。"""
+        rng: Optional[Random] = None,
+        max_words: int = MAX_PROMPT_WORDS,
+    ) -> AssemblyResult:
+        """预设模板与风格配方统一装配接口，返回包含 source_atoms 的不可变 AssemblyResult。"""
         if rng is None:
             rng = Random(42)
 
@@ -308,51 +358,91 @@ class PromptAssembler:
         order = 0
 
         # 1. 预设核心 Prompt
+        preset_id = preset.get("id", "preset_custom")
         raw_preset_prompt = preset.get("positive", preset.get("prompt", ""))
         for t in split_top_level_tags(raw_preset_prompt):
-            fragments.append(
-                PromptFragment(
-                    text=t,
-                    source_slot="preset_core",
-                    order=order,
+            if t:
+                fragments.append(
+                    PromptFragment(
+                        text=t,
+                        source_slot="preset_core",
+                        source_item_id=preset_id,
+                        order=order,
+                        provenance=TagProvenance(
+                            item_id=preset_id,
+                            kind="preset",
+                            semantic_ids=(f"preset:{preset_id}",),
+                        ),
+                    )
                 )
-            )
-            order += 1
+                order += 1
 
         # 2. 风格配方叠加
         if style_recipe:
+            recipe_id = style_recipe.get("id", "recipe_custom")
             for k in ["lighting_palette", "style_recipe", "focus_detail"]:
                 val = style_recipe.get(k, "")
                 if val:
                     for t in split_top_level_tags(str(val)):
-                        fragments.append(
-                            PromptFragment(
-                                text=t,
-                                source_slot=f"recipe_{k}",
-                                order=order,
+                        if t:
+                            fragments.append(
+                                PromptFragment(
+                                    text=t,
+                                    source_slot=f"recipe_{k}",
+                                    source_item_id=recipe_id,
+                                    order=order,
+                                    provenance=TagProvenance(
+                                        item_id=recipe_id,
+                                        kind="style_recipe",
+                                        semantic_ids=(f"recipe:{recipe_id}",),
+                                    ),
+                                )
                             )
-                        )
-                        order += 1
+                            order += 1
 
-        # 3. 画质等级锚点
+        # 3. 画质等级锚点 (稳定内部 quality ID)
         q_str = str(quality_tier or "").lower()
         if "cctv" in q_str or "监控" in q_str:
+            quality_id = "quality_cctv"
             q_tags = ["CCTV footage", "security camera", "low resolution", "grainy"]
         elif "phone" in q_str or "手机" in q_str:
+            quality_id = "quality_phone"
             q_tags = ["phone camera", "selfie", "amateur photo", "slightly blurry"]
         elif "masterpiece" in q_str or "顶尖" in q_str:
+            quality_id = "quality_masterpiece"
             q_tags = ["masterpiece", "best quality", "ultra detailed", "8k", "photorealistic"]
         else:
-            q_tags = ["best quality", "detailed", "photorealistic"]
+            quality_id = "quality_standard"
+            q_tags = ["best quality", "masterpiece", "high resolution", "photorealistic"]
 
-        for qt in q_tags:
+        for q in q_tags:
             fragments.append(
                 PromptFragment(
-                    text=qt,
+                    text=q,
                     source_slot="quality",
+                    source_item_id=quality_id,
                     order=order,
+                    provenance=TagProvenance(
+                        item_id=quality_id,
+                        kind="quality",
+                        semantic_ids=(f"quality:{quality_id}",),
+                    ),
                 )
             )
             order += 1
 
-        return finalize_prompt(fragments, data_dir=self.data_dir, rng=rng, max_words=MAX_PROMPT_WORDS)
+        return assemble_result(fragments, self.data_dir, rng, max_words, resolver=self.resolver)
+
+    def assemble_preset_result(
+        self,
+        preset: Dict[str, Any],
+        style_recipe: Optional[Dict[str, Any]],
+        quality_tier: str,
+        rng: Optional[Random] = None
+    ) -> Tuple[str, Tuple[PromptAtom, ...], Tuple[str, ...]]:
+        """兼容包装器：投影 AssemblyResult 为 (prompt_str, accepted_atoms, rules_applied)。"""
+        res = self.assemble_preset(preset, style_recipe, quality_tier, rng)
+        return res.prompt, res.accepted_atoms, res.rules_applied
+
+
+finalize_prompt = assemble_prompt

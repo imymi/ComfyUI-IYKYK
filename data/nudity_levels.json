@@ -17,6 +17,9 @@
         "nothing exposed",
         "everything covered",
         "dressed to the nines"
+      ],
+      "aliases": [
+        "L1 包裹暗示 (Fully Clothed / Suggestive)"
       ]
     },
     {
@@ -35,6 +38,9 @@
         "backless dress showing spine",
         "bare feet with otherwise fully dressed",
         "wrist exposed from pushed sleeve"
+      ],
+      "aliases": [
+        "L2 差分微露 (Partially Exposed)"
       ]
     },
     {
@@ -54,6 +60,9 @@
         "topless bottom still dressed",
         "bikini top removed bottom still on",
         "tank top raised showing breasts"
+      ],
+      "aliases": [
+        "L3 半裸诱惑 (Half Nude)"
       ]
     },
     {
@@ -75,6 +84,10 @@
         "jewelry only",
         "naked with only shoes on",
         "completely bare except wristwatch"
+      ],
+      "aliases": [
+        "L4 重点暴露 (Topless / Bottomless)",
+        "L4 极简遮挡 (Topless / Bottomless)"
       ]
     },
     {
@@ -99,6 +112,10 @@
         "naked body",
         "no clothing at all",
         "completely unclothed"
+      ],
+      "aliases": [
+        "L5 极致全裸 (Full Nude)",
+        "L5 全身赤裸 (Full Nudity / Explicit)"
       ]
     },
     {
@@ -122,6 +139,10 @@
         "self-touching",
         "masturbating",
         "fingers inside"
+      ],
+      "aliases": [
+        "L6 特写全见 (Explicit Genital Close-up)",
+        "L6 极致特写 (Close-up / Uncensored)"
       ]
     }
   ],
