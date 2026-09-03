@@ -257,7 +257,8 @@ class ConflictResolver:
         for a in atoms:
             if a.source_slot == "nudity":
                 for lvl_code in ("L6", "L5", "L4", "L3", "L2", "L1"):
-                    if lvl_code in (a.source_item_id or "") or PatternSpec(pattern=lvl_code, match_mode="phrase").matches(a.text):
+                    raw_id = (a.source_item_id or "").upper()
+                    if lvl_code in raw_id or any(f"nudity:{lvl_code.lower()}" in s.lower() for s in a.provenance.semantic_ids) or PatternSpec(pattern=lvl_code, match_mode="phrase").matches(a.text):
                         active_level = lvl_code
                         break
             if active_level:

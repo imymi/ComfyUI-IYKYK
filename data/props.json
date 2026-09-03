@@ -9,96 +9,336 @@
       "id": "sex_toy_vibrator",
       "name_zh": "🔞 经典魔杖振动棒/跳蛋",
       "tags": [
-        "magic wand vibrator on bed",
-        "bullet vibrator resting on skin",
-        "glistening lube bottle nearby"
+        {
+          "id": "sex_toy_vibrator__tag_000",
+          "text": "magic wand vibrator on bed",
+          "facts": {
+            "semantic_role": "selector",
+            "prop_usage": "furniture",
+            "hands_required": 0
+          }
+        },
+        {
+          "id": "sex_toy_vibrator__tag_001",
+          "text": "bullet vibrator resting on skin",
+          "facts": {
+            "semantic_role": "selector",
+            "prop_usage": "body_contact",
+            "hands_required": 0
+          }
+        },
+        {
+          "id": "sex_toy_vibrator__tag_002",
+          "text": "glistening lube bottle nearby",
+          "facts": {
+            "semantic_role": "selector",
+            "prop_usage": "ambient",
+            "hands_required": 0
+          }
+        }
       ]
     },
     {
       "id": "bondage_rope_collar",
       "name_zh": "🔗 和风红绳/手铐/项圈",
       "tags": [
-        "crimson hemp rope bindings",
-        "metal handcuffs on headboard",
-        "leather collar with O-ring"
+        {
+          "id": "bondage_rope_collar__tag_000",
+          "text": "crimson hemp rope bindings",
+          "facts": {
+            "semantic_role": "selector",
+            "prop_usage": "worn",
+            "hands_required": 0
+          }
+        },
+        {
+          "id": "bondage_rope_collar__tag_001",
+          "text": "metal handcuffs on headboard",
+          "facts": {
+            "semantic_role": "selector",
+            "prop_usage": "furniture",
+            "hands_required": 0
+          }
+        },
+        {
+          "id": "bondage_rope_collar__tag_002",
+          "text": "leather collar with O-ring",
+          "facts": {
+            "semantic_role": "selector",
+            "prop_usage": "worn",
+            "hands_required": 0
+          }
+        }
       ]
     },
     {
       "id": "wine_glass_bottle",
       "name_zh": "🍷 红酒杯/半空香槟/微醺",
       "tags": [
-        "half-empty wine glass on nightstand",
-        "stemware with red wine",
-        "bottle of champagne on ice"
+        {
+          "id": "wine_glass_bottle__tag_000",
+          "text": "half-empty wine glass on nightstand",
+          "facts": {
+            "semantic_role": "selector",
+            "prop_usage": "ambient",
+            "hands_required": 0
+          }
+        },
+        {
+          "id": "wine_glass_bottle__tag_001",
+          "text": "stemware with red wine",
+          "facts": {
+            "semantic_role": "selector",
+            "prop_usage": "handheld",
+            "hands_required": 1
+          }
+        },
+        {
+          "id": "wine_glass_bottle__tag_002",
+          "text": "bottle of champagne on ice",
+          "facts": {
+            "semantic_role": "selector",
+            "prop_usage": "ambient",
+            "hands_required": 0
+          }
+        }
       ]
     },
     {
       "id": "smartphone_recording",
       "name_zh": "📱 手机录像中/屏幕发光",
       "tags": [
-        "smartphone in hand recording",
-        "screen light glowing on face",
-        "phone face down on bed"
+        {
+          "id": "smartphone_recording__tag_000",
+          "text": "smartphone in hand recording",
+          "facts": {
+            "semantic_role": "selector",
+            "prop_usage": "handheld",
+            "hands_required": 1
+          }
+        },
+        {
+          "id": "smartphone_recording__tag_001",
+          "text": "screen light glowing on face",
+          "facts": {
+            "semantic_role": "selector",
+            "prop_usage": "ambient",
+            "hands_required": 0
+          }
+        },
+        {
+          "id": "smartphone_recording__tag_002",
+          "text": "phone face down on bed",
+          "facts": {
+            "semantic_role": "selector",
+            "prop_usage": "ambient",
+            "hands_required": 0
+          }
+        }
       ]
     },
     {
       "id": "camera_tripod_flash",
       "name_zh": "📷 单反相机/三脚架/写真补光灯",
       "tags": [
-        "professional DSLR on tripod in background",
-        "ring light reflection in eyes",
-        "studio lighting equipment"
+        {
+          "id": "camera_tripod_flash__tag_000",
+          "text": "professional DSLR on tripod in background",
+          "facts": {
+            "semantic_role": "selector",
+            "prop_usage": "ambient",
+            "hands_required": 0
+          }
+        },
+        {
+          "id": "camera_tripod_flash__tag_001",
+          "text": "ring light reflection in eyes",
+          "facts": {
+            "semantic_role": "selector",
+            "prop_usage": "ambient",
+            "hands_required": 0
+          }
+        },
+        {
+          "id": "camera_tripod_flash__tag_002",
+          "text": "studio lighting equipment",
+          "facts": {
+            "semantic_role": "selector",
+            "prop_usage": "ambient",
+            "hands_required": 0
+          }
+        }
       ]
     },
     {
       "id": "rose_petals_candles",
       "name_zh": "🌸 玫瑰花瓣/香薰蜡烛浪漫氛围",
       "tags": [
-        "scattered red rose petals on sheets",
-        "lit scented candles glowing warmly on bedside"
+        {
+          "id": "rose_petals_candles__tag_000",
+          "text": "scattered red rose petals on sheets",
+          "facts": {
+            "semantic_role": "selector",
+            "prop_usage": "ambient",
+            "hands_required": 0
+          }
+        },
+        {
+          "id": "rose_petals_candles__tag_001",
+          "text": "lit scented candles glowing warmly on bedside",
+          "facts": {
+            "semantic_role": "selector",
+            "prop_usage": "ambient",
+            "hands_required": 0
+          }
+        }
       ]
     },
     {
       "id": "ice_cubes",
       "name_zh": "🧊 冰块融化/冷感前戏",
       "tags": [
-        "melting ice cube resting on collarbone",
-        "water trickle running down chest",
-        "ice bucket on table"
+        {
+          "id": "ice_cubes__tag_000",
+          "text": "melting ice cube resting on collarbone",
+          "facts": {
+            "semantic_role": "selector",
+            "prop_usage": "body_contact",
+            "hands_required": 0
+          }
+        },
+        {
+          "id": "ice_cubes__tag_001",
+          "text": "water trickle running down chest",
+          "facts": {
+            "semantic_role": "selector",
+            "prop_usage": "body_contact",
+            "hands_required": 0
+          }
+        },
+        {
+          "id": "ice_cubes__tag_002",
+          "text": "ice bucket on table",
+          "facts": {
+            "semantic_role": "selector",
+            "prop_usage": "ambient",
+            "hands_required": 0
+          }
+        }
       ]
     },
     {
       "id": "pillow_clutching",
       "name_zh": "🛏️ 抱枕/抓紧凌乱被单",
       "tags": [
-        "pillow clutched to chest",
-        "fingers tightly gripping wrinkled bed sheets",
-        "tangled linen"
+        {
+          "id": "pillow_clutching__tag_000",
+          "text": "pillow clutched to chest",
+          "facts": {
+            "semantic_role": "selector",
+            "prop_usage": "handheld",
+            "hands_required": 1
+          }
+        },
+        {
+          "id": "pillow_clutching__tag_001",
+          "text": "fingers tightly gripping wrinkled bed sheets",
+          "facts": {
+            "semantic_role": "selector",
+            "prop_usage": "handheld",
+            "hands_required": 2
+          }
+        },
+        {
+          "id": "pillow_clutching__tag_002",
+          "text": "tangled linen",
+          "facts": {
+            "semantic_role": "selector",
+            "prop_usage": "ambient",
+            "hands_required": 0
+          }
+        }
       ]
     },
     {
       "id": "cute_cat_on_bed",
       "name_zh": "🐱 萌宠猫咪在床边/膝上",
       "tags": [
-        "fluffy cat sleeping on corner of bed",
-        "kitten resting nearby on sheets"
+        {
+          "id": "cute_cat_on_bed__tag_000",
+          "text": "fluffy cat sleeping on corner of bed",
+          "facts": {
+            "semantic_role": "selector",
+            "prop_usage": "ambient",
+            "hands_required": 0
+          }
+        },
+        {
+          "id": "cute_cat_on_bed__tag_001",
+          "text": "kitten resting nearby on sheets",
+          "facts": {
+            "semantic_role": "selector",
+            "prop_usage": "ambient",
+            "hands_required": 0
+          }
+        }
       ]
     },
     {
       "id": "glasses_reading",
       "name_zh": "👓 黑框眼镜/课本笔记本",
       "tags": [
-        "black-framed glasses pushed up nose",
-        "open textbook and notebook on desk"
+        {
+          "id": "glasses_reading__tag_000",
+          "text": "black-framed glasses pushed up nose",
+          "facts": {
+            "semantic_role": "selector",
+            "prop_usage": "worn",
+            "hands_required": 0
+          }
+        },
+        {
+          "id": "glasses_reading__tag_001",
+          "text": "open textbook and notebook on desk",
+          "facts": {
+            "semantic_role": "selector",
+            "prop_usage": "ambient",
+            "hands_required": 0
+          }
+        }
       ]
     },
     {
       "id": "game_controller",
       "name_zh": "🎮 游戏手柄/Switch/宅家",
       "tags": [
-        "holding game controller",
-        "Nintendo Switch console on bed",
-        "headphones around neck"
+        {
+          "id": "game_controller__tag_000",
+          "text": "holding game controller",
+          "facts": {
+            "semantic_role": "selector",
+            "prop_usage": "handheld",
+            "hands_required": 2
+          }
+        },
+        {
+          "id": "game_controller__tag_001",
+          "text": "Nintendo Switch console on bed",
+          "facts": {
+            "semantic_role": "selector",
+            "prop_usage": "ambient",
+            "hands_required": 0
+          }
+        },
+        {
+          "id": "game_controller__tag_002",
+          "text": "headphones around neck",
+          "facts": {
+            "semantic_role": "selector",
+            "prop_usage": "worn",
+            "hands_required": 0
+          }
+        }
       ]
     },
     {
@@ -109,10 +349,42 @@
           "id": "digital_camera_in_hand",
           "name_zh": "手持数码微单相机",
           "tags": [
-            "holding black compact digital camera",
-            "camera screen facing outward recording",
-            "recording the intimate moment",
-            "compact camera in hand"
+            {
+              "id": "digital_camera_in_hand__tag_000",
+              "text": "holding black compact digital camera",
+              "facts": {
+                "semantic_role": "selector",
+                "prop_usage": "handheld",
+                "hands_required": 1
+              }
+            },
+            {
+              "id": "digital_camera_in_hand__tag_001",
+              "text": "camera screen facing outward recording",
+              "facts": {
+                "semantic_role": "selector",
+                "prop_usage": "handheld",
+                "hands_required": 1
+              }
+            },
+            {
+              "id": "digital_camera_in_hand__tag_002",
+              "text": "recording the intimate moment",
+              "facts": {
+                "semantic_role": "selector",
+                "prop_usage": "handheld",
+                "hands_required": 1
+              }
+            },
+            {
+              "id": "digital_camera_in_hand__tag_003",
+              "text": "compact camera in hand",
+              "facts": {
+                "semantic_role": "selector",
+                "prop_usage": "handheld",
+                "hands_required": 1
+              }
+            }
           ]
         }
       ]
@@ -125,17 +397,72 @@
           "id": "embroidered_round_fan",
           "name_zh": "刺绣团扇",
           "tags": [
-            "holding embroidered round silk fan",
-            "translucent silk fan shielding chest",
-            "delicate bamboo handle"
+            {
+              "id": "embroidered_round_fan__tag_000",
+              "text": "holding embroidered round silk fan",
+              "facts": {
+                "semantic_role": "selector",
+                "prop_usage": "handheld",
+                "hands_required": 1,
+                "mutex_groups": [
+                  "fan_umbrella"
+                ]
+              }
+            },
+            {
+              "id": "embroidered_round_fan__tag_001",
+              "text": "translucent silk fan shielding chest",
+              "facts": {
+                "semantic_role": "selector",
+                "prop_usage": "handheld",
+                "hands_required": 1,
+                "mutex_groups": [
+                  "fan_umbrella"
+                ]
+              }
+            },
+            {
+              "id": "embroidered_round_fan__tag_002",
+              "text": "delicate bamboo handle",
+              "facts": {
+                "semantic_role": "selector",
+                "prop_usage": "handheld",
+                "hands_required": 1,
+                "mutex_groups": [
+                  "fan_umbrella"
+                ]
+              }
+            }
           ]
         },
         {
           "id": "oil_paper_umbrella",
           "name_zh": "油纸伞",
           "tags": [
-            "holding oiled paper umbrella propped on shoulder",
-            "translucent umbrella canopy filtering warm light"
+            {
+              "id": "oil_paper_umbrella__tag_000",
+              "text": "holding oiled paper umbrella propped on shoulder",
+              "facts": {
+                "semantic_role": "selector",
+                "prop_usage": "handheld",
+                "hands_required": 1,
+                "mutex_groups": [
+                  "fan_umbrella"
+                ]
+              }
+            },
+            {
+              "id": "oil_paper_umbrella__tag_001",
+              "text": "translucent umbrella canopy filtering warm light",
+              "facts": {
+                "semantic_role": "selector",
+                "prop_usage": "handheld",
+                "hands_required": 1,
+                "mutex_groups": [
+                  "fan_umbrella"
+                ]
+              }
+            }
           ]
         }
       ]
@@ -148,9 +475,33 @@
           "id": "fresh_flower_bouquet",
           "name_zh": "怀抱鲜花花束",
           "tags": [
-            "holding lush fresh floral bouquet",
-            "flower petals pressed against chest",
-            "bouquet wrapped in crinkled craft paper"
+            {
+              "id": "fresh_flower_bouquet__tag_000",
+              "text": "holding lush fresh floral bouquet",
+              "facts": {
+                "semantic_role": "selector",
+                "prop_usage": "handheld",
+                "hands_required": 1
+              }
+            },
+            {
+              "id": "fresh_flower_bouquet__tag_001",
+              "text": "flower petals pressed against chest",
+              "facts": {
+                "semantic_role": "selector",
+                "prop_usage": "body_contact",
+                "hands_required": 0
+              }
+            },
+            {
+              "id": "fresh_flower_bouquet__tag_002",
+              "text": "bouquet wrapped in crinkled craft paper",
+              "facts": {
+                "semantic_role": "selector",
+                "prop_usage": "handheld",
+                "hands_required": 1
+              }
+            }
           ]
         }
       ]
@@ -163,9 +514,33 @@
           "id": "fluffy_teddy_bear",
           "name_zh": "毛绒泰迪熊",
           "tags": [
-            "hugging large fluffy plush teddy bear",
-            "arms wrapped around cute stuffed animal",
-            "soft plush toy on bed"
+            {
+              "id": "fluffy_teddy_bear__tag_000",
+              "text": "hugging large fluffy plush teddy bear",
+              "facts": {
+                "semantic_role": "selector",
+                "prop_usage": "handheld",
+                "hands_required": 1
+              }
+            },
+            {
+              "id": "fluffy_teddy_bear__tag_001",
+              "text": "arms wrapped around cute stuffed animal",
+              "facts": {
+                "semantic_role": "selector",
+                "prop_usage": "handheld",
+                "hands_required": 1
+              }
+            },
+            {
+              "id": "fluffy_teddy_bear__tag_002",
+              "text": "soft plush toy on bed",
+              "facts": {
+                "semantic_role": "selector",
+                "prop_usage": "ambient",
+                "hands_required": 0
+              }
+            }
           ]
         }
       ]

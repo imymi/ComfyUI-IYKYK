@@ -9,97 +9,331 @@
       "id": "cute_heart_star",
       "name_zh": "💕 可爱小爱心/手腕微图案",
       "tags": [
-        "small solid heart tattoo on inner wrist",
-        "delicate tiny minimalist ink"
+        {
+          "id": "cute_heart_star__tag_000",
+          "text": "small solid heart tattoo on inner wrist",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "cute_heart_star__tag_001",
+          "text": "delicate tiny minimalist ink",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        }
       ]
     },
     {
       "id": "cherry_blossom_shoulder",
       "name_zh": "🌸 樱花花瓣飘落/肩膀锁骨",
       "tags": [
-        "cherry blossom petals tattoo drifting across shoulder",
-        "delicate pink sakura ink"
+        {
+          "id": "cherry_blossom_shoulder__tag_000",
+          "text": "cherry blossom petals tattoo drifting across shoulder",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "cherry_blossom_shoulder__tag_001",
+          "text": "delicate pink sakura ink",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        }
       ]
     },
     {
       "id": "lewd_womb_pubic",
       "name_zh": "🔞 耻骨/下腹部魅魔淫纹",
       "tags": [
-        "lewd womb tattoo on lower abdomen just above pubic area",
-        "ornate symmetrical succubus crest ink"
+        {
+          "id": "lewd_womb_pubic__tag_000",
+          "text": "lewd womb tattoo on lower abdomen just above pubic area",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "lewd_womb_pubic__tag_001",
+          "text": "ornate symmetrical succubus crest ink",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        }
       ]
     },
     {
       "id": "snake_coiling",
       "name_zh": "🐍 毒蛇缠绕/大腿或手臂",
       "tags": [
-        "snake tattoo coiling around upper thigh",
-        "detailed serpent scales wrapping limb"
+        {
+          "id": "snake_coiling__tag_000",
+          "text": "snake tattoo coiling around upper thigh",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "lower_body"
+            ]
+          }
+        },
+        {
+          "id": "snake_coiling__tag_001",
+          "text": "detailed serpent scales wrapping limb",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        }
       ]
     },
     {
       "id": "rose_flower_hip",
       "name_zh": "🌹 盛开红玫瑰/胯骨腰侧",
       "tags": [
-        "blooming red rose tattoo on hip bone",
-        "velvet flower petals with thorned vine"
+        {
+          "id": "rose_flower_hip__tag_000",
+          "text": "blooming red rose tattoo on hip bone",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "rose_flower_hip__tag_001",
+          "text": "velvet flower petals with thorned vine",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        }
       ]
     },
     {
       "id": "underbust_mandala",
       "name_zh": "💃 胸下曼陀罗/胸骨花纹",
       "tags": [
-        "ornamental underbust mandala tattoo curving below breasts",
-        "geometric lace line art"
+        {
+          "id": "underbust_mandala__tag_000",
+          "text": "ornamental underbust mandala tattoo curving below breasts",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "underbust_mandala__tag_001",
+          "text": "geometric lace line art",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        }
       ]
     },
     {
       "id": "spine_vertical_script",
       "name_zh": "📜 脊椎竖排诗文/腰窝",
       "tags": [
-        "vertical script tattoo running along spine",
-        "delicate Japanese kanji calligraphy down back"
+        {
+          "id": "spine_vertical_script__tag_000",
+          "text": "vertical script tattoo running along spine",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "spine_vertical_script__tag_001",
+          "text": "delicate Japanese kanji calligraphy down back",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        }
       ]
     },
     {
       "id": "japanese_irezumi_dragon",
       "name_zh": "🐉 和彫极道龙/半胛大花臂",
       "tags": [
-        "traditional Japanese irezumi dragon tattoo",
-        "clouds and waves background on arm and shoulder"
+        {
+          "id": "japanese_irezumi_dragon__tag_000",
+          "text": "traditional Japanese irezumi dragon tattoo",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "japanese_irezumi_dragon__tag_001",
+          "text": "clouds and waves background on arm and shoulder",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        }
       ]
     },
     {
       "id": "barcode_serial_number",
       "name_zh": "🔒 编号条形码/后颈或臀上",
       "tags": [
-        "small barcode tattoo with serial numbers on back of neck",
-        "product mark aesthetic"
+        {
+          "id": "barcode_serial_number__tag_000",
+          "text": "small barcode tattoo with serial numbers on back of neck",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "barcode_serial_number__tag_001",
+          "text": "product mark aesthetic",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        }
       ]
     },
     {
       "id": "tally_marks_inner_thigh",
       "name_zh": "📏 正字计数/大腿内侧",
       "tags": [
-        "正 kanji tally marks tattoo on inner thigh",
-        "handwritten scratched tally lines"
+        {
+          "id": "tally_marks_inner_thigh__tag_000",
+          "text": "正 kanji tally marks tattoo on inner thigh",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "lower_body"
+            ]
+          }
+        },
+        {
+          "id": "tally_marks_inner_thigh__tag_001",
+          "text": "handwritten scratched tally lines",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        }
       ]
     },
     {
       "id": "butterfly_lower_back",
       "name_zh": "🦋 蝴蝶/后腰骶骨经典位置",
       "tags": [
-        "delicate butterfly tattoo on lower back above buttocks",
-        "ornate symmetrical butterfly wings"
+        {
+          "id": "butterfly_lower_back__tag_000",
+          "text": "delicate butterfly tattoo on lower back above buttocks",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "butterfly_lower_back__tag_001",
+          "text": "ornate symmetrical butterfly wings",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        }
       ]
     }
   ],
   "core_fusion_tags": [
-    "realistic tattoo",
-    "ink embedded in dermis",
-    "tattoo beneath skin surface",
-    "follows body contours",
-    "slightly faded edges",
-    "pores visible through ink"
+    {
+      "id": "tattoo_core_fusion__tag_000",
+      "text": "realistic tattoo",
+      "facts": {
+        "semantic_role": "selector"
+      }
+    },
+    {
+      "id": "tattoo_core_fusion__tag_001",
+      "text": "ink embedded in dermis",
+      "facts": {
+        "semantic_role": "selector"
+      }
+    },
+    {
+      "id": "tattoo_core_fusion__tag_002",
+      "text": "tattoo beneath skin surface",
+      "facts": {
+        "semantic_role": "selector"
+      }
+    },
+    {
+      "id": "tattoo_core_fusion__tag_003",
+      "text": "follows body contours",
+      "facts": {
+        "semantic_role": "selector"
+      }
+    },
+    {
+      "id": "tattoo_core_fusion__tag_004",
+      "text": "slightly faded edges",
+      "facts": {
+        "semantic_role": "selector"
+      }
+    },
+    {
+      "id": "tattoo_core_fusion__tag_005",
+      "text": "pores visible through ink",
+      "facts": {
+        "semantic_role": "selector"
+      }
+    }
   ]
 }

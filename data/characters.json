@@ -9,90 +9,390 @@
       "id": "jk_schoolgirl",
       "name_zh": "清纯女高/JK学妹 (High School Girl)",
       "tags": [
-        "innocent Japanese high school girl",
-        "youthful student aura",
-        "sweet schoolgirl demeanor"
+        {
+          "id": "jk_schoolgirl__tag_000",
+          "text": "innocent Japanese high school girl",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "lower_body",
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "jk_schoolgirl__tag_001",
+          "text": "youthful student aura",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "lower_body",
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "jk_schoolgirl__tag_002",
+          "text": "sweet schoolgirl demeanor",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "lower_body",
+              "upper_body"
+            ]
+          }
+        }
       ]
     },
     {
       "id": "ol_subordinate",
       "name_zh": "职场新人OL/下属 (Office Lady Subordinate)",
       "tags": [
-        "young office lady",
-        "subordinate in corporate office",
-        "diligent workplace demeanor"
+        {
+          "id": "ol_subordinate__tag_000",
+          "text": "young office lady",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "lower_body",
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "ol_subordinate__tag_001",
+          "text": "subordinate in corporate office",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "lower_body",
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "ol_subordinate__tag_002",
+          "text": "diligent workplace demeanor",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "lower_body",
+              "upper_body"
+            ]
+          }
+        }
       ]
     },
     {
       "id": "female_boss",
       "name_zh": "高冷职场女上司 (Strict Female Boss)",
       "tags": [
-        "mature female executive",
-        "confident dominant demeanor",
-        "authoritative office lady"
+        {
+          "id": "female_boss__tag_000",
+          "text": "mature female executive",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "lower_body",
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "female_boss__tag_001",
+          "text": "confident dominant demeanor",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "lower_body",
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "female_boss__tag_002",
+          "text": "authoritative office lady",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "lower_body",
+              "upper_body"
+            ]
+          }
+        }
       ]
     },
     {
       "id": "married_housewife",
       "name_zh": "温柔少妇/出轨人妻 (Lonely Housewife)",
       "tags": [
-        "elegant married Japanese housewife",
-        "gentle mature demeanor",
-        "secret yearning housewife"
+        {
+          "id": "married_housewife__tag_000",
+          "text": "elegant married Japanese housewife",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "lower_body",
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "married_housewife__tag_001",
+          "text": "gentle mature demeanor",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "lower_body",
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "married_housewife__tag_002",
+          "text": "secret yearning housewife",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "lower_body",
+              "upper_body"
+            ]
+          }
+        }
       ]
     },
     {
       "id": "strict_teacher",
       "name_zh": "黑丝女教师/家庭教师 (Female Tutor/Teacher)",
       "tags": [
-        "intellectual female teacher",
-        "glasses wearing tutor",
-        "strict yet alluring educator"
+        {
+          "id": "strict_teacher__tag_000",
+          "text": "intellectual female teacher",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "lower_body",
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "strict_teacher__tag_001",
+          "text": "glasses wearing tutor",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "lower_body",
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "strict_teacher__tag_002",
+          "text": "strict yet alluring educator",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "lower_body",
+              "upper_body"
+            ]
+          }
+        }
       ]
     },
     {
       "id": "kind_nurse",
       "name_zh": "白衣天使小护士 (Young Hospital Nurse)",
       "tags": [
-        "caring young hospital nurse",
-        "soft-spoken clinical demeanor",
-        "gentle medical nurse"
+        {
+          "id": "kind_nurse__tag_000",
+          "text": "caring young hospital nurse",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "lower_body",
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "kind_nurse__tag_001",
+          "text": "soft-spoken clinical demeanor",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "lower_body",
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "kind_nurse__tag_002",
+          "text": "gentle medical nurse",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "lower_body",
+              "upper_body"
+            ]
+          }
+        }
       ]
     },
     {
       "id": "french_maid",
       "name_zh": "听话女仆/专属侍女 (Obedient Maid)",
       "tags": [
-        "submissive French maid",
-        "polite devoted servant",
-        "bowing respectful demeanor"
+        {
+          "id": "french_maid__tag_000",
+          "text": "submissive French maid",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "lower_body",
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "french_maid__tag_001",
+          "text": "polite devoted servant",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "lower_body",
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "french_maid__tag_002",
+          "text": "bowing respectful demeanor",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "lower_body",
+              "upper_body"
+            ]
+          }
+        }
       ]
     },
     {
       "id": "gravure_idol",
       "name_zh": "写真偶像/女优 (Gravure Idol / Model)",
       "tags": [
-        "glamorous gravure idol",
-        "confident bikini model",
-        "photogenic performer aura"
+        {
+          "id": "gravure_idol__tag_000",
+          "text": "glamorous gravure idol",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "lower_body",
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "gravure_idol__tag_001",
+          "text": "confident bikini model",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "lower_body",
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "gravure_idol__tag_002",
+          "text": "photogenic performer aura",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "lower_body",
+              "upper_body"
+            ]
+          }
+        }
       ]
     },
     {
       "id": "hostess_cabaret",
       "name_zh": "歌舞伎町陪酒女/风俗娘 (Cabaret Hostess)",
       "tags": [
-        "glamorous cabaret club hostess",
-        "charming nightlife entertainer",
-        "seductive hostess"
+        {
+          "id": "hostess_cabaret__tag_000",
+          "text": "glamorous cabaret club hostess",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "lower_body",
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "hostess_cabaret__tag_001",
+          "text": "charming nightlife entertainer",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "lower_body",
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "hostess_cabaret__tag_002",
+          "text": "seductive hostess",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "lower_body",
+              "upper_body"
+            ]
+          }
+        }
       ]
     },
     {
       "id": "neighbor_girlfriend",
       "name_zh": "邻家素人/合租女友 (Next-door Girlfriend)",
       "tags": [
-        "sweet amateur girlfriend",
-        "approachable girl next door",
-        "natural casual charm"
+        {
+          "id": "neighbor_girlfriend__tag_000",
+          "text": "sweet amateur girlfriend",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "lower_body",
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "neighbor_girlfriend__tag_001",
+          "text": "approachable girl next door",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "lower_body",
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "neighbor_girlfriend__tag_002",
+          "text": "natural casual charm",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "lower_body",
+              "upper_body"
+            ]
+          }
+        }
       ]
     }
   ]

@@ -4,69 +4,313 @@
       "id": "extreme_close_up",
       "name_zh": "大特写 ECU (局部细节/唇/乳/私处)",
       "tags": [
-        "extreme close-up",
-        "macro detail shot",
-        "body part filling frame",
-        "shallow depth of field"
+        {
+          "id": "extreme_close_up__tag_000",
+          "text": "extreme close-up",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "face"
+            ]
+          }
+        },
+        {
+          "id": "extreme_close_up__tag_001",
+          "text": "macro detail shot",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "face"
+            ]
+          }
+        },
+        {
+          "id": "extreme_close_up__tag_002",
+          "text": "body part filling frame",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "lower_body",
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "extreme_close_up__tag_003",
+          "text": "shallow depth of field",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        }
       ]
     },
     {
       "id": "close_up",
       "name_zh": "近景 CU (面部表情/眼神)",
       "tags": [
-        "close-up",
-        "face shot filling frame",
-        "portrait framing",
-        "focused on facial expression"
+        {
+          "id": "close_up__tag_000",
+          "text": "close-up",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "face"
+            ]
+          }
+        },
+        {
+          "id": "close_up__tag_001",
+          "text": "face shot filling frame",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "face"
+            ]
+          }
+        },
+        {
+          "id": "close_up__tag_002",
+          "text": "portrait framing",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "face"
+            ]
+          }
+        },
+        {
+          "id": "close_up__tag_003",
+          "text": "focused on facial expression",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        }
       ]
     },
     {
       "id": "medium_close_up",
       "name_zh": "中近景 MCU (胸部以上/手部互动)",
       "tags": [
-        "medium close-up",
-        "chest-up shot",
-        "upper body framing",
-        "hands interacting with body"
+        {
+          "id": "medium_close_up__tag_000",
+          "text": "medium close-up",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "face"
+            ]
+          }
+        },
+        {
+          "id": "medium_close_up__tag_001",
+          "text": "chest-up shot",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "medium_close_up__tag_002",
+          "text": "upper body framing",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "medium_close_up__tag_003",
+          "text": "hands interacting with body",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        }
       ]
     },
     {
       "id": "medium_shot",
       "name_zh": "中景 MS (腰部以上/半身动作)",
       "tags": [
-        "medium shot",
-        "waist-up framing",
-        "half-body portrait",
-        "pose and environment balanced"
+        {
+          "id": "medium_shot__tag_000",
+          "text": "medium shot",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "medium_shot__tag_001",
+          "text": "waist-up framing",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "medium_shot__tag_002",
+          "text": "half-body portrait",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "face"
+            ]
+          }
+        },
+        {
+          "id": "medium_shot__tag_003",
+          "text": "pose and environment balanced",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        }
       ]
     },
     {
       "id": "medium_long_shot",
       "name_zh": "中全景 MLS (膝盖以上/3/4全身)",
       "tags": [
-        "medium long shot",
-        "knee-up shot",
-        "three-quarter body framing"
+        {
+          "id": "medium_long_shot__tag_000",
+          "text": "medium long shot",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "full_body"
+            ]
+          }
+        },
+        {
+          "id": "medium_long_shot__tag_001",
+          "text": "knee-up shot",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "medium_long_shot__tag_002",
+          "text": "three-quarter body framing",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        }
       ]
     },
     {
       "id": "full_body_shot",
       "name_zh": "全景 LS (全身展示/环境氛围)",
       "tags": [
-        "full body shot",
-        "wide shot",
-        "entire figure visible head to toe",
-        "environmental background"
+        {
+          "id": "full_body_shot__tag_000",
+          "text": "full body shot",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "full_body"
+            ]
+          }
+        },
+        {
+          "id": "full_body_shot__tag_001",
+          "text": "wide shot",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "full_body"
+            ]
+          }
+        },
+        {
+          "id": "full_body_shot__tag_002",
+          "text": "entire figure visible head to toe",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "full_body_shot__tag_003",
+          "text": "environmental background",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        }
       ]
     },
     {
       "id": "erotic_close_up",
       "name_zh": "情色局部特写 (胸/臀/双腿间)",
       "tags": [
-        "erotic close-up",
-        "breast and cleavage focus",
-        "crotch and inner thigh detail",
-        "sensual macro framing"
+        {
+          "id": "erotic_close_up__tag_000",
+          "text": "erotic close-up",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "face"
+            ]
+          }
+        },
+        {
+          "id": "erotic_close_up__tag_001",
+          "text": "breast and cleavage focus",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "erotic_close_up__tag_002",
+          "text": "crotch and inner thigh detail",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "erotic_close_up__tag_003",
+          "text": "sensual macro framing",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "face"
+            ]
+          }
+        }
       ]
     }
   ],
@@ -75,94 +319,400 @@
       "id": "eye_level",
       "name_zh": "平视 (自然视线·中立)",
       "tags": [
-        "eye level angle",
-        "straight-on camera",
-        "neutral perspective"
+        {
+          "id": "eye_level__tag_000",
+          "text": "eye level angle",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "eye_level__tag_001",
+          "text": "straight-on camera",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "eye_level__tag_002",
+          "text": "neutral perspective",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        }
       ]
     },
     {
       "id": "low_angle",
       "name_zh": "仰视 (由下至上·崇拜感/高大)",
       "tags": [
-        "low angle shot",
-        "looking up from below",
-        "towering perspective"
+        {
+          "id": "low_angle__tag_000",
+          "text": "low angle shot",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "low_angle__tag_001",
+          "text": "looking up from below",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "low_angle__tag_002",
+          "text": "towering perspective",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        }
       ]
     },
     {
       "id": "high_angle",
       "name_zh": "俯视 (由上至下·掌控感/无助)",
       "tags": [
-        "high angle shot",
-        "looking down from above",
-        "submissive angle"
+        {
+          "id": "high_angle__tag_000",
+          "text": "high angle shot",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "high_angle__tag_001",
+          "text": "looking down from above",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "high_angle__tag_002",
+          "text": "submissive angle",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        }
       ]
     },
     {
       "id": "overhead_birds_eye",
       "name_zh": "鸟瞰 (正上方顶视·上帝视角)",
       "tags": [
-        "overhead top-down shot",
-        "directly above bed",
-        "bird eye view"
+        {
+          "id": "overhead_birds_eye__tag_000",
+          "text": "overhead top-down shot",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "overhead_birds_eye__tag_001",
+          "text": "directly above bed",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "overhead_birds_eye__tag_002",
+          "text": "bird eye view",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        }
       ]
     },
     {
       "id": "worms_eye",
       "name_zh": "蛙眼 (贴地极端仰拍)",
       "tags": [
-        "worm eye view",
-        "extreme low angle ground level",
-        "floor level perspective"
+        {
+          "id": "worms_eye__tag_000",
+          "text": "worm eye view",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "worms_eye__tag_001",
+          "text": "extreme low angle ground level",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "worms_eye__tag_002",
+          "text": "floor level perspective",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        }
       ]
     },
     {
       "id": "dutch_angle",
       "name_zh": "斜角 (倾斜构图·不安张力)",
       "tags": [
-        "dutch angle",
-        "tilted frame",
-        "canted angle",
-        "dynamic dramatic composition"
+        {
+          "id": "dutch_angle__tag_000",
+          "text": "dutch angle",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "dutch_angle__tag_001",
+          "text": "tilted frame",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "dutch_angle__tag_002",
+          "text": "canted angle",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "dutch_angle__tag_003",
+          "text": "dynamic dramatic composition",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        }
       ]
     },
     {
       "id": "over_the_shoulder",
       "name_zh": "过肩视角 OTS (双人互动前景)",
       "tags": [
-        "over the shoulder shot",
-        "OTS perspective",
-        "partner silhouette in foreground"
+        {
+          "id": "over_the_shoulder__tag_000",
+          "text": "over the shoulder shot",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "over_the_shoulder__tag_001",
+          "text": "OTS perspective",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "over_the_shoulder__tag_002",
+          "text": "partner silhouette in foreground",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        }
       ]
     },
     {
       "id": "pov_first_person",
       "name_zh": "POV 主观第一人称视角 (代入感)",
       "tags": [
-        "point of view",
-        "POV perspective",
-        "first person view",
-        "looking directly at camera"
+        {
+          "id": "pov_first_person__tag_000",
+          "text": "point of view",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "pov_first_person__tag_001",
+          "text": "POV perspective",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "pov_first_person__tag_002",
+          "text": "first person view",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "pov_first_person__tag_003",
+          "text": "looking directly at camera",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        }
       ]
     },
     {
       "id": "voyeur_peeping",
       "name_zh": "偷窥视角 (门缝/窗帘后偷拍)",
       "tags": [
-        "voyeur angle",
-        "peeping through door gap",
-        "hidden camera angle",
-        "foreground frame obstruction"
+        {
+          "id": "voyeur_peeping__tag_000",
+          "text": "voyeur angle",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "voyeur_peeping__tag_001",
+          "text": "peeping through door gap",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "voyeur_peeping__tag_002",
+          "text": "hidden camera angle",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "voyeur_peeping__tag_003",
+          "text": "foreground frame obstruction",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        }
       ]
     },
     {
       "id": "between_legs_angle",
       "name_zh": "情色特殊视角 (双腿间/裙底仰拍)",
       "tags": [
-        "between legs angle",
-        "upskirt perspective",
-        "looking up from floor",
-        "crotch level view"
+        {
+          "id": "between_legs_angle__tag_000",
+          "text": "between legs angle",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "between_legs_angle__tag_001",
+          "text": "upskirt perspective",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "between_legs_angle__tag_002",
+          "text": "looking up from floor",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "between_legs_angle__tag_003",
+          "text": "crotch level view",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        }
       ]
     }
   ]

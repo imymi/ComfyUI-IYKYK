@@ -7,17 +7,18 @@ atomizer.py — 提示词原子化与标签容器转换模块 (零循环依赖)
 """
 from __future__ import annotations
 
+import hashlib
 from dataclasses import dataclass, field
 from typing import List, Optional, Sequence, Set, Tuple
 
 if __package__:
     from .errors import PromptValidationError
     from .lexer import parse_prompt
-    from .models import PromptAtom, PromptFragment, TagProvenance
+    from .models import PromptAtom, PromptFragment, SelectionOrigin, SemanticFacts, TagProvenance
 else:
     from lib.errors import PromptValidationError
     from lib.lexer import parse_prompt
-    from lib.models import PromptAtom, PromptFragment, TagProvenance
+    from lib.models import PromptAtom, PromptFragment, SelectionOrigin, SemanticFacts, TagProvenance
 
 
 @dataclass(frozen=True)
@@ -98,11 +99,14 @@ def fragments_to_atoms(
     for _, _, f in indexed_items:
         if isinstance(f, str):
             f_text = f
-            f_slot = "unknown"
+            f_slot = "custom"
             f_item_id = None
             f_ctx = ()
             f_ex = None
-            f_prov = TagProvenance()
+            f_prov = TagProvenance(kind="user_input")
+            f_facts = SemanticFacts()
+            f_origin = SelectionOrigin(entry_point="custom_combiner", mode="custom", selector="custom", raw_value=f)
+            f_id = ""
         else:
             f_text = f.text
             f_slot = f.source_slot
@@ -110,7 +114,13 @@ def fragments_to_atoms(
             f_ctx = f.context_ids
             f_ex = f.exclusive_group
             f_prov = f.provenance
+            f_facts = getattr(f, "facts", SemanticFacts())
+            f_origin = getattr(f, "origin", None)
+            f_id = getattr(f, "id", "")
 
+        f_text = f.text if isinstance(f, PromptFragment) else (f.text if hasattr(f, "text") else str(f))
+        if isinstance(f_text, dict):
+            f_text = f_text.get("text", "")
         if not f_text or not f_text.strip():
             continue
 
@@ -119,9 +129,16 @@ def fragments_to_atoms(
 
         for tag in parsed.tags:
             tag_atoms: List[PromptAtom] = []
+            entry_str = str(f_origin.entry_point) if (f_origin and f_origin.entry_point) else "unknown"
+            item_str = str(f_item_id or (f_prov.item_id if (f_prov and f_prov.item_id) else "item"))
             for span_order, sp in enumerate(tag.spans):
                 if sp.text:
-                    atom_id = f"atom_{f_slot}_{tag_order}_{span_order}"
+                    if f_id:
+                        leaf_str = str(f_id)
+                    else:
+                        leaf_str = hashlib.sha256(sp.text.encode("utf-8")).hexdigest()[:12]
+                    seed_str = f"{entry_str}\0{item_str}\0{leaf_str}\0{tag_order}\0{span_order}"
+                    atom_id = f"atom_{hashlib.sha256(seed_str.encode('utf-8')).hexdigest()[:24]}"
                     atom = PromptAtom(
                         text=sp.text,
                         span_type=sp.span_type,
@@ -134,6 +151,9 @@ def fragments_to_atoms(
                         provenance=f_prov,
                         contains_blackbox=sp.contains_blackbox,
                         atom_id=atom_id,
+                        facts=f_facts,
+                        origin=f_origin,
+                        id=f_id,
                     )
                     tag_atoms.append(atom)
                     atoms.append(atom)
@@ -166,6 +186,13 @@ def atoms_to_tags(atoms: Sequence[PromptAtom]) -> List[PromptTag]:
         if not group:
             continue
         first = group[0]
+        for other in group[1:]:
+            if other.id != first.id or other.facts != first.facts or other.origin != first.origin:
+                raise ValueError(
+                    f"Metadata mismatch across spans in tag_order {t_order}: "
+                    f"span {first.span_order} (id={first.id}, facts={first.facts}, origin={first.origin}) vs "
+                    f"span {other.span_order} (id={other.id}, facts={other.facts}, origin={other.origin})"
+                )
         ptag = PromptTag(
             tag_order=t_order,
             source_slot=first.source_slot,
@@ -185,21 +212,32 @@ def atoms_to_fragments(atoms: Sequence[PromptAtom]) -> List[PromptFragment]:
     """
     兼容接口：将消解后的 Atom 聚合成完整的 Top-Level PromptFragment 列表。
     绝不将半截 plain 或 LoRA span 暴露为独立 Fragment。
+    100% 保持 id, facts, origin 元数据回转。
     """
     tags = atoms_to_tags(atoms)
-    return [
-        PromptFragment(
-            text=t.text,
-            source_slot=t.source_slot,
-            source_item_id=t.source_item_id,
-            context_ids=t.context_ids,
-            exclusive_group=t.exclusive_group,
-            order=t.tag_order,
-            provenance=t.provenance,
+    frags: List[PromptFragment] = []
+    for t in tags:
+        if not t.text:
+            continue
+        first_atom = t.atoms[0] if t.atoms else None
+        f_id = (first_atom.id if (first_atom and first_atom.id) else (getattr(first_atom, "atom_id", "") if first_atom else ""))
+        f_facts = first_atom.facts if first_atom else SemanticFacts()
+        f_origin = first_atom.origin if first_atom else None
+        frags.append(
+            PromptFragment(
+                text=t.text,
+                source_slot=t.source_slot,
+                source_item_id=t.source_item_id,
+                context_ids=t.context_ids,
+                exclusive_group=t.exclusive_group,
+                order=t.tag_order,
+                provenance=t.provenance,
+                id=f_id,
+                facts=f_facts,
+                origin=f_origin,
+            )
         )
-        for t in tags
-        if t.text
-    ]
+    return frags
 
 
 def deduplicate_tags(tags: Sequence[PromptTag]) -> List[PromptTag]:

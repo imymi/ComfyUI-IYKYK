@@ -4,876 +4,6186 @@
       "name_zh": "人妻/出轨系列",
       "theme_zh": "人妻/出轨系列",
       "tags": [
-        "married woman",
-        "housewife",
-        "cheating wife",
-        "lonely wife",
-        "neighbor wife",
-        "adultery",
-        "forbidden desire",
-        "affair with boss",
-        "husband's friend",
-        "secret motel meeting",
-        "wedding ring still on",
-        "tanline from ring",
-        "part-time job affair",
-        "PTA mom",
-        "apartment wife",
-        "delivery affair"
+        {
+          "id": "theme_married_affair__tag_000",
+          "text": "married woman",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_married_affair__tag_001",
+          "text": "housewife",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_married_affair__tag_002",
+          "text": "cheating wife",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_married_affair__tag_003",
+          "text": "lonely wife",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_married_affair__tag_004",
+          "text": "neighbor wife",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_married_affair__tag_005",
+          "text": "adultery",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_married_affair__tag_006",
+          "text": "forbidden desire",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_married_affair__tag_007",
+          "text": "affair with boss",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_married_affair__tag_008",
+          "text": "husband's friend",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_married_affair__tag_009",
+          "text": "secret motel meeting",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_married_affair__tag_010",
+          "text": "wedding ring still on",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_married_affair__tag_011",
+          "text": "tanline from ring",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_married_affair__tag_012",
+          "text": "part-time job affair",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_married_affair__tag_013",
+          "text": "PTA mom",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_married_affair__tag_014",
+          "text": "apartment wife",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_married_affair__tag_015",
+          "text": "delivery affair",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        }
+      ],
+      "id": "theme_married_affair",
+      "context_ids": [
+        "domestic",
+        "adult"
       ]
     },
     {
       "name_zh": "OL/职场系列",
       "theme_zh": "OL/职场系列",
       "tags": [
-        "office lady",
-        "business woman",
-        "after work drinking",
-        "overtime alone",
-        "business trip hotel",
-        "secretary under desk",
-        "boss secretary",
-        "copy room quickie",
-        "elevator encounter",
-        "office party drunk",
-        "new employee",
-        "female boss",
-        "subordinate",
-        "transfer employee",
-        "workplace harassment"
+        {
+          "id": "theme_office__tag_000",
+          "text": "office lady",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": "indoor",
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_office__tag_001",
+          "text": "business woman",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": "indoor",
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_office__tag_002",
+          "text": "after work drinking",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": "indoor",
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_office__tag_003",
+          "text": "overtime alone",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": "indoor",
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_office__tag_004",
+          "text": "business trip hotel",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": "indoor",
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_office__tag_005",
+          "text": "secretary under desk",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": "indoor",
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_office__tag_006",
+          "text": "boss secretary",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": "indoor",
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_office__tag_007",
+          "text": "copy room quickie",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": "indoor",
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_office__tag_008",
+          "text": "elevator encounter",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": "indoor",
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_office__tag_009",
+          "text": "office party drunk",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": "indoor",
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_office__tag_010",
+          "text": "new employee",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": "indoor",
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_office__tag_011",
+          "text": "female boss",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": "indoor",
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_office__tag_012",
+          "text": "subordinate",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": "indoor",
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_office__tag_013",
+          "text": "transfer employee",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": "indoor",
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_office__tag_014",
+          "text": "workplace harassment",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": "indoor",
+            "venue_ids": []
+          }
+        }
+      ],
+      "id": "theme_office",
+      "context_ids": [
+        "office"
       ]
     },
     {
       "name_zh": "教师/学生系列",
       "theme_zh": "教师/学生系列",
       "tags": [
-        "female teacher",
-        "tutor",
-        "after school lesson",
-        "private lesson",
-        "strict teacher",
-        "glasses teacher",
-        "student seduces teacher",
-        "teacher lounge",
-        "detention with student",
-        "home tutor",
-        "student council",
-        "class president",
-        "school trip room",
-        "club advisor"
+        {
+          "id": "theme_teacher_student__tag_000",
+          "text": "female teacher",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_teacher_student__tag_001",
+          "text": "tutor",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_teacher_student__tag_002",
+          "text": "after school lesson",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_teacher_student__tag_003",
+          "text": "private lesson",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_teacher_student__tag_004",
+          "text": "strict teacher",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_teacher_student__tag_005",
+          "text": "glasses teacher",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_teacher_student__tag_006",
+          "text": "student seduces teacher",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_teacher_student__tag_007",
+          "text": "teacher lounge",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_teacher_student__tag_008",
+          "text": "detention with student",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_teacher_student__tag_009",
+          "text": "home tutor",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_teacher_student__tag_010",
+          "text": "student council",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_teacher_student__tag_011",
+          "text": "class president",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_teacher_student__tag_012",
+          "text": "school trip room",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": "indoor",
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_teacher_student__tag_013",
+          "text": "club advisor",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": "indoor",
+            "venue_ids": []
+          }
+        }
+      ],
+      "id": "theme_teacher_student",
+      "context_ids": [
+        "school"
       ]
     },
     {
       "name_zh": "护士/医疗系列",
       "theme_zh": "护士/医疗系列",
       "tags": [
-        "nurse",
-        "patient care",
-        "hospital gown",
-        "medical exam",
-        "doctor nurse",
-        "clinic",
-        "physical examination",
-        "bed bath",
-        "sponge bath",
-        "nurse changing",
-        "night shift nurse",
-        "health check",
-        "injection"
+        {
+          "id": "theme_nurse_medical__tag_000",
+          "text": "nurse",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": "indoor",
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_nurse_medical__tag_001",
+          "text": "patient care",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": "outdoor",
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_nurse_medical__tag_002",
+          "text": "hospital gown",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": "indoor",
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_nurse_medical__tag_003",
+          "text": "medical exam",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": "indoor",
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_nurse_medical__tag_004",
+          "text": "doctor nurse",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": "indoor",
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_nurse_medical__tag_005",
+          "text": "clinic",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": "indoor",
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_nurse_medical__tag_006",
+          "text": "physical examination",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": "indoor",
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_nurse_medical__tag_007",
+          "text": "bed bath",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": "indoor",
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_nurse_medical__tag_008",
+          "text": "sponge bath",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": "indoor",
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_nurse_medical__tag_009",
+          "text": "nurse changing",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": "indoor",
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_nurse_medical__tag_010",
+          "text": "night shift nurse",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": "indoor",
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_nurse_medical__tag_011",
+          "text": "health check",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": "indoor",
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_nurse_medical__tag_012",
+          "text": "injection",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": "indoor",
+            "venue_ids": []
+          }
+        }
+      ],
+      "id": "theme_nurse_medical",
+      "context_ids": [
+        "medical"
       ]
     },
     {
       "name_zh": "女仆/制服系列",
       "theme_zh": "女仆/制服系列",
       "tags": [
-        "maid",
-        "cosplay",
-        "cat ears",
-        "bunny girl",
-        "shrine maiden",
-        "waitress",
-        "hostess",
-        "cabaret girl",
-        "soapland girl",
-        "policewoman",
-        "female officer",
-        "race queen",
-        "cabin attendant",
-        "elevator girl",
-        "receptionist",
-        "convenience store clerk"
+        {
+          "id": "theme_maid_uniform__tag_000",
+          "text": "maid",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_maid_uniform__tag_001",
+          "text": "cosplay",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_maid_uniform__tag_002",
+          "text": "cat ears",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_maid_uniform__tag_003",
+          "text": "bunny girl",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_maid_uniform__tag_004",
+          "text": "shrine maiden",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_maid_uniform__tag_005",
+          "text": "waitress",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_maid_uniform__tag_006",
+          "text": "hostess",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_maid_uniform__tag_007",
+          "text": "cabaret girl",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": "indoor",
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_maid_uniform__tag_008",
+          "text": "soapland girl",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_maid_uniform__tag_009",
+          "text": "policewoman",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_maid_uniform__tag_010",
+          "text": "female officer",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": "indoor",
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_maid_uniform__tag_011",
+          "text": "race queen",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_maid_uniform__tag_012",
+          "text": "cabin attendant",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_maid_uniform__tag_013",
+          "text": "elevator girl",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": "indoor",
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_maid_uniform__tag_014",
+          "text": "receptionist",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_maid_uniform__tag_015",
+          "text": "convenience store clerk",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": "indoor",
+            "venue_ids": []
+          }
+        }
+      ],
+      "id": "theme_maid_uniform",
+      "context_ids": [
+        "dining",
+        "adult"
       ]
     },
     {
       "name_zh": "熟女/人母系列",
       "theme_zh": "熟女/人母系列",
       "tags": [
-        "mature woman",
-        "older woman",
-        "experienced",
-        "milf",
-        "elegant lady",
-        "cougar",
-        "aunt",
-        "friend's mom",
-        "PTA mom",
-        "yoga mom",
-        "wine aunt",
-        "divorcee next door",
-        "widow",
-        "remarried mother",
-        "mother-in-law"
+        {
+          "id": "theme_mature_mother__tag_000",
+          "text": "mature woman",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_mature_mother__tag_001",
+          "text": "older woman",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_mature_mother__tag_002",
+          "text": "experienced",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_mature_mother__tag_003",
+          "text": "milf",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_mature_mother__tag_004",
+          "text": "elegant lady",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_mature_mother__tag_005",
+          "text": "cougar",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_mature_mother__tag_006",
+          "text": "aunt",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_mature_mother__tag_007",
+          "text": "friend's mom",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_mature_mother__tag_008",
+          "text": "PTA mom",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_mature_mother__tag_009",
+          "text": "yoga mom",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_mature_mother__tag_010",
+          "text": "wine aunt",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_mature_mother__tag_011",
+          "text": "divorcee next door",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_mature_mother__tag_012",
+          "text": "widow",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_mature_mother__tag_013",
+          "text": "remarried mother",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_mature_mother__tag_014",
+          "text": "mother-in-law",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        }
+      ],
+      "id": "theme_mature_mother",
+      "context_ids": [
+        "domestic"
       ]
     },
     {
       "name_zh": "素人/女友系列",
       "theme_zh": "素人/女友系列",
       "tags": [
-        "amateur girl",
-        "everyday girl",
-        "casual clothes",
-        "natural beauty",
-        "no makeup shy",
-        "first time",
-        "girlfriend experience",
-        "innocent turned wild",
-        "next door girl",
-        "online date",
-        "matching app girl",
-        "papa katsu girl",
-        "compensated dating"
+        {
+          "id": "theme_amateur_girlfriend__tag_000",
+          "text": "amateur girl",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_amateur_girlfriend__tag_001",
+          "text": "everyday girl",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_amateur_girlfriend__tag_002",
+          "text": "casual clothes",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_amateur_girlfriend__tag_003",
+          "text": "natural beauty",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_amateur_girlfriend__tag_004",
+          "text": "no makeup shy",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_amateur_girlfriend__tag_005",
+          "text": "first time",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_amateur_girlfriend__tag_006",
+          "text": "girlfriend experience",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_amateur_girlfriend__tag_007",
+          "text": "innocent turned wild",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_amateur_girlfriend__tag_008",
+          "text": "next door girl",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_amateur_girlfriend__tag_009",
+          "text": "online date",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_amateur_girlfriend__tag_010",
+          "text": "matching app girl",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_amateur_girlfriend__tag_011",
+          "text": "papa katsu girl",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_amateur_girlfriend__tag_012",
+          "text": "compensated dating",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        }
+      ],
+      "id": "theme_amateur_girlfriend",
+      "context_ids": [
+        "generic",
+        "domestic"
       ]
     },
     {
       "name_zh": "痴汉/NTR系列",
       "theme_zh": "痴汉/NTR系列",
       "tags": [
-        "chikan",
-        "groped on train",
-        "voyeur",
-        "caught in act",
-        "stolen kiss",
-        "forbidden touch",
-        "secret affair",
-        "watching wife",
-        "netorare",
-        "cuckolding",
-        "forced to watch",
-        "unwanted but aroused",
-        "peeping tom",
-        "hidden camera",
-        "blackmail"
+        {
+          "id": "theme_chikan_ntr__tag_000",
+          "text": "chikan",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_chikan_ntr__tag_001",
+          "text": "groped on train",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_chikan_ntr__tag_002",
+          "text": "voyeur",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_chikan_ntr__tag_003",
+          "text": "caught in act",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_chikan_ntr__tag_004",
+          "text": "stolen kiss",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_chikan_ntr__tag_005",
+          "text": "forbidden touch",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_chikan_ntr__tag_006",
+          "text": "secret affair",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_chikan_ntr__tag_007",
+          "text": "watching wife",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_chikan_ntr__tag_008",
+          "text": "netorare",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_chikan_ntr__tag_009",
+          "text": "cuckolding",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_chikan_ntr__tag_010",
+          "text": "forced to watch",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_chikan_ntr__tag_011",
+          "text": "unwanted but aroused",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_chikan_ntr__tag_012",
+          "text": "peeping tom",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_chikan_ntr__tag_013",
+          "text": "hidden camera",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_chikan_ntr__tag_014",
+          "text": "blackmail",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        }
+      ],
+      "id": "theme_chikan_ntr",
+      "context_ids": [
+        "transit",
+        "adult"
       ]
     },
     {
       "name_zh": "凌辱/调教系列",
       "theme_zh": "凌辱/调教系列",
       "tags": [
-        "submissive",
-        "bondage",
-        "blindfold",
-        "restrained",
-        "dominant",
-        "rough",
-        "gentle force",
-        "helpless",
-        "rope marks",
-        "collar and leash",
-        "spanking",
-        "discipline",
-        "punishment",
-        "begging for more",
-        "slave training",
-        "pet play",
-        "humiliation"
+        {
+          "id": "theme_humiliation_training__tag_000",
+          "text": "submissive",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_humiliation_training__tag_001",
+          "text": "bondage",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_humiliation_training__tag_002",
+          "text": "blindfold",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_humiliation_training__tag_003",
+          "text": "restrained",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_humiliation_training__tag_004",
+          "text": "dominant",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_humiliation_training__tag_005",
+          "text": "rough",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_humiliation_training__tag_006",
+          "text": "gentle force",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_humiliation_training__tag_007",
+          "text": "helpless",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_humiliation_training__tag_008",
+          "text": "rope marks",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_humiliation_training__tag_009",
+          "text": "collar and leash",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_humiliation_training__tag_010",
+          "text": "spanking",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_humiliation_training__tag_011",
+          "text": "discipline",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_humiliation_training__tag_012",
+          "text": "punishment",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_humiliation_training__tag_013",
+          "text": "begging for more",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_humiliation_training__tag_014",
+          "text": "slave training",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_humiliation_training__tag_015",
+          "text": "pet play",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_humiliation_training__tag_016",
+          "text": "humiliation",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        }
+      ],
+      "id": "theme_humiliation_training",
+      "context_ids": [
+        "bondage_sm",
+        "adult"
       ]
     },
     {
       "name_zh": "温泉/旅行系列",
       "theme_zh": "温泉/旅行系列",
       "tags": [
-        "onsen trip",
-        "ryokan",
-        "yukata",
-        "hot spring",
-        "travel romance",
-        "night bath",
-        "outdoor bath",
-        "couples room",
-        "business trip affair",
-        "hotel one night stand",
-        "mixed bathing",
-        "hot spring town"
+        {
+          "id": "theme_onsen_travel__tag_000",
+          "text": "onsen trip",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": "indoor",
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_onsen_travel__tag_001",
+          "text": "ryokan",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": "indoor",
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_onsen_travel__tag_002",
+          "text": "yukata",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": "indoor",
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_onsen_travel__tag_003",
+          "text": "hot spring",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": "indoor",
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_onsen_travel__tag_004",
+          "text": "travel romance",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": "indoor",
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_onsen_travel__tag_005",
+          "text": "night bath",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": "indoor",
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_onsen_travel__tag_006",
+          "text": "outdoor bath",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": "outdoor",
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_onsen_travel__tag_007",
+          "text": "couples room",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": "indoor",
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_onsen_travel__tag_008",
+          "text": "business trip affair",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": "indoor",
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_onsen_travel__tag_009",
+          "text": "hotel one night stand",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": "indoor",
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_onsen_travel__tag_010",
+          "text": "mixed bathing",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": "indoor",
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_onsen_travel__tag_011",
+          "text": "hot spring town",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": "indoor",
+            "venue_ids": []
+          }
+        }
+      ],
+      "id": "theme_onsen_travel",
+      "context_ids": [
+        "onsen_bath"
       ]
     },
     {
       "name_zh": "姐妹/亲属系列",
       "theme_zh": "姐妹/亲属系列",
       "tags": [
-        "twin sisters",
-        "older sister",
-        "younger sister",
-        "cousin",
-        "stepsister",
-        "sister-in-law",
-        "mother daughter",
-        "aunt niece",
-        "family resemblance",
-        "forbidden family",
-        "brother's wife"
+        {
+          "id": "theme_sisters_relatives__tag_000",
+          "text": "twin sisters",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_sisters_relatives__tag_001",
+          "text": "older sister",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_sisters_relatives__tag_002",
+          "text": "younger sister",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_sisters_relatives__tag_003",
+          "text": "cousin",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_sisters_relatives__tag_004",
+          "text": "stepsister",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_sisters_relatives__tag_005",
+          "text": "sister-in-law",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_sisters_relatives__tag_006",
+          "text": "mother daughter",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_sisters_relatives__tag_007",
+          "text": "aunt niece",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_sisters_relatives__tag_008",
+          "text": "family resemblance",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_sisters_relatives__tag_009",
+          "text": "forbidden family",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_sisters_relatives__tag_010",
+          "text": "brother's wife",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        }
+      ],
+      "id": "theme_sisters_relatives",
+      "context_ids": [
+        "domestic"
       ]
     },
     {
       "name_zh": "偶像/艺人系列",
       "theme_zh": "偶像/艺人系列",
       "tags": [
-        "idol girl",
-        "gravure model",
-        "AV actress",
-        "porn star",
-        "cam girl",
-        "gravure shoot behind scenes",
-        "audition",
-        "photo shoot seduction",
-        "underground idol",
-        "local idol",
-        "gravure DVD shoot"
+        {
+          "id": "theme_idol_entertainer__tag_000",
+          "text": "idol girl",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_idol_entertainer__tag_001",
+          "text": "gravure model",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_idol_entertainer__tag_002",
+          "text": "AV actress",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_idol_entertainer__tag_003",
+          "text": "porn star",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_idol_entertainer__tag_004",
+          "text": "cam girl",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_idol_entertainer__tag_005",
+          "text": "gravure shoot behind scenes",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_idol_entertainer__tag_006",
+          "text": "audition",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_idol_entertainer__tag_007",
+          "text": "photo shoot seduction",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_idol_entertainer__tag_008",
+          "text": "underground idol",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_idol_entertainer__tag_009",
+          "text": "local idol",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_idol_entertainer__tag_010",
+          "text": "gravure DVD shoot",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        }
+      ],
+      "id": "theme_idol_entertainer",
+      "context_ids": [
+        "adult",
+        "nightlife"
       ]
     },
     {
       "name_zh": "风俗/夜生活系列",
       "theme_zh": "风俗/夜生活系列",
       "tags": [
-        "hostess",
-        "cabaret girl",
-        "soapland worker",
-        "delivery health",
-        "pink salon",
-        "image club",
-        "snack bar mama",
-        "kyabakura girl",
-        "soap girl",
-        "delivery health girl",
-        "fashion health",
-        "oppai pub girl",
-        "girls bar"
+        {
+          "id": "theme_nightlife_services__tag_000",
+          "text": "hostess",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": "indoor",
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_nightlife_services__tag_001",
+          "text": "cabaret girl",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": "indoor",
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_nightlife_services__tag_002",
+          "text": "soapland worker",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": "indoor",
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_nightlife_services__tag_003",
+          "text": "delivery health",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": "indoor",
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_nightlife_services__tag_004",
+          "text": "pink salon",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": "indoor",
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_nightlife_services__tag_005",
+          "text": "image club",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": "indoor",
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_nightlife_services__tag_006",
+          "text": "snack bar mama",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": "indoor",
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_nightlife_services__tag_007",
+          "text": "kyabakura girl",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": "indoor",
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_nightlife_services__tag_008",
+          "text": "soap girl",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": "indoor",
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_nightlife_services__tag_009",
+          "text": "delivery health girl",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": "indoor",
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_nightlife_services__tag_010",
+          "text": "fashion health",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": "indoor",
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_nightlife_services__tag_011",
+          "text": "oppai pub girl",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": "indoor",
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_nightlife_services__tag_012",
+          "text": "girls bar",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": "indoor",
+            "venue_ids": []
+          }
+        }
+      ],
+      "id": "theme_nightlife_services",
+      "context_ids": [
+        "nightlife",
+        "adult"
       ]
     },
     {
       "name_zh": "特殊状态系列",
       "theme_zh": "特殊状态系列",
       "tags": [
-        "drunk girl",
-        "sleep sex",
-        "hypnotized",
-        "mind break",
-        "brainwashed",
-        "drug-induced",
-        "knocked up",
-        "pregnant",
-        "lactating",
-        "after sex",
-        "sloppy seconds",
-        "used goods",
-        "aphrodisiac",
-        "time stop",
-        "invisible man"
+        {
+          "id": "theme_special_state__tag_000",
+          "text": "drunk girl",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_special_state__tag_001",
+          "text": "sleep sex",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_special_state__tag_002",
+          "text": "hypnotized",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_special_state__tag_003",
+          "text": "mind break",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_special_state__tag_004",
+          "text": "brainwashed",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_special_state__tag_005",
+          "text": "drug-induced",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_special_state__tag_006",
+          "text": "knocked up",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_special_state__tag_007",
+          "text": "pregnant",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_special_state__tag_008",
+          "text": "lactating",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_special_state__tag_009",
+          "text": "after sex",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_special_state__tag_010",
+          "text": "sloppy seconds",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_special_state__tag_011",
+          "text": "used goods",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_special_state__tag_012",
+          "text": "aphrodisiac",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_special_state__tag_013",
+          "text": "time stop",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_special_state__tag_014",
+          "text": "invisible man",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        }
+      ],
+      "id": "theme_special_state",
+      "context_ids": [
+        "special"
       ]
     },
     {
       "name_zh": "多人系列",
       "theme_zh": "多人系列",
       "tags": [
-        "threesome",
-        "foursome",
-        "gangbang",
-        "orgy",
-        "double penetration",
-        "spit roast",
-        "bukkake",
-        "circle jerk",
-        "swap party",
-        "wife sharing",
-        "group sex",
-        "reverse gangbang",
-        "harem"
+        {
+          "id": "theme_multi_person__tag_000",
+          "text": "threesome",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_multi_person__tag_001",
+          "text": "foursome",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_multi_person__tag_002",
+          "text": "gangbang",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_multi_person__tag_003",
+          "text": "orgy",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_multi_person__tag_004",
+          "text": "double penetration",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_multi_person__tag_005",
+          "text": "spit roast",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_multi_person__tag_006",
+          "text": "bukkake",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_multi_person__tag_007",
+          "text": "circle jerk",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_multi_person__tag_008",
+          "text": "swap party",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_multi_person__tag_009",
+          "text": "wife sharing",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_multi_person__tag_010",
+          "text": "group sex",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_multi_person__tag_011",
+          "text": "reverse gangbang",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_multi_person__tag_012",
+          "text": "harem",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        }
+      ],
+      "id": "theme_multi_person",
+      "context_ids": [
+        "adult"
       ]
     },
     {
       "name_zh": "魔术镜系列（JAV独有）",
       "theme_zh": "魔术镜系列（JAV独有）",
       "tags": [
-        "magic mirror room",
-        "one-way mirror",
-        "hidden observation",
-        "girl unaware of being watched",
-        "two-way mirror",
-        "mirror room interview",
-        "magic mirror bus",
-        "voyeur through mirror",
-        "camera behind mirror",
-        "observed from other side"
+        {
+          "id": "theme_magic_mirror__tag_000",
+          "text": "magic mirror room",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": "indoor",
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_magic_mirror__tag_001",
+          "text": "one-way mirror",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_magic_mirror__tag_002",
+          "text": "hidden observation",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_magic_mirror__tag_003",
+          "text": "girl unaware of being watched",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_magic_mirror__tag_004",
+          "text": "two-way mirror",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_magic_mirror__tag_005",
+          "text": "mirror room interview",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": "indoor",
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_magic_mirror__tag_006",
+          "text": "magic mirror bus",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_magic_mirror__tag_007",
+          "text": "voyeur through mirror",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_magic_mirror__tag_008",
+          "text": "camera behind mirror",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_magic_mirror__tag_009",
+          "text": "observed from other side",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        }
+      ],
+      "id": "theme_magic_mirror",
+      "context_ids": [
+        "adult",
+        "special"
       ]
     },
     {
       "name_zh": "同居/出差NTR系列",
       "theme_zh": "同居/出差NTR系列",
       "tags": [
-        "shared hotel room",
-        "business trip forced sharing",
-        "same room with colleague",
-        "one room left at hotel",
-        "mixed bathing trip",
-        "company trip room sharing",
-        "forced proximity",
-        "no choice but same room",
-        "futon side by side",
-        "sleeping next to forbidden partner"
+        {
+          "id": "theme_cohabitation_trip__tag_000",
+          "text": "shared hotel room",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": "indoor",
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_cohabitation_trip__tag_001",
+          "text": "business trip forced sharing",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_cohabitation_trip__tag_002",
+          "text": "same room with colleague",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": "indoor",
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_cohabitation_trip__tag_003",
+          "text": "one room left at hotel",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": "indoor",
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_cohabitation_trip__tag_004",
+          "text": "mixed bathing trip",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": "indoor",
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_cohabitation_trip__tag_005",
+          "text": "company trip room sharing",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": "indoor",
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_cohabitation_trip__tag_006",
+          "text": "forced proximity",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_cohabitation_trip__tag_007",
+          "text": "no choice but same room",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": "indoor",
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_cohabitation_trip__tag_008",
+          "text": "futon side by side",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_cohabitation_trip__tag_009",
+          "text": "sleeping next to forbidden partner",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        }
+      ],
+      "id": "theme_cohabitation_trip",
+      "context_ids": [
+        "office",
+        "domestic"
       ]
     },
     {
       "name_zh": "AV面试/试镜系列",
       "theme_zh": "AV面试/试镜系列",
       "tags": [
-        "AV audition",
-        "casting interview",
-        "first time AV",
-        "nervous newbie",
-        "application form",
-        "AV producer watching",
-        "test shoot",
-        "audition sofa",
-        "nervous undressing",
-        "first time on camera",
-        "amateur debut",
-        "first gravure shoot",
-        "being convinced to pose nude"
+        {
+          "id": "theme_av_audition__tag_000",
+          "text": "AV audition",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_av_audition__tag_001",
+          "text": "casting interview",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_av_audition__tag_002",
+          "text": "first time AV",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_av_audition__tag_003",
+          "text": "nervous newbie",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_av_audition__tag_004",
+          "text": "application form",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_av_audition__tag_005",
+          "text": "AV producer watching",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_av_audition__tag_006",
+          "text": "test shoot",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_av_audition__tag_007",
+          "text": "audition sofa",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_av_audition__tag_008",
+          "text": "nervous undressing",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_av_audition__tag_009",
+          "text": "first time on camera",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_av_audition__tag_010",
+          "text": "amateur debut",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_av_audition__tag_011",
+          "text": "first gravure shoot",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_av_audition__tag_012",
+          "text": "being convinced to pose nude",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        }
+      ],
+      "id": "theme_av_audition",
+      "context_ids": [
+        "adult"
       ]
     },
     {
       "name_zh": "逆NTR/逆强暴系列",
       "theme_zh": "逆NTR/逆强暴系列",
       "tags": [
-        "female dominant",
-        "reverse rape",
-        "woman on top aggressive",
-        "girl forces herself on guy",
-        "dominant girlfriend",
-        "aggressive seduction",
-        "tied up man",
-        "male victim",
-        "female predator",
-        "overpowered by woman",
-        "forced to cum inside",
-        "woman taking control"
+        {
+          "id": "theme_reverse_ntr__tag_000",
+          "text": "female dominant",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_reverse_ntr__tag_001",
+          "text": "reverse rape",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_reverse_ntr__tag_002",
+          "text": "woman on top aggressive",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_reverse_ntr__tag_003",
+          "text": "girl forces herself on guy",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_reverse_ntr__tag_004",
+          "text": "dominant girlfriend",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_reverse_ntr__tag_005",
+          "text": "aggressive seduction",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_reverse_ntr__tag_006",
+          "text": "tied up man",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_reverse_ntr__tag_007",
+          "text": "male victim",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_reverse_ntr__tag_008",
+          "text": "female predator",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_reverse_ntr__tag_009",
+          "text": "overpowered by woman",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_reverse_ntr__tag_010",
+          "text": "forced to cum inside",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_reverse_ntr__tag_011",
+          "text": "woman taking control",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        }
+      ],
+      "id": "theme_reverse_ntr",
+      "context_ids": [
+        "adult"
       ]
     },
     {
       "name_zh": "女同/百合系列",
       "theme_zh": "女同/百合系列",
       "tags": [
-        "lesbian",
-        "girl on girl",
-        "yuri",
-        "female couple",
-        "two women kissing",
-        "tribadism",
-        "scissoring",
-        "lesbian couple making love",
-        "two girls exploring each other",
-        "gentle female love",
-        "experienced woman teaching younger"
+        {
+          "id": "theme_yuri__tag_000",
+          "text": "lesbian",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_yuri__tag_001",
+          "text": "girl on girl",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_yuri__tag_002",
+          "text": "yuri",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_yuri__tag_003",
+          "text": "female couple",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_yuri__tag_004",
+          "text": "two women kissing",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_yuri__tag_005",
+          "text": "tribadism",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_yuri__tag_006",
+          "text": "scissoring",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_yuri__tag_007",
+          "text": "lesbian couple making love",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_yuri__tag_008",
+          "text": "two girls exploring each other",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_yuri__tag_009",
+          "text": "gentle female love",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_yuri__tag_010",
+          "text": "experienced woman teaching younger",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        }
+      ],
+      "id": "theme_yuri",
+      "context_ids": [
+        "adult",
+        "generic"
       ]
     },
     {
       "name_zh": "紧缚/和式SM系列",
       "theme_zh": "紧缚/和式SM系列",
       "tags": [
-        "shibari",
-        "kinbaku",
-        "Japanese rope bondage",
-        "hemp rope patterns",
-        "rope marks on skin",
-        "suspended rope",
-        "intricate rope ties",
-        "traditional Japanese bondage",
-        "kinbaku-bi",
-        "rope dress",
-        "bound and helpless",
-        "tsuri suspension",
-        "floor rope tie"
+        {
+          "id": "theme_kinbaku__tag_000",
+          "text": "shibari",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": "indoor",
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_kinbaku__tag_001",
+          "text": "kinbaku",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_kinbaku__tag_002",
+          "text": "Japanese rope bondage",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_kinbaku__tag_003",
+          "text": "hemp rope patterns",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_kinbaku__tag_004",
+          "text": "rope marks on skin",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_kinbaku__tag_005",
+          "text": "suspended rope",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_kinbaku__tag_006",
+          "text": "intricate rope ties",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_kinbaku__tag_007",
+          "text": "traditional Japanese bondage",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_kinbaku__tag_008",
+          "text": "kinbaku-bi",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_kinbaku__tag_009",
+          "text": "rope dress",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_kinbaku__tag_010",
+          "text": "bound and helpless",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_kinbaku__tag_011",
+          "text": "tsuri suspension",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_kinbaku__tag_012",
+          "text": "floor rope tie",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        }
+      ],
+      "id": "theme_kinbaku",
+      "context_ids": [
+        "bondage_sm",
+        "traditional"
       ]
     },
     {
       "name_zh": "寝取/被寝取系列",
       "theme_zh": "寝取/被寝取系列",
       "tags": [
-        "netorare victim watching",
-        "netori active stealing",
-        "wife stolen away",
-        "stealing husband",
-        "watching partner cheat",
-        "stolen by colleague",
-        "seduced away",
-        "partner lured",
-        "jealousy and arousal mixed",
-        "forbidden watching",
-        "hiding while partner cheats"
+        {
+          "id": "theme_netorare__tag_000",
+          "text": "netorare victim watching",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_netorare__tag_001",
+          "text": "netori active stealing",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_netorare__tag_002",
+          "text": "wife stolen away",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_netorare__tag_003",
+          "text": "stealing husband",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_netorare__tag_004",
+          "text": "watching partner cheat",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_netorare__tag_005",
+          "text": "stolen by colleague",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_netorare__tag_006",
+          "text": "seduced away",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_netorare__tag_007",
+          "text": "partner lured",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_netorare__tag_008",
+          "text": "jealousy and arousal mixed",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_netorare__tag_009",
+          "text": "forbidden watching",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_netorare__tag_010",
+          "text": "hiding while partner cheats",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        }
+      ],
+      "id": "theme_netorare",
+      "context_ids": [
+        "adult"
       ]
     },
     {
       "name_zh": "媚药/迷奸系列",
       "theme_zh": "媚药/迷奸系列",
       "tags": [
-        "aphrodisiac",
-        "drugged drink",
-        "unknowingly drugged",
-        "sleep sex",
-        "sleeping assault",
-        "passed out",
-        "unconscious but body responding",
-        "waking up mid-act",
-        "drowsy confusion",
-        "spiked drink at party",
-        "aphrodisiac taking effect",
-        "helpless arousal"
+        {
+          "id": "theme_aphrodisiac__tag_000",
+          "text": "aphrodisiac",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_aphrodisiac__tag_001",
+          "text": "drugged drink",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_aphrodisiac__tag_002",
+          "text": "unknowingly drugged",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_aphrodisiac__tag_003",
+          "text": "sleep sex",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_aphrodisiac__tag_004",
+          "text": "sleeping assault",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_aphrodisiac__tag_005",
+          "text": "passed out",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_aphrodisiac__tag_006",
+          "text": "unconscious but body responding",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_aphrodisiac__tag_007",
+          "text": "waking up mid-act",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_aphrodisiac__tag_008",
+          "text": "drowsy confusion",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_aphrodisiac__tag_009",
+          "text": "spiked drink at party",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_aphrodisiac__tag_010",
+          "text": "aphrodisiac taking effect",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_aphrodisiac__tag_011",
+          "text": "helpless arousal",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        }
+      ],
+      "id": "theme_aphrodisiac",
+      "context_ids": [
+        "special",
+        "adult"
       ]
     },
     {
       "name_zh": "胁迫/敲诈系列",
       "theme_zh": "胁迫/敲诈系列",
       "tags": [
-        "blackmail",
-        "secret photos",
-        "compromising evidence",
-        "forced to obey",
-        "threatened with exposure",
-        "hidden camera recording",
-        "demanded sexual favors",
-        "cannot refuse",
-        "trapped by secret",
-        "extortion",
-        "teacher threatening student",
-        "boss threatening employee"
+        {
+          "id": "theme_blackmail__tag_000",
+          "text": "blackmail",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_blackmail__tag_001",
+          "text": "secret photos",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_blackmail__tag_002",
+          "text": "compromising evidence",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_blackmail__tag_003",
+          "text": "forced to obey",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_blackmail__tag_004",
+          "text": "threatened with exposure",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_blackmail__tag_005",
+          "text": "hidden camera recording",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_blackmail__tag_006",
+          "text": "demanded sexual favors",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_blackmail__tag_007",
+          "text": "cannot refuse",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_blackmail__tag_008",
+          "text": "trapped by secret",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_blackmail__tag_009",
+          "text": "extortion",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_blackmail__tag_010",
+          "text": "teacher threatening student",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_blackmail__tag_011",
+          "text": "boss threatening employee",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        }
+      ],
+      "id": "theme_blackmail",
+      "context_ids": [
+        "special",
+        "adult"
       ]
     },
     {
       "name_zh": "泥醉/酒后系列",
       "theme_zh": "泥醉/酒后系列",
       "tags": [
-        "drunk after party",
-        "nomikai afterwards",
-        "passed out drunk",
-        "drunken mistake",
-        "carried to hotel",
-        "too drunk to resist",
-        "after work drinking",
-        "company party aftermath",
-        "sake drunk",
-        "beer drunk",
-        "unconscious from alcohol",
-        "vomiting",
-        "drunken stupor",
-        "hungover morning"
+        {
+          "id": "theme_drunken__tag_000",
+          "text": "drunk after party",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_drunken__tag_001",
+          "text": "nomikai afterwards",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_drunken__tag_002",
+          "text": "passed out drunk",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_drunken__tag_003",
+          "text": "drunken mistake",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_drunken__tag_004",
+          "text": "carried to hotel",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": "outdoor",
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_drunken__tag_005",
+          "text": "too drunk to resist",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_drunken__tag_006",
+          "text": "after work drinking",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_drunken__tag_007",
+          "text": "company party aftermath",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_drunken__tag_008",
+          "text": "sake drunk",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_drunken__tag_009",
+          "text": "beer drunk",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_drunken__tag_010",
+          "text": "unconscious from alcohol",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_drunken__tag_011",
+          "text": "vomiting",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_drunken__tag_012",
+          "text": "drunken stupor",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_drunken__tag_013",
+          "text": "hungover morning",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        }
+      ],
+      "id": "theme_drunken",
+      "context_ids": [
+        "nightlife"
       ]
     },
     {
       "name_zh": "中出/怀孕系列",
       "theme_zh": "中出/怀孕系列",
       "tags": [
-        "creampie",
-        "cum inside",
-        "impregnation risk",
-        "raw sex no condom",
-        "cum dripping out",
-        "creampie leaking down thigh",
-        "breeding",
-        "impregnation fetish",
-        "risky creampie",
-        "multiple creampies",
-        "cum overflowing",
-        "knocked up risk",
-        "fertile womb",
-        "ovulation day",
-        "unprotected sex",
-        "raw dogging"
+        {
+          "id": "theme_impregnation__tag_000",
+          "text": "creampie",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_impregnation__tag_001",
+          "text": "cum inside",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_impregnation__tag_002",
+          "text": "impregnation risk",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_impregnation__tag_003",
+          "text": "raw sex no condom",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_impregnation__tag_004",
+          "text": "cum dripping out",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_impregnation__tag_005",
+          "text": "creampie leaking down thigh",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_impregnation__tag_006",
+          "text": "breeding",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_impregnation__tag_007",
+          "text": "impregnation fetish",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_impregnation__tag_008",
+          "text": "risky creampie",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_impregnation__tag_009",
+          "text": "multiple creampies",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_impregnation__tag_010",
+          "text": "cum overflowing",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_impregnation__tag_011",
+          "text": "knocked up risk",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_impregnation__tag_012",
+          "text": "fertile womb",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_impregnation__tag_013",
+          "text": "ovulation day",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_impregnation__tag_014",
+          "text": "unprotected sex",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_impregnation__tag_015",
+          "text": "raw dogging",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        }
+      ],
+      "id": "theme_impregnation",
+      "context_ids": [
+        "adult"
       ]
     },
     {
       "name_zh": "口交深喉系列",
       "theme_zh": "口交深喉系列",
       "tags": [
-        "irrumatio",
-        "face fucking",
-        "throat fucking",
-        "deepthroat gagging",
-        "mouth forced open",
-        "head held still",
-        "cock ramming throat",
-        "throat bulging",
-        "tears streaming",
-        "mascara running",
-        "saliva waterfall",
-        "throat destroyed",
-        "choking sounds implied",
-        "spit everywhere",
-        "messy face",
-        "ruined makeup",
-        "cum from nose"
+        {
+          "id": "theme_deepthroat__tag_000",
+          "text": "irrumatio",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_deepthroat__tag_001",
+          "text": "face fucking",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_deepthroat__tag_002",
+          "text": "throat fucking",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_deepthroat__tag_003",
+          "text": "deepthroat gagging",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_deepthroat__tag_004",
+          "text": "mouth forced open",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_deepthroat__tag_005",
+          "text": "head held still",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_deepthroat__tag_006",
+          "text": "cock ramming throat",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_deepthroat__tag_007",
+          "text": "throat bulging",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_deepthroat__tag_008",
+          "text": "tears streaming",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_deepthroat__tag_009",
+          "text": "mascara running",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": "outdoor",
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_deepthroat__tag_010",
+          "text": "saliva waterfall",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_deepthroat__tag_011",
+          "text": "throat destroyed",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_deepthroat__tag_012",
+          "text": "choking sounds implied",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_deepthroat__tag_013",
+          "text": "spit everywhere",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_deepthroat__tag_014",
+          "text": "messy face",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_deepthroat__tag_015",
+          "text": "ruined makeup",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_deepthroat__tag_016",
+          "text": "cum from nose",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        }
+      ],
+      "id": "theme_deepthroat",
+      "context_ids": [
+        "adult"
       ]
     },
     {
       "name_zh": "颜射系列",
       "theme_zh": "颜射系列",
       "tags": [
-        "bukkake",
-        "facial cumshot",
-        "cum on face",
-        "multiple loads on face",
-        "cum covering cheeks",
-        "cum on glasses",
-        "cum in hair",
-        "cum dripping from chin",
-        "sperm on lips",
-        "eyes closed covered in cum",
-        "dozens of shots",
-        "group bukkake",
-        "cum bath",
-        "sperm drenched",
-        "cum-soaked face",
-        "sticky white mess"
+        {
+          "id": "theme_facial__tag_000",
+          "text": "bukkake",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_facial__tag_001",
+          "text": "facial cumshot",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_facial__tag_002",
+          "text": "cum on face",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_facial__tag_003",
+          "text": "multiple loads on face",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_facial__tag_004",
+          "text": "cum covering cheeks",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_facial__tag_005",
+          "text": "cum on glasses",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_facial__tag_006",
+          "text": "cum in hair",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_facial__tag_007",
+          "text": "cum dripping from chin",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_facial__tag_008",
+          "text": "sperm on lips",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_facial__tag_009",
+          "text": "eyes closed covered in cum",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_facial__tag_010",
+          "text": "dozens of shots",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_facial__tag_011",
+          "text": "group bukkake",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_facial__tag_012",
+          "text": "cum bath",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": "indoor",
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_facial__tag_013",
+          "text": "sperm drenched",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_facial__tag_014",
+          "text": "cum-soaked face",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_facial__tag_015",
+          "text": "sticky white mess",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        }
+      ],
+      "id": "theme_facial",
+      "context_ids": [
+        "adult"
       ]
     },
     {
       "name_zh": "痴女系列",
       "theme_zh": "痴女系列",
       "tags": [
-        "nympho",
-        "man-eater",
-        "sex addict woman",
-        "insatiable",
-        "multiple orgasms",
-        "begging for more",
-        "can't get enough",
-        "cock hungry",
-        "sex crazed",
-        "predatory female",
-        "seduces and takes what she wants",
-        "always horny",
-        "nymphomaniac",
-        "relentless sexual appetite",
-        "wears men out",
-        "pussy always wet"
+        {
+          "id": "theme_nympho__tag_000",
+          "text": "nympho",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_nympho__tag_001",
+          "text": "man-eater",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_nympho__tag_002",
+          "text": "sex addict woman",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_nympho__tag_003",
+          "text": "insatiable",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_nympho__tag_004",
+          "text": "multiple orgasms",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_nympho__tag_005",
+          "text": "begging for more",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_nympho__tag_006",
+          "text": "can't get enough",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_nympho__tag_007",
+          "text": "cock hungry",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_nympho__tag_008",
+          "text": "sex crazed",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_nympho__tag_009",
+          "text": "predatory female",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_nympho__tag_010",
+          "text": "seduces and takes what she wants",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_nympho__tag_011",
+          "text": "always horny",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_nympho__tag_012",
+          "text": "nymphomaniac",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_nympho__tag_013",
+          "text": "relentless sexual appetite",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_nympho__tag_014",
+          "text": "wears men out",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_nympho__tag_015",
+          "text": "pussy always wet",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        }
+      ],
+      "id": "theme_nympho",
+      "context_ids": [
+        "adult"
       ]
     },
     {
       "name_zh": "放置/野外系列（JAV经典暴露主题）",
       "theme_zh": "放置/野外系列（JAV经典暴露主题）",
       "tags": [
-        "exhibitionism",
-        "public nudity",
-        "outdoor exposure",
-        "flashing",
-        "outdoor sex",
-        "streaking",
-        "mooning",
-        "flashing at train",
-        "flashing at convenience store",
-        "public masterbation",
-        "onishi",
-        "outdoor flashing",
-        "street flashing",
-        "park sex",
-        "park public sex",
-        "rooftop sex",
-        "rooftop public",
-        "beach sex",
-        "beach public",
-        "mountain sex",
-        "outdoor exposed",
-        "outdoors flashing skirt",
-        "upskirt",
-        "downblouse",
-        "train flashing",
-        "train station flashing",
-        "crowded place flashing",
-        "street corner flashing",
-        "exhibitionism",
-        "outdoor exposure",
-        "public arousal"
+        {
+          "id": "theme_outdoor_exposure__tag_000",
+          "text": "exhibitionism",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": "outdoor",
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_outdoor_exposure__tag_001",
+          "text": "public nudity",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": "outdoor",
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_outdoor_exposure__tag_002",
+          "text": "outdoor exposure",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": "outdoor",
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_outdoor_exposure__tag_003",
+          "text": "flashing",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": "outdoor",
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_outdoor_exposure__tag_004",
+          "text": "outdoor sex",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": "outdoor",
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_outdoor_exposure__tag_005",
+          "text": "streaking",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": "outdoor",
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_outdoor_exposure__tag_006",
+          "text": "mooning",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": "outdoor",
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_outdoor_exposure__tag_007",
+          "text": "flashing at train",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": "outdoor",
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_outdoor_exposure__tag_008",
+          "text": "flashing at convenience store",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": "outdoor",
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_outdoor_exposure__tag_009",
+          "text": "public masterbation",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": "outdoor",
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_outdoor_exposure__tag_010",
+          "text": "onishi",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": "outdoor",
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_outdoor_exposure__tag_011",
+          "text": "outdoor flashing",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": "outdoor",
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_outdoor_exposure__tag_012",
+          "text": "street flashing",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": "outdoor",
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_outdoor_exposure__tag_013",
+          "text": "park sex",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": "outdoor",
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_outdoor_exposure__tag_014",
+          "text": "park public sex",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": "outdoor",
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_outdoor_exposure__tag_015",
+          "text": "rooftop sex",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": "outdoor",
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_outdoor_exposure__tag_016",
+          "text": "rooftop public",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": "outdoor",
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_outdoor_exposure__tag_017",
+          "text": "beach sex",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": "outdoor",
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_outdoor_exposure__tag_018",
+          "text": "beach public",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": "outdoor",
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_outdoor_exposure__tag_019",
+          "text": "mountain sex",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": "outdoor",
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_outdoor_exposure__tag_020",
+          "text": "outdoor exposed",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": "outdoor",
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_outdoor_exposure__tag_021",
+          "text": "outdoors flashing skirt",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": "outdoor",
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_outdoor_exposure__tag_022",
+          "text": "upskirt",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": "outdoor",
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_outdoor_exposure__tag_023",
+          "text": "downblouse",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": "outdoor",
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_outdoor_exposure__tag_024",
+          "text": "train flashing",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": "outdoor",
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_outdoor_exposure__tag_025",
+          "text": "train station flashing",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": "outdoor",
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_outdoor_exposure__tag_026",
+          "text": "crowded place flashing",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": "outdoor",
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_outdoor_exposure__tag_027",
+          "text": "street corner flashing",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": "outdoor",
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_outdoor_exposure__tag_028",
+          "text": "exhibitionism",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": "outdoor",
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_outdoor_exposure__tag_029",
+          "text": "outdoor exposure",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": "outdoor",
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_outdoor_exposure__tag_030",
+          "text": "public arousal",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": "outdoor",
+            "venue_ids": []
+          }
+        }
+      ],
+      "id": "theme_outdoor_exposure",
+      "context_ids": [
+        "outdoor",
+        "adult"
       ]
     },
     {
       "name_zh": "露出/偷窥系列",
       "theme_zh": "露出/偷窥系列",
       "tags": [
-        "voyeurism",
-        "hidden camera",
-        "peephole",
-        "one-way mirror",
-        "watching through window",
-        "peeping through curtain",
-        "peeping through door gap",
-        "spy cam",
-        "voyeur shot",
-        "watching from closet",
-        "watching from under bed",
-        "watching from bathroom",
-        "peeping tom",
-        "surveillance footage",
-        "hidden in closet",
-        "watching through keyhole",
-        "under door view",
-        "observation without being seen",
-        "voyeur angle",
-        "reverse voyeur",
-        "caught being watched",
-        "unaware victim",
-        "hidden angle shot"
+        {
+          "id": "theme_voyeur__tag_000",
+          "text": "voyeurism",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_voyeur__tag_001",
+          "text": "hidden camera",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_voyeur__tag_002",
+          "text": "peephole",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_voyeur__tag_003",
+          "text": "one-way mirror",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_voyeur__tag_004",
+          "text": "watching through window",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_voyeur__tag_005",
+          "text": "peeping through curtain",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_voyeur__tag_006",
+          "text": "peeping through door gap",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_voyeur__tag_007",
+          "text": "spy cam",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_voyeur__tag_008",
+          "text": "voyeur shot",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_voyeur__tag_009",
+          "text": "watching from closet",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_voyeur__tag_010",
+          "text": "watching from under bed",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_voyeur__tag_011",
+          "text": "watching from bathroom",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": "indoor",
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_voyeur__tag_012",
+          "text": "peeping tom",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_voyeur__tag_013",
+          "text": "surveillance footage",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_voyeur__tag_014",
+          "text": "hidden in closet",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_voyeur__tag_015",
+          "text": "watching through keyhole",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_voyeur__tag_016",
+          "text": "under door view",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_voyeur__tag_017",
+          "text": "observation without being seen",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_voyeur__tag_018",
+          "text": "voyeur angle",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_voyeur__tag_019",
+          "text": "reverse voyeur",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_voyeur__tag_020",
+          "text": "caught being watched",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_voyeur__tag_021",
+          "text": "unaware victim",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_voyeur__tag_022",
+          "text": "hidden angle shot",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        }
+      ],
+      "id": "theme_voyeur",
+      "context_ids": [
+        "special",
+        "adult"
       ]
     },
     {
       "name_zh": "睡眠/无意识系列",
       "theme_zh": "睡眠/无意识系列",
       "tags": [
-        "sleep sex",
-        "unconscious",
-        "drugged",
-        "roofied drink",
-        "passed out",
-        "asleep",
-        "sleeping pill",
-        "too drunk to resist",
-        "hypnosis",
-        "hypnotic suggestion",
-        "mind control",
-        "brainwashed",
-        "somnophilia",
-        "sleep paralysis",
-        "unconscious masterbation",
-        "waking up to sex",
-        "morning sex while half asleep",
-        "drug in drink",
-        "unconscious from exhaustion",
-        "fainted",
-        "ko",
-        "knocked out"
+        {
+          "id": "theme_unconscious__tag_000",
+          "text": "sleep sex",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_unconscious__tag_001",
+          "text": "unconscious",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_unconscious__tag_002",
+          "text": "drugged",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_unconscious__tag_003",
+          "text": "roofied drink",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_unconscious__tag_004",
+          "text": "passed out",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_unconscious__tag_005",
+          "text": "asleep",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_unconscious__tag_006",
+          "text": "sleeping pill",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_unconscious__tag_007",
+          "text": "too drunk to resist",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_unconscious__tag_008",
+          "text": "hypnosis",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_unconscious__tag_009",
+          "text": "hypnotic suggestion",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_unconscious__tag_010",
+          "text": "mind control",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_unconscious__tag_011",
+          "text": "brainwashed",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_unconscious__tag_012",
+          "text": "somnophilia",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_unconscious__tag_013",
+          "text": "sleep paralysis",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_unconscious__tag_014",
+          "text": "unconscious masterbation",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_unconscious__tag_015",
+          "text": "waking up to sex",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_unconscious__tag_016",
+          "text": "morning sex while half asleep",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_unconscious__tag_017",
+          "text": "drug in drink",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_unconscious__tag_018",
+          "text": "unconscious from exhaustion",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_unconscious__tag_019",
+          "text": "fainted",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_unconscious__tag_020",
+          "text": "ko",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_unconscious__tag_021",
+          "text": "knocked out",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        }
+      ],
+      "id": "theme_unconscious",
+      "context_ids": [
+        "special"
       ]
     },
     {
       "name_zh": "幻想/梦境系列",
       "theme_zh": "幻想/梦境系列",
       "tags": [
-        "fantasy",
-        "delusion",
-        "hallucination",
-        "dream sequence",
-        "dream within dream",
-        "imaginary lover",
-        "alter ego",
-        "split personality",
-        "double",
-        "doppelganger",
-        "devil on shoulder",
-        "angel on shoulder",
-        "role-play fantasy",
-        "power fantasy",
-        "celebrity fantasy",
-        "teacher fantasy",
-        "rape fantasy ( consensual non-consent)",
-        "rough fantasy",
-        "taboo fantasy",
-        "race play fantasy",
-        "age play fantasy",
-        "pet play fantasy"
+        {
+          "id": "theme_fantasy_dream__tag_000",
+          "text": "fantasy",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_fantasy_dream__tag_001",
+          "text": "delusion",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_fantasy_dream__tag_002",
+          "text": "hallucination",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_fantasy_dream__tag_003",
+          "text": "dream sequence",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_fantasy_dream__tag_004",
+          "text": "dream within dream",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_fantasy_dream__tag_005",
+          "text": "imaginary lover",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_fantasy_dream__tag_006",
+          "text": "alter ego",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_fantasy_dream__tag_007",
+          "text": "split personality",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_fantasy_dream__tag_008",
+          "text": "double",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_fantasy_dream__tag_009",
+          "text": "doppelganger",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_fantasy_dream__tag_010",
+          "text": "devil on shoulder",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_fantasy_dream__tag_011",
+          "text": "angel on shoulder",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_fantasy_dream__tag_012",
+          "text": "role-play fantasy",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_fantasy_dream__tag_013",
+          "text": "power fantasy",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_fantasy_dream__tag_014",
+          "text": "celebrity fantasy",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_fantasy_dream__tag_015",
+          "text": "teacher fantasy",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_fantasy_dream__tag_016",
+          "text": "rape fantasy ( consensual non-consent)",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": "indoor",
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_fantasy_dream__tag_017",
+          "text": "rough fantasy",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_fantasy_dream__tag_018",
+          "text": "taboo fantasy",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_fantasy_dream__tag_019",
+          "text": "race play fantasy",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_fantasy_dream__tag_020",
+          "text": "age play fantasy",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_fantasy_dream__tag_021",
+          "text": "pet play fantasy",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        }
+      ],
+      "id": "theme_fantasy_dream",
+      "context_ids": [
+        "special"
       ]
     },
     {
       "name_zh": "恋足/特殊部位系列",
       "theme_zh": "恋足/特殊部位系列",
       "tags": [
-        "foot fetish",
-        "foot job",
-        "foot worship",
-        "toe sucking",
-        "sole licking",
-        "ankle worship",
-        "foot licking",
-        "foot smell",
-        "stocking feet",
-        "barefoot",
-        "dirty feet",
-        "feet on face",
-        "trampling",
-        "foot domination",
-        "toe ring",
-        "pedicure feet",
-        "foot slave",
-        "foot sub",
-        "sole tickle",
-        "socked feet",
-        "barefoot in heels",
-        "stocking feet in heels",
-        "foot smell worship",
-        "smelly socks"
+        {
+          "id": "theme_foot_fetish__tag_000",
+          "text": "foot fetish",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_foot_fetish__tag_001",
+          "text": "foot job",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_foot_fetish__tag_002",
+          "text": "foot worship",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_foot_fetish__tag_003",
+          "text": "toe sucking",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_foot_fetish__tag_004",
+          "text": "sole licking",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_foot_fetish__tag_005",
+          "text": "ankle worship",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_foot_fetish__tag_006",
+          "text": "foot licking",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_foot_fetish__tag_007",
+          "text": "foot smell",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_foot_fetish__tag_008",
+          "text": "stocking feet",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_foot_fetish__tag_009",
+          "text": "barefoot",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": "indoor",
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_foot_fetish__tag_010",
+          "text": "dirty feet",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_foot_fetish__tag_011",
+          "text": "feet on face",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_foot_fetish__tag_012",
+          "text": "trampling",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_foot_fetish__tag_013",
+          "text": "foot domination",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_foot_fetish__tag_014",
+          "text": "toe ring",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_foot_fetish__tag_015",
+          "text": "pedicure feet",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_foot_fetish__tag_016",
+          "text": "foot slave",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_foot_fetish__tag_017",
+          "text": "foot sub",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_foot_fetish__tag_018",
+          "text": "sole tickle",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_foot_fetish__tag_019",
+          "text": "socked feet",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_foot_fetish__tag_020",
+          "text": "barefoot in heels",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": "indoor",
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_foot_fetish__tag_021",
+          "text": "stocking feet in heels",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_foot_fetish__tag_022",
+          "text": "foot smell worship",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_foot_fetish__tag_023",
+          "text": "smelly socks",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        }
+      ],
+      "id": "theme_foot_fetish",
+      "context_ids": [
+        "adult"
       ]
     },
     {
       "name_zh": "SM/支配与臣服系列",
       "theme_zh": "SM/支配与臣服系列",
       "tags": [
-        "bondage",
-        "rope bondage",
-        "Shibari",
-        "kinbaku",
-        "suspension",
-        "spreader bar",
-        "stocks",
-        "pillory",
-        "chains",
-        "cuffs",
-        "hogtie",
-        "frogtie",
-        "box tie",
-        "Japanese bondage",
-        "suspension bondage",
-        "partial bondage",
-        "wrist restraints",
-        "ankle restraints",
-        "collar and leash",
-        "chain leash",
-        "metal collar",
-        "cage",
-        "locked in cage",
-        "locked in room",
-        "imprisoned",
-        "bound and gagged"
+        {
+          "id": "theme_sm_dominance__tag_000",
+          "text": "bondage",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_sm_dominance__tag_001",
+          "text": "rope bondage",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_sm_dominance__tag_002",
+          "text": "Shibari",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": "indoor",
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_sm_dominance__tag_003",
+          "text": "kinbaku",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_sm_dominance__tag_004",
+          "text": "suspension",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_sm_dominance__tag_005",
+          "text": "spreader bar",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": "indoor",
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_sm_dominance__tag_006",
+          "text": "stocks",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_sm_dominance__tag_007",
+          "text": "pillory",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_sm_dominance__tag_008",
+          "text": "chains",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_sm_dominance__tag_009",
+          "text": "cuffs",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_sm_dominance__tag_010",
+          "text": "hogtie",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_sm_dominance__tag_011",
+          "text": "frogtie",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_sm_dominance__tag_012",
+          "text": "box tie",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_sm_dominance__tag_013",
+          "text": "Japanese bondage",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_sm_dominance__tag_014",
+          "text": "suspension bondage",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_sm_dominance__tag_015",
+          "text": "partial bondage",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_sm_dominance__tag_016",
+          "text": "wrist restraints",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_sm_dominance__tag_017",
+          "text": "ankle restraints",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_sm_dominance__tag_018",
+          "text": "collar and leash",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_sm_dominance__tag_019",
+          "text": "chain leash",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_sm_dominance__tag_020",
+          "text": "metal collar",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_sm_dominance__tag_021",
+          "text": "cage",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_sm_dominance__tag_022",
+          "text": "locked in cage",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_sm_dominance__tag_023",
+          "text": "locked in room",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": "indoor",
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_sm_dominance__tag_024",
+          "text": "imprisoned",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_sm_dominance__tag_025",
+          "text": "bound and gagged",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        }
+      ],
+      "id": "theme_sm_dominance",
+      "context_ids": [
+        "bondage_sm"
       ]
     },
     {
       "name_zh": "身体改造/特殊状态系列",
       "theme_zh": "身体改造/特殊状态系列",
       "tags": [
-        "tattoo",
-        "tattoos visible",
-        "full sleeve",
-        "back tattoo",
-        "hip tattoo",
-        "bondage marks",
-        "brand marks",
-        "scarification",
-        "piercings",
-        "nipple piercing",
-        "genital piercing",
-        "labia piercing",
-        "Prince Albert",
-        "guiche piercing",
-        "apadravya",
-        "ampallang",
-        "surface piercing",
-        "PA piercing",
-        "nipple ring",
-        "body modification",
-        "stretched ears",
-        "corset piercings"
+        {
+          "id": "theme_body_modification__tag_000",
+          "text": "tattoo",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_body_modification__tag_001",
+          "text": "tattoos visible",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_body_modification__tag_002",
+          "text": "full sleeve",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_body_modification__tag_003",
+          "text": "back tattoo",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_body_modification__tag_004",
+          "text": "hip tattoo",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_body_modification__tag_005",
+          "text": "bondage marks",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_body_modification__tag_006",
+          "text": "brand marks",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_body_modification__tag_007",
+          "text": "scarification",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": "outdoor",
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_body_modification__tag_008",
+          "text": "piercings",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_body_modification__tag_009",
+          "text": "nipple piercing",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_body_modification__tag_010",
+          "text": "genital piercing",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_body_modification__tag_011",
+          "text": "labia piercing",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_body_modification__tag_012",
+          "text": "Prince Albert",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_body_modification__tag_013",
+          "text": "guiche piercing",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_body_modification__tag_014",
+          "text": "apadravya",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_body_modification__tag_015",
+          "text": "ampallang",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_body_modification__tag_016",
+          "text": "surface piercing",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_body_modification__tag_017",
+          "text": "PA piercing",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_body_modification__tag_018",
+          "text": "nipple ring",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_body_modification__tag_019",
+          "text": "body modification",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_body_modification__tag_020",
+          "text": "stretched ears",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_body_modification__tag_021",
+          "text": "corset piercings",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        }
+      ],
+      "id": "theme_body_modification",
+      "context_ids": [
+        "special"
       ]
     },
     {
       "name_zh": "食物/食用系列",
       "theme_zh": "食物/食用系列",
       "tags": [
-        "food play",
-        "whipped cream on body",
-        "chocolate body",
-        "honey on body",
-        "fruit on body",
-        "body as plate",
-        "feeding each other",
-        "ice cube play",
-        "ice on skin",
-        "hot sauce play",
-        "wasabi",
-        "mustard",
-        "sauce play",
-        "syrup sticky",
-        "sticky body",
-        "body painting",
-        "edible underwear",
-        "food and sex",
-        "eating while having sex",
-        "food fetish"
+        {
+          "id": "theme_food_play__tag_000",
+          "text": "food play",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_food_play__tag_001",
+          "text": "whipped cream on body",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_food_play__tag_002",
+          "text": "chocolate body",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_food_play__tag_003",
+          "text": "honey on body",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_food_play__tag_004",
+          "text": "fruit on body",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_food_play__tag_005",
+          "text": "body as plate",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_food_play__tag_006",
+          "text": "feeding each other",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_food_play__tag_007",
+          "text": "ice cube play",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_food_play__tag_008",
+          "text": "ice on skin",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_food_play__tag_009",
+          "text": "hot sauce play",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_food_play__tag_010",
+          "text": "wasabi",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_food_play__tag_011",
+          "text": "mustard",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_food_play__tag_012",
+          "text": "sauce play",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_food_play__tag_013",
+          "text": "syrup sticky",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_food_play__tag_014",
+          "text": "sticky body",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_food_play__tag_015",
+          "text": "body painting",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_food_play__tag_016",
+          "text": "edible underwear",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_food_play__tag_017",
+          "text": "food and sex",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_food_play__tag_018",
+          "text": "eating while having sex",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_food_play__tag_019",
+          "text": "food fetish",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        }
+      ],
+      "id": "theme_food_play",
+      "context_ids": [
+        "dining",
+        "adult"
       ]
     },
     {
       "name_zh": "远程/影像系列",
       "theme_zh": "远程/影像系列",
       "tags": [
-        "video call sex",
-        "cam sex",
-        "livestream",
-        "video chat sex",
-        "phone sex",
-        "sexting",
-        "sending nudes",
-        "nude photo",
-        "mirror selfie",
-        "bathroom mirror nude",
-        "bedroom mirror reflection",
-        "recording myself",
-        "self shot",
-        "taking pictures of sex",
-        "documenting",
-        "POV recording",
-        "first person cam",
-        "selfie during sex",
-        "mirror reflection shot",
-        "reverse mirror shot"
+        {
+          "id": "theme_remote_imagery__tag_000",
+          "text": "video call sex",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_remote_imagery__tag_001",
+          "text": "cam sex",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_remote_imagery__tag_002",
+          "text": "livestream",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_remote_imagery__tag_003",
+          "text": "video chat sex",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_remote_imagery__tag_004",
+          "text": "phone sex",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_remote_imagery__tag_005",
+          "text": "sexting",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_remote_imagery__tag_006",
+          "text": "sending nudes",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_remote_imagery__tag_007",
+          "text": "nude photo",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_remote_imagery__tag_008",
+          "text": "mirror selfie",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_remote_imagery__tag_009",
+          "text": "bathroom mirror nude",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": "indoor",
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_remote_imagery__tag_010",
+          "text": "bedroom mirror reflection",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": "indoor",
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_remote_imagery__tag_011",
+          "text": "recording myself",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_remote_imagery__tag_012",
+          "text": "self shot",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_remote_imagery__tag_013",
+          "text": "taking pictures of sex",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_remote_imagery__tag_014",
+          "text": "documenting",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_remote_imagery__tag_015",
+          "text": "POV recording",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_remote_imagery__tag_016",
+          "text": "first person cam",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_remote_imagery__tag_017",
+          "text": "selfie during sex",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_remote_imagery__tag_018",
+          "text": "mirror reflection shot",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_remote_imagery__tag_019",
+          "text": "reverse mirror shot",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        }
+      ],
+      "id": "theme_remote_imagery",
+      "context_ids": [
+        "adult",
+        "generic"
       ]
     },
     {
       "name_zh": "角色扮演/职业扮演系列",
       "theme_zh": "角色扮演/职业扮演系列",
       "tags": [
-        "role play",
-        "costume play",
-        "cosplay",
-        "cosplayer",
-        "maid costume",
-        "nurse costume",
-        "police costume",
-        "school uniform costume",
-        "bunny suit",
-        "cat ears",
-        "catgirl",
-        "fox ears",
-        "witch costume",
-        "angel costume",
-        "demon costume",
-        "princess costume",
-        "nurse uniform",
-        "police uniform",
-        "military uniform",
-        "suit and tie",
-        "office suit",
-        "blazer",
-        "skirt suit",
-        "leather suit",
-        "latex suit",
-        "vinyl suit",
-        "rubber suit",
-        "pvc catsuit",
-        "superhero costume",
-        "spandex",
-        "tight costume",
-        "zentai",
-        "bodysuit",
-        "full body suit",
-        "face covered",
-        "masked",
-        "ballgag",
-        "hood",
-        "gas mask",
-        "helmet"
+        {
+          "id": "theme_roleplay_profession__tag_000",
+          "text": "role play",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_roleplay_profession__tag_001",
+          "text": "costume play",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_roleplay_profession__tag_002",
+          "text": "cosplay",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_roleplay_profession__tag_003",
+          "text": "cosplayer",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_roleplay_profession__tag_004",
+          "text": "maid costume",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_roleplay_profession__tag_005",
+          "text": "nurse costume",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_roleplay_profession__tag_006",
+          "text": "police costume",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_roleplay_profession__tag_007",
+          "text": "school uniform costume",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_roleplay_profession__tag_008",
+          "text": "bunny suit",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_roleplay_profession__tag_009",
+          "text": "cat ears",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_roleplay_profession__tag_010",
+          "text": "catgirl",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_roleplay_profession__tag_011",
+          "text": "fox ears",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_roleplay_profession__tag_012",
+          "text": "witch costume",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_roleplay_profession__tag_013",
+          "text": "angel costume",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_roleplay_profession__tag_014",
+          "text": "demon costume",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_roleplay_profession__tag_015",
+          "text": "princess costume",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_roleplay_profession__tag_016",
+          "text": "nurse uniform",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_roleplay_profession__tag_017",
+          "text": "police uniform",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_roleplay_profession__tag_018",
+          "text": "military uniform",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_roleplay_profession__tag_019",
+          "text": "suit and tie",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_roleplay_profession__tag_020",
+          "text": "office suit",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": "indoor",
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_roleplay_profession__tag_021",
+          "text": "blazer",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_roleplay_profession__tag_022",
+          "text": "skirt suit",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_roleplay_profession__tag_023",
+          "text": "leather suit",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_roleplay_profession__tag_024",
+          "text": "latex suit",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_roleplay_profession__tag_025",
+          "text": "vinyl suit",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_roleplay_profession__tag_026",
+          "text": "rubber suit",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_roleplay_profession__tag_027",
+          "text": "pvc catsuit",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_roleplay_profession__tag_028",
+          "text": "superhero costume",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_roleplay_profession__tag_029",
+          "text": "spandex",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_roleplay_profession__tag_030",
+          "text": "tight costume",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_roleplay_profession__tag_031",
+          "text": "zentai",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_roleplay_profession__tag_032",
+          "text": "bodysuit",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_roleplay_profession__tag_033",
+          "text": "full body suit",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_roleplay_profession__tag_034",
+          "text": "face covered",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_roleplay_profession__tag_035",
+          "text": "masked",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_roleplay_profession__tag_036",
+          "text": "ballgag",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_roleplay_profession__tag_037",
+          "text": "hood",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_roleplay_profession__tag_038",
+          "text": "gas mask",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        },
+        {
+          "id": "theme_roleplay_profession__tag_039",
+          "text": "helmet",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "venue_ids": []
+          }
+        }
+      ],
+      "id": "theme_roleplay_profession",
+      "context_ids": [
+        "special",
+        "adult"
       ]
     }
   ]

@@ -5,15 +5,105 @@
       "name_zh": "Kodak Portra 400 (暖调人像·奶油肤色)",
       "series": "🟡 暖调人像系",
       "tags": [
-        "warm skin tones",
-        "fine grain",
-        "soft contrast",
-        "pastel colors",
-        "soft light",
-        "creamy skin",
-        "natural warmth",
-        "gentle highlight",
-        "pink undertones"
+        {
+          "id": "kodak_portra_400__tag_000",
+          "text": "warm skin tones",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "kodak_portra_400__tag_001",
+          "text": "fine grain",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "kodak_portra_400__tag_002",
+          "text": "soft contrast",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "kodak_portra_400__tag_003",
+          "text": "pastel colors",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "kodak_portra_400__tag_004",
+          "text": "soft light",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "kodak_portra_400__tag_005",
+          "text": "creamy skin",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "kodak_portra_400__tag_006",
+          "text": "natural warmth",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "kodak_portra_400__tag_007",
+          "text": "gentle highlight",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "kodak_portra_400__tag_008",
+          "text": "pink undertones",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        }
       ],
       "scenarios": "卧室私密、情人旅馆、素人日常"
     },
@@ -22,15 +112,105 @@
       "name_zh": "Kodak Gold 200 (暖金复古·温馨生活)",
       "series": "🟡 暖调人像系",
       "tags": [
-        "warm nostalgic tones",
-        "slightly grainy",
-        "golden cast",
-        "snapshot feel",
-        "warm highlights",
-        "yellow bias",
-        "home movie aesthetic",
-        "intimate warmth",
-        "faded warmth"
+        {
+          "id": "kodak_gold_200__tag_000",
+          "text": "warm nostalgic tones",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "kodak_gold_200__tag_001",
+          "text": "slightly grainy",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "kodak_gold_200__tag_002",
+          "text": "golden cast",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "kodak_gold_200__tag_003",
+          "text": "snapshot feel",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "kodak_gold_200__tag_004",
+          "text": "warm highlights",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "kodak_gold_200__tag_005",
+          "text": "yellow bias",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "kodak_gold_200__tag_006",
+          "text": "home movie aesthetic",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "kodak_gold_200__tag_007",
+          "text": "intimate warmth",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "kodak_gold_200__tag_008",
+          "text": "faded warmth",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        }
       ],
       "scenarios": "日常偷拍、家庭感、温馨时刻"
     },
@@ -39,14 +219,94 @@
       "name_zh": "Kodak Ektar 100 (高饱和锐利·商业写真)",
       "series": "🔴 高饱和鲜艳系",
       "tags": [
-        "vivid saturated colors",
-        "rich reds",
-        "deep blues",
-        "ultra sharp",
-        "magazine quality",
-        "punchy contrast",
-        "high saturation",
-        "clean skin tones"
+        {
+          "id": "kodak_ektar_100__tag_000",
+          "text": "vivid saturated colors",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "high_saturation"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "kodak_ektar_100__tag_001",
+          "text": "rich reds",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "kodak_ektar_100__tag_002",
+          "text": "deep blues",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "kodak_ektar_100__tag_003",
+          "text": "ultra sharp",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "kodak_ektar_100__tag_004",
+          "text": "magazine quality",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "kodak_ektar_100__tag_005",
+          "text": "punchy contrast",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "kodak_ektar_100__tag_006",
+          "text": "high saturation",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "high_saturation"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "kodak_ektar_100__tag_007",
+          "text": "clean skin tones",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        }
       ],
       "scenarios": "AV封面、商业写真、色彩浓烈"
     },
@@ -55,14 +315,94 @@
       "name_zh": "Fujifilm Superia 400 (日系生活·平民随拍)",
       "series": "🟡 暖调人像系",
       "tags": [
-        "warm color cast",
-        "everyday snapshot",
-        "consumer film look",
-        "soft colors",
-        "relaxed mood",
-        "casual warmth",
-        "faded contrast",
-        "nostalgic snapshot"
+        {
+          "id": "fujifilm_superia_400__tag_000",
+          "text": "warm color cast",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "fujifilm_superia_400__tag_001",
+          "text": "everyday snapshot",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "fujifilm_superia_400__tag_002",
+          "text": "consumer film look",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "fujifilm_superia_400__tag_003",
+          "text": "soft colors",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "fujifilm_superia_400__tag_004",
+          "text": "relaxed mood",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "fujifilm_superia_400__tag_005",
+          "text": "casual warmth",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "fujifilm_superia_400__tag_006",
+          "text": "faded contrast",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "fujifilm_superia_400__tag_007",
+          "text": "nostalgic snapshot",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        }
       ],
       "scenarios": "素人感、日常记录"
     },
@@ -71,14 +411,94 @@
       "name_zh": "Cinestill 800T (霓虹夜景·电影光晕)",
       "series": "🟡 暖调人像系",
       "tags": [
-        "tungsten balanced",
-        "blue-ish shadows",
-        "cinematic halation",
-        "warm highlights",
-        "film with halation effect",
-        "night scene ready",
-        "cool tones",
-        "Hollywood cinema look"
+        {
+          "id": "cinestill_800t__tag_000",
+          "text": "tungsten balanced",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "cinestill_800t__tag_001",
+          "text": "blue-ish shadows",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "cinestill_800t__tag_002",
+          "text": "cinematic halation",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "cinestill_800t__tag_003",
+          "text": "warm highlights",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "cinestill_800t__tag_004",
+          "text": "film with halation effect",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "cinestill_800t__tag_005",
+          "text": "night scene ready",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "cinestill_800t__tag_006",
+          "text": "cool tones",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "cinestill_800t__tag_007",
+          "text": "Hollywood cinema look",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        }
       ],
       "scenarios": "夜景、霓虹、风俗街"
     },
@@ -87,13 +507,83 @@
       "name_zh": "Kodak Max 400 (全能随拍·自然通透)",
       "series": "🔴 高饱和鲜艳系",
       "tags": [
-        "slightly washed out",
-        "soft contrast",
-        "vivid colors",
-        "everyday film",
-        "affordable consumer look",
-        "casual snapshot",
-        "natural skin tones"
+        {
+          "id": "kodak_max_400__tag_000",
+          "text": "slightly washed out",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "kodak_max_400__tag_001",
+          "text": "soft contrast",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "kodak_max_400__tag_002",
+          "text": "vivid colors",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "high_saturation"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "kodak_max_400__tag_003",
+          "text": "everyday film",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "kodak_max_400__tag_004",
+          "text": "affordable consumer look",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "kodak_max_400__tag_005",
+          "text": "casual snapshot",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "kodak_max_400__tag_006",
+          "text": "natural skin tones",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        }
       ],
       "scenarios": "素人感、随意感"
     },
@@ -102,14 +592,94 @@
       "name_zh": "Fujifilm Velvia 50 (极致鲜艳·高反差冲击)",
       "series": "🔴 高饱和鲜艳系",
       "tags": [
-        "vivid saturated colors",
-        "rich greens",
-        "deep reds",
-        "punchy",
-        "high contrast",
-        "vivid saturation",
-        "Velvia punch",
-        "landscape colors"
+        {
+          "id": "fujifilm_velvia_50__tag_000",
+          "text": "vivid saturated colors",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "high_saturation"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "fujifilm_velvia_50__tag_001",
+          "text": "rich greens",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "fujifilm_velvia_50__tag_002",
+          "text": "deep reds",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "fujifilm_velvia_50__tag_003",
+          "text": "punchy",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "fujifilm_velvia_50__tag_004",
+          "text": "high contrast",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "fujifilm_velvia_50__tag_005",
+          "text": "vivid saturation",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "high_saturation"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "fujifilm_velvia_50__tag_006",
+          "text": "Velvia punch",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "high_saturation"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "fujifilm_velvia_50__tag_007",
+          "text": "landscape colors",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        }
       ],
       "scenarios": "户外露出、泳池、制服"
     },
@@ -118,14 +688,94 @@
       "name_zh": "Fujifilm Pro 400H (唯美柔光·仙气粉青)",
       "series": "🔴 高饱和鲜艳系",
       "tags": [
-        "soft pastel",
-        "low contrast",
-        "dreamy",
-        "ethereal skin",
-        "airy colors",
-        "professional negative",
-        "delicate tones",
-        "soft highlight"
+        {
+          "id": "fujifilm_pro_400h__tag_000",
+          "text": "soft pastel",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "fujifilm_pro_400h__tag_001",
+          "text": "low contrast",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "fujifilm_pro_400h__tag_002",
+          "text": "dreamy",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "fujifilm_pro_400h__tag_003",
+          "text": "ethereal skin",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "fujifilm_pro_400h__tag_004",
+          "text": "airy colors",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "fujifilm_pro_400h__tag_005",
+          "text": "professional negative",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "fujifilm_pro_400h__tag_006",
+          "text": "delicate tones",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "fujifilm_pro_400h__tag_007",
+          "text": "soft highlight",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        }
       ],
       "scenarios": "唯美写真、韩系通透"
     },
@@ -134,14 +784,94 @@
       "name_zh": "Fujifilm Classic Chrome (低饱和冷淡·纪实街拍)",
       "series": "🟤 低饱和纪实系",
       "tags": [
-        "muted colors",
-        "documentary tone",
-        "desaturated",
-        "journalistic",
-        "flat contrast",
-        "greyish",
-        "subdued",
-        "real-world feel"
+        {
+          "id": "fujifilm_classic_chrome__tag_000",
+          "text": "muted colors",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "fujifilm_classic_chrome__tag_001",
+          "text": "documentary tone",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "fujifilm_classic_chrome__tag_002",
+          "text": "desaturated",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "fujifilm_classic_chrome__tag_003",
+          "text": "journalistic",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "fujifilm_classic_chrome__tag_004",
+          "text": "flat contrast",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "fujifilm_classic_chrome__tag_005",
+          "text": "greyish",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "fujifilm_classic_chrome__tag_006",
+          "text": "subdued",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "fujifilm_classic_chrome__tag_007",
+          "text": "real-world feel",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        }
       ],
       "scenarios": "街拍、OL职场、纪实偷拍"
     },
@@ -150,14 +880,94 @@
       "name_zh": "Fujifilm Classic Negative (90年代昭和·复古胶卷)",
       "series": "🟤 低饱和纪实系",
       "tags": [
-        "retro muted",
-        "faded warmth",
-        "90s film look",
-        "vintage cast",
-        "slightly desaturated",
-        "nostalgic mood",
-        "retro skin tones",
-        "warm shadows"
+        {
+          "id": "fujifilm_classic_negative__tag_000",
+          "text": "retro muted",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "fujifilm_classic_negative__tag_001",
+          "text": "faded warmth",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "fujifilm_classic_negative__tag_002",
+          "text": "90s film look",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "fujifilm_classic_negative__tag_003",
+          "text": "vintage cast",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "fujifilm_classic_negative__tag_004",
+          "text": "slightly desaturated",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "fujifilm_classic_negative__tag_005",
+          "text": "nostalgic mood",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "fujifilm_classic_negative__tag_006",
+          "text": "retro skin tones",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "fujifilm_classic_negative__tag_007",
+          "text": "warm shadows",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        }
       ],
       "scenarios": "昭和复古、和室、怀旧"
     },
@@ -166,13 +976,83 @@
       "name_zh": "Kodak T-MAX 400 (专业黑白·细腻灰阶)",
       "series": "🟤 低饱和纪实系",
       "tags": [
-        "fine grain B&W",
-        "smooth tonal range",
-        "professional monochrome",
-        "neutral grey",
-        "clean blacks",
-        "documentary quality",
-        "realistic tones"
+        {
+          "id": "kodak_tmax_400__tag_000",
+          "text": "fine grain B&W",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "monochrome"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "kodak_tmax_400__tag_001",
+          "text": "smooth tonal range",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "monochrome"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "kodak_tmax_400__tag_002",
+          "text": "professional monochrome",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "monochrome"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "kodak_tmax_400__tag_003",
+          "text": "neutral grey",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "monochrome"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "kodak_tmax_400__tag_004",
+          "text": "clean blacks",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "monochrome"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "kodak_tmax_400__tag_005",
+          "text": "documentary quality",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "monochrome"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "kodak_tmax_400__tag_006",
+          "text": "realistic tones",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "monochrome"
+            ],
+            "capture_device": null
+          }
+        }
       ],
       "scenarios": "专业黑白人像、纪实风格"
     },
@@ -181,13 +1061,83 @@
       "name_zh": "Fujifilm Acros 100 (和风黑白·丝滑质感)",
       "series": "🟤 低饱和纪实系",
       "tags": [
-        "rich tonal B&W",
-        "fine grain",
-        "smooth gradation",
-        "deep blacks",
-        "yellow filter tones",
-        "cool blacks",
-        "silky tones"
+        {
+          "id": "fujifilm_acros_100__tag_000",
+          "text": "rich tonal B&W",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "monochrome"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "fujifilm_acros_100__tag_001",
+          "text": "fine grain",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "monochrome"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "fujifilm_acros_100__tag_002",
+          "text": "smooth gradation",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "monochrome"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "fujifilm_acros_100__tag_003",
+          "text": "deep blacks",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "monochrome"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "fujifilm_acros_100__tag_004",
+          "text": "yellow filter tones",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "monochrome"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "fujifilm_acros_100__tag_005",
+          "text": "cool blacks",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "monochrome"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "fujifilm_acros_100__tag_006",
+          "text": "silky tones",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "monochrome"
+            ],
+            "capture_device": null
+          }
+        }
       ],
       "scenarios": "艺术裸体、和风黑白"
     },
@@ -196,14 +1146,94 @@
       "name_zh": "Kodak Tri-X 400 (硬派粗粒·高反差黑白)",
       "series": "⚫ 黑白/单色系",
       "tags": [
-        "high contrast B&W",
-        "gritty grain",
-        "deep blacks",
-        "street photography",
-        "punchy contrast",
-        "classic B&W film",
-        "documentary feel",
-        "raw tone"
+        {
+          "id": "kodak_trix_400__tag_000",
+          "text": "high contrast B&W",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "monochrome"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "kodak_trix_400__tag_001",
+          "text": "gritty grain",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "monochrome"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "kodak_trix_400__tag_002",
+          "text": "deep blacks",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "monochrome"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "kodak_trix_400__tag_003",
+          "text": "street photography",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "monochrome"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "kodak_trix_400__tag_004",
+          "text": "punchy contrast",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "monochrome"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "kodak_trix_400__tag_005",
+          "text": "classic B&W film",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "monochrome"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "kodak_trix_400__tag_006",
+          "text": "documentary feel",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "monochrome"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "kodak_trix_400__tag_007",
+          "text": "raw tone",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "monochrome"
+            ],
+            "capture_device": null
+          }
+        }
       ],
       "scenarios": "街头、监禁、硬派压抑"
     },
@@ -212,13 +1242,83 @@
       "name_zh": "Ilford HP5 Plus (经典英伦·纪实黑白)",
       "series": "⚫ 黑白/单色系",
       "tags": [
-        "versatile B&W",
-        "natural contrast",
-        "fine grain",
-        "pushable",
-        "documentary feel",
-        "natural skin tones in B&W",
-        "classic monochrome"
+        {
+          "id": "ilford_hp5_plus__tag_000",
+          "text": "versatile B&W",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "monochrome"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "ilford_hp5_plus__tag_001",
+          "text": "natural contrast",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "monochrome"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "ilford_hp5_plus__tag_002",
+          "text": "fine grain",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "monochrome"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "ilford_hp5_plus__tag_003",
+          "text": "pushable",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "monochrome"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "ilford_hp5_plus__tag_004",
+          "text": "documentary feel",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "monochrome"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "ilford_hp5_plus__tag_005",
+          "text": "natural skin tones in B&W",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "monochrome"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "ilford_hp5_plus__tag_006",
+          "text": "classic monochrome",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "monochrome"
+            ],
+            "capture_device": null
+          }
+        }
       ],
       "scenarios": "日常黑白、纪实"
     },
@@ -227,12 +1327,72 @@
       "name_zh": "Ilford Delta 3200 (极暗光高感·强烈噪点)",
       "series": "⚫ 黑白/单色系",
       "tags": [
-        "ultra high speed",
-        "grain visible",
-        "pushed development",
-        "gritty detail",
-        "dark scene ready",
-        "high ISO film look"
+        {
+          "id": "ilford_delta_3200__tag_000",
+          "text": "ultra high speed",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "monochrome"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "ilford_delta_3200__tag_001",
+          "text": "grain visible",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "monochrome"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "ilford_delta_3200__tag_002",
+          "text": "pushed development",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "monochrome"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "ilford_delta_3200__tag_003",
+          "text": "gritty detail",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "monochrome"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "ilford_delta_3200__tag_004",
+          "text": "dark scene ready",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "monochrome"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "ilford_delta_3200__tag_005",
+          "text": "high ISO film look",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "monochrome"
+            ],
+            "capture_device": null
+          }
+        }
       ],
       "scenarios": "暗光场景、粗粒黑白"
     },
@@ -241,12 +1401,72 @@
       "name_zh": "Kodak Double-X (50年代好莱坞·电影黑白)",
       "series": "⚫ 黑白/单色系",
       "tags": [
-        "cinematic B&W",
-        "classic Hollywood B&W",
-        "punchy contrast",
-        "theatrical",
-        "cinematic film stock",
-        "1950s cinema look"
+        {
+          "id": "kodak_double_x__tag_000",
+          "text": "cinematic B&W",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "monochrome"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "kodak_double_x__tag_001",
+          "text": "classic Hollywood B&W",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "monochrome"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "kodak_double_x__tag_002",
+          "text": "punchy contrast",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "monochrome"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "kodak_double_x__tag_003",
+          "text": "theatrical",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "monochrome"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "kodak_double_x__tag_004",
+          "text": "cinematic film stock",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "monochrome"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "kodak_double_x__tag_005",
+          "text": "1950s cinema look",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "monochrome"
+            ],
+            "capture_device": null
+          }
+        }
       ],
       "scenarios": "电影感黑白、复古戏剧"
     },
@@ -255,12 +1475,72 @@
       "name_zh": "Sepia Tone (复古暖棕·老照片)",
       "series": "⚫ 黑白/单色系",
       "tags": [
-        "warm brown monochrome",
-        "vintage antique tone",
-        "old photograph",
-        "nostalgic warmth",
-        "aged paper tone",
-        "Victorian feel"
+        {
+          "id": "sepia_tone__tag_000",
+          "text": "warm brown monochrome",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "sepia"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "sepia_tone__tag_001",
+          "text": "vintage antique tone",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "sepia"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "sepia_tone__tag_002",
+          "text": "old photograph",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "sepia"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "sepia_tone__tag_003",
+          "text": "nostalgic warmth",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "sepia"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "sepia_tone__tag_004",
+          "text": "aged paper tone",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "sepia"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "sepia_tone__tag_005",
+          "text": "Victorian feel",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "sepia"
+            ],
+            "capture_device": null
+          }
+        }
       ],
       "scenarios": "复古怀旧、年代感"
     },
@@ -269,13 +1549,83 @@
       "name_zh": "Fujifilm Ektachrome E100 (冷调正片·科技质感)",
       "series": "🔵 冷调/特殊系",
       "tags": [
-        "cool blue cast",
-        "slide film",
-        "vivid but cool",
-        "clinical tone",
-        "clean",
-        "professional slide",
-        "precise colors"
+        {
+          "id": "fujifilm_ektachrome_e100__tag_000",
+          "text": "cool blue cast",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "fujifilm_ektachrome_e100__tag_001",
+          "text": "slide film",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "fujifilm_ektachrome_e100__tag_002",
+          "text": "vivid but cool",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "high_saturation"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "fujifilm_ektachrome_e100__tag_003",
+          "text": "clinical tone",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "fujifilm_ektachrome_e100__tag_004",
+          "text": "clean",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "fujifilm_ektachrome_e100__tag_005",
+          "text": "professional slide",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "fujifilm_ektachrome_e100__tag_006",
+          "text": "precise colors",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        }
       ],
       "scenarios": "医疗场景、科技感"
     },
@@ -284,13 +1634,83 @@
       "name_zh": "Fujifilm Provia 100F (真实自然·标准中性反转片)",
       "series": "🔵 冷调/特殊系",
       "tags": [
-        "neutral color",
-        "balanced contrast",
-        "clean skin",
-        "natural",
-        "vivid but accurate",
-        "professional slide",
-        "slight warmth"
+        {
+          "id": "fujifilm_provia_100f__tag_000",
+          "text": "neutral color",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "fujifilm_provia_100f__tag_001",
+          "text": "balanced contrast",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "fujifilm_provia_100f__tag_002",
+          "text": "clean skin",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "fujifilm_provia_100f__tag_003",
+          "text": "natural",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "fujifilm_provia_100f__tag_004",
+          "text": "vivid but accurate",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "high_saturation"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "fujifilm_provia_100f__tag_005",
+          "text": "professional slide",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "fujifilm_provia_100f__tag_006",
+          "text": "slight warmth",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        }
       ],
       "scenarios": "自然人像、真实记录"
     },
@@ -299,13 +1719,83 @@
       "name_zh": "Lomography Color (实验偏色·艺术交叉冲印)",
       "series": "🔵 冷调/特殊系",
       "tags": [
-        "experimental colors",
-        "unpredictable hues",
-        "vivid unusual tones",
-        "playful",
-        "artistic",
-        "cross-processed look",
-        "shifted colors"
+        {
+          "id": "lomography_color__tag_000",
+          "text": "experimental colors",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "lomography_color__tag_001",
+          "text": "unpredictable hues",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "lomography_color__tag_002",
+          "text": "vivid unusual tones",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "high_saturation"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "lomography_color__tag_003",
+          "text": "playful",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "lomography_color__tag_004",
+          "text": "artistic",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "lomography_color__tag_005",
+          "text": "cross-processed look",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "lomography_color__tag_006",
+          "text": "shifted colors",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        }
       ],
       "scenarios": "艺术写真、创意风格"
     },
@@ -314,13 +1804,83 @@
       "name_zh": "Cinestill 50D (日光电影感·高端杂志)",
       "series": "🔵 冷调/特殊系",
       "tags": [
-        "daylight balanced",
-        "fine grain",
-        "clean highlights",
-        "cinematic",
-        "soft contrast",
-        "natural skin",
-        "Hollywood look"
+        {
+          "id": "cinestill_50d__tag_000",
+          "text": "daylight balanced",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "cinestill_50d__tag_001",
+          "text": "fine grain",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "cinestill_50d__tag_002",
+          "text": "clean highlights",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "cinestill_50d__tag_003",
+          "text": "cinematic",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "cinestill_50d__tag_004",
+          "text": "soft contrast",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "cinestill_50d__tag_005",
+          "text": "natural skin",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "cinestill_50d__tag_006",
+          "text": "Hollywood look",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        }
       ],
       "scenarios": "日光电影感、高端写真"
     },
@@ -329,14 +1889,94 @@
       "name_zh": "Expired Film (过期褪色胶片·破损记忆)",
       "series": "🔵 冷调/特殊系",
       "tags": [
-        "faded colors",
-        "shifted hues",
-        "foggy",
-        "low contrast",
-        "washed out",
-        "unpredictable color cast",
-        "degraded grain",
-        "vintage feel"
+        {
+          "id": "expired_film__tag_000",
+          "text": "faded colors",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "expired_film__tag_001",
+          "text": "shifted hues",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "expired_film__tag_002",
+          "text": "foggy",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "expired_film__tag_003",
+          "text": "low contrast",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "expired_film__tag_004",
+          "text": "washed out",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "expired_film__tag_005",
+          "text": "unpredictable color cast",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "expired_film__tag_006",
+          "text": "degraded grain",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "expired_film__tag_007",
+          "text": "vintage feel",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        }
       ],
       "scenarios": "复古、年代感、破损记忆"
     }
@@ -346,91 +1986,581 @@
       "id": "cooke_s4",
       "name_zh": "Cooke S4 / 安琴 (暖柔电影感·奶油焦外)",
       "tags": [
-        "creamy bokeh",
-        "warm skin tones",
-        "soft rendering",
-        "organic glow",
-        "smooth focus roll-off",
-        "gentle highlight bloom",
-        "flattering skin"
+        {
+          "id": "cooke_s4__tag_000",
+          "text": "creamy bokeh",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "cooke_s4__tag_001",
+          "text": "warm skin tones",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "cooke_s4__tag_002",
+          "text": "soft rendering",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "cooke_s4__tag_003",
+          "text": "organic glow",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "cooke_s4__tag_004",
+          "text": "smooth focus roll-off",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "cooke_s4__tag_005",
+          "text": "gentle highlight bloom",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "cooke_s4__tag_006",
+          "text": "flattering skin",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        }
       ]
     },
     {
       "id": "arri_signature",
       "name_zh": "ARRI Signature / 蔡司 (现代锐利·高分辨率细节)",
       "tags": [
-        "clean sharp rendering",
-        "neutral color",
-        "precise detail",
-        "clinical beauty",
-        "large format look",
-        "cinematic clean",
-        "distortion-free"
+        {
+          "id": "arri_signature__tag_000",
+          "text": "clean sharp rendering",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "arri_signature__tag_001",
+          "text": "neutral color",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "arri_signature__tag_002",
+          "text": "precise detail",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "arri_signature__tag_003",
+          "text": "clinical beauty",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "arri_signature__tag_004",
+          "text": "large format look",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "arri_signature__tag_005",
+          "text": "cinematic clean",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "arri_signature__tag_006",
+          "text": "distortion-free",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        }
       ]
     },
     {
       "id": "panavision_anamorphic",
       "name_zh": "Panavision 宽银幕变形镜头 (好莱坞大片·蓝色拉丝耀斑)",
       "tags": [
-        "anamorphic flare",
-        "oval bokeh",
-        "widescreen",
-        "classic Hollywood",
-        "blue streak flare",
-        "anamorphic squeeze",
-        "cinematic letterbox feel"
+        {
+          "id": "panavision_anamorphic__tag_000",
+          "text": "anamorphic flare",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "panavision_anamorphic__tag_001",
+          "text": "oval bokeh",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "panavision_anamorphic__tag_002",
+          "text": "widescreen",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "panavision_anamorphic__tag_003",
+          "text": "classic Hollywood",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "panavision_anamorphic__tag_004",
+          "text": "blue streak flare",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "panavision_anamorphic__tag_005",
+          "text": "anamorphic squeeze",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "panavision_anamorphic__tag_006",
+          "text": "cinematic letterbox feel",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        }
       ]
     },
     {
       "id": "leica_noctilux",
       "name_zh": "Leica Noctilux 夜神 (梦幻奢华·极浅景深德味)",
       "tags": [
-        "dreamy bokeh",
-        "3D depth",
-        "micro-contrast",
-        "jewel-like colors",
-        "shallow DOF",
-        "glow on highlights",
-        "soft magical bokeh"
+        {
+          "id": "leica_noctilux__tag_000",
+          "text": "dreamy bokeh",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "leica_noctilux__tag_001",
+          "text": "3D depth",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "leica_noctilux__tag_002",
+          "text": "micro-contrast",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "leica_noctilux__tag_003",
+          "text": "jewel-like colors",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "leica_noctilux__tag_004",
+          "text": "shallow DOF",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "leica_noctilux__tag_005",
+          "text": "glow on highlights",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "leica_noctilux__tag_006",
+          "text": "soft magical bokeh",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        }
       ]
     },
     {
       "id": "canon_85_12",
       "name_zh": "Canon 85mm f/1.2L 红圈 (顶级人像·唯美柔美)",
       "tags": [
-        "warm skin",
-        "creamy bokeh",
-        "professional portrait",
-        "soft out of focus",
-        "flattering",
-        "smooth bokeh",
-        "gentle rendering"
+        {
+          "id": "canon_85_12__tag_000",
+          "text": "warm skin",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "canon_85_12__tag_001",
+          "text": "creamy bokeh",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "canon_85_12__tag_002",
+          "text": "professional portrait",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "canon_85_12__tag_003",
+          "text": "soft out of focus",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "canon_85_12__tag_004",
+          "text": "flattering",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "canon_85_12__tag_005",
+          "text": "smooth bokeh",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "canon_85_12__tag_006",
+          "text": "gentle rendering",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        }
       ]
     },
     {
       "id": "helios_44_2",
       "name_zh": "Helios 44-2 八羽怪 (复古旋转焦外·氛围感)",
       "tags": [
-        "swirly bokeh",
-        "dreamy soft focus",
-        "vintage look",
-        "warm tones",
-        "soft glow",
-        "helios swirl",
-        "art-house feel"
+        {
+          "id": "helios_44_2__tag_000",
+          "text": "swirly bokeh",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "helios_44_2__tag_001",
+          "text": "dreamy soft focus",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "helios_44_2__tag_002",
+          "text": "vintage look",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "helios_44_2__tag_003",
+          "text": "warm tones",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "helios_44_2__tag_004",
+          "text": "soft glow",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "helios_44_2__tag_005",
+          "text": "helios swirl",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "helios_44_2__tag_006",
+          "text": "art-house feel",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        }
       ]
     },
     {
       "id": "arri_dna",
       "name_zh": "ARRI DNA (终极电影质感·大师导演视角)",
       "tags": [
-        "legendary cinema look",
-        "organic rendering",
-        "imperceptible sharpness",
-        "smooth falloff",
-        "ultimate cinematic",
-        "warm skin",
-        "natural beauty"
+        {
+          "id": "arri_dna__tag_000",
+          "text": "legendary cinema look",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "arri_dna__tag_001",
+          "text": "organic rendering",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "arri_dna__tag_002",
+          "text": "imperceptible sharpness",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "arri_dna__tag_003",
+          "text": "smooth falloff",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "arri_dna__tag_004",
+          "text": "ultimate cinematic",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "arri_dna__tag_005",
+          "text": "warm skin",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "arri_dna__tag_006",
+          "text": "natural beauty",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        }
       ]
     }
   ],
@@ -439,100 +2569,680 @@
       "id": "sunny",
       "name_zh": "☀️ 晴天暖阳 (Sunny Day)",
       "tags": [
-        "sunny day",
-        "bright sunlight",
-        "summer heat",
-        "golden afternoon",
-        "sweating in heat",
-        "harsh sunlight",
-        "bright shadows",
-        "hot day"
+        {
+          "id": "sunny__tag_000",
+          "text": "sunny day",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "sunny__tag_001",
+          "text": "bright sunlight",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "sunny__tag_002",
+          "text": "summer heat",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "sunny__tag_003",
+          "text": "golden afternoon",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "sunny__tag_004",
+          "text": "sweating in heat",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "sunny__tag_005",
+          "text": "harsh sunlight",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "sunny__tag_006",
+          "text": "bright shadows",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "sunny__tag_007",
+          "text": "hot day",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        }
       ]
     },
     {
       "id": "rainy",
       "name_zh": "🌧️ 湿润雨天 (Rainy Day)",
       "tags": [
-        "rainy day",
-        "heavy rain",
-        "rain-soaked",
-        "dripping wet",
-        "rain on window",
-        "rain streaming down body",
-        "raindrops on skin",
-        "wet street reflections"
+        {
+          "id": "rainy__tag_000",
+          "text": "rainy day",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "rainy__tag_001",
+          "text": "heavy rain",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "rainy__tag_002",
+          "text": "rain-soaked",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "rainy__tag_003",
+          "text": "dripping wet",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "rainy__tag_004",
+          "text": "rain on window",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "rainy__tag_005",
+          "text": "rain streaming down body",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "rainy__tag_006",
+          "text": "raindrops on skin",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "rainy__tag_007",
+          "text": "wet street reflections",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        }
       ]
     },
     {
       "id": "overcast",
       "name_zh": "🌫️ 阴天/晨雾 (Overcast & Fog)",
       "tags": [
-        "overcast sky",
-        "foggy morning",
-        "misty",
-        "hazy light",
-        "moody grey sky",
-        "cloudy",
-        "flat light",
-        "diffused grey",
-        "atmospheric fog"
+        {
+          "id": "overcast__tag_000",
+          "text": "overcast sky",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "overcast__tag_001",
+          "text": "foggy morning",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "overcast__tag_002",
+          "text": "misty",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "overcast__tag_003",
+          "text": "hazy light",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "overcast__tag_004",
+          "text": "moody grey sky",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "overcast__tag_005",
+          "text": "cloudy",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "overcast__tag_006",
+          "text": "flat light",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "overcast__tag_007",
+          "text": "diffused grey",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "overcast__tag_008",
+          "text": "atmospheric fog",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        }
       ]
     },
     {
       "id": "snowy",
       "name_zh": "❄️ 寒冷雪景 (Snowy Day)",
       "tags": [
-        "snowy day",
-        "snowing outside",
-        "winter cold",
-        "frozen breath",
-        "flushed cheeks from cold",
-        "icy air",
-        "white landscape",
-        "cold atmosphere"
+        {
+          "id": "snowy__tag_000",
+          "text": "snowy day",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "snowy__tag_001",
+          "text": "snowing outside",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "snowy__tag_002",
+          "text": "winter cold",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "snowy__tag_003",
+          "text": "frozen breath",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "snowy__tag_004",
+          "text": "flushed cheeks from cold",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "snowy__tag_005",
+          "text": "icy air",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "snowy__tag_006",
+          "text": "white landscape",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "snowy__tag_007",
+          "text": "cold atmosphere",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        }
       ]
     },
     {
       "id": "night",
       "name_zh": "🌙 昏暗夜晚 (Night Atmosphere)",
       "tags": [
-        "night time",
-        "moonlit",
-        "city lights through window",
-        "neon glow outside",
-        "candle-lit room",
-        "dim interior",
-        "warm lamp light"
+        {
+          "id": "night__tag_000",
+          "text": "night time",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "night__tag_001",
+          "text": "moonlit",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "night__tag_002",
+          "text": "city lights through window",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "night__tag_003",
+          "text": "neon glow outside",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "night__tag_004",
+          "text": "candle-lit room",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "night__tag_005",
+          "text": "dim interior",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "night__tag_006",
+          "text": "warm lamp light",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        }
       ]
     },
     {
       "id": "sunset",
       "name_zh": "🌇 黄昏夕阳 (Golden Hour / Sunset)",
       "tags": [
-        "sunset",
-        "golden hour",
-        "dusk",
-        "twilight",
-        "pink sky",
-        "blue hour",
-        "warm sunset light",
-        "orange sky",
-        "magic hour"
+        {
+          "id": "sunset__tag_000",
+          "text": "sunset",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "sunset__tag_001",
+          "text": "golden hour",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "sunset__tag_002",
+          "text": "dusk",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "sunset__tag_003",
+          "text": "twilight",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "sunset__tag_004",
+          "text": "pink sky",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "sunset__tag_005",
+          "text": "blue hour",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "sunset__tag_006",
+          "text": "warm sunset light",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "sunset__tag_007",
+          "text": "orange sky",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "sunset__tag_008",
+          "text": "magic hour",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        }
       ]
     },
     {
       "id": "special",
       "name_zh": "✨ 丁达尔光效/蒸汽 (Atmosphere & Steam)",
       "tags": [
-        "steam",
-        "foggy room",
-        "haze",
-        "smoke",
-        "dust in light beam",
-        "god rays",
-        "shaft of light",
-        "dramatic lighting",
-        "candlelight"
+        {
+          "id": "special__tag_000",
+          "text": "steam",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "special__tag_001",
+          "text": "foggy room",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "special__tag_002",
+          "text": "haze",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "special__tag_003",
+          "text": "smoke",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "special__tag_004",
+          "text": "dust in light beam",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "special__tag_005",
+          "text": "god rays",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "special__tag_006",
+          "text": "shaft of light",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "special__tag_007",
+          "text": "dramatic lighting",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "special__tag_008",
+          "text": "candlelight",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        }
       ]
     }
   ],
@@ -541,44 +3251,364 @@
       "id": "photo_styles",
       "name_zh": "📷 摄影风格",
       "tags": [
-        "cinematic film still",
-        "fashion editorial",
-        "boudoir photography",
-        "polaroid snapshot",
-        "vintage photo",
-        "candid shot",
-        "professional photography",
-        "documentary style",
-        "raw documentary",
-        "street photography style",
-        "night photography",
-        "golden hour portrait",
-        "studio portrait",
-        "editorial fashion",
-        "high fashion photography"
+        {
+          "id": "photo_styles__tag_000",
+          "text": "cinematic film still",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "photo_styles__tag_001",
+          "text": "fashion editorial",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "photo_styles__tag_002",
+          "text": "boudoir photography",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "photo_styles__tag_003",
+          "text": "polaroid snapshot",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "photo_styles__tag_004",
+          "text": "vintage photo",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "photo_styles__tag_005",
+          "text": "candid shot",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "photo_styles__tag_006",
+          "text": "professional photography",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "photo_styles__tag_007",
+          "text": "documentary style",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "photo_styles__tag_008",
+          "text": "raw documentary",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "photo_styles__tag_009",
+          "text": "street photography style",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "photo_styles__tag_010",
+          "text": "night photography",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "photo_styles__tag_011",
+          "text": "golden hour portrait",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "photo_styles__tag_012",
+          "text": "studio portrait",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "photo_styles__tag_013",
+          "text": "editorial fashion",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "photo_styles__tag_014",
+          "text": "high fashion photography",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        }
       ]
     },
     {
       "id": "erotic_styles",
       "name_zh": "🔞 私密情色写真",
       "tags": [
-        "private photo",
-        "leaked selfie",
-        "amateur photo",
-        "bedroom selfie",
-        "bathroom mirror selfie",
-        "hotel room photo",
-        "JAV screenshot",
-        "gravure idol",
-        "softcore",
-        "pin-up",
-        "nude art photography",
-        "erotic photography",
-        "intimate photography",
-        "sensual photography",
-        "boudoir shot",
-        "intimate portrait",
-        "tasteful erotic"
+        {
+          "id": "erotic_styles__tag_000",
+          "text": "private photo",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "erotic_styles__tag_001",
+          "text": "leaked selfie",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": "phone"
+          }
+        },
+        {
+          "id": "erotic_styles__tag_002",
+          "text": "amateur photo",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "erotic_styles__tag_003",
+          "text": "bedroom selfie",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": "phone"
+          }
+        },
+        {
+          "id": "erotic_styles__tag_004",
+          "text": "bathroom mirror selfie",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": "phone"
+          }
+        },
+        {
+          "id": "erotic_styles__tag_005",
+          "text": "hotel room photo",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "erotic_styles__tag_006",
+          "text": "JAV screenshot",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "erotic_styles__tag_007",
+          "text": "gravure idol",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "erotic_styles__tag_008",
+          "text": "softcore",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "erotic_styles__tag_009",
+          "text": "pin-up",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "erotic_styles__tag_010",
+          "text": "nude art photography",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "erotic_styles__tag_011",
+          "text": "erotic photography",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "erotic_styles__tag_012",
+          "text": "intimate photography",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "erotic_styles__tag_013",
+          "text": "sensual photography",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "erotic_styles__tag_014",
+          "text": "boudoir shot",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "erotic_styles__tag_015",
+          "text": "intimate portrait",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        },
+        {
+          "id": "erotic_styles__tag_016",
+          "text": "tasteful erotic",
+          "facts": {
+            "semantic_role": "selector",
+            "color_modes": [
+              "color"
+            ],
+            "capture_device": null
+          }
+        }
       ]
     }
   ]

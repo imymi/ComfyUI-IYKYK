@@ -16,16 +16,16 @@ from __future__ import annotations
 import hashlib
 import random
 from pathlib import Path
-from typing import Any, Dict, List, Tuple
+from typing import Any, Dict, List, Sequence, Tuple
 
 if __package__:
     from .lib.assembler import PromptAssembler, assemble_result, split_top_level_tags
-    from .lib.models import GenerationResult, PromptFragment, TagProvenance
-    from .lib.sampler import DataSampler, _is_none
+    from .lib.models import GenerationResult, PromptAtom, PromptFragment, SelectionOrigin, SemanticFacts, TagProvenance
+    from .lib.sampler import DataSampler, _is_none, get_selection_mode
 else:
     from lib.assembler import PromptAssembler, assemble_result, split_top_level_tags
-    from lib.models import GenerationResult, PromptFragment, TagProvenance
-    from lib.sampler import DataSampler, _is_none
+    from lib.models import GenerationResult, PromptAtom, PromptFragment, SelectionOrigin, SemanticFacts, TagProvenance
+    from lib.sampler import DataSampler, _is_none, get_selection_mode
 
 DATA_DIR = Path(__file__).parent / "data"
 _sampler = DataSampler(DATA_DIR)
@@ -53,11 +53,148 @@ def _compute_is_changed(prompt_seed: int, inputs: Dict[str, Any]) -> Any:
     return hasher.hexdigest()
 
 
+def _extract_ordered_selections(atoms: Sequence[PromptAtom]) -> Tuple[SelectionOrigin, ...]:
+    seen: set[SelectionOrigin] = set()
+    ordered: List[SelectionOrigin] = []
+    for atom in atoms:
+        if atom.origin is not None and atom.origin not in seen:
+            seen.add(atom.origin)
+            ordered.append(atom.origin)
+    return tuple(ordered)
+
+
+def _make_slot_fragments(
+    res: Any,
+    slot_name: str,
+    user_input_val: str,
+    entry_point: str = "generator",
+) -> List[PromptFragment]:
+    if not res:
+        return []
+    mode = get_selection_mode(user_input_val)
+    frags: List[PromptFragment] = []
+
+    # ClothingSampleResult
+    if hasattr(res, "all_tags"):
+        for order, stag in enumerate(res.all_tags):
+            frags.append(
+                PromptFragment(
+                    text=stag.text,
+                    source_slot=slot_name,
+                    source_item_id=stag.provenance.item_id or getattr(res, "style_id", None),
+                    order=order,
+                    provenance=stag.provenance,
+                    id=stag.id,
+                    facts=stag.facts,
+                    origin=stag.origin or SelectionOrigin(
+                        entry_point=entry_point,
+                        mode=mode,
+                        selector=slot_name,
+                        selected_id=stag.provenance.item_id or getattr(res, "style_id", None),
+                        raw_value=stag.text,
+                        parent_ids=(stag.provenance.item_id,) if stag.provenance.item_id else (),
+                    ),
+                )
+            )
+        return frags
+
+    # ThemeSampleResult
+    if hasattr(res, "tags") and hasattr(res, "theme_id"):
+        for order, stag in enumerate(res.tags):
+            frags.append(
+                PromptFragment(
+                    text=stag.text,
+                    source_slot=slot_name,
+                    source_item_id=res.theme_id,
+                    context_ids=getattr(res, "context_ids", ()),
+                    order=order,
+                    provenance=stag.provenance,
+                    id=stag.id,
+                    facts=stag.facts,
+                    origin=stag.origin or SelectionOrigin(
+                        entry_point=entry_point,
+                        mode=mode,
+                        selector=slot_name,
+                        selected_id=res.theme_id,
+                        raw_value=stag.text,
+                        parent_ids=(res.theme_id,),
+                    ),
+                )
+            )
+        return frags
+
+    # SampleResult with sampled_tags
+    if hasattr(res, "sampled_tags") and res.sampled_tags:
+        for order, stag in enumerate(res.sampled_tags):
+            frags.append(
+                PromptFragment(
+                    text=stag.text,
+                    source_slot=slot_name,
+                    source_item_id=res.item_id,
+                    context_ids=getattr(res, "context_ids", ()),
+                    exclusive_group=getattr(res, "exclusive_group", None),
+                    order=order,
+                    provenance=stag.provenance,
+                    id=stag.id,
+                    facts=stag.facts,
+                    origin=stag.origin or SelectionOrigin(
+                        entry_point=entry_point,
+                        mode=mode,
+                        selector=slot_name,
+                        selected_id=res.item_id,
+                        raw_value=stag.text,
+                        parent_ids=(res.item_id,) if res.item_id else (),
+                    ),
+                )
+            )
+        return frags
+
+    # Fallback to tags (str or SampledTag)
+    tags = getattr(res, "tags", ())
+    item_id = getattr(res, "item_id", None)
+    for order, t in enumerate(tags):
+        t_text = t.text if hasattr(t, "text") else str(t)
+        t_id = getattr(t, "id", f"{item_id}__tag_{order:03d}" if item_id else "")
+        t_facts = getattr(t, "facts", SemanticFacts())
+        t_prov = getattr(t, "provenance", None)
+        if not t_prov or not t_prov.item_id:
+            prov_item_id = item_id if item_id else t_id
+            t_prov = TagProvenance(
+                item_id=prov_item_id,
+                kind=slot_name,
+                parent_ids=(item_id,) if item_id else (),
+                semantic_ids=((f"{slot_name}:{item_id}",) if item_id else ()),
+            )
+        frags.append(
+            PromptFragment(
+                text=t_text,
+                source_slot=slot_name,
+                source_item_id=item_id,
+                context_ids=getattr(res, "context_ids", ()),
+                exclusive_group=getattr(res, "exclusive_group", None),
+                order=order,
+                provenance=t_prov,
+                id=t_id,
+                facts=t_facts,
+                origin=getattr(t, "origin", None) or SelectionOrigin(
+                    entry_point=entry_point,
+                    mode=mode,
+                    selector=slot_name,
+                    selected_id=item_id,
+                    raw_value=t_text,
+                    parent_ids=(item_id,) if item_id else (),
+                ),
+            )
+        )
+    return frags
+
+
 def _generate_structured(
     sampler: DataSampler,
     assembler: PromptAssembler,
     inputs: Dict[str, Any],
-    rng: random.Random
+    rng: random.Random,
+    entry_point: str = "generator",
 ) -> GenerationResult:
     """提示词生成纯函数流水线 (修订 7 纯函数与丰富 Provenance 契约)。
 
@@ -93,11 +230,12 @@ def _generate_structured(
         preset = sampler.get_preset(预设模板, rng)
         if preset:
             recipe = sampler.get_style_recipe(风格配方, rng) if not _is_none(风格配方) else None
-            assembly_res = assembler.assemble_preset(preset, recipe, 画质等级, rng=rng)
+            assembly_res = assembler.assemble_preset(preset, recipe, 画质等级, rng=rng, entry_point=entry_point)
             neg = sampler.get_negative_prompt()
             desc = f"【预设模板】{preset.get('id', '')} {preset.get('name_zh', '')}"
             if recipe:
                 desc += f" | 【叠加配方】{recipe.get('style_name', recipe.get('name_zh', ''))}"
+            selections = _extract_ordered_selections(assembly_res.source_atoms)
             return GenerationResult(
                 positive=assembly_res.prompt,
                 negative=neg,
@@ -105,6 +243,7 @@ def _generate_structured(
                 atoms=assembly_res.accepted_atoms,
                 rules_applied=assembly_res.rules_applied,
                 source_atoms=assembly_res.source_atoms,
+                selections=selections,
             )
 
     # 2. 采样 15 槽位
@@ -112,259 +251,143 @@ def _generate_structured(
     scene_res = sampler.sample_scene_result(场景大类, rng)
     slots: Dict[str, List[Any]] = {}
 
-    slots["scene_theme"] = [
-        PromptFragment(
-            text=t,
-            source_slot="scene_theme",
-            source_item_id=scene_res.item_id,
-            context_ids=scene_res.context_ids,
-            exclusive_group=scene_res.exclusive_group,
-            provenance=scene_res.provenance,
-        )
-        for t in (scene_res.tags if scene_res else ())
-    ]
+    slots["scene_theme"] = _make_slot_fragments(scene_res, "scene_theme", 场景大类, entry_point)
 
     theme_res = sampler.sample_theme_result(剧情主题, rng)
     if theme_res:
-        slots["scene_theme"].extend([
-            PromptFragment(
-                text=t.text,
-                source_slot="scene_theme",
-                source_item_id=theme_res.theme_id,
-                context_ids=(),
-                exclusive_group=None,
-                provenance=t.provenance,
-            )
-            for t in theme_res.tags
-        ])
+        slots["scene_theme"].extend(_make_slot_fragments(theme_res, "scene_theme", 剧情主题, entry_point))
 
     primary_context = scene_res.context_ids[0] if (scene_res and scene_res.context_ids) else "generic"
     context = primary_context if primary_context != "generic" else sampler.detect_context(场景大类, 剧情主题)
 
     # 槽位 2: 景别 + 视角
     shot_res = sampler.sample_shot_type_result(景别构图, rng)
-    slots["shot_type"] = [
-        PromptFragment(
-            text=t,
-            source_slot="shot_type",
-            source_item_id=shot_res.item_id,
-            provenance=shot_res.provenance,
-        )
-        for t in (shot_res.tags if shot_res else ())
-    ]
+    slots["shot_type"] = _make_slot_fragments(shot_res, "shot_type", 景别构图, entry_point)
 
     angle_res = sampler.sample_camera_angle_result(拍摄视角, rng)
-    slots["camera_angle"] = [
-        PromptFragment(
-            text=t,
-            source_slot="camera_angle",
-            source_item_id=angle_res.item_id,
-            provenance=angle_res.provenance,
-        )
-        for t in (angle_res.tags if angle_res else ())
-    ]
+    slots["camera_angle"] = _make_slot_fragments(angle_res, "camera_angle", 拍摄视角, entry_point)
 
     # 槽位 3 & 4: 裸露等级与服装穿脱联动
     nudity_res, lvl_code = sampler.sample_nudity_result(裸露等级, rng)
-    slots["nudity"] = [
-        PromptFragment(
-            text=t,
-            source_slot="nudity",
-            source_item_id=nudity_res.item_id,
-            provenance=nudity_res.provenance,
-        )
-        for t in (nudity_res.tags if nudity_res else ())
-    ]
+    slots["nudity"] = _make_slot_fragments(nudity_res, "nudity", 裸露等级, entry_point)
     clothing_res = sampler.sample_clothing_result(
         服装款式, 服装状态, lvl_code, rng, context=context
     )
-    slots["clothing"] = [
-        PromptFragment(
-            text=t.text,
-            source_slot="clothing",
-            source_item_id=t.provenance.item_id,
-            context_ids=(),
-            exclusive_group=None,
-            provenance=t.provenance,
-        )
-        for t in clothing_res.all_tags
-    ]
+    slots["clothing"] = _make_slot_fragments(clothing_res, "clothing", 服装款式, entry_point)
 
     # 槽位 5: 光影氛围
     lighting_res = sampler.sample_lighting_result(光影预设, rng, nudity_level_code=lvl_code)
-    slots["lighting"] = [
-        PromptFragment(
-            text=t,
-            source_slot="lighting",
-            source_item_id=lighting_res.item_id,
-            provenance=lighting_res.provenance,
-        )
-        for t in (lighting_res.tags if lighting_res else ())
-    ]
+    slots["lighting"] = _make_slot_fragments(lighting_res, "lighting", 光影预设, entry_point)
 
     # 槽位 6: 姿势动作
     pose_res = sampler.sample_pose_result(姿势动作, rng, nudity_level_code=lvl_code)
-    slots["pose"] = [
-        PromptFragment(
-            text=t,
-            source_slot="pose",
-            source_item_id=pose_res.item_id,
-            provenance=pose_res.provenance,
-        )
-        for t in (pose_res.tags if pose_res else ())
-    ]
+    slots["pose"] = _make_slot_fragments(pose_res, "pose", 姿势动作, entry_point)
 
     # 槽位 7: 表情眼神
     expression_res = sampler.sample_expression_result(情绪表情, rng)
-    slots["expression"] = [
-        PromptFragment(
-            text=t,
-            source_slot="expression",
-            source_item_id=expression_res.item_id,
-            provenance=expression_res.provenance,
-        )
-        for t in (expression_res.tags if expression_res else ())
-    ]
+    slots["expression"] = _make_slot_fragments(expression_res, "expression", 情绪表情, entry_point)
 
     # 槽位 8: 风格胶片
     film_res = sampler.sample_film_result(胶片风格, rng)
-    slots["film"] = [
-        PromptFragment(
-            text=t,
-            source_slot="film",
-            source_item_id=film_res.item_id,
-            provenance=film_res.provenance,
-        )
-        for t in (film_res.tags if film_res else ())
-    ]
+    slots["film"] = _make_slot_fragments(film_res, "film", 胶片风格, entry_point)
 
     # 槽位 9: 妆容细节
     makeup_res = sampler.sample_makeup_result(妆容细节, rng, context=context)
-    slots["makeup"] = [
-        PromptFragment(
-            text=t,
-            source_slot="makeup",
-            source_item_id=makeup_res.item_id,
-            provenance=makeup_res.provenance,
-        )
-        for t in (makeup_res.tags if makeup_res else ())
-    ]
+    slots["makeup"] = _make_slot_fragments(makeup_res, "makeup", 妆容细节, entry_point)
 
     # 槽位 10: 发型与饰品
     hairstyle_res = sampler.sample_hairstyle_result(发型发色, rng, context=context)
-    slots["hairstyle"] = [
-        PromptFragment(
-            text=t,
-            source_slot="hairstyle",
-            source_item_id=hairstyle_res.item_id,
-            provenance=hairstyle_res.provenance,
-        )
-        for t in (hairstyle_res.tags if hairstyle_res else ())
-    ]
+    slots["hairstyle"] = _make_slot_fragments(hairstyle_res, "hairstyle", 发型发色, entry_point)
     jewelry_res = sampler.sample_jewelry_result(饰品头饰, rng, context=context)
-    slots["jewelry"] = [
-        PromptFragment(
-            text=t,
-            source_slot="jewelry",
-            source_item_id=jewelry_res.item_id,
-            provenance=jewelry_res.provenance,
-        )
-        for t in (jewelry_res.tags if jewelry_res else ())
-    ]
+    slots["jewelry"] = _make_slot_fragments(jewelry_res, "jewelry", 饰品头饰, entry_point)
 
     # 槽位 11: 真实微瑕
     imperfection_res = sampler.sample_imperfections_result(真实微瑕, rng)
-    slots["imperfections"] = [
-        PromptFragment(
-            text=t,
-            source_slot="imperfections",
-            source_item_id=imperfection_res.item_id,
-            provenance=imperfection_res.provenance,
-        )
-        for t in (imperfection_res.tags if imperfection_res else ())
-    ]
+    slots["imperfections"] = _make_slot_fragments(imperfection_res, "imperfections", 真实微瑕, entry_point)
 
     # 槽位 12: 纹身标记（仅在显式配置时生效）
     tattoo_res = sampler.sample_tattoo_result(纹身标记, rng, context=context)
-    slots["tattoo"] = [
-        PromptFragment(
-            text=t,
-            source_slot="tattoo",
-            source_item_id=tattoo_res.item_id,
-            provenance=tattoo_res.provenance,
-        )
-        for t in (tattoo_res.tags if tattoo_res else ())
-    ]
+    slots["tattoo"] = _make_slot_fragments(tattoo_res, "tattoo", 纹身标记, entry_point)
 
     # 槽位 13: 道具物件
     prop_res = sampler.sample_prop_result(道具物件, rng, context=context)
-    slots["props"] = [
-        PromptFragment(
-            text=t,
-            source_slot="props",
-            source_item_id=prop_res.item_id,
-            provenance=prop_res.provenance,
-        )
-        for t in (prop_res.tags if prop_res else ())
-    ]
+    slots["props"] = _make_slot_fragments(prop_res, "props", 道具物件, entry_point)
 
     # 槽位 14: 人格角色
     character_res = sampler.sample_character_result(角色设定, rng, context=context)
-    slots["character"] = [
-        PromptFragment(
-            text=t,
-            source_slot="character",
-            source_item_id=character_res.item_id,
-            provenance=character_res.provenance,
-        )
-        for t in (character_res.tags if character_res else ())
-    ]
+    slots["character"] = _make_slot_fragments(character_res, "character", 角色设定, entry_point)
 
     # 槽位 15: 液体体液
     liquid_res = sampler.sample_liquid_result(液体效果, rng, context=context)
-    slots["liquids"] = [
-        PromptFragment(
-            text=t,
-            source_slot="liquids",
-            source_item_id=liquid_res.item_id,
-            provenance=liquid_res.provenance,
-        )
-        for t in (liquid_res.tags if liquid_res else ())
-    ]
+    slots["liquids"] = _make_slot_fragments(liquid_res, "liquids", 液体效果, entry_point)
 
     # 画质强化锚点
     quality_res = sampler.sample_quality_result(画质等级)
-    slots["quality"] = [
-        PromptFragment(
-            text=t,
-            source_slot="quality",
-            source_item_id=quality_res.item_id,
-            provenance=quality_res.provenance,
-        )
-        for t in (quality_res.tags if quality_res else ())
-    ]
+    slots["quality"] = _make_slot_fragments(quality_res, "quality", 画质等级, entry_point)
 
     # 3. 叠加风格配方
     recipe = sampler.get_style_recipe(风格配方, rng) if not _is_none(风格配方) else None
     if recipe:
         recipe_id = recipe.get("id", "recipe_custom")
-        for k in ["lighting_palette", "style_recipe", "focus_detail"]:
-            val = recipe.get(k, "")
-            if val:
-                for t in split_top_level_tags(str(val)):
-                    if t:
-                        slots.setdefault("style_recipe", []).append(
-                            PromptFragment(
-                                text=t,
-                                source_slot=f"recipe_{k}",
-                                source_item_id=recipe_id,
-                                provenance=TagProvenance(
-                                    item_id=recipe_id,
-                                    kind="style_recipe",
-                                    semantic_ids=(f"recipe:{recipe_id}",),
-                                ),
-                            )
+        recipe_frags = recipe.get("fragments")
+        if recipe_frags and isinstance(recipe_frags, list):
+            for f_data in recipe_frags:
+                text = f_data.get("text", "")
+                if text:
+                    f_id = f_data.get("id", "")
+                    f_slot = f_data.get("slot", "style_recipe")
+                    f_facts = SemanticFacts.from_dict(f_data.get("facts", {}))
+                    origin_d = f_data.get("origin", {})
+                    f_origin = SelectionOrigin(
+                        entry_point=entry_point,
+                        mode=origin_d.get("mode", "recipe"),
+                        selector=origin_d.get("selector", f_slot),
+                        selected_id=origin_d.get("selected_id", recipe_id),
+                        raw_value=origin_d.get("raw_value", text),
+                        parent_ids=tuple(origin_d.get("parent_ids", (recipe_id,))),
+                    )
+                    slots.setdefault("style_recipe", []).append(
+                        PromptFragment(
+                            text=text,
+                            source_slot=f_slot,
+                            source_item_id=recipe_id,
+                            provenance=TagProvenance(
+                                item_id=f_id or recipe_id,
+                                kind="style_recipe",
+                                semantic_ids=(f"recipe:{recipe_id}",),
+                                parent_ids=(recipe_id,),
+                            ),
+                            id=f_id,
+                            facts=f_facts,
+                            origin=f_origin,
                         )
+                    )
+        else:
+            for k in ["lighting_palette", "style_recipe", "focus_detail"]:
+                val = recipe.get(k, "")
+                if val:
+                    for t in split_top_level_tags(str(val)):
+                        if t:
+                            slots.setdefault("style_recipe", []).append(
+                                PromptFragment(
+                                    text=t,
+                                    source_slot=f"recipe_{k}",
+                                    source_item_id=recipe_id,
+                                    provenance=TagProvenance(
+                                        item_id=recipe_id,
+                                        kind="style_recipe",
+                                        semantic_ids=(f"recipe:{recipe_id}",),
+                                    ),
+                                    origin=SelectionOrigin(
+                                        entry_point=entry_point,
+                                        mode="recipe",
+                                        selector=k,
+                                        selected_id=recipe_id,
+                                        raw_value=t,
+                                        parent_ids=(recipe_id,),
+                                    ),
+                                )
+                            )
 
     # 4. 组装、冲突消解与统一 Finalize
     positive_prompt, atoms, rules_applied, source_atoms = assembler.assemble_result_with_sources(slots, rng=rng)
@@ -389,6 +412,7 @@ def _generate_structured(
         desc_parts.append(f"配方: {recipe.get('style_name', recipe.get('name_zh', ''))}")
 
     chinese_desc = " | ".join(desc_parts)
+    selections = _extract_ordered_selections(source_atoms)
     return GenerationResult(
         positive=positive_prompt,
         negative=negative_prompt,
@@ -396,6 +420,7 @@ def _generate_structured(
         atoms=atoms,
         rules_applied=rules_applied,
         source_atoms=source_atoms,
+        selections=selections,
     )
 
 
@@ -474,7 +499,7 @@ class IYKYKPromptGenerator:
     def IS_CHANGED(cls, prompt_seed: int = -1, **kwargs) -> Any:
         return _compute_is_changed(prompt_seed, kwargs)
 
-    def generate(
+    def generate_structured(
         self,
         预设模板: str,
         风格配方: str,
@@ -499,8 +524,8 @@ class IYKYKPromptGenerator:
         真实微瑕: str,
         画质等级: str,
         prompt_seed: int = -1,
-    ) -> Tuple[str, str, str]:
-        rng, _ = _get_rng(prompt_seed)
+    ) -> GenerationResult:
+        rng, effective_seed = _get_rng(prompt_seed)
         res = _generate_structured(
             sampler=_sampler,
             assembler=_assembler,
@@ -529,6 +554,52 @@ class IYKYKPromptGenerator:
                 "画质等级": 画质等级,
             },
             rng=rng,
+            entry_point="generator",
+        )
+        return GenerationResult(
+            positive=res.positive,
+            negative=res.negative,
+            description=res.description,
+            atoms=res.atoms,
+            rules_applied=res.rules_applied,
+            source_atoms=res.source_atoms,
+            effective_seed=effective_seed,
+            context_profile=res.context_profile,
+            selections=res.selections,
+            resolution_report=res.resolution_report,
+        )
+
+    def generate(
+        self,
+        预设模板: str,
+        风格配方: str,
+        场景大类: str,
+        剧情主题: str,
+        景别构图: str,
+        拍摄视角: str,
+        裸露等级: str,
+        服装款式: str,
+        服装状态: str,
+        发型发色: str,
+        饰品头饰: str,
+        妆容细节: str,
+        姿势动作: str,
+        情绪表情: str,
+        光影预设: str,
+        胶片风格: str,
+        液体效果: str,
+        纹身标记: str,
+        道具物件: str,
+        角色设定: str,
+        真实微瑕: str,
+        画质等级: str,
+        prompt_seed: int = -1,
+    ) -> Tuple[str, str, str]:
+        res = self.generate_structured(
+            预设模板, 风格配方, 场景大类, 剧情主题, 景别构图, 拍摄视角, 裸露等级,
+            服装款式, 服装状态, 发型发色, 饰品头饰, 妆容细节, 姿势动作, 情绪表情,
+            光影预设, 胶片风格, 液体效果, 纹身标记, 道具物件, 角色设定, 真实微瑕,
+            画质等级, prompt_seed
         )
         return (res.positive, res.negative, res.description)
 
@@ -580,7 +651,7 @@ class IYKYKPresetBrowser:
         画质等级: str,
         prompt_seed: int = -1,
     ) -> GenerationResult:
-        rng, _ = _get_rng(prompt_seed)
+        rng, effective_seed = _get_rng(prompt_seed)
         preset = _sampler.get_preset(预设模板, rng)
         if not preset:
             return GenerationResult(
@@ -590,16 +661,18 @@ class IYKYKPresetBrowser:
                 atoms=(),
                 rules_applied=(),
                 source_atoms=(),
+                effective_seed=effective_seed,
             )
 
         recipe = _sampler.get_style_recipe(风格配方, rng) if not _is_none(风格配方) else None
-        assembly_res = _assembler.assemble_preset(preset, recipe, 画质等级, rng=rng)
+        assembly_res = _assembler.assemble_preset(preset, recipe, 画质等级, rng=rng, entry_point="preset_browser")
         neg = _sampler.get_negative_prompt()
 
         desc = f"【预设模板】{preset.get('id', '')} {preset.get('name_zh', '')}"
         if recipe:
             desc += f" | 【叠加配方】{recipe.get('style_name', recipe.get('name_zh', ''))}"
 
+        selections = _extract_ordered_selections(assembly_res.source_atoms)
         return GenerationResult(
             positive=assembly_res.prompt,
             negative=neg,
@@ -607,6 +680,10 @@ class IYKYKPresetBrowser:
             atoms=assembly_res.accepted_atoms,
             rules_applied=assembly_res.rules_applied,
             source_atoms=assembly_res.source_atoms,
+            effective_seed=effective_seed,
+            context_profile=assembly_res.context_profile,
+            selections=selections,
+            resolution_report=assembly_res.resolution_report,
         )
 
     def browse(
@@ -666,7 +743,7 @@ class IYKYKCustomSlotCombiner:
         return _compute_is_changed(prompt_seed, kwargs)
 
     def combine_structured(self, prompt_seed: int = -1, **kwargs) -> GenerationResult:
-        rng, _ = _get_rng(prompt_seed)
+        rng, effective_seed = _get_rng(prompt_seed)
 
         slot_mapping = {
             "场景主题": "scene_theme",
@@ -702,6 +779,12 @@ class IYKYKCustomSlotCombiner:
                             source_slot=slot_name,
                             order=order,
                             provenance=TagProvenance(kind="user_input", semantic_ids=(f"slot:{slot_name}",)),
+                            origin=SelectionOrigin(
+                                entry_point="custom_combiner",
+                                mode="custom",
+                                selector=slot_name,
+                                raw_value=t,
+                            ),
                         )
                     )
                     order += 1
@@ -709,6 +792,7 @@ class IYKYKCustomSlotCombiner:
         assembly_res = assemble_result(fragments, DATA_DIR, rng=rng)
         negative_prompt = _sampler.get_negative_prompt()
         desc = f"已成功拼装 {active_count} 个自定义槽位"
+        selections = _extract_ordered_selections(assembly_res.source_atoms)
 
         return GenerationResult(
             positive=assembly_res.prompt,
@@ -717,6 +801,10 @@ class IYKYKCustomSlotCombiner:
             atoms=assembly_res.accepted_atoms,
             rules_applied=assembly_res.rules_applied,
             source_atoms=assembly_res.source_atoms,
+            effective_seed=effective_seed,
+            context_profile=assembly_res.context_profile,
+            selections=selections,
+            resolution_report=assembly_res.resolution_report,
         )
 
     def combine(self, prompt_seed: int = -1, **kwargs) -> Tuple[str, str, str]:

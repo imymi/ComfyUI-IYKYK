@@ -9,53 +9,206 @@
       "id": "beauty_mark_mole",
       "name_zh": "💄 泪痣/唇角美人痣/锁骨痣",
       "tags": [
-        "delicate beauty mark near eye",
-        "small dark mole on collarbone",
-        "tiny freckle on cheek"
+        {
+          "id": "beauty_mark_mole__tag_000",
+          "text": "delicate beauty mark near eye",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "face"
+            ]
+          }
+        },
+        {
+          "id": "beauty_mark_mole__tag_001",
+          "text": "small dark mole on collarbone",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "face"
+            ]
+          }
+        },
+        {
+          "id": "beauty_mark_mole__tag_002",
+          "text": "tiny freckle on cheek",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "face"
+            ]
+          }
+        }
       ]
     },
     {
       "id": "natural_skin_pores",
       "name_zh": "🧬 真实皮肤毛孔微肌理",
       "tags": [
-        "visible fine skin pores",
-        "natural skin texture",
-        "authentic realistic skin surface"
+        {
+          "id": "natural_skin_pores__tag_000",
+          "text": "visible fine skin pores",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "natural_skin_pores__tag_001",
+          "text": "natural skin texture",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "natural_skin_pores__tag_002",
+          "text": "authentic realistic skin surface",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        }
       ]
     },
     {
       "id": "bra_strap_lines",
       "name_zh": "👙 内衣勒痕/肩带印记/晒痕",
       "tags": [
-        "bra strap indent marks on shoulders",
-        "elastic pressure line on skin",
-        "subtle bikini tan lines"
+        {
+          "id": "bra_strap_lines__tag_000",
+          "text": "bra strap indent marks on shoulders",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "bra_strap_lines__tag_001",
+          "text": "elastic pressure line on skin",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "bra_strap_lines__tag_002",
+          "text": "subtle bikini tan lines",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        }
       ]
     },
     {
       "id": "dewy_flush_veins",
       "name_zh": "🩸 皮肤潮红/透光淡蓝血管",
       "tags": [
-        "rosy flushed chest and neck",
-        "faint blue veins visible on inner breast",
-        "subtle subsurface scattering"
+        {
+          "id": "dewy_flush_veins__tag_000",
+          "text": "rosy flushed chest and neck",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "dewy_flush_veins__tag_001",
+          "text": "faint blue veins visible on inner breast",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "dewy_flush_veins__tag_002",
+          "text": "subtle subsurface scattering",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        }
       ]
     },
     {
       "id": "manicured_nails",
       "name_zh": "💅 美甲与手指关节细节",
       "tags": [
-        "delicate manicured fingernails with red polish",
-        "subtle knuckle creases",
-        "slender fingers"
+        {
+          "id": "manicured_nails__tag_000",
+          "text": "delicate manicured fingernails with red polish",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "manicured_nails__tag_001",
+          "text": "subtle knuckle creases",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "manicured_nails__tag_002",
+          "text": "slender fingers",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        }
       ]
     },
     {
       "id": "collarbone_arch",
       "name_zh": "✨ 锁骨深陷/足弓骨感特写",
       "tags": [
-        "prominent defined collarbone hollow",
-        "delicate arched foot with tense tendons"
+        {
+          "id": "collarbone_arch__tag_000",
+          "text": "prominent defined collarbone hollow",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "collarbone_arch__tag_001",
+          "text": "delicate arched foot with tense tendons",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        }
       ]
     }
   ]

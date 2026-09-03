@@ -25,9 +25,13 @@ class TestPropsAndExtensionsReachability(unittest.TestCase):
         cls.generator = IYKYKPromptGenerator()
 
         clothing_doc = json.loads((DATA_DIR / "clothing.json").read_text(encoding="utf-8"))
-        cls.exp_tags = {t.lower(): item["id"] for item in clothing_doc.get("sfw_exposure_tiers", []) for t in item.get("tags", [])}
-        cls.trans_tags = {t.lower(): item["id"] for item in clothing_doc.get("cloth_transparency_tiers", []) for t in item.get("tags", [])}
-        cls.wardrobe_tags = {t.lower(): item["id"] for item in clothing_doc.get("lingerie_wardrobe", []) for t in item.get("tags", [])}
+
+        def _tag_str(t):
+            return (t.get("text", "") if isinstance(t, dict) else str(t)).lower()
+
+        cls.exp_tags = {_tag_str(t): item["id"] for item in clothing_doc.get("sfw_exposure_tiers", []) for t in item.get("tags", [])}
+        cls.trans_tags = {_tag_str(t): item["id"] for item in clothing_doc.get("cloth_transparency_tiers", []) for t in item.get("tags", [])}
+        cls.wardrobe_tags = {_tag_str(t): item["id"] for item in clothing_doc.get("lingerie_wardrobe", []) for t in item.get("tags", [])}
         cls.all_extension_tags = set(cls.exp_tags.keys()) | set(cls.trans_tags.keys()) | set(cls.wardrobe_tags.keys())
 
         cls.expected_exposure_ids = {item["id"] for item in clothing_doc.get("sfw_exposure_tiers", [])}

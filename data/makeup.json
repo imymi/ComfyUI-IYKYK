@@ -4,197 +4,997 @@
       "id": "natural_pure",
       "name_zh": "清纯伪素颜 (Natural Clean Beauty)",
       "tags": [
-        "natural makeup",
-        "pure face",
-        "clean beauty",
-        "minimal makeup",
-        "barely-there foundation",
-        "hydrated skin",
-        "sheer lip balm"
+        {
+          "id": "natural_pure__tag_000",
+          "text": "natural makeup",
+          "facts": {
+            "semantic_role": "selector",
+            "makeup_base": "natural",
+            "makeup_effects": []
+          }
+        },
+        {
+          "id": "natural_pure__tag_001",
+          "text": "pure face",
+          "facts": {
+            "semantic_role": "selector",
+            "makeup_base": "natural",
+            "makeup_effects": []
+          }
+        },
+        {
+          "id": "natural_pure__tag_002",
+          "text": "clean beauty",
+          "facts": {
+            "semantic_role": "selector",
+            "makeup_base": "natural",
+            "makeup_effects": []
+          }
+        },
+        {
+          "id": "natural_pure__tag_003",
+          "text": "minimal makeup",
+          "facts": {
+            "semantic_role": "selector",
+            "makeup_base": "natural",
+            "makeup_effects": []
+          }
+        },
+        {
+          "id": "natural_pure__tag_004",
+          "text": "barely-there foundation",
+          "facts": {
+            "semantic_role": "selector",
+            "makeup_base": "clean",
+            "makeup_effects": []
+          }
+        },
+        {
+          "id": "natural_pure__tag_005",
+          "text": "hydrated skin",
+          "facts": {
+            "semantic_role": "selector",
+            "makeup_base": "natural",
+            "makeup_effects": []
+          }
+        },
+        {
+          "id": "natural_pure__tag_006",
+          "text": "sheer lip balm",
+          "facts": {
+            "semantic_role": "selector",
+            "makeup_base": "natural",
+            "makeup_effects": []
+          }
+        }
       ]
     },
     {
       "id": "cute_peachy",
       "name_zh": "甜美果汁妆 (Kawaii Peachy Glow)",
       "tags": [
-        "kawaii makeup",
-        "peachy eyeshadow",
-        "aegyo sal",
-        "glossy pink lips",
-        "rosy cheek flush",
-        "dewy glass skin"
+        {
+          "id": "cute_peachy__tag_000",
+          "text": "kawaii makeup",
+          "facts": {
+            "semantic_role": "selector",
+            "makeup_base": "natural",
+            "makeup_effects": []
+          }
+        },
+        {
+          "id": "cute_peachy__tag_001",
+          "text": "peachy eyeshadow",
+          "facts": {
+            "semantic_role": "selector",
+            "makeup_base": "natural",
+            "makeup_effects": []
+          }
+        },
+        {
+          "id": "cute_peachy__tag_002",
+          "text": "aegyo sal",
+          "facts": {
+            "semantic_role": "selector",
+            "makeup_base": "natural",
+            "makeup_effects": []
+          }
+        },
+        {
+          "id": "cute_peachy__tag_003",
+          "text": "glossy pink lips",
+          "facts": {
+            "semantic_role": "selector",
+            "makeup_base": "natural",
+            "makeup_effects": [
+              "wet"
+            ]
+          }
+        },
+        {
+          "id": "cute_peachy__tag_004",
+          "text": "rosy cheek flush",
+          "facts": {
+            "semantic_role": "selector",
+            "makeup_base": "natural",
+            "makeup_effects": [
+              "flush"
+            ]
+          }
+        },
+        {
+          "id": "cute_peachy__tag_005",
+          "text": "dewy glass skin",
+          "facts": {
+            "semantic_role": "selector",
+            "makeup_base": "natural",
+            "makeup_effects": [
+              "wet"
+            ]
+          }
+        }
       ]
     },
     {
       "id": "mature_wife",
       "name_zh": "人妻轻熟妆 (Mature Elegant Glam)",
       "tags": [
-        "wife makeup",
-        "mature beauty",
-        "soft glam",
-        "warm brown eyeshadow",
-        "creamy satin foundation",
-        "rosewood matte lips"
+        {
+          "id": "mature_wife__tag_000",
+          "text": "wife makeup",
+          "facts": {
+            "semantic_role": "selector",
+            "makeup_base": "full",
+            "makeup_effects": []
+          }
+        },
+        {
+          "id": "mature_wife__tag_001",
+          "text": "mature beauty",
+          "facts": {
+            "semantic_role": "selector",
+            "makeup_base": "full",
+            "makeup_effects": []
+          }
+        },
+        {
+          "id": "mature_wife__tag_002",
+          "text": "soft glam",
+          "facts": {
+            "semantic_role": "selector",
+            "makeup_base": "full",
+            "makeup_effects": []
+          }
+        },
+        {
+          "id": "mature_wife__tag_003",
+          "text": "warm brown eyeshadow",
+          "facts": {
+            "semantic_role": "selector",
+            "makeup_base": "full",
+            "makeup_effects": []
+          }
+        },
+        {
+          "id": "mature_wife__tag_004",
+          "text": "creamy satin foundation",
+          "facts": {
+            "semantic_role": "selector",
+            "makeup_base": "full",
+            "makeup_effects": []
+          }
+        },
+        {
+          "id": "mature_wife__tag_005",
+          "text": "rosewood matte lips",
+          "facts": {
+            "semantic_role": "selector",
+            "makeup_base": "full",
+            "makeup_effects": []
+          }
+        }
       ]
     },
     {
       "id": "sultry_smoky",
       "name_zh": "魅惑烟熏妆 (Sultry Smoky Glam)",
       "tags": [
-        "glamorous sultry makeup",
-        "smoky eye makeup",
-        "winged black eyeliner",
-        "bold crimson lipstick",
-        "sculpted cheekbones",
-        "full coverage matte"
+        {
+          "id": "sultry_smoky__tag_000",
+          "text": "glamorous sultry makeup",
+          "facts": {
+            "semantic_role": "selector",
+            "makeup_base": "full",
+            "makeup_effects": []
+          }
+        },
+        {
+          "id": "sultry_smoky__tag_001",
+          "text": "smoky eye makeup",
+          "facts": {
+            "semantic_role": "selector",
+            "makeup_base": "full",
+            "makeup_effects": []
+          }
+        },
+        {
+          "id": "sultry_smoky__tag_002",
+          "text": "winged black eyeliner",
+          "facts": {
+            "semantic_role": "selector",
+            "makeup_base": "full",
+            "makeup_effects": []
+          }
+        },
+        {
+          "id": "sultry_smoky__tag_003",
+          "text": "bold crimson lipstick",
+          "facts": {
+            "semantic_role": "selector",
+            "makeup_base": "full",
+            "makeup_effects": []
+          }
+        },
+        {
+          "id": "sultry_smoky__tag_004",
+          "text": "sculpted cheekbones",
+          "facts": {
+            "semantic_role": "selector",
+            "makeup_base": "full",
+            "makeup_effects": []
+          }
+        },
+        {
+          "id": "sultry_smoky__tag_005",
+          "text": "full coverage matte",
+          "facts": {
+            "semantic_role": "selector",
+            "makeup_base": "full",
+            "makeup_effects": []
+          }
+        }
       ]
     },
     {
       "id": "ruined_crying",
       "name_zh": "被弄花/泪痕残妆 (Ruined Post-Sex Makeup)",
       "tags": [
-        "ruined makeup",
-        "smudged eyeliner",
-        "tear tracks down cheeks",
-        "smeared lipstick on cheek",
-        "watery red-rimmed eyes",
-        "melting foundation"
+        {
+          "id": "ruined_crying__tag_000",
+          "text": "ruined makeup",
+          "facts": {
+            "semantic_role": "selector",
+            "makeup_base": "natural",
+            "makeup_effects": []
+          }
+        },
+        {
+          "id": "ruined_crying__tag_001",
+          "text": "smudged eyeliner",
+          "facts": {
+            "semantic_role": "selector",
+            "makeup_base": "natural",
+            "makeup_effects": [
+              "smudged"
+            ]
+          }
+        },
+        {
+          "id": "ruined_crying__tag_002",
+          "text": "tear tracks down cheeks",
+          "facts": {
+            "semantic_role": "selector",
+            "makeup_base": "natural",
+            "makeup_effects": [
+              "tear_streaked"
+            ]
+          }
+        },
+        {
+          "id": "ruined_crying__tag_003",
+          "text": "smeared lipstick on cheek",
+          "facts": {
+            "semantic_role": "selector",
+            "makeup_base": "natural",
+            "makeup_effects": [
+              "smudged"
+            ]
+          }
+        },
+        {
+          "id": "ruined_crying__tag_004",
+          "text": "watery red-rimmed eyes",
+          "facts": {
+            "semantic_role": "selector",
+            "makeup_base": "natural",
+            "makeup_effects": []
+          }
+        },
+        {
+          "id": "ruined_crying__tag_005",
+          "text": "melting foundation",
+          "facts": {
+            "semantic_role": "selector",
+            "makeup_base": "natural",
+            "makeup_effects": []
+          }
+        }
       ]
     },
     {
       "id": "climax_flush",
       "name_zh": "高潮潮红妆 (Climax Pleasure Flush)",
       "tags": [
-        "pleasure flush on cheeks",
-        "heated red face",
-        "sweat glistening on skin",
-        "bitten swollen red lips",
-        "parted glossed lips",
-        "heavy sleepy eyelids"
+        {
+          "id": "climax_flush__tag_000",
+          "text": "pleasure flush on cheeks",
+          "facts": {
+            "semantic_role": "selector",
+            "makeup_base": "natural",
+            "makeup_effects": [
+              "flush"
+            ]
+          }
+        },
+        {
+          "id": "climax_flush__tag_001",
+          "text": "heated red face",
+          "facts": {
+            "semantic_role": "selector",
+            "makeup_base": "natural",
+            "makeup_effects": []
+          }
+        },
+        {
+          "id": "climax_flush__tag_002",
+          "text": "sweat glistening on skin",
+          "facts": {
+            "semantic_role": "selector",
+            "makeup_base": "natural",
+            "makeup_effects": []
+          }
+        },
+        {
+          "id": "climax_flush__tag_003",
+          "text": "bitten swollen red lips",
+          "facts": {
+            "semantic_role": "selector",
+            "makeup_base": "natural",
+            "makeup_effects": []
+          }
+        },
+        {
+          "id": "climax_flush__tag_004",
+          "text": "parted glossed lips",
+          "facts": {
+            "semantic_role": "selector",
+            "makeup_base": "natural",
+            "makeup_effects": []
+          }
+        },
+        {
+          "id": "climax_flush__tag_005",
+          "text": "heavy sleepy eyelids",
+          "facts": {
+            "semantic_role": "selector",
+            "makeup_base": "natural",
+            "makeup_effects": []
+          }
+        }
       ]
     },
     {
       "id": "submissive_marked",
       "name_zh": "被支配顺从妆 (Submissive Marked Look)",
       "tags": [
-        "submissive makeup",
-        "finger mark on cheek",
-        "grab redness on face",
-        "smudged kohl eyeliner",
-        "transferred lipstick on lips",
-        "swollen bruised lip"
+        {
+          "id": "submissive_marked__tag_000",
+          "text": "submissive makeup",
+          "facts": {
+            "semantic_role": "selector",
+            "makeup_base": "natural",
+            "makeup_effects": []
+          }
+        },
+        {
+          "id": "submissive_marked__tag_001",
+          "text": "finger mark on cheek",
+          "facts": {
+            "semantic_role": "selector",
+            "makeup_base": "natural",
+            "makeup_effects": []
+          }
+        },
+        {
+          "id": "submissive_marked__tag_002",
+          "text": "grab redness on face",
+          "facts": {
+            "semantic_role": "selector",
+            "makeup_base": "natural",
+            "makeup_effects": []
+          }
+        },
+        {
+          "id": "submissive_marked__tag_003",
+          "text": "smudged kohl eyeliner",
+          "facts": {
+            "semantic_role": "selector",
+            "makeup_base": "natural",
+            "makeup_effects": [
+              "smudged"
+            ]
+          }
+        },
+        {
+          "id": "submissive_marked__tag_004",
+          "text": "transferred lipstick on lips",
+          "facts": {
+            "semantic_role": "selector",
+            "makeup_base": "natural",
+            "makeup_effects": []
+          }
+        },
+        {
+          "id": "submissive_marked__tag_005",
+          "text": "swollen bruised lip",
+          "facts": {
+            "semantic_role": "selector",
+            "makeup_base": "natural",
+            "makeup_effects": []
+          }
+        }
       ]
     },
     {
       "id": "wet_dewy",
       "name_zh": "浴室湿身妆 (Wet Skin & Glistening)",
       "tags": [
-        "wet skin look",
-        "water droplets on face",
-        "dewy foundation",
-        "natural rosy flush from warm bath",
-        "glossy wet lips",
-        "clean lashes"
+        {
+          "id": "wet_dewy__tag_000",
+          "text": "wet skin look",
+          "facts": {
+            "semantic_role": "selector",
+            "makeup_base": "natural",
+            "makeup_effects": [
+              "wet"
+            ]
+          }
+        },
+        {
+          "id": "wet_dewy__tag_001",
+          "text": "water droplets on face",
+          "facts": {
+            "semantic_role": "selector",
+            "makeup_base": "natural",
+            "makeup_effects": []
+          }
+        },
+        {
+          "id": "wet_dewy__tag_002",
+          "text": "dewy foundation",
+          "facts": {
+            "semantic_role": "selector",
+            "makeup_base": "natural",
+            "makeup_effects": [
+              "wet"
+            ]
+          }
+        },
+        {
+          "id": "wet_dewy__tag_003",
+          "text": "natural rosy flush from warm bath",
+          "facts": {
+            "semantic_role": "selector",
+            "makeup_base": "natural",
+            "makeup_effects": [
+              "flush"
+            ]
+          }
+        },
+        {
+          "id": "wet_dewy__tag_004",
+          "text": "glossy wet lips",
+          "facts": {
+            "semantic_role": "selector",
+            "makeup_base": "natural",
+            "makeup_effects": [
+              "wet"
+            ]
+          }
+        },
+        {
+          "id": "wet_dewy__tag_005",
+          "text": "clean lashes",
+          "facts": {
+            "semantic_role": "selector",
+            "makeup_base": "natural",
+            "makeup_effects": []
+          }
+        }
       ]
     },
     {
       "id": "gothic_dark",
       "name_zh": "哥特暗黑妆 (Gothic Dark Aesthetic)",
       "tags": [
-        "gothic makeup",
-        "pale matte porcelain skin",
-        "dark charcoal smoky eyes",
-        "dark berry lipstick",
-        "sharp contour",
-        "dramatic black lashes"
+        {
+          "id": "gothic_dark__tag_000",
+          "text": "gothic makeup",
+          "facts": {
+            "semantic_role": "selector",
+            "makeup_base": "special",
+            "makeup_effects": []
+          }
+        },
+        {
+          "id": "gothic_dark__tag_001",
+          "text": "pale matte porcelain skin",
+          "facts": {
+            "semantic_role": "selector",
+            "makeup_base": "natural",
+            "makeup_effects": []
+          }
+        },
+        {
+          "id": "gothic_dark__tag_002",
+          "text": "dark charcoal smoky eyes",
+          "facts": {
+            "semantic_role": "selector",
+            "makeup_base": "full",
+            "makeup_effects": []
+          }
+        },
+        {
+          "id": "gothic_dark__tag_003",
+          "text": "dark berry lipstick",
+          "facts": {
+            "semantic_role": "selector",
+            "makeup_base": "natural",
+            "makeup_effects": []
+          }
+        },
+        {
+          "id": "gothic_dark__tag_004",
+          "text": "sharp contour",
+          "facts": {
+            "semantic_role": "selector",
+            "makeup_base": "natural",
+            "makeup_effects": []
+          }
+        },
+        {
+          "id": "gothic_dark__tag_005",
+          "text": "dramatic black lashes",
+          "facts": {
+            "semantic_role": "selector",
+            "makeup_base": "natural",
+            "makeup_effects": []
+          }
+        }
       ]
     },
     {
       "id": "vintage_retro",
       "name_zh": "昭和复古名伶 (Vintage Retro Red Lip)",
       "tags": [
-        "retro makeup",
-        "classic vintage red lip",
-        "defined arched brow",
-        "soft powder finish",
-        "cat eye liner",
-        "faded golden glam"
+        {
+          "id": "vintage_retro__tag_000",
+          "text": "retro makeup",
+          "facts": {
+            "semantic_role": "selector",
+            "makeup_base": "natural",
+            "makeup_effects": []
+          }
+        },
+        {
+          "id": "vintage_retro__tag_001",
+          "text": "classic vintage red lip",
+          "facts": {
+            "semantic_role": "selector",
+            "makeup_base": "natural",
+            "makeup_effects": []
+          }
+        },
+        {
+          "id": "vintage_retro__tag_002",
+          "text": "defined arched brow",
+          "facts": {
+            "semantic_role": "selector",
+            "makeup_base": "natural",
+            "makeup_effects": []
+          }
+        },
+        {
+          "id": "vintage_retro__tag_003",
+          "text": "soft powder finish",
+          "facts": {
+            "semantic_role": "selector",
+            "makeup_base": "natural",
+            "makeup_effects": []
+          }
+        },
+        {
+          "id": "vintage_retro__tag_004",
+          "text": "cat eye liner",
+          "facts": {
+            "semantic_role": "selector",
+            "makeup_base": "natural",
+            "makeup_effects": []
+          }
+        },
+        {
+          "id": "vintage_retro__tag_005",
+          "text": "faded golden glam",
+          "facts": {
+            "semantic_role": "selector",
+            "makeup_base": "full",
+            "makeup_effects": []
+          }
+        }
       ]
     },
     {
       "id": "sun_kissed",
       "name_zh": "夏日晒斑日晒妆 (Sun-kissed Bronze)",
       "tags": [
-        "sun-kissed cheeks",
-        "freckles across nose bridge",
-        "bronzer glow",
-        "coral glossy lips",
-        "warm golden shimmer on lids"
+        {
+          "id": "sun_kissed__tag_000",
+          "text": "sun-kissed cheeks",
+          "facts": {
+            "semantic_role": "selector",
+            "makeup_base": "natural",
+            "makeup_effects": []
+          }
+        },
+        {
+          "id": "sun_kissed__tag_001",
+          "text": "freckles across nose bridge",
+          "facts": {
+            "semantic_role": "selector",
+            "makeup_base": "natural",
+            "makeup_effects": []
+          }
+        },
+        {
+          "id": "sun_kissed__tag_002",
+          "text": "bronzer glow",
+          "facts": {
+            "semantic_role": "selector",
+            "makeup_base": "natural",
+            "makeup_effects": []
+          }
+        },
+        {
+          "id": "sun_kissed__tag_003",
+          "text": "coral glossy lips",
+          "facts": {
+            "semantic_role": "selector",
+            "makeup_base": "natural",
+            "makeup_effects": [
+              "wet"
+            ]
+          }
+        },
+        {
+          "id": "sun_kissed__tag_004",
+          "text": "warm golden shimmer on lids",
+          "facts": {
+            "semantic_role": "selector",
+            "makeup_base": "natural",
+            "makeup_effects": [
+              "glitter"
+            ]
+          }
+        }
       ]
     },
     {
       "id": "sweet_peach_milk",
       "name_zh": "甜妹蜜桃草莓妆 (Sweet Peach Milk Tea Glow)",
       "tags": [
-        "peach blush blended across apple cheeks",
-        "shimmering pink eyeshadow",
-        "glossy plump lip tint",
-        "curled lashes",
-        "nose tip highlight"
+        {
+          "id": "sweet_peach_milk__tag_000",
+          "text": "peach blush blended across apple cheeks",
+          "facts": {
+            "semantic_role": "selector",
+            "makeup_base": "natural",
+            "makeup_effects": [
+              "flush"
+            ]
+          }
+        },
+        {
+          "id": "sweet_peach_milk__tag_001",
+          "text": "shimmering pink eyeshadow",
+          "facts": {
+            "semantic_role": "selector",
+            "makeup_base": "natural",
+            "makeup_effects": [
+              "glitter"
+            ]
+          }
+        },
+        {
+          "id": "sweet_peach_milk__tag_002",
+          "text": "glossy plump lip tint",
+          "facts": {
+            "semantic_role": "selector",
+            "makeup_base": "natural",
+            "makeup_effects": [
+              "wet"
+            ]
+          }
+        },
+        {
+          "id": "sweet_peach_milk__tag_003",
+          "text": "curled lashes",
+          "facts": {
+            "semantic_role": "selector",
+            "makeup_base": "natural",
+            "makeup_effects": []
+          }
+        },
+        {
+          "id": "sweet_peach_milk__tag_004",
+          "text": "nose tip highlight",
+          "facts": {
+            "semantic_role": "selector",
+            "makeup_base": "natural",
+            "makeup_effects": []
+          }
+        }
       ]
     },
     {
       "id": "drunken_milky_youth",
       "name_zh": "奶醉幼态妆 (Drunken Milky Blush & Aegyo Sal)",
       "tags": [
-        "milky translucent base",
-        "under-eye drunken blush",
-        "downturned doe-eyed eyeliner",
-        "defined puffy aegyo sal highlights",
-        "plump gradient pout"
+        {
+          "id": "drunken_milky_youth__tag_000",
+          "text": "milky translucent base",
+          "facts": {
+            "semantic_role": "selector",
+            "makeup_base": "natural",
+            "makeup_effects": []
+          }
+        },
+        {
+          "id": "drunken_milky_youth__tag_001",
+          "text": "under-eye drunken blush",
+          "facts": {
+            "semantic_role": "selector",
+            "makeup_base": "natural",
+            "makeup_effects": [
+              "flush"
+            ]
+          }
+        },
+        {
+          "id": "drunken_milky_youth__tag_002",
+          "text": "downturned doe-eyed eyeliner",
+          "facts": {
+            "semantic_role": "selector",
+            "makeup_base": "natural",
+            "makeup_effects": []
+          }
+        },
+        {
+          "id": "drunken_milky_youth__tag_003",
+          "text": "defined puffy aegyo sal highlights",
+          "facts": {
+            "semantic_role": "selector",
+            "makeup_base": "natural",
+            "makeup_effects": []
+          }
+        },
+        {
+          "id": "drunken_milky_youth__tag_004",
+          "text": "plump gradient pout",
+          "facts": {
+            "semantic_role": "selector",
+            "makeup_base": "natural",
+            "makeup_effects": []
+          }
+        }
       ]
     },
     {
       "id": "clear_water_bare",
       "name_zh": "清透白开水妆 (Clear Dewy Water Bare Makeup)",
       "tags": [
-        "low-saturation clear glass skin",
-        "soft apricot neutral eyeshadow",
-        "minimal subtle eyeliner",
-        "sheer nude lip gloss",
-        "clean aesthetic look"
+        {
+          "id": "clear_water_bare__tag_000",
+          "text": "low-saturation clear glass skin",
+          "facts": {
+            "semantic_role": "selector",
+            "makeup_base": "natural",
+            "makeup_effects": []
+          }
+        },
+        {
+          "id": "clear_water_bare__tag_001",
+          "text": "soft apricot neutral eyeshadow",
+          "facts": {
+            "semantic_role": "selector",
+            "makeup_base": "natural",
+            "makeup_effects": []
+          }
+        },
+        {
+          "id": "clear_water_bare__tag_002",
+          "text": "minimal subtle eyeliner",
+          "facts": {
+            "semantic_role": "selector",
+            "makeup_base": "natural",
+            "makeup_effects": []
+          }
+        },
+        {
+          "id": "clear_water_bare__tag_003",
+          "text": "sheer nude lip gloss",
+          "facts": {
+            "semantic_role": "selector",
+            "makeup_base": "natural",
+            "makeup_effects": []
+          }
+        },
+        {
+          "id": "clear_water_bare__tag_004",
+          "text": "clean aesthetic look",
+          "facts": {
+            "semantic_role": "selector",
+            "makeup_base": "natural",
+            "makeup_effects": []
+          }
+        }
       ]
     },
     {
       "id": "chinese_vermilion",
       "name_zh": "古风黛眉朱唇 (Classical Chinese Vermilion & Willow Brow)",
       "tags": [
-        "delicate arched willow brows",
-        "slender winged phoenix eyeliner",
-        "crimson vermilion lip stain",
-        "subtle rouge gradient on outer eyes",
-        "forehead huadian flower mark"
+        {
+          "id": "chinese_vermilion__tag_000",
+          "text": "delicate arched willow brows",
+          "facts": {
+            "semantic_role": "selector",
+            "makeup_base": "natural",
+            "makeup_effects": []
+          }
+        },
+        {
+          "id": "chinese_vermilion__tag_001",
+          "text": "slender winged phoenix eyeliner",
+          "facts": {
+            "semantic_role": "selector",
+            "makeup_base": "natural",
+            "makeup_effects": []
+          }
+        },
+        {
+          "id": "chinese_vermilion__tag_002",
+          "text": "crimson vermilion lip stain",
+          "facts": {
+            "semantic_role": "selector",
+            "makeup_base": "natural",
+            "makeup_effects": []
+          }
+        },
+        {
+          "id": "chinese_vermilion__tag_003",
+          "text": "subtle rouge gradient on outer eyes",
+          "facts": {
+            "semantic_role": "selector",
+            "makeup_base": "natural",
+            "makeup_effects": []
+          }
+        },
+        {
+          "id": "chinese_vermilion__tag_004",
+          "text": "forehead huadian flower mark",
+          "facts": {
+            "semantic_role": "selector",
+            "makeup_base": "natural",
+            "makeup_effects": []
+          }
+        }
       ]
     },
     {
       "id": "pure_desire_white_peach",
       "name_zh": "白桃纯欲妆 (Pure Desire White Peach Glam)",
       "tags": [
-        "diffused under-eye flush",
-        "hydrated dewy jelly lips",
-        "soft pearl highlighter on inner eye corners",
-        "youthful innocent charm"
+        {
+          "id": "pure_desire_white_peach__tag_000",
+          "text": "diffused under-eye flush",
+          "facts": {
+            "semantic_role": "selector",
+            "makeup_base": "full",
+            "makeup_effects": [
+              "flush"
+            ]
+          }
+        },
+        {
+          "id": "pure_desire_white_peach__tag_001",
+          "text": "hydrated dewy jelly lips",
+          "facts": {
+            "semantic_role": "selector",
+            "makeup_base": "full",
+            "makeup_effects": [
+              "wet"
+            ]
+          }
+        },
+        {
+          "id": "pure_desire_white_peach__tag_002",
+          "text": "soft pearl highlighter on inner eye corners",
+          "facts": {
+            "semantic_role": "selector",
+            "makeup_base": "full",
+            "makeup_effects": []
+          }
+        },
+        {
+          "id": "pure_desire_white_peach__tag_003",
+          "text": "youthful innocent charm",
+          "facts": {
+            "semantic_role": "selector",
+            "makeup_base": "full",
+            "makeup_effects": []
+          }
+        }
       ]
     },
     {
       "id": "asian_hybrid_contour",
       "name_zh": "网感亚裔混血妆 (Asian Hybrid Sculpted Glam)",
       "tags": [
-        "sculpted eye socket contouring",
-        "sharp cat-eye eyeliner",
-        "radiant cheekbone highlighter",
-        "nude peach satin lips",
-        "fluffy defined brows"
+        {
+          "id": "asian_hybrid_contour__tag_000",
+          "text": "sculpted eye socket contouring",
+          "facts": {
+            "semantic_role": "selector",
+            "makeup_base": "full",
+            "makeup_effects": []
+          }
+        },
+        {
+          "id": "asian_hybrid_contour__tag_001",
+          "text": "sharp cat-eye eyeliner",
+          "facts": {
+            "semantic_role": "selector",
+            "makeup_base": "full",
+            "makeup_effects": []
+          }
+        },
+        {
+          "id": "asian_hybrid_contour__tag_002",
+          "text": "radiant cheekbone highlighter",
+          "facts": {
+            "semantic_role": "selector",
+            "makeup_base": "full",
+            "makeup_effects": []
+          }
+        },
+        {
+          "id": "asian_hybrid_contour__tag_003",
+          "text": "nude peach satin lips",
+          "facts": {
+            "semantic_role": "selector",
+            "makeup_base": "full",
+            "makeup_effects": []
+          }
+        },
+        {
+          "id": "asian_hybrid_contour__tag_004",
+          "text": "fluffy defined brows",
+          "facts": {
+            "semantic_role": "selector",
+            "makeup_base": "full",
+            "makeup_effects": []
+          }
+        }
       ]
     }
   ]

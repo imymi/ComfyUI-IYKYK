@@ -3,347 +3,1904 @@
     {
       "name": "😳 害羞/羞涩",
       "tags": [
-        "shy expression",
-        "blushing cheeks",
-        "looking away",
-        "embarrassed smile",
-        "covering face",
-        "downcast eyes",
-        "timid look",
-        "coy smile",
-        "nervous lip bite",
-        "flustered face",
-        "rosy flush on cheeks",
-        "ears turning red",
-        "can't hold eye contact"
-      ]
+        {
+          "id": "emotion_shy__tag_000",
+          "text": "shy expression",
+          "facts": {
+            "semantic_role": "selector",
+            "emotion": "shy"
+          }
+        },
+        {
+          "id": "emotion_shy__tag_001",
+          "text": "blushing cheeks",
+          "facts": {
+            "semantic_role": "selector",
+            "emotion": "shy"
+          }
+        },
+        {
+          "id": "emotion_shy__tag_002",
+          "text": "looking away",
+          "facts": {
+            "semantic_role": "selector",
+            "emotion": "shy",
+            "gaze": "away"
+          }
+        },
+        {
+          "id": "emotion_shy__tag_003",
+          "text": "embarrassed smile",
+          "facts": {
+            "semantic_role": "selector",
+            "emotion": "shy"
+          }
+        },
+        {
+          "id": "emotion_shy__tag_004",
+          "text": "covering face",
+          "facts": {
+            "semantic_role": "selector",
+            "emotion": "shy"
+          }
+        },
+        {
+          "id": "emotion_shy__tag_005",
+          "text": "downcast eyes",
+          "facts": {
+            "semantic_role": "selector",
+            "emotion": "shy",
+            "gaze": "down"
+          }
+        },
+        {
+          "id": "emotion_shy__tag_006",
+          "text": "timid look",
+          "facts": {
+            "semantic_role": "selector",
+            "emotion": "shy"
+          }
+        },
+        {
+          "id": "emotion_shy__tag_007",
+          "text": "coy smile",
+          "facts": {
+            "semantic_role": "selector",
+            "emotion": "shy"
+          }
+        },
+        {
+          "id": "emotion_shy__tag_008",
+          "text": "nervous lip bite",
+          "facts": {
+            "semantic_role": "selector",
+            "emotion": "shy"
+          }
+        },
+        {
+          "id": "emotion_shy__tag_009",
+          "text": "flustered face",
+          "facts": {
+            "semantic_role": "selector",
+            "emotion": "shy"
+          }
+        },
+        {
+          "id": "emotion_shy__tag_010",
+          "text": "rosy flush on cheeks",
+          "facts": {
+            "semantic_role": "selector",
+            "emotion": "shy"
+          }
+        },
+        {
+          "id": "emotion_shy__tag_011",
+          "text": "ears turning red",
+          "facts": {
+            "semantic_role": "selector",
+            "emotion": "shy"
+          }
+        },
+        {
+          "id": "emotion_shy__tag_012",
+          "text": "can't hold eye contact",
+          "facts": {
+            "semantic_role": "selector",
+            "emotion": "shy"
+          }
+        }
+      ],
+      "id": "emotion_shy",
+      "name_zh": "😳 害羞/羞涩"
     },
     {
       "name": "😏 魅惑/诱惑",
       "tags": [
-        "sultry gaze",
-        "bedroom eyes",
-        "seductive smile",
-        "half-closed eyes",
-        "licking lips",
-        "biting lower lip",
-        "intense stare",
-        "come-hither look",
-        "fuck-me eyes",
-        "smoldering gaze",
-        "knowing smirk",
-        "sultry pout"
-      ]
+        {
+          "id": "emotion_seductive__tag_000",
+          "text": "sultry gaze",
+          "facts": {
+            "semantic_role": "selector",
+            "emotion": "seductive"
+          }
+        },
+        {
+          "id": "emotion_seductive__tag_001",
+          "text": "bedroom eyes",
+          "facts": {
+            "semantic_role": "selector",
+            "emotion": "seductive"
+          }
+        },
+        {
+          "id": "emotion_seductive__tag_002",
+          "text": "seductive smile",
+          "facts": {
+            "semantic_role": "selector",
+            "emotion": "seductive"
+          }
+        },
+        {
+          "id": "emotion_seductive__tag_003",
+          "text": "half-closed eyes",
+          "facts": {
+            "semantic_role": "selector",
+            "emotion": "seductive",
+            "gaze": "eyes_closed"
+          }
+        },
+        {
+          "id": "emotion_seductive__tag_004",
+          "text": "licking lips",
+          "facts": {
+            "semantic_role": "selector",
+            "emotion": "seductive"
+          }
+        },
+        {
+          "id": "emotion_seductive__tag_005",
+          "text": "biting lower lip",
+          "facts": {
+            "semantic_role": "selector",
+            "emotion": "seductive"
+          }
+        },
+        {
+          "id": "emotion_seductive__tag_006",
+          "text": "intense stare",
+          "facts": {
+            "semantic_role": "selector",
+            "emotion": "seductive"
+          }
+        },
+        {
+          "id": "emotion_seductive__tag_007",
+          "text": "come-hither look",
+          "facts": {
+            "semantic_role": "selector",
+            "emotion": "seductive"
+          }
+        },
+        {
+          "id": "emotion_seductive__tag_008",
+          "text": "fuck-me eyes",
+          "facts": {
+            "semantic_role": "selector",
+            "emotion": "seductive"
+          }
+        },
+        {
+          "id": "emotion_seductive__tag_009",
+          "text": "smoldering gaze",
+          "facts": {
+            "semantic_role": "selector",
+            "emotion": "seductive"
+          }
+        },
+        {
+          "id": "emotion_seductive__tag_010",
+          "text": "knowing smirk",
+          "facts": {
+            "semantic_role": "selector",
+            "emotion": "seductive"
+          }
+        },
+        {
+          "id": "emotion_seductive__tag_011",
+          "text": "sultry pout",
+          "facts": {
+            "semantic_role": "selector",
+            "emotion": "seductive"
+          }
+        }
+      ],
+      "id": "emotion_seductive",
+      "name_zh": "😏 魅惑/诱惑"
     },
     {
       "name": "😵 愉悦/高潮",
       "tags": [
-        "ecstatic expression",
-        "pleasure face",
-        "arched eyebrows",
-        "open mouth moaning",
-        "gasping",
-        "biting lip in pleasure",
-        "euphoric expression",
-        "eyes squeezed shut in pleasure",
-        "cross-eyed from ecstasy",
-        "mouth wide moaning"
-      ]
+        {
+          "id": "emotion_pleasure__tag_000",
+          "text": "ecstatic expression",
+          "facts": {
+            "semantic_role": "selector",
+            "emotion": "pleasure"
+          }
+        },
+        {
+          "id": "emotion_pleasure__tag_001",
+          "text": "pleasure face",
+          "facts": {
+            "semantic_role": "selector",
+            "emotion": "pleasure"
+          }
+        },
+        {
+          "id": "emotion_pleasure__tag_002",
+          "text": "arched eyebrows",
+          "facts": {
+            "semantic_role": "selector",
+            "emotion": "pleasure"
+          }
+        },
+        {
+          "id": "emotion_pleasure__tag_003",
+          "text": "open mouth moaning",
+          "facts": {
+            "semantic_role": "selector",
+            "emotion": "pleasure"
+          }
+        },
+        {
+          "id": "emotion_pleasure__tag_004",
+          "text": "gasping",
+          "facts": {
+            "semantic_role": "selector",
+            "emotion": "pleasure"
+          }
+        },
+        {
+          "id": "emotion_pleasure__tag_005",
+          "text": "biting lip in pleasure",
+          "facts": {
+            "semantic_role": "selector",
+            "emotion": "pleasure"
+          }
+        },
+        {
+          "id": "emotion_pleasure__tag_006",
+          "text": "euphoric expression",
+          "facts": {
+            "semantic_role": "selector",
+            "emotion": "pleasure"
+          }
+        },
+        {
+          "id": "emotion_pleasure__tag_007",
+          "text": "eyes squeezed shut in pleasure",
+          "facts": {
+            "semantic_role": "selector",
+            "emotion": "pleasure"
+          }
+        },
+        {
+          "id": "emotion_pleasure__tag_008",
+          "text": "cross-eyed from ecstasy",
+          "facts": {
+            "semantic_role": "selector",
+            "emotion": "pleasure"
+          }
+        },
+        {
+          "id": "emotion_pleasure__tag_009",
+          "text": "mouth wide moaning",
+          "facts": {
+            "semantic_role": "selector",
+            "emotion": "pleasure"
+          }
+        }
+      ],
+      "id": "emotion_pleasure",
+      "name_zh": "😵 愉悦/高潮"
     },
     {
       "name": "🙇 服从/顺从",
       "tags": [
-        "submissive look",
-        "pleading eyes",
-        "teary eyes",
-        "helpless expression",
-        "obedient face",
-        "awaiting command",
-        "vulnerable expression",
-        "worship face",
-        "devoted look",
-        "please-have-mercy face"
-      ]
+        {
+          "id": "emotion_submissive__tag_000",
+          "text": "submissive look",
+          "facts": {
+            "semantic_role": "selector",
+            "emotion": "submissive"
+          }
+        },
+        {
+          "id": "emotion_submissive__tag_001",
+          "text": "pleading eyes",
+          "facts": {
+            "semantic_role": "selector",
+            "emotion": "submissive"
+          }
+        },
+        {
+          "id": "emotion_submissive__tag_002",
+          "text": "teary eyes",
+          "facts": {
+            "semantic_role": "selector",
+            "emotion": "submissive"
+          }
+        },
+        {
+          "id": "emotion_submissive__tag_003",
+          "text": "helpless expression",
+          "facts": {
+            "semantic_role": "selector",
+            "emotion": "submissive"
+          }
+        },
+        {
+          "id": "emotion_submissive__tag_004",
+          "text": "obedient face",
+          "facts": {
+            "semantic_role": "selector",
+            "emotion": "submissive"
+          }
+        },
+        {
+          "id": "emotion_submissive__tag_005",
+          "text": "awaiting command",
+          "facts": {
+            "semantic_role": "selector",
+            "emotion": "submissive"
+          }
+        },
+        {
+          "id": "emotion_submissive__tag_006",
+          "text": "vulnerable expression",
+          "facts": {
+            "semantic_role": "selector",
+            "emotion": "submissive"
+          }
+        },
+        {
+          "id": "emotion_submissive__tag_007",
+          "text": "worship face",
+          "facts": {
+            "semantic_role": "selector",
+            "emotion": "submissive"
+          }
+        },
+        {
+          "id": "emotion_submissive__tag_008",
+          "text": "devoted look",
+          "facts": {
+            "semantic_role": "selector",
+            "emotion": "submissive"
+          }
+        },
+        {
+          "id": "emotion_submissive__tag_009",
+          "text": "please-have-mercy face",
+          "facts": {
+            "semantic_role": "selector",
+            "emotion": "submissive"
+          }
+        }
+      ],
+      "id": "emotion_submissive",
+      "name_zh": "🙇 服从/顺从"
     },
     {
       "name": "😜 俏皮/调皮",
       "tags": [
-        "playful smile",
-        "winking",
-        "tongue out",
-        "teasing grin",
-        "mischievous look",
-        "laughing",
-        "bright smile",
-        "cheeky expression",
-        "naughty smile",
-        "sly grin",
-        "sticking tongue out playfully"
-      ]
+        {
+          "id": "emotion_playful__tag_000",
+          "text": "playful smile",
+          "facts": {
+            "semantic_role": "selector",
+            "emotion": "playful"
+          }
+        },
+        {
+          "id": "emotion_playful__tag_001",
+          "text": "winking",
+          "facts": {
+            "semantic_role": "selector",
+            "emotion": "playful"
+          }
+        },
+        {
+          "id": "emotion_playful__tag_002",
+          "text": "tongue out",
+          "facts": {
+            "semantic_role": "selector",
+            "emotion": "playful"
+          }
+        },
+        {
+          "id": "emotion_playful__tag_003",
+          "text": "teasing grin",
+          "facts": {
+            "semantic_role": "selector",
+            "emotion": "playful"
+          }
+        },
+        {
+          "id": "emotion_playful__tag_004",
+          "text": "mischievous look",
+          "facts": {
+            "semantic_role": "selector",
+            "emotion": "playful"
+          }
+        },
+        {
+          "id": "emotion_playful__tag_005",
+          "text": "laughing",
+          "facts": {
+            "semantic_role": "selector",
+            "emotion": "playful"
+          }
+        },
+        {
+          "id": "emotion_playful__tag_006",
+          "text": "bright smile",
+          "facts": {
+            "semantic_role": "selector",
+            "emotion": "playful"
+          }
+        },
+        {
+          "id": "emotion_playful__tag_007",
+          "text": "cheeky expression",
+          "facts": {
+            "semantic_role": "selector",
+            "emotion": "playful"
+          }
+        },
+        {
+          "id": "emotion_playful__tag_008",
+          "text": "naughty smile",
+          "facts": {
+            "semantic_role": "selector",
+            "emotion": "playful"
+          }
+        },
+        {
+          "id": "emotion_playful__tag_009",
+          "text": "sly grin",
+          "facts": {
+            "semantic_role": "selector",
+            "emotion": "playful"
+          }
+        },
+        {
+          "id": "emotion_playful__tag_010",
+          "text": "sticking tongue out playfully",
+          "facts": {
+            "semantic_role": "selector",
+            "emotion": "playful"
+          }
+        }
+      ],
+      "id": "emotion_playful",
+      "name_zh": "😜 俏皮/调皮"
     },
     {
       "name": "😖 痛苦/折磨（SM·凌辱专用）",
       "tags": [
-        "pained expression",
-        "grimacing",
-        "wincing",
-        "face contorted in pain",
-        "biting lip to endure",
-        "furrowed brows",
-        "pained but enduring",
-        "tears forming from pain",
-        "sharp intake breath face",
-        "whimpering expression",
-        "pained yet aroused",
-        "suffering face"
-      ]
+        {
+          "id": "emotion_pain__tag_000",
+          "text": "pained expression",
+          "facts": {
+            "semantic_role": "selector",
+            "emotion": "pain"
+          }
+        },
+        {
+          "id": "emotion_pain__tag_001",
+          "text": "grimacing",
+          "facts": {
+            "semantic_role": "selector",
+            "emotion": "pain"
+          }
+        },
+        {
+          "id": "emotion_pain__tag_002",
+          "text": "wincing",
+          "facts": {
+            "semantic_role": "selector",
+            "emotion": "pain"
+          }
+        },
+        {
+          "id": "emotion_pain__tag_003",
+          "text": "face contorted in pain",
+          "facts": {
+            "semantic_role": "selector",
+            "emotion": "pain"
+          }
+        },
+        {
+          "id": "emotion_pain__tag_004",
+          "text": "biting lip to endure",
+          "facts": {
+            "semantic_role": "selector",
+            "emotion": "pain"
+          }
+        },
+        {
+          "id": "emotion_pain__tag_005",
+          "text": "furrowed brows",
+          "facts": {
+            "semantic_role": "selector",
+            "emotion": "pain"
+          }
+        },
+        {
+          "id": "emotion_pain__tag_006",
+          "text": "pained but enduring",
+          "facts": {
+            "semantic_role": "selector",
+            "emotion": "pain"
+          }
+        },
+        {
+          "id": "emotion_pain__tag_007",
+          "text": "tears forming from pain",
+          "facts": {
+            "semantic_role": "selector",
+            "emotion": "pain"
+          }
+        },
+        {
+          "id": "emotion_pain__tag_008",
+          "text": "sharp intake breath face",
+          "facts": {
+            "semantic_role": "selector",
+            "emotion": "pain"
+          }
+        },
+        {
+          "id": "emotion_pain__tag_009",
+          "text": "whimpering expression",
+          "facts": {
+            "semantic_role": "selector",
+            "emotion": "pain"
+          }
+        },
+        {
+          "id": "emotion_pain__tag_010",
+          "text": "pained yet aroused",
+          "facts": {
+            "semantic_role": "selector",
+            "emotion": "pain"
+          }
+        },
+        {
+          "id": "emotion_pain__tag_011",
+          "text": "suffering face",
+          "facts": {
+            "semantic_role": "selector",
+            "emotion": "pain"
+          }
+        }
+      ],
+      "id": "emotion_pain",
+      "name_zh": "😖 痛苦/折磨（SM·凌辱专用）"
     },
     {
       "name": "😱 惊恐/被抓（偷拍·暴露专用）",
       "tags": [
-        "shocked expression",
-        "caught off guard",
-        "eyes wide in panic",
-        "frozen in fear",
-        "deer in headlights",
-        "panicked face",
-        "gasping in shock",
-        "hand to mouth in surprise",
-        "horrified realization",
-        "caught red-handed face"
-      ]
+        {
+          "id": "emotion_fear__tag_000",
+          "text": "shocked expression",
+          "facts": {
+            "semantic_role": "selector",
+            "emotion": "fear"
+          }
+        },
+        {
+          "id": "emotion_fear__tag_001",
+          "text": "caught off guard",
+          "facts": {
+            "semantic_role": "selector",
+            "emotion": "fear"
+          }
+        },
+        {
+          "id": "emotion_fear__tag_002",
+          "text": "eyes wide in panic",
+          "facts": {
+            "semantic_role": "selector",
+            "emotion": "fear"
+          }
+        },
+        {
+          "id": "emotion_fear__tag_003",
+          "text": "frozen in fear",
+          "facts": {
+            "semantic_role": "selector",
+            "emotion": "fear"
+          }
+        },
+        {
+          "id": "emotion_fear__tag_004",
+          "text": "deer in headlights",
+          "facts": {
+            "semantic_role": "selector",
+            "emotion": "fear"
+          }
+        },
+        {
+          "id": "emotion_fear__tag_005",
+          "text": "panicked face",
+          "facts": {
+            "semantic_role": "selector",
+            "emotion": "fear"
+          }
+        },
+        {
+          "id": "emotion_fear__tag_006",
+          "text": "gasping in shock",
+          "facts": {
+            "semantic_role": "selector",
+            "emotion": "fear"
+          }
+        },
+        {
+          "id": "emotion_fear__tag_007",
+          "text": "hand to mouth in surprise",
+          "facts": {
+            "semantic_role": "selector",
+            "emotion": "fear"
+          }
+        },
+        {
+          "id": "emotion_fear__tag_008",
+          "text": "horrified realization",
+          "facts": {
+            "semantic_role": "selector",
+            "emotion": "fear"
+          }
+        },
+        {
+          "id": "emotion_fear__tag_009",
+          "text": "caught red-handed face",
+          "facts": {
+            "semantic_role": "selector",
+            "emotion": "fear"
+          }
+        }
+      ],
+      "id": "emotion_fear",
+      "name_zh": "😱 惊恐/被抓（偷拍·暴露专用）"
     },
     {
       "name": "😴 恍惚/失神",
       "tags": [
-        "dazed expression",
-        "glazed eyes",
-        "unfocused gaze",
-        "clouded vision",
-        "intoxicated look",
-        "trance-like stare",
-        "dizzy with pleasure",
-        "mind blank expression",
-        "post-orgasm stupor",
-        "blank but satisfied"
-      ]
+        {
+          "id": "emotion_dazed__tag_000",
+          "text": "dazed expression",
+          "facts": {
+            "semantic_role": "selector",
+            "emotion": "dazed"
+          }
+        },
+        {
+          "id": "emotion_dazed__tag_001",
+          "text": "glazed eyes",
+          "facts": {
+            "semantic_role": "selector",
+            "emotion": "dazed"
+          }
+        },
+        {
+          "id": "emotion_dazed__tag_002",
+          "text": "unfocused gaze",
+          "facts": {
+            "semantic_role": "selector",
+            "emotion": "dazed"
+          }
+        },
+        {
+          "id": "emotion_dazed__tag_003",
+          "text": "clouded vision",
+          "facts": {
+            "semantic_role": "selector",
+            "emotion": "dazed"
+          }
+        },
+        {
+          "id": "emotion_dazed__tag_004",
+          "text": "intoxicated look",
+          "facts": {
+            "semantic_role": "selector",
+            "emotion": "dazed"
+          }
+        },
+        {
+          "id": "emotion_dazed__tag_005",
+          "text": "trance-like stare",
+          "facts": {
+            "semantic_role": "selector",
+            "emotion": "dazed"
+          }
+        },
+        {
+          "id": "emotion_dazed__tag_006",
+          "text": "dizzy with pleasure",
+          "facts": {
+            "semantic_role": "selector",
+            "emotion": "dazed"
+          }
+        },
+        {
+          "id": "emotion_dazed__tag_007",
+          "text": "mind blank expression",
+          "facts": {
+            "semantic_role": "selector",
+            "emotion": "dazed"
+          }
+        },
+        {
+          "id": "emotion_dazed__tag_008",
+          "text": "post-orgasm stupor",
+          "facts": {
+            "semantic_role": "selector",
+            "emotion": "dazed"
+          }
+        },
+        {
+          "id": "emotion_dazed__tag_009",
+          "text": "blank but satisfied",
+          "facts": {
+            "semantic_role": "selector",
+            "emotion": "dazed"
+          }
+        }
+      ],
+      "id": "emotion_dazed",
+      "name_zh": "😴 恍惚/失神"
     },
     {
       "name": "😰 隐忍/克制",
       "tags": [
-        "biting back moans",
-        "hand over mouth to silence",
-        "trying to stay quiet",
-        "holding back face",
-        "tensed jaw",
-        "veins on neck from restraint",
-        "struggling to keep composure",
-        "barely holding together",
-        "expression of someone trying not to make noise"
-      ]
+        {
+          "id": "emotion_restrained__tag_000",
+          "text": "biting back moans",
+          "facts": {
+            "semantic_role": "selector",
+            "emotion": "restrained"
+          }
+        },
+        {
+          "id": "emotion_restrained__tag_001",
+          "text": "hand over mouth to silence",
+          "facts": {
+            "semantic_role": "selector",
+            "emotion": "restrained"
+          }
+        },
+        {
+          "id": "emotion_restrained__tag_002",
+          "text": "trying to stay quiet",
+          "facts": {
+            "semantic_role": "selector",
+            "emotion": "restrained"
+          }
+        },
+        {
+          "id": "emotion_restrained__tag_003",
+          "text": "holding back face",
+          "facts": {
+            "semantic_role": "selector",
+            "emotion": "restrained"
+          }
+        },
+        {
+          "id": "emotion_restrained__tag_004",
+          "text": "tensed jaw",
+          "facts": {
+            "semantic_role": "selector",
+            "emotion": "restrained"
+          }
+        },
+        {
+          "id": "emotion_restrained__tag_005",
+          "text": "veins on neck from restraint",
+          "facts": {
+            "semantic_role": "selector",
+            "emotion": "restrained"
+          }
+        },
+        {
+          "id": "emotion_restrained__tag_006",
+          "text": "struggling to keep composure",
+          "facts": {
+            "semantic_role": "selector",
+            "emotion": "restrained"
+          }
+        },
+        {
+          "id": "emotion_restrained__tag_007",
+          "text": "barely holding together",
+          "facts": {
+            "semantic_role": "selector",
+            "emotion": "restrained"
+          }
+        },
+        {
+          "id": "emotion_restrained__tag_008",
+          "text": "expression of someone trying not to make noise",
+          "facts": {
+            "semantic_role": "selector",
+            "emotion": "restrained"
+          }
+        }
+      ],
+      "id": "emotion_restrained",
+      "name_zh": "😰 隐忍/克制"
     },
     {
       "name": "🥱 冷淡/无聊（风俗·被动专用）",
       "tags": [
-        "bored expression",
-        "deadpan face",
-        "looking away uninterested",
-        "unimpressed look",
-        "going through the motions",
-        "blank stare",
-        "flat expression",
-        "emotionally detached",
-        "mechanical compliance",
-        "empty inside face"
-      ]
+        {
+          "id": "emotion_detached__tag_000",
+          "text": "bored expression",
+          "facts": {
+            "semantic_role": "selector",
+            "emotion": "detached"
+          }
+        },
+        {
+          "id": "emotion_detached__tag_001",
+          "text": "deadpan face",
+          "facts": {
+            "semantic_role": "selector",
+            "emotion": "detached"
+          }
+        },
+        {
+          "id": "emotion_detached__tag_002",
+          "text": "looking away uninterested",
+          "facts": {
+            "semantic_role": "selector",
+            "emotion": "detached",
+            "gaze": "away"
+          }
+        },
+        {
+          "id": "emotion_detached__tag_003",
+          "text": "unimpressed look",
+          "facts": {
+            "semantic_role": "selector",
+            "emotion": "detached"
+          }
+        },
+        {
+          "id": "emotion_detached__tag_004",
+          "text": "going through the motions",
+          "facts": {
+            "semantic_role": "selector",
+            "emotion": "detached"
+          }
+        },
+        {
+          "id": "emotion_detached__tag_005",
+          "text": "blank stare",
+          "facts": {
+            "semantic_role": "selector",
+            "emotion": "detached"
+          }
+        },
+        {
+          "id": "emotion_detached__tag_006",
+          "text": "flat expression",
+          "facts": {
+            "semantic_role": "selector",
+            "emotion": "detached"
+          }
+        },
+        {
+          "id": "emotion_detached__tag_007",
+          "text": "emotionally detached",
+          "facts": {
+            "semantic_role": "selector",
+            "emotion": "detached"
+          }
+        },
+        {
+          "id": "emotion_detached__tag_008",
+          "text": "mechanical compliance",
+          "facts": {
+            "semantic_role": "selector",
+            "emotion": "detached"
+          }
+        },
+        {
+          "id": "emotion_detached__tag_009",
+          "text": "empty inside face",
+          "facts": {
+            "semantic_role": "selector",
+            "emotion": "detached"
+          }
+        }
+      ],
+      "id": "emotion_detached",
+      "name_zh": "🥱 冷淡/无聊（风俗·被动专用）"
     },
     {
       "name": "🔀 反差/矛盾（复合情绪）",
       "tags": [
-        "innocent face but aroused body",
-        "shy smile but legs spread",
-        "embarrassed pleasure",
-        "reluctant enjoyment",
-        "trying to resist but moaning",
-        "ashamed of own desire",
-        "good girl face doing bad things",
-        "virgin look but whore body"
-      ]
+        {
+          "id": "emotion_contrast__tag_000",
+          "text": "innocent face but aroused body",
+          "facts": {
+            "semantic_role": "selector",
+            "emotion": "contrast"
+          }
+        },
+        {
+          "id": "emotion_contrast__tag_001",
+          "text": "shy smile but legs spread",
+          "facts": {
+            "semantic_role": "selector",
+            "emotion": "contrast"
+          }
+        },
+        {
+          "id": "emotion_contrast__tag_002",
+          "text": "embarrassed pleasure",
+          "facts": {
+            "semantic_role": "selector",
+            "emotion": "contrast"
+          }
+        },
+        {
+          "id": "emotion_contrast__tag_003",
+          "text": "reluctant enjoyment",
+          "facts": {
+            "semantic_role": "selector",
+            "emotion": "contrast"
+          }
+        },
+        {
+          "id": "emotion_contrast__tag_004",
+          "text": "trying to resist but moaning",
+          "facts": {
+            "semantic_role": "selector",
+            "emotion": "contrast"
+          }
+        },
+        {
+          "id": "emotion_contrast__tag_005",
+          "text": "ashamed of own desire",
+          "facts": {
+            "semantic_role": "selector",
+            "emotion": "contrast"
+          }
+        },
+        {
+          "id": "emotion_contrast__tag_006",
+          "text": "good girl face doing bad things",
+          "facts": {
+            "semantic_role": "selector",
+            "emotion": "contrast"
+          }
+        },
+        {
+          "id": "emotion_contrast__tag_007",
+          "text": "virgin look but whore body",
+          "facts": {
+            "semantic_role": "selector",
+            "emotion": "contrast"
+          }
+        }
+      ],
+      "id": "emotion_contrast",
+      "name_zh": "🔀 反差/矛盾（复合情绪）"
     }
   ],
   "gaze_rules": [
     {
       "name": "★ 勾引眼神（最通用，95% 场景可用）",
       "tags": [
-        "looking up through lower lashes",
-        "seductive sidelong glance",
-        "making eye contact with camera then breaking away shyly",
-        "glancing back over shoulder with inviting gaze",
-        "peeking with one eye",
-        "batting eyelashes",
-        "coy look"
-      ]
+        {
+          "id": "gaze_seductive_direct__tag_000",
+          "text": "looking up through lower lashes",
+          "facts": {
+            "semantic_role": "selector",
+            "gaze": "camera"
+          }
+        },
+        {
+          "id": "gaze_seductive_direct__tag_001",
+          "text": "seductive sidelong glance",
+          "facts": {
+            "semantic_role": "selector",
+            "gaze": "camera"
+          }
+        },
+        {
+          "id": "gaze_seductive_direct__tag_002",
+          "text": "making eye contact with camera then breaking away shyly",
+          "facts": {
+            "semantic_role": "selector",
+            "gaze": "camera"
+          }
+        },
+        {
+          "id": "gaze_seductive_direct__tag_003",
+          "text": "glancing back over shoulder with inviting gaze",
+          "facts": {
+            "semantic_role": "selector",
+            "gaze": "camera"
+          }
+        },
+        {
+          "id": "gaze_seductive_direct__tag_004",
+          "text": "peeking with one eye",
+          "facts": {
+            "semantic_role": "selector",
+            "gaze": "camera"
+          }
+        },
+        {
+          "id": "gaze_seductive_direct__tag_005",
+          "text": "batting eyelashes",
+          "facts": {
+            "semantic_role": "selector",
+            "gaze": "camera"
+          }
+        },
+        {
+          "id": "gaze_seductive_direct__tag_006",
+          "text": "coy look",
+          "facts": {
+            "semantic_role": "selector",
+            "gaze": "camera"
+          }
+        }
+      ],
+      "id": "gaze_seductive_direct",
+      "name_zh": "★ 勾引眼神（最通用，95% 场景可用）"
     },
     {
       "name": "★ 迷离失神（高潮必备）",
       "tags": [
-        "eyes half-lidded",
-        "glassy unfocused gaze",
-        "heavy eyelids",
-        "pupils dilated",
-        "dazed expression",
-        "gaze drifted beyond camera",
-        "eyes losing focus",
-        "looking at nothing",
-        "vacant stare",
-        "blank glassy eyes"
-      ]
+        {
+          "id": "gaze_dazed_pleasure__tag_000",
+          "text": "eyes half-lidded",
+          "facts": {
+            "semantic_role": "selector",
+            "gaze": "neutral"
+          }
+        },
+        {
+          "id": "gaze_dazed_pleasure__tag_001",
+          "text": "glassy unfocused gaze",
+          "facts": {
+            "semantic_role": "selector",
+            "gaze": "neutral"
+          }
+        },
+        {
+          "id": "gaze_dazed_pleasure__tag_002",
+          "text": "heavy eyelids",
+          "facts": {
+            "semantic_role": "selector",
+            "gaze": "neutral"
+          }
+        },
+        {
+          "id": "gaze_dazed_pleasure__tag_003",
+          "text": "pupils dilated",
+          "facts": {
+            "semantic_role": "selector",
+            "gaze": "neutral"
+          }
+        },
+        {
+          "id": "gaze_dazed_pleasure__tag_004",
+          "text": "dazed expression",
+          "facts": {
+            "semantic_role": "selector",
+            "gaze": "neutral"
+          }
+        },
+        {
+          "id": "gaze_dazed_pleasure__tag_005",
+          "text": "gaze drifted beyond camera",
+          "facts": {
+            "semantic_role": "selector",
+            "gaze": "neutral"
+          }
+        },
+        {
+          "id": "gaze_dazed_pleasure__tag_006",
+          "text": "eyes losing focus",
+          "facts": {
+            "semantic_role": "selector",
+            "gaze": "neutral"
+          }
+        },
+        {
+          "id": "gaze_dazed_pleasure__tag_007",
+          "text": "looking at nothing",
+          "facts": {
+            "semantic_role": "selector",
+            "gaze": "neutral"
+          }
+        },
+        {
+          "id": "gaze_dazed_pleasure__tag_008",
+          "text": "vacant stare",
+          "facts": {
+            "semantic_role": "selector",
+            "gaze": "neutral"
+          }
+        },
+        {
+          "id": "gaze_dazed_pleasure__tag_009",
+          "text": "blank glassy eyes",
+          "facts": {
+            "semantic_role": "selector",
+            "gaze": "neutral"
+          }
+        }
+      ],
+      "id": "gaze_dazed_pleasure",
+      "name_zh": "★ 迷离失神（高潮必备）"
     },
     {
       "name": "★ 羞耻回避（暴露/偷拍场景）",
       "tags": [
-        "shy averted gaze",
-        "looking away in embarrassment",
-        "eyes squeezed shut in shame but face flushed",
-        "face hiding behind hands but eyes peeking through fingers",
-        "hiding eyes with arm",
-        "eyes downcast but body exposed",
-        "can't hold eye contact",
-        "blushing and avoiding gaze"
-      ]
+        {
+          "id": "gaze_shy_avoidant__tag_000",
+          "text": "shy averted gaze",
+          "facts": {
+            "semantic_role": "selector",
+            "gaze": "away"
+          }
+        },
+        {
+          "id": "gaze_shy_avoidant__tag_001",
+          "text": "looking away in embarrassment",
+          "facts": {
+            "semantic_role": "selector",
+            "gaze": "away"
+          }
+        },
+        {
+          "id": "gaze_shy_avoidant__tag_002",
+          "text": "eyes squeezed shut in shame but face flushed",
+          "facts": {
+            "semantic_role": "selector",
+            "gaze": "away"
+          }
+        },
+        {
+          "id": "gaze_shy_avoidant__tag_003",
+          "text": "face hiding behind hands but eyes peeking through fingers",
+          "facts": {
+            "semantic_role": "selector",
+            "gaze": "away"
+          }
+        },
+        {
+          "id": "gaze_shy_avoidant__tag_004",
+          "text": "hiding eyes with arm",
+          "facts": {
+            "semantic_role": "selector",
+            "gaze": "away"
+          }
+        },
+        {
+          "id": "gaze_shy_avoidant__tag_005",
+          "text": "eyes downcast but body exposed",
+          "facts": {
+            "semantic_role": "selector",
+            "gaze": "away"
+          }
+        },
+        {
+          "id": "gaze_shy_avoidant__tag_006",
+          "text": "can't hold eye contact",
+          "facts": {
+            "semantic_role": "selector",
+            "gaze": "away"
+          }
+        },
+        {
+          "id": "gaze_shy_avoidant__tag_007",
+          "text": "blushing and avoiding gaze",
+          "facts": {
+            "semantic_role": "selector",
+            "gaze": "away"
+          }
+        }
+      ],
+      "id": "gaze_shy_avoidant",
+      "name_zh": "★ 羞耻回避（暴露/偷拍场景）"
     },
     {
       "name": "乞求哀怨（服从/调教场景）",
       "tags": [
-        "puppy eyes pleading for mercy",
-        "desperate watery eyes looking up",
-        "pleading upward gaze",
-        "helpless begging eyes",
-        "submissive downcast eyes",
-        "pleading through lashes",
-        "begging without words",
-        "please-have-mercy gaze"
-      ]
+        {
+          "id": "gaze_pleading_submissive__tag_000",
+          "text": "puppy eyes pleading for mercy",
+          "facts": {
+            "semantic_role": "selector",
+            "gaze": "up"
+          }
+        },
+        {
+          "id": "gaze_pleading_submissive__tag_001",
+          "text": "desperate watery eyes looking up",
+          "facts": {
+            "semantic_role": "selector",
+            "gaze": "up"
+          }
+        },
+        {
+          "id": "gaze_pleading_submissive__tag_002",
+          "text": "pleading upward gaze",
+          "facts": {
+            "semantic_role": "selector",
+            "gaze": "up"
+          }
+        },
+        {
+          "id": "gaze_pleading_submissive__tag_003",
+          "text": "helpless begging eyes",
+          "facts": {
+            "semantic_role": "selector",
+            "gaze": "up"
+          }
+        },
+        {
+          "id": "gaze_pleading_submissive__tag_004",
+          "text": "submissive downcast eyes",
+          "facts": {
+            "semantic_role": "selector",
+            "gaze": "up"
+          }
+        },
+        {
+          "id": "gaze_pleading_submissive__tag_005",
+          "text": "pleading through lashes",
+          "facts": {
+            "semantic_role": "selector",
+            "gaze": "up"
+          }
+        },
+        {
+          "id": "gaze_pleading_submissive__tag_006",
+          "text": "begging without words",
+          "facts": {
+            "semantic_role": "selector",
+            "gaze": "up"
+          }
+        },
+        {
+          "id": "gaze_pleading_submissive__tag_007",
+          "text": "please-have-mercy gaze",
+          "facts": {
+            "semantic_role": "selector",
+            "gaze": "up"
+          }
+        }
+      ],
+      "id": "gaze_pleading_submissive",
+      "name_zh": "乞求哀怨（服从/调教场景）"
     },
     {
       "name": "放空虚无（高潮后/药物/催眠场景）",
       "tags": [
-        "empty hollow eyes",
-        "no thoughts behind gaze",
-        "eyes rolled back showing whites",
-        "blank exhausted stare",
-        "post-orgasm glaze",
-        "used and satisfied emptiness",
-        "soulless submissive gaze",
-        "broken surrender eyes"
-      ]
+        {
+          "id": "gaze_vacant_empty__tag_000",
+          "text": "empty hollow eyes",
+          "facts": {
+            "semantic_role": "selector",
+            "gaze": "neutral"
+          }
+        },
+        {
+          "id": "gaze_vacant_empty__tag_001",
+          "text": "no thoughts behind gaze",
+          "facts": {
+            "semantic_role": "selector",
+            "gaze": "neutral"
+          }
+        },
+        {
+          "id": "gaze_vacant_empty__tag_002",
+          "text": "eyes rolled back showing whites",
+          "facts": {
+            "semantic_role": "selector",
+            "gaze": "neutral"
+          }
+        },
+        {
+          "id": "gaze_vacant_empty__tag_003",
+          "text": "blank exhausted stare",
+          "facts": {
+            "semantic_role": "selector",
+            "gaze": "neutral"
+          }
+        },
+        {
+          "id": "gaze_vacant_empty__tag_004",
+          "text": "post-orgasm glaze",
+          "facts": {
+            "semantic_role": "selector",
+            "gaze": "neutral"
+          }
+        },
+        {
+          "id": "gaze_vacant_empty__tag_005",
+          "text": "used and satisfied emptiness",
+          "facts": {
+            "semantic_role": "selector",
+            "gaze": "neutral"
+          }
+        },
+        {
+          "id": "gaze_vacant_empty__tag_006",
+          "text": "soulless submissive gaze",
+          "facts": {
+            "semantic_role": "selector",
+            "gaze": "neutral"
+          }
+        },
+        {
+          "id": "gaze_vacant_empty__tag_007",
+          "text": "broken surrender eyes",
+          "facts": {
+            "semantic_role": "selector",
+            "gaze": "neutral"
+          }
+        }
+      ],
+      "id": "gaze_vacant_empty",
+      "name_zh": "放空虚无（高潮后/药物/催眠场景）"
     },
     {
       "name": "惊恐被抓（偷拍/暴露/凌辱场景）",
       "tags": [
-        "eyes wide in panic",
-        "frozen fear",
-        "deer-in-headlights stare",
-        "wide open shocked eyes",
-        "panicked desperate gaze",
-        "horrified frozen face",
-        "eyes screaming in fear",
-        "caught-red-handed terrified eyes"
-      ]
+        {
+          "id": "gaze_fear_caught__tag_000",
+          "text": "eyes wide in panic",
+          "facts": {
+            "semantic_role": "selector",
+            "gaze": "camera"
+          }
+        },
+        {
+          "id": "gaze_fear_caught__tag_001",
+          "text": "frozen fear",
+          "facts": {
+            "semantic_role": "selector",
+            "gaze": "camera"
+          }
+        },
+        {
+          "id": "gaze_fear_caught__tag_002",
+          "text": "deer-in-headlights stare",
+          "facts": {
+            "semantic_role": "selector",
+            "gaze": "camera"
+          }
+        },
+        {
+          "id": "gaze_fear_caught__tag_003",
+          "text": "wide open shocked eyes",
+          "facts": {
+            "semantic_role": "selector",
+            "gaze": "camera"
+          }
+        },
+        {
+          "id": "gaze_fear_caught__tag_004",
+          "text": "panicked desperate gaze",
+          "facts": {
+            "semantic_role": "selector",
+            "gaze": "camera"
+          }
+        },
+        {
+          "id": "gaze_fear_caught__tag_005",
+          "text": "horrified frozen face",
+          "facts": {
+            "semantic_role": "selector",
+            "gaze": "camera"
+          }
+        },
+        {
+          "id": "gaze_fear_caught__tag_006",
+          "text": "eyes screaming in fear",
+          "facts": {
+            "semantic_role": "selector",
+            "gaze": "camera"
+          }
+        },
+        {
+          "id": "gaze_fear_caught__tag_007",
+          "text": "caught-red-handed terrified eyes",
+          "facts": {
+            "semantic_role": "selector",
+            "gaze": "camera"
+          }
+        }
+      ],
+      "id": "gaze_fear_caught",
+      "name_zh": "惊恐被抓（偷拍/暴露/凌辱场景）"
     },
     {
       "name": "挑逗诱惑（主动 / 放荡场景）",
       "tags": [
-        "eye-fucking the viewer",
-        "predatory inviting gaze",
-        "devouring hungry stare",
-        "wanton greedy eyes",
-        "smoldering intensity",
-        "challenging dominant gaze",
-        "lustful stare",
-        "insatiable wanting eyes"
-      ]
+        {
+          "id": "gaze_teasing_provocative__tag_000",
+          "text": "eye-fucking the viewer",
+          "facts": {
+            "semantic_role": "selector",
+            "gaze": "side"
+          }
+        },
+        {
+          "id": "gaze_teasing_provocative__tag_001",
+          "text": "predatory inviting gaze",
+          "facts": {
+            "semantic_role": "selector",
+            "gaze": "side"
+          }
+        },
+        {
+          "id": "gaze_teasing_provocative__tag_002",
+          "text": "devouring hungry stare",
+          "facts": {
+            "semantic_role": "selector",
+            "gaze": "side"
+          }
+        },
+        {
+          "id": "gaze_teasing_provocative__tag_003",
+          "text": "wanton greedy eyes",
+          "facts": {
+            "semantic_role": "selector",
+            "gaze": "side"
+          }
+        },
+        {
+          "id": "gaze_teasing_provocative__tag_004",
+          "text": "smoldering intensity",
+          "facts": {
+            "semantic_role": "selector",
+            "gaze": "side"
+          }
+        },
+        {
+          "id": "gaze_teasing_provocative__tag_005",
+          "text": "challenging dominant gaze",
+          "facts": {
+            "semantic_role": "selector",
+            "gaze": "side"
+          }
+        },
+        {
+          "id": "gaze_teasing_provocative__tag_006",
+          "text": "lustful stare",
+          "facts": {
+            "semantic_role": "selector",
+            "gaze": "side"
+          }
+        },
+        {
+          "id": "gaze_teasing_provocative__tag_007",
+          "text": "insatiable wanting eyes",
+          "facts": {
+            "semantic_role": "selector",
+            "gaze": "side"
+          }
+        }
+      ],
+      "id": "gaze_teasing_provocative",
+      "name_zh": "挑逗诱惑（主动 / 放荡场景）"
     },
     {
       "name": "湿润含泪（情绪加成，非主角）",
       "tags": [
-        "watery glistening eyes",
-        "glassy dewy gaze",
-        "glistening wet lashes",
-        "tears welling up",
-        "red-rimmed aroused eyes",
-        "teary but pleasure-filled",
-        "mascara-smudged eyes (after context)"
-      ]
+        {
+          "id": "gaze_moist_tearful__tag_000",
+          "text": "watery glistening eyes",
+          "facts": {
+            "semantic_role": "selector",
+            "gaze": "neutral"
+          }
+        },
+        {
+          "id": "gaze_moist_tearful__tag_001",
+          "text": "glassy dewy gaze",
+          "facts": {
+            "semantic_role": "selector",
+            "gaze": "neutral"
+          }
+        },
+        {
+          "id": "gaze_moist_tearful__tag_002",
+          "text": "glistening wet lashes",
+          "facts": {
+            "semantic_role": "selector",
+            "gaze": "neutral"
+          }
+        },
+        {
+          "id": "gaze_moist_tearful__tag_003",
+          "text": "tears welling up",
+          "facts": {
+            "semantic_role": "selector",
+            "gaze": "neutral"
+          }
+        },
+        {
+          "id": "gaze_moist_tearful__tag_004",
+          "text": "red-rimmed aroused eyes",
+          "facts": {
+            "semantic_role": "selector",
+            "gaze": "neutral"
+          }
+        },
+        {
+          "id": "gaze_moist_tearful__tag_005",
+          "text": "teary but pleasure-filled",
+          "facts": {
+            "semantic_role": "selector",
+            "gaze": "neutral"
+          }
+        },
+        {
+          "id": "gaze_moist_tearful__tag_006",
+          "text": "mascara-smudged eyes (after context)",
+          "facts": {
+            "semantic_role": "selector",
+            "gaze": "neutral"
+          }
+        }
+      ],
+      "id": "gaze_moist_tearful",
+      "name_zh": "湿润含泪（情绪加成，非主角）"
     }
   ],
   "mouth_actions": [
     {
       "name": "闭合状态",
       "tags": [
-        "lips gently closed",
-        "soft relaxed mouth",
-        "neutral expression",
-        "pursed lips",
-        "tight-lipped",
-        "lips pressed together",
-        "smiling with closed lips",
-        "slight smirk",
-        "pout"
-      ]
+        {
+          "id": "mouth_closed__tag_000",
+          "text": "lips gently closed",
+          "facts": {
+            "semantic_role": "selector"
+          }
+        },
+        {
+          "id": "mouth_closed__tag_001",
+          "text": "soft relaxed mouth",
+          "facts": {
+            "semantic_role": "selector"
+          }
+        },
+        {
+          "id": "mouth_closed__tag_002",
+          "text": "neutral expression",
+          "facts": {
+            "semantic_role": "selector"
+          }
+        },
+        {
+          "id": "mouth_closed__tag_003",
+          "text": "pursed lips",
+          "facts": {
+            "semantic_role": "selector"
+          }
+        },
+        {
+          "id": "mouth_closed__tag_004",
+          "text": "tight-lipped",
+          "facts": {
+            "semantic_role": "selector"
+          }
+        },
+        {
+          "id": "mouth_closed__tag_005",
+          "text": "lips pressed together",
+          "facts": {
+            "semantic_role": "selector"
+          }
+        },
+        {
+          "id": "mouth_closed__tag_006",
+          "text": "smiling with closed lips",
+          "facts": {
+            "semantic_role": "selector"
+          }
+        },
+        {
+          "id": "mouth_closed__tag_007",
+          "text": "slight smirk",
+          "facts": {
+            "semantic_role": "selector"
+          }
+        },
+        {
+          "id": "mouth_closed__tag_008",
+          "text": "pout",
+          "facts": {
+            "semantic_role": "selector"
+          }
+        }
+      ],
+      "id": "mouth_closed",
+      "name_zh": "闭合状态"
     },
     {
       "name": "张开状态",
       "tags": [
-        "mouth slightly open",
-        "lips parted",
-        "mouth agape",
-        "open mouth breathing",
-        "gasping mouth",
-        "moaning mouth",
-        "jaw dropped open",
-        "panting heavily",
-        "mouth open wide"
-      ]
+        {
+          "id": "mouth_open__tag_000",
+          "text": "mouth slightly open",
+          "facts": {
+            "semantic_role": "selector"
+          }
+        },
+        {
+          "id": "mouth_open__tag_001",
+          "text": "lips parted",
+          "facts": {
+            "semantic_role": "selector"
+          }
+        },
+        {
+          "id": "mouth_open__tag_002",
+          "text": "mouth agape",
+          "facts": {
+            "semantic_role": "selector"
+          }
+        },
+        {
+          "id": "mouth_open__tag_003",
+          "text": "open mouth breathing",
+          "facts": {
+            "semantic_role": "selector"
+          }
+        },
+        {
+          "id": "mouth_open__tag_004",
+          "text": "gasping mouth",
+          "facts": {
+            "semantic_role": "selector"
+          }
+        },
+        {
+          "id": "mouth_open__tag_005",
+          "text": "moaning mouth",
+          "facts": {
+            "semantic_role": "selector"
+          }
+        },
+        {
+          "id": "mouth_open__tag_006",
+          "text": "jaw dropped open",
+          "facts": {
+            "semantic_role": "selector"
+          }
+        },
+        {
+          "id": "mouth_open__tag_007",
+          "text": "panting heavily",
+          "facts": {
+            "semantic_role": "selector"
+          }
+        },
+        {
+          "id": "mouth_open__tag_008",
+          "text": "mouth open wide",
+          "facts": {
+            "semantic_role": "selector"
+          }
+        }
+      ],
+      "id": "mouth_open",
+      "name_zh": "张开状态"
     },
     {
       "name": "咬唇/含唇",
       "tags": [
-        "biting lower lip",
-        "biting upper lip",
-        "biting both lips",
-        "lip bite in pleasure",
-        "nervous lip bite",
-        "teasing lip bite",
-        "lips caught between teeth",
-        "chewing on lip"
-      ]
+        {
+          "id": "mouth_biting_lip__tag_000",
+          "text": "biting lower lip",
+          "facts": {
+            "semantic_role": "selector"
+          }
+        },
+        {
+          "id": "mouth_biting_lip__tag_001",
+          "text": "biting upper lip",
+          "facts": {
+            "semantic_role": "selector"
+          }
+        },
+        {
+          "id": "mouth_biting_lip__tag_002",
+          "text": "biting both lips",
+          "facts": {
+            "semantic_role": "selector"
+          }
+        },
+        {
+          "id": "mouth_biting_lip__tag_003",
+          "text": "lip bite in pleasure",
+          "facts": {
+            "semantic_role": "selector"
+          }
+        },
+        {
+          "id": "mouth_biting_lip__tag_004",
+          "text": "nervous lip bite",
+          "facts": {
+            "semantic_role": "selector"
+          }
+        },
+        {
+          "id": "mouth_biting_lip__tag_005",
+          "text": "teasing lip bite",
+          "facts": {
+            "semantic_role": "selector"
+          }
+        },
+        {
+          "id": "mouth_biting_lip__tag_006",
+          "text": "lips caught between teeth",
+          "facts": {
+            "semantic_role": "selector"
+          }
+        },
+        {
+          "id": "mouth_biting_lip__tag_007",
+          "text": "chewing on lip",
+          "facts": {
+            "semantic_role": "selector"
+          }
+        }
+      ],
+      "id": "mouth_biting_lip",
+      "name_zh": "咬唇/含唇"
     },
     {
       "name": "舌头状态",
       "tags": [
-        "tongue out",
-        "tongue tip visible between lips",
-        "tongue licking lips",
-        "tongue touching upper lip",
-        "tongue pressed against teeth",
-        "tongue hanging out panting",
-        "tongue curled",
-        "tongue flat out"
-      ]
+        {
+          "id": "mouth_tongue__tag_000",
+          "text": "tongue out",
+          "facts": {
+            "semantic_role": "selector"
+          }
+        },
+        {
+          "id": "mouth_tongue__tag_001",
+          "text": "tongue tip visible between lips",
+          "facts": {
+            "semantic_role": "selector"
+          }
+        },
+        {
+          "id": "mouth_tongue__tag_002",
+          "text": "tongue licking lips",
+          "facts": {
+            "semantic_role": "selector"
+          }
+        },
+        {
+          "id": "mouth_tongue__tag_003",
+          "text": "tongue touching upper lip",
+          "facts": {
+            "semantic_role": "selector"
+          }
+        },
+        {
+          "id": "mouth_tongue__tag_004",
+          "text": "tongue pressed against teeth",
+          "facts": {
+            "semantic_role": "selector"
+          }
+        },
+        {
+          "id": "mouth_tongue__tag_005",
+          "text": "tongue hanging out panting",
+          "facts": {
+            "semantic_role": "selector"
+          }
+        },
+        {
+          "id": "mouth_tongue__tag_006",
+          "text": "tongue curled",
+          "facts": {
+            "semantic_role": "selector"
+          }
+        },
+        {
+          "id": "mouth_tongue__tag_007",
+          "text": "tongue flat out",
+          "facts": {
+            "semantic_role": "selector"
+          }
+        }
+      ],
+      "id": "mouth_tongue",
+      "name_zh": "舌头状态"
     },
     {
       "name": "唾液/湿润",
       "tags": [
-        "drool from corner of mouth",
-        "saliva string from lips",
-        "wet glossy lips",
-        "drool on chin",
-        "saliva dripping",
-        "mouth glistening wet",
-        "spit trail",
-        "foamy saliva"
-      ]
+        {
+          "id": "mouth_saliva_wet__tag_000",
+          "text": "drool from corner of mouth",
+          "facts": {
+            "semantic_role": "selector"
+          }
+        },
+        {
+          "id": "mouth_saliva_wet__tag_001",
+          "text": "saliva string from lips",
+          "facts": {
+            "semantic_role": "selector"
+          }
+        },
+        {
+          "id": "mouth_saliva_wet__tag_002",
+          "text": "wet glossy lips",
+          "facts": {
+            "semantic_role": "selector"
+          }
+        },
+        {
+          "id": "mouth_saliva_wet__tag_003",
+          "text": "drool on chin",
+          "facts": {
+            "semantic_role": "selector"
+          }
+        },
+        {
+          "id": "mouth_saliva_wet__tag_004",
+          "text": "saliva dripping",
+          "facts": {
+            "semantic_role": "selector"
+          }
+        },
+        {
+          "id": "mouth_saliva_wet__tag_005",
+          "text": "mouth glistening wet",
+          "facts": {
+            "semantic_role": "selector"
+          }
+        },
+        {
+          "id": "mouth_saliva_wet__tag_006",
+          "text": "spit trail",
+          "facts": {
+            "semantic_role": "selector"
+          }
+        },
+        {
+          "id": "mouth_saliva_wet__tag_007",
+          "text": "foamy saliva",
+          "facts": {
+            "semantic_role": "selector"
+          }
+        }
+      ],
+      "id": "mouth_saliva_wet",
+      "name_zh": "唾液/湿润"
     }
   ],
   "progression_phases": [
@@ -379,7 +1936,8 @@
           "mouth": "lips just touching, barely there",
           "body": "tilting head, hand on neck"
         }
-      ]
+      ],
+      "id": "phase_1"
     },
     {
       "phase": "第二阶段：爱抚/探索（Foreplay）",
@@ -413,7 +1971,8 @@
           "mouth": "mouth open, tongue extended",
           "body": "kneeling, leaning forward, hands on thighs"
         }
-      ]
+      ],
+      "id": "phase_2"
     },
     {
       "phase": "第三阶段：进入/抽插（Penetration）",
@@ -447,7 +2006,8 @@
           "mouth": "panting, breathless moaning",
           "body": "hips meeting thrusts, involuntary movement"
         }
-      ]
+      ],
+      "id": "phase_3"
     },
     {
       "phase": "第四阶段：高潮/崩溃（Climax）",
@@ -481,7 +2041,8 @@
           "mouth": "panting with mouth open, catching breath",
           "body": "body going limp, still twitching"
         }
-      ]
+      ],
+      "id": "phase_4"
     },
     {
       "phase": "第五阶段：射精/释放（Ejaculation）",
@@ -515,7 +2076,8 @@
           "mouth": "mouth full, cheeks puffed",
           "body": "staying still, not swallowing yet"
         }
-      ]
+      ],
+      "id": "phase_5"
     },
     {
       "phase": "第六阶段：事后/余韵（Afterglow）",
@@ -556,7 +2118,8 @@
           "mouth": "mouth slightly open, nothing to say",
           "body": "lying apart, alone in same bed"
         }
-      ]
+      ],
+      "id": "phase_6"
     }
   ]
 }

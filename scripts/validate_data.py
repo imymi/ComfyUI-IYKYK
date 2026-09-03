@@ -13,6 +13,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 import sys
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -27,6 +28,8 @@ except ImportError:
 REPO_DIR = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(REPO_DIR))
 
+from lib.lexer import split_top_level_tags
+from lib.models import CANONICAL_RECIPE_SELECTORS, SelectionOrigin, SemanticFacts
 from lib.rule_contract import validate_rule_document
 from lib.runtime_manifest import RUNTIME_DATA_FILES
 
@@ -122,6 +125,7 @@ def validate_all(
                 result.errors.append(f"[ERROR] Schema validation error on {data_file}: {e}")
 
     # 3. 校验 scenes.json 结构与两阶段全局防冲突
+    id_regex = re.compile(r'^[a-z][a-z0-9_]{2,95}$')
     scenes_data = data_cache.get("scenes.json", {}).get("scenes", [])
     if not scenes_data:
         result.errors.append("[ERROR] scenes.json: No scenes defined")
@@ -173,7 +177,9 @@ def validate_all(
             if not anchors:
                 result.errors.append(f"[ERROR] scenes.json [{sid}]: anchor_tags must have at least 1 item")
 
-            overlap = set(anchors) & set(details)
+            anchor_texts = {a.get("text", a) if isinstance(a, dict) else str(a) for a in anchors}
+            detail_texts = {d.get("text", d) if isinstance(d, dict) else str(d) for d in details}
+            overlap = anchor_texts & detail_texts
             if overlap:
                 result.errors.append(f"[ERROR] scenes.json [{sid}]: overlapping tags between anchors and details: {overlap}")
 
@@ -198,44 +204,341 @@ def validate_all(
                 else:
                     global_scene_registry[norm_alias] = ("alias", sid, alias)
 
-    # 4. 校验 presets.json 结构
+    # 4. 校验 presets.json 结构与逐 Tag 逐字节等价性
+    preset_id_regex = re.compile(r'^[A-Za-z0-9_]{2,95}$')
     presets = data_cache.get("presets.json", {}).get("presets", [])
     if len(presets) < 70:
         result.errors.append(f"[ERROR] presets.json: Expected >=70 presets, got {len(presets)}")
-    seen_preset_ids: Set[str] = set()
-    for p in presets:
+    preset_catalog_registry: Dict[str, Tuple[str, str]] = {}
+    for p_idx, p in enumerate(presets):
         pid = p.get("id", "")
-        if not pid or pid in seen_preset_ids:
-            result.errors.append(f"[ERROR] presets.json: Invalid or duplicate preset id '{pid}'")
-        seen_preset_ids.add(pid)
+        if not pid or not isinstance(pid, str) or not preset_id_regex.match(pid):
+            result.errors.append(f"[ERROR] presets.json: Invalid preset id '{pid}'")
+        elif pid in preset_catalog_registry:
+            prev_kind, prev_path = preset_catalog_registry[pid]
+            result.errors.append(f"[ERROR] presets.json at presets[{p_idx}]: duplicate ID '{pid}' collides with {prev_kind} at {prev_path}")
+        else:
+            preset_catalog_registry[pid] = ("preset", f"presets[{p_idx}]")
+
         if not p.get("name_zh") or not p.get("positive"):
             result.errors.append(f"[ERROR] presets.json [{pid}]: Missing name_zh or positive prompt")
 
-    # 5. 校验 style_recipes.json 结构
+        frags = p.get("fragments")
+        if not frags or not isinstance(frags, list):
+            result.errors.append(f"[ERROR] presets.json [{pid}]: Missing or invalid fragments")
+            continue
+        expected_tags = split_top_level_tags(p.get("positive", ""))
+        actual_tags = [f.get("text", "") for f in frags]
+        if expected_tags != actual_tags:
+            result.errors.append(f"[ERROR] presets.json [{pid}]: fragments text mismatch with positive prompt: expected {expected_tags} vs actual {actual_tags}")
+        for idx, f in enumerate(frags):
+            actual_frag_keys = set(f.keys())
+            expected_frag_keys = {"id", "slot", "text", "facts", "origin"}
+            if actual_frag_keys != expected_frag_keys:
+                result.errors.append(f"[ERROR] presets.json [{pid}] fragment[{idx}]: invalid fragment keys: {sorted(actual_frag_keys)}")
+            fid = f.get("id")
+            frag_path = f"presets[{p_idx}][{pid}].fragments[{idx}]"
+            if not fid or not isinstance(fid, str) or not id_regex.match(fid):
+                result.errors.append(f"[ERROR] presets.json [{pid}] fragment[{idx}]: invalid fragment ID '{fid}'")
+            elif fid in preset_catalog_registry:
+                prev_kind, prev_path = preset_catalog_registry[fid]
+                result.errors.append(f"[ERROR] presets.json at {frag_path}: duplicate ID '{fid}' collides with {prev_kind} at {prev_path}")
+            else:
+                preset_catalog_registry[fid] = ("fragment", frag_path)
+
+            if not isinstance(f.get("text"), str) or len(f.get("text", "").strip()) == 0:
+                result.errors.append(f"[ERROR] presets.json [{pid}] fragment[{idx}]: fragment text must be non-empty str")
+            if not isinstance(f.get("facts"), dict):
+                result.errors.append(f"[ERROR] presets.json [{pid}] fragment[{idx}]: fragment facts must be dict")
+            else:
+                try:
+                    sf = SemanticFacts.from_dict(f.get("facts"))
+                    sf.validate()
+                except Exception as err:
+                    result.errors.append(f"[ERROR] presets.json [{pid}] fragment[{idx}]: invalid fragment facts: {err}")
+            orig = f.get("origin", {})
+            if not isinstance(orig, dict):
+                result.errors.append(f"[ERROR] presets.json [{pid}] fragment[{idx}]: origin must be dict")
+                continue
+            try:
+                SelectionOrigin.from_dict(orig)
+            except Exception as err:
+                result.errors.append(f"[ERROR] presets.json [{pid}] fragment[{idx}]: invalid fragment origin: {err}")
+            if orig.get("entry_point") != "preset_browser":
+                result.errors.append(f"[ERROR] presets.json [{pid}] fragment[{idx}]: invalid entry_point '{orig.get('entry_point')}'")
+            if orig.get("mode") != "preset":
+                result.errors.append(f"[ERROR] presets.json [{pid}] fragment[{idx}]: invalid mode '{orig.get('mode')}'")
+            if orig.get("selected_id") != pid:
+                result.errors.append(f"[ERROR] presets.json [{pid}] fragment[{idx}]: selected_id '{orig.get('selected_id')}' != '{pid}'")
+            if orig.get("selector") != "preset_core":
+                result.errors.append(f"[ERROR] presets.json [{pid}] fragment[{idx}]: origin selector must be 'preset_core', got '{orig.get('selector')}'")
+            pids = orig.get("parent_ids", [])
+            if pids != [pid] and pids != (pid,):
+                result.errors.append(f"[ERROR] presets.json [{pid}] fragment[{idx}]: parent_ids must be exactly ['{pid}'], got {pids}")
+
+    # 5. 校验 style_recipes.json 结构与逐字段逐字节等价性
     recipes = data_cache.get("style_recipes.json", {}).get("recipes", [])
     if len(recipes) < 8:
         result.errors.append(f"[ERROR] style_recipes.json: Expected >=8 recipes, got {len(recipes)}")
-    for r in recipes:
+    recipe_catalog_registry: Dict[str, Tuple[str, str]] = {}
+    for r_idx, r in enumerate(recipes):
         rid = r.get("id", "")
-        if not rid or not r.get("style_name") or not r.get("style_recipe"):
-            result.errors.append(f"[ERROR] style_recipes.json [{rid}]: Missing required recipe fields")
+        if not rid or not isinstance(rid, str) or not id_regex.match(rid):
+            result.errors.append(f"[ERROR] style_recipes.json: Invalid recipe id '{rid}'")
+        elif rid in recipe_catalog_registry:
+            prev_kind, prev_path = recipe_catalog_registry[rid]
+            result.errors.append(f"[ERROR] style_recipes.json at recipes[{r_idx}]: duplicate ID '{rid}' collides with {prev_kind} at {prev_path}")
+        else:
+            recipe_catalog_registry[rid] = ("recipe", f"recipes[{r_idx}]")
 
-    # 6. 校验 clothing.json 扩展策略与 24 档唯一性
+        if not r.get("style_name") or not r.get("style_recipe"):
+            result.errors.append(f"[ERROR] style_recipes.json [{rid}]: Missing required recipe fields")
+        frags = r.get("fragments")
+        if not frags or not isinstance(frags, list):
+            result.errors.append(f"[ERROR] style_recipes.json [{rid}]: Missing or invalid fragments")
+            continue
+
+        # 逐字段等价性校验：配方文本字段与 fragments 逐 Tag 逐字节等价
+        ignore_keys = {"id", "style_name", "name_zh", "description", "fragments"}
+        for k, v in r.items():
+            if k in ignore_keys or not isinstance(v, str):
+                continue
+            expected_field_tags = split_top_level_tags(v)
+            actual_field_tags = [f.get("text", "") for f in frags if f.get("origin", {}).get("selector") == k]
+            if expected_field_tags != actual_field_tags:
+                result.errors.append(
+                    f"[ERROR] style_recipes.json [{rid}]: field '{k}' text mismatch with fragments: "
+                    f"expected {expected_field_tags} vs actual {actual_field_tags}"
+                )
+
+        # 校验 Fragment origin 闭环与强类型
+        for idx, f in enumerate(frags):
+            actual_frag_keys = set(f.keys())
+            expected_frag_keys = {"id", "slot", "text", "facts", "origin"}
+            if actual_frag_keys != expected_frag_keys:
+                result.errors.append(f"[ERROR] style_recipes.json [{rid}] fragment[{idx}]: invalid fragment keys: {sorted(actual_frag_keys)}")
+            fid = f.get("id")
+            frag_path = f"recipes[{r_idx}][{rid}].fragments[{idx}]"
+            if not fid or not isinstance(fid, str) or not id_regex.match(fid):
+                result.errors.append(f"[ERROR] style_recipes.json [{rid}] fragment[{idx}]: invalid fragment ID '{fid}'")
+            elif fid in recipe_catalog_registry:
+                prev_kind, prev_path = recipe_catalog_registry[fid]
+                result.errors.append(f"[ERROR] style_recipes.json at {frag_path}: duplicate ID '{fid}' collides with {prev_kind} at {prev_path}")
+            else:
+                recipe_catalog_registry[fid] = ("fragment", frag_path)
+            if not isinstance(f.get("text"), str) or len(f.get("text", "").strip()) == 0:
+                result.errors.append(f"[ERROR] style_recipes.json [{rid}] fragment[{idx}]: fragment text must be non-empty str")
+            if not isinstance(f.get("facts"), dict):
+                result.errors.append(f"[ERROR] style_recipes.json [{rid}] fragment[{idx}]: fragment facts must be dict")
+            else:
+                try:
+                    sf = SemanticFacts.from_dict(f.get("facts"))
+                    sf.validate()
+                except Exception as err:
+                    result.errors.append(f"[ERROR] style_recipes.json [{rid}] fragment[{idx}]: invalid fragment facts: {err}")
+            orig = f.get("origin", {})
+            if not isinstance(orig, dict):
+                result.errors.append(f"[ERROR] style_recipes.json [{rid}] fragment[{idx}]: origin must be dict")
+                continue
+            try:
+                SelectionOrigin.from_dict(orig)
+            except Exception as err:
+                result.errors.append(f"[ERROR] style_recipes.json [{rid}] fragment[{idx}]: invalid fragment origin: {err}")
+            if orig.get("entry_point") != "preset_browser":
+                result.errors.append(f"[ERROR] style_recipes.json [{rid}] fragment[{idx}]: invalid entry_point '{orig.get('entry_point')}'")
+            if orig.get("mode") != "recipe":
+                result.errors.append(f"[ERROR] style_recipes.json [{rid}] fragment[{idx}]: invalid mode '{orig.get('mode')}'")
+            if orig.get("selected_id") != rid:
+                result.errors.append(f"[ERROR] style_recipes.json [{rid}] fragment[{idx}]: selected_id '{orig.get('selected_id')}' != '{rid}'")
+            if orig.get("selector") not in CANONICAL_RECIPE_SELECTORS:
+                result.errors.append(f"[ERROR] style_recipes.json [{rid}] fragment[{idx}]: invalid selector '{orig.get('selector')}', expected one of {sorted(CANONICAL_RECIPE_SELECTORS)}")
+            pids = orig.get("parent_ids", [])
+            if pids != [rid] and pids != (rid,):
+                result.errors.append(f"[ERROR] style_recipes.json [{rid}] fragment[{idx}]: parent_ids must be exactly ['{rid}'], got {pids}")
+
+    # 6. 校验 clothing.json 扩展策略与跨目录引用图闭环
     clothing_data = data_cache.get("clothing.json", {})
     policy = clothing_data.get("extension_policy", {})
+    exp_ids = {t.get("id") for t in clothing_data.get("sfw_exposure_tiers", [])}
+    trans_ids = {t.get("id") for t in clothing_data.get("cloth_transparency_tiers", [])}
+    ward_ids = {t.get("id") for t in clothing_data.get("lingerie_wardrobe", [])}
+    clothing_style_ids = {s.get("id") for s in clothing_data.get("categories", [])}
+
     for lvl in ("L2", "L3", "L4"):
         if lvl not in policy:
             result.errors.append(f"[ERROR] clothing.json: extension_policy missing nudity level '{lvl}'")
         else:
             lvl_policy = policy[lvl]
-            if not lvl_policy.get("exposure_ids"):
+            eids = lvl_policy.get("exposure_ids", [])
+            if not eids:
                 result.errors.append(f"[ERROR] clothing.json: extension_policy[{lvl}] missing or empty 'exposure_ids'")
-            if not lvl_policy.get("transparency_ids"):
-                result.errors.append(f"[ERROR] clothing.json: extension_policy[{lvl}] missing or empty 'transparency_ids'")
-            if lvl == "L4" and not lvl_policy.get("wardrobe_ids"):
-                result.errors.append("[ERROR] clothing.json: extension_policy[L4] missing or empty 'wardrobe_ids'")
+            for eid in eids:
+                if eid not in exp_ids:
+                    result.errors.append(f"[ERROR] clothing.json: extension_policy[{lvl}] dangling exposure_id '{eid}'")
 
-    # 4. 校验 conflict_rules.json 17 规则完整性与强类型契约 (单源验证)
+            tids = lvl_policy.get("transparency_ids", [])
+            if not tids:
+                result.errors.append(f"[ERROR] clothing.json: extension_policy[{lvl}] missing or empty 'transparency_ids'")
+            for tid in tids:
+                if tid not in trans_ids:
+                    result.errors.append(f"[ERROR] clothing.json: extension_policy[{lvl}] dangling transparency_id '{tid}'")
+
+            if lvl == "L4":
+                wids = lvl_policy.get("wardrobe_ids", [])
+                if not wids:
+                    result.errors.append("[ERROR] clothing.json: extension_policy[L4] missing or empty 'wardrobe_ids'")
+                for wid in wids:
+                    if wid not in ward_ids:
+                        result.errors.append(f"[ERROR] clothing.json: extension_policy[L4] dangling wardrobe_id '{wid}'")
+
+    for lvl, ldata in clothing_data.get("clothing_nudity_linkage", {}).items():
+        for sid in ldata.get("style_overrides", {}).keys():
+            if sid not in clothing_style_ids:
+                result.errors.append(f"[ERROR] clothing.json: clothing_nudity_linkage[{lvl}] dangling style_override '{sid}'")
+
+    # 7. 校验 themes.json ID 规范与跨文件 context_ids
+    themes_data = data_cache.get("themes.json", {}).get("themes", [])
+    if len(themes_data) < 39:
+        result.errors.append(f"[ERROR] themes.json: Expected >=39 themes, got {len(themes_data)}")
+    seen_theme_ids: Set[str] = set()
+    for t in themes_data:
+        tid = t.get("id", "")
+        if not tid or not re.match(r'^[a-z][a-z0-9_]{2,95}$', tid):
+            result.errors.append(f"[ERROR] themes.json: Invalid theme id '{tid}'")
+        if tid in seen_theme_ids:
+            result.errors.append(f"[ERROR] themes.json: Duplicate theme id '{tid}'")
+        seen_theme_ids.add(tid)
+        cids = t.get("context_ids", [])
+        if not cids:
+            result.errors.append(f"[ERROR] themes.json [{tid}]: context_ids cannot be empty")
+        for c in cids:
+            if c not in VALID_CONTEXT_ENUMS:
+                result.errors.append(f"[ERROR] themes.json [{tid}]: invalid context_id '{c}'")
+
+    # 8. 校验全量数据文件中的可采样叶子节点 (Fail-Closed: 拒绝字符串、拒绝缺失ID/text/facts、拒绝额外字段、强类型)
+    id_regex = re.compile(r'^[a-z][a-z0-9_]{2,95}$')
+    tag_containers = {"tags", "anchor_tags", "detail_tags", "general_tags", "erotic_tags"}
+    known_facts_fields = set(SemanticFacts.__dataclass_fields__.keys())
+
+    for fname, fcontent in data_cache.items():
+        if fname in ("conflict_rules.json", "negative_prompts.json", "presets.json", "style_recipes.json"):
+            continue
+        catalog_id_registry: Dict[str, Tuple[str, str]] = {}
+
+        def _check_leaf_tag(item: Any, item_path: str):
+            if not isinstance(item, dict):
+                result.errors.append(
+                    f"[ERROR] {fname} at {item_path}: expected object for leaf tag, got {type(item).__name__}"
+                )
+                return
+            actual_keys = set(item.keys())
+            if actual_keys != {"id", "text", "facts"}:
+                result.errors.append(
+                    f"[ERROR] {fname} at {item_path}: invalid leaf tag keys: {sorted(actual_keys)} (expected ['facts', 'id', 'text'])"
+                )
+                return
+            lid = item["id"]
+            if not isinstance(lid, str) or not id_regex.match(lid):
+                result.errors.append(f"[ERROR] {fname} at {item_path}: invalid leaf ID {lid!r}")
+            elif lid in catalog_id_registry:
+                prev_kind, prev_path = catalog_id_registry[lid]
+                if prev_kind == "leaf_tag":
+                    result.errors.append(
+                        f"[ERROR] {fname} at {item_path}: duplicate leaf ID '{lid}' collides with {prev_kind} at {prev_path}"
+                    )
+                else:
+                    result.errors.append(
+                        f"[ERROR] {fname} at {item_path}: duplicate ID '{lid}' (leaf_tag) collides with {prev_kind} at {prev_path}"
+                    )
+            else:
+                catalog_id_registry[lid] = ("leaf_tag", item_path)
+
+            txt = item["text"]
+            if not isinstance(txt, str) or len(txt.strip()) == 0:
+                result.errors.append(f"[ERROR] {fname} at {item_path}: leaf tag text must be non-empty str, got {txt!r}")
+
+            fcts = item["facts"]
+            if not isinstance(fcts, dict):
+                result.errors.append(f"[ERROR] {fname} at {item_path}: facts must be dict, got {type(fcts).__name__}")
+                return
+            unexpected = set(fcts.keys()) - known_facts_fields
+            if unexpected:
+                result.errors.append(f"[ERROR] {fname} at {item_path}: unexpected facts fields {sorted(unexpected)}")
+            if "hands_required" in fcts:
+                hr = fcts["hands_required"]
+                if not isinstance(hr, int) or isinstance(hr, bool) or hr not in (0, 1, 2):
+                    result.errors.append(
+                        f"[ERROR] {fname} at {item_path}: hands_required must be int in 0..2, got {hr!r}"
+                    )
+            try:
+                sf = SemanticFacts.from_dict(fcts)
+                sf.validate()
+            except Exception as err:
+                result.errors.append(f"[ERROR] {fname} at {item_path} ({lid}): invalid SemanticFacts: {err}")
+
+        def _traverse_leaves(obj: Any, path: str = ""):
+            if isinstance(obj, dict):
+                # 校验选择器/条目 ID 文件内唯一性并注册到统一碰撞域
+                if "id" in obj and isinstance(obj["id"], str) and not ("text" in obj and "facts" in obj):
+                    sid = obj["id"]
+                    if not id_regex.match(sid):
+                        result.errors.append(f"[ERROR] {fname} at {path}: invalid selector/item ID '{sid}'")
+                    elif sid in catalog_id_registry:
+                        prev_kind, prev_path = catalog_id_registry[sid]
+                        result.errors.append(
+                            f"[ERROR] {fname} at {path}: duplicate ID '{sid}' (selector_or_item) collides with {prev_kind} at {prev_path}"
+                        )
+                    else:
+                        catalog_id_registry[sid] = ("selector_or_item", path)
+
+                # 校验同一选择器内 tags 的事实互斥性
+                tags_list = None
+                for k_t in tag_containers:
+                    if k_t in obj and isinstance(obj[k_t], list):
+                        tags_list = obj[k_t]
+                        break
+                if tags_list:
+                    sid = obj.get("id", path)
+                    all_cm: Set[str] = set()
+                    all_lk: Set[str] = set()
+                    for itm in tags_list:
+                        if isinstance(itm, dict):
+                            fcts = itm.get("facts", {})
+                            for cm in fcts.get("color_modes", ()):
+                                all_cm.add(cm)
+                            lk = fcts.get("liquid_kind")
+                            if lk and lk != "none":
+                                all_lk.add(lk)
+                    if "monochrome" in all_cm and any(c in ("color", "high_saturation") for c in all_cm):
+                        result.errors.append(
+                            f"[ERROR] {fname} [{sid}]: selector tags declare mutually contradictory color_modes: {sorted(all_cm)}"
+                        )
+                    if len(all_lk) > 1:
+                        result.errors.append(
+                            f"[ERROR] {fname} [{sid}]: selector tags declare mutually contradictory liquid_kinds: {sorted(all_lk)}"
+                        )
+
+                for k, v in obj.items():
+                    curr_path = f"{path}.{k}" if path else k
+                    if k in tag_containers and isinstance(v, list):
+                        for idx, item in enumerate(v):
+                            _check_leaf_tag(item, f"{curr_path}[{idx}]")
+                    elif k == "attributes" and isinstance(v, dict):
+                        for attr_cat, attr_tags in v.items():
+                            if isinstance(attr_tags, list):
+                                for idx, item in enumerate(attr_tags):
+                                    _check_leaf_tag(item, f"{curr_path}.{attr_cat}[{idx}]")
+                            else:
+                                _traverse_leaves(attr_tags, f"{curr_path}.{attr_cat}")
+                    else:
+                        _traverse_leaves(v, curr_path)
+            elif isinstance(obj, list):
+                for i, elem in enumerate(obj):
+                    _traverse_leaves(elem, f"{path}[{i}]")
+
+        _traverse_leaves(fcontent)
+
+    # 9. 校验 conflict_rules.json 17 规则完整性与强类型契约 (单源验证)
     conflict_doc = data_cache.get("conflict_rules.json")
     if conflict_doc:
         try:

@@ -4,141 +4,600 @@
       "id": "long_straight_black",
       "name_zh": "黑长直散发 (Long Straight Black Hair)",
       "tags": [
-        "long straight black hair",
-        "pin-straight hair",
-        "silky smooth hair flowing over shoulders"
+        {
+          "id": "long_straight_black__tag_000",
+          "text": "long straight black hair",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "face"
+            ]
+          }
+        },
+        {
+          "id": "long_straight_black__tag_001",
+          "text": "pin-straight hair",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "face"
+            ]
+          }
+        },
+        {
+          "id": "long_straight_black__tag_002",
+          "text": "silky smooth hair flowing over shoulders",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "face"
+            ]
+          }
+        }
       ]
     },
     {
       "id": "big_wavy_curls",
       "name_zh": "大波浪卷发 (Big Voluminous Waves)",
       "tags": [
-        "big loose waves",
-        "voluminous bouncy curls",
-        "glamorous wavy hair",
-        "rich texture"
+        {
+          "id": "big_wavy_curls__tag_000",
+          "text": "big loose waves",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "face"
+            ]
+          }
+        },
+        {
+          "id": "big_wavy_curls__tag_001",
+          "text": "voluminous bouncy curls",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "face"
+            ]
+          }
+        },
+        {
+          "id": "big_wavy_curls__tag_002",
+          "text": "glamorous wavy hair",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "face"
+            ]
+          }
+        },
+        {
+          "id": "big_wavy_curls__tag_003",
+          "text": "rich texture",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "face"
+            ]
+          }
+        }
       ]
     },
     {
       "id": "twin_tails",
       "name_zh": "双马尾 (Twin Tails / Pigtails)",
       "tags": [
-        "twin tails",
-        "pigtails tied high",
-        "long twin ponytails framing face",
-        "cute ribbons"
+        {
+          "id": "twin_tails__tag_000",
+          "text": "twin tails",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "face"
+            ]
+          }
+        },
+        {
+          "id": "twin_tails__tag_001",
+          "text": "pigtails tied high",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "face"
+            ]
+          }
+        },
+        {
+          "id": "twin_tails__tag_002",
+          "text": "long twin ponytails framing face",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "face"
+            ]
+          }
+        },
+        {
+          "id": "twin_tails__tag_003",
+          "text": "cute ribbons",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "face"
+            ]
+          }
+        }
       ]
     },
     {
       "id": "high_ponytail",
       "name_zh": "高马尾 (High Ponytail)",
       "tags": [
-        "high ponytail",
-        "hair pulled up tight",
-        "sleek high ponytail swaying",
-        "exposed neck"
+        {
+          "id": "high_ponytail__tag_000",
+          "text": "high ponytail",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "face"
+            ]
+          }
+        },
+        {
+          "id": "high_ponytail__tag_001",
+          "text": "hair pulled up tight",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "face"
+            ]
+          }
+        },
+        {
+          "id": "high_ponytail__tag_002",
+          "text": "sleek high ponytail swaying",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "face"
+            ]
+          }
+        },
+        {
+          "id": "high_ponytail__tag_003",
+          "text": "exposed neck",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "face"
+            ]
+          }
+        }
       ]
     },
     {
       "id": "low_ponytail",
       "name_zh": "低马尾 (Low Ponytail)",
       "tags": [
-        "low ponytail gathered at nape",
-        "loose elegant ponytail",
-        "loose side strands framing face"
+        {
+          "id": "low_ponytail__tag_000",
+          "text": "low ponytail gathered at nape",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "face"
+            ]
+          }
+        },
+        {
+          "id": "low_ponytail__tag_001",
+          "text": "loose elegant ponytail",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "face"
+            ]
+          }
+        },
+        {
+          "id": "low_ponytail__tag_002",
+          "text": "loose side strands framing face",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "face"
+            ]
+          }
+        }
       ]
     },
     {
       "id": "messy_bun",
       "name_zh": "丸子头 (Messy Top Knot Bun)",
       "tags": [
-        "messy bun",
-        "hair in a high bun",
-        "loose tendrils escaping",
-        "casual top knot"
+        {
+          "id": "messy_bun__tag_000",
+          "text": "messy bun",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "face"
+            ]
+          }
+        },
+        {
+          "id": "messy_bun__tag_001",
+          "text": "hair in a high bun",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "face"
+            ]
+          }
+        },
+        {
+          "id": "messy_bun__tag_002",
+          "text": "loose tendrils escaping",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "face"
+            ]
+          }
+        },
+        {
+          "id": "messy_bun__tag_003",
+          "text": "casual top knot",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "face"
+            ]
+          }
+        }
       ]
     },
     {
       "id": "space_buns",
       "name_zh": "双丸子头 (Space Buns)",
       "tags": [
-        "space buns on top of head",
-        "twin buns",
-        "playful anime hair buns"
+        {
+          "id": "space_buns__tag_000",
+          "text": "space buns on top of head",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "face"
+            ]
+          }
+        },
+        {
+          "id": "space_buns__tag_001",
+          "text": "twin buns",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "face"
+            ]
+          }
+        },
+        {
+          "id": "space_buns__tag_002",
+          "text": "playful anime hair buns",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "face"
+            ]
+          }
+        }
       ]
     },
     {
       "id": "bob_cut",
       "name_zh": "齐下巴短发 (Chin Length Bob Cut)",
       "tags": [
-        "chin length bob",
-        "sleek modern bob",
-        "hair curving around jawline"
+        {
+          "id": "bob_cut__tag_000",
+          "text": "chin length bob",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "face"
+            ]
+          }
+        },
+        {
+          "id": "bob_cut__tag_001",
+          "text": "sleek modern bob",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "face"
+            ]
+          }
+        },
+        {
+          "id": "bob_cut__tag_002",
+          "text": "hair curving around jawline",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "face"
+            ]
+          }
+        }
       ]
     },
     {
       "id": "collarbone_lob",
       "name_zh": "齐肩锁骨发 (Collarbone Length Lob)",
       "tags": [
-        "collarbone length hair",
-        "soft layered lob",
-        "gentle wavy ends"
+        {
+          "id": "collarbone_lob__tag_000",
+          "text": "collarbone length hair",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "face"
+            ]
+          }
+        },
+        {
+          "id": "collarbone_lob__tag_001",
+          "text": "soft layered lob",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "face"
+            ]
+          }
+        },
+        {
+          "id": "collarbone_lob__tag_002",
+          "text": "gentle wavy ends",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "face"
+            ]
+          }
+        }
       ]
     },
     {
       "id": "hime_cut",
       "name_zh": "日系公主切 (Hime Cut)",
       "tags": [
-        "hime cut",
-        "princess cut with blunt side pieces framing cheeks",
-        "straight bangs",
-        "long black hair"
+        {
+          "id": "hime_cut__tag_000",
+          "text": "hime cut",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "face"
+            ]
+          }
+        },
+        {
+          "id": "hime_cut__tag_001",
+          "text": "princess cut with blunt side pieces framing cheeks",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "face"
+            ]
+          }
+        },
+        {
+          "id": "hime_cut__tag_002",
+          "text": "straight bangs",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "face"
+            ]
+          }
+        },
+        {
+          "id": "hime_cut__tag_003",
+          "text": "long black hair",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "face"
+            ]
+          }
+        }
       ]
     },
     {
       "id": "braided_twins",
       "name_zh": "麻花双辫 (Braided Twin Pigtails)",
       "tags": [
-        "twin braids",
-        "braided pigtails resting on shoulders",
-        "neat woven braids"
+        {
+          "id": "braided_twins__tag_000",
+          "text": "twin braids",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "face"
+            ]
+          }
+        },
+        {
+          "id": "braided_twins__tag_001",
+          "text": "braided pigtails resting on shoulders",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "face"
+            ]
+          }
+        },
+        {
+          "id": "braided_twins__tag_002",
+          "text": "neat woven braids",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "face"
+            ]
+          }
+        }
       ]
     },
     {
       "id": "wet_hair_face",
       "name_zh": "湿发贴脸 (Wet Hair Clinging to Face)",
       "tags": [
-        "wet hair clinging to face and neck",
-        "damp strands sticking to sweaty skin",
-        "soaked heavy hair"
+        {
+          "id": "wet_hair_face__tag_000",
+          "text": "wet hair clinging to face and neck",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "face"
+            ]
+          }
+        },
+        {
+          "id": "wet_hair_face__tag_001",
+          "text": "damp strands sticking to sweaty skin",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "face"
+            ]
+          }
+        },
+        {
+          "id": "wet_hair_face__tag_002",
+          "text": "soaked heavy hair",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "face"
+            ]
+          }
+        }
       ]
     },
     {
       "id": "messy_bedhead",
       "name_zh": "凌乱事后散发 (Messy Disheveled Bedhead)",
       "tags": [
-        "messy disheveled hair",
-        "tousled bedhead hair",
-        "hair spread across pillow",
-        "tangled locks"
+        {
+          "id": "messy_bedhead__tag_000",
+          "text": "messy disheveled hair",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "face"
+            ]
+          }
+        },
+        {
+          "id": "messy_bedhead__tag_001",
+          "text": "tousled bedhead hair",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "face"
+            ]
+          }
+        },
+        {
+          "id": "messy_bedhead__tag_002",
+          "text": "hair spread across pillow",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "face"
+            ]
+          }
+        },
+        {
+          "id": "messy_bedhead__tag_003",
+          "text": "tangled locks",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "face"
+            ]
+          }
+        }
       ]
     },
     {
       "id": "hair_over_breast",
       "name_zh": "发丝遮乳/纯欲 (Hair Draped Over Breasts)",
       "tags": [
-        "long hair draped over bare chest",
-        "strands partially covering breasts",
-        "hair cascading over torso"
+        {
+          "id": "hair_over_breast__tag_000",
+          "text": "long hair draped over bare chest",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "face"
+            ]
+          }
+        },
+        {
+          "id": "hair_over_breast__tag_001",
+          "text": "strands partially covering breasts",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "face"
+            ]
+          }
+        },
+        {
+          "id": "hair_over_breast__tag_002",
+          "text": "hair cascading over torso",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "face"
+            ]
+          }
+        }
       ]
     },
     {
       "id": "hair_in_mouth",
       "name_zh": "嘴咬发丝 (Strand of Hair in Mouth)",
       "tags": [
-        "strand of hair between parted lips",
-        "biting hair sensually",
-        "hair falling across eyes"
+        {
+          "id": "hair_in_mouth__tag_000",
+          "text": "strand of hair between parted lips",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "face"
+            ]
+          }
+        },
+        {
+          "id": "hair_in_mouth__tag_001",
+          "text": "biting hair sensually",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "face"
+            ]
+          }
+        },
+        {
+          "id": "hair_in_mouth__tag_002",
+          "text": "hair falling across eyes",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "face"
+            ]
+          }
+        }
       ]
     }
   ],
@@ -147,95 +606,258 @@
       "id": "cat_ears",
       "name_zh": "猫耳发箍 (Cat Ear Headband)",
       "tags": [
-        "fluffy cat ear headband",
-        "neko ears with pink inner"
+        {
+          "id": "cat_ears__tag_000",
+          "text": "fluffy cat ear headband",
+          "facts": {
+            "semantic_role": "selector",
+            "prop_usage": "worn"
+          }
+        },
+        {
+          "id": "cat_ears__tag_001",
+          "text": "neko ears with pink inner",
+          "facts": {
+            "semantic_role": "selector",
+            "prop_usage": "worn"
+          }
+        }
       ]
     },
     {
       "id": "bunny_ears",
       "name_zh": "兔耳发箍 (Bunny Ears Headband)",
       "tags": [
-        "tall satin bunny ears headband",
-        "playboy bunny ears"
+        {
+          "id": "bunny_ears__tag_000",
+          "text": "tall satin bunny ears headband",
+          "facts": {
+            "semantic_role": "selector",
+            "prop_usage": "worn"
+          }
+        },
+        {
+          "id": "bunny_ears__tag_001",
+          "text": "playboy bunny ears",
+          "facts": {
+            "semantic_role": "selector",
+            "prop_usage": "worn"
+          }
+        }
       ]
     },
     {
       "id": "maid_headdress",
       "name_zh": "女仆蕾丝头饰 (Maid Lace Headdress)",
       "tags": [
-        "white ruffled maid headband",
-        "lace maid headdress"
+        {
+          "id": "maid_headdress__tag_000",
+          "text": "white ruffled maid headband",
+          "facts": {
+            "semantic_role": "selector",
+            "prop_usage": "worn"
+          }
+        },
+        {
+          "id": "maid_headdress__tag_001",
+          "text": "lace maid headdress",
+          "facts": {
+            "semantic_role": "selector",
+            "prop_usage": "worn"
+          }
+        }
       ]
     },
     {
       "id": "nurse_cap",
       "name_zh": "护士帽 (Nurse Cap)",
       "tags": [
-        "white nurse cap with red cross logo"
+        {
+          "id": "nurse_cap__tag_000",
+          "text": "white nurse cap with red cross logo",
+          "facts": {
+            "semantic_role": "selector",
+            "prop_usage": "worn"
+          }
+        }
       ]
     },
     {
       "id": "ribbon_bow",
       "name_zh": "丝带蝴蝶结 (Silk Ribbon Bow)",
       "tags": [
-        "red ribbon bow in hair",
-        "cute side hair bow clip"
+        {
+          "id": "ribbon_bow__tag_000",
+          "text": "red ribbon bow in hair",
+          "facts": {
+            "semantic_role": "selector",
+            "prop_usage": "worn"
+          }
+        },
+        {
+          "id": "ribbon_bow__tag_001",
+          "text": "cute side hair bow clip",
+          "facts": {
+            "semantic_role": "selector",
+            "prop_usage": "worn"
+          }
+        }
       ]
     },
     {
       "id": "lace_blindfold",
       "name_zh": "蕾丝眼罩 (Lace Blindfold)",
       "tags": [
-        "black lace blindfold covering eyes",
-        "sheer patterned eye mask"
+        {
+          "id": "lace_blindfold__tag_000",
+          "text": "black lace blindfold covering eyes",
+          "facts": {
+            "semantic_role": "selector",
+            "prop_usage": "worn",
+            "occlusion": "eyes"
+          }
+        },
+        {
+          "id": "lace_blindfold__tag_001",
+          "text": "sheer patterned eye mask",
+          "facts": {
+            "semantic_role": "selector",
+            "prop_usage": "worn",
+            "occlusion": "eyes"
+          }
+        }
       ]
     },
     {
       "id": "leather_choker",
       "name_zh": "皮质项圈Choker (Leather O-ring Choker)",
       "tags": [
-        "black leather choker with metal O-ring",
-        "tight neck collar"
+        {
+          "id": "leather_choker__tag_000",
+          "text": "black leather choker with metal O-ring",
+          "facts": {
+            "semantic_role": "selector",
+            "prop_usage": "worn"
+          }
+        },
+        {
+          "id": "leather_choker__tag_001",
+          "text": "tight neck collar",
+          "facts": {
+            "semantic_role": "selector",
+            "prop_usage": "worn"
+          }
+        }
       ]
     },
     {
       "id": "gold_collarbone_chain",
       "name_zh": "细金锁骨链 (Dainty Collarbone Chain)",
       "tags": [
-        "thin delicate gold chain resting on collarbone",
-        "pendant in collarbone hollow"
+        {
+          "id": "gold_collarbone_chain__tag_000",
+          "text": "thin delicate gold chain resting on collarbone",
+          "facts": {
+            "semantic_role": "selector",
+            "prop_usage": "worn"
+          }
+        },
+        {
+          "id": "gold_collarbone_chain__tag_001",
+          "text": "pendant in collarbone hollow",
+          "facts": {
+            "semantic_role": "selector",
+            "prop_usage": "worn"
+          }
+        }
       ]
     },
     {
       "id": "pearl_necklace",
       "name_zh": "珍珠项链 (Pearl Strand Necklace)",
       "tags": [
-        "single strand white pearl necklace",
-        "pearls resting on skin"
+        {
+          "id": "pearl_necklace__tag_000",
+          "text": "single strand white pearl necklace",
+          "facts": {
+            "semantic_role": "selector",
+            "prop_usage": "worn"
+          }
+        },
+        {
+          "id": "pearl_necklace__tag_001",
+          "text": "pearls resting on skin",
+          "facts": {
+            "semantic_role": "selector",
+            "prop_usage": "worn"
+          }
+        }
       ]
     },
     {
       "id": "body_chain",
       "name_zh": "性感身体链/乳链 (Body Chain Harness)",
       "tags": [
-        "delicate gold body chain across bare chest and waist",
-        "cross-torso body jewelry"
+        {
+          "id": "body_chain__tag_000",
+          "text": "delicate gold body chain across bare chest and waist",
+          "facts": {
+            "semantic_role": "selector",
+            "prop_usage": "worn"
+          }
+        },
+        {
+          "id": "body_chain__tag_001",
+          "text": "cross-torso body jewelry",
+          "facts": {
+            "semantic_role": "selector",
+            "prop_usage": "worn"
+          }
+        }
       ]
     },
     {
       "id": "nipple_rings",
       "name_zh": "乳环饰品 (Nipple Piercing Jewelry)",
       "tags": [
-        "small barbell nipple rings",
-        "silver piercing flush against areola"
+        {
+          "id": "nipple_rings__tag_000",
+          "text": "small barbell nipple rings",
+          "facts": {
+            "semantic_role": "selector",
+            "prop_usage": "worn"
+          }
+        },
+        {
+          "id": "nipple_rings__tag_001",
+          "text": "silver piercing flush against areola",
+          "facts": {
+            "semantic_role": "selector",
+            "prop_usage": "worn"
+          }
+        }
       ]
     },
     {
       "id": "ankle_bracelet",
       "name_zh": "细金脚链 (Delicate Anklet)",
       "tags": [
-        "thin gold anklet around bare ankle",
-        "tiny dangling charm on ankle"
+        {
+          "id": "ankle_bracelet__tag_000",
+          "text": "thin gold anklet around bare ankle",
+          "facts": {
+            "semantic_role": "selector",
+            "prop_usage": "worn"
+          }
+        },
+        {
+          "id": "ankle_bracelet__tag_001",
+          "text": "tiny dangling charm on ankle",
+          "facts": {
+            "semantic_role": "selector",
+            "prop_usage": "worn"
+          }
+        }
       ]
     }
   ]

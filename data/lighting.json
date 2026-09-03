@@ -3,544 +3,3866 @@
     {
       "name": "发丝光 / 轮廓光（Rim Light / Hair Light / Kicker）",
       "tags": [
-        "rim light",
-        "hair light",
-        "kicker light",
-        "edge lighting",
-        "backlit hair glow",
-        "golden hair rim",
-        "silver rim light",
-        "halo effect around hair",
-        "light catching hair strands",
-        "backlight outlining body",
-        "light wrapping around curves",
-        "glowing hair edges",
-        "wispy hair illuminated",
-        "light leaking through hair",
-        "translucent ear glow from backlight",
-        "backlight spray",
-        "glowing edges",
-        "golden outline on body"
+        {
+          "id": "professional_lighting_00__tag_000",
+          "text": "rim light",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "professional_lighting_00__tag_001",
+          "text": "hair light",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "professional_lighting_00__tag_002",
+          "text": "kicker light",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "professional_lighting_00__tag_003",
+          "text": "edge lighting",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "professional_lighting_00__tag_004",
+          "text": "backlit hair glow",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "professional_lighting_00__tag_005",
+          "text": "golden hair rim",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "professional_lighting_00__tag_006",
+          "text": "silver rim light",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "professional_lighting_00__tag_007",
+          "text": "halo effect around hair",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "professional_lighting_00__tag_008",
+          "text": "light catching hair strands",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "professional_lighting_00__tag_009",
+          "text": "backlight outlining body",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "professional_lighting_00__tag_010",
+          "text": "light wrapping around curves",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "professional_lighting_00__tag_011",
+          "text": "glowing hair edges",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "professional_lighting_00__tag_012",
+          "text": "wispy hair illuminated",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "professional_lighting_00__tag_013",
+          "text": "light leaking through hair",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "professional_lighting_00__tag_014",
+          "text": "translucent ear glow from backlight",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "professional_lighting_00__tag_015",
+          "text": "backlight spray",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "professional_lighting_00__tag_016",
+          "text": "glowing edges",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "professional_lighting_00__tag_017",
+          "text": "golden outline on body",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        }
       ],
       "erotic_tags": [
-        "backlit nude outline",
-        "light wrapping around breasts",
-        "rim light on hip curve",
-        "golden edge on wet skin",
-        "hair catching backlight"
-      ]
+        {
+          "id": "professional_lighting_00__erotic_000",
+          "text": "backlit nude outline",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "professional_lighting_00__erotic_001",
+          "text": "light wrapping around breasts",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "professional_lighting_00__erotic_002",
+          "text": "rim light on hip curve",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "professional_lighting_00__erotic_003",
+          "text": "golden edge on wet skin",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "professional_lighting_00__erotic_004",
+          "text": "hair catching backlight",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        }
+      ],
+      "id": "professional_lighting_00"
     },
     {
       "name": "侧逆光（Back Side Light / Edge Light）",
       "tags": [
-        "back side light",
-        "135 degree light",
-        "side backlight",
-        "edge light from behind",
-        "asymmetric rim glow",
-        "one side rim one side shadow",
-        "diagonal backlight",
-        "quarter back light",
-        "three-quarter back illumination",
-        "side kicker",
-        "shoulder edge glow",
-        "asymmetric outline light"
+        {
+          "id": "professional_lighting_01__tag_000",
+          "text": "back side light",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "professional_lighting_01__tag_001",
+          "text": "135 degree light",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "professional_lighting_01__tag_002",
+          "text": "side backlight",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "professional_lighting_01__tag_003",
+          "text": "edge light from behind",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "professional_lighting_01__tag_004",
+          "text": "asymmetric rim glow",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "professional_lighting_01__tag_005",
+          "text": "one side rim one side shadow",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "professional_lighting_01__tag_006",
+          "text": "diagonal backlight",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "professional_lighting_01__tag_007",
+          "text": "quarter back light",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "professional_lighting_01__tag_008",
+          "text": "three-quarter back illumination",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "professional_lighting_01__tag_009",
+          "text": "side kicker",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "professional_lighting_01__tag_010",
+          "text": "shoulder edge glow",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "professional_lighting_01__tag_011",
+          "text": "asymmetric outline light",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        }
       ],
       "erotic_tags": [
-        "side backlight on breast curve",
-        "asymmetric body rim",
-        "one side glowing one shadow",
-        "edge light on thigh"
-      ]
+        {
+          "id": "professional_lighting_01__erotic_000",
+          "text": "side backlight on breast curve",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "professional_lighting_01__erotic_001",
+          "text": "asymmetric body rim",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "professional_lighting_01__erotic_002",
+          "text": "one side glowing one shadow",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "professional_lighting_01__erotic_003",
+          "text": "edge light on thigh",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        }
+      ],
+      "id": "professional_lighting_01"
     },
     {
       "name": "伦勃朗光（Rembrandt Lighting）",
       "tags": [
-        "Rembrandt lighting",
-        "45 degree side light",
-        "triangle of light on cheek",
-        "dramatic side lighting",
-        "painterly light",
-        "Dutch Golden Age lighting",
-        "chiaroscuro portrait",
-        "shadow triangle under eye",
-        "classical portrait light",
-        "Caravaggio-style lighting",
-        "tenebrism",
-        "Baroque lighting",
-        "Old Master light"
+        {
+          "id": "professional_lighting_02__tag_000",
+          "text": "Rembrandt lighting",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "professional_lighting_02__tag_001",
+          "text": "45 degree side light",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "professional_lighting_02__tag_002",
+          "text": "triangle of light on cheek",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "professional_lighting_02__tag_003",
+          "text": "dramatic side lighting",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "professional_lighting_02__tag_004",
+          "text": "painterly light",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "professional_lighting_02__tag_005",
+          "text": "Dutch Golden Age lighting",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "professional_lighting_02__tag_006",
+          "text": "chiaroscuro portrait",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "professional_lighting_02__tag_007",
+          "text": "shadow triangle under eye",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "professional_lighting_02__tag_008",
+          "text": "classical portrait light",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "professional_lighting_02__tag_009",
+          "text": "Caravaggio-style lighting",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "professional_lighting_02__tag_010",
+          "text": "tenebrism",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "professional_lighting_02__tag_011",
+          "text": "Baroque lighting",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "professional_lighting_02__tag_012",
+          "text": "Old Master light",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        }
       ],
       "erotic_tags": [
-        "Rembrandt light on face",
-        "one breast illuminated one in shadow",
-        "dramatic body chiaroscuro",
-        "painterly nude",
-        "Old Master body study"
-      ]
+        {
+          "id": "professional_lighting_02__erotic_000",
+          "text": "Rembrandt light on face",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "professional_lighting_02__erotic_001",
+          "text": "one breast illuminated one in shadow",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "professional_lighting_02__erotic_002",
+          "text": "dramatic body chiaroscuro",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "professional_lighting_02__erotic_003",
+          "text": "painterly nude",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "professional_lighting_02__erotic_004",
+          "text": "Old Master body study",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        }
+      ],
+      "id": "professional_lighting_02"
     },
     {
       "name": "蝴蝶光 / 派拉蒙光（Butterfly / Paramount Lighting）",
       "tags": [
-        "butterfly lighting",
-        "Paramount lighting",
-        "overhead beauty light",
-        "nose shadow under",
-        "glamorous studio light",
-        "classic Hollywood lighting",
-        "beauty portrait light",
-        "top-down glamour",
-        "shadow under nose bridge",
-        "cheekbone highlight",
-        "forehead glow",
-        "glamour shadow"
+        {
+          "id": "professional_lighting_03__tag_000",
+          "text": "butterfly lighting",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "professional_lighting_03__tag_001",
+          "text": "Paramount lighting",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "professional_lighting_03__tag_002",
+          "text": "overhead beauty light",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "professional_lighting_03__tag_003",
+          "text": "nose shadow under",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "professional_lighting_03__tag_004",
+          "text": "glamorous studio light",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [
+              "studio"
+            ],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "professional_lighting_03__tag_005",
+          "text": "classic Hollywood lighting",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "professional_lighting_03__tag_006",
+          "text": "beauty portrait light",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "professional_lighting_03__tag_007",
+          "text": "top-down glamour",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "professional_lighting_03__tag_008",
+          "text": "shadow under nose bridge",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "professional_lighting_03__tag_009",
+          "text": "cheekbone highlight",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "professional_lighting_03__tag_010",
+          "text": "forehead glow",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "professional_lighting_03__tag_011",
+          "text": "glamour shadow",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        }
       ],
       "erotic_tags": [
-        "butterfly light on face",
-        "overhead light emphasizing cleavage",
-        "glamorous body studio lighting",
-        "Hollywood glamour nude"
-      ]
+        {
+          "id": "professional_lighting_03__erotic_000",
+          "text": "butterfly light on face",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "professional_lighting_03__erotic_001",
+          "text": "overhead light emphasizing cleavage",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "professional_lighting_03__erotic_002",
+          "text": "glamorous body studio lighting",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [
+              "studio"
+            ],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "professional_lighting_03__erotic_003",
+          "text": "Hollywood glamour nude",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        }
+      ],
+      "id": "professional_lighting_03"
     },
     {
       "name": "分割光（Split Lighting）",
       "tags": [
-        "split lighting",
-        "half face lit",
-        "90 degree side light",
-        "extreme side lighting",
-        "half shadow portrait",
-        "light and dark division",
-        "face split by shadow",
-        "body half-lit",
-        "one side in complete shadow",
-        "dramatic left-right contrast",
-        "chiaroscuro split"
+        {
+          "id": "professional_lighting_04__tag_000",
+          "text": "split lighting",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "professional_lighting_04__tag_001",
+          "text": "half face lit",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "professional_lighting_04__tag_002",
+          "text": "90 degree side light",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "professional_lighting_04__tag_003",
+          "text": "extreme side lighting",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "professional_lighting_04__tag_004",
+          "text": "half shadow portrait",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "professional_lighting_04__tag_005",
+          "text": "light and dark division",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "professional_lighting_04__tag_006",
+          "text": "face split by shadow",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "professional_lighting_04__tag_007",
+          "text": "body half-lit",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "professional_lighting_04__tag_008",
+          "text": "one side in complete shadow",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "professional_lighting_04__tag_009",
+          "text": "dramatic left-right contrast",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "professional_lighting_04__tag_010",
+          "text": "chiaroscuro split",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        }
       ],
       "erotic_tags": [
-        "split light on body",
-        "one breast in light one in darkness",
-        "half-lit nude",
-        "shadow dividing body",
-        "dramatic body split"
-      ]
+        {
+          "id": "professional_lighting_04__erotic_000",
+          "text": "split light on body",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "professional_lighting_04__erotic_001",
+          "text": "one breast in light one in darkness",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": "night",
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "professional_lighting_04__erotic_002",
+          "text": "half-lit nude",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "professional_lighting_04__erotic_003",
+          "text": "shadow dividing body",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "professional_lighting_04__erotic_004",
+          "text": "dramatic body split",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        }
+      ],
+      "id": "professional_lighting_04"
     },
     {
       "name": "环形光（Loop Lighting）",
       "tags": [
-        "loop lighting",
-        "30 degree light",
-        "soft nose shadow",
-        "natural portrait light",
-        "gentle side light",
-        "subtle face shadow",
-        "flattering face light",
-        "soft cheek shadow",
-        "natural dimension light",
-        "classic portrait loop"
+        {
+          "id": "professional_lighting_05__tag_000",
+          "text": "loop lighting",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "professional_lighting_05__tag_001",
+          "text": "30 degree light",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "professional_lighting_05__tag_002",
+          "text": "soft nose shadow",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "professional_lighting_05__tag_003",
+          "text": "natural portrait light",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "professional_lighting_05__tag_004",
+          "text": "gentle side light",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "professional_lighting_05__tag_005",
+          "text": "subtle face shadow",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "professional_lighting_05__tag_006",
+          "text": "flattering face light",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "professional_lighting_05__tag_007",
+          "text": "soft cheek shadow",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "professional_lighting_05__tag_008",
+          "text": "natural dimension light",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "professional_lighting_05__tag_009",
+          "text": "classic portrait loop",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        }
       ],
       "erotic_tags": [
-        "soft loop light on face",
-        "gentle body dimension",
-        "flattering nude lighting",
-        "natural skin dimension"
-      ]
+        {
+          "id": "professional_lighting_05__erotic_000",
+          "text": "soft loop light on face",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "professional_lighting_05__erotic_001",
+          "text": "gentle body dimension",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "professional_lighting_05__erotic_002",
+          "text": "flattering nude lighting",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "professional_lighting_05__erotic_003",
+          "text": "natural skin dimension",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        }
+      ],
+      "id": "professional_lighting_05"
     },
     {
       "name": "短照明（Short Lighting）",
       "tags": [
-        "short lighting",
-        "face turned away from light",
-        "shadow side to camera",
-        "slimming light",
-        "narrow face lighting",
-        "shadow toward camera",
-        "face narrowing effect"
+        {
+          "id": "professional_lighting_06__tag_000",
+          "text": "short lighting",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "professional_lighting_06__tag_001",
+          "text": "face turned away from light",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "professional_lighting_06__tag_002",
+          "text": "shadow side to camera",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "professional_lighting_06__tag_003",
+          "text": "slimming light",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "professional_lighting_06__tag_004",
+          "text": "narrow face lighting",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "professional_lighting_06__tag_005",
+          "text": "shadow toward camera",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "professional_lighting_06__tag_006",
+          "text": "face narrowing effect",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        }
       ],
       "erotic_tags": [
-        "short lighting slimming face",
-        "shadow side creating mystery",
-        "dramatic body short light"
-      ]
+        {
+          "id": "professional_lighting_06__erotic_000",
+          "text": "short lighting slimming face",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "professional_lighting_06__erotic_001",
+          "text": "shadow side creating mystery",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "professional_lighting_06__erotic_002",
+          "text": "dramatic body short light",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        }
+      ],
+      "id": "professional_lighting_06"
     },
     {
       "name": "宽照明（Broad Lighting）",
       "tags": [
-        "broad lighting",
-        "face turned toward light",
-        "lit side to camera",
-        "full face lighting",
-        "bright face toward camera",
-        "open face illumination"
+        {
+          "id": "professional_lighting_07__tag_000",
+          "text": "broad lighting",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "professional_lighting_07__tag_001",
+          "text": "face turned toward light",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "professional_lighting_07__tag_002",
+          "text": "lit side to camera",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "professional_lighting_07__tag_003",
+          "text": "full face lighting",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "professional_lighting_07__tag_004",
+          "text": "bright face toward camera",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "professional_lighting_07__tag_005",
+          "text": "open face illumination",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        }
       ],
       "erotic_tags": [
-        "broad lighting on face",
-        "full body illumination",
-        "open bright body study"
-      ]
+        {
+          "id": "professional_lighting_07__erotic_000",
+          "text": "broad lighting on face",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "professional_lighting_07__erotic_001",
+          "text": "full body illumination",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "professional_lighting_07__erotic_002",
+          "text": "open bright body study",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        }
+      ],
+      "id": "professional_lighting_07"
     },
     {
       "name": "柔光箱 / 包围柔光（Soft Box / Beauty Dish）",
       "tags": [
-        "soft box lighting",
-        "broad light",
-        "wrap-around soft light",
-        "beauty dish",
-        "soft diffused studio light",
-        "large source soft light",
-        "even illumination",
-        "minimal shadows",
-        "flattering flat light",
-        "luminous skin",
-        "angelic glow",
-        "beauty editorial light",
-        "magazine cover lighting"
+        {
+          "id": "professional_lighting_08__tag_000",
+          "text": "soft box lighting",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "professional_lighting_08__tag_001",
+          "text": "broad light",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "professional_lighting_08__tag_002",
+          "text": "wrap-around soft light",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "professional_lighting_08__tag_003",
+          "text": "beauty dish",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [
+              "studio"
+            ],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "professional_lighting_08__tag_004",
+          "text": "soft diffused studio light",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [
+              "studio"
+            ],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "professional_lighting_08__tag_005",
+          "text": "large source soft light",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "professional_lighting_08__tag_006",
+          "text": "even illumination",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "professional_lighting_08__tag_007",
+          "text": "minimal shadows",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "professional_lighting_08__tag_008",
+          "text": "flattering flat light",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "professional_lighting_08__tag_009",
+          "text": "luminous skin",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "professional_lighting_08__tag_010",
+          "text": "angelic glow",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "professional_lighting_08__tag_011",
+          "text": "beauty editorial light",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "professional_lighting_08__tag_012",
+          "text": "magazine cover lighting",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        }
       ],
       "erotic_tags": [
-        "soft glowing skin",
-        "angelic nude lighting",
-        "luminous body",
-        "even skin illumination",
-        "beauty editorial nude"
-      ]
+        {
+          "id": "professional_lighting_08__erotic_000",
+          "text": "soft glowing skin",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "professional_lighting_08__erotic_001",
+          "text": "angelic nude lighting",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "professional_lighting_08__erotic_002",
+          "text": "luminous body",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "professional_lighting_08__erotic_003",
+          "text": "even skin illumination",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "professional_lighting_08__erotic_004",
+          "text": "beauty editorial nude",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        }
+      ],
+      "id": "professional_lighting_08"
     },
     {
       "name": "硬光 / 直射光（Hard Light）",
       "tags": [
-        "hard light",
-        "direct light",
-        "focused beam",
-        "sharp shadow",
-        "high contrast",
-        "bare bulb",
-        "harsh sun",
-        "spotlight",
-        "strong directional",
-        "intense shadow edge",
-        "crisp shadow",
-        "dramatic hard light"
+        {
+          "id": "professional_lighting_09__tag_000",
+          "text": "hard light",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "professional_lighting_09__tag_001",
+          "text": "direct light",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "professional_lighting_09__tag_002",
+          "text": "focused beam",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "professional_lighting_09__tag_003",
+          "text": "sharp shadow",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "professional_lighting_09__tag_004",
+          "text": "high contrast",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "professional_lighting_09__tag_005",
+          "text": "bare bulb",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "professional_lighting_09__tag_006",
+          "text": "harsh sun",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": "day",
+            "light_sources": [
+              "daylight"
+            ],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "professional_lighting_09__tag_007",
+          "text": "spotlight",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "professional_lighting_09__tag_008",
+          "text": "strong directional",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "professional_lighting_09__tag_009",
+          "text": "intense shadow edge",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "professional_lighting_09__tag_010",
+          "text": "crisp shadow",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "professional_lighting_09__tag_011",
+          "text": "dramatic hard light",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        }
       ],
       "erotic_tags": [
-        "hard light emphasizing body texture",
-        "harsh shadow on curves",
-        "high contrast nude",
-        "dramatic skin texture"
-      ]
+        {
+          "id": "professional_lighting_09__erotic_000",
+          "text": "hard light emphasizing body texture",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "professional_lighting_09__erotic_001",
+          "text": "harsh shadow on curves",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "professional_lighting_09__erotic_002",
+          "text": "high contrast nude",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "professional_lighting_09__erotic_003",
+          "text": "dramatic skin texture",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        }
+      ],
+      "id": "professional_lighting_09"
     },
     {
       "name": "底光 / 恐怖光（Under Lighting / Uplighting）",
       "tags": [
-        "under lighting",
-        "uplighting",
-        "light from below",
-        "chin lit from under",
-        "eerie glow",
-        "unnatural angle",
-        "flashlight from below",
-        "candle under face",
-        "light rising",
-        "under chin shadow",
-        "nose shadow upward"
+        {
+          "id": "professional_lighting_10__tag_000",
+          "text": "under lighting",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "professional_lighting_10__tag_001",
+          "text": "uplighting",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "professional_lighting_10__tag_002",
+          "text": "light from below",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "professional_lighting_10__tag_003",
+          "text": "chin lit from under",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "professional_lighting_10__tag_004",
+          "text": "eerie glow",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "professional_lighting_10__tag_005",
+          "text": "unnatural angle",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "professional_lighting_10__tag_006",
+          "text": "flashlight from below",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "professional_lighting_10__tag_007",
+          "text": "candle under face",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [
+              "candle"
+            ],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "professional_lighting_10__tag_008",
+          "text": "light rising",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "professional_lighting_10__tag_009",
+          "text": "under chin shadow",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "professional_lighting_10__tag_010",
+          "text": "nose shadow upward",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        }
       ],
       "erotic_tags": [
-        "under lighting on body",
-        "light from below illuminating breasts",
-        "eerie sexy glow",
-        "candle under chin",
-        "flashlight on body"
-      ]
+        {
+          "id": "professional_lighting_10__erotic_000",
+          "text": "under lighting on body",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "professional_lighting_10__erotic_001",
+          "text": "light from below illuminating breasts",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "professional_lighting_10__erotic_002",
+          "text": "eerie sexy glow",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "professional_lighting_10__erotic_003",
+          "text": "candle under chin",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [
+              "candle"
+            ],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "professional_lighting_10__erotic_004",
+          "text": "flashlight on body",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        }
+      ],
+      "id": "professional_lighting_10"
     },
     {
       "name": "剪影光（Silhouette Lighting）",
       "tags": [
-        "silhouette lighting",
-        "full silhouette",
-        "backlit figure",
-        "dark outline",
-        "body contour silhouette",
-        "window silhouette",
-        "doorway figure",
-        "standing figure in light",
-        "pure silhouette",
-        "complete shadow figure"
+        {
+          "id": "professional_lighting_11__tag_000",
+          "text": "silhouette lighting",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "professional_lighting_11__tag_001",
+          "text": "full silhouette",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "professional_lighting_11__tag_002",
+          "text": "backlit figure",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "professional_lighting_11__tag_003",
+          "text": "dark outline",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "professional_lighting_11__tag_004",
+          "text": "body contour silhouette",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "professional_lighting_11__tag_005",
+          "text": "window silhouette",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "professional_lighting_11__tag_006",
+          "text": "doorway figure",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "professional_lighting_11__tag_007",
+          "text": "standing figure in light",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "professional_lighting_11__tag_008",
+          "text": "pure silhouette",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "professional_lighting_11__tag_009",
+          "text": "complete shadow figure",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        }
       ],
       "erotic_tags": [
-        "nude silhouette",
-        "body contour in backlight",
-        "standing figure in doorway light",
-        "window light silhouette",
-        "breast silhouette outline"
-      ]
+        {
+          "id": "professional_lighting_11__erotic_000",
+          "text": "nude silhouette",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "professional_lighting_11__erotic_001",
+          "text": "body contour in backlight",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "professional_lighting_11__erotic_002",
+          "text": "standing figure in doorway light",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "professional_lighting_11__erotic_003",
+          "text": "window light silhouette",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [
+              "daylight"
+            ],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "professional_lighting_11__erotic_004",
+          "text": "breast silhouette outline",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        }
+      ],
+      "id": "professional_lighting_11"
     },
     {
       "name": "美颜补光灯 / 环形眼神光 (Ring Beauty Light / Catchlight)",
       "name_zh": "美颜补光灯/环形眼神光",
       "tags": [
-        "ring beauty light close to face",
-        "soft circular catchlight in pupils",
-        "minimized facial shadows",
-        "flawless beauty fill light",
-        "bright illuminated face"
+        {
+          "id": "professional_lighting_12__tag_000",
+          "text": "ring beauty light close to face",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "professional_lighting_12__tag_001",
+          "text": "soft circular catchlight in pupils",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "professional_lighting_12__tag_002",
+          "text": "minimized facial shadows",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "professional_lighting_12__tag_003",
+          "text": "flawless beauty fill light",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [
+              "studio"
+            ],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "professional_lighting_12__tag_004",
+          "text": "bright illuminated face",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        }
       ],
-      "erotic_tags": []
+      "erotic_tags": [],
+      "id": "professional_lighting_12"
     },
     {
       "name": "纱帘散射光 (Diffused Sheer Curtain Light)",
       "name_zh": "纱帘散射柔光",
       "tags": [
-        "soft sunlight filtered through sheer curtains",
-        "gentle diffused indoor illumination",
-        "seamless soft ambient light",
-        "delicate room glow with no harsh shadows"
+        {
+          "id": "professional_lighting_13__tag_000",
+          "text": "soft sunlight filtered through sheer curtains",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": "day",
+            "light_sources": [
+              "daylight"
+            ],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "professional_lighting_13__tag_001",
+          "text": "gentle diffused indoor illumination",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "professional_lighting_13__tag_002",
+          "text": "seamless soft ambient light",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "professional_lighting_13__tag_003",
+          "text": "delicate room glow with no harsh shadows",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        }
       ],
-      "erotic_tags": []
+      "erotic_tags": [],
+      "id": "professional_lighting_13"
     },
     {
       "name": "树影斑驳光 (Dappled Sunlight & Leaf Shadows)",
       "name_zh": "树影斑驳日光",
       "tags": [
-        "dappled sunlight filtering through tree canopy",
-        "flickering leaf shadow patterns on body and floor",
-        "organic natural light spots",
-        "sunlit forest ambiance"
+        {
+          "id": "professional_lighting_14__tag_000",
+          "text": "dappled sunlight filtering through tree canopy",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": "day",
+            "light_sources": [
+              "daylight"
+            ],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "professional_lighting_14__tag_001",
+          "text": "flickering leaf shadow patterns on body and floor",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "professional_lighting_14__tag_002",
+          "text": "organic natural light spots",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "professional_lighting_14__tag_003",
+          "text": "sunlit forest ambiance",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": "day",
+            "light_sources": [
+              "daylight"
+            ],
+            "color_modes": []
+          }
+        }
       ],
-      "erotic_tags": []
+      "erotic_tags": [],
+      "id": "professional_lighting_14"
     },
     {
       "name": "落日余晖金色侧光 (Golden Hour Sunset Sidelight)",
       "name_zh": "落日金色侧光",
       "tags": [
-        "low-angle golden sunset sidelight",
-        "warm golden rim lighting on body edges",
-        "long dramatic shadows",
-        "amber evening glow"
+        {
+          "id": "professional_lighting_15__tag_000",
+          "text": "low-angle golden sunset sidelight",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": "dusk",
+            "light_sources": [
+              "daylight"
+            ],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "professional_lighting_15__tag_001",
+          "text": "warm golden rim lighting on body edges",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "professional_lighting_15__tag_002",
+          "text": "long dramatic shadows",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "professional_lighting_15__tag_003",
+          "text": "amber evening glow",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": "dusk",
+            "light_sources": [],
+            "color_modes": []
+          }
+        }
       ],
-      "erotic_tags": []
+      "erotic_tags": [],
+      "id": "professional_lighting_15"
     },
     {
       "name": "逆光透亮发丝 (Backlit Luminous Glow)",
       "name_zh": "逆光透亮发丝",
       "tags": [
-        "direct backlight creating radiant glowing outline",
-        "illuminated glowing hair strands",
-        "luminous ethereal silhouette edges",
-        "bright rim light from behind"
+        {
+          "id": "professional_lighting_16__tag_000",
+          "text": "direct backlight creating radiant glowing outline",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "professional_lighting_16__tag_001",
+          "text": "illuminated glowing hair strands",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "professional_lighting_16__tag_002",
+          "text": "luminous ethereal silhouette edges",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "professional_lighting_16__tag_003",
+          "text": "bright rim light from behind",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        }
       ],
-      "erotic_tags": []
+      "erotic_tags": [],
+      "id": "professional_lighting_16"
     }
   ],
   "cinematic_lighting": [
     {
       "name": "经典电影光",
       "tags": [
-        "cinematic lighting",
-        "volumetric light",
-        "atmosphere fog with light",
-        "light shafts through dust",
-        "volumetric rays",
-        "god rays",
-        "Tyndall effect",
-        "atmospheric haze",
-        "fog machine with backlight",
-        "mist catching light",
-        "cinematic practical light",
-        "motivated lighting"
-      ]
+        {
+          "id": "cinematic_lighting_00__tag_000",
+          "text": "cinematic lighting",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "cinematic_lighting_00__tag_001",
+          "text": "volumetric light",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "cinematic_lighting_00__tag_002",
+          "text": "atmosphere fog with light",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "cinematic_lighting_00__tag_003",
+          "text": "light shafts through dust",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "cinematic_lighting_00__tag_004",
+          "text": "volumetric rays",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "cinematic_lighting_00__tag_005",
+          "text": "god rays",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "cinematic_lighting_00__tag_006",
+          "text": "Tyndall effect",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "cinematic_lighting_00__tag_007",
+          "text": "atmospheric haze",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "cinematic_lighting_00__tag_008",
+          "text": "fog machine with backlight",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "cinematic_lighting_00__tag_009",
+          "text": "mist catching light",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "cinematic_lighting_00__tag_010",
+          "text": "cinematic practical light",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "cinematic_lighting_00__tag_011",
+          "text": "motivated lighting",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        }
+      ],
+      "id": "cinematic_lighting_00",
+      "erotic_tags": []
     },
     {
       "name": "黑色电影",
       "tags": [
-        "film noir lighting",
-        "venetian blind shadows",
-        "slatted shadow pattern",
-        "noir chiaroscuro",
-        "detective movie light",
-        "shadow bars across body",
-        "high contrast noir",
-        "blind shadow stripes on skin",
-        "jail-bar shadows",
-        "dramatic noir",
-        "low key noir",
-        "deep shadow"
-      ]
+        {
+          "id": "cinematic_lighting_01__tag_000",
+          "text": "film noir lighting",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "cinematic_lighting_01__tag_001",
+          "text": "venetian blind shadows",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "cinematic_lighting_01__tag_002",
+          "text": "slatted shadow pattern",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "cinematic_lighting_01__tag_003",
+          "text": "noir chiaroscuro",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "cinematic_lighting_01__tag_004",
+          "text": "detective movie light",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "cinematic_lighting_01__tag_005",
+          "text": "shadow bars across body",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "cinematic_lighting_01__tag_006",
+          "text": "high contrast noir",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "cinematic_lighting_01__tag_007",
+          "text": "blind shadow stripes on skin",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "cinematic_lighting_01__tag_008",
+          "text": "jail-bar shadows",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "cinematic_lighting_01__tag_009",
+          "text": "dramatic noir",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "cinematic_lighting_01__tag_010",
+          "text": "low key noir",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "cinematic_lighting_01__tag_011",
+          "text": "deep shadow",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        }
+      ],
+      "id": "cinematic_lighting_01",
+      "erotic_tags": []
     },
     {
       "name": "霓虹灯光",
       "tags": [
-        "neon rim light",
-        "colored side light",
-        "pink and blue split lighting",
-        "neon reflection on skin",
-        "magenta and cyan",
-        "colored gel lighting",
-        "RGB lighting on body",
-        "disco ball light fragments",
-        "UV blacklight",
-        "neon glow on wet skin",
-        "love hotel neon glow",
-        "hostess club lighting",
-        "red light district ambiance",
-        "neon sign reflection on skin",
-        "colored tube light"
-      ]
+        {
+          "id": "cinematic_lighting_02__tag_000",
+          "text": "neon rim light",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [
+              "neon"
+            ],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "cinematic_lighting_02__tag_001",
+          "text": "colored side light",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "cinematic_lighting_02__tag_002",
+          "text": "pink and blue split lighting",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "cinematic_lighting_02__tag_003",
+          "text": "neon reflection on skin",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [
+              "neon"
+            ],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "cinematic_lighting_02__tag_004",
+          "text": "magenta and cyan",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "cinematic_lighting_02__tag_005",
+          "text": "colored gel lighting",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "cinematic_lighting_02__tag_006",
+          "text": "RGB lighting on body",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "cinematic_lighting_02__tag_007",
+          "text": "disco ball light fragments",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "cinematic_lighting_02__tag_008",
+          "text": "UV blacklight",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "cinematic_lighting_02__tag_009",
+          "text": "neon glow on wet skin",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [
+              "neon"
+            ],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "cinematic_lighting_02__tag_010",
+          "text": "love hotel neon glow",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [
+              "neon"
+            ],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "cinematic_lighting_02__tag_011",
+          "text": "hostess club lighting",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "cinematic_lighting_02__tag_012",
+          "text": "red light district ambiance",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "cinematic_lighting_02__tag_013",
+          "text": "neon sign reflection on skin",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [
+              "neon"
+            ],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "cinematic_lighting_02__tag_014",
+          "text": "colored tube light",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        }
+      ],
+      "id": "cinematic_lighting_02",
+      "erotic_tags": []
     },
     {
       "name": "自然电影光",
       "tags": [
-        "magic hour light",
-        "golden hour window",
-        "afternoon slant light",
-        "morning backlight",
-        "twilight blue",
-        "candlelit dinner ambiance",
-        "fireplace warm glow",
-        "moonbeam through window",
-        "storm flash illumination",
-        "twilight ambient",
-        "dusk glow"
-      ]
+        {
+          "id": "cinematic_lighting_03__tag_000",
+          "text": "magic hour light",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "cinematic_lighting_03__tag_001",
+          "text": "golden hour window",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": "dusk",
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "cinematic_lighting_03__tag_002",
+          "text": "afternoon slant light",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": "day",
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "cinematic_lighting_03__tag_003",
+          "text": "morning backlight",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": "day",
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "cinematic_lighting_03__tag_004",
+          "text": "twilight blue",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": "dusk",
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "cinematic_lighting_03__tag_005",
+          "text": "candlelit dinner ambiance",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [
+              "candle"
+            ],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "cinematic_lighting_03__tag_006",
+          "text": "fireplace warm glow",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [
+              "candle"
+            ],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "cinematic_lighting_03__tag_007",
+          "text": "moonbeam through window",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "cinematic_lighting_03__tag_008",
+          "text": "storm flash illumination",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "cinematic_lighting_03__tag_009",
+          "text": "twilight ambient",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": "dusk",
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "cinematic_lighting_03__tag_010",
+          "text": "dusk glow",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": "dusk",
+            "light_sources": [],
+            "color_modes": []
+          }
+        }
+      ],
+      "id": "cinematic_lighting_03",
+      "erotic_tags": []
     }
   ],
   "special_effects": [
     {
       "name": "透射光",
       "tags": [
-        "backlit ears",
-        "light through earlobes",
-        "translucent fingers",
-        "light through thin fabric",
-        "glow through sheet",
-        "silhouette through curtain",
-        "light through sheer lingerie",
-        "veins visible in backlight",
-        "light through fingers covering face",
-        "light through shower curtain",
-        "light through wet hair",
-        "translucent skin glow"
-      ]
+        {
+          "id": "special_effects_00__tag_000",
+          "text": "backlit ears",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "special_effects_00__tag_001",
+          "text": "light through earlobes",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "special_effects_00__tag_002",
+          "text": "translucent fingers",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "special_effects_00__tag_003",
+          "text": "light through thin fabric",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "special_effects_00__tag_004",
+          "text": "glow through sheet",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "special_effects_00__tag_005",
+          "text": "silhouette through curtain",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "special_effects_00__tag_006",
+          "text": "light through sheer lingerie",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "special_effects_00__tag_007",
+          "text": "veins visible in backlight",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "special_effects_00__tag_008",
+          "text": "light through fingers covering face",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "special_effects_00__tag_009",
+          "text": "light through shower curtain",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "special_effects_00__tag_010",
+          "text": "light through wet hair",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "special_effects_00__tag_011",
+          "text": "translucent skin glow",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        }
+      ],
+      "id": "special_effects_00",
+      "erotic_tags": []
     },
     {
       "name": "反射光",
       "tags": [
-        "light reflecting off wet skin",
-        "specular highlights on body",
-        "mirror reflection glow",
-        "water surface bounce",
-        "glossy lip shine",
-        "eye catchlight",
-        "light bounce from white sheet",
-        "reflected neon on body",
-        "chrome reflection",
-        "glass reflection adding depth",
-        "oil on body reflection",
-        "sweat specular highlight"
-      ]
+        {
+          "id": "special_effects_01__tag_000",
+          "text": "light reflecting off wet skin",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "special_effects_01__tag_001",
+          "text": "specular highlights on body",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "special_effects_01__tag_002",
+          "text": "mirror reflection glow",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "special_effects_01__tag_003",
+          "text": "water surface bounce",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "special_effects_01__tag_004",
+          "text": "glossy lip shine",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "special_effects_01__tag_005",
+          "text": "eye catchlight",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "special_effects_01__tag_006",
+          "text": "light bounce from white sheet",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "special_effects_01__tag_007",
+          "text": "reflected neon on body",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [
+              "neon"
+            ],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "special_effects_01__tag_008",
+          "text": "chrome reflection",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "special_effects_01__tag_009",
+          "text": "glass reflection adding depth",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "special_effects_01__tag_010",
+          "text": "oil on body reflection",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "special_effects_01__tag_011",
+          "text": "sweat specular highlight",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        }
+      ],
+      "id": "special_effects_01",
+      "erotic_tags": []
     },
     {
       "name": "光影纹理",
       "tags": [
-        "lace shadow pattern on skin",
-        "curtain shadow stripes",
-        "tree leaf shadow dapple",
-        "window frame shadow grid",
-        "jewelry shadow pattern",
-        "chain link shadow",
-        "mesh shadow on body",
-        "fabric texture shadow",
-        "venetian blind stripes",
-        "bamboo blind shadows",
-        "lattice shadow pattern",
-        "chain necklace shadow",
-        "hair shadow on face"
-      ]
+        {
+          "id": "special_effects_02__tag_000",
+          "text": "lace shadow pattern on skin",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "special_effects_02__tag_001",
+          "text": "curtain shadow stripes",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "special_effects_02__tag_002",
+          "text": "tree leaf shadow dapple",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "special_effects_02__tag_003",
+          "text": "window frame shadow grid",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "special_effects_02__tag_004",
+          "text": "jewelry shadow pattern",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "special_effects_02__tag_005",
+          "text": "chain link shadow",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "special_effects_02__tag_006",
+          "text": "mesh shadow on body",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "special_effects_02__tag_007",
+          "text": "fabric texture shadow",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "special_effects_02__tag_008",
+          "text": "venetian blind stripes",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "special_effects_02__tag_009",
+          "text": "bamboo blind shadows",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "special_effects_02__tag_010",
+          "text": "lattice shadow pattern",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "special_effects_02__tag_011",
+          "text": "chain necklace shadow",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "special_effects_02__tag_012",
+          "text": "hair shadow on face",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        }
+      ],
+      "id": "special_effects_02",
+      "erotic_tags": []
     },
     {
       "name": "光雾交互",
       "tags": [
-        "light through steam",
-        "backlit shower spray",
-        "dusty light rays",
-        "fog machine atmosphere",
-        "breath visible in cold light",
-        "smoke catching light",
-        "perfume mist illuminated",
-        "condensation droplets catching light",
-        "vapor rising in backlight",
-        "haze with light shafts",
-        "incense smoke in light beam",
-        "dust motes in sunbeam"
-      ]
+        {
+          "id": "special_effects_03__tag_000",
+          "text": "light through steam",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "special_effects_03__tag_001",
+          "text": "backlit shower spray",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "special_effects_03__tag_002",
+          "text": "dusty light rays",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "special_effects_03__tag_003",
+          "text": "fog machine atmosphere",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "special_effects_03__tag_004",
+          "text": "breath visible in cold light",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [
+              "artificial_cool"
+            ],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "special_effects_03__tag_005",
+          "text": "smoke catching light",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "special_effects_03__tag_006",
+          "text": "perfume mist illuminated",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "special_effects_03__tag_007",
+          "text": "condensation droplets catching light",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "special_effects_03__tag_008",
+          "text": "vapor rising in backlight",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "special_effects_03__tag_009",
+          "text": "haze with light shafts",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "special_effects_03__tag_010",
+          "text": "incense smoke in light beam",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "special_effects_03__tag_011",
+          "text": "dust motes in sunbeam",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [
+              "daylight"
+            ],
+            "color_modes": []
+          }
+        }
+      ],
+      "id": "special_effects_03",
+      "erotic_tags": []
     }
   ],
   "erotic_lighting": [
     {
       "name": "暧昧氛围光",
       "tags": [
-        "red-tinted room",
-        "pink ambient light",
-        "under-sheet glow",
-        "phone screen glow on face",
-        "lava lamp light",
-        "red light district ambiance",
-        "candlelit bedroom",
-        "warm lamp glow on naked skin",
-        "bedside lamp intimacy",
-        "dimmed overhead",
-        "night light only",
-        "single candle flame",
-        "warm orange pool of light",
-        "intimate soft glow"
-      ]
+        {
+          "id": "erotic_lighting_00__tag_000",
+          "text": "red-tinted room",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "erotic_lighting_00__tag_001",
+          "text": "pink ambient light",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "erotic_lighting_00__tag_002",
+          "text": "under-sheet glow",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "erotic_lighting_00__tag_003",
+          "text": "phone screen glow on face",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [
+              "screen"
+            ],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "erotic_lighting_00__tag_004",
+          "text": "lava lamp light",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "erotic_lighting_00__tag_005",
+          "text": "red light district ambiance",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "erotic_lighting_00__tag_006",
+          "text": "candlelit bedroom",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [
+              "candle"
+            ],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "erotic_lighting_00__tag_007",
+          "text": "warm lamp glow on naked skin",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [
+              "artificial_warm"
+            ],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "erotic_lighting_00__tag_008",
+          "text": "bedside lamp intimacy",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "erotic_lighting_00__tag_009",
+          "text": "dimmed overhead",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "erotic_lighting_00__tag_010",
+          "text": "night light only",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": "night",
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "erotic_lighting_00__tag_011",
+          "text": "single candle flame",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [
+              "candle"
+            ],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "erotic_lighting_00__tag_012",
+          "text": "warm orange pool of light",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "erotic_lighting_00__tag_013",
+          "text": "intimate soft glow",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        }
+      ],
+      "id": "erotic_lighting_00",
+      "erotic_tags": []
     },
     {
       "name": "轮廓 / 剪影",
       "tags": [
-        "dark silhouette",
-        "backlit nude outline",
-        "body contour in rim light",
-        "hip curve highlighted",
-        "breast silhouette",
-        "standing figure in doorway light",
-        "window light silhouette",
-        "body outline glow",
-        "light defining curves",
-        "dark room with single backlight",
-        "golden body rim",
-        "edge light on wet skin"
-      ]
+        {
+          "id": "erotic_lighting_01__tag_000",
+          "text": "dark silhouette",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "erotic_lighting_01__tag_001",
+          "text": "backlit nude outline",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "erotic_lighting_01__tag_002",
+          "text": "body contour in rim light",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "erotic_lighting_01__tag_003",
+          "text": "hip curve highlighted",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "erotic_lighting_01__tag_004",
+          "text": "breast silhouette",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "erotic_lighting_01__tag_005",
+          "text": "standing figure in doorway light",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "erotic_lighting_01__tag_006",
+          "text": "window light silhouette",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [
+              "daylight"
+            ],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "erotic_lighting_01__tag_007",
+          "text": "body outline glow",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "erotic_lighting_01__tag_008",
+          "text": "light defining curves",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "erotic_lighting_01__tag_009",
+          "text": "dark room with single backlight",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "erotic_lighting_01__tag_010",
+          "text": "golden body rim",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "erotic_lighting_01__tag_011",
+          "text": "edge light on wet skin",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        }
+      ],
+      "id": "erotic_lighting_01",
+      "erotic_tags": []
     },
     {
       "name": "湿润反光",
       "tags": [
-        "sweat glistening under warm light",
-        "wet skin specular highlights",
-        "oil on body catching light",
-        "cum glistening on skin",
-        "body moisture in rim light",
-        "glistening afterglow",
-        "wet hair shine",
-        "lip gloss reflection",
-        "skin sheen from perspiration",
-        "dewy wet glow",
-        "wet skin catching light",
-        "body oil reflection"
-      ]
+        {
+          "id": "erotic_lighting_02__tag_000",
+          "text": "sweat glistening under warm light",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [
+              "artificial_warm"
+            ],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "erotic_lighting_02__tag_001",
+          "text": "wet skin specular highlights",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "erotic_lighting_02__tag_002",
+          "text": "oil on body catching light",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "erotic_lighting_02__tag_003",
+          "text": "cum glistening on skin",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "erotic_lighting_02__tag_004",
+          "text": "body moisture in rim light",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "erotic_lighting_02__tag_005",
+          "text": "glistening afterglow",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "erotic_lighting_02__tag_006",
+          "text": "wet hair shine",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "erotic_lighting_02__tag_007",
+          "text": "lip gloss reflection",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "erotic_lighting_02__tag_008",
+          "text": "skin sheen from perspiration",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "erotic_lighting_02__tag_009",
+          "text": "dewy wet glow",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "erotic_lighting_02__tag_010",
+          "text": "wet skin catching light",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "erotic_lighting_02__tag_011",
+          "text": "body oil reflection",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        }
+      ],
+      "id": "erotic_lighting_02",
+      "erotic_tags": []
     },
     {
       "name": "私密偷光感",
       "tags": [
-        "peeking light from under door",
-        "hallway light leaking in",
-        "fridge light in dark kitchen",
-        "laptop screen glow",
-        "TV flicker on body",
-        "alarm clock glow",
-        "flashlight beam",
-        "candle carried in dark",
-        "match strike illumination",
-        "lighter flame on face",
-        "screen glow on naked skin",
-        "phone light under sheets"
-      ]
+        {
+          "id": "erotic_lighting_03__tag_000",
+          "text": "peeking light from under door",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "erotic_lighting_03__tag_001",
+          "text": "hallway light leaking in",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "erotic_lighting_03__tag_002",
+          "text": "fridge light in dark kitchen",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "erotic_lighting_03__tag_003",
+          "text": "laptop screen glow",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [
+              "screen"
+            ],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "erotic_lighting_03__tag_004",
+          "text": "TV flicker on body",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "erotic_lighting_03__tag_005",
+          "text": "alarm clock glow",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "erotic_lighting_03__tag_006",
+          "text": "flashlight beam",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "erotic_lighting_03__tag_007",
+          "text": "candle carried in dark",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [
+              "candle"
+            ],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "erotic_lighting_03__tag_008",
+          "text": "match strike illumination",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "erotic_lighting_03__tag_009",
+          "text": "lighter flame on face",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [
+              "candle"
+            ],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "erotic_lighting_03__tag_010",
+          "text": "screen glow on naked skin",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [
+              "screen"
+            ],
+            "color_modes": []
+          }
+        },
+        {
+          "id": "erotic_lighting_03__tag_011",
+          "text": "phone light under sheets",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [
+              "screen"
+            ],
+            "color_modes": []
+          }
+        }
+      ],
+      "id": "erotic_lighting_03",
+      "erotic_tags": []
     }
   ],
   "color_temperature_table": [
@@ -665,70 +3987,100 @@
       "main_light": "Rembrandt lighting",
       "modifier_light": "chiaroscuro, deep shadow",
       "atmosphere": "candlelight",
-      "effect": "巴洛克油画感"
+      "effect": "巴洛克油画感",
+      "id": "lighting_oil_classical",
+      "name_zh": "油画古典",
+      "tags": []
     },
     {
       "name": "日系清新",
       "main_light": "soft window light",
       "modifier_light": "loop lighting, diffused",
       "atmosphere": "bright airy",
-      "effect": "清纯唯美"
+      "effect": "清纯唯美",
+      "id": "lighting_japanese_fresh",
+      "name_zh": "日系清新",
+      "tags": []
     },
     {
       "name": "逆光发丝",
       "main_light": "backlight, rim light",
       "modifier_light": "hair glow, edge light",
       "atmosphere": "golden hour",
-      "effect": "仙女感"
+      "effect": "仙女感",
+      "id": "lighting_backlit_hair",
+      "name_zh": "逆光发丝",
+      "tags": []
     },
     {
       "name": "电影暗调",
       "main_light": "split lighting",
       "modifier_light": "volumetric haze",
       "atmosphere": "single practical",
-      "effect": "戏剧张力"
+      "effect": "戏剧张力",
+      "id": "lighting_cinematic_dark",
+      "name_zh": "电影暗调",
+      "tags": []
     },
     {
       "name": "情人旅馆霓虹",
       "main_light": "neon side light",
       "modifier_light": "colored rim, RGB",
       "atmosphere": "love hotel glow, pink ambiance",
-      "effect": "暧昧诱惑"
+      "effect": "暧昧诱惑",
+      "id": "lighting_love_hotel_neon",
+      "name_zh": "情人旅馆霓虹",
+      "tags": []
     },
     {
       "name": "温泉暧昧",
       "main_light": "moonlight",
       "modifier_light": "backlit steam",
       "atmosphere": "warm water glow",
-      "effect": "情欲朦胧"
+      "effect": "情欲朦胧",
+      "id": "lighting_onsen_intimate",
+      "name_zh": "温泉暧昧",
+      "tags": []
     },
     {
       "name": "卧室私密",
       "main_light": "bedside lamp",
       "modifier_light": "rim light on body",
       "atmosphere": "candlelight",
-      "effect": "亲密感"
+      "effect": "亲密感",
+      "id": "lighting_bedroom_private",
+      "name_zh": "卧室私密",
+      "tags": []
     },
     {
       "name": "影棚商业",
       "main_light": "beauty dish",
       "modifier_light": "hair light, fill",
       "atmosphere": "soft even",
-      "effect": "杂志大片"
+      "effect": "杂志大片",
+      "id": "lighting_studio_commercial",
+      "name_zh": "影棚商业",
+      "tags": []
     },
     {
       "name": "偷窥私密",
       "main_light": "screen glow",
       "modifier_light": "under door light",
       "atmosphere": "dark ambient",
-      "effect": "禁忌感"
+      "effect": "禁忌感",
+      "id": "lighting_voyeur_private",
+      "name_zh": "偷窥私密",
+      "tags": []
     },
     {
       "name": "雨天湿润",
       "main_light": "overcast diffused",
       "modifier_light": "rim light through rain",
       "atmosphere": "moody grey",
-      "effect": "忧郁美感"
+      "effect": "忧郁美感",
+      "id": "lighting_rain_wet",
+      "name_zh": "雨天湿润",
+      "tags": []
     }
   ]
 }

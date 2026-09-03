@@ -20,10 +20,24 @@ from typing import Any, Dict, List, Optional, Sequence, Tuple
 
 if __package__:
     from .errors import CatalogIndexingError, DataLoadError, DataSelectionError
-    from .models import ClothingSampleResult, SampleResult, SampledTag, TagProvenance, ThemeSampleResult
+    from .models import (
+        ClothingSampleResult,
+        SampleResult,
+        SampledTag,
+        SemanticFacts,
+        TagProvenance,
+        ThemeSampleResult,
+    )
 else:
     from lib.errors import CatalogIndexingError, DataLoadError, DataSelectionError
-    from lib.models import ClothingSampleResult, SampleResult, SampledTag, TagProvenance, ThemeSampleResult
+    from lib.models import (
+        ClothingSampleResult,
+        SampleResult,
+        SampledTag,
+        SemanticFacts,
+        TagProvenance,
+        ThemeSampleResult,
+    )
 
 
 class SelectionMode:
@@ -366,9 +380,25 @@ class DataSampler:
                 for t in tags:
                     if isinstance(t, str) and t.strip():
                         result.append(t.strip())
+                    elif isinstance(t, dict):
+                        text = t.get("text", "")
+                        if isinstance(text, str) and text.strip():
+                            result.append(text.strip())
                 return result
             if isinstance(tags, str):
                 return [t.strip() for t in tags.split(",") if t.strip()]
+            # 兼容只有 anchor_tags 或 detail_tags 的情况
+            combined = item.get("anchor_tags", []) + item.get("detail_tags", [])
+            if combined:
+                res = []
+                for t in combined:
+                    if isinstance(t, str) and t.strip():
+                        res.append(t.strip())
+                    elif isinstance(t, dict):
+                        text = t.get("text", "")
+                        if isinstance(text, str) and text.strip():
+                            res.append(text.strip())
+                return res
         return []
 
     # ─── 情境推断核心 ───
@@ -419,6 +449,53 @@ class DataSampler:
 
         return "generic"
 
+    @staticmethod
+    def _to_sampled_tags(
+        items: Sequence[Any],
+        parent_id: str,
+        kind: str,
+        semantic_ids: Tuple[str, ...] = (),
+        parent_ids: Tuple[str, ...] = (),
+        extra_facts: Optional[Dict[str, Any]] = None,
+    ) -> Tuple[Tuple[str, ...], Tuple[SampledTag, ...]]:
+        tags_str: List[str] = []
+        sampled_tags: List[SampledTag] = []
+        for idx, item in enumerate(items):
+            if isinstance(item, SampledTag):
+                tags_str.append(item.text)
+                sampled_tags.append(item)
+                continue
+            if isinstance(item, dict):
+                t_text = item.get("text", "")
+                t_id = item.get("id", f"{parent_id}__tag_{idx:03d}")
+                f_dict = dict(item.get("facts", {}))
+                if extra_facts:
+                    f_dict.update(extra_facts)
+                facts = SemanticFacts.from_dict(f_dict)
+            else:
+                t_text = str(item).strip()
+                t_id = f"{parent_id}__tag_{idx:03d}"
+                facts = SemanticFacts.from_dict(extra_facts or {})
+            if not t_text:
+                continue
+            tags_str.append(t_text)
+            p_ids = parent_ids or ((parent_id,) if parent_id else ())
+            prov = TagProvenance(
+                item_id=parent_id if parent_id else t_id,
+                kind=kind,
+                parent_ids=p_ids,
+                semantic_ids=tuple(semantic_ids or ((f"{kind}:{parent_id}",) if parent_id else ())),
+            )
+            sampled_tags.append(
+                SampledTag(
+                    text=t_text,
+                    provenance=prov,
+                    id=t_id,
+                    facts=facts,
+                )
+            )
+        return tuple(tags_str), tuple(sampled_tags)
+
     # ─── 槽位 1: 场景 + 主题 ───
 
     def sample_scene_result(self, category: str, rng: Random) -> Optional[SampleResult]:
@@ -450,11 +527,11 @@ class DataSampler:
             anchors = chosen.get("tags", ["room"])
 
         anchor = rng.choice(anchors) if anchors else "room"
-        sampled_tags = [anchor]
+        sampled_raw = [anchor]
 
         if details:
             detail_count = min(rng.randint(1, 2), len(details))
-            sampled_tags.extend(rng.sample(details, detail_count))
+            sampled_raw.extend(rng.sample(details, detail_count))
 
         c_id = chosen.get("id", "scene_unknown")
         ctx_ids = tuple(chosen.get("context_ids", ("generic",)))
@@ -463,12 +540,44 @@ class DataSampler:
             semantic_ids=tuple([f"scene:{c_id}"] + [f"context:{c}" for c in ctx_ids]),
             kind="scene"
         )
+        sampled_tags: List[SampledTag] = []
+        tags_str: List[str] = []
+        for idx, item_tag in enumerate(sampled_raw):
+            is_anchor = (idx == 0)
+            if isinstance(item_tag, dict):
+                t_text = item_tag.get("text", "")
+                t_id = item_tag.get("id", f"{c_id}__tag_{idx:03d}")
+                t_facts = SemanticFacts.from_dict(item_tag.get("facts", {}))
+            else:
+                t_text = str(item_tag).strip()
+                t_id = f"{c_id}__tag_{idx:03d}"
+                t_facts = SemanticFacts(
+                    semantic_role="scene_anchor" if is_anchor else "scene_detail",
+                    space_kind="outdoor" if chosen.get("exclusive_group") in ("beach", "outdoor") else "indoor",
+                    venue_ids=(chosen.get("exclusive_group") or c_id,) if chosen.get("exclusive_group") else (c_id,),
+                )
+            tags_str.append(t_text)
+            sampled_tags.append(
+                SampledTag(
+                    text=t_text,
+                    provenance=TagProvenance(
+                        item_id=c_id if c_id else t_id,
+                        kind="scene",
+                        parent_ids=(c_id,),
+                        semantic_ids=(f"scene:{c_id}",)
+                    ),
+                    id=t_id,
+                    facts=t_facts,
+                )
+            )
+
         return SampleResult(
-            tags=tuple(sampled_tags),
+            tags=tuple(tags_str),
             item_id=c_id,
             context_ids=ctx_ids,
             exclusive_group=chosen.get("exclusive_group"),
             provenance=prov,
+            sampled_tags=tuple(sampled_tags),
         )
 
     def sample_scene(self, category: str, rng: Random) -> List[str]:
@@ -494,18 +603,42 @@ class DataSampler:
                 raise DataSelectionError(f"Unknown theme: {theme!r}")
 
         t_id = t.get("id", "theme_unknown")
-        tags = self._flatten_tags(t)
-        sampled = self._pick(tags, rng, min(rng.randint(2, 3), len(tags))) if tags else []
+        raw_tags = t.get("tags", [])
+        sampled_raw = rng.sample(raw_tags, min(rng.randint(2, 3), len(raw_tags))) if raw_tags else []
         prov = TagProvenance(
             item_id=t_id,
             semantic_ids=(f"theme:{t_id}",),
             kind="theme"
         )
-        sampled_tags = tuple(SampledTag(text=tag, provenance=prov) for tag in sampled)
+        ctx_ids = tuple(t.get("context_ids", ()))
+        sampled_tags_list: List[SampledTag] = []
+        for idx, tag in enumerate(sampled_raw):
+            if isinstance(tag, dict):
+                text = tag.get("text", "")
+                tag_id = tag.get("id", f"{t_id}__tag_{idx:03d}")
+                tag_facts = SemanticFacts.from_dict(tag.get("facts", {}))
+            else:
+                text = str(tag).strip()
+                tag_id = f"{t_id}__tag_{idx:03d}"
+                tag_facts = SemanticFacts(semantic_role="selector")
+            sampled_tags_list.append(
+                SampledTag(
+                    text=text,
+                    provenance=TagProvenance(
+                        item_id=t_id,
+                        kind="theme",
+                        parent_ids=(t_id,),
+                        semantic_ids=(f"theme:{t_id}",),
+                    ),
+                    id=tag_id,
+                    facts=tag_facts,
+                )
+            )
         return ThemeSampleResult(
-            tags=sampled_tags,
+            tags=tuple(sampled_tags_list),
             theme_id=t_id,
             provenance=prov,
+            context_ids=ctx_ids,
         )
 
     def sample_theme(self, theme: str, rng: Random) -> List[str]:
@@ -531,18 +664,20 @@ class DataSampler:
             if not chosen:
                 raise DataSelectionError(f"Unknown shot type: {shot_type!r}")
 
-        tags = self._flatten_tags(chosen)
-        selected_tags = tags[:2] if tags else []
+        raw_tags = chosen.get("tags", [])
+        selected_raw = raw_tags[:2] if raw_tags else []
         item_id = chosen.get("id", "shot_type_custom")
+        tags_str, sampled = self._to_sampled_tags(selected_raw, item_id, "shot_type")
         prov = TagProvenance(
             item_id=item_id,
             kind="shot_type",
             semantic_ids=(f"shot:{item_id}",),
         )
         return SampleResult(
-            tags=tuple(selected_tags),
+            tags=tags_str,
             item_id=item_id,
             provenance=prov,
+            sampled_tags=sampled,
         )
 
     def sample_shot_type(self, shot_type: str, rng: Random) -> List[str]:
@@ -564,18 +699,20 @@ class DataSampler:
             if not chosen:
                 raise DataSelectionError(f"Unknown camera angle: {angle!r}")
 
-        tags = self._flatten_tags(chosen)
-        selected_tags = tags[:1] if tags else []
+        raw_tags = chosen.get("tags", [])
+        selected_raw = raw_tags[:1] if raw_tags else []
         item_id = chosen.get("id", "camera_angle_custom")
+        tags_str, sampled = self._to_sampled_tags(selected_raw, item_id, "camera_angle")
         prov = TagProvenance(
             item_id=item_id,
             kind="camera_angle",
             semantic_ids=(f"angle:{item_id}",),
         )
         return SampleResult(
-            tags=tuple(selected_tags),
+            tags=tags_str,
             item_id=item_id,
             provenance=prov,
+            sampled_tags=sampled,
         )
 
     def sample_camera_angle(self, angle: str, rng: Random) -> List[str]:
@@ -602,16 +739,33 @@ class DataSampler:
         }
         if q_norm not in quality_map:
             raise DataSelectionError(f"Unknown quality level: {quality_tier!r}")
-        item_id, tags = quality_map[q_norm]
+        item_id, tags_list = quality_map[q_norm]
+        q_class = "high"
+        c_dev = "professional"
+        if "masterpiece" in item_id:
+            q_class = "masterpiece"
+        elif "phone" in item_id:
+            q_class = "phone"
+            c_dev = "phone"
+        elif "cctv" in item_id:
+            q_class = "cctv"
+            c_dev = "cctv"
+        elif "standard" in item_id:
+            q_class = "standard"
+            c_dev = "neutral"
+
+        fcts = {"semantic_role": "quality", "quality_class": q_class, "capture_device": c_dev}
+        tags_str, sampled = self._to_sampled_tags(tags_list, item_id, "quality", extra_facts=fcts)
         prov = TagProvenance(
             item_id=item_id,
             kind="quality",
             semantic_ids=(f"quality:{item_id}",),
         )
         return SampleResult(
-            tags=tuple(tags),
+            tags=tags_str,
             item_id=item_id,
             provenance=prov,
+            sampled_tags=sampled,
         )
 
     def sample_quality_tags(self, quality_tier: str) -> List[str]:
@@ -620,22 +774,20 @@ class DataSampler:
 
     # ─── 槽位 3: 裸露状态 ───
 
-    def sample_nudity(self, level: str | int, rng: Random) -> Tuple[List[str], str]:
-        """返回 (采样tags, 标准等级代码比如L1/L2/L3/L4/L5/L6)"""
+    def sample_nudity_result(self, level: str | int, rng: Random) -> Tuple[Optional[SampleResult], str]:
         if _is_none(level):
-            return ([], "L1")
+            return (None, "L1")
 
         data = self._load("nudity_levels")
         levels = data.get("nudity_levels", [])
         if not levels:
-            return ([], "L3")
+            return (None, "L3")
 
         if _is_random(level):
             lvl = self._pick_one(levels, rng)
         else:
             lvl = _match_item(levels, str(level), "nudity_levels")
             if not lvl:
-                # 规范化整数字符串或纯数字 (如 1 -> L1)
                 s = str(level).strip().upper()
                 code_map = {"1": "L1", "2": "L2", "3": "L3", "4": "L4", "5": "L5", "6": "L6"}
                 mapped = code_map.get(s, s if s in ("L1", "L2", "L3", "L4", "L5", "L6") else None)
@@ -650,20 +802,21 @@ class DataSampler:
                 lvl_code = code
                 break
 
-        tags = self._flatten_tags(lvl)
-        sampled_tags = self._pick(tags, rng, min(rng.randint(2, 3), len(tags))) if tags else []
-        return (sampled_tags, lvl_code)
-
-    def sample_nudity_result(self, level: str | int, rng: Random) -> Tuple[Optional[SampleResult], str]:
-        tags, lvl_code = self.sample_nudity(level, rng)
-        if not tags:
-            return None, lvl_code
+        raw_tags = lvl.get("tags", [])
+        selected = self._pick(raw_tags, rng, min(rng.randint(2, 3), len(raw_tags))) if raw_tags else []
+        item_id = lvl.get("id", f"nudity_{lvl_code}")
+        tags_str, sampled = self._to_sampled_tags(selected, item_id, "nudity")
         prov = TagProvenance(
-            item_id=f"nudity_{lvl_code}",
+            item_id=item_id,
             kind="nudity",
             semantic_ids=(f"nudity:{lvl_code}",),
         )
-        return SampleResult(tags=tuple(tags), item_id=f"nudity_{lvl_code}", provenance=prov), lvl_code
+        return SampleResult(tags=tags_str, item_id=item_id, provenance=prov, sampled_tags=sampled), lvl_code
+
+    def sample_nudity(self, level: str | int, rng: Random) -> Tuple[List[str], str]:
+        """返回 (采样tags, 标准等级代码比如L1/L2/L3/L4/L5/L6)"""
+        res, lvl_code = self.sample_nudity_result(level, rng)
+        return (list(res.tags) if res else [], lvl_code)
 
     # ─── 槽位 4: 服装款式与穿脱状态 ───
 
@@ -706,18 +859,14 @@ class DataSampler:
                 raise DataSelectionError(f"Unknown clothing style: {style!r}")
 
         c_id = chosen_style.get("id", "")
-        base_style_tags_raw = self._flatten_tags(chosen_style)
-        base_tags_tuple = tuple(
-            SampledTag(
-                text=t,
-                provenance=TagProvenance(
-                    item_id=c_id,
-                    semantic_ids=(f"clothing:{c_id}", f"nudity:{nudity_level_code}"),
-                    kind="base_clothing"
-                )
-            )
-            for t in base_style_tags_raw
+        raw_style_tags = chosen_style.get("tags", [])
+        _, all_base_sampled = self._to_sampled_tags(
+            raw_style_tags,
+            c_id,
+            "base_clothing",
+            semantic_ids=(f"clothing:{c_id}", f"nudity:{nudity_level_code}")
         )
+        base_tags_tuple = tuple(all_base_sampled)
 
         state_mode = get_selection_mode(state)
 
@@ -737,16 +886,18 @@ class DataSampler:
         style_overrides = linkage_data.get("style_overrides", {})
         states = data.get("clothing_states", [])
 
-        state_tags_list: List[SampledTag] = []
+        state_tags_list: Sequence[SampledTag] = ()
         state_id: Optional[str] = None
 
         # L1, L5, L6: 强力应用 style_overrides 保证纯净性与防泄漏
         if nudity_level_code in ("L1", "L5", "L6") and c_id in style_overrides:
             override_tags = list(style_overrides[c_id])
-            state_tags_list = [
-                SampledTag(text=t, provenance=TagProvenance(item_id=c_id, semantic_ids=(f"clothing:{c_id}", f"nudity:{nudity_level_code}", "override:linkage"), kind="clothing_state"))
-                for t in override_tags
-            ]
+            _, state_tags_list = self._to_sampled_tags(
+                override_tags,
+                c_id,
+                "clothing_state",
+                semantic_ids=(f"clothing:{c_id}", f"nudity:{nudity_level_code}", "override:linkage")
+            )
             return ClothingSampleResult(
                 base_tags=(),
                 state_tags=tuple(state_tags_list),
@@ -760,10 +911,16 @@ class DataSampler:
             if nudity_level_code in ("L1", "L5", "L6"):
                 gen_tags = linkage_data.get("general_tags", [])
                 chosen_gen = self._pick(gen_tags, rng, min(2, len(gen_tags)))
-                chosen_base = self._pick([t.text for t in base_tags_tuple], rng, min(2, len(base_tags_tuple)))
+                _, state_tags_list = self._to_sampled_tags(
+                    chosen_gen,
+                    "linkage_general",
+                    "clothing_state",
+                    semantic_ids=(f"clothing:{c_id}", f"nudity:{nudity_level_code}", "linkage:general")
+                )
+                chosen_base = self._pick(base_tags_tuple, rng, min(2, len(base_tags_tuple)))
                 return ClothingSampleResult(
-                    base_tags=tuple(SampledTag(text=t, provenance=TagProvenance(item_id=c_id, semantic_ids=(f"clothing:{c_id}", f"nudity:{nudity_level_code}"), kind="base_clothing")) for t in chosen_base),
-                    state_tags=tuple(SampledTag(text=t, provenance=TagProvenance(item_id="linkage_general", semantic_ids=(f"clothing:{c_id}", f"nudity:{nudity_level_code}", "linkage:general"), kind="clothing_state")) for t in chosen_gen),
+                    base_tags=tuple(chosen_base),
+                    state_tags=tuple(state_tags_list),
                     extension_tags=(),
                     style_id=c_id,
                     state_id="linkage_general",
@@ -774,19 +931,23 @@ class DataSampler:
                 # L2, L3, L4 Auto mode
                 if c_id in style_overrides:
                     override_tags = list(style_overrides[c_id])
-                    state_tags_list = [
-                        SampledTag(text=t, provenance=TagProvenance(item_id=c_id, semantic_ids=(f"clothing:{c_id}", f"nudity:{nudity_level_code}", "override:linkage"), kind="clothing_state"))
-                        for t in override_tags
-                    ]
+                    _, state_tags_list = self._to_sampled_tags(
+                        override_tags,
+                        c_id,
+                        "clothing_state",
+                        semantic_ids=(f"clothing:{c_id}", f"nudity:{nudity_level_code}", "override:linkage")
+                    )
                 else:
                     gen_tags = linkage_data.get("general_tags", [])
                     chosen_gen = self._pick(gen_tags, rng, min(2, len(gen_tags)))
-                    chosen_base = self._pick([t.text for t in base_tags_tuple], rng, min(2, len(base_tags_tuple)))
-                    base_tags_tuple = tuple(SampledTag(text=t, provenance=TagProvenance(item_id=c_id, semantic_ids=(f"clothing:{c_id}", f"nudity:{nudity_level_code}"), kind="base_clothing")) for t in chosen_base)
-                    state_tags_list = [
-                        SampledTag(text=t, provenance=TagProvenance(item_id="linkage_general", semantic_ids=(f"clothing:{c_id}", f"nudity:{nudity_level_code}", "linkage:general"), kind="clothing_state"))
-                        for t in chosen_gen
-                    ]
+                    _, state_tags_list = self._to_sampled_tags(
+                        chosen_gen,
+                        "linkage_general",
+                        "clothing_state",
+                        semantic_ids=(f"clothing:{c_id}", f"nudity:{nudity_level_code}", "linkage:general")
+                    )
+                    chosen_base = self._pick(base_tags_tuple, rng, min(2, len(base_tags_tuple)))
+                    base_tags_tuple = tuple(chosen_base)
                 state_id = "auto_linkage"
 
         elif state_mode == SelectionMode.RANDOM:
@@ -804,13 +965,16 @@ class DataSampler:
             pool = [s for s in states if s.get("id") in allowed_state_ids] if allowed_state_ids else states
             chosen_state = self._pick_one(pool if pool else states, rng)
             state_id = chosen_state.get("id", "")
-            raw_state_tags = self._pick(self._flatten_tags(chosen_state), rng, min(2, len(self._flatten_tags(chosen_state))))
-            chosen_base = self._pick([t.text for t in base_tags_tuple], rng, min(2, len(base_tags_tuple)))
-            base_tags_tuple = tuple(SampledTag(text=t, provenance=TagProvenance(item_id=c_id, semantic_ids=(f"clothing:{c_id}", f"nudity:{nudity_level_code}"), kind="base_clothing")) for t in chosen_base)
-            state_tags_list = [
-                SampledTag(text=t, provenance=TagProvenance(item_id=state_id, semantic_ids=(f"clothing:{c_id}", f"state:{state_id}", f"nudity:{nudity_level_code}"), kind="clothing_state"))
-                for t in raw_state_tags
-            ]
+            raw_state_tags = chosen_state.get("tags", [])
+            picked_state_tags = self._pick(raw_state_tags, rng, min(2, len(raw_state_tags)))
+            _, state_tags_list = self._to_sampled_tags(
+                picked_state_tags,
+                state_id,
+                "clothing_state",
+                semantic_ids=(f"clothing:{c_id}", f"state:{state_id}", f"nudity:{nudity_level_code}")
+            )
+            chosen_base = self._pick(base_tags_tuple, rng, min(2, len(base_tags_tuple)))
+            base_tags_tuple = tuple(chosen_base)
 
         else:
             # EXPLICIT
@@ -818,13 +982,16 @@ class DataSampler:
             if not chosen_state:
                 raise DataSelectionError(f"Unknown clothing state: {state!r}")
             state_id = chosen_state.get("id", "")
-            raw_state_tags = self._pick(self._flatten_tags(chosen_state), rng, min(2, len(self._flatten_tags(chosen_state))))
-            chosen_base = self._pick([t.text for t in base_tags_tuple], rng, min(2, len(base_tags_tuple)))
-            base_tags_tuple = tuple(SampledTag(text=t, provenance=TagProvenance(item_id=c_id, semantic_ids=(f"clothing:{c_id}", f"nudity:{nudity_level_code}"), kind="base_clothing")) for t in chosen_base)
-            state_tags_list = [
-                SampledTag(text=t, provenance=TagProvenance(item_id=state_id, semantic_ids=(f"clothing:{c_id}", f"state:{state_id}", f"nudity:{nudity_level_code}"), kind="clothing_state"))
-                for t in raw_state_tags
-            ]
+            raw_state_tags = chosen_state.get("tags", [])
+            picked_state_tags = self._pick(raw_state_tags, rng, min(2, len(raw_state_tags)))
+            _, state_tags_list = self._to_sampled_tags(
+                picked_state_tags,
+                state_id,
+                "clothing_state",
+                semantic_ids=(f"clothing:{c_id}", f"state:{state_id}", f"nudity:{nudity_level_code}")
+            )
+            chosen_base = self._pick(base_tags_tuple, rng, min(2, len(base_tags_tuple)))
+            base_tags_tuple = tuple(chosen_base)
 
         # 契约：Auto, Random, Explicit 在 L2/L3/L4 均通过数据驱动采样扩展库
         extension_sampled_tags: List[SampledTag] = []
@@ -876,47 +1043,64 @@ class DataSampler:
         all_trans_tiers = [t for t in data.get("cloth_transparency_tiers", []) if t.get("id") in allowed_trans_ids]
         all_wardrobe = [t for t in data.get("lingerie_wardrobe", []) if t.get("id") in allowed_wardrobe_ids]
 
+        def _make_ext_tag(itm: Any, parent_id: str, family: str) -> SampledTag:
+            if isinstance(itm, dict):
+                txt = itm.get("text", "")
+                tid = itm.get("id", parent_id)
+                fcts = SemanticFacts.from_dict(itm.get("facts", {}))
+            else:
+                txt = str(itm).strip()
+                tid = parent_id
+                fcts = SemanticFacts()
+            prov = TagProvenance(
+                item_id=parent_id,
+                semantic_ids=(f"extension_family:{family}", f"extension_tier:{parent_id}", f"nudity:{nudity_level_code}"),
+                kind="clothing_extension",
+                parent_ids=(parent_id,),
+            )
+            return SampledTag(text=txt, provenance=prov, id=tid, facts=fcts)
+
         if nudity_level_code == "L2":
             if all_exp_tiers and rng.random() < 0.7:
                 picked = self._pick_one(all_exp_tiers, rng)
                 t_id = picked.get("id", "")
                 for t in picked.get("tags", [])[:1]:
-                    result_tags.append(SampledTag(text=t, provenance=TagProvenance(item_id=t_id, semantic_ids=("extension_family:sfw_exposure", f"extension_tier:{t_id}", f"nudity:{nudity_level_code}"), kind="clothing_extension")))
+                    result_tags.append(_make_ext_tag(t, t_id, "sfw_exposure"))
             if all_trans_tiers and rng.random() < 0.5:
                 picked = self._pick_one(all_trans_tiers, rng)
                 t_id = picked.get("id", "")
                 for t in picked.get("tags", [])[:1]:
-                    result_tags.append(SampledTag(text=t, provenance=TagProvenance(item_id=t_id, semantic_ids=("extension_family:cloth_transparency", f"extension_tier:{t_id}", f"nudity:{nudity_level_code}"), kind="clothing_extension")))
+                    result_tags.append(_make_ext_tag(t, t_id, "cloth_transparency"))
 
         elif nudity_level_code == "L3":
             if all_exp_tiers and rng.random() < 0.7:
                 picked = self._pick_one(all_exp_tiers, rng)
                 t_id = picked.get("id", "")
                 for t in picked.get("tags", [])[:1]:
-                    result_tags.append(SampledTag(text=t, provenance=TagProvenance(item_id=t_id, semantic_ids=("extension_family:sfw_exposure", f"extension_tier:{t_id}", f"nudity:{nudity_level_code}"), kind="clothing_extension")))
+                    result_tags.append(_make_ext_tag(t, t_id, "sfw_exposure"))
             if all_trans_tiers and rng.random() < 0.6:
                 picked = self._pick_one(all_trans_tiers, rng)
                 t_id = picked.get("id", "")
                 for t in picked.get("tags", [])[:1]:
-                    result_tags.append(SampledTag(text=t, provenance=TagProvenance(item_id=t_id, semantic_ids=("extension_family:cloth_transparency", f"extension_tier:{t_id}", f"nudity:{nudity_level_code}"), kind="clothing_extension")))
+                    result_tags.append(_make_ext_tag(t, t_id, "cloth_transparency"))
 
         elif nudity_level_code == "L4":
             if all_wardrobe and (clothing_id == "lingerie_lace" or rng.random() < 0.6):
                 picked = self._pick_one(all_wardrobe, rng)
                 t_id = picked.get("id", "")
                 for t in picked.get("tags", [])[:2]:
-                    result_tags.append(SampledTag(text=t, provenance=TagProvenance(item_id=t_id, semantic_ids=("extension_family:lingerie_wardrobe", f"extension_tier:{t_id}", f"nudity:{nudity_level_code}"), kind="clothing_extension")))
+                    result_tags.append(_make_ext_tag(t, t_id, "lingerie_wardrobe"))
             else:
                 if all_exp_tiers and rng.random() < 0.6:
                     picked = self._pick_one(all_exp_tiers, rng)
                     t_id = picked.get("id", "")
                     for t in picked.get("tags", [])[:1]:
-                        result_tags.append(SampledTag(text=t, provenance=TagProvenance(item_id=t_id, semantic_ids=("extension_family:sfw_exposure", f"extension_tier:{t_id}", f"nudity:{nudity_level_code}"), kind="clothing_extension")))
+                        result_tags.append(_make_ext_tag(t, t_id, "sfw_exposure"))
                 if all_trans_tiers and rng.random() < 0.5:
                     picked = self._pick_one(all_trans_tiers, rng)
                     t_id = picked.get("id", "")
                     for t in picked.get("tags", [])[:1]:
-                        result_tags.append(SampledTag(text=t, provenance=TagProvenance(item_id=t_id, semantic_ids=("extension_family:cloth_transparency", f"extension_tier:{t_id}", f"nudity:{nudity_level_code}"), kind="clothing_extension")))
+                        result_tags.append(_make_ext_tag(t, t_id, "cloth_transparency"))
 
         return result_tags
 
@@ -939,7 +1123,7 @@ class DataSampler:
         data = self._load("lighting")
 
         if _is_auto(preset) or _is_random(preset):
-            result: List[str] = []
+            raw_result: List[Any] = []
             chosen_id = "lighting_auto"
             techniques = data.get("professional_lighting", [])
             if techniques:
@@ -949,16 +1133,41 @@ class DataSampler:
                 if nudity_level_code != "L1":
                     tags.extend(tech.get("erotic_tags", []))
                 if tags:
-                    result.extend(self._pick(tags, rng, min(2, len(tags))))
+                    raw_result.extend(self._pick(tags, rng, min(2, len(tags))))
 
             temps = data.get("color_temperature_table", [])
             if temps:
                 temp = self._pick_one(temps, rng)
                 t_tags = self._flatten_tags(temp)
                 if t_tags:
-                    result.append(t_tags[0])
+                    raw_result.append(t_tags[0])
             prov = TagProvenance(item_id=chosen_id, kind="lighting", semantic_ids=(f"lighting:{chosen_id}",))
-            return SampleResult(tags=tuple(result), item_id=chosen_id, provenance=prov)
+            tags_str: List[str] = []
+            sampled_tags: List[SampledTag] = []
+            for idx, item in enumerate(raw_result):
+                if isinstance(item, dict):
+                    t_text = item.get("text", "")
+                    t_id = item.get("id", f"{chosen_id}__tag_{idx:03d}")
+                    t_facts = SemanticFacts.from_dict(item.get("facts", {}))
+                else:
+                    t_text = str(item).strip()
+                    t_id = f"{chosen_id}__tag_{idx:03d}"
+                    t_facts = SemanticFacts()
+                tags_str.append(t_text)
+                sampled_tags.append(
+                    SampledTag(
+                        text=t_text,
+                        provenance=TagProvenance(
+                            item_id=chosen_id,
+                            kind="lighting",
+                            parent_ids=(chosen_id,),
+                            semantic_ids=(f"lighting:{chosen_id}",),
+                        ),
+                        id=t_id,
+                        facts=t_facts,
+                    )
+                )
+            return SampleResult(tags=tuple(tags_str), item_id=chosen_id, provenance=prov, sampled_tags=tuple(sampled_tags))
 
         # EXPLICIT
         combos = data.get("preset_combos", [])
@@ -987,7 +1196,32 @@ class DataSampler:
             chosen_id = item_match.get("id", "lighting_preset")
             selected = tags[:2] if tags else []
             prov = TagProvenance(item_id=chosen_id, kind="lighting", semantic_ids=(f"lighting:{chosen_id}",))
-            return SampleResult(tags=tuple(selected), item_id=chosen_id, provenance=prov)
+            tags_str = []
+            sampled_tags = []
+            for idx, item in enumerate(selected):
+                if isinstance(item, dict):
+                    t_text = item.get("text", "")
+                    t_id = item.get("id", f"{chosen_id}__tag_{idx:03d}")
+                    t_facts = SemanticFacts.from_dict(item.get("facts", {}))
+                else:
+                    t_text = str(item).strip()
+                    t_id = f"{chosen_id}__tag_{idx:03d}"
+                    t_facts = SemanticFacts()
+                tags_str.append(t_text)
+                sampled_tags.append(
+                    SampledTag(
+                        text=t_text,
+                        provenance=TagProvenance(
+                            item_id=chosen_id,
+                            kind="lighting",
+                            parent_ids=(chosen_id,),
+                            semantic_ids=(f"lighting:{chosen_id}",),
+                        ),
+                        id=t_id,
+                        facts=t_facts,
+                    )
+                )
+            return SampleResult(tags=tuple(tags_str), item_id=chosen_id, provenance=prov, sampled_tags=tuple(sampled_tags))
 
         raise DataSelectionError(f"Unknown lighting preset: {preset!r}")
 
@@ -1020,12 +1254,37 @@ class DataSampler:
 
         if nudity_level_code == "L1":
             banned_in_l1 = ["skirt lifted", "skirt hiked", "skirt pulled", "skirt riding", "bra", "panties", "breasts", "pussy", "nude", "naked", "undressed", "cock sliding", "penetrated", "face-fucked", "cum dripping", "dripping on", "cupping breasts"]
-            all_tags = [t for t in all_tags if not any(b in t.lower() for b in banned_in_l1)]
+            all_tags = [t for t in all_tags if not any(b in (t if isinstance(t, str) else t.get("text", "")).lower() for b in banned_in_l1)]
 
         selected = self._pick(all_tags, rng, min(rng.randint(1, 2), max(1, len(all_tags)))) if all_tags else []
         cat_id = cat.get("id", "pose_default")
         prov = TagProvenance(item_id=cat_id, kind="pose", semantic_ids=(f"pose:{cat_id}",))
-        return SampleResult(tags=tuple(selected), item_id=cat_id, provenance=prov)
+        tags_str: List[str] = []
+        sampled_tags: List[SampledTag] = []
+        for idx, itm in enumerate(selected):
+            if isinstance(itm, dict):
+                t_text = itm.get("text", "")
+                t_id = itm.get("id", f"{cat_id}__tag_{idx:03d}")
+                t_facts = SemanticFacts.from_dict(itm.get("facts", {}))
+            else:
+                t_text = str(itm).strip()
+                t_id = f"{cat_id}__tag_{idx:03d}"
+                t_facts = SemanticFacts()
+            tags_str.append(t_text)
+            sampled_tags.append(
+                SampledTag(
+                    text=t_text,
+                    provenance=TagProvenance(
+                        item_id=cat_id if cat_id else t_id,
+                        kind="pose",
+                        parent_ids=(cat_id,),
+                        semantic_ids=(f"pose:{cat_id}",)
+                    ),
+                    id=t_id,
+                    facts=t_facts,
+                )
+            )
+        return SampleResult(tags=tuple(tags_str), item_id=cat_id, provenance=prov, sampled_tags=tuple(sampled_tags))
 
     def sample_pose(self, category: str, rng: Random, nudity_level_code: Optional[str] = None) -> List[str]:
         res = self.sample_pose_result(category, rng, nudity_level_code)
@@ -1048,11 +1307,12 @@ class DataSampler:
             if not cat:
                 raise DataSelectionError(f"Unknown expression mood: {mood!r}")
 
-        tags = self._flatten_tags(cat)
-        selected = self._pick(tags, rng, min(rng.randint(2, 3), len(tags))) if tags else []
+        raw_tags = cat.get("tags", [])
+        selected = self._pick(raw_tags, rng, min(rng.randint(2, 3), len(raw_tags))) if raw_tags else []
         cat_id = cat.get("id", "expression_default")
+        tags_str, sampled = self._to_sampled_tags(selected, cat_id, "expression")
         prov = TagProvenance(item_id=cat_id, kind="expression", semantic_ids=(f"expression:{cat_id}",))
-        return SampleResult(tags=tuple(selected), item_id=cat_id, provenance=prov)
+        return SampleResult(tags=tags_str, item_id=cat_id, provenance=prov, sampled_tags=sampled)
 
     def sample_expression(self, mood: str, rng: Random) -> List[str]:
         res = self.sample_expression_result(mood, rng)
@@ -1085,17 +1345,20 @@ class DataSampler:
         if not chosen_film:
             return None
 
-        tags = tuple(self._flatten_tags(chosen_film)[:3])
+        raw_tags = chosen_film.get("tags", [])
+        selected = raw_tags[:3] if raw_tags else []
         c_id = chosen_film.get("id", "film_unknown")
+        tags_str, sampled = self._to_sampled_tags(selected, c_id, "film")
         prov = TagProvenance(
             kind="film",
             item_id=c_id,
             semantic_ids=(f"film:{c_id}",),
         )
         return SampleResult(
-            tags=tags,
+            tags=tags_str,
             item_id=c_id,
             provenance=prov,
+            sampled_tags=sampled,
         )
 
     def sample_film(self, stock: str, rng: Random) -> List[str]:
@@ -1108,7 +1371,11 @@ class DataSampler:
         if _is_none(makeup_style):
             return None
         data = self._load("makeup")
-        styles = data.get("categories", [])
+        styles: List[Dict[str, Any]] = []
+        for grp in ["natural_makeup", "creative_artistic", "japanese_style", "erotic_sensual"]:
+            styles.extend(data.get(grp, []))
+        if not styles:
+            styles = data.get("categories", [])
         if not styles:
             return None
 
@@ -1124,11 +1391,12 @@ class DataSampler:
             if not chosen:
                 raise DataSelectionError(f"Unknown makeup style: {makeup_style!r}")
 
-        tags = self._flatten_tags(chosen)
-        selected = self._pick(tags, rng, min(rng.randint(2, 3), len(tags))) if tags else []
+        raw_tags = chosen.get("tags", [])
+        selected = self._pick(raw_tags, rng, min(rng.randint(2, 3), len(raw_tags))) if raw_tags else []
         c_id = chosen.get("id", "makeup_default")
+        tags_str, sampled = self._to_sampled_tags(selected, c_id, "makeup")
         prov = TagProvenance(item_id=c_id, kind="makeup", semantic_ids=(f"makeup:{c_id}",))
-        return SampleResult(tags=tuple(selected), item_id=c_id, provenance=prov)
+        return SampleResult(tags=tags_str, item_id=c_id, provenance=prov, sampled_tags=sampled)
 
     def sample_makeup(self, makeup_style: str, rng: Random, context: Optional[str] = None) -> List[str]:
         res = self.sample_makeup_result(makeup_style, rng, context)
@@ -1156,11 +1424,12 @@ class DataSampler:
             if not chosen:
                 raise DataSelectionError(f"Unknown hairstyle: {hairstyle!r}")
 
-        tags = self._flatten_tags(chosen)
-        selected = tags[:2] if tags else []
+        raw_tags = chosen.get("tags", [])
+        selected = raw_tags[:2] if raw_tags else []
         c_id = chosen.get("id", "hairstyle_default")
+        tags_str, sampled = self._to_sampled_tags(selected, c_id, "hairstyle")
         prov = TagProvenance(item_id=c_id, kind="hairstyle", semantic_ids=(f"hairstyle:{c_id}",))
-        return SampleResult(tags=tuple(selected), item_id=c_id, provenance=prov)
+        return SampleResult(tags=tags_str, item_id=c_id, provenance=prov, sampled_tags=sampled)
 
     def sample_hairstyle(self, hairstyle: str, rng: Random, context: Optional[str] = None) -> List[str]:
         res = self.sample_hairstyle_result(hairstyle, rng, context)
@@ -1172,7 +1441,7 @@ class DataSampler:
         if _is_none(jewelry_style):
             return None
         data = self._load("accessories")
-        items = data.get("headwear_jewelry", [])
+        items = data.get("jewelry", []) or data.get("headwear_jewelry", [])
         if not items:
             return None
 
@@ -1191,17 +1460,20 @@ class DataSampler:
         if not chosen:
             return None
 
-        tags = tuple(self._flatten_tags(chosen)[:2])
+        raw_tags = chosen.get("tags", [])
+        selected = raw_tags[:2] if raw_tags else []
         c_id = chosen.get("id", "jewelry_unknown")
+        tags_str, sampled = self._to_sampled_tags(selected, c_id, "jewelry")
         prov = TagProvenance(
             kind="jewelry",
             item_id=c_id,
             semantic_ids=(f"jewelry:{c_id}",),
         )
         return SampleResult(
-            tags=tags,
+            tags=tags_str,
             item_id=c_id,
             provenance=prov,
+            sampled_tags=sampled,
         )
 
     def sample_jewelry(self, jewelry_style: str, rng: Random, context: Optional[str] = None) -> List[str]:
@@ -1225,11 +1497,12 @@ class DataSampler:
             if not chosen:
                 raise DataSelectionError(f"Unknown imperfection type: {imp_type!r}")
 
-        tags = self._flatten_tags(chosen)
-        selected = self._pick(tags, rng, min(2, len(tags))) if tags else []
+        raw_tags = chosen.get("tags", [])
+        selected = self._pick(raw_tags, rng, min(2, len(raw_tags))) if raw_tags else []
         c_id = chosen.get("id", "imperfection_default")
+        tags_str, sampled = self._to_sampled_tags(selected, c_id, "imperfections")
         prov = TagProvenance(item_id=c_id, kind="imperfections", semantic_ids=(f"imperfection:{c_id}",))
-        return SampleResult(tags=tuple(selected), item_id=c_id, provenance=prov)
+        return SampleResult(tags=tags_str, item_id=c_id, provenance=prov, sampled_tags=sampled)
 
     def sample_imperfections(self, imp_type: str, rng: Random) -> List[str]:
         res = self.sample_imperfections_result(imp_type, rng)
@@ -1263,17 +1536,20 @@ class DataSampler:
         if not chosen or chosen.get("id") == "none":
             return None
 
-        tags = tuple(self._flatten_tags(chosen))
+        raw_tags = chosen.get("tags", [])
+        selected = raw_tags[:2] if raw_tags else []
         c_id = chosen.get("id", "tattoo_unknown")
+        tags_str, sampled = self._to_sampled_tags(selected, c_id, "tattoo")
         prov = TagProvenance(
             kind="tattoo",
             item_id=c_id,
             semantic_ids=(f"tattoo:{c_id}",),
         )
         return SampleResult(
-            tags=tags,
+            tags=tags_str,
             item_id=c_id,
             provenance=prov,
+            sampled_tags=sampled,
         )
 
     def sample_tattoo(self, tattoo_style: str, rng: Random, context: Optional[str] = None) -> List[str]:
@@ -1310,16 +1586,17 @@ class DataSampler:
         if chosen.get("items"):
             items = chosen["items"]
             picked_item = self._pick_one(items, rng)
-            item_tags = self._flatten_tags(picked_item)
-            selected = self._pick(item_tags, rng, min(2, len(item_tags))) if item_tags else []
             item_id = picked_item.get("id", c_id)
+            raw_tags = picked_item.get("tags", [])
+            selected = self._pick(raw_tags, rng, min(2, len(raw_tags))) if raw_tags else []
         else:
-            tags = self._flatten_tags(chosen)
-            selected = self._pick(tags, rng, min(2, len(tags))) if tags else []
             item_id = c_id
+            raw_tags = chosen.get("tags", [])
+            selected = self._pick(raw_tags, rng, min(2, len(raw_tags))) if raw_tags else []
 
+        tags_str, sampled = self._to_sampled_tags(selected, item_id, "prop")
         prov = TagProvenance(item_id=item_id, kind="prop", semantic_ids=(f"prop:{item_id}",))
-        return SampleResult(tags=tuple(selected), item_id=item_id, provenance=prov)
+        return SampleResult(tags=tags_str, item_id=item_id, provenance=prov, sampled_tags=sampled)
 
     def sample_prop(self, prop_style: str, rng: Random, context: Optional[str] = None) -> List[str]:
         res = self.sample_prop_result(prop_style, rng, context)
@@ -1355,9 +1632,11 @@ class DataSampler:
         if not chosen:
             return None
         c_id = chosen.get("id", "sfw_exposure_default")
-        tags = list(chosen.get("tags", []))
+        raw_tags = chosen.get("tags", [])
+        selected = raw_tags[:2] if raw_tags else []
+        tags_str, sampled = self._to_sampled_tags(selected, c_id, "clothing_extension")
         prov = TagProvenance(item_id=c_id, kind="clothing_extension", semantic_ids=(f"extension:{c_id}",))
-        return SampleResult(tags=tuple(tags), item_id=c_id, provenance=prov)
+        return SampleResult(tags=tags_str, item_id=c_id, provenance=prov, sampled_tags=sampled)
 
     def sample_sfw_exposure(self, tier: str, rng: Random) -> List[str]:
         res = self.sample_sfw_exposure_result(tier, rng)
@@ -1379,9 +1658,11 @@ class DataSampler:
         if not chosen:
             return None
         c_id = chosen.get("id", "cloth_transparency_default")
-        tags = list(chosen.get("tags", []))
+        raw_tags = chosen.get("tags", [])
+        selected = raw_tags[:2] if raw_tags else []
+        tags_str, sampled = self._to_sampled_tags(selected, c_id, "clothing_extension")
         prov = TagProvenance(item_id=c_id, kind="clothing_extension", semantic_ids=(f"extension:{c_id}",))
-        return SampleResult(tags=tuple(tags), item_id=c_id, provenance=prov)
+        return SampleResult(tags=tags_str, item_id=c_id, provenance=prov, sampled_tags=sampled)
 
     def sample_cloth_transparency(self, tier: str, rng: Random) -> List[str]:
         res = self.sample_cloth_transparency_result(tier, rng)
@@ -1403,9 +1684,11 @@ class DataSampler:
         if not chosen:
             return None
         c_id = chosen.get("id", "lingerie_wardrobe_default")
-        selected = self._pick(chosen.get("tags", []), rng, min(2, len(chosen.get("tags", [])))) if chosen.get("tags") else []
+        raw_tags = chosen.get("tags", [])
+        selected = self._pick(raw_tags, rng, min(2, len(raw_tags))) if raw_tags else []
+        tags_str, sampled = self._to_sampled_tags(selected, c_id, "clothing_extension")
         prov = TagProvenance(item_id=c_id, kind="clothing_extension", semantic_ids=(f"extension:{c_id}",))
-        return SampleResult(tags=tuple(selected), item_id=c_id, provenance=prov)
+        return SampleResult(tags=tags_str, item_id=c_id, provenance=prov, sampled_tags=sampled)
 
     def sample_lingerie_wardrobe(self, cat: str, rng: Random) -> List[str]:
         res = self.sample_lingerie_wardrobe_result(cat, rng)
@@ -1437,11 +1720,12 @@ class DataSampler:
         if not chosen or chosen.get("id") == "none":
             return None
 
-        tags = self._flatten_tags(chosen)
-        selected = tags[:2] if tags else []
+        raw_tags = chosen.get("tags", [])
+        selected = raw_tags[:2] if raw_tags else []
         c_id = chosen.get("id", "character_default")
+        tags_str, sampled = self._to_sampled_tags(selected, c_id, "character")
         prov = TagProvenance(item_id=c_id, kind="character", semantic_ids=(f"character:{c_id}",))
-        return SampleResult(tags=tuple(selected), item_id=c_id, provenance=prov)
+        return SampleResult(tags=tags_str, item_id=c_id, provenance=prov, sampled_tags=sampled)
 
     def sample_character(self, character_role: str, rng: Random, context: Optional[str] = None) -> List[str]:
         res = self.sample_character_result(character_role, rng, context)
@@ -1453,7 +1737,9 @@ class DataSampler:
         if _is_none(liquid_effect):
             return None
         data = self._load("nudity_levels")
-        liquids = data.get("liquid_effects", [])
+        liquids = data.get("body_liquids", []) + data.get("environmental_liquids", [])
+        if not liquids:
+            liquids = data.get("liquid_effects", [])
         if not liquids:
             return None
 
@@ -1473,11 +1759,12 @@ class DataSampler:
         if not chosen or chosen.get("id") == "none":
             return None
 
-        tags = self._flatten_tags(chosen)
-        selected = self._pick(tags, rng, min(2, len(tags))) if tags else []
+        raw_tags = chosen.get("tags", [])
+        selected = self._pick(raw_tags, rng, min(2, len(raw_tags))) if raw_tags else []
         c_id = chosen.get("id", "liquid_default")
+        tags_str, sampled = self._to_sampled_tags(selected, c_id, "liquid")
         prov = TagProvenance(item_id=c_id, kind="liquid", semantic_ids=(f"liquid:{c_id}",))
-        return SampleResult(tags=tuple(selected), item_id=c_id, provenance=prov)
+        return SampleResult(tags=tags_str, item_id=c_id, provenance=prov, sampled_tags=sampled)
 
     def sample_liquid(self, liquid_effect: str, rng: Random, context: Optional[str] = None) -> List[str]:
         res = self.sample_liquid_result(liquid_effect, rng, context)

@@ -17,14 +17,14 @@ if __package__:
     from .conflict_resolver import ConflictResolver
     from .errors import PromptValidationError
     from .lexer import split_top_level_tags, validate_prompt_syntax
-    from .models import AssemblyResult, PromptAtom, PromptFragment, TagProvenance
+    from .models import AssemblyResult, PromptAtom, PromptFragment, SampledTag, SelectionOrigin, SemanticFacts, TagProvenance
     from .slot_contract import AUXILIARY_SLOT_ORDER, SLOT_ORDER, normalize_slot_mapping
 else:
     from lib.atomizer import PromptTag, atoms_to_tags, deduplicate_tags, fragments_to_atoms
     from lib.conflict_resolver import ConflictResolver
     from lib.errors import PromptValidationError
     from lib.lexer import split_top_level_tags, validate_prompt_syntax
-    from lib.models import AssemblyResult, PromptAtom, PromptFragment, TagProvenance
+    from lib.models import AssemblyResult, PromptAtom, PromptFragment, SampledTag, SelectionOrigin, SemanticFacts, TagProvenance
     from lib.slot_contract import AUXILIARY_SLOT_ORDER, SLOT_ORDER, normalize_slot_mapping
 
 MAX_PROMPT_WORDS = 250
@@ -247,7 +247,7 @@ def iter_normalized_slot_fragments(
         if items is None:
             continue
 
-        item_list = [items] if isinstance(items, (str, PromptFragment)) else list(items)
+        item_list = [items] if isinstance(items, (str, PromptFragment, SampledTag)) else list(items)
         for item in item_list:
             if isinstance(item, PromptFragment):
                 prov = item.provenance if item.provenance is not None else TagProvenance(kind="user_input", semantic_ids=(f"slot:{slot_name}",))
@@ -259,6 +259,21 @@ def iter_normalized_slot_fragments(
                     exclusive_group=item.exclusive_group,
                     order=item.order,
                     provenance=prov,
+                    id=item.id,
+                    facts=item.facts,
+                    origin=item.origin,
+                )
+            elif isinstance(item, SampledTag):
+                prov = item.provenance if item.provenance is not None else TagProvenance(kind="user_input", semantic_ids=(f"slot:{slot_name}",))
+                yield PromptFragment(
+                    text=item.text,
+                    source_slot=slot_name,
+                    source_item_id=prov.item_id,
+                    order=0,
+                    provenance=prov,
+                    id=item.id,
+                    facts=item.facts,
+                    origin=item.origin,
                 )
             elif isinstance(item, str):
                 for st in split_top_level_tags(item):
@@ -266,7 +281,8 @@ def iter_normalized_slot_fragments(
                         yield PromptFragment(
                             text=st,
                             source_slot=slot_name,
-                            provenance=TagProvenance(kind="user_input", semantic_ids=(f"slot:{slot_name}",))
+                            provenance=TagProvenance(kind="user_input", semantic_ids=(f"slot:{slot_name}",)),
+                            origin=SelectionOrigin(entry_point="custom_combiner", mode="custom", selector=slot_name, raw_value=st),
                         )
 
 
@@ -338,6 +354,9 @@ class PromptAssembler:
                     exclusive_group=frag.exclusive_group,
                     order=order,
                     provenance=frag.provenance if frag.provenance is not None else TagProvenance(kind="user_input"),
+                    id=frag.id,
+                    facts=frag.facts,
+                    origin=frag.origin,
                 )
             )
         return fragments
@@ -349,6 +368,7 @@ class PromptAssembler:
         quality_tier: str,
         rng: Optional[Random] = None,
         max_words: int = MAX_PROMPT_WORDS,
+        entry_point: str = "preset_browser",
     ) -> AssemblyResult:
         """预设模板与风格配方统一装配接口，返回包含 source_atoms 的不可变 AssemblyResult。"""
         if rng is None:
@@ -357,63 +377,155 @@ class PromptAssembler:
         fragments: List[PromptFragment] = []
         order = 0
 
-        # 1. 预设核心 Prompt
+        # 1. 预设核心 Prompt (优先消费结构化 fragments)
         preset_id = preset.get("id", "preset_custom")
-        raw_preset_prompt = preset.get("positive", preset.get("prompt", ""))
-        for t in split_top_level_tags(raw_preset_prompt):
-            if t:
-                fragments.append(
-                    PromptFragment(
-                        text=t,
-                        source_slot="preset_core",
-                        source_item_id=preset_id,
-                        order=order,
-                        provenance=TagProvenance(
-                            item_id=preset_id,
-                            kind="preset",
-                            semantic_ids=(f"preset:{preset_id}",),
-                        ),
+        preset_frags = preset.get("fragments")
+        if preset_frags and isinstance(preset_frags, list):
+            for f_data in preset_frags:
+                text = f_data.get("text", "")
+                if text:
+                    f_id = f_data.get("id", "")
+                    f_slot = f_data.get("slot", "preset_core")
+                    f_facts = SemanticFacts.from_dict(f_data.get("facts", {}))
+                    origin_d = f_data.get("origin", {})
+                    f_origin = SelectionOrigin(
+                        entry_point=entry_point,
+                        mode=origin_d.get("mode", "preset"),
+                        selector=origin_d.get("selector", "preset_core"),
+                        selected_id=origin_d.get("selected_id", preset_id),
+                        raw_value=origin_d.get("raw_value", text),
+                        parent_ids=tuple(origin_d.get("parent_ids", (preset_id,))),
                     )
-                )
-                order += 1
+                    fragments.append(
+                        PromptFragment(
+                            text=text,
+                            source_slot=f_slot,
+                            source_item_id=preset_id,
+                            order=order,
+                            provenance=TagProvenance(
+                                item_id=f_id or preset_id,
+                                kind="preset",
+                                semantic_ids=(f"preset:{preset_id}",),
+                                parent_ids=(preset_id,),
+                            ),
+                            id=f_id,
+                            facts=f_facts,
+                            origin=f_origin,
+                        )
+                    )
+                    order += 1
+        else:
+            raw_preset_prompt = preset.get("positive", preset.get("prompt", ""))
+            for t in split_top_level_tags(raw_preset_prompt):
+                if t:
+                    fragments.append(
+                        PromptFragment(
+                            text=t,
+                            source_slot="preset_core",
+                            source_item_id=preset_id,
+                            order=order,
+                            provenance=TagProvenance(
+                                item_id=preset_id,
+                                kind="preset",
+                                semantic_ids=(f"preset:{preset_id}",),
+                            ),
+                            origin=SelectionOrigin(
+                                entry_point=entry_point,
+                                mode="preset",
+                                selector="preset_core",
+                                selected_id=preset_id,
+                                raw_value=t,
+                                parent_ids=(preset_id,),
+                            ),
+                        )
+                    )
+                    order += 1
 
-        # 2. 风格配方叠加
+        # 2. 风格配方叠加 (优先消费结构化 fragments)
         if style_recipe:
             recipe_id = style_recipe.get("id", "recipe_custom")
-            for k in ["lighting_palette", "style_recipe", "focus_detail"]:
-                val = style_recipe.get(k, "")
-                if val:
-                    for t in split_top_level_tags(str(val)):
-                        if t:
-                            fragments.append(
-                                PromptFragment(
-                                    text=t,
-                                    source_slot=f"recipe_{k}",
-                                    source_item_id=recipe_id,
-                                    order=order,
-                                    provenance=TagProvenance(
-                                        item_id=recipe_id,
-                                        kind="style_recipe",
-                                        semantic_ids=(f"recipe:{recipe_id}",),
-                                    ),
-                                )
+            recipe_frags = style_recipe.get("fragments")
+            if recipe_frags and isinstance(recipe_frags, list):
+                for f_data in recipe_frags:
+                    text = f_data.get("text", "")
+                    if text:
+                        f_id = f_data.get("id", "")
+                        f_slot = f_data.get("slot", "style_recipe")
+                        f_facts = SemanticFacts.from_dict(f_data.get("facts", {}))
+                        origin_d = f_data.get("origin", {})
+                        f_origin = SelectionOrigin(
+                            entry_point=entry_point,
+                            mode=origin_d.get("mode", "recipe"),
+                            selector=origin_d.get("selector", f_slot),
+                            selected_id=origin_d.get("selected_id", recipe_id),
+                            raw_value=origin_d.get("raw_value", text),
+                            parent_ids=tuple(origin_d.get("parent_ids", (recipe_id,))),
+                        )
+                        fragments.append(
+                            PromptFragment(
+                                text=text,
+                                source_slot=f_slot,
+                                source_item_id=recipe_id,
+                                order=order,
+                                provenance=TagProvenance(
+                                    item_id=f_id or recipe_id,
+                                    kind="style_recipe",
+                                    semantic_ids=(f"recipe:{recipe_id}",),
+                                    parent_ids=(recipe_id,),
+                                ),
+                                id=f_id,
+                                facts=f_facts,
+                                origin=f_origin,
                             )
-                            order += 1
+                        )
+                        order += 1
+            else:
+                for k in ["lighting_palette", "style_recipe", "focus_detail"]:
+                    val = style_recipe.get(k, "")
+                    if val:
+                        for t in split_top_level_tags(str(val)):
+                            if t:
+                                fragments.append(
+                                    PromptFragment(
+                                        text=t,
+                                        source_slot=f"recipe_{k}",
+                                        source_item_id=recipe_id,
+                                        order=order,
+                                        provenance=TagProvenance(
+                                            item_id=recipe_id,
+                                            kind="style_recipe",
+                                            semantic_ids=(f"recipe:{recipe_id}",),
+                                        ),
+                                        origin=SelectionOrigin(
+                                            entry_point=entry_point,
+                                            mode="recipe",
+                                            selector=k,
+                                            selected_id=recipe_id,
+                                            raw_value=t,
+                                            parent_ids=(recipe_id,),
+                                        ),
+                                    )
+                                )
+                                order += 1
 
-        # 3. 画质等级锚点 (稳定内部 quality ID)
+        # 3. 画质等级锚点 (稳定内部 quality ID 与事实)
         q_str = str(quality_tier or "").lower()
         if "cctv" in q_str or "监控" in q_str:
             quality_id = "quality_cctv"
             q_tags = ["CCTV footage", "security camera", "low resolution", "grainy"]
+            q_facts = SemanticFacts(semantic_role="quality", quality_class="cctv", capture_device="cctv")
         elif "phone" in q_str or "手机" in q_str:
             quality_id = "quality_phone"
             q_tags = ["phone camera", "selfie", "amateur photo", "slightly blurry"]
+            q_facts = SemanticFacts(semantic_role="quality", quality_class="phone", capture_device="phone")
         elif "masterpiece" in q_str or "顶尖" in q_str:
             quality_id = "quality_masterpiece"
             q_tags = ["masterpiece", "best quality", "ultra detailed", "8k", "photorealistic"]
+            q_facts = SemanticFacts(semantic_role="quality", quality_class="masterpiece", capture_device="professional")
         else:
             quality_id = "quality_standard"
             q_tags = ["best quality", "masterpiece", "high resolution", "photorealistic"]
+            q_facts = SemanticFacts(semantic_role="quality", quality_class="standard", capture_device="professional")
 
         for q in q_tags:
             fragments.append(
@@ -427,6 +539,15 @@ class PromptAssembler:
                         kind="quality",
                         semantic_ids=(f"quality:{quality_id}",),
                     ),
+                    id=f"{quality_id}__tag_{order:03d}",
+                    facts=q_facts,
+                    origin=SelectionOrigin(
+                        entry_point=entry_point,
+                        mode="explicit",
+                        selector="quality",
+                        selected_id=quality_id,
+                        raw_value=q,
+                    ),
                 )
             )
             order += 1
@@ -438,10 +559,11 @@ class PromptAssembler:
         preset: Dict[str, Any],
         style_recipe: Optional[Dict[str, Any]],
         quality_tier: str,
-        rng: Optional[Random] = None
+        rng: Optional[Random] = None,
+        entry_point: str = "preset_browser",
     ) -> Tuple[str, Tuple[PromptAtom, ...], Tuple[str, ...]]:
         """兼容包装器：投影 AssemblyResult 为 (prompt_str, accepted_atoms, rules_applied)。"""
-        res = self.assemble_preset(preset, style_recipe, quality_tier, rng)
+        res = self.assemble_preset(preset, style_recipe, quality_tier, rng, entry_point=entry_point)
         return res.prompt, res.accepted_atoms, res.rules_applied
 
 

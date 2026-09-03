@@ -4,372 +4,2746 @@
       "level": "L1",
       "name_zh": "包裹感（全遮/暗示）",
       "tags": [
-        "fully clothed",
-        "dressed",
-        "clothed body",
-        "modest outfit",
-        "tight dress showing silhouette",
-        "form-fitting clothes",
-        "body outline visible through fabric",
-        "figure visible under clothes",
-        "clothes clinging to body",
-        "fabric hugging curves",
-        "nothing exposed",
-        "everything covered",
-        "dressed to the nines"
+        {
+          "id": "nudity_l1__tag_000",
+          "text": "fully clothed",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nudity_l1__tag_001",
+          "text": "dressed",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nudity_l1__tag_002",
+          "text": "clothed body",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nudity_l1__tag_003",
+          "text": "modest outfit",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nudity_l1__tag_004",
+          "text": "tight dress showing silhouette",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nudity_l1__tag_005",
+          "text": "form-fitting clothes",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nudity_l1__tag_006",
+          "text": "body outline visible through fabric",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nudity_l1__tag_007",
+          "text": "figure visible under clothes",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nudity_l1__tag_008",
+          "text": "clothes clinging to body",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nudity_l1__tag_009",
+          "text": "fabric hugging curves",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nudity_l1__tag_010",
+          "text": "nothing exposed",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nudity_l1__tag_011",
+          "text": "everything covered",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nudity_l1__tag_012",
+          "text": "dressed to the nines",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        }
       ],
       "aliases": [
         "L1 包裹暗示 (Fully Clothed / Suggestive)"
-      ]
+      ],
+      "id": "nudity_l1"
     },
     {
       "level": "L2",
       "name_zh": "差分裸露（1-2处泄露）",
       "tags": [
-        "cleavage visible through collar",
-        "collarbone exposed",
-        "midriff showing between top and skirt",
-        "ankle visible",
-        "shoulder slipping out of neckline",
-        "bare arm from sleeve rolled up",
-        "low neckline revealing upper chest",
-        "skirt slit revealing thigh",
-        "one button undone showing bra edge",
-        "backless dress showing spine",
-        "bare feet with otherwise fully dressed",
-        "wrist exposed from pushed sleeve"
+        {
+          "id": "nudity_l2__tag_000",
+          "text": "cleavage visible through collar",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nudity_l2__tag_001",
+          "text": "collarbone exposed",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nudity_l2__tag_002",
+          "text": "midriff showing between top and skirt",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nudity_l2__tag_003",
+          "text": "ankle visible",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "feet"
+            ]
+          }
+        },
+        {
+          "id": "nudity_l2__tag_004",
+          "text": "shoulder slipping out of neckline",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nudity_l2__tag_005",
+          "text": "bare arm from sleeve rolled up",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nudity_l2__tag_006",
+          "text": "low neckline revealing upper chest",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nudity_l2__tag_007",
+          "text": "skirt slit revealing thigh",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "lower_body"
+            ]
+          }
+        },
+        {
+          "id": "nudity_l2__tag_008",
+          "text": "one button undone showing bra edge",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nudity_l2__tag_009",
+          "text": "backless dress showing spine",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nudity_l2__tag_010",
+          "text": "bare feet with otherwise fully dressed",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "feet"
+            ]
+          }
+        },
+        {
+          "id": "nudity_l2__tag_011",
+          "text": "wrist exposed from pushed sleeve",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        }
       ],
       "aliases": [
         "L2 差分微露 (Partially Exposed)"
-      ]
+      ],
+      "id": "nudity_l2"
     },
     {
       "level": "L3",
       "name_zh": "半裸诱惑（关键部位半遮）",
       "tags": [
-        "topless with skirt still on",
-        "bra removed blouse still open",
-        "panties only",
-        "all top removed",
-        "breasts bare waist covered",
-        "shirt open showing bare breasts",
-        "bra pushed up above breasts",
-        "dress pulled down to waist",
-        "bare chest with pants on",
-        "one breast covered one exposed",
-        "topless bottom still dressed",
-        "bikini top removed bottom still on",
-        "tank top raised showing breasts"
+        {
+          "id": "nudity_l3__tag_000",
+          "text": "topless with skirt still on",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nudity_l3__tag_001",
+          "text": "bra removed blouse still open",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nudity_l3__tag_002",
+          "text": "panties only",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nudity_l3__tag_003",
+          "text": "all top removed",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nudity_l3__tag_004",
+          "text": "breasts bare waist covered",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nudity_l3__tag_005",
+          "text": "shirt open showing bare breasts",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nudity_l3__tag_006",
+          "text": "bra pushed up above breasts",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nudity_l3__tag_007",
+          "text": "dress pulled down to waist",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nudity_l3__tag_008",
+          "text": "bare chest with pants on",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nudity_l3__tag_009",
+          "text": "one breast covered one exposed",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nudity_l3__tag_010",
+          "text": "topless bottom still dressed",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nudity_l3__tag_011",
+          "text": "bikini top removed bottom still on",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nudity_l3__tag_012",
+          "text": "tank top raised showing breasts",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        }
       ],
       "aliases": [
         "L3 半裸诱惑 (Half Nude)"
-      ]
+      ],
+      "id": "nudity_l3"
     },
     {
       "level": "L4",
       "name_zh": "极简遮挡（只剩碎片衣物）",
       "tags": [
-        "only panties remaining",
-        "just stockings and heels",
-        "garter belt only",
-        "nothing but thigh-highs",
-        "socks only",
-        "completely naked except socks",
-        "only underwear left",
-        "bra and panties only",
-        "just a towel around waist",
-        "sheet barely covering",
-        "ribbon on body",
-        "collar only",
-        "jewelry only",
-        "naked with only shoes on",
-        "completely bare except wristwatch"
+        {
+          "id": "nudity_l4__tag_000",
+          "text": "only panties remaining",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nudity_l4__tag_001",
+          "text": "just stockings and heels",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nudity_l4__tag_002",
+          "text": "garter belt only",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nudity_l4__tag_003",
+          "text": "nothing but thigh-highs",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "lower_body"
+            ]
+          }
+        },
+        {
+          "id": "nudity_l4__tag_004",
+          "text": "socks only",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nudity_l4__tag_005",
+          "text": "completely naked except socks",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "full_body"
+            ]
+          }
+        },
+        {
+          "id": "nudity_l4__tag_006",
+          "text": "only underwear left",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nudity_l4__tag_007",
+          "text": "bra and panties only",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nudity_l4__tag_008",
+          "text": "just a towel around waist",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nudity_l4__tag_009",
+          "text": "sheet barely covering",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nudity_l4__tag_010",
+          "text": "ribbon on body",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nudity_l4__tag_011",
+          "text": "collar only",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nudity_l4__tag_012",
+          "text": "jewelry only",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nudity_l4__tag_013",
+          "text": "naked with only shoes on",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "full_body"
+            ]
+          }
+        },
+        {
+          "id": "nudity_l4__tag_014",
+          "text": "completely bare except wristwatch",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        }
       ],
       "aliases": [
         "L4 重点暴露 (Topless / Bottomless)",
         "L4 极简遮挡 (Topless / Bottomless)"
-      ]
+      ],
+      "id": "nudity_l4"
     },
     {
       "level": "L5",
       "name_zh": "完全裸露（一览无余）",
       "tags": [
-        "nude",
-        "naked",
-        "fully nude",
-        "completely naked",
-        "bare everything",
-        "full frontal nudity",
-        "full body naked",
-        "all clothes removed",
-        "stripped bare",
-        "unclothed",
-        "nothing on",
-        "birthday suit",
-        "every inch of skin visible",
-        "body fully exposed",
-        "bare skin",
-        "naked body",
-        "no clothing at all",
-        "completely unclothed"
+        {
+          "id": "nudity_l5__tag_000",
+          "text": "nude",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "full_body"
+            ]
+          }
+        },
+        {
+          "id": "nudity_l5__tag_001",
+          "text": "naked",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "full_body"
+            ]
+          }
+        },
+        {
+          "id": "nudity_l5__tag_002",
+          "text": "fully nude",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "full_body"
+            ]
+          }
+        },
+        {
+          "id": "nudity_l5__tag_003",
+          "text": "completely naked",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "full_body"
+            ]
+          }
+        },
+        {
+          "id": "nudity_l5__tag_004",
+          "text": "bare everything",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nudity_l5__tag_005",
+          "text": "full frontal nudity",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nudity_l5__tag_006",
+          "text": "full body naked",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "full_body"
+            ]
+          }
+        },
+        {
+          "id": "nudity_l5__tag_007",
+          "text": "all clothes removed",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nudity_l5__tag_008",
+          "text": "stripped bare",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nudity_l5__tag_009",
+          "text": "unclothed",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nudity_l5__tag_010",
+          "text": "nothing on",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nudity_l5__tag_011",
+          "text": "birthday suit",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nudity_l5__tag_012",
+          "text": "every inch of skin visible",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nudity_l5__tag_013",
+          "text": "body fully exposed",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "full_body"
+            ]
+          }
+        },
+        {
+          "id": "nudity_l5__tag_014",
+          "text": "bare skin",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nudity_l5__tag_015",
+          "text": "naked body",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "full_body"
+            ]
+          }
+        },
+        {
+          "id": "nudity_l5__tag_016",
+          "text": "no clothing at all",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nudity_l5__tag_017",
+          "text": "completely unclothed",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        }
       ],
       "aliases": [
         "L5 极致全裸 (Full Nude)",
         "L5 全身赤裸 (Full Nudity / Explicit)"
-      ]
+      ],
+      "id": "nudity_l5"
     },
     {
       "level": "L6",
       "name_zh": "展示性裸露（主动打开/暴露）",
       "tags": [
-        "legs spread wide open",
-        "pussy fully displayed",
-        "spreading labia",
-        "fingers pulling apart labia",
-        "vaginal opening exposed",
-        "squatting showing everything",
-        "presenting genitals to camera",
-        "opening herself up",
-        "displaying pussy",
-        "legs over head exposed",
-        "bent over showing anus",
-        "ass cheeks spread apart",
-        "lying with legs open wide",
-        "missionary spread",
-        "self-touching",
-        "masturbating",
-        "fingers inside"
+        {
+          "id": "nudity_l6__tag_000",
+          "text": "legs spread wide open",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "lower_body"
+            ]
+          }
+        },
+        {
+          "id": "nudity_l6__tag_001",
+          "text": "pussy fully displayed",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "lower_body"
+            ]
+          }
+        },
+        {
+          "id": "nudity_l6__tag_002",
+          "text": "spreading labia",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nudity_l6__tag_003",
+          "text": "fingers pulling apart labia",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "hands"
+            ]
+          }
+        },
+        {
+          "id": "nudity_l6__tag_004",
+          "text": "vaginal opening exposed",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nudity_l6__tag_005",
+          "text": "squatting showing everything",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nudity_l6__tag_006",
+          "text": "presenting genitals to camera",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nudity_l6__tag_007",
+          "text": "opening herself up",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nudity_l6__tag_008",
+          "text": "displaying pussy",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "lower_body"
+            ]
+          }
+        },
+        {
+          "id": "nudity_l6__tag_009",
+          "text": "legs over head exposed",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "lower_body"
+            ]
+          }
+        },
+        {
+          "id": "nudity_l6__tag_010",
+          "text": "bent over showing anus",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nudity_l6__tag_011",
+          "text": "ass cheeks spread apart",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nudity_l6__tag_012",
+          "text": "lying with legs open wide",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "lower_body"
+            ]
+          }
+        },
+        {
+          "id": "nudity_l6__tag_013",
+          "text": "missionary spread",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nudity_l6__tag_014",
+          "text": "self-touching",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nudity_l6__tag_015",
+          "text": "masturbating",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nudity_l6__tag_016",
+          "text": "fingers inside",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "hands"
+            ]
+          }
+        }
       ],
       "aliases": [
         "L6 特写全见 (Explicit Genital Close-up)",
         "L6 极致特写 (Close-up / Uncensored)"
-      ]
+      ],
+      "id": "nudity_l6"
     }
   ],
   "clothing_states": [
     {
       "name_zh": "解开型（主动/缓慢诱惑）",
       "tags": [
-        "unbuttoned shirt",
-        "open blouse",
-        "dress unzipped",
-        "coat open",
-        "shirt unbuttoned from top",
-        "sweater pulled down to waist",
-        "zipper down",
-        "buttons undone",
-        "cardigan open",
-        "robe untied",
-        "one button undone at a time",
-        "slow zipper pull",
-        "lace-up loosened"
+        {
+          "id": "nud_clothing_00__tag_000",
+          "text": "unbuttoned shirt",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nud_clothing_00__tag_001",
+          "text": "open blouse",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nud_clothing_00__tag_002",
+          "text": "dress unzipped",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nud_clothing_00__tag_003",
+          "text": "coat open",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nud_clothing_00__tag_004",
+          "text": "shirt unbuttoned from top",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nud_clothing_00__tag_005",
+          "text": "sweater pulled down to waist",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nud_clothing_00__tag_006",
+          "text": "zipper down",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nud_clothing_00__tag_007",
+          "text": "buttons undone",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nud_clothing_00__tag_008",
+          "text": "cardigan open",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nud_clothing_00__tag_009",
+          "text": "robe untied",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nud_clothing_00__tag_010",
+          "text": "one button undone at a time",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nud_clothing_00__tag_011",
+          "text": "slow zipper pull",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nud_clothing_00__tag_012",
+          "text": "lace-up loosened",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        }
       ]
     },
     {
       "name_zh": "滑落型（被动/失控/意外）",
       "tags": [
-        "bra slipping off",
-        "towel slipping off shoulder",
-        "dress slipping off",
-        "shirt sliding down arms",
-        "strap falling off shoulder",
-        "slip dress falling",
-        "underwear sliding down",
-        "towel loosely wrapped",
-        "robe slipping off",
-        "sleeve falling down",
-        "skirt sliding off hips",
-        "belt coming undone",
-        "shoe falling off heel"
+        {
+          "id": "nud_clothing_01__tag_000",
+          "text": "bra slipping off",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nud_clothing_01__tag_001",
+          "text": "towel slipping off shoulder",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nud_clothing_01__tag_002",
+          "text": "dress slipping off",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nud_clothing_01__tag_003",
+          "text": "shirt sliding down arms",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nud_clothing_01__tag_004",
+          "text": "strap falling off shoulder",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nud_clothing_01__tag_005",
+          "text": "slip dress falling",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nud_clothing_01__tag_006",
+          "text": "underwear sliding down",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nud_clothing_01__tag_007",
+          "text": "towel loosely wrapped",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nud_clothing_01__tag_008",
+          "text": "robe slipping off",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nud_clothing_01__tag_009",
+          "text": "sleeve falling down",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nud_clothing_01__tag_010",
+          "text": "skirt sliding off hips",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "lower_body"
+            ]
+          }
+        },
+        {
+          "id": "nud_clothing_01__tag_011",
+          "text": "belt coming undone",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nud_clothing_01__tag_012",
+          "text": "shoe falling off heel",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        }
       ]
     },
     {
       "name_zh": "掀起型（主动撩拨/快速暴露）",
       "tags": [
-        "shirt lifted to show breasts",
-        "crop top pulled up",
-        "skirt lifted",
-        "dress pulled up to waist",
-        "tank top raised",
-        "shirt raised",
-        "cleavage exposed by lifting",
-        "panties pulled to side",
-        "underwear pulled aside",
-        "fabric bunched at waist",
-        "skirt hem gathered in fist",
-        "blanket lifted to reveal",
-        "curtain pulled aside"
+        {
+          "id": "nud_clothing_02__tag_000",
+          "text": "shirt lifted to show breasts",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nud_clothing_02__tag_001",
+          "text": "crop top pulled up",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nud_clothing_02__tag_002",
+          "text": "skirt lifted",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nud_clothing_02__tag_003",
+          "text": "dress pulled up to waist",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nud_clothing_02__tag_004",
+          "text": "tank top raised",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nud_clothing_02__tag_005",
+          "text": "shirt raised",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nud_clothing_02__tag_006",
+          "text": "cleavage exposed by lifting",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nud_clothing_02__tag_007",
+          "text": "panties pulled to side",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nud_clothing_02__tag_008",
+          "text": "underwear pulled aside",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nud_clothing_02__tag_009",
+          "text": "fabric bunched at waist",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nud_clothing_02__tag_010",
+          "text": "skirt hem gathered in fist",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nud_clothing_02__tag_011",
+          "text": "blanket lifted to reveal",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nud_clothing_02__tag_012",
+          "text": "curtain pulled aside",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        }
       ]
     },
     {
       "name_zh": "撕毁型（粗暴/支配/SM）",
       "tags": [
-        "torn dress",
-        "ripped stockings",
-        "torn shirt",
-        "clothes torn off",
-        "ripped lingerie",
-        "torn sleeve",
-        "ripped seam",
-        "destroyed clothing",
-        "dress hanging in tatters",
-        "only sleeve remaining",
-        "lingerie destroyed",
-        "only bra remaining",
-        "panties torn off",
-        "clothes half on",
-        "outfit ruined",
-        "barely holding together",
-        "buttons popping off from force",
-        "fabric ripping sound implied",
-        "collar grabbed and torn",
-        "skirt ripped at seam"
+        {
+          "id": "nud_clothing_03__tag_000",
+          "text": "torn dress",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nud_clothing_03__tag_001",
+          "text": "ripped stockings",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nud_clothing_03__tag_002",
+          "text": "torn shirt",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nud_clothing_03__tag_003",
+          "text": "clothes torn off",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nud_clothing_03__tag_004",
+          "text": "ripped lingerie",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nud_clothing_03__tag_005",
+          "text": "torn sleeve",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nud_clothing_03__tag_006",
+          "text": "ripped seam",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nud_clothing_03__tag_007",
+          "text": "destroyed clothing",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nud_clothing_03__tag_008",
+          "text": "dress hanging in tatters",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nud_clothing_03__tag_009",
+          "text": "only sleeve remaining",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nud_clothing_03__tag_010",
+          "text": "lingerie destroyed",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nud_clothing_03__tag_011",
+          "text": "only bra remaining",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nud_clothing_03__tag_012",
+          "text": "panties torn off",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nud_clothing_03__tag_013",
+          "text": "clothes half on",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nud_clothing_03__tag_014",
+          "text": "outfit ruined",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nud_clothing_03__tag_015",
+          "text": "barely holding together",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nud_clothing_03__tag_016",
+          "text": "buttons popping off from force",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nud_clothing_03__tag_017",
+          "text": "fabric ripping sound implied",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nud_clothing_03__tag_018",
+          "text": "collar grabbed and torn",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nud_clothing_03__tag_019",
+          "text": "skirt ripped at seam",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        }
       ]
     },
     {
       "name_zh": "风吹型（自然暴露/意外春光）",
       "tags": [
-        "wind blowing skirt up",
-        "dress lifting in breeze",
-        "hair and fabric flying",
-        "skirt caught by sudden gust",
-        "hem flipping up revealing thigh",
-        "wind pressing fabric tight against body showing silhouette",
-        "wind blowing shirt open",
-        "coat flapping wide",
-        "dress plastered to body by wind",
-        "every curve outlined",
-        "wind blowing hair across face obscuring view",
-        "parasol blown away",
-        "hat flying off",
-        "ribbon untying in wind",
-        "fan blowing upskirt",
-        "hem fluttering in draft",
-        "fabric rippling"
+        {
+          "id": "nud_clothing_04__tag_000",
+          "text": "wind blowing skirt up",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nud_clothing_04__tag_001",
+          "text": "dress lifting in breeze",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nud_clothing_04__tag_002",
+          "text": "hair and fabric flying",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nud_clothing_04__tag_003",
+          "text": "skirt caught by sudden gust",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nud_clothing_04__tag_004",
+          "text": "hem flipping up revealing thigh",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "lower_body"
+            ]
+          }
+        },
+        {
+          "id": "nud_clothing_04__tag_005",
+          "text": "wind pressing fabric tight against body showing silhouette",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nud_clothing_04__tag_006",
+          "text": "wind blowing shirt open",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nud_clothing_04__tag_007",
+          "text": "coat flapping wide",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nud_clothing_04__tag_008",
+          "text": "dress plastered to body by wind",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nud_clothing_04__tag_009",
+          "text": "every curve outlined",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nud_clothing_04__tag_010",
+          "text": "wind blowing hair across face obscuring view",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nud_clothing_04__tag_011",
+          "text": "parasol blown away",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nud_clothing_04__tag_012",
+          "text": "hat flying off",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nud_clothing_04__tag_013",
+          "text": "ribbon untying in wind",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nud_clothing_04__tag_014",
+          "text": "fan blowing upskirt",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nud_clothing_04__tag_015",
+          "text": "hem fluttering in draft",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nud_clothing_04__tag_016",
+          "text": "fabric rippling",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        }
       ]
     },
     {
       "name_zh": "打湿型（水/雨/液体浸透）",
       "tags": [
-        "wet clothes clinging to body",
-        "soaked dress showing skin beneath",
-        "rain-soaked white shirt",
-        "wet fabric transparent on breasts",
-        "drenched and dripping",
-        "clothes heavy with water",
-        "wet t-shirt clinging to nipples",
-        "soaked through revealing outline",
-        "shower-wet clothes stuck to skin",
-        "drenched hair and dress",
-        "splashed by puddle",
-        "soaked from rain",
-        "wet from pool",
-        "clothes dripping water onto floor",
-        "puddle forming at feet",
-        "wet socks",
-        "wet shoes squelching",
-        "soaked underwear visible through skirt",
-        "wet dress clinging to ass",
-        "wet skirt stuck between thighs"
+        {
+          "id": "nud_clothing_05__tag_000",
+          "text": "wet clothes clinging to body",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nud_clothing_05__tag_001",
+          "text": "soaked dress showing skin beneath",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nud_clothing_05__tag_002",
+          "text": "rain-soaked white shirt",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nud_clothing_05__tag_003",
+          "text": "wet fabric transparent on breasts",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nud_clothing_05__tag_004",
+          "text": "drenched and dripping",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nud_clothing_05__tag_005",
+          "text": "clothes heavy with water",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nud_clothing_05__tag_006",
+          "text": "wet t-shirt clinging to nipples",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nud_clothing_05__tag_007",
+          "text": "soaked through revealing outline",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nud_clothing_05__tag_008",
+          "text": "shower-wet clothes stuck to skin",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nud_clothing_05__tag_009",
+          "text": "drenched hair and dress",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nud_clothing_05__tag_010",
+          "text": "splashed by puddle",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nud_clothing_05__tag_011",
+          "text": "soaked from rain",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nud_clothing_05__tag_012",
+          "text": "wet from pool",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nud_clothing_05__tag_013",
+          "text": "clothes dripping water onto floor",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nud_clothing_05__tag_014",
+          "text": "puddle forming at feet",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "feet"
+            ]
+          }
+        },
+        {
+          "id": "nud_clothing_05__tag_015",
+          "text": "wet socks",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nud_clothing_05__tag_016",
+          "text": "wet shoes squelching",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nud_clothing_05__tag_017",
+          "text": "soaked underwear visible through skirt",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nud_clothing_05__tag_018",
+          "text": "wet dress clinging to ass",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nud_clothing_05__tag_019",
+          "text": "wet skirt stuck between thighs",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "lower_body"
+            ]
+          }
+        }
       ]
     },
     {
       "name_zh": "汗湿型（运动/性爱/高温）",
       "tags": [
-        "sweat-soaked top",
-        "clothes damp from heat",
-        "perspiration staining fabric",
-        "shirt sticking to back from sweat",
-        "sports bra soaked through",
-        "sweat patches visible under arms",
-        "damp collar from exertion",
-        "clothes clinging from body heat",
-        "fabric darkened by sweat",
-        "gym clothes drenched",
-        "workout outfit sweat-stained",
-        "after-sex clothes thrown on hastily still damp",
-        "thigh-highs soaked with sweat",
-        "stockings damp and clinging",
-        "sweat running through clothes",
-        "fabric glued to skin by moisture"
+        {
+          "id": "nud_clothing_06__tag_000",
+          "text": "sweat-soaked top",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nud_clothing_06__tag_001",
+          "text": "clothes damp from heat",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nud_clothing_06__tag_002",
+          "text": "perspiration staining fabric",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nud_clothing_06__tag_003",
+          "text": "shirt sticking to back from sweat",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nud_clothing_06__tag_004",
+          "text": "sports bra soaked through",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nud_clothing_06__tag_005",
+          "text": "sweat patches visible under arms",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nud_clothing_06__tag_006",
+          "text": "damp collar from exertion",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nud_clothing_06__tag_007",
+          "text": "clothes clinging from body heat",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nud_clothing_06__tag_008",
+          "text": "fabric darkened by sweat",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nud_clothing_06__tag_009",
+          "text": "gym clothes drenched",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nud_clothing_06__tag_010",
+          "text": "workout outfit sweat-stained",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nud_clothing_06__tag_011",
+          "text": "after-sex clothes thrown on hastily still damp",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nud_clothing_06__tag_012",
+          "text": "thigh-highs soaked with sweat",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "lower_body"
+            ]
+          }
+        },
+        {
+          "id": "nud_clothing_06__tag_013",
+          "text": "stockings damp and clinging",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nud_clothing_06__tag_014",
+          "text": "sweat running through clothes",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nud_clothing_06__tag_015",
+          "text": "fabric glued to skin by moisture",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        }
       ]
     },
     {
       "name_zh": "凌乱型（事后/仓促/生活感）",
       "tags": [
-        "clothes wrinkled from sleep",
-        "shirt inside-out",
-        "buttoned wrong",
-        "dress on backwards",
-        "collar askew",
-        "hem tucked into underwear",
-        "one shoe on one off",
-        "stockings rolled unevenly",
-        "bra on over shirt",
-        "sweater inside-out",
-        "jacket half-on",
-        "shirt untucked on one side",
-        "zipper half-up",
-        "belt dangling",
-        "post-sex outfit hastily thrown on",
-        "mismatched clothes",
-        "pajama top with skirt",
-        "nightgown with heels",
-        "robe over nothing",
-        "hair still messy from pillow",
-        "one earring missing",
-        "makeup half-done"
+        {
+          "id": "nud_clothing_07__tag_000",
+          "text": "clothes wrinkled from sleep",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nud_clothing_07__tag_001",
+          "text": "shirt inside-out",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nud_clothing_07__tag_002",
+          "text": "buttoned wrong",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nud_clothing_07__tag_003",
+          "text": "dress on backwards",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nud_clothing_07__tag_004",
+          "text": "collar askew",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nud_clothing_07__tag_005",
+          "text": "hem tucked into underwear",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nud_clothing_07__tag_006",
+          "text": "one shoe on one off",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nud_clothing_07__tag_007",
+          "text": "stockings rolled unevenly",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nud_clothing_07__tag_008",
+          "text": "bra on over shirt",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nud_clothing_07__tag_009",
+          "text": "sweater inside-out",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nud_clothing_07__tag_010",
+          "text": "jacket half-on",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nud_clothing_07__tag_011",
+          "text": "shirt untucked on one side",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nud_clothing_07__tag_012",
+          "text": "zipper half-up",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nud_clothing_07__tag_013",
+          "text": "belt dangling",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nud_clothing_07__tag_014",
+          "text": "post-sex outfit hastily thrown on",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nud_clothing_07__tag_015",
+          "text": "mismatched clothes",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nud_clothing_07__tag_016",
+          "text": "pajama top with skirt",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nud_clothing_07__tag_017",
+          "text": "nightgown with heels",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nud_clothing_07__tag_018",
+          "text": "robe over nothing",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nud_clothing_07__tag_019",
+          "text": "hair still messy from pillow",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nud_clothing_07__tag_020",
+          "text": "one earring missing",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nud_clothing_07__tag_021",
+          "text": "makeup half-done",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        }
       ]
     },
     {
       "name_zh": "破旧型（时间/磨损/痕迹）",
       "tags": [
-        "faded fabric",
-        "worn thin from washing",
-        "threadbare at elbows",
-        "pilling sweater",
-        "stretched-out neckline",
-        "fraying hem",
-        "faded bra elastic",
-        "stretched-out panties",
-        "worn-out lace",
-        "old tank top with holes",
-        "thinning fabric showing skin through",
-        "yellowed white shirt",
-        "dingy fabric",
-        "old cotton worn soft",
-        "threadbare stockings",
-        "laddered tights",
-        "run in stocking",
-        "patched knee",
-        "mended seam visible",
-        "safety pin holding together",
-        "vintage worn lingerie",
-        "retro faded colors",
-        "well-loved garment"
+        {
+          "id": "nud_clothing_08__tag_000",
+          "text": "faded fabric",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nud_clothing_08__tag_001",
+          "text": "worn thin from washing",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nud_clothing_08__tag_002",
+          "text": "threadbare at elbows",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nud_clothing_08__tag_003",
+          "text": "pilling sweater",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nud_clothing_08__tag_004",
+          "text": "stretched-out neckline",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nud_clothing_08__tag_005",
+          "text": "fraying hem",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nud_clothing_08__tag_006",
+          "text": "faded bra elastic",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nud_clothing_08__tag_007",
+          "text": "stretched-out panties",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nud_clothing_08__tag_008",
+          "text": "worn-out lace",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nud_clothing_08__tag_009",
+          "text": "old tank top with holes",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nud_clothing_08__tag_010",
+          "text": "thinning fabric showing skin through",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nud_clothing_08__tag_011",
+          "text": "yellowed white shirt",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nud_clothing_08__tag_012",
+          "text": "dingy fabric",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nud_clothing_08__tag_013",
+          "text": "old cotton worn soft",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nud_clothing_08__tag_014",
+          "text": "threadbare stockings",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nud_clothing_08__tag_015",
+          "text": "laddered tights",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nud_clothing_08__tag_016",
+          "text": "run in stocking",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nud_clothing_08__tag_017",
+          "text": "patched knee",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nud_clothing_08__tag_018",
+          "text": "mended seam visible",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nud_clothing_08__tag_019",
+          "text": "safety pin holding together",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nud_clothing_08__tag_020",
+          "text": "vintage worn lingerie",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nud_clothing_08__tag_021",
+          "text": "retro faded colors",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nud_clothing_08__tag_022",
+          "text": "well-loved garment",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        }
       ]
     },
     {
       "name_zh": "遮挡失败型（意外暴露/想遮遮不住）",
       "tags": [
-        "hand trying to cover breasts but too small",
-        "arm across chest not enough",
-        "grabbing torn fabric to cover",
-        "clutching towel that's too short",
-        "crossing legs but skirt still shows everything",
-        "turning away but seen",
-        "bent over and skirt rides up",
-        "reaching up and shirt lifts",
-        "squatting and panties visible",
-        "sitting and legs accidentally open",
-        "leaning forward and cleavage spills out",
-        "stretching and top lifts",
-        "bending to pick up and ass exposed",
-        "tripping and clothes fly",
-        "wind blowing hand-held skirt",
-        "one hand on breast one on crotch",
-        "desperately covering with both hands",
-        "embarrassed exposure"
+        {
+          "id": "nud_clothing_09__tag_000",
+          "text": "hand trying to cover breasts but too small",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nud_clothing_09__tag_001",
+          "text": "arm across chest not enough",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nud_clothing_09__tag_002",
+          "text": "grabbing torn fabric to cover",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nud_clothing_09__tag_003",
+          "text": "clutching towel that's too short",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nud_clothing_09__tag_004",
+          "text": "crossing legs but skirt still shows everything",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "lower_body"
+            ]
+          }
+        },
+        {
+          "id": "nud_clothing_09__tag_005",
+          "text": "turning away but seen",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nud_clothing_09__tag_006",
+          "text": "bent over and skirt rides up",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nud_clothing_09__tag_007",
+          "text": "reaching up and shirt lifts",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nud_clothing_09__tag_008",
+          "text": "squatting and panties visible",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nud_clothing_09__tag_009",
+          "text": "sitting and legs accidentally open",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "lower_body"
+            ]
+          }
+        },
+        {
+          "id": "nud_clothing_09__tag_010",
+          "text": "leaning forward and cleavage spills out",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nud_clothing_09__tag_011",
+          "text": "stretching and top lifts",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nud_clothing_09__tag_012",
+          "text": "bending to pick up and ass exposed",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nud_clothing_09__tag_013",
+          "text": "tripping and clothes fly",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nud_clothing_09__tag_014",
+          "text": "wind blowing hand-held skirt",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nud_clothing_09__tag_015",
+          "text": "one hand on breast one on crotch",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "lower_body",
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nud_clothing_09__tag_016",
+          "text": "desperately covering with both hands",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "nud_clothing_09__tag_017",
+          "text": "embarrassed exposure",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        }
       ]
     }
   ],
@@ -378,324 +2752,2779 @@
       "name_zh": "精液（Cum）",
       "attributes": {
         "量词（必选其一）": [
-          "single drop",
-          "thin streak",
-          "faint trace",
-          "one droplet",
-          "barely visible trace",
-          "wispy thin line",
-          "minuscule amount",
-          "tiny globule",
-          "micro droplet",
-          "fine thread"
+          {
+            "id": "liq_sys_0_item__000",
+            "text": "single drop",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "sexual_fluid",
+              "liquid_amount": "trace",
+              "liquid_locations": [
+                "skin"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_0_item__001",
+            "text": "thin streak",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "sexual_fluid",
+              "liquid_amount": "trace",
+              "liquid_locations": [
+                "skin"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_0_item__002",
+            "text": "faint trace",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "sexual_fluid",
+              "liquid_amount": "trace",
+              "liquid_locations": [
+                "skin"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_0_item__003",
+            "text": "one droplet",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "sexual_fluid",
+              "liquid_amount": "trace",
+              "liquid_locations": [
+                "skin"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_0_item__004",
+            "text": "barely visible trace",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "sexual_fluid",
+              "liquid_amount": "trace",
+              "liquid_locations": [
+                "skin"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_0_item__005",
+            "text": "wispy thin line",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "sexual_fluid",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "skin"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_0_item__006",
+            "text": "minuscule amount",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "sexual_fluid",
+              "liquid_amount": "trace",
+              "liquid_locations": [
+                "skin"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_0_item__007",
+            "text": "tiny globule",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "sexual_fluid",
+              "liquid_amount": "trace",
+              "liquid_locations": [
+                "skin"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_0_item__008",
+            "text": "micro droplet",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "sexual_fluid",
+              "liquid_amount": "trace",
+              "liquid_locations": [
+                "skin"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_0_item__009",
+            "text": "fine thread",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "sexual_fluid",
+              "liquid_amount": "trace",
+              "liquid_locations": [
+                "skin"
+              ]
+            }
+          }
         ],
         "质地（选 1-2 个）": [
-          "translucent milky fluid",
-          "slightly yellowish tint",
-          "egg-white viscosity",
-          "almost transparent",
-          "watery consistency",
-          "thin enough to see skin color through",
-          "sticky viscosity",
-          "stringy texture when pulled",
-          "viscous gel-like consistency",
-          "surface tension holding droplet shape",
-          "semi-transparent opalescent sheen"
+          {
+            "id": "liq_sys_0_1_2__010",
+            "text": "translucent milky fluid",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "sexual_fluid",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "skin"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_0_1_2__011",
+            "text": "slightly yellowish tint",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "sexual_fluid",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "skin"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_0_1_2__012",
+            "text": "egg-white viscosity",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "sexual_fluid",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "skin"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_0_1_2__013",
+            "text": "almost transparent",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "sexual_fluid",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "skin"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_0_1_2__014",
+            "text": "watery consistency",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "sexual_fluid",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "skin"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_0_1_2__015",
+            "text": "thin enough to see skin color through",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "sexual_fluid",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "skin"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_0_1_2__016",
+            "text": "sticky viscosity",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "sexual_fluid",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "skin"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_0_1_2__017",
+            "text": "stringy texture when pulled",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "sexual_fluid",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "skin"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_0_1_2__018",
+            "text": "viscous gel-like consistency",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "sexual_fluid",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "skin"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_0_1_2__019",
+            "text": "surface tension holding droplet shape",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "sexual_fluid",
+              "liquid_amount": "light",
+              "liquid_locations": [
+                "face"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_0_1_2__020",
+            "text": "semi-transparent opalescent sheen",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "sexual_fluid",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "skin"
+              ]
+            }
+          }
         ],
         "皮肤接触真实感（必选 2-3 个）": [
-          "cum conforming to skin texture",
-          "fluid settling into wrinkle lines",
-          "specular highlights on droplet surface",
-          "light refracting through thin layer",
-          "cum thinning at edges where it meets skin",
-          "gradual opacity fade at borders",
-          "glistening wet catch rim light",
-          "translucent showing skin color beneath",
-          "caustics effect in droplet",
-          "tiny rainbow refractions in fluid",
-          "light bending through fluid layer",
-          "glossy wet surface reflection",
-          "fluid following skin pore pattern",
-          "meniscus curve at droplet edge"
+          {
+            "id": "liq_sys_0_2_3__021",
+            "text": "cum conforming to skin texture",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "sexual_fluid",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "skin"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_0_2_3__022",
+            "text": "fluid settling into wrinkle lines",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "sexual_fluid",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "skin"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_0_2_3__023",
+            "text": "specular highlights on droplet surface",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "sexual_fluid",
+              "liquid_amount": "light",
+              "liquid_locations": [
+                "face"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_0_2_3__024",
+            "text": "light refracting through thin layer",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "sexual_fluid",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "skin"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_0_2_3__025",
+            "text": "cum thinning at edges where it meets skin",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "sexual_fluid",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "skin"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_0_2_3__026",
+            "text": "gradual opacity fade at borders",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "sexual_fluid",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "skin"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_0_2_3__027",
+            "text": "glistening wet catch rim light",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "sexual_fluid",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "skin"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_0_2_3__028",
+            "text": "translucent showing skin color beneath",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "sexual_fluid",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "skin"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_0_2_3__029",
+            "text": "caustics effect in droplet",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "sexual_fluid",
+              "liquid_amount": "light",
+              "liquid_locations": [
+                "skin"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_0_2_3__030",
+            "text": "tiny rainbow refractions in fluid",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "sexual_fluid",
+              "liquid_amount": "trace",
+              "liquid_locations": [
+                "skin"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_0_2_3__031",
+            "text": "light bending through fluid layer",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "sexual_fluid",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "skin"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_0_2_3__032",
+            "text": "glossy wet surface reflection",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "sexual_fluid",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "face"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_0_2_3__033",
+            "text": "fluid following skin pore pattern",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "sexual_fluid",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "skin"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_0_2_3__034",
+            "text": "meniscus curve at droplet edge",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "sexual_fluid",
+              "liquid_amount": "light",
+              "liquid_locations": [
+                "skin"
+              ]
+            }
+          }
         ],
         "粘性/拉丝（选 1 个）": [
-          "sticky thread connecting surfaces",
-          "stretchy strand before breaking",
-          "viscous string pulling between points",
-          "elastic fluid trail",
-          "glue-like consistency when stretched",
-          "spiderweb-thin thread"
+          {
+            "id": "liq_sys_0_1__035",
+            "text": "sticky thread connecting surfaces",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "sexual_fluid",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "face"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_0_1__036",
+            "text": "stretchy strand before breaking",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "sexual_fluid",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "skin"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_0_1__037",
+            "text": "viscous string pulling between points",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "sexual_fluid",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "skin"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_0_1__038",
+            "text": "elastic fluid trail",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "sexual_fluid",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "skin"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_0_1__039",
+            "text": "glue-like consistency when stretched",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "sexual_fluid",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "skin"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_0_1__040",
+            "text": "spiderweb-thin thread",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "sexual_fluid",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "skin"
+              ]
+            }
+          }
         ],
         "物理行为（选 1 个）": [
-          "viscous drop slowly sliding down",
-          "surface tension holding droplet shape",
-          "cum stretching in thin thread before breaking",
-          "droplet pooling in skin crease",
-          "gravity pulling fluid downward",
-          "droplet hanging before falling",
-          "fluid accumulating at lowest point",
-          "thin film coating skin surface"
+          {
+            "id": "liq_sys_0_1__041",
+            "text": "viscous drop slowly sliding down",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "sexual_fluid",
+              "liquid_amount": "light",
+              "liquid_locations": [
+                "skin"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_0_1__042",
+            "text": "surface tension holding droplet shape",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "sexual_fluid",
+              "liquid_amount": "light",
+              "liquid_locations": [
+                "face"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_0_1__043",
+            "text": "cum stretching in thin thread before breaking",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "sexual_fluid",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "mouth"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_0_1__044",
+            "text": "droplet pooling in skin crease",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "sexual_fluid",
+              "liquid_amount": "light",
+              "liquid_locations": [
+                "skin"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_0_1__045",
+            "text": "gravity pulling fluid downward",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "sexual_fluid",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "skin"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_0_1__046",
+            "text": "droplet hanging before falling",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "sexual_fluid",
+              "liquid_amount": "light",
+              "liquid_locations": [
+                "skin"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_0_1__047",
+            "text": "fluid accumulating at lowest point",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "sexual_fluid",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "skin"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_0_1__048",
+            "text": "thin film coating skin surface",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "sexual_fluid",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "face",
+                "skin"
+              ]
+            }
+          }
         ],
         "颜射负面提示": [
-          "cum covering entire face",
-          "opaque white mask",
-          "paint-like coating",
-          "cum in eyes",
-          "cum blocking nose",
-          "cum on eyelashes",
-          "evenly distributed facial",
-          "symmetrical splatter"
+          {
+            "id": "liq_sys_0_item__049",
+            "text": "cum covering entire face",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "sexual_fluid",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "face"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_0_item__050",
+            "text": "opaque white mask",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "sexual_fluid",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "skin"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_0_item__051",
+            "text": "paint-like coating",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "sexual_fluid",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "skin"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_0_item__052",
+            "text": "cum in eyes",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "sexual_fluid",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "skin"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_0_item__053",
+            "text": "cum blocking nose",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "sexual_fluid",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "skin"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_0_item__054",
+            "text": "cum on eyelashes",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "sexual_fluid",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "skin"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_0_item__055",
+            "text": "evenly distributed facial",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "sexual_fluid",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "skin"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_0_item__056",
+            "text": "symmetrical splatter",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "sexual_fluid",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "skin"
+              ]
+            }
+          }
         ]
-      }
+      },
+      "id": "sys_cum"
     },
     {
       "name_zh": "乳液/母乳（Breast Milk）",
       "attributes": {
         "量词（必选其一）": [
-          "few drops",
-          "single droplet",
-          "faint trickle",
-          "thin line",
-          "barely leaking"
+          {
+            "id": "liq_sys_1_item__057",
+            "text": "few drops",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "sexual_fluid",
+              "liquid_amount": "light",
+              "liquid_locations": [
+                "skin"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_1_item__058",
+            "text": "single droplet",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "sexual_fluid",
+              "liquid_amount": "trace",
+              "liquid_locations": [
+                "skin"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_1_item__059",
+            "text": "faint trickle",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "sexual_fluid",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "skin"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_1_item__060",
+            "text": "thin line",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "sexual_fluid",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "skin"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_1_item__061",
+            "text": "barely leaking",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "sexual_fluid",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "skin"
+              ]
+            }
+          }
         ],
         "质地（选 1 个）": [
-          "thin watery milk",
-          "translucent white",
-          "slightly bluish tint"
+          {
+            "id": "liq_sys_1_1__062",
+            "text": "thin watery milk",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "sexual_fluid",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "skin"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_1_1__063",
+            "text": "translucent white",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "sexual_fluid",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "skin"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_1_1__064",
+            "text": "slightly bluish tint",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "sexual_fluid",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "skin"
+              ]
+            }
+          }
         ],
         "皮肤接触（选 2 个）": [
-          "milk droplet conforming to nipple shape",
-          "thin stream following breast curve",
-          "translucent fluid catching light",
-          "wet trail on warm skin"
+          {
+            "id": "liq_sys_1_2__065",
+            "text": "milk droplet conforming to nipple shape",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "sexual_fluid",
+              "liquid_amount": "light",
+              "liquid_locations": [
+                "skin"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_1_2__066",
+            "text": "thin stream following breast curve",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "sexual_fluid",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "torso"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_1_2__067",
+            "text": "translucent fluid catching light",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "sexual_fluid",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "mouth"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_1_2__068",
+            "text": "wet trail on warm skin",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "sexual_fluid",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "skin"
+              ]
+            }
+          }
         ],
         "负面提示": [
-          "pure white",
-          "opaque",
-          "paint-like",
-          "massive spray",
-          "flooding",
-          "random placement"
+          {
+            "id": "liq_sys_1_item__069",
+            "text": "pure white",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "sexual_fluid",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "skin"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_1_item__070",
+            "text": "opaque",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "sexual_fluid",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "skin"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_1_item__071",
+            "text": "paint-like",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "sexual_fluid",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "skin"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_1_item__072",
+            "text": "massive spray",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "sexual_fluid",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "skin"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_1_item__073",
+            "text": "flooding",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "sexual_fluid",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "skin"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_1_item__074",
+            "text": "random placement",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "sexual_fluid",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "skin"
+              ]
+            }
+          }
         ]
-      }
+      },
+      "id": "sys_breast_milk"
     },
     {
       "name_zh": "淫水/爱液（Pussy Juice/Vaginal Fluid）",
       "attributes": {
         "质地描述（必须包含颜色限定词）": [
-          "clear slippery fluid",
-          "thin transparent liquid",
-          "colorless clear lubricant",
-          "water-clear fluid",
-          "not white",
-          "not milky",
-          "no white tint",
-          "transparent like water",
-          "clear not opaque"
+          {
+            "id": "liq_sys_2_item__075",
+            "text": "clear slippery fluid",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "sexual_fluid",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "mouth"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_2_item__076",
+            "text": "thin transparent liquid",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "sexual_fluid",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "skin"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_2_item__077",
+            "text": "colorless clear lubricant",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "sexual_fluid",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "skin"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_2_item__078",
+            "text": "water-clear fluid",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "sexual_fluid",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "skin"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_2_item__079",
+            "text": "not white",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "sexual_fluid",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "skin"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_2_item__080",
+            "text": "not milky",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "sexual_fluid",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "skin"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_2_item__081",
+            "text": "no white tint",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "sexual_fluid",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "skin"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_2_item__082",
+            "text": "transparent like water",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "sexual_fluid",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "skin"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_2_item__083",
+            "text": "clear not opaque",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "sexual_fluid",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "skin"
+              ]
+            }
+          }
         ],
         "量感（必选）": [
-          "subtle wetness",
-          "thin sheen",
-          "faint glistening",
-          "slight dampness",
-          "barely moist",
-          "light wetness",
-          "minimal fluid",
-          "just a hint of moisture"
+          {
+            "id": "liq_sys_2_item__084",
+            "text": "subtle wetness",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "sexual_fluid",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "skin"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_2_item__085",
+            "text": "thin sheen",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "sexual_fluid",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "skin"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_2_item__086",
+            "text": "faint glistening",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "sexual_fluid",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "skin"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_2_item__087",
+            "text": "slight dampness",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "sexual_fluid",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "skin"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_2_item__088",
+            "text": "barely moist",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "sexual_fluid",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "skin"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_2_item__089",
+            "text": "light wetness",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "sexual_fluid",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "skin"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_2_item__090",
+            "text": "minimal fluid",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "sexual_fluid",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "skin"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_2_item__091",
+            "text": "just a hint of moisture",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "sexual_fluid",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "skin"
+              ]
+            }
+          }
         ],
         "位置（只选 1 处）": [
-          "subtle wetness on inner labia",
-          "glistening faintly thin wet trail running down inner thigh slight dampness spreading on panties faint glistening on mons pubis"
+          {
+            "id": "liq_sys_2_1__092",
+            "text": "subtle wetness on inner labia",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "sexual_fluid",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "skin"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_2_1__093",
+            "text": "glistening faintly thin wet trail running down inner thigh slight dampness spreading on panties faint glistening on mons pubis",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "sexual_fluid",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "lower_body"
+              ]
+            }
+          }
         ],
         "与精液混合（少量）": [
-          "thin white cum mixed with clear wetness",
-          "subtle mixed fluids on thigh",
-          "faint creampie leaking"
+          {
+            "id": "liq_sys_2_item__094",
+            "text": "thin white cum mixed with clear wetness",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "sexual_fluid",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "skin"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_2_item__095",
+            "text": "subtle mixed fluids on thigh",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "sexual_fluid",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "lower_body"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_2_item__096",
+            "text": "faint creampie leaking",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "sexual_fluid",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "skin"
+              ]
+            }
+          }
         ]
-      }
+      },
+      "id": "sys_pussy_juice"
     },
     {
       "name_zh": "尿液（Urine/Piss）",
       "attributes": {
         "质地描述": [
-          "clear yellow fluid",
-          "pale straw color",
-          "transparent liquid",
-          "slightly darker when concentrated",
-          "very thin and watery",
-          "less viscous than other fluids",
-          "natural yellow tint",
-          "not fluorescent"
+          {
+            "id": "liq_sys_3_item__097",
+            "text": "clear yellow fluid",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "sexual_fluid",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "skin"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_3_item__098",
+            "text": "pale straw color",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "sexual_fluid",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "skin"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_3_item__099",
+            "text": "transparent liquid",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "sexual_fluid",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "skin"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_3_item__100",
+            "text": "slightly darker when concentrated",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "sexual_fluid",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "skin"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_3_item__101",
+            "text": "very thin and watery",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "sexual_fluid",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "skin"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_3_item__102",
+            "text": "less viscous than other fluids",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "sexual_fluid",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "skin"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_3_item__103",
+            "text": "natural yellow tint",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "sexual_fluid",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "skin"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_3_item__104",
+            "text": "not fluorescent",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "sexual_fluid",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "skin"
+              ]
+            }
+          }
         ],
         "表面交互": [
-          "urine splashing where it hits hard floor",
-          "urine soaking into fabric creating dark halo",
-          "steam rising from warm urine on cold surface",
-          "urine mixing with bath water diluting",
-          "bubbles forming in puddle",
-          "urine running along tile grout"
+          {
+            "id": "liq_sys_3_item__105",
+            "text": "urine splashing where it hits hard floor",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "sexual_fluid",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "skin"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_3_item__106",
+            "text": "urine soaking into fabric creating dark halo",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "sexual_fluid",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "skin"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_3_item__107",
+            "text": "steam rising from warm urine on cold surface",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "sexual_fluid",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "face",
+                "skin"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_3_item__108",
+            "text": "urine mixing with bath water diluting",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "sexual_fluid",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "skin"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_3_item__109",
+            "text": "bubbles forming in puddle",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "sexual_fluid",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "skin"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_3_item__110",
+            "text": "urine running along tile grout",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "sexual_fluid",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "skin"
+              ]
+            }
+          }
         ],
         "位置": [
-          "urine running down inner thighs in thin streams",
-          "urine soaking through panties from crotch outward",
-          "puddle forming under standing figure",
-          "urine dripping from hem of skirt",
-          "urine trail on floor"
+          {
+            "id": "liq_sys_3_item__111",
+            "text": "urine running down inner thighs in thin streams",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "sexual_fluid",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "lower_body"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_3_item__112",
+            "text": "urine soaking through panties from crotch outward",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "sexual_fluid",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "lower_body"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_3_item__113",
+            "text": "puddle forming under standing figure",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "sexual_fluid",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "skin"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_3_item__114",
+            "text": "urine dripping from hem of skirt",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "sexual_fluid",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "skin"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_3_item__115",
+            "text": "urine trail on floor",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "sexual_fluid",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "skin"
+              ]
+            }
+          }
         ],
         "光线": [
-          "urine catching light as thin transparent layer",
-          "golden tint under warm light",
-          "steam visible in backlight",
-          "urine soaking through fabric creating visible outline of skin beneath"
+          {
+            "id": "liq_sys_3_item__116",
+            "text": "urine catching light as thin transparent layer",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "sexual_fluid",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "mouth"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_3_item__117",
+            "text": "golden tint under warm light",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "sexual_fluid",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "skin"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_3_item__118",
+            "text": "steam visible in backlight",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "sexual_fluid",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "skin"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_3_item__119",
+            "text": "urine soaking through fabric creating visible outline of skin beneath",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "sexual_fluid",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "skin"
+              ]
+            }
+          }
         ]
-      }
+      },
+      "id": "sys_urine"
     },
     {
       "name_zh": "汗液（Sweat）",
       "attributes": {
         "描述": [
-          "sweat beads forming on skin",
-          "perspiration sheen",
-          "body glistening",
-          "thin moisture layer",
-          "damp skin glow",
-          "individual droplets visible",
-          "continuous wet sheen",
-          "afterglow perspiration"
+          {
+            "id": "liq_sys_4_item__120",
+            "text": "sweat beads forming on skin",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "sweat",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "skin"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_4_item__121",
+            "text": "perspiration sheen",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "sweat",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "skin"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_4_item__122",
+            "text": "body glistening",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "sweat",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "skin"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_4_item__123",
+            "text": "thin moisture layer",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "sweat",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "skin"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_4_item__124",
+            "text": "damp skin glow",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "sweat",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "skin"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_4_item__125",
+            "text": "individual droplets visible",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "sweat",
+              "liquid_amount": "light",
+              "liquid_locations": [
+                "skin"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_4_item__126",
+            "text": "continuous wet sheen",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "sweat",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "skin"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_4_item__127",
+            "text": "afterglow perspiration",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "sweat",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "skin"
+              ]
+            }
+          }
         ],
         "流动动态": [
-          "sweat bead rolling down temple",
-          "droplet tracing jawline then dripping from chin",
-          "sweat running down spine in single stream",
-          "beads collecting in collarbone hollow then overflowing",
-          "sweat tracing between breasts following gravity"
+          {
+            "id": "liq_sys_4_item__128",
+            "text": "sweat bead rolling down temple",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "sweat",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "skin"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_4_item__129",
+            "text": "droplet tracing jawline then dripping from chin",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "sweat",
+              "liquid_amount": "light",
+              "liquid_locations": [
+                "mouth"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_4_item__130",
+            "text": "sweat running down spine in single stream",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "sweat",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "skin"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_4_item__131",
+            "text": "beads collecting in collarbone hollow then overflowing",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "sweat",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "skin"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_4_item__132",
+            "text": "sweat tracing between breasts following gravity",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "sweat",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "torso"
+              ]
+            }
+          }
         ],
         "位置": [
-          "sweat on forehead and temples",
-          "sweat running down neck",
-          "droplets between breasts",
-          "sheen on stomach",
-          "sweat on lower back",
-          "damp inner thighs",
-          "sweat dripping from chin tip",
-          "glistening collarbone"
+          {
+            "id": "liq_sys_4_item__133",
+            "text": "sweat on forehead and temples",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "sweat",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "face"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_4_item__134",
+            "text": "sweat running down neck",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "sweat",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "skin"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_4_item__135",
+            "text": "droplets between breasts",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "sweat",
+              "liquid_amount": "light",
+              "liquid_locations": [
+                "torso"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_4_item__136",
+            "text": "sheen on stomach",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "sweat",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "torso"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_4_item__137",
+            "text": "sweat on lower back",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "sweat",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "skin"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_4_item__138",
+            "text": "damp inner thighs",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "sweat",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "lower_body"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_4_item__139",
+            "text": "sweat dripping from chin tip",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "sweat",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "mouth"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_4_item__140",
+            "text": "glistening collarbone",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "sweat",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "skin"
+              ]
+            }
+          }
         ],
         "光线": [
-          "sweat catching rim light as tiny sparkles",
-          "body sheen from moisture layer",
-          "specular highlights on droplets",
-          "skin glow from thin moisture",
-          "backlight showing sweat beads"
+          {
+            "id": "liq_sys_4_item__141",
+            "text": "sweat catching rim light as tiny sparkles",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "sweat",
+              "liquid_amount": "trace",
+              "liquid_locations": [
+                "mouth"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_4_item__142",
+            "text": "body sheen from moisture layer",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "sweat",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "skin"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_4_item__143",
+            "text": "specular highlights on droplets",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "sweat",
+              "liquid_amount": "light",
+              "liquid_locations": [
+                "skin"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_4_item__144",
+            "text": "skin glow from thin moisture",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "sweat",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "skin"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_4_item__145",
+            "text": "backlight showing sweat beads",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "sweat",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "skin"
+              ]
+            }
+          }
         ]
-      }
+      },
+      "id": "sys_sweat"
     },
     {
       "name_zh": "唾液（Saliva）",
       "attributes": {
         "描述": [
-          "saliva string stretching between lips",
-          "thin drool thread",
-          "transparent sticky strand",
-          "glossy wet mouth",
-          "saliva trail",
-          "stretchy spit connecting surfaces",
-          "watery and clear"
+          {
+            "id": "liq_sys_5_item__146",
+            "text": "saliva string stretching between lips",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "saliva",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "mouth"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_5_item__147",
+            "text": "thin drool thread",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "saliva",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "skin"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_5_item__148",
+            "text": "transparent sticky strand",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "saliva",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "skin"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_5_item__149",
+            "text": "glossy wet mouth",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "saliva",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "mouth"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_5_item__150",
+            "text": "saliva trail",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "saliva",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "skin"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_5_item__151",
+            "text": "stretchy spit connecting surfaces",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "saliva",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "face"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_5_item__152",
+            "text": "watery and clear",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "saliva",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "skin"
+              ]
+            }
+          }
         ],
         "流动动态": [
-          "saliva dripping from corner of relaxed mouth",
-          "thin strand stretching from lower lip then breaking",
-          "drool pooling at chin",
-          "saliva trail from mouth to skin",
-          "spit string connecting tongue to lip"
+          {
+            "id": "liq_sys_5_item__153",
+            "text": "saliva dripping from corner of relaxed mouth",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "saliva",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "mouth"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_5_item__154",
+            "text": "thin strand stretching from lower lip then breaking",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "saliva",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "mouth"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_5_item__155",
+            "text": "drool pooling at chin",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "saliva",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "mouth"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_5_item__156",
+            "text": "saliva trail from mouth to skin",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "saliva",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "mouth",
+                "skin"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_5_item__157",
+            "text": "spit string connecting tongue to lip",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "saliva",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "mouth"
+              ]
+            }
+          }
         ],
         "位置": [
-          "drool from corner of mouth",
-          "saliva on chin",
-          "spit trail on body",
-          "wet kiss mark with saliva",
-          "saliva mixed with cum on tongue",
-          "drool on pillow",
-          "saliva dripping onto partner"
+          {
+            "id": "liq_sys_5_item__158",
+            "text": "drool from corner of mouth",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "saliva",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "mouth"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_5_item__159",
+            "text": "saliva on chin",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "saliva",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "mouth"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_5_item__160",
+            "text": "spit trail on body",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "saliva",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "skin"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_5_item__161",
+            "text": "wet kiss mark with saliva",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "saliva",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "skin"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_5_item__162",
+            "text": "saliva mixed with cum on tongue",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "saliva",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "mouth"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_5_item__163",
+            "text": "drool on pillow",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "saliva",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "skin"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_5_item__164",
+            "text": "saliva dripping onto partner",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "saliva",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "skin"
+              ]
+            }
+          }
         ],
         "光线": [
-          "saliva string catching light as thin bright line",
-          "glossy mouth reflecting light",
-          "drool glistening on chin",
-          "transparent strand visible only by light refraction",
-          "colorless transparent saliva",
-          "water-clear drool",
-          "no white tint in saliva",
-          "clear fluid not opaque"
+          {
+            "id": "liq_sys_5_item__165",
+            "text": "saliva string catching light as thin bright line",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "saliva",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "mouth"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_5_item__166",
+            "text": "glossy mouth reflecting light",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "saliva",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "mouth"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_5_item__167",
+            "text": "drool glistening on chin",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "saliva",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "mouth"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_5_item__168",
+            "text": "transparent strand visible only by light refraction",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "saliva",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "skin"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_5_item__169",
+            "text": "colorless transparent saliva",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "saliva",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "skin"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_5_item__170",
+            "text": "water-clear drool",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "saliva",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "skin"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_5_item__171",
+            "text": "no white tint in saliva",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "saliva",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "skin"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_5_item__172",
+            "text": "clear fluid not opaque",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "saliva",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "skin"
+              ]
+            }
+          }
         ]
-      }
+      },
+      "id": "sys_saliva"
     },
     {
       "name_zh": "泡沫/泡泡（Foam/Bubbles）",
       "attributes": {
         "泡沫质地（蓬松轻盈）": [
-          "fluffy white foam",
-          "airy soap bubbles",
-          "dense bath foam",
-          "creamy lather",
-          "soft suds",
-          "frothy bubbles",
-          "cloud-like foam texture",
-          "whipped cream-like foam",
-          "voluminous bubble clusters"
+          {
+            "id": "liq_sys_6_item__173",
+            "text": "fluffy white foam",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "water",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "skin"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_6_item__174",
+            "text": "airy soap bubbles",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "water",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "skin"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_6_item__175",
+            "text": "dense bath foam",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "water",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "skin"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_6_item__176",
+            "text": "creamy lather",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "water",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "skin"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_6_item__177",
+            "text": "soft suds",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "water",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "skin"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_6_item__178",
+            "text": "frothy bubbles",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "water",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "skin"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_6_item__179",
+            "text": "cloud-like foam texture",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "water",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "skin"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_6_item__180",
+            "text": "whipped cream-like foam",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "water",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "skin"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_6_item__181",
+            "text": "voluminous bubble clusters",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "water",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "skin"
+              ]
+            }
+          }
         ],
         "泡泡外观（虹彩透明）": [
-          "iridescent soap bubbles",
-          "rainbow sheen on bubble surface",
-          "translucent bubble walls",
-          "thin soap film",
-          "bubbles with oil-slick colors",
-          "prismatic bubble reflections",
-          "light passing through bubbles",
-          "shimmering bubble clusters"
+          {
+            "id": "liq_sys_6_item__182",
+            "text": "iridescent soap bubbles",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "water",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "skin"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_6_item__183",
+            "text": "rainbow sheen on bubble surface",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "water",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "face"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_6_item__184",
+            "text": "translucent bubble walls",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "water",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "skin"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_6_item__185",
+            "text": "thin soap film",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "water",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "skin"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_6_item__186",
+            "text": "bubbles with oil-slick colors",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "water",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "skin"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_6_item__187",
+            "text": "prismatic bubble reflections",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "water",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "skin"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_6_item__188",
+            "text": "light passing through bubbles",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "water",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "skin"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_6_item__189",
+            "text": "shimmering bubble clusters",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "water",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "skin"
+              ]
+            }
+          }
         ],
         "泡沫状态（蓬松堆积）": [
-          "foam piled on chest",
-          "bubbles clinging to shoulders",
-          "foam covering breasts like soft clouds",
-          "bath foam overflowing",
-          "bubble bath mounds",
-          "foam sitting on skin surface",
-          "froth y layer on water",
-          "foam clinging to curves"
+          {
+            "id": "liq_sys_6_item__190",
+            "text": "foam piled on chest",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "water",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "torso"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_6_item__191",
+            "text": "bubbles clinging to shoulders",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "water",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "skin"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_6_item__192",
+            "text": "foam covering breasts like soft clouds",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "water",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "torso"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_6_item__193",
+            "text": "bath foam overflowing",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "water",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "skin"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_6_item__194",
+            "text": "bubble bath mounds",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "water",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "skin"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_6_item__195",
+            "text": "foam sitting on skin surface",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "water",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "face",
+                "skin"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_6_item__196",
+            "text": "froth y layer on water",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "water",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "skin"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_6_item__197",
+            "text": "foam clinging to curves",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "water",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "skin"
+              ]
+            }
+          }
         ],
         "泡泡动态（轻盈漂浮）": [
-          "bubbles floating on water surface",
-          "foam slowly dissipating",
-          "bubbles popping gently",
-          "foam sliding down skin in soft sheets",
-          "bubbles clustering together",
-          "foam rising with steam"
+          {
+            "id": "liq_sys_6_item__198",
+            "text": "bubbles floating on water surface",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "water",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "face"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_6_item__199",
+            "text": "foam slowly dissipating",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "water",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "skin"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_6_item__200",
+            "text": "bubbles popping gently",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "water",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "skin"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_6_item__201",
+            "text": "foam sliding down skin in soft sheets",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "water",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "skin"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_6_item__202",
+            "text": "bubbles clustering together",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "water",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "skin"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_6_item__203",
+            "text": "foam rising with steam",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "water",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "skin"
+              ]
+            }
+          }
         ],
         "位置（洗浴场景）": [
-          "foam covering chest and shoulders",
-          "fluffy white bubbles bubble bath foam piled on breasts",
-          "soft iridescent sheen soap suds on wet skin",
-          "rainbow reflections on bubbles bath foam overflowing from tub",
-          "frothy white mounds bubbles clinging to arms and legs",
-          "translucent spheres"
+          {
+            "id": "liq_sys_6_item__204",
+            "text": "foam covering chest and shoulders",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "water",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "skin",
+                "torso"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_6_item__205",
+            "text": "fluffy white bubbles bubble bath foam piled on breasts",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "water",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "torso"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_6_item__206",
+            "text": "soft iridescent sheen soap suds on wet skin",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "water",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "skin"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_6_item__207",
+            "text": "rainbow reflections on bubbles bath foam overflowing from tub",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "water",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "skin"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_6_item__208",
+            "text": "frothy white mounds bubbles clinging to arms and legs",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "water",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "lower_body",
+                "skin"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_6_item__209",
+            "text": "translucent spheres",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "water",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "skin"
+              ]
+            }
+          }
         ],
         "光线（虹彩效果）": [
-          "bubbles catching light with rainbow sheen",
-          "iridescent soap film showing oil-slick colors",
-          "prismatic reflections in bubble walls",
-          "light passing through translucent bubbles",
-          "foam edges glistening with soft white glow",
-          "rainbow refractions on bubble surfaces"
+          {
+            "id": "liq_sys_6_item__210",
+            "text": "bubbles catching light with rainbow sheen",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "water",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "mouth"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_6_item__211",
+            "text": "iridescent soap film showing oil-slick colors",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "water",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "skin"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_6_item__212",
+            "text": "prismatic reflections in bubble walls",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "water",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "skin"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_6_item__213",
+            "text": "light passing through translucent bubbles",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "water",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "skin"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_6_item__214",
+            "text": "foam edges glistening with soft white glow",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "water",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "skin"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_6_item__215",
+            "text": "rainbow refractions on bubble surfaces",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "water",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "face"
+              ]
+            }
+          }
         ],
         "正确使用示例": [
-          "fluffy white bath foam covering chest",
-          "iridescent bubbles on shoulders",
-          "soap bubbles with rainbow sheen",
-          "foam clinging to wet skin",
-          "soft cloud-like lather",
-          "translucent bubble walls catching light"
+          {
+            "id": "liq_sys_6_item__216",
+            "text": "fluffy white bath foam covering chest",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "water",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "torso"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_6_item__217",
+            "text": "iridescent bubbles on shoulders",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "water",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "skin"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_6_item__218",
+            "text": "soap bubbles with rainbow sheen",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "water",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "skin"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_6_item__219",
+            "text": "foam clinging to wet skin",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "water",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "skin"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_6_item__220",
+            "text": "soft cloud-like lather",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "water",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "skin"
+              ]
+            }
+          },
+          {
+            "id": "liq_sys_6_item__221",
+            "text": "translucent bubble walls catching light",
+            "facts": {
+              "semantic_role": "effect",
+              "liquid_kind": "water",
+              "liquid_amount": "normal",
+              "liquid_locations": [
+                "mouth"
+              ]
+            }
+          }
         ]
-      }
+      },
+      "id": "sys_bath_foam"
     }
   ],
   "liquid_effects": [
@@ -708,54 +5537,253 @@
       "id": "sweat_glistening",
       "name_zh": "💦 微汗晶莹 (Fine Perspiration & Sweat Sheen)",
       "tags": [
-        "fine perspiration glistening on skin",
-        "beads of sweat rolling down chest",
-        "dewy sweaty sheen"
+        {
+          "id": "sweat_glistening__tag_000",
+          "text": "fine perspiration glistening on skin",
+          "facts": {
+            "semantic_role": "selector",
+            "liquid_kind": "sweat",
+            "liquid_amount": "normal",
+            "liquid_locations": [
+              "skin"
+            ]
+          }
+        },
+        {
+          "id": "sweat_glistening__tag_001",
+          "text": "beads of sweat rolling down chest",
+          "facts": {
+            "semantic_role": "selector",
+            "liquid_kind": "sweat",
+            "liquid_amount": "normal",
+            "liquid_locations": [
+              "torso"
+            ]
+          }
+        },
+        {
+          "id": "sweat_glistening__tag_002",
+          "text": "dewy sweaty sheen",
+          "facts": {
+            "semantic_role": "selector",
+            "liquid_kind": "sweat",
+            "liquid_amount": "normal",
+            "liquid_locations": [
+              "skin"
+            ]
+          }
+        }
       ]
     },
     {
       "id": "wet_water_drops",
       "name_zh": "🚿 沐浴水珠 (Water Droplets & Shower Wetness)",
       "tags": [
-        "water droplets running down skin",
-        "freshly showered wet skin glistening",
-        "trickling water streams"
+        {
+          "id": "wet_water_drops__tag_000",
+          "text": "water droplets running down skin",
+          "facts": {
+            "semantic_role": "selector",
+            "liquid_kind": "water",
+            "liquid_amount": "light",
+            "liquid_locations": [
+              "skin"
+            ]
+          }
+        },
+        {
+          "id": "wet_water_drops__tag_001",
+          "text": "freshly showered wet skin glistening",
+          "facts": {
+            "semantic_role": "selector",
+            "liquid_kind": "water",
+            "liquid_amount": "normal",
+            "liquid_locations": [
+              "skin"
+            ]
+          }
+        },
+        {
+          "id": "wet_water_drops__tag_002",
+          "text": "trickling water streams",
+          "facts": {
+            "semantic_role": "selector",
+            "liquid_kind": "water",
+            "liquid_amount": "normal",
+            "liquid_locations": [
+              "skin"
+            ]
+          }
+        }
       ]
     },
     {
       "id": "saliva_drool",
       "name_zh": "👄 唾液拉丝 (Saliva String & Wet Lips)",
       "tags": [
-        "saliva string between parted lips",
-        "wet glistening chin",
-        "sloppy kiss moisture trail"
+        {
+          "id": "saliva_drool__tag_000",
+          "text": "saliva string between parted lips",
+          "facts": {
+            "semantic_role": "selector",
+            "liquid_kind": "saliva",
+            "liquid_amount": "normal",
+            "liquid_locations": [
+              "mouth"
+            ]
+          }
+        },
+        {
+          "id": "saliva_drool__tag_001",
+          "text": "wet glistening chin",
+          "facts": {
+            "semantic_role": "selector",
+            "liquid_kind": "saliva",
+            "liquid_amount": "normal",
+            "liquid_locations": [
+              "mouth"
+            ]
+          }
+        },
+        {
+          "id": "saliva_drool__tag_002",
+          "text": "sloppy kiss moisture trail",
+          "facts": {
+            "semantic_role": "selector",
+            "liquid_kind": "saliva",
+            "liquid_amount": "normal",
+            "liquid_locations": [
+              "skin"
+            ]
+          }
+        }
       ]
     },
     {
       "id": "pussy_juice",
       "name_zh": "🌊 爱液湿润 (Female Arousal Fluids)",
       "tags": [
-        "glistening pussy juice on inner thighs",
-        "wet slick moisture trail dripping",
-        "aroused lubrication"
+        {
+          "id": "pussy_juice__tag_000",
+          "text": "glistening pussy juice on inner thighs",
+          "facts": {
+            "semantic_role": "selector",
+            "liquid_kind": "sexual_fluid",
+            "liquid_amount": "normal",
+            "liquid_locations": [
+              "lower_body"
+            ]
+          }
+        },
+        {
+          "id": "pussy_juice__tag_001",
+          "text": "wet slick moisture trail dripping",
+          "facts": {
+            "semantic_role": "selector",
+            "liquid_kind": "sexual_fluid",
+            "liquid_amount": "normal",
+            "liquid_locations": [
+              "skin"
+            ]
+          }
+        },
+        {
+          "id": "pussy_juice__tag_002",
+          "text": "aroused lubrication",
+          "facts": {
+            "semantic_role": "selector",
+            "liquid_kind": "sexual_fluid",
+            "liquid_amount": "normal",
+            "liquid_locations": [
+              "skin"
+            ]
+          }
+        }
       ]
     },
     {
       "id": "cum_splatter",
       "name_zh": "🥛 颜射/精液残留 (Cum Splatter & Semen Residual)",
       "tags": [
-        "traces of white cum on skin",
-        "drops of semen dripping on stomach",
-        "milky white fluid glistening"
+        {
+          "id": "cum_splatter__tag_000",
+          "text": "traces of white cum on skin",
+          "facts": {
+            "semantic_role": "selector",
+            "liquid_kind": "sexual_fluid",
+            "liquid_amount": "trace",
+            "liquid_locations": [
+              "skin"
+            ]
+          }
+        },
+        {
+          "id": "cum_splatter__tag_001",
+          "text": "drops of semen dripping on stomach",
+          "facts": {
+            "semantic_role": "selector",
+            "liquid_kind": "sexual_fluid",
+            "liquid_amount": "light",
+            "liquid_locations": [
+              "torso"
+            ]
+          }
+        },
+        {
+          "id": "cum_splatter__tag_002",
+          "text": "milky white fluid glistening",
+          "facts": {
+            "semantic_role": "selector",
+            "liquid_kind": "sexual_fluid",
+            "liquid_amount": "normal",
+            "liquid_locations": [
+              "skin"
+            ]
+          }
+        }
       ]
     },
     {
       "id": "body_oil_lube",
       "name_zh": "🧴 按摩精油 (Massage Oil / Lube Sheen)",
       "tags": [
-        "slick massage oil glistening across body",
-        "glossy lubricated skin surface",
-        "shiny oil sheen"
+        {
+          "id": "body_oil_lube__tag_000",
+          "text": "slick massage oil glistening across body",
+          "facts": {
+            "semantic_role": "selector",
+            "liquid_kind": "oil",
+            "liquid_amount": "normal",
+            "liquid_locations": [
+              "skin"
+            ]
+          }
+        },
+        {
+          "id": "body_oil_lube__tag_001",
+          "text": "glossy lubricated skin surface",
+          "facts": {
+            "semantic_role": "selector",
+            "liquid_kind": "oil",
+            "liquid_amount": "normal",
+            "liquid_locations": [
+              "face",
+              "skin"
+            ]
+          }
+        },
+        {
+          "id": "body_oil_lube__tag_002",
+          "text": "shiny oil sheen",
+          "facts": {
+            "semantic_role": "selector",
+            "liquid_kind": "oil",
+            "liquid_amount": "normal",
+            "liquid_locations": [
+              "skin"
+            ]
+          }
+        }
       ]
     }
   ]

@@ -10,7 +10,315 @@
       "pose_direction": "standing S-curve pose, leaning forward slightly",
       "makeup_direction": "gravure idol makeup, glossy pink lips",
       "expression_gaze": "looking at viewer, confident smile, slight blush",
-      "focus_detail": "tack-sharp focus on eyes, high-fidelity skin texture, studio light catching reflection"
+      "focus_detail": "tack-sharp focus on eyes, high-fidelity skin texture, studio light catching reflection",
+      "fragments": [
+        {
+          "id": "recipe_av_cover__frag_000",
+          "slot": "style_recipe",
+          "text": "85mm portrait lens",
+          "facts": {
+            "semantic_role": "selector"
+          },
+          "origin": {
+            "entry_point": "preset_browser",
+            "mode": "recipe",
+            "selector": "style_recipe",
+            "selected_id": "recipe_av_cover",
+            "raw_value": "85mm portrait lens",
+            "parent_ids": [
+              "recipe_av_cover"
+            ]
+          }
+        },
+        {
+          "id": "recipe_av_cover__frag_001",
+          "slot": "style_recipe",
+          "text": "gravure idol photography",
+          "facts": {
+            "semantic_role": "selector"
+          },
+          "origin": {
+            "entry_point": "preset_browser",
+            "mode": "recipe",
+            "selector": "style_recipe",
+            "selected_id": "recipe_av_cover",
+            "raw_value": "gravure idol photography",
+            "parent_ids": [
+              "recipe_av_cover"
+            ]
+          }
+        },
+        {
+          "id": "recipe_av_cover__frag_002",
+          "slot": "style_recipe",
+          "text": "photorealistic",
+          "facts": {
+            "semantic_role": "selector"
+          },
+          "origin": {
+            "entry_point": "preset_browser",
+            "mode": "recipe",
+            "selector": "style_recipe",
+            "selected_id": "recipe_av_cover",
+            "raw_value": "photorealistic",
+            "parent_ids": [
+              "recipe_av_cover"
+            ]
+          }
+        },
+        {
+          "id": "recipe_av_cover__frag_003",
+          "slot": "style_recipe",
+          "text": "half_nude",
+          "facts": {
+            "semantic_role": "selector"
+          },
+          "origin": {
+            "entry_point": "preset_browser",
+            "mode": "recipe",
+            "selector": "exposure_mode",
+            "selected_id": "recipe_av_cover",
+            "raw_value": "half_nude",
+            "parent_ids": [
+              "recipe_av_cover"
+            ]
+          }
+        },
+        {
+          "id": "recipe_av_cover__frag_004",
+          "slot": "lighting",
+          "text": "ring light",
+          "facts": {
+            "semantic_role": "selector"
+          },
+          "origin": {
+            "entry_point": "preset_browser",
+            "mode": "recipe",
+            "selector": "lighting_palette",
+            "selected_id": "recipe_av_cover",
+            "raw_value": "ring light",
+            "parent_ids": [
+              "recipe_av_cover"
+            ]
+          }
+        },
+        {
+          "id": "recipe_av_cover__frag_005",
+          "slot": "lighting",
+          "text": "soft studio lighting",
+          "facts": {
+            "semantic_role": "selector"
+          },
+          "origin": {
+            "entry_point": "preset_browser",
+            "mode": "recipe",
+            "selector": "lighting_palette",
+            "selected_id": "recipe_av_cover",
+            "raw_value": "soft studio lighting",
+            "parent_ids": [
+              "recipe_av_cover"
+            ]
+          }
+        },
+        {
+          "id": "recipe_av_cover__frag_006",
+          "slot": "lighting",
+          "text": "neutral white",
+          "facts": {
+            "semantic_role": "selector"
+          },
+          "origin": {
+            "entry_point": "preset_browser",
+            "mode": "recipe",
+            "selector": "lighting_palette",
+            "selected_id": "recipe_av_cover",
+            "raw_value": "neutral white",
+            "parent_ids": [
+              "recipe_av_cover"
+            ]
+          }
+        },
+        {
+          "id": "recipe_av_cover__frag_007",
+          "slot": "pose",
+          "text": "standing S-curve pose",
+          "facts": {
+            "semantic_role": "selector"
+          },
+          "origin": {
+            "entry_point": "preset_browser",
+            "mode": "recipe",
+            "selector": "pose_direction",
+            "selected_id": "recipe_av_cover",
+            "raw_value": "standing S-curve pose",
+            "parent_ids": [
+              "recipe_av_cover"
+            ]
+          }
+        },
+        {
+          "id": "recipe_av_cover__frag_008",
+          "slot": "pose",
+          "text": "leaning forward slightly",
+          "facts": {
+            "semantic_role": "selector"
+          },
+          "origin": {
+            "entry_point": "preset_browser",
+            "mode": "recipe",
+            "selector": "pose_direction",
+            "selected_id": "recipe_av_cover",
+            "raw_value": "leaning forward slightly",
+            "parent_ids": [
+              "recipe_av_cover"
+            ]
+          }
+        },
+        {
+          "id": "recipe_av_cover__frag_009",
+          "slot": "makeup",
+          "text": "gravure idol makeup",
+          "facts": {
+            "semantic_role": "selector"
+          },
+          "origin": {
+            "entry_point": "preset_browser",
+            "mode": "recipe",
+            "selector": "makeup_direction",
+            "selected_id": "recipe_av_cover",
+            "raw_value": "gravure idol makeup",
+            "parent_ids": [
+              "recipe_av_cover"
+            ]
+          }
+        },
+        {
+          "id": "recipe_av_cover__frag_010",
+          "slot": "makeup",
+          "text": "glossy pink lips",
+          "facts": {
+            "semantic_role": "selector"
+          },
+          "origin": {
+            "entry_point": "preset_browser",
+            "mode": "recipe",
+            "selector": "makeup_direction",
+            "selected_id": "recipe_av_cover",
+            "raw_value": "glossy pink lips",
+            "parent_ids": [
+              "recipe_av_cover"
+            ]
+          }
+        },
+        {
+          "id": "recipe_av_cover__frag_011",
+          "slot": "expression",
+          "text": "looking at viewer",
+          "facts": {
+            "semantic_role": "selector"
+          },
+          "origin": {
+            "entry_point": "preset_browser",
+            "mode": "recipe",
+            "selector": "expression_gaze",
+            "selected_id": "recipe_av_cover",
+            "raw_value": "looking at viewer",
+            "parent_ids": [
+              "recipe_av_cover"
+            ]
+          }
+        },
+        {
+          "id": "recipe_av_cover__frag_012",
+          "slot": "expression",
+          "text": "confident smile",
+          "facts": {
+            "semantic_role": "selector"
+          },
+          "origin": {
+            "entry_point": "preset_browser",
+            "mode": "recipe",
+            "selector": "expression_gaze",
+            "selected_id": "recipe_av_cover",
+            "raw_value": "confident smile",
+            "parent_ids": [
+              "recipe_av_cover"
+            ]
+          }
+        },
+        {
+          "id": "recipe_av_cover__frag_013",
+          "slot": "expression",
+          "text": "slight blush",
+          "facts": {
+            "semantic_role": "selector"
+          },
+          "origin": {
+            "entry_point": "preset_browser",
+            "mode": "recipe",
+            "selector": "expression_gaze",
+            "selected_id": "recipe_av_cover",
+            "raw_value": "slight blush",
+            "parent_ids": [
+              "recipe_av_cover"
+            ]
+          }
+        },
+        {
+          "id": "recipe_av_cover__frag_014",
+          "slot": "quality",
+          "text": "tack-sharp focus on eyes",
+          "facts": {
+            "semantic_role": "selector"
+          },
+          "origin": {
+            "entry_point": "preset_browser",
+            "mode": "recipe",
+            "selector": "focus_detail",
+            "selected_id": "recipe_av_cover",
+            "raw_value": "tack-sharp focus on eyes",
+            "parent_ids": [
+              "recipe_av_cover"
+            ]
+          }
+        },
+        {
+          "id": "recipe_av_cover__frag_015",
+          "slot": "quality",
+          "text": "high-fidelity skin texture",
+          "facts": {
+            "semantic_role": "selector"
+          },
+          "origin": {
+            "entry_point": "preset_browser",
+            "mode": "recipe",
+            "selector": "focus_detail",
+            "selected_id": "recipe_av_cover",
+            "raw_value": "high-fidelity skin texture",
+            "parent_ids": [
+              "recipe_av_cover"
+            ]
+          }
+        },
+        {
+          "id": "recipe_av_cover__frag_016",
+          "slot": "quality",
+          "text": "studio light catching reflection",
+          "facts": {
+            "semantic_role": "selector"
+          },
+          "origin": {
+            "entry_point": "preset_browser",
+            "mode": "recipe",
+            "selector": "focus_detail",
+            "selected_id": "recipe_av_cover",
+            "raw_value": "studio light catching reflection",
+            "parent_ids": [
+              "recipe_av_cover"
+            ]
+          }
+        }
+      ]
     },
     {
       "id": "recipe_cctv_surveillance",
@@ -22,7 +330,351 @@
       "pose_direction": "unaware body pose, bending over desk, looking down",
       "makeup_direction": "bare face, sweat-glistened skin, exhausted look",
       "expression_gaze": "looking down, startled expression, wide eyes",
-      "focus_detail": "overhead static camera angle, grainy scanlines, low resolution artifacts, digital timestamp watermark"
+      "focus_detail": "overhead static camera angle, grainy scanlines, low resolution artifacts, digital timestamp watermark",
+      "fragments": [
+        {
+          "id": "recipe_cctv_surveillance__frag_000",
+          "slot": "style_recipe",
+          "text": "CCTV footage",
+          "facts": {
+            "semantic_role": "selector"
+          },
+          "origin": {
+            "entry_point": "preset_browser",
+            "mode": "recipe",
+            "selector": "style_recipe",
+            "selected_id": "recipe_cctv_surveillance",
+            "raw_value": "CCTV footage",
+            "parent_ids": [
+              "recipe_cctv_surveillance"
+            ]
+          }
+        },
+        {
+          "id": "recipe_cctv_surveillance__frag_001",
+          "slot": "style_recipe",
+          "text": "security camera style",
+          "facts": {
+            "semantic_role": "selector"
+          },
+          "origin": {
+            "entry_point": "preset_browser",
+            "mode": "recipe",
+            "selector": "style_recipe",
+            "selected_id": "recipe_cctv_surveillance",
+            "raw_value": "security camera style",
+            "parent_ids": [
+              "recipe_cctv_surveillance"
+            ]
+          }
+        },
+        {
+          "id": "recipe_cctv_surveillance__frag_002",
+          "slot": "style_recipe",
+          "text": "surveillance camera view",
+          "facts": {
+            "semantic_role": "selector"
+          },
+          "origin": {
+            "entry_point": "preset_browser",
+            "mode": "recipe",
+            "selector": "style_recipe",
+            "selected_id": "recipe_cctv_surveillance",
+            "raw_value": "surveillance camera view",
+            "parent_ids": [
+              "recipe_cctv_surveillance"
+            ]
+          }
+        },
+        {
+          "id": "recipe_cctv_surveillance__frag_003",
+          "slot": "style_recipe",
+          "text": "half_covered",
+          "facts": {
+            "semantic_role": "selector"
+          },
+          "origin": {
+            "entry_point": "preset_browser",
+            "mode": "recipe",
+            "selector": "exposure_mode",
+            "selected_id": "recipe_cctv_surveillance",
+            "raw_value": "half_covered",
+            "parent_ids": [
+              "recipe_cctv_surveillance"
+            ]
+          }
+        },
+        {
+          "id": "recipe_cctv_surveillance__frag_004",
+          "slot": "lighting",
+          "text": "harsh fluorescent ceiling light",
+          "facts": {
+            "semantic_role": "selector"
+          },
+          "origin": {
+            "entry_point": "preset_browser",
+            "mode": "recipe",
+            "selector": "lighting_palette",
+            "selected_id": "recipe_cctv_surveillance",
+            "raw_value": "harsh fluorescent ceiling light",
+            "parent_ids": [
+              "recipe_cctv_surveillance"
+            ]
+          }
+        },
+        {
+          "id": "recipe_cctv_surveillance__frag_005",
+          "slot": "lighting",
+          "text": "cool white 6500K",
+          "facts": {
+            "semantic_role": "selector"
+          },
+          "origin": {
+            "entry_point": "preset_browser",
+            "mode": "recipe",
+            "selector": "lighting_palette",
+            "selected_id": "recipe_cctv_surveillance",
+            "raw_value": "cool white 6500K",
+            "parent_ids": [
+              "recipe_cctv_surveillance"
+            ]
+          }
+        },
+        {
+          "id": "recipe_cctv_surveillance__frag_006",
+          "slot": "pose",
+          "text": "unaware body pose",
+          "facts": {
+            "semantic_role": "selector"
+          },
+          "origin": {
+            "entry_point": "preset_browser",
+            "mode": "recipe",
+            "selector": "pose_direction",
+            "selected_id": "recipe_cctv_surveillance",
+            "raw_value": "unaware body pose",
+            "parent_ids": [
+              "recipe_cctv_surveillance"
+            ]
+          }
+        },
+        {
+          "id": "recipe_cctv_surveillance__frag_007",
+          "slot": "pose",
+          "text": "bending over desk",
+          "facts": {
+            "semantic_role": "selector"
+          },
+          "origin": {
+            "entry_point": "preset_browser",
+            "mode": "recipe",
+            "selector": "pose_direction",
+            "selected_id": "recipe_cctv_surveillance",
+            "raw_value": "bending over desk",
+            "parent_ids": [
+              "recipe_cctv_surveillance"
+            ]
+          }
+        },
+        {
+          "id": "recipe_cctv_surveillance__frag_008",
+          "slot": "pose",
+          "text": "looking down",
+          "facts": {
+            "semantic_role": "selector"
+          },
+          "origin": {
+            "entry_point": "preset_browser",
+            "mode": "recipe",
+            "selector": "pose_direction",
+            "selected_id": "recipe_cctv_surveillance",
+            "raw_value": "looking down",
+            "parent_ids": [
+              "recipe_cctv_surveillance"
+            ]
+          }
+        },
+        {
+          "id": "recipe_cctv_surveillance__frag_009",
+          "slot": "makeup",
+          "text": "bare face",
+          "facts": {
+            "semantic_role": "selector"
+          },
+          "origin": {
+            "entry_point": "preset_browser",
+            "mode": "recipe",
+            "selector": "makeup_direction",
+            "selected_id": "recipe_cctv_surveillance",
+            "raw_value": "bare face",
+            "parent_ids": [
+              "recipe_cctv_surveillance"
+            ]
+          }
+        },
+        {
+          "id": "recipe_cctv_surveillance__frag_010",
+          "slot": "makeup",
+          "text": "sweat-glistened skin",
+          "facts": {
+            "semantic_role": "selector"
+          },
+          "origin": {
+            "entry_point": "preset_browser",
+            "mode": "recipe",
+            "selector": "makeup_direction",
+            "selected_id": "recipe_cctv_surveillance",
+            "raw_value": "sweat-glistened skin",
+            "parent_ids": [
+              "recipe_cctv_surveillance"
+            ]
+          }
+        },
+        {
+          "id": "recipe_cctv_surveillance__frag_011",
+          "slot": "makeup",
+          "text": "exhausted look",
+          "facts": {
+            "semantic_role": "selector"
+          },
+          "origin": {
+            "entry_point": "preset_browser",
+            "mode": "recipe",
+            "selector": "makeup_direction",
+            "selected_id": "recipe_cctv_surveillance",
+            "raw_value": "exhausted look",
+            "parent_ids": [
+              "recipe_cctv_surveillance"
+            ]
+          }
+        },
+        {
+          "id": "recipe_cctv_surveillance__frag_012",
+          "slot": "expression",
+          "text": "looking down",
+          "facts": {
+            "semantic_role": "selector"
+          },
+          "origin": {
+            "entry_point": "preset_browser",
+            "mode": "recipe",
+            "selector": "expression_gaze",
+            "selected_id": "recipe_cctv_surveillance",
+            "raw_value": "looking down",
+            "parent_ids": [
+              "recipe_cctv_surveillance"
+            ]
+          }
+        },
+        {
+          "id": "recipe_cctv_surveillance__frag_013",
+          "slot": "expression",
+          "text": "startled expression",
+          "facts": {
+            "semantic_role": "selector"
+          },
+          "origin": {
+            "entry_point": "preset_browser",
+            "mode": "recipe",
+            "selector": "expression_gaze",
+            "selected_id": "recipe_cctv_surveillance",
+            "raw_value": "startled expression",
+            "parent_ids": [
+              "recipe_cctv_surveillance"
+            ]
+          }
+        },
+        {
+          "id": "recipe_cctv_surveillance__frag_014",
+          "slot": "expression",
+          "text": "wide eyes",
+          "facts": {
+            "semantic_role": "selector"
+          },
+          "origin": {
+            "entry_point": "preset_browser",
+            "mode": "recipe",
+            "selector": "expression_gaze",
+            "selected_id": "recipe_cctv_surveillance",
+            "raw_value": "wide eyes",
+            "parent_ids": [
+              "recipe_cctv_surveillance"
+            ]
+          }
+        },
+        {
+          "id": "recipe_cctv_surveillance__frag_015",
+          "slot": "quality",
+          "text": "overhead static camera angle",
+          "facts": {
+            "semantic_role": "selector"
+          },
+          "origin": {
+            "entry_point": "preset_browser",
+            "mode": "recipe",
+            "selector": "focus_detail",
+            "selected_id": "recipe_cctv_surveillance",
+            "raw_value": "overhead static camera angle",
+            "parent_ids": [
+              "recipe_cctv_surveillance"
+            ]
+          }
+        },
+        {
+          "id": "recipe_cctv_surveillance__frag_016",
+          "slot": "quality",
+          "text": "grainy scanlines",
+          "facts": {
+            "semantic_role": "selector"
+          },
+          "origin": {
+            "entry_point": "preset_browser",
+            "mode": "recipe",
+            "selector": "focus_detail",
+            "selected_id": "recipe_cctv_surveillance",
+            "raw_value": "grainy scanlines",
+            "parent_ids": [
+              "recipe_cctv_surveillance"
+            ]
+          }
+        },
+        {
+          "id": "recipe_cctv_surveillance__frag_017",
+          "slot": "quality",
+          "text": "low resolution artifacts",
+          "facts": {
+            "semantic_role": "selector"
+          },
+          "origin": {
+            "entry_point": "preset_browser",
+            "mode": "recipe",
+            "selector": "focus_detail",
+            "selected_id": "recipe_cctv_surveillance",
+            "raw_value": "low resolution artifacts",
+            "parent_ids": [
+              "recipe_cctv_surveillance"
+            ]
+          }
+        },
+        {
+          "id": "recipe_cctv_surveillance__frag_018",
+          "slot": "quality",
+          "text": "digital timestamp watermark",
+          "facts": {
+            "semantic_role": "selector"
+          },
+          "origin": {
+            "entry_point": "preset_browser",
+            "mode": "recipe",
+            "selector": "focus_detail",
+            "selected_id": "recipe_cctv_surveillance",
+            "raw_value": "digital timestamp watermark",
+            "parent_ids": [
+              "recipe_cctv_surveillance"
+            ]
+          }
+        }
+      ]
     },
     {
       "id": "recipe_phone_selfie",
@@ -34,7 +686,297 @@
       "pose_direction": "holding phone for mirror selfie, one leg slightly bent",
       "makeup_direction": "casual makeup, slightly messy hair",
       "expression_gaze": "looking at screen, seductive smile, shy gaze",
-      "focus_detail": "handheld phone selfie perspective, mirror reflection lens flare, soft background blur"
+      "focus_detail": "handheld phone selfie perspective, mirror reflection lens flare, soft background blur",
+      "fragments": [
+        {
+          "id": "recipe_phone_selfie__frag_000",
+          "slot": "style_recipe",
+          "text": "phone camera selfie",
+          "facts": {
+            "semantic_role": "selector"
+          },
+          "origin": {
+            "entry_point": "preset_browser",
+            "mode": "recipe",
+            "selector": "style_recipe",
+            "selected_id": "recipe_phone_selfie",
+            "raw_value": "phone camera selfie",
+            "parent_ids": [
+              "recipe_phone_selfie"
+            ]
+          }
+        },
+        {
+          "id": "recipe_phone_selfie__frag_001",
+          "slot": "style_recipe",
+          "text": "mobile photography snapshot",
+          "facts": {
+            "semantic_role": "selector"
+          },
+          "origin": {
+            "entry_point": "preset_browser",
+            "mode": "recipe",
+            "selector": "style_recipe",
+            "selected_id": "recipe_phone_selfie",
+            "raw_value": "mobile photography snapshot",
+            "parent_ids": [
+              "recipe_phone_selfie"
+            ]
+          }
+        },
+        {
+          "id": "recipe_phone_selfie__frag_002",
+          "slot": "style_recipe",
+          "text": "upper",
+          "facts": {
+            "semantic_role": "selector"
+          },
+          "origin": {
+            "entry_point": "preset_browser",
+            "mode": "recipe",
+            "selector": "exposure_mode",
+            "selected_id": "recipe_phone_selfie",
+            "raw_value": "upper",
+            "parent_ids": [
+              "recipe_phone_selfie"
+            ]
+          }
+        },
+        {
+          "id": "recipe_phone_selfie__frag_003",
+          "slot": "lighting",
+          "text": "warm lamp light",
+          "facts": {
+            "semantic_role": "selector"
+          },
+          "origin": {
+            "entry_point": "preset_browser",
+            "mode": "recipe",
+            "selector": "lighting_palette",
+            "selected_id": "recipe_phone_selfie",
+            "raw_value": "warm lamp light",
+            "parent_ids": [
+              "recipe_phone_selfie"
+            ]
+          }
+        },
+        {
+          "id": "recipe_phone_selfie__frag_004",
+          "slot": "lighting",
+          "text": "glow from phone screen",
+          "facts": {
+            "semantic_role": "selector"
+          },
+          "origin": {
+            "entry_point": "preset_browser",
+            "mode": "recipe",
+            "selector": "lighting_palette",
+            "selected_id": "recipe_phone_selfie",
+            "raw_value": "glow from phone screen",
+            "parent_ids": [
+              "recipe_phone_selfie"
+            ]
+          }
+        },
+        {
+          "id": "recipe_phone_selfie__frag_005",
+          "slot": "lighting",
+          "text": "2700K",
+          "facts": {
+            "semantic_role": "selector"
+          },
+          "origin": {
+            "entry_point": "preset_browser",
+            "mode": "recipe",
+            "selector": "lighting_palette",
+            "selected_id": "recipe_phone_selfie",
+            "raw_value": "2700K",
+            "parent_ids": [
+              "recipe_phone_selfie"
+            ]
+          }
+        },
+        {
+          "id": "recipe_phone_selfie__frag_006",
+          "slot": "pose",
+          "text": "holding phone for mirror selfie",
+          "facts": {
+            "semantic_role": "selector"
+          },
+          "origin": {
+            "entry_point": "preset_browser",
+            "mode": "recipe",
+            "selector": "pose_direction",
+            "selected_id": "recipe_phone_selfie",
+            "raw_value": "holding phone for mirror selfie",
+            "parent_ids": [
+              "recipe_phone_selfie"
+            ]
+          }
+        },
+        {
+          "id": "recipe_phone_selfie__frag_007",
+          "slot": "pose",
+          "text": "one leg slightly bent",
+          "facts": {
+            "semantic_role": "selector"
+          },
+          "origin": {
+            "entry_point": "preset_browser",
+            "mode": "recipe",
+            "selector": "pose_direction",
+            "selected_id": "recipe_phone_selfie",
+            "raw_value": "one leg slightly bent",
+            "parent_ids": [
+              "recipe_phone_selfie"
+            ]
+          }
+        },
+        {
+          "id": "recipe_phone_selfie__frag_008",
+          "slot": "makeup",
+          "text": "casual makeup",
+          "facts": {
+            "semantic_role": "selector"
+          },
+          "origin": {
+            "entry_point": "preset_browser",
+            "mode": "recipe",
+            "selector": "makeup_direction",
+            "selected_id": "recipe_phone_selfie",
+            "raw_value": "casual makeup",
+            "parent_ids": [
+              "recipe_phone_selfie"
+            ]
+          }
+        },
+        {
+          "id": "recipe_phone_selfie__frag_009",
+          "slot": "makeup",
+          "text": "slightly messy hair",
+          "facts": {
+            "semantic_role": "selector"
+          },
+          "origin": {
+            "entry_point": "preset_browser",
+            "mode": "recipe",
+            "selector": "makeup_direction",
+            "selected_id": "recipe_phone_selfie",
+            "raw_value": "slightly messy hair",
+            "parent_ids": [
+              "recipe_phone_selfie"
+            ]
+          }
+        },
+        {
+          "id": "recipe_phone_selfie__frag_010",
+          "slot": "expression",
+          "text": "looking at screen",
+          "facts": {
+            "semantic_role": "selector"
+          },
+          "origin": {
+            "entry_point": "preset_browser",
+            "mode": "recipe",
+            "selector": "expression_gaze",
+            "selected_id": "recipe_phone_selfie",
+            "raw_value": "looking at screen",
+            "parent_ids": [
+              "recipe_phone_selfie"
+            ]
+          }
+        },
+        {
+          "id": "recipe_phone_selfie__frag_011",
+          "slot": "expression",
+          "text": "seductive smile",
+          "facts": {
+            "semantic_role": "selector"
+          },
+          "origin": {
+            "entry_point": "preset_browser",
+            "mode": "recipe",
+            "selector": "expression_gaze",
+            "selected_id": "recipe_phone_selfie",
+            "raw_value": "seductive smile",
+            "parent_ids": [
+              "recipe_phone_selfie"
+            ]
+          }
+        },
+        {
+          "id": "recipe_phone_selfie__frag_012",
+          "slot": "expression",
+          "text": "shy gaze",
+          "facts": {
+            "semantic_role": "selector"
+          },
+          "origin": {
+            "entry_point": "preset_browser",
+            "mode": "recipe",
+            "selector": "expression_gaze",
+            "selected_id": "recipe_phone_selfie",
+            "raw_value": "shy gaze",
+            "parent_ids": [
+              "recipe_phone_selfie"
+            ]
+          }
+        },
+        {
+          "id": "recipe_phone_selfie__frag_013",
+          "slot": "quality",
+          "text": "handheld phone selfie perspective",
+          "facts": {
+            "semantic_role": "selector"
+          },
+          "origin": {
+            "entry_point": "preset_browser",
+            "mode": "recipe",
+            "selector": "focus_detail",
+            "selected_id": "recipe_phone_selfie",
+            "raw_value": "handheld phone selfie perspective",
+            "parent_ids": [
+              "recipe_phone_selfie"
+            ]
+          }
+        },
+        {
+          "id": "recipe_phone_selfie__frag_014",
+          "slot": "quality",
+          "text": "mirror reflection lens flare",
+          "facts": {
+            "semantic_role": "selector"
+          },
+          "origin": {
+            "entry_point": "preset_browser",
+            "mode": "recipe",
+            "selector": "focus_detail",
+            "selected_id": "recipe_phone_selfie",
+            "raw_value": "mirror reflection lens flare",
+            "parent_ids": [
+              "recipe_phone_selfie"
+            ]
+          }
+        },
+        {
+          "id": "recipe_phone_selfie__frag_015",
+          "slot": "quality",
+          "text": "soft background blur",
+          "facts": {
+            "semantic_role": "selector"
+          },
+          "origin": {
+            "entry_point": "preset_browser",
+            "mode": "recipe",
+            "selector": "focus_detail",
+            "selected_id": "recipe_phone_selfie",
+            "raw_value": "soft background blur",
+            "parent_ids": [
+              "recipe_phone_selfie"
+            ]
+          }
+        }
+      ]
     },
     {
       "id": "recipe_90s_hk_cinema",
@@ -46,7 +988,333 @@
       "pose_direction": "lounging on velvet sofa, relaxed head rest, bare shoulder",
       "makeup_direction": "retro makeup, matte skin, bold red lipstick",
       "expression_gaze": "gazing into distance, melancholy look, parted lips",
-      "focus_detail": "warm analog film grain, cinematic color grading, Kodak Gold 200 tones, realistic skin texture"
+      "focus_detail": "warm analog film grain, cinematic color grading, Kodak Gold 200 tones, realistic skin texture",
+      "fragments": [
+        {
+          "id": "recipe_90s_hk_cinema__frag_000",
+          "slot": "style_recipe",
+          "text": "35mm film camera photography",
+          "facts": {
+            "semantic_role": "selector"
+          },
+          "origin": {
+            "entry_point": "preset_browser",
+            "mode": "recipe",
+            "selector": "style_recipe",
+            "selected_id": "recipe_90s_hk_cinema",
+            "raw_value": "35mm film camera photography",
+            "parent_ids": [
+              "recipe_90s_hk_cinema"
+            ]
+          }
+        },
+        {
+          "id": "recipe_90s_hk_cinema__frag_001",
+          "slot": "style_recipe",
+          "text": "1990s Hong Kong cinematic look",
+          "facts": {
+            "semantic_role": "selector"
+          },
+          "origin": {
+            "entry_point": "preset_browser",
+            "mode": "recipe",
+            "selector": "style_recipe",
+            "selected_id": "recipe_90s_hk_cinema",
+            "raw_value": "1990s Hong Kong cinematic look",
+            "parent_ids": [
+              "recipe_90s_hk_cinema"
+            ]
+          }
+        },
+        {
+          "id": "recipe_90s_hk_cinema__frag_002",
+          "slot": "style_recipe",
+          "text": "half_covered",
+          "facts": {
+            "semantic_role": "selector"
+          },
+          "origin": {
+            "entry_point": "preset_browser",
+            "mode": "recipe",
+            "selector": "exposure_mode",
+            "selected_id": "recipe_90s_hk_cinema",
+            "raw_value": "half_covered",
+            "parent_ids": [
+              "recipe_90s_hk_cinema"
+            ]
+          }
+        },
+        {
+          "id": "recipe_90s_hk_cinema__frag_003",
+          "slot": "lighting",
+          "text": "warm golden environmental light",
+          "facts": {
+            "semantic_role": "selector"
+          },
+          "origin": {
+            "entry_point": "preset_browser",
+            "mode": "recipe",
+            "selector": "lighting_palette",
+            "selected_id": "recipe_90s_hk_cinema",
+            "raw_value": "warm golden environmental light",
+            "parent_ids": [
+              "recipe_90s_hk_cinema"
+            ]
+          }
+        },
+        {
+          "id": "recipe_90s_hk_cinema__frag_004",
+          "slot": "lighting",
+          "text": "neon refraction",
+          "facts": {
+            "semantic_role": "selector"
+          },
+          "origin": {
+            "entry_point": "preset_browser",
+            "mode": "recipe",
+            "selector": "lighting_palette",
+            "selected_id": "recipe_90s_hk_cinema",
+            "raw_value": "neon refraction",
+            "parent_ids": [
+              "recipe_90s_hk_cinema"
+            ]
+          }
+        },
+        {
+          "id": "recipe_90s_hk_cinema__frag_005",
+          "slot": "pose",
+          "text": "lounging on velvet sofa",
+          "facts": {
+            "semantic_role": "selector"
+          },
+          "origin": {
+            "entry_point": "preset_browser",
+            "mode": "recipe",
+            "selector": "pose_direction",
+            "selected_id": "recipe_90s_hk_cinema",
+            "raw_value": "lounging on velvet sofa",
+            "parent_ids": [
+              "recipe_90s_hk_cinema"
+            ]
+          }
+        },
+        {
+          "id": "recipe_90s_hk_cinema__frag_006",
+          "slot": "pose",
+          "text": "relaxed head rest",
+          "facts": {
+            "semantic_role": "selector"
+          },
+          "origin": {
+            "entry_point": "preset_browser",
+            "mode": "recipe",
+            "selector": "pose_direction",
+            "selected_id": "recipe_90s_hk_cinema",
+            "raw_value": "relaxed head rest",
+            "parent_ids": [
+              "recipe_90s_hk_cinema"
+            ]
+          }
+        },
+        {
+          "id": "recipe_90s_hk_cinema__frag_007",
+          "slot": "pose",
+          "text": "bare shoulder",
+          "facts": {
+            "semantic_role": "selector"
+          },
+          "origin": {
+            "entry_point": "preset_browser",
+            "mode": "recipe",
+            "selector": "pose_direction",
+            "selected_id": "recipe_90s_hk_cinema",
+            "raw_value": "bare shoulder",
+            "parent_ids": [
+              "recipe_90s_hk_cinema"
+            ]
+          }
+        },
+        {
+          "id": "recipe_90s_hk_cinema__frag_008",
+          "slot": "makeup",
+          "text": "retro makeup",
+          "facts": {
+            "semantic_role": "selector"
+          },
+          "origin": {
+            "entry_point": "preset_browser",
+            "mode": "recipe",
+            "selector": "makeup_direction",
+            "selected_id": "recipe_90s_hk_cinema",
+            "raw_value": "retro makeup",
+            "parent_ids": [
+              "recipe_90s_hk_cinema"
+            ]
+          }
+        },
+        {
+          "id": "recipe_90s_hk_cinema__frag_009",
+          "slot": "makeup",
+          "text": "matte skin",
+          "facts": {
+            "semantic_role": "selector"
+          },
+          "origin": {
+            "entry_point": "preset_browser",
+            "mode": "recipe",
+            "selector": "makeup_direction",
+            "selected_id": "recipe_90s_hk_cinema",
+            "raw_value": "matte skin",
+            "parent_ids": [
+              "recipe_90s_hk_cinema"
+            ]
+          }
+        },
+        {
+          "id": "recipe_90s_hk_cinema__frag_010",
+          "slot": "makeup",
+          "text": "bold red lipstick",
+          "facts": {
+            "semantic_role": "selector"
+          },
+          "origin": {
+            "entry_point": "preset_browser",
+            "mode": "recipe",
+            "selector": "makeup_direction",
+            "selected_id": "recipe_90s_hk_cinema",
+            "raw_value": "bold red lipstick",
+            "parent_ids": [
+              "recipe_90s_hk_cinema"
+            ]
+          }
+        },
+        {
+          "id": "recipe_90s_hk_cinema__frag_011",
+          "slot": "expression",
+          "text": "gazing into distance",
+          "facts": {
+            "semantic_role": "selector"
+          },
+          "origin": {
+            "entry_point": "preset_browser",
+            "mode": "recipe",
+            "selector": "expression_gaze",
+            "selected_id": "recipe_90s_hk_cinema",
+            "raw_value": "gazing into distance",
+            "parent_ids": [
+              "recipe_90s_hk_cinema"
+            ]
+          }
+        },
+        {
+          "id": "recipe_90s_hk_cinema__frag_012",
+          "slot": "expression",
+          "text": "melancholy look",
+          "facts": {
+            "semantic_role": "selector"
+          },
+          "origin": {
+            "entry_point": "preset_browser",
+            "mode": "recipe",
+            "selector": "expression_gaze",
+            "selected_id": "recipe_90s_hk_cinema",
+            "raw_value": "melancholy look",
+            "parent_ids": [
+              "recipe_90s_hk_cinema"
+            ]
+          }
+        },
+        {
+          "id": "recipe_90s_hk_cinema__frag_013",
+          "slot": "expression",
+          "text": "parted lips",
+          "facts": {
+            "semantic_role": "selector"
+          },
+          "origin": {
+            "entry_point": "preset_browser",
+            "mode": "recipe",
+            "selector": "expression_gaze",
+            "selected_id": "recipe_90s_hk_cinema",
+            "raw_value": "parted lips",
+            "parent_ids": [
+              "recipe_90s_hk_cinema"
+            ]
+          }
+        },
+        {
+          "id": "recipe_90s_hk_cinema__frag_014",
+          "slot": "quality",
+          "text": "warm analog film grain",
+          "facts": {
+            "semantic_role": "selector"
+          },
+          "origin": {
+            "entry_point": "preset_browser",
+            "mode": "recipe",
+            "selector": "focus_detail",
+            "selected_id": "recipe_90s_hk_cinema",
+            "raw_value": "warm analog film grain",
+            "parent_ids": [
+              "recipe_90s_hk_cinema"
+            ]
+          }
+        },
+        {
+          "id": "recipe_90s_hk_cinema__frag_015",
+          "slot": "quality",
+          "text": "cinematic color grading",
+          "facts": {
+            "semantic_role": "selector"
+          },
+          "origin": {
+            "entry_point": "preset_browser",
+            "mode": "recipe",
+            "selector": "focus_detail",
+            "selected_id": "recipe_90s_hk_cinema",
+            "raw_value": "cinematic color grading",
+            "parent_ids": [
+              "recipe_90s_hk_cinema"
+            ]
+          }
+        },
+        {
+          "id": "recipe_90s_hk_cinema__frag_016",
+          "slot": "quality",
+          "text": "Kodak Gold 200 tones",
+          "facts": {
+            "semantic_role": "selector"
+          },
+          "origin": {
+            "entry_point": "preset_browser",
+            "mode": "recipe",
+            "selector": "focus_detail",
+            "selected_id": "recipe_90s_hk_cinema",
+            "raw_value": "Kodak Gold 200 tones",
+            "parent_ids": [
+              "recipe_90s_hk_cinema"
+            ]
+          }
+        },
+        {
+          "id": "recipe_90s_hk_cinema__frag_017",
+          "slot": "quality",
+          "text": "realistic skin texture",
+          "facts": {
+            "semantic_role": "selector"
+          },
+          "origin": {
+            "entry_point": "preset_browser",
+            "mode": "recipe",
+            "selector": "focus_detail",
+            "selected_id": "recipe_90s_hk_cinema",
+            "raw_value": "realistic skin texture",
+            "parent_ids": [
+              "recipe_90s_hk_cinema"
+            ]
+          }
+        }
+      ]
     },
     {
       "id": "recipe_neon_desire",
@@ -58,7 +1326,315 @@
       "pose_direction": "sitting cross-legged, arched back, dynamic silhouette",
       "makeup_direction": "nightclub heavy makeup, dark eyeliner, glossy lips",
       "expression_gaze": "dilated pupils, heavy lidded eyes, sensual gaze",
-      "focus_detail": "cinematic depth of field, anamorphic purple neon lens flare, water droplets on glistening skin"
+      "focus_detail": "cinematic depth of field, anamorphic purple neon lens flare, water droplets on glistening skin",
+      "fragments": [
+        {
+          "id": "recipe_neon_desire__frag_000",
+          "slot": "style_recipe",
+          "text": "anamorphic lens cinematic photography",
+          "facts": {
+            "semantic_role": "selector"
+          },
+          "origin": {
+            "entry_point": "preset_browser",
+            "mode": "recipe",
+            "selector": "style_recipe",
+            "selected_id": "recipe_neon_desire",
+            "raw_value": "anamorphic lens cinematic photography",
+            "parent_ids": [
+              "recipe_neon_desire"
+            ]
+          }
+        },
+        {
+          "id": "recipe_neon_desire__frag_001",
+          "slot": "style_recipe",
+          "text": "cyberpunk night style",
+          "facts": {
+            "semantic_role": "selector"
+          },
+          "origin": {
+            "entry_point": "preset_browser",
+            "mode": "recipe",
+            "selector": "style_recipe",
+            "selected_id": "recipe_neon_desire",
+            "raw_value": "cyberpunk night style",
+            "parent_ids": [
+              "recipe_neon_desire"
+            ]
+          }
+        },
+        {
+          "id": "recipe_neon_desire__frag_002",
+          "slot": "style_recipe",
+          "text": "half_nude",
+          "facts": {
+            "semantic_role": "selector"
+          },
+          "origin": {
+            "entry_point": "preset_browser",
+            "mode": "recipe",
+            "selector": "exposure_mode",
+            "selected_id": "recipe_neon_desire",
+            "raw_value": "half_nude",
+            "parent_ids": [
+              "recipe_neon_desire"
+            ]
+          }
+        },
+        {
+          "id": "recipe_neon_desire__frag_003",
+          "slot": "lighting",
+          "text": "vibrant neon ambient",
+          "facts": {
+            "semantic_role": "selector"
+          },
+          "origin": {
+            "entry_point": "preset_browser",
+            "mode": "recipe",
+            "selector": "lighting_palette",
+            "selected_id": "recipe_neon_desire",
+            "raw_value": "vibrant neon ambient",
+            "parent_ids": [
+              "recipe_neon_desire"
+            ]
+          }
+        },
+        {
+          "id": "recipe_neon_desire__frag_004",
+          "slot": "lighting",
+          "text": "pink and blue rim light",
+          "facts": {
+            "semantic_role": "selector"
+          },
+          "origin": {
+            "entry_point": "preset_browser",
+            "mode": "recipe",
+            "selector": "lighting_palette",
+            "selected_id": "recipe_neon_desire",
+            "raw_value": "pink and blue rim light",
+            "parent_ids": [
+              "recipe_neon_desire"
+            ]
+          }
+        },
+        {
+          "id": "recipe_neon_desire__frag_005",
+          "slot": "pose",
+          "text": "sitting cross-legged",
+          "facts": {
+            "semantic_role": "selector"
+          },
+          "origin": {
+            "entry_point": "preset_browser",
+            "mode": "recipe",
+            "selector": "pose_direction",
+            "selected_id": "recipe_neon_desire",
+            "raw_value": "sitting cross-legged",
+            "parent_ids": [
+              "recipe_neon_desire"
+            ]
+          }
+        },
+        {
+          "id": "recipe_neon_desire__frag_006",
+          "slot": "pose",
+          "text": "arched back",
+          "facts": {
+            "semantic_role": "selector"
+          },
+          "origin": {
+            "entry_point": "preset_browser",
+            "mode": "recipe",
+            "selector": "pose_direction",
+            "selected_id": "recipe_neon_desire",
+            "raw_value": "arched back",
+            "parent_ids": [
+              "recipe_neon_desire"
+            ]
+          }
+        },
+        {
+          "id": "recipe_neon_desire__frag_007",
+          "slot": "pose",
+          "text": "dynamic silhouette",
+          "facts": {
+            "semantic_role": "selector"
+          },
+          "origin": {
+            "entry_point": "preset_browser",
+            "mode": "recipe",
+            "selector": "pose_direction",
+            "selected_id": "recipe_neon_desire",
+            "raw_value": "dynamic silhouette",
+            "parent_ids": [
+              "recipe_neon_desire"
+            ]
+          }
+        },
+        {
+          "id": "recipe_neon_desire__frag_008",
+          "slot": "makeup",
+          "text": "nightclub heavy makeup",
+          "facts": {
+            "semantic_role": "selector"
+          },
+          "origin": {
+            "entry_point": "preset_browser",
+            "mode": "recipe",
+            "selector": "makeup_direction",
+            "selected_id": "recipe_neon_desire",
+            "raw_value": "nightclub heavy makeup",
+            "parent_ids": [
+              "recipe_neon_desire"
+            ]
+          }
+        },
+        {
+          "id": "recipe_neon_desire__frag_009",
+          "slot": "makeup",
+          "text": "dark eyeliner",
+          "facts": {
+            "semantic_role": "selector"
+          },
+          "origin": {
+            "entry_point": "preset_browser",
+            "mode": "recipe",
+            "selector": "makeup_direction",
+            "selected_id": "recipe_neon_desire",
+            "raw_value": "dark eyeliner",
+            "parent_ids": [
+              "recipe_neon_desire"
+            ]
+          }
+        },
+        {
+          "id": "recipe_neon_desire__frag_010",
+          "slot": "makeup",
+          "text": "glossy lips",
+          "facts": {
+            "semantic_role": "selector"
+          },
+          "origin": {
+            "entry_point": "preset_browser",
+            "mode": "recipe",
+            "selector": "makeup_direction",
+            "selected_id": "recipe_neon_desire",
+            "raw_value": "glossy lips",
+            "parent_ids": [
+              "recipe_neon_desire"
+            ]
+          }
+        },
+        {
+          "id": "recipe_neon_desire__frag_011",
+          "slot": "expression",
+          "text": "dilated pupils",
+          "facts": {
+            "semantic_role": "selector"
+          },
+          "origin": {
+            "entry_point": "preset_browser",
+            "mode": "recipe",
+            "selector": "expression_gaze",
+            "selected_id": "recipe_neon_desire",
+            "raw_value": "dilated pupils",
+            "parent_ids": [
+              "recipe_neon_desire"
+            ]
+          }
+        },
+        {
+          "id": "recipe_neon_desire__frag_012",
+          "slot": "expression",
+          "text": "heavy lidded eyes",
+          "facts": {
+            "semantic_role": "selector"
+          },
+          "origin": {
+            "entry_point": "preset_browser",
+            "mode": "recipe",
+            "selector": "expression_gaze",
+            "selected_id": "recipe_neon_desire",
+            "raw_value": "heavy lidded eyes",
+            "parent_ids": [
+              "recipe_neon_desire"
+            ]
+          }
+        },
+        {
+          "id": "recipe_neon_desire__frag_013",
+          "slot": "expression",
+          "text": "sensual gaze",
+          "facts": {
+            "semantic_role": "selector"
+          },
+          "origin": {
+            "entry_point": "preset_browser",
+            "mode": "recipe",
+            "selector": "expression_gaze",
+            "selected_id": "recipe_neon_desire",
+            "raw_value": "sensual gaze",
+            "parent_ids": [
+              "recipe_neon_desire"
+            ]
+          }
+        },
+        {
+          "id": "recipe_neon_desire__frag_014",
+          "slot": "quality",
+          "text": "cinematic depth of field",
+          "facts": {
+            "semantic_role": "selector"
+          },
+          "origin": {
+            "entry_point": "preset_browser",
+            "mode": "recipe",
+            "selector": "focus_detail",
+            "selected_id": "recipe_neon_desire",
+            "raw_value": "cinematic depth of field",
+            "parent_ids": [
+              "recipe_neon_desire"
+            ]
+          }
+        },
+        {
+          "id": "recipe_neon_desire__frag_015",
+          "slot": "quality",
+          "text": "anamorphic purple neon lens flare",
+          "facts": {
+            "semantic_role": "selector"
+          },
+          "origin": {
+            "entry_point": "preset_browser",
+            "mode": "recipe",
+            "selector": "focus_detail",
+            "selected_id": "recipe_neon_desire",
+            "raw_value": "anamorphic purple neon lens flare",
+            "parent_ids": [
+              "recipe_neon_desire"
+            ]
+          }
+        },
+        {
+          "id": "recipe_neon_desire__frag_016",
+          "slot": "quality",
+          "text": "water droplets on glistening skin",
+          "facts": {
+            "semantic_role": "selector"
+          },
+          "origin": {
+            "entry_point": "preset_browser",
+            "mode": "recipe",
+            "selector": "focus_detail",
+            "selected_id": "recipe_neon_desire",
+            "raw_value": "water droplets on glistening skin",
+            "parent_ids": [
+              "recipe_neon_desire"
+            ]
+          }
+        }
+      ]
     },
     {
       "id": "recipe_monochrome_noir",
@@ -70,7 +1646,315 @@
       "pose_direction": "crouching on floor, arms wrapping knees, stretched spine",
       "makeup_direction": "completely bare face, natural skin textures",
       "expression_gaze": "empty gaze, staring into space, neutral face",
-      "focus_detail": "Ilford HP5 monochrome film grain, deep shadows, fine gray gradient, high microcontrast"
+      "focus_detail": "Ilford HP5 monochrome film grain, deep shadows, fine gray gradient, high microcontrast",
+      "fragments": [
+        {
+          "id": "recipe_monochrome_noir__frag_000",
+          "slot": "style_recipe",
+          "text": "medium format monochrome photography",
+          "facts": {
+            "semantic_role": "selector"
+          },
+          "origin": {
+            "entry_point": "preset_browser",
+            "mode": "recipe",
+            "selector": "style_recipe",
+            "selected_id": "recipe_monochrome_noir",
+            "raw_value": "medium format monochrome photography",
+            "parent_ids": [
+              "recipe_monochrome_noir"
+            ]
+          }
+        },
+        {
+          "id": "recipe_monochrome_noir__frag_001",
+          "slot": "style_recipe",
+          "text": "classic film noir style",
+          "facts": {
+            "semantic_role": "selector"
+          },
+          "origin": {
+            "entry_point": "preset_browser",
+            "mode": "recipe",
+            "selector": "style_recipe",
+            "selected_id": "recipe_monochrome_noir",
+            "raw_value": "classic film noir style",
+            "parent_ids": [
+              "recipe_monochrome_noir"
+            ]
+          }
+        },
+        {
+          "id": "recipe_monochrome_noir__frag_002",
+          "slot": "style_recipe",
+          "text": "both",
+          "facts": {
+            "semantic_role": "selector"
+          },
+          "origin": {
+            "entry_point": "preset_browser",
+            "mode": "recipe",
+            "selector": "exposure_mode",
+            "selected_id": "recipe_monochrome_noir",
+            "raw_value": "both",
+            "parent_ids": [
+              "recipe_monochrome_noir"
+            ]
+          }
+        },
+        {
+          "id": "recipe_monochrome_noir__frag_003",
+          "slot": "lighting",
+          "text": "high contrast side light",
+          "facts": {
+            "semantic_role": "selector"
+          },
+          "origin": {
+            "entry_point": "preset_browser",
+            "mode": "recipe",
+            "selector": "lighting_palette",
+            "selected_id": "recipe_monochrome_noir",
+            "raw_value": "high contrast side light",
+            "parent_ids": [
+              "recipe_monochrome_noir"
+            ]
+          }
+        },
+        {
+          "id": "recipe_monochrome_noir__frag_004",
+          "slot": "lighting",
+          "text": "chiaroscuro shadows",
+          "facts": {
+            "semantic_role": "selector"
+          },
+          "origin": {
+            "entry_point": "preset_browser",
+            "mode": "recipe",
+            "selector": "lighting_palette",
+            "selected_id": "recipe_monochrome_noir",
+            "raw_value": "chiaroscuro shadows",
+            "parent_ids": [
+              "recipe_monochrome_noir"
+            ]
+          }
+        },
+        {
+          "id": "recipe_monochrome_noir__frag_005",
+          "slot": "pose",
+          "text": "crouching on floor",
+          "facts": {
+            "semantic_role": "selector"
+          },
+          "origin": {
+            "entry_point": "preset_browser",
+            "mode": "recipe",
+            "selector": "pose_direction",
+            "selected_id": "recipe_monochrome_noir",
+            "raw_value": "crouching on floor",
+            "parent_ids": [
+              "recipe_monochrome_noir"
+            ]
+          }
+        },
+        {
+          "id": "recipe_monochrome_noir__frag_006",
+          "slot": "pose",
+          "text": "arms wrapping knees",
+          "facts": {
+            "semantic_role": "selector"
+          },
+          "origin": {
+            "entry_point": "preset_browser",
+            "mode": "recipe",
+            "selector": "pose_direction",
+            "selected_id": "recipe_monochrome_noir",
+            "raw_value": "arms wrapping knees",
+            "parent_ids": [
+              "recipe_monochrome_noir"
+            ]
+          }
+        },
+        {
+          "id": "recipe_monochrome_noir__frag_007",
+          "slot": "pose",
+          "text": "stretched spine",
+          "facts": {
+            "semantic_role": "selector"
+          },
+          "origin": {
+            "entry_point": "preset_browser",
+            "mode": "recipe",
+            "selector": "pose_direction",
+            "selected_id": "recipe_monochrome_noir",
+            "raw_value": "stretched spine",
+            "parent_ids": [
+              "recipe_monochrome_noir"
+            ]
+          }
+        },
+        {
+          "id": "recipe_monochrome_noir__frag_008",
+          "slot": "makeup",
+          "text": "completely bare face",
+          "facts": {
+            "semantic_role": "selector"
+          },
+          "origin": {
+            "entry_point": "preset_browser",
+            "mode": "recipe",
+            "selector": "makeup_direction",
+            "selected_id": "recipe_monochrome_noir",
+            "raw_value": "completely bare face",
+            "parent_ids": [
+              "recipe_monochrome_noir"
+            ]
+          }
+        },
+        {
+          "id": "recipe_monochrome_noir__frag_009",
+          "slot": "makeup",
+          "text": "natural skin textures",
+          "facts": {
+            "semantic_role": "selector"
+          },
+          "origin": {
+            "entry_point": "preset_browser",
+            "mode": "recipe",
+            "selector": "makeup_direction",
+            "selected_id": "recipe_monochrome_noir",
+            "raw_value": "natural skin textures",
+            "parent_ids": [
+              "recipe_monochrome_noir"
+            ]
+          }
+        },
+        {
+          "id": "recipe_monochrome_noir__frag_010",
+          "slot": "expression",
+          "text": "empty gaze",
+          "facts": {
+            "semantic_role": "selector"
+          },
+          "origin": {
+            "entry_point": "preset_browser",
+            "mode": "recipe",
+            "selector": "expression_gaze",
+            "selected_id": "recipe_monochrome_noir",
+            "raw_value": "empty gaze",
+            "parent_ids": [
+              "recipe_monochrome_noir"
+            ]
+          }
+        },
+        {
+          "id": "recipe_monochrome_noir__frag_011",
+          "slot": "expression",
+          "text": "staring into space",
+          "facts": {
+            "semantic_role": "selector"
+          },
+          "origin": {
+            "entry_point": "preset_browser",
+            "mode": "recipe",
+            "selector": "expression_gaze",
+            "selected_id": "recipe_monochrome_noir",
+            "raw_value": "staring into space",
+            "parent_ids": [
+              "recipe_monochrome_noir"
+            ]
+          }
+        },
+        {
+          "id": "recipe_monochrome_noir__frag_012",
+          "slot": "expression",
+          "text": "neutral face",
+          "facts": {
+            "semantic_role": "selector"
+          },
+          "origin": {
+            "entry_point": "preset_browser",
+            "mode": "recipe",
+            "selector": "expression_gaze",
+            "selected_id": "recipe_monochrome_noir",
+            "raw_value": "neutral face",
+            "parent_ids": [
+              "recipe_monochrome_noir"
+            ]
+          }
+        },
+        {
+          "id": "recipe_monochrome_noir__frag_013",
+          "slot": "quality",
+          "text": "Ilford HP5 monochrome film grain",
+          "facts": {
+            "semantic_role": "selector"
+          },
+          "origin": {
+            "entry_point": "preset_browser",
+            "mode": "recipe",
+            "selector": "focus_detail",
+            "selected_id": "recipe_monochrome_noir",
+            "raw_value": "Ilford HP5 monochrome film grain",
+            "parent_ids": [
+              "recipe_monochrome_noir"
+            ]
+          }
+        },
+        {
+          "id": "recipe_monochrome_noir__frag_014",
+          "slot": "quality",
+          "text": "deep shadows",
+          "facts": {
+            "semantic_role": "selector"
+          },
+          "origin": {
+            "entry_point": "preset_browser",
+            "mode": "recipe",
+            "selector": "focus_detail",
+            "selected_id": "recipe_monochrome_noir",
+            "raw_value": "deep shadows",
+            "parent_ids": [
+              "recipe_monochrome_noir"
+            ]
+          }
+        },
+        {
+          "id": "recipe_monochrome_noir__frag_015",
+          "slot": "quality",
+          "text": "fine gray gradient",
+          "facts": {
+            "semantic_role": "selector"
+          },
+          "origin": {
+            "entry_point": "preset_browser",
+            "mode": "recipe",
+            "selector": "focus_detail",
+            "selected_id": "recipe_monochrome_noir",
+            "raw_value": "fine gray gradient",
+            "parent_ids": [
+              "recipe_monochrome_noir"
+            ]
+          }
+        },
+        {
+          "id": "recipe_monochrome_noir__frag_016",
+          "slot": "quality",
+          "text": "high microcontrast",
+          "facts": {
+            "semantic_role": "selector"
+          },
+          "origin": {
+            "entry_point": "preset_browser",
+            "mode": "recipe",
+            "selector": "focus_detail",
+            "selected_id": "recipe_monochrome_noir",
+            "raw_value": "high microcontrast",
+            "parent_ids": [
+              "recipe_monochrome_noir"
+            ]
+          }
+        }
+      ]
     },
     {
       "id": "recipe_morning_sunlight",
@@ -82,7 +1966,315 @@
       "pose_direction": "sitting on edge of unmade bed, hugging pillow, looking back",
       "makeup_direction": "morning dewy skin, natural flush, gentle lips",
       "expression_gaze": "shy affectionate smile, sleepy morning eyes",
-      "focus_detail": "dust motes in sunbeam, soft lens halation, sheer curtain texture, peach fuzz skin detail"
+      "focus_detail": "dust motes in sunbeam, soft lens halation, sheer curtain texture, peach fuzz skin detail",
+      "fragments": [
+        {
+          "id": "recipe_morning_sunlight__frag_000",
+          "slot": "style_recipe",
+          "text": "50mm prime lens",
+          "facts": {
+            "semantic_role": "selector"
+          },
+          "origin": {
+            "entry_point": "preset_browser",
+            "mode": "recipe",
+            "selector": "style_recipe",
+            "selected_id": "recipe_morning_sunlight",
+            "raw_value": "50mm prime lens",
+            "parent_ids": [
+              "recipe_morning_sunlight"
+            ]
+          }
+        },
+        {
+          "id": "recipe_morning_sunlight__frag_001",
+          "slot": "style_recipe",
+          "text": "soft natural window light portrait",
+          "facts": {
+            "semantic_role": "selector"
+          },
+          "origin": {
+            "entry_point": "preset_browser",
+            "mode": "recipe",
+            "selector": "style_recipe",
+            "selected_id": "recipe_morning_sunlight",
+            "raw_value": "soft natural window light portrait",
+            "parent_ids": [
+              "recipe_morning_sunlight"
+            ]
+          }
+        },
+        {
+          "id": "recipe_morning_sunlight__frag_002",
+          "slot": "style_recipe",
+          "text": "half_covered",
+          "facts": {
+            "semantic_role": "selector"
+          },
+          "origin": {
+            "entry_point": "preset_browser",
+            "mode": "recipe",
+            "selector": "exposure_mode",
+            "selected_id": "recipe_morning_sunlight",
+            "raw_value": "half_covered",
+            "parent_ids": [
+              "recipe_morning_sunlight"
+            ]
+          }
+        },
+        {
+          "id": "recipe_morning_sunlight__frag_003",
+          "slot": "lighting",
+          "text": "golden morning sun ray through sheer curtain",
+          "facts": {
+            "semantic_role": "selector"
+          },
+          "origin": {
+            "entry_point": "preset_browser",
+            "mode": "recipe",
+            "selector": "lighting_palette",
+            "selected_id": "recipe_morning_sunlight",
+            "raw_value": "golden morning sun ray through sheer curtain",
+            "parent_ids": [
+              "recipe_morning_sunlight"
+            ]
+          }
+        },
+        {
+          "id": "recipe_morning_sunlight__frag_004",
+          "slot": "lighting",
+          "text": "warm 3200K",
+          "facts": {
+            "semantic_role": "selector"
+          },
+          "origin": {
+            "entry_point": "preset_browser",
+            "mode": "recipe",
+            "selector": "lighting_palette",
+            "selected_id": "recipe_morning_sunlight",
+            "raw_value": "warm 3200K",
+            "parent_ids": [
+              "recipe_morning_sunlight"
+            ]
+          }
+        },
+        {
+          "id": "recipe_morning_sunlight__frag_005",
+          "slot": "pose",
+          "text": "sitting on edge of unmade bed",
+          "facts": {
+            "semantic_role": "selector"
+          },
+          "origin": {
+            "entry_point": "preset_browser",
+            "mode": "recipe",
+            "selector": "pose_direction",
+            "selected_id": "recipe_morning_sunlight",
+            "raw_value": "sitting on edge of unmade bed",
+            "parent_ids": [
+              "recipe_morning_sunlight"
+            ]
+          }
+        },
+        {
+          "id": "recipe_morning_sunlight__frag_006",
+          "slot": "pose",
+          "text": "hugging pillow",
+          "facts": {
+            "semantic_role": "selector"
+          },
+          "origin": {
+            "entry_point": "preset_browser",
+            "mode": "recipe",
+            "selector": "pose_direction",
+            "selected_id": "recipe_morning_sunlight",
+            "raw_value": "hugging pillow",
+            "parent_ids": [
+              "recipe_morning_sunlight"
+            ]
+          }
+        },
+        {
+          "id": "recipe_morning_sunlight__frag_007",
+          "slot": "pose",
+          "text": "looking back",
+          "facts": {
+            "semantic_role": "selector"
+          },
+          "origin": {
+            "entry_point": "preset_browser",
+            "mode": "recipe",
+            "selector": "pose_direction",
+            "selected_id": "recipe_morning_sunlight",
+            "raw_value": "looking back",
+            "parent_ids": [
+              "recipe_morning_sunlight"
+            ]
+          }
+        },
+        {
+          "id": "recipe_morning_sunlight__frag_008",
+          "slot": "makeup",
+          "text": "morning dewy skin",
+          "facts": {
+            "semantic_role": "selector"
+          },
+          "origin": {
+            "entry_point": "preset_browser",
+            "mode": "recipe",
+            "selector": "makeup_direction",
+            "selected_id": "recipe_morning_sunlight",
+            "raw_value": "morning dewy skin",
+            "parent_ids": [
+              "recipe_morning_sunlight"
+            ]
+          }
+        },
+        {
+          "id": "recipe_morning_sunlight__frag_009",
+          "slot": "makeup",
+          "text": "natural flush",
+          "facts": {
+            "semantic_role": "selector"
+          },
+          "origin": {
+            "entry_point": "preset_browser",
+            "mode": "recipe",
+            "selector": "makeup_direction",
+            "selected_id": "recipe_morning_sunlight",
+            "raw_value": "natural flush",
+            "parent_ids": [
+              "recipe_morning_sunlight"
+            ]
+          }
+        },
+        {
+          "id": "recipe_morning_sunlight__frag_010",
+          "slot": "makeup",
+          "text": "gentle lips",
+          "facts": {
+            "semantic_role": "selector"
+          },
+          "origin": {
+            "entry_point": "preset_browser",
+            "mode": "recipe",
+            "selector": "makeup_direction",
+            "selected_id": "recipe_morning_sunlight",
+            "raw_value": "gentle lips",
+            "parent_ids": [
+              "recipe_morning_sunlight"
+            ]
+          }
+        },
+        {
+          "id": "recipe_morning_sunlight__frag_011",
+          "slot": "expression",
+          "text": "shy affectionate smile",
+          "facts": {
+            "semantic_role": "selector"
+          },
+          "origin": {
+            "entry_point": "preset_browser",
+            "mode": "recipe",
+            "selector": "expression_gaze",
+            "selected_id": "recipe_morning_sunlight",
+            "raw_value": "shy affectionate smile",
+            "parent_ids": [
+              "recipe_morning_sunlight"
+            ]
+          }
+        },
+        {
+          "id": "recipe_morning_sunlight__frag_012",
+          "slot": "expression",
+          "text": "sleepy morning eyes",
+          "facts": {
+            "semantic_role": "selector"
+          },
+          "origin": {
+            "entry_point": "preset_browser",
+            "mode": "recipe",
+            "selector": "expression_gaze",
+            "selected_id": "recipe_morning_sunlight",
+            "raw_value": "sleepy morning eyes",
+            "parent_ids": [
+              "recipe_morning_sunlight"
+            ]
+          }
+        },
+        {
+          "id": "recipe_morning_sunlight__frag_013",
+          "slot": "quality",
+          "text": "dust motes in sunbeam",
+          "facts": {
+            "semantic_role": "selector"
+          },
+          "origin": {
+            "entry_point": "preset_browser",
+            "mode": "recipe",
+            "selector": "focus_detail",
+            "selected_id": "recipe_morning_sunlight",
+            "raw_value": "dust motes in sunbeam",
+            "parent_ids": [
+              "recipe_morning_sunlight"
+            ]
+          }
+        },
+        {
+          "id": "recipe_morning_sunlight__frag_014",
+          "slot": "quality",
+          "text": "soft lens halation",
+          "facts": {
+            "semantic_role": "selector"
+          },
+          "origin": {
+            "entry_point": "preset_browser",
+            "mode": "recipe",
+            "selector": "focus_detail",
+            "selected_id": "recipe_morning_sunlight",
+            "raw_value": "soft lens halation",
+            "parent_ids": [
+              "recipe_morning_sunlight"
+            ]
+          }
+        },
+        {
+          "id": "recipe_morning_sunlight__frag_015",
+          "slot": "quality",
+          "text": "sheer curtain texture",
+          "facts": {
+            "semantic_role": "selector"
+          },
+          "origin": {
+            "entry_point": "preset_browser",
+            "mode": "recipe",
+            "selector": "focus_detail",
+            "selected_id": "recipe_morning_sunlight",
+            "raw_value": "sheer curtain texture",
+            "parent_ids": [
+              "recipe_morning_sunlight"
+            ]
+          }
+        },
+        {
+          "id": "recipe_morning_sunlight__frag_016",
+          "slot": "quality",
+          "text": "peach fuzz skin detail",
+          "facts": {
+            "semantic_role": "selector"
+          },
+          "origin": {
+            "entry_point": "preset_browser",
+            "mode": "recipe",
+            "selector": "focus_detail",
+            "selected_id": "recipe_morning_sunlight",
+            "raw_value": "peach fuzz skin detail",
+            "parent_ids": [
+              "recipe_morning_sunlight"
+            ]
+          }
+        }
+      ]
     },
     {
       "id": "recipe_japanese_aesthetic",
@@ -94,7 +2286,297 @@
       "pose_direction": "kneeling on tatami floor, resting chin on hands",
       "makeup_direction": "subtle Japanese makeup, light pink blush, sheer gloss",
       "expression_gaze": "gentle direct gaze at camera, tranquil calm mood",
-      "focus_detail": "tatami straw texture, shoji screen soft shadows, creamy bokeh background"
+      "focus_detail": "tatami straw texture, shoji screen soft shadows, creamy bokeh background",
+      "fragments": [
+        {
+          "id": "recipe_japanese_aesthetic__frag_000",
+          "slot": "style_recipe",
+          "text": "Japanese aesthetic photography",
+          "facts": {
+            "semantic_role": "selector"
+          },
+          "origin": {
+            "entry_point": "preset_browser",
+            "mode": "recipe",
+            "selector": "style_recipe",
+            "selected_id": "recipe_japanese_aesthetic",
+            "raw_value": "Japanese aesthetic photography",
+            "parent_ids": [
+              "recipe_japanese_aesthetic"
+            ]
+          }
+        },
+        {
+          "id": "recipe_japanese_aesthetic__frag_001",
+          "slot": "style_recipe",
+          "text": "muted pastel tones",
+          "facts": {
+            "semantic_role": "selector"
+          },
+          "origin": {
+            "entry_point": "preset_browser",
+            "mode": "recipe",
+            "selector": "style_recipe",
+            "selected_id": "recipe_japanese_aesthetic",
+            "raw_value": "muted pastel tones",
+            "parent_ids": [
+              "recipe_japanese_aesthetic"
+            ]
+          }
+        },
+        {
+          "id": "recipe_japanese_aesthetic__frag_002",
+          "slot": "style_recipe",
+          "text": "calm mood",
+          "facts": {
+            "semantic_role": "selector"
+          },
+          "origin": {
+            "entry_point": "preset_browser",
+            "mode": "recipe",
+            "selector": "style_recipe",
+            "selected_id": "recipe_japanese_aesthetic",
+            "raw_value": "calm mood",
+            "parent_ids": [
+              "recipe_japanese_aesthetic"
+            ]
+          }
+        },
+        {
+          "id": "recipe_japanese_aesthetic__frag_003",
+          "slot": "style_recipe",
+          "text": "upper",
+          "facts": {
+            "semantic_role": "selector"
+          },
+          "origin": {
+            "entry_point": "preset_browser",
+            "mode": "recipe",
+            "selector": "exposure_mode",
+            "selected_id": "recipe_japanese_aesthetic",
+            "raw_value": "upper",
+            "parent_ids": [
+              "recipe_japanese_aesthetic"
+            ]
+          }
+        },
+        {
+          "id": "recipe_japanese_aesthetic__frag_004",
+          "slot": "lighting",
+          "text": "diffused overcast daylight",
+          "facts": {
+            "semantic_role": "selector"
+          },
+          "origin": {
+            "entry_point": "preset_browser",
+            "mode": "recipe",
+            "selector": "lighting_palette",
+            "selected_id": "recipe_japanese_aesthetic",
+            "raw_value": "diffused overcast daylight",
+            "parent_ids": [
+              "recipe_japanese_aesthetic"
+            ]
+          }
+        },
+        {
+          "id": "recipe_japanese_aesthetic__frag_005",
+          "slot": "lighting",
+          "text": "pale cool tones",
+          "facts": {
+            "semantic_role": "selector"
+          },
+          "origin": {
+            "entry_point": "preset_browser",
+            "mode": "recipe",
+            "selector": "lighting_palette",
+            "selected_id": "recipe_japanese_aesthetic",
+            "raw_value": "pale cool tones",
+            "parent_ids": [
+              "recipe_japanese_aesthetic"
+            ]
+          }
+        },
+        {
+          "id": "recipe_japanese_aesthetic__frag_006",
+          "slot": "pose",
+          "text": "kneeling on tatami floor",
+          "facts": {
+            "semantic_role": "selector"
+          },
+          "origin": {
+            "entry_point": "preset_browser",
+            "mode": "recipe",
+            "selector": "pose_direction",
+            "selected_id": "recipe_japanese_aesthetic",
+            "raw_value": "kneeling on tatami floor",
+            "parent_ids": [
+              "recipe_japanese_aesthetic"
+            ]
+          }
+        },
+        {
+          "id": "recipe_japanese_aesthetic__frag_007",
+          "slot": "pose",
+          "text": "resting chin on hands",
+          "facts": {
+            "semantic_role": "selector"
+          },
+          "origin": {
+            "entry_point": "preset_browser",
+            "mode": "recipe",
+            "selector": "pose_direction",
+            "selected_id": "recipe_japanese_aesthetic",
+            "raw_value": "resting chin on hands",
+            "parent_ids": [
+              "recipe_japanese_aesthetic"
+            ]
+          }
+        },
+        {
+          "id": "recipe_japanese_aesthetic__frag_008",
+          "slot": "makeup",
+          "text": "subtle Japanese makeup",
+          "facts": {
+            "semantic_role": "selector"
+          },
+          "origin": {
+            "entry_point": "preset_browser",
+            "mode": "recipe",
+            "selector": "makeup_direction",
+            "selected_id": "recipe_japanese_aesthetic",
+            "raw_value": "subtle Japanese makeup",
+            "parent_ids": [
+              "recipe_japanese_aesthetic"
+            ]
+          }
+        },
+        {
+          "id": "recipe_japanese_aesthetic__frag_009",
+          "slot": "makeup",
+          "text": "light pink blush",
+          "facts": {
+            "semantic_role": "selector"
+          },
+          "origin": {
+            "entry_point": "preset_browser",
+            "mode": "recipe",
+            "selector": "makeup_direction",
+            "selected_id": "recipe_japanese_aesthetic",
+            "raw_value": "light pink blush",
+            "parent_ids": [
+              "recipe_japanese_aesthetic"
+            ]
+          }
+        },
+        {
+          "id": "recipe_japanese_aesthetic__frag_010",
+          "slot": "makeup",
+          "text": "sheer gloss",
+          "facts": {
+            "semantic_role": "selector"
+          },
+          "origin": {
+            "entry_point": "preset_browser",
+            "mode": "recipe",
+            "selector": "makeup_direction",
+            "selected_id": "recipe_japanese_aesthetic",
+            "raw_value": "sheer gloss",
+            "parent_ids": [
+              "recipe_japanese_aesthetic"
+            ]
+          }
+        },
+        {
+          "id": "recipe_japanese_aesthetic__frag_011",
+          "slot": "expression",
+          "text": "gentle direct gaze at camera",
+          "facts": {
+            "semantic_role": "selector"
+          },
+          "origin": {
+            "entry_point": "preset_browser",
+            "mode": "recipe",
+            "selector": "expression_gaze",
+            "selected_id": "recipe_japanese_aesthetic",
+            "raw_value": "gentle direct gaze at camera",
+            "parent_ids": [
+              "recipe_japanese_aesthetic"
+            ]
+          }
+        },
+        {
+          "id": "recipe_japanese_aesthetic__frag_012",
+          "slot": "expression",
+          "text": "tranquil calm mood",
+          "facts": {
+            "semantic_role": "selector"
+          },
+          "origin": {
+            "entry_point": "preset_browser",
+            "mode": "recipe",
+            "selector": "expression_gaze",
+            "selected_id": "recipe_japanese_aesthetic",
+            "raw_value": "tranquil calm mood",
+            "parent_ids": [
+              "recipe_japanese_aesthetic"
+            ]
+          }
+        },
+        {
+          "id": "recipe_japanese_aesthetic__frag_013",
+          "slot": "quality",
+          "text": "tatami straw texture",
+          "facts": {
+            "semantic_role": "selector"
+          },
+          "origin": {
+            "entry_point": "preset_browser",
+            "mode": "recipe",
+            "selector": "focus_detail",
+            "selected_id": "recipe_japanese_aesthetic",
+            "raw_value": "tatami straw texture",
+            "parent_ids": [
+              "recipe_japanese_aesthetic"
+            ]
+          }
+        },
+        {
+          "id": "recipe_japanese_aesthetic__frag_014",
+          "slot": "quality",
+          "text": "shoji screen soft shadows",
+          "facts": {
+            "semantic_role": "selector"
+          },
+          "origin": {
+            "entry_point": "preset_browser",
+            "mode": "recipe",
+            "selector": "focus_detail",
+            "selected_id": "recipe_japanese_aesthetic",
+            "raw_value": "shoji screen soft shadows",
+            "parent_ids": [
+              "recipe_japanese_aesthetic"
+            ]
+          }
+        },
+        {
+          "id": "recipe_japanese_aesthetic__frag_015",
+          "slot": "quality",
+          "text": "creamy bokeh background",
+          "facts": {
+            "semantic_role": "selector"
+          },
+          "origin": {
+            "entry_point": "preset_browser",
+            "mode": "recipe",
+            "selector": "focus_detail",
+            "selected_id": "recipe_japanese_aesthetic",
+            "raw_value": "creamy bokeh background",
+            "parent_ids": [
+              "recipe_japanese_aesthetic"
+            ]
+          }
+        }
+      ]
     }
   ]
 }

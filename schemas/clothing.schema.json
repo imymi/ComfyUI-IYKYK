@@ -1,5 +1,4 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
   "title": "ClothingDataset",
   "type": "object",
   "required": [
@@ -14,8 +13,6 @@
   "properties": {
     "categories": {
       "type": "array",
-      "minItems": 28,
-      "maxItems": 28,
       "items": {
         "type": "object",
         "required": [
@@ -23,20 +20,19 @@
           "name_zh",
           "tags"
         ],
+        "additionalProperties": false,
         "properties": {
           "id": {
             "type": "string",
-            "minLength": 1
+            "pattern": "^[a-z][a-z0-9_]{2,95}$"
           },
           "name_zh": {
-            "type": "string",
-            "minLength": 1
+            "type": "string"
           },
           "tags": {
             "type": "array",
-            "minItems": 1,
             "items": {
-              "type": "string"
+              "$ref": "#/definitions/leaf_tag"
             }
           }
         }
@@ -44,7 +40,6 @@
     },
     "clothing_states": {
       "type": "array",
-      "minItems": 1,
       "items": {
         "type": "object",
         "required": [
@@ -52,19 +47,19 @@
           "name_zh",
           "tags"
         ],
+        "additionalProperties": false,
         "properties": {
           "id": {
             "type": "string",
-            "minLength": 1
+            "pattern": "^[a-z][a-z0-9_]{2,95}$"
           },
           "name_zh": {
-            "type": "string",
-            "minLength": 1
+            "type": "string"
           },
           "tags": {
             "type": "array",
             "items": {
-              "type": "string"
+              "$ref": "#/definitions/leaf_tag"
             }
           }
         }
@@ -72,57 +67,43 @@
     },
     "clothing_nudity_linkage": {
       "type": "object",
-      "required": [
-        "L1",
-        "L2",
-        "L3",
-        "L4",
-        "L5",
-        "L6"
-      ],
-      "properties": {
-        "L1": {
+      "additionalProperties": false,
+      "patternProperties": {
+        "^L[1-6]$": {
           "type": "object",
           "required": [
+            "general_tags",
             "style_overrides"
-          ]
-        },
-        "L2": {
-          "type": "object",
-          "required": [
-            "style_overrides"
-          ]
-        },
-        "L3": {
-          "type": "object",
-          "required": [
-            "style_overrides"
-          ]
-        },
-        "L4": {
-          "type": "object",
-          "required": [
-            "style_overrides"
-          ]
-        },
-        "L5": {
-          "type": "object",
-          "required": [
-            "style_overrides"
-          ]
-        },
-        "L6": {
-          "type": "object",
-          "required": [
-            "style_overrides"
-          ]
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "description": {
+              "type": "string"
+            },
+            "state_name": {
+              "type": "string"
+            },
+            "general_tags": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/leaf_tag"
+              }
+            },
+            "style_overrides": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/definitions/leaf_tag"
+                }
+              }
+            }
+          }
         }
       }
     },
     "sfw_exposure_tiers": {
       "type": "array",
-      "minItems": 9,
-      "maxItems": 9,
       "items": {
         "type": "object",
         "required": [
@@ -130,20 +111,19 @@
           "name_zh",
           "tags"
         ],
+        "additionalProperties": false,
         "properties": {
           "id": {
             "type": "string",
-            "minLength": 1
+            "pattern": "^[a-z][a-z0-9_]{2,95}$"
           },
           "name_zh": {
-            "type": "string",
-            "minLength": 1
+            "type": "string"
           },
           "tags": {
             "type": "array",
-            "minItems": 1,
             "items": {
-              "type": "string"
+              "$ref": "#/definitions/leaf_tag"
             }
           }
         }
@@ -151,8 +131,6 @@
     },
     "cloth_transparency_tiers": {
       "type": "array",
-      "minItems": 5,
-      "maxItems": 5,
       "items": {
         "type": "object",
         "required": [
@@ -160,20 +138,19 @@
           "name_zh",
           "tags"
         ],
+        "additionalProperties": false,
         "properties": {
           "id": {
             "type": "string",
-            "minLength": 1
+            "pattern": "^[a-z][a-z0-9_]{2,95}$"
           },
           "name_zh": {
-            "type": "string",
-            "minLength": 1
+            "type": "string"
           },
           "tags": {
             "type": "array",
-            "minItems": 1,
             "items": {
-              "type": "string"
+              "$ref": "#/definitions/leaf_tag"
             }
           }
         }
@@ -181,8 +158,6 @@
     },
     "lingerie_wardrobe": {
       "type": "array",
-      "minItems": 10,
-      "maxItems": 10,
       "items": {
         "type": "object",
         "required": [
@@ -190,20 +165,19 @@
           "name_zh",
           "tags"
         ],
+        "additionalProperties": false,
         "properties": {
           "id": {
             "type": "string",
-            "minLength": 1
+            "pattern": "^[a-z][a-z0-9_]{2,95}$"
           },
           "name_zh": {
-            "type": "string",
-            "minLength": 1
+            "type": "string"
           },
           "tags": {
             "type": "array",
-            "minItems": 1,
             "items": {
-              "type": "string"
+              "$ref": "#/definitions/leaf_tag"
             }
           }
         }
@@ -216,6 +190,7 @@
         "L3",
         "L4"
       ],
+      "additionalProperties": false,
       "properties": {
         "L2": {
           "type": "object",
@@ -223,17 +198,16 @@
             "exposure_ids",
             "transparency_ids"
           ],
+          "additionalProperties": false,
           "properties": {
             "exposure_ids": {
               "type": "array",
-              "minItems": 1,
               "items": {
                 "type": "string"
               }
             },
             "transparency_ids": {
               "type": "array",
-              "minItems": 1,
               "items": {
                 "type": "string"
               }
@@ -246,17 +220,16 @@
             "exposure_ids",
             "transparency_ids"
           ],
+          "additionalProperties": false,
           "properties": {
             "exposure_ids": {
               "type": "array",
-              "minItems": 1,
               "items": {
                 "type": "string"
               }
             },
             "transparency_ids": {
               "type": "array",
-              "minItems": 1,
               "items": {
                 "type": "string"
               }
@@ -270,28 +243,204 @@
             "transparency_ids",
             "wardrobe_ids"
           ],
+          "additionalProperties": false,
           "properties": {
             "exposure_ids": {
               "type": "array",
-              "minItems": 1,
               "items": {
                 "type": "string"
               }
             },
             "transparency_ids": {
               "type": "array",
-              "minItems": 1,
               "items": {
                 "type": "string"
               }
             },
             "wardrobe_ids": {
               "type": "array",
-              "minItems": 1,
               "items": {
                 "type": "string"
               }
             }
+          }
+        }
+      }
+    }
+  },
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "definitions": {
+    "leaf_tag": {
+      "type": "object",
+      "required": [
+        "id",
+        "text",
+        "facts"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_]{2,95}$"
+        },
+        "text": {
+          "type": "string",
+          "minLength": 1
+        },
+        "facts": {
+          "$ref": "#/definitions/semantic_facts"
+        }
+      }
+    },
+    "semantic_facts": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "semantic_role": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "space_kind": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "venue_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "visible_regions": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "garment_topologies": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "garment_states": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "hand_state": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "prop_usage": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "hands_required": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 2
+        },
+        "emotion": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "gaze": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "occlusion": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "time_of_day": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "light_sources": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "color_modes": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "capture_device": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "quality_class": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "makeup_base": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "makeup_effects": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "liquid_kind": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "liquid_locations": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "liquid_amount": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "mutex_groups": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
           }
         }
       }

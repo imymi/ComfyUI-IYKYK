@@ -25,7 +25,8 @@ def _extract_all_tags(data_file: Path) -> set[str]:
             for k in ["tags", "anchor_tags", "detail_tags"]:
                 if k in node and isinstance(node[k], list):
                     for t in node[k]:
-                        tags.add(t.lower().strip())
+                        t_text = t.get("text", "") if isinstance(t, dict) else str(t)
+                        tags.add(t_text.lower().strip())
             for v in node.values():
                 _rec(v)
         elif isinstance(node, list):

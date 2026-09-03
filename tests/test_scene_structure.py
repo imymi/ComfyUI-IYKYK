@@ -42,8 +42,8 @@ class TestSceneStructure(unittest.TestCase):
                 self.assertEqual(item["exclusive_group"], exp["exclusive_group"], f"Exclusive group mismatch for {sid}")
 
                 # Zero overlap between anchors and details
-                anchors = set(item.get("anchor_tags", []))
-                details = set(item.get("detail_tags", []))
+                anchors = {a.get("text", "") if isinstance(a, dict) else str(a) for a in item.get("anchor_tags", [])}
+                details = {d.get("text", "") if isinstance(d, dict) else str(d) for d in item.get("detail_tags", [])}
                 self.assertTrue(anchors.isdisjoint(details), f"Overlap in scene {sid}: {anchors & details}")
                 self.assertGreater(len(anchors), 0, f"Empty anchors in {sid}")
 

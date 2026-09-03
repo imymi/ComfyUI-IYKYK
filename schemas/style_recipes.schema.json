@@ -1,5 +1,4 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
   "title": "StyleRecipesDataset",
   "type": "object",
   "required": [
@@ -8,7 +7,311 @@
   "properties": {
     "recipes": {
       "type": "array",
-      "minItems": 8
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "style_name",
+          "name_zh",
+          "style_recipe",
+          "exposure_mode",
+          "lighting_palette",
+          "pose_direction",
+          "makeup_direction",
+          "expression_gaze",
+          "focus_detail",
+          "fragments"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_]{2,95}$"
+          },
+          "style_name": {
+            "type": "string"
+          },
+          "name_zh": {
+            "type": "string"
+          },
+          "style_recipe": {
+            "type": "string"
+          },
+          "exposure_mode": {
+            "type": "string"
+          },
+          "lighting_palette": {
+            "type": "string"
+          },
+          "pose_direction": {
+            "type": "string"
+          },
+          "makeup_direction": {
+            "type": "string"
+          },
+          "expression_gaze": {
+            "type": "string"
+          },
+          "focus_detail": {
+            "type": "string"
+          },
+          "fragments": {
+            "type": "array",
+            "items": {
+              "$ref": "#/definitions/fragment"
+            }
+          }
+        }
+      }
+    }
+  },
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "definitions": {
+    "leaf_tag": {
+      "type": "object",
+      "required": [
+        "id",
+        "text",
+        "facts"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_]{2,95}$"
+        },
+        "text": {
+          "type": "string",
+          "minLength": 1
+        },
+        "facts": {
+          "$ref": "#/definitions/semantic_facts"
+        }
+      }
+    },
+    "semantic_facts": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "semantic_role": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "space_kind": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "venue_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "visible_regions": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "garment_topologies": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "garment_states": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "hand_state": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "prop_usage": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "hands_required": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 2
+        },
+        "emotion": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "gaze": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "occlusion": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "time_of_day": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "light_sources": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "color_modes": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "capture_device": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "quality_class": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "makeup_base": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "makeup_effects": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "liquid_kind": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "liquid_locations": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "liquid_amount": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "mutex_groups": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "selection_origin": {
+      "type": "object",
+      "required": [
+        "entry_point",
+        "mode",
+        "selector",
+        "selected_id",
+        "raw_value",
+        "parent_ids"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "entry_point": {
+          "type": "string"
+        },
+        "mode": {
+          "type": "string"
+        },
+        "selector": {
+          "type": "string"
+        },
+        "selected_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "raw_value": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "parent_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "fragment": {
+      "type": "object",
+      "required": [
+        "id",
+        "text",
+        "facts",
+        "origin"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "slot": {
+          "type": "string"
+        },
+        "text": {
+          "type": "string",
+          "minLength": 1
+        },
+        "facts": {
+          "$ref": "#/definitions/semantic_facts"
+        },
+        "origin": {
+          "$ref": "#/definitions/selection_origin"
+        }
+      }
     }
   }
 }
