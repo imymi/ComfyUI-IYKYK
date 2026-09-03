@@ -1,0 +1,64 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+    - uses: actions/checkout@v6
+      with:
+        fetch-depth: 0
+        fetch-tags: true
+
+    - name: Set up Python 3.11
+      uses: actions/setup-python@v6
+      with:
+        python-version: "3.11"
+
+    - name: Install Development Dependencies
+      run: |
+        python -m pip install --upgrade pip
+        python -m pip install -e ".[dev]"
+
+    - name: Run Release Quality Gates
+      run: |
+        ruff check .
+        python scripts/generate_rule_schemas.py --check
+        python scripts/validate_data.py --strict
+        python -m unittest discover -s tests -v
+
+    - name: Build Release Assets
+      run: |
+        python scripts/build_release.py --mode release --output-dir dist
+
+    - name: Create GitHub Release
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        GEN_DIR=$(python -c "import json; print(json.load(open('dist/CURRENT.json'))['generation_dir'])")
+        RELEASE_FILE=$(python -c "import json; print(json.load(open('dist/CURRENT.json'))['release_file'])")
+        RELEASE_FLAGS=()
+        if [[ "$GITHUB_REF_NAME" == *-* ]]; then
+          RELEASE_FLAGS+=(--prerelease)
+        fi
+        gh release create "$GITHUB_REF_NAME" \
+          "dist/$GEN_DIR/$RELEASE_FILE" \
+          "dist/$GEN_DIR/MANIFEST.json" \
+          "dist/$GEN_DIR/SHA256SUMS.txt" \
+          --verify-tag \
+          --generate-notes \
+          --title "$GITHUB_REF_NAME" \
+          "${RELEASE_FLAGS[@]}"
