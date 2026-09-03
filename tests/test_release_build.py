@@ -27,6 +27,7 @@ def make_clean_git_repo(target_dir: Path) -> Path:
     并在此临时目录初始化 git，建立一个确定性的干净提交快照。
     """
     exclude_patterns = {".git", "__pycache__", ".pytest_cache", "dist", ".venv"}
+    target_dir.mkdir(parents=True, exist_ok=True)
     for item in REPO_DIR.iterdir():
         if item.name in exclude_patterns or item.name.startswith(".staging"):
             continue
