@@ -4,6 +4,7 @@ test_conflict_engine_ssot.py — 冲突消解引擎 17 规则收敛、match_mode
 from __future__ import annotations
 
 import copy
+from dataclasses import replace
 import json
 import tempfile
 import unittest
@@ -11,13 +12,14 @@ from pathlib import Path
 from random import Random
 
 from lib.atomizer import fragments_to_atoms
-from lib.conflict_resolver import ConflictResolver, match_pattern
-from lib.errors import RuleConfigurationError
-from lib.models import PromptAtom, PromptFragment, SpanType, TagProvenance
+from lib.conflict_resolver import ConflictResolver, DecisionLedger, OneTimeIndex, match_pattern
+from lib.errors import RuleConfigurationError, UnresolvedConflictError
+from lib.models import PromptAtom, PromptFragment, SemanticFacts, SpanType, TagProvenance
 from lib.rule_contract import (
     RULE_REQUIRED_FIELDS,
     STABLE_RULE_ORDER,
     PatternSpec,
+    TextFallbackSpec,
     export_json_schema,
     parse_pattern_spec,
 )
@@ -360,10 +362,9 @@ class TestConflictEngineSSOT(unittest.TestCase):
                 self.assertTrue(a.contains_blackbox)
                 self.assertFalse(a.can_delete_atom)
 
-        resolved_atoms, rules_applied = self.resolver.resolve_atoms_with_report(raw_atoms, rng)
-        resolved_texts = [a.text for a in resolved_atoms]
-        self.assertIn("(classroom <lora:x:1>:1.2)", resolved_texts)
-        self.assertIn("[classroom \"exact phrase\":1.2]", resolved_texts)
+        with self.assertRaises(UnresolvedConflictError) as cm:
+            self.resolver.resolve_atoms_with_report(raw_atoms, rng)
+        self.assertEqual(cm.exception.reason, "protected_syntax_conflict")
 
         # 2. 校验在所有 17 条规则的结构中，含黑盒后代的原子 can_delete_atom 恒为 False
         bracket_atom_with_lora = PromptAtom(
@@ -687,6 +688,10 @@ class TestConflictEngineSSOT(unittest.TestCase):
                 if r["id"] == "pose_hand_occupation":
                     r["catalog_busy_pose_triggers"] = []
                     r["custom_busy_pose_triggers"] = [{"pattern": "unrelated_trigger", "match_mode": "phrase"}]
+                    r["text_fallback"]["patterns"] = [
+                        {"pattern": "unrelated_trigger", "match_mode": "phrase", "role": "trigger", "group_id": "pose_hand"},
+                        {"pattern": "unrelated_handheld", "match_mode": "phrase", "role": "handheld", "group_id": "pose_hand"},
+                    ]
             (tmp_data / "conflict_rules.json").write_text(json.dumps(raw_rules), encoding="utf-8")
 
             res_mut = ConflictResolver(tmp_data)
@@ -722,6 +727,10 @@ class TestConflictEngineSSOT(unittest.TestCase):
                 if r["id"] == "accessory_occlusion_gaze_coherence":
                     r["catalog_occlusion_triggers"] = []
                     r["custom_occlusion_triggers"] = [{"pattern": "unrelated_occlusion", "match_mode": "phrase"}]
+                    r["text_fallback"]["patterns"] = [
+                        {"pattern": "unrelated_occlusion", "match_mode": "phrase", "role": "trigger", "group_id": "occlusion"},
+                        {"pattern": "unrelated_banned", "match_mode": "phrase", "role": "banned", "group_id": "occlusion"},
+                    ]
             (tmp_data / "conflict_rules.json").write_text(json.dumps(raw_rules), encoding="utf-8")
 
             res_mut_b = ConflictResolver(tmp_data)
@@ -949,6 +958,1003 @@ class TestConflictEngineSSOT(unittest.TestCase):
         c_orig = render_atoms(clothing_atoms)
         c_res = render_atoms(self.resolver.resolve_atoms(clothing_atoms, Random(42)))
         self.assertNotEqual(c_orig, c_res, "Clothing slot sheer blouse should have been mutated by Rule 3")
+
+    def test_ssot_frozen_fields_disk_mutations_and_runtime_injection(self):
+        """R2R2-P1-001 深度门禁：
+        1. 磁盘变异：删除/缩减 17 规则中任意一条的 target_slots 必须被解析器拒绝 (RuleConfigurationError)。
+        2. 磁盘变异：删除/缩减 17 规则中任意一条的 fact_fields 必须被解析器拒绝 (RuleConfigurationError)。
+        3. 磁盘变异：删除/缩减/篡改 17 规则中任意一条的 text_fallback.patterns 必须被解析器拒绝 (RuleConfigurationError)。
+        4. 运行时：未知正式 ID + 空/不足 facts 必须 Fail-Closed 拒绝 (RuleConfigurationError)。
+        5. 运行时：正式 Atom 自带 facts 与 catalog 权威 facts 冲突必须 Fail-Closed 拒绝 (RuleConfigurationError)。
+        6. 运行时：测试 custom fallback 只能消费 RuleItem 中声明的 text_fallback.patterns，通过注入自定义 RuleItem 验证处理器真实生效。
+        """
+        raw_rules_doc = json.loads((self.data_dir / "conflict_rules.json").read_text(encoding="utf-8"))
+
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_data = Path(tmp)
+
+            def assert_fails_on_doc(mutated_doc, err_desc):
+                (tmp_data / "conflict_rules.json").write_text(json.dumps(mutated_doc), encoding="utf-8")
+                with self.assertRaises(RuleConfigurationError, msg=f"Failed to reject: {err_desc}"):
+                    ConflictResolver(tmp_data)
+
+            # 1. 变异 target_slots (缩减/清空)
+            mutated_1 = copy.deepcopy(raw_rules_doc)
+            for r in mutated_1["rules"]:
+                if r["id"] == "nudity_clothing_conflicts":
+                    r["semantic_constraints"]["target_slots"] = ["nudity"]  # 缩减
+                    break
+            assert_fails_on_doc(mutated_1, "reduced target_slots in nudity_clothing_conflicts")
+
+            # 2. 变异 fact_fields (清空)
+            mutated_2 = copy.deepcopy(raw_rules_doc)
+            for r in mutated_2["rules"]:
+                if r["id"] == "spatial_environmental_mutual_exclusion":
+                    r["semantic_constraints"]["fact_fields"] = []
+                    break
+            assert_fails_on_doc(mutated_2, "empty fact_fields in spatial_environmental_mutual_exclusion")
+
+            # 3. 变异 text_fallback.patterns (篡改 pattern)
+            mutated_3 = copy.deepcopy(raw_rules_doc)
+            for r in mutated_3["rules"]:
+                if r["id"] == "pose_hand_occupation":
+                    r["text_fallback"]["patterns"] = [{"pattern": "fake_pattern_xyz", "match_mode": "phrase"}]
+                    break
+            assert_fails_on_doc(mutated_3, "altered text_fallback.patterns in pose_hand_occupation")
+
+        # 4. 运行时：未知正式 ID + 空 facts 必须 Fail-Closed 拒绝
+        from lib.models import PromptAtom, SelectionOrigin, SpanType, TagProvenance, SemanticFacts
+        unknown_atom = PromptAtom(
+            atom_id="atom_unknown_001",
+            text="unknown cyber attire",
+            span_type=SpanType.PLAIN,
+            source_slot="clothing",
+            source_item_id="completely_unknown_formal_id_xyz",
+            provenance=TagProvenance(item_id="completely_unknown_formal_id_xyz"),
+            origin=SelectionOrigin(mode="preset", selector="clothing", selected_id="completely_unknown_formal_id_xyz"),
+            facts=SemanticFacts(),
+        )
+        with self.assertRaises(RuleConfigurationError) as ctx_unknown:
+            self.resolver.resolve_atoms_with_full_report([unknown_atom], Random(42))
+        self.assertIn("unrecognized item ID", str(ctx_unknown.exception))
+
+        # 5. 运行时：正式 Atom facts 与 catalog 权威 facts 冲突必须 Fail-Closed 拒绝
+        conflict_atom = PromptAtom(
+            atom_id="atom_suite_001",
+            text="honeymoon suite",
+            span_type=SpanType.PLAIN,
+            source_slot="scene",
+            source_item_id="scene_honeymoon_suite__tag_000",
+            provenance=TagProvenance(item_id="scene_honeymoon_suite__tag_000"),
+            origin=SelectionOrigin(mode="preset", selector="scene", selected_id="scene_honeymoon_suite__tag_000"),
+            facts=SemanticFacts(space_kind="outdoor", time_of_day="day"),  # 故意与 catalog 中的 indoor 冲突
+        )
+        with self.assertRaises(RuleConfigurationError) as ctx_conflict:
+            self.resolver.resolve_atoms_with_full_report([conflict_atom], Random(42))
+        self.assertIn("conflicts with catalog", str(ctx_conflict.exception))
+
+        # 6. 运行时：注入自定义 RuleItem，验证 custom fallback 真实消费 RuleItem 中编译的 text_fallback.patterns
+        from lib.rule_contract import HandheldPropsRuleSpec, RuleItem, TextFallbackSpec
+        injected_pattern_a = PatternSpec(pattern="custom_exclusive_gizmo_a", match_mode="phrase")
+        injected_pattern_b = PatternSpec(pattern="custom_exclusive_gizmo_b", match_mode="phrase")
+        injected_spec = HandheldPropsRuleSpec(
+            id="handheld_props_single_holder",
+            description="test injection",
+            priority=210,
+            phase="physical",
+            depends_on=("pose_hand_occupation",),
+            handheld_patterns=(injected_pattern_a, injected_pattern_b),
+            reason_codes=("single_handheld_prop_limit",),
+            text_fallback=TextFallbackSpec(
+                strategy="custom",
+                enabled=True,
+                target_slots=("props",),
+                patterns=(injected_pattern_a, injected_pattern_b),
+            ),
+        )
+        injected_rule_item = RuleItem(
+            id="handheld_props_single_holder",
+            description="test injection",
+            spec=injected_spec,
+            priority=210,
+            phase="physical",
+            depends_on=("pose_hand_occupation",),
+            reason_codes=("single_handheld_prop_limit",),
+            text_fallback=injected_spec.text_fallback,
+        )
+
+        prop_a = PromptAtom(
+            atom_id="atom_prop_a",
+            text="custom_exclusive_gizmo_a",
+            span_type=SpanType.PLAIN,
+            source_slot="props",
+            origin=SelectionOrigin(mode="custom", selector="props"),
+            facts=SemanticFacts(),
+        )
+        prop_b = PromptAtom(
+            atom_id="atom_prop_b",
+            text="custom_exclusive_gizmo_b",
+            span_type=SpanType.PLAIN,
+            source_slot="props",
+            origin=SelectionOrigin(mode="custom", selector="props"),
+            facts=SemanticFacts(),
+        )
+
+        from lib.conflict_resolver import OneTimeIndex, DecisionLedger
+        test_index = OneTimeIndex([prop_a, prop_b])
+        test_ledger = DecisionLedger(self.resolver.registry)
+        res_atoms = self.resolver._resolve_handheld_props_single_holder_atoms(
+            [prop_a, prop_b],
+            injected_rule_item,
+            test_ledger,
+            Random(42),
+            test_index,
+            None,
+        )
+        self.assertEqual(len(res_atoms), 1, "Injected RuleItem fallback patterns should have resolved conflict to 1 atom")
+        self.assertEqual(len(test_ledger.decisions), 1, "Injected RuleItem fallback patterns should have produced 1 decision")
+
+    def test_r2r3_p1_001_fallback_exclusively_consumes_rule_item_text_fallback(self):
+        """反例验证 R2R3-P1-001: fallback 必须严格且仅消费 RuleItem.spec.text_fallback.patterns。
+        1. 正例反例：RuleItem 的处理器专属集合为空 (handheld_patterns=())，但 text_fallback.patterns 声明了两个有效模式 ->
+           必须成功命中 fallback 并消解冲突 (1 drop, 1 decision)。
+        2. 负例反例：RuleItem 的处理器专属集合包含两个有效模式，但 text_fallback.patterns 为空 (patterns=()) ->
+           必须 Fail-Closed，绝不命中 fallback (0 drop, 0 decisions, 2 atoms 原样保留)。
+        """
+        from lib.conflict_resolver import DecisionLedger, OneTimeIndex
+        from lib.models import PromptAtom, SelectionOrigin, SemanticFacts, SpanType
+        from lib.rule_contract import HandheldPropsRuleSpec, PatternSpec, RuleItem, TextFallbackSpec
+
+        p_a = PatternSpec(pattern="exclusive_gizmo_alpha", match_mode="phrase")
+        p_b = PatternSpec(pattern="exclusive_gizmo_beta", match_mode="phrase")
+
+        atom_a = PromptAtom(
+            atom_id="atom_gizmo_a",
+            text="exclusive_gizmo_alpha",
+            span_type=SpanType.PLAIN,
+            source_slot="props",
+            origin=SelectionOrigin(mode="custom", selector="props"),
+            facts=SemanticFacts(),
+        )
+        atom_b = PromptAtom(
+            atom_id="atom_gizmo_b",
+            text="exclusive_gizmo_beta",
+            span_type=SpanType.PLAIN,
+            source_slot="props",
+            origin=SelectionOrigin(mode="custom", selector="props"),
+            facts=SemanticFacts(),
+        )
+
+        # 1. 专属集合为空，仅 text_fallback.patterns 有效 -> 必须命中
+        rule_spec_pos = HandheldPropsRuleSpec(
+            id="handheld_props_single_holder",
+            description="positive fallback test",
+            priority=210,
+            phase="physical",
+            depends_on=("pose_hand_occupation",),
+            handheld_patterns=(),  # 专属集合为空！
+            reason_codes=("single_handheld_prop_limit",),
+            text_fallback=TextFallbackSpec(
+                strategy="custom",
+                enabled=True,
+                target_slots=("props",),
+                patterns=(p_a, p_b),  # 唯一事实源！
+            ),
+        )
+        rule_item_pos = RuleItem(
+            id="handheld_props_single_holder",
+            description="positive fallback test",
+            spec=rule_spec_pos,
+            priority=210,
+            phase="physical",
+            depends_on=("pose_hand_occupation",),
+            reason_codes=("single_handheld_prop_limit",),
+            text_fallback=rule_spec_pos.text_fallback,
+        )
+
+        idx_pos = OneTimeIndex([atom_a, atom_b])
+        ledger_pos = DecisionLedger(self.resolver.registry)
+        res_pos = self.resolver._resolve_handheld_props_single_holder_atoms(
+            [atom_a, atom_b],
+            rule_item_pos,
+            ledger_pos,
+            Random(42),
+            idx_pos,
+            None,
+        )
+        self.assertEqual(len(res_pos), 1, "Empty handler patterns + valid text_fallback.patterns must resolve conflict to 1 atom")
+        self.assertEqual(len(ledger_pos.decisions), 1, "Must produce 1 drop decision")
+
+        # 2. 专属集合有词，但 text_fallback.patterns 为空 -> 绝不命中 (Fail-Closed)
+        rule_spec_neg = HandheldPropsRuleSpec(
+            id="handheld_props_single_holder",
+            description="negative fallback test",
+            priority=210,
+            phase="physical",
+            depends_on=("pose_hand_occupation",),
+            handheld_patterns=(p_a, p_b),  # 专属集合有词
+            reason_codes=("single_handheld_prop_limit",),
+            text_fallback=TextFallbackSpec(
+                strategy="custom",
+                enabled=True,
+                target_slots=("props",),
+                patterns=(),  # fallback 为空！
+            ),
+        )
+        rule_item_neg = RuleItem(
+            id="handheld_props_single_holder",
+            description="negative fallback test",
+            spec=rule_spec_neg,
+            priority=210,
+            phase="physical",
+            depends_on=("pose_hand_occupation",),
+            reason_codes=("single_handheld_prop_limit",),
+            text_fallback=rule_spec_neg.text_fallback,
+        )
+
+        idx_neg = OneTimeIndex([atom_a, atom_b])
+        ledger_neg = DecisionLedger(self.resolver.registry)
+        res_neg = self.resolver._resolve_handheld_props_single_holder_atoms(
+            [atom_a, atom_b],
+            rule_item_neg,
+            ledger_neg,
+            Random(42),
+            idx_neg,
+            None,
+        )
+        self.assertEqual(len(res_neg), 2, "Valid handler patterns + empty text_fallback.patterns must NOT resolve conflict")
+        self.assertEqual(len(ledger_neg.decisions), 0, "Must produce 0 decisions")
+
+    def test_r2r3_p3_001_fact_and_mutex_index_integration_and_tombstone(self):
+        """反例验证 R2R3-P3-001: 事实、ID 与互斥组索引直接参与候选原子发现，且墓碑直接导致候选差分。"""
+        from lib.conflict_resolver import DecisionLedger, OneTimeIndex
+        from lib.models import PromptAtom, SelectionOrigin, SemanticFacts, SpanType
+
+        atom_space = PromptAtom(
+            atom_id="atom_space_01",
+            text="indoor living room",
+            span_type=SpanType.PLAIN,
+            source_slot="scene",
+            origin=SelectionOrigin(mode="preset", selector="scene"),
+            facts=SemanticFacts(space_kind="indoor"),
+        )
+        atom_prop = PromptAtom(
+            atom_id="atom_prop_01",
+            text="prop coffee mug",
+            span_type=SpanType.PLAIN,
+            source_slot="props",
+            origin=SelectionOrigin(mode="preset", selector="props"),
+            facts=SemanticFacts(prop_usage="handheld", hands_required=1),
+        )
+        atom_busy = PromptAtom(
+            atom_id="atom_pose_01",
+            text="hands tied behind back",
+            span_type=SpanType.PLAIN,
+            source_slot="pose",
+            origin=SelectionOrigin(mode="preset", selector="pose"),
+            facts=SemanticFacts(hand_state="both_busy", mutex_groups=("busy_hands",)),
+        )
+
+        index = OneTimeIndex([atom_space, atom_prop, atom_busy])
+
+        # 1. 索引查询方法实际返回匹配原子
+        self.assertEqual([a.atom_id for a in index.get_active_by_fact("space_kind", "indoor")], ["atom_space_01"])
+        self.assertEqual([a.atom_id for a in index.get_active_by_fact("prop_usage", "handheld")], ["atom_prop_01"])
+        self.assertEqual([a.atom_id for a in index.get_active_by_mutex_group("busy_hands")], ["atom_pose_01"])
+
+        # 2. 墓碑差分测试：当 atom_prop_01 被墓碑标记后，相关事实索引立即排除该原子
+        index.tombstone("atom_prop_01")
+        self.assertFalse(index.is_active("atom_prop_01"))
+        self.assertEqual([a.atom_id for a in index.get_active_by_fact("prop_usage", "handheld")], [])
+
+        # 3. 墓碑直接改变规则候选与消解结果：
+        #    在单持道具规则中，如果候选已被前序规则墓碑，则不参与单持消解
+        rule_item = self.resolver.registry.get_rule_item("handheld_props_single_holder")
+        ledger = DecisionLedger(self.resolver.registry)
+        remaining = self.resolver._resolve_handheld_props_single_holder_atoms(
+            [atom_prop],
+            rule_item,
+            ledger,
+            Random(42),
+            index,
+            None,
+        )
+        self.assertEqual(len(ledger.decisions), 0, "Tombstoned prop must not generate further drop decisions")
+
+    def test_r2r4_p1_001_non_intersecting_handler_does_not_mask_declared_pattern(self):
+        """反例验证 R2R4-P1-001 (1): 非空但不相交的旧 handler 集合不得屏蔽 text_fallback 声明 pattern。"""
+        from lib.conflict_resolver import DecisionLedger, OneTimeIndex
+        from lib.models import PromptAtom, SelectionOrigin, SemanticFacts, SpanType
+        from lib.rule_contract import HandheldPropsRuleSpec, PatternSpec, RuleItem, TextFallbackSpec
+
+        p_legacy = PatternSpec(pattern="unrelated_legacy_gadget", match_mode="phrase", role="handheld")
+        p_decl_a = PatternSpec(pattern="declared_gadget_a", match_mode="phrase", role="handheld")
+        p_decl_b = PatternSpec(pattern="declared_gadget_b", match_mode="phrase", role="handheld")
+
+        rule_spec = HandheldPropsRuleSpec(
+            id="handheld_props_single_holder",
+            description="non-intersecting handler test",
+            priority=210,
+            phase="physical",
+            depends_on=("pose_hand_occupation",),
+            handheld_patterns=(p_legacy,),  # 非空旧 handler 集合，与声明完全不相交！
+            reason_codes=("single_handheld_prop_limit",),
+            text_fallback=TextFallbackSpec(
+                strategy="custom",
+                enabled=True,
+                target_slots=("props",),
+                patterns=(p_decl_a, p_decl_b),  # 声明性 fallback pattern
+            ),
+        )
+        rule_item = RuleItem(
+            id="handheld_props_single_holder",
+            description="non-intersecting handler test",
+            spec=rule_spec,
+            priority=210,
+            phase="physical",
+            depends_on=("pose_hand_occupation",),
+            reason_codes=("single_handheld_prop_limit",),
+            text_fallback=rule_spec.text_fallback,
+        )
+
+        atom_a = PromptAtom(
+            atom_id="atom_gadget_a",
+            text="declared_gadget_a",
+            span_type=SpanType.PLAIN,
+            source_slot="props",
+            origin=SelectionOrigin(mode="custom", selector="props"),
+            facts=SemanticFacts(),
+        )
+        atom_b = PromptAtom(
+            atom_id="atom_gadget_b",
+            text="declared_gadget_b",
+            span_type=SpanType.PLAIN,
+            source_slot="props",
+            origin=SelectionOrigin(mode="custom", selector="props"),
+            facts=SemanticFacts(),
+        )
+
+        idx = OneTimeIndex([atom_a, atom_b])
+        ledger = DecisionLedger(self.resolver.registry)
+        res = self.resolver._resolve_handheld_props_single_holder_atoms(
+            [atom_a, atom_b],
+            rule_item,
+            ledger,
+            Random(42),
+            idx,
+            None,
+        )
+        self.assertEqual(len(res), 1, "Non-intersecting handler patterns MUST NOT mask declared text_fallback patterns")
+        self.assertEqual(len(ledger.decisions), 1, "Must resolve conflict and produce 1 decision")
+        self.assertEqual(ledger.decisions[0].target_atom_id, "atom_gadget_b")
+
+    def test_r2r4_p1_001_empty_declaration_prevents_old_handler_patterns_from_triggering(self):
+        """反例验证 R2R4-P1-001 (2): text_fallback 声明为空时，旧 handler pattern 绝不得触发 (Fail-Closed)。"""
+        from lib.conflict_resolver import DecisionLedger, OneTimeIndex
+        from lib.models import PromptAtom, SelectionOrigin, SemanticFacts, SpanType
+        from lib.rule_contract import HandheldPropsRuleSpec, PatternSpec, RuleItem, TextFallbackSpec
+
+        p_legacy_a = PatternSpec(pattern="legacy_gadget_a", match_mode="phrase", role="handheld")
+        p_legacy_b = PatternSpec(pattern="legacy_gadget_b", match_mode="phrase", role="handheld")
+
+        rule_spec = HandheldPropsRuleSpec(
+            id="handheld_props_single_holder",
+            description="empty declaration test",
+            priority=210,
+            phase="physical",
+            depends_on=("pose_hand_occupation",),
+            handheld_patterns=(p_legacy_a, p_legacy_b),  # 旧 handler 集合非空
+            reason_codes=("single_handheld_prop_limit",),
+            text_fallback=TextFallbackSpec(
+                strategy="custom",
+                enabled=True,
+                target_slots=("props",),
+                patterns=(),  # 声明为空！
+            ),
+        )
+        rule_item = RuleItem(
+            id="handheld_props_single_holder",
+            description="empty declaration test",
+            spec=rule_spec,
+            priority=210,
+            phase="physical",
+            depends_on=("pose_hand_occupation",),
+            reason_codes=("single_handheld_prop_limit",),
+            text_fallback=rule_spec.text_fallback,
+        )
+
+        atom_a = PromptAtom(
+            atom_id="atom_legacy_a",
+            text="legacy_gadget_a",
+            span_type=SpanType.PLAIN,
+            source_slot="props",
+            origin=SelectionOrigin(mode="custom", selector="props"),
+            facts=SemanticFacts(),
+        )
+        atom_b = PromptAtom(
+            atom_id="atom_legacy_b",
+            text="legacy_gadget_b",
+            span_type=SpanType.PLAIN,
+            source_slot="props",
+            origin=SelectionOrigin(mode="custom", selector="props"),
+            facts=SemanticFacts(),
+        )
+
+        idx = OneTimeIndex([atom_a, atom_b])
+        ledger = DecisionLedger(self.resolver.registry)
+        res = self.resolver._resolve_handheld_props_single_holder_atoms(
+            [atom_a, atom_b],
+            rule_item,
+            ledger,
+            Random(42),
+            idx,
+            None,
+        )
+        self.assertEqual(len(res), 2, "Empty text_fallback declaration MUST NOT trigger conflict resolution from legacy patterns")
+        self.assertEqual(len(ledger.decisions), 0, "Must produce 0 decisions when text_fallback declaration is empty")
+
+    def test_r2r4_p3_001_get_active_by_item_id_affects_candidates_and_decisions(self):
+        """行为差分验证 R2R4-P3-001: get_active_by_item_id() 真实影响规则候选与胜负。
+        1. 正例：非标准 slot 中的 close_up 原子通过 get_active_by_item_id 成功被规则捕获为胜者，触发下身衣物剔除。
+        2. 差分：若该 close_up 原子被 tombstone，get_active_by_item_id 返回空，下身衣物完好保留 (0 decision)。
+        """
+        from lib.conflict_resolver import DecisionLedger, OneTimeIndex
+        from lib.models import PromptAtom, SelectionOrigin, SemanticFacts, SpanType, TagProvenance
+
+        cu_atom = PromptAtom(
+            atom_id="atom_cu_01",
+            text="extreme close-up face shot",
+            span_type=SpanType.PLAIN,
+            source_slot="custom_camera_framing",  # 非标准 shot_type 槽位！
+            source_item_id="extreme_close_up",
+            provenance=TagProvenance(item_id="extreme_close_up"),
+            origin=SelectionOrigin(mode="preset", selector="shot", selected_id="extreme_close_up"),
+            facts=SemanticFacts(visible_regions=("face",)),
+        )
+        skirt_atom = PromptAtom(
+            atom_id="atom_skirt_01",
+            text="pleated skirt",
+            span_type=SpanType.PLAIN,
+            source_slot="clothing",
+            origin=SelectionOrigin(mode="preset", selector="clothing"),
+            facts=SemanticFacts(visible_regions=("lower_body", "feet"), garment_topologies=("bottom_skirt",)),
+        )
+
+        # 1. 活跃状态：get_active_by_item_id 捕获候选并胜出，剔除 skirt
+        idx_active = OneTimeIndex([cu_atom, skirt_atom])
+        cu_query = idx_active.get_active_by_item_id("extreme_close_up")
+        self.assertEqual([a.atom_id for a in cu_query], ["atom_cu_01"])
+
+        rule_item = self.resolver.registry.get_rule_item("framing_lower_body_coherence")
+        ledger_active = DecisionLedger(self.resolver.registry)
+        res_active = self.resolver._resolve_framing_lower_body_coherence_atoms(
+            [cu_atom, skirt_atom],
+            rule_item,
+            ledger_active,
+            Random(42),
+            idx_active,
+            None,
+        )
+        self.assertEqual(len(ledger_active.decisions), 1, "Active item_id candidate must trigger lower-body drop")
+        self.assertEqual(ledger_active.decisions[0].target_atom_id, "atom_skirt_01")
+        self.assertEqual(ledger_active.decisions[0].winner_atom_ids, ("atom_cu_01",))
+
+        # 2. 墓碑状态：get_active_by_item_id 排除墓碑，候选为空，skirt 不被剔除
+        idx_tomb = OneTimeIndex([cu_atom, skirt_atom])
+        idx_tomb.tombstone("atom_cu_01")
+        cu_tomb_query = idx_tomb.get_active_by_item_id("extreme_close_up")
+        self.assertEqual(cu_tomb_query, [], "Tombstoned item_id must return empty active list")
+
+        ledger_tomb = DecisionLedger(self.resolver.registry)
+        res_tomb = self.resolver._resolve_framing_lower_body_coherence_atoms(
+            [cu_atom, skirt_atom],
+            rule_item,
+            ledger_tomb,
+            Random(42),
+            idx_tomb,
+            None,
+        )
+        self.assertEqual(len(ledger_tomb.decisions), 0, "When item_id candidate is tombstoned, rule must not drop clothing")
+
+    def test_all_17_rules_sentinel_behavior_matrix(self):
+        """反例验证 R2R5-P1-001: 17 条规则全量 sentinel 行为矩阵验证。
+        - 正例断言：只修改声明 pattern、保持旧集合不变时必须触发 (produce >0 decisions)；
+        - 负例断言：声明清空时旧集合不得触发 (Fail-Closed, produce 0 decisions)。
+        """
+        sentinel_fixtures = {
+            "spatial_environmental_mutual_exclusion": {
+                "pos_patterns": (
+                    PatternSpec("sentinel_indoor_v1", "phrase", role="indoor", group_id="indoor"),
+                    PatternSpec("sentinel_outdoor_v1", "phrase", role="outdoor", group_id="outdoor"),
+                ),
+                "pos_atoms": [
+                    PromptAtom(atom_id="a0", text="sentinel_indoor_v1", span_type=SpanType.PLAIN, source_slot="scene", origin=None, facts=SemanticFacts(), tag_order=0, span_order=0),
+                    PromptAtom(atom_id="a1", text="sentinel_outdoor_v1", span_type=SpanType.PLAIN, source_slot="scene", origin=None, facts=SemanticFacts(), tag_order=1, span_order=1),
+                ],
+                "neg_atoms": [
+                    PromptAtom(atom_id="a0", text="indoor onsen", span_type=SpanType.PLAIN, source_slot="scene", origin=None, facts=SemanticFacts(), tag_order=0, span_order=0),
+                    PromptAtom(atom_id="a1", text="rotenburo", span_type=SpanType.PLAIN, source_slot="scene", origin=None, facts=SemanticFacts(), tag_order=1, span_order=1),
+                ],
+            },
+            "nudity_clothing_conflicts": {
+                "pos_patterns": (
+                    PatternSpec("sentinel_trig_nude", "phrase", role="trigger", group_id="conflict_sentinel"),
+                    PatternSpec("sentinel_ban_cloth", "phrase", role="banned", group_id="conflict_sentinel"),
+                ),
+                "pos_atoms": [
+                    PromptAtom(atom_id="a0", text="sentinel_trig_nude", span_type=SpanType.PLAIN, source_slot="nudity", origin=None, facts=SemanticFacts(), tag_order=0, span_order=0),
+                    PromptAtom(atom_id="a1", text="sentinel_ban_cloth", span_type=SpanType.PLAIN, source_slot="clothing", origin=None, facts=SemanticFacts(), tag_order=1, span_order=1),
+                ],
+                "neg_atoms": [
+                    PromptAtom(atom_id="a0", text="completely naked", span_type=SpanType.PLAIN, source_slot="nudity", origin=None, facts=SemanticFacts(), tag_order=0, span_order=0),
+                    PromptAtom(atom_id="a1", text="wearing uniform", span_type=SpanType.PLAIN, source_slot="clothing", origin=None, facts=SemanticFacts(), tag_order=1, span_order=1),
+                ],
+            },
+            "framing_lower_body_coherence": {
+                "pos_patterns": (
+                    PatternSpec("sentinel_cu_shot", "phrase", role="trigger", group_id="framing"),
+                    PatternSpec("sentinel_lb_boots", "phrase", role="banned", group_id="framing"),
+                ),
+                "pos_atoms": [
+                    PromptAtom(atom_id="a0", text="sentinel_cu_shot", span_type=SpanType.PLAIN, source_slot="shot_type", origin=None, facts=SemanticFacts(), tag_order=0, span_order=0),
+                    PromptAtom(atom_id="a1", text="sentinel_lb_boots", span_type=SpanType.PLAIN, source_slot="clothing", origin=None, facts=SemanticFacts(), tag_order=1, span_order=1),
+                ],
+                "neg_atoms": [
+                    PromptAtom(atom_id="a0", text="close-up", span_type=SpanType.PLAIN, source_slot="shot_type", origin=None, facts=SemanticFacts(), tag_order=0, span_order=0),
+                    PromptAtom(atom_id="a1", text="boots", span_type=SpanType.PLAIN, source_slot="clothing", origin=None, facts=SemanticFacts(), tag_order=1, span_order=1),
+                ],
+            },
+            "pose_hand_occupation": {
+                "pos_patterns": (
+                    PatternSpec("sentinel_busy_pose", "phrase", role="trigger", group_id="pose_hand"),
+                    PatternSpec("sentinel_handheld_gizmo", "phrase", role="handheld", group_id="pose_hand"),
+                ),
+                "pos_atoms": [
+                    PromptAtom(atom_id="a0", text="sentinel_busy_pose", span_type=SpanType.PLAIN, source_slot="pose", origin=None, facts=SemanticFacts(), tag_order=0, span_order=0),
+                    PromptAtom(atom_id="a1", text="sentinel_handheld_gizmo", span_type=SpanType.PLAIN, source_slot="props", origin=None, facts=SemanticFacts(), tag_order=1, span_order=1),
+                ],
+                "neg_atoms": [
+                    PromptAtom(atom_id="a0", text="hands behind back", span_type=SpanType.PLAIN, source_slot="pose", origin=None, facts=SemanticFacts(), tag_order=0, span_order=0),
+                    PromptAtom(atom_id="a1", text="holding smartphone", span_type=SpanType.PLAIN, source_slot="props", origin=None, facts=SemanticFacts(), tag_order=1, span_order=1),
+                ],
+            },
+            "handheld_props_single_holder": {
+                "pos_patterns": (
+                    PatternSpec("sentinel_prop_a", "phrase", role="handheld", group_id="handheld"),
+                    PatternSpec("sentinel_prop_b", "phrase", role="handheld", group_id="handheld"),
+                ),
+                "pos_atoms": [
+                    PromptAtom(atom_id="a0", text="sentinel_prop_a", span_type=SpanType.PLAIN, source_slot="props", origin=None, facts=SemanticFacts(), tag_order=0, span_order=0),
+                    PromptAtom(atom_id="a1", text="sentinel_prop_b", span_type=SpanType.PLAIN, source_slot="props", origin=None, facts=SemanticFacts(), tag_order=1, span_order=1),
+                ],
+                "neg_atoms": [
+                    PromptAtom(atom_id="a0", text="holding smartphone", span_type=SpanType.PLAIN, source_slot="props", origin=None, facts=SemanticFacts(), tag_order=0, span_order=0),
+                    PromptAtom(atom_id="a1", text="holding camera", span_type=SpanType.PLAIN, source_slot="props", origin=None, facts=SemanticFacts(), tag_order=1, span_order=1),
+                ],
+            },
+            "clothing_style_state_coherence": {
+                "pos_patterns": (
+                    PatternSpec("sentinel_onepiece_suit", "phrase", role="trigger", group_id="one_piece"),
+                    PatternSpec("sentinel_unbuttoned_blouse", "phrase", role="banned", group_id="one_piece"),
+                ),
+                "pos_atoms": [
+                    PromptAtom(atom_id="a0", text="sentinel_onepiece_suit", span_type=SpanType.PLAIN, source_slot="clothing", origin=None, facts=SemanticFacts(), tag_order=0, span_order=0),
+                    PromptAtom(atom_id="a1", text="sentinel_unbuttoned_blouse", span_type=SpanType.PLAIN, source_slot="clothing_state", origin=None, facts=SemanticFacts(), tag_order=1, span_order=1),
+                ],
+                "neg_atoms": [
+                    PromptAtom(atom_id="a0", text="one-piece swimsuit", span_type=SpanType.PLAIN, source_slot="clothing", origin=None, facts=SemanticFacts(), tag_order=0, span_order=0),
+                    PromptAtom(atom_id="a1", text="unbuttoned blouse", span_type=SpanType.PLAIN, source_slot="clothing_state", origin=None, facts=SemanticFacts(), tag_order=1, span_order=1),
+                ],
+            },
+            "material_penetration": {
+                "pos_patterns": (
+                    PatternSpec("sentinel_sheer_fabric", "phrase", role="banned", group_id="material"),
+                ),
+                "pos_atoms": [
+                    PromptAtom(atom_id="a0", text="sentinel_sheer_fabric", span_type=SpanType.PLAIN, source_slot="clothing", origin=None, facts=SemanticFacts(), tag_order=0, span_order=0),
+                ],
+                "neg_atoms": [
+                    PromptAtom(atom_id="a0", text="see-through", span_type=SpanType.PLAIN, source_slot="clothing", origin=None, facts=SemanticFacts(), tag_order=0, span_order=0),
+                ],
+            },
+            "device_quality_compatibility": {
+                "pos_patterns": (
+                    PatternSpec("sentinel_device_cam", "phrase", role="device", group_id="sentinel_dev"),
+                    PatternSpec("sentinel_banned_quality", "phrase", role="banned", group_id="sentinel_dev"),
+                ),
+                "pos_atoms": [
+                    PromptAtom(atom_id="a0", text="sentinel_device_cam", span_type=SpanType.PLAIN, source_slot="shot_type", origin=None, facts=SemanticFacts(), tag_order=0, span_order=0),
+                    PromptAtom(atom_id="a1", text="sentinel_banned_quality", span_type=SpanType.PLAIN, source_slot="quality", origin=None, facts=SemanticFacts(), tag_order=1, span_order=1),
+                ],
+                "neg_atoms": [
+                    PromptAtom(atom_id="a0", text="cctv", span_type=SpanType.PLAIN, source_slot="shot_type", origin=None, facts=SemanticFacts(), tag_order=0, span_order=0),
+                    PromptAtom(atom_id="a1", text="masterpiece", span_type=SpanType.PLAIN, source_slot="quality", origin=None, facts=SemanticFacts(), tag_order=1, span_order=1),
+                ],
+            },
+            "environmental_lighting_coherence": {
+                "pos_patterns": (
+                    PatternSpec("sentinel_daylight_glow", "phrase", role="trigger", group_id="daylight"),
+                    PatternSpec("sentinel_midnight_shadow", "phrase", role="banned", group_id="daylight"),
+                ),
+                "pos_atoms": [
+                    PromptAtom(atom_id="a0", text="sentinel_daylight_glow", span_type=SpanType.PLAIN, source_slot="lighting", origin=None, facts=SemanticFacts(), tag_order=0, span_order=0),
+                    PromptAtom(atom_id="a1", text="sentinel_midnight_shadow", span_type=SpanType.PLAIN, source_slot="lighting", origin=None, facts=SemanticFacts(), tag_order=1, span_order=1),
+                ],
+                "neg_atoms": [
+                    PromptAtom(atom_id="a0", text="natural sunlight", span_type=SpanType.PLAIN, source_slot="lighting", origin=None, facts=SemanticFacts(), tag_order=0, span_order=0),
+                    PromptAtom(atom_id="a1", text="night shadows", span_type=SpanType.PLAIN, source_slot="lighting", origin=None, facts=SemanticFacts(), tag_order=1, span_order=1),
+                ],
+            },
+            "monochrome_film_chroma_coherence": {
+                "pos_patterns": (
+                    PatternSpec("sentinel_bw_film", "phrase", role="trigger", group_id="monochrome"),
+                    PatternSpec("sentinel_neon_color", "phrase", role="banned", group_id="monochrome"),
+                ),
+                "pos_atoms": [
+                    PromptAtom(atom_id="a0", text="sentinel_bw_film", span_type=SpanType.PLAIN, source_slot="film", origin=None, facts=SemanticFacts(), tag_order=0, span_order=0),
+                    PromptAtom(atom_id="a1", text="sentinel_neon_color", span_type=SpanType.PLAIN, source_slot="lighting", origin=None, facts=SemanticFacts(), tag_order=1, span_order=1),
+                ],
+                "neg_atoms": [
+                    PromptAtom(atom_id="a0", text="black and white", span_type=SpanType.PLAIN, source_slot="film", origin=None, facts=SemanticFacts(), tag_order=0, span_order=0),
+                    PromptAtom(atom_id="a1", text="vibrant neon colors", span_type=SpanType.PLAIN, source_slot="lighting", origin=None, facts=SemanticFacts(), tag_order=1, span_order=1),
+                ],
+            },
+            "makeup_details_coherence": {
+                "pos_patterns": (
+                    PatternSpec("sentinel_bare_skin", "phrase", role="trigger", group_id="no_makeup"),
+                    PatternSpec("sentinel_heavy_eyeliner", "phrase", role="banned", group_id="no_makeup"),
+                ),
+                "pos_atoms": [
+                    PromptAtom(atom_id="a0", text="sentinel_bare_skin", span_type=SpanType.PLAIN, source_slot="makeup", origin=None, facts=SemanticFacts(), tag_order=0, span_order=0),
+                    PromptAtom(atom_id="a1", text="sentinel_heavy_eyeliner", span_type=SpanType.PLAIN, source_slot="makeup", origin=None, facts=SemanticFacts(), tag_order=1, span_order=1),
+                ],
+                "neg_atoms": [
+                    PromptAtom(atom_id="a0", text="no makeup", span_type=SpanType.PLAIN, source_slot="makeup", origin=None, facts=SemanticFacts(), tag_order=0, span_order=0),
+                    PromptAtom(atom_id="a1", text="smudged eyeliner", span_type=SpanType.PLAIN, source_slot="makeup", origin=None, facts=SemanticFacts(), tag_order=1, span_order=1),
+                ],
+            },
+            "gaze_angle_geometry": {
+                "pos_patterns": (
+                    PatternSpec("sentinel_high_angle", "phrase", role="angle", group_id="high_angle"),
+                    PatternSpec("sentinel_banned_look", "phrase", role="banned", group_id="high_angle"),
+                ),
+                "pos_atoms": [
+                    PromptAtom(atom_id="a0", text="sentinel_high_angle", span_type=SpanType.PLAIN, source_slot="camera_angle", origin=None, facts=SemanticFacts(), tag_order=0, span_order=0),
+                    PromptAtom(atom_id="a1", text="sentinel_banned_look", span_type=SpanType.PLAIN, source_slot="expression", origin=None, facts=SemanticFacts(), tag_order=1, span_order=1),
+                ],
+                "neg_atoms": [
+                    PromptAtom(atom_id="a0", text="high angle", span_type=SpanType.PLAIN, source_slot="camera_angle", origin=None, facts=SemanticFacts(), tag_order=0, span_order=0),
+                    PromptAtom(atom_id="a1", text="looking up", span_type=SpanType.PLAIN, source_slot="expression", origin=None, facts=SemanticFacts(), tag_order=1, span_order=1),
+                ],
+            },
+            "accessory_occlusion_gaze_coherence": {
+                "pos_patterns": (
+                    PatternSpec("sentinel_eye_mask", "phrase", role="trigger", group_id="occlusion"),
+                    PatternSpec("sentinel_direct_stare", "phrase", role="banned", group_id="occlusion"),
+                ),
+                "pos_atoms": [
+                    PromptAtom(atom_id="a0", text="sentinel_eye_mask", span_type=SpanType.PLAIN, source_slot="jewelry", origin=None, facts=SemanticFacts(), tag_order=0, span_order=0),
+                    PromptAtom(atom_id="a1", text="sentinel_direct_stare", span_type=SpanType.PLAIN, source_slot="expression", origin=None, facts=SemanticFacts(), tag_order=1, span_order=1),
+                ],
+                "neg_atoms": [
+                    PromptAtom(atom_id="a0", text="blindfold", span_type=SpanType.PLAIN, source_slot="jewelry", origin=None, facts=SemanticFacts(), tag_order=0, span_order=0),
+                    PromptAtom(atom_id="a1", text="looking at viewer", span_type=SpanType.PLAIN, source_slot="expression", origin=None, facts=SemanticFacts(), tag_order=1, span_order=1),
+                ],
+            },
+            "emotion_gaze_affinity": {
+                "pos_patterns": (
+                    PatternSpec("sentinel_shy_emotion", "phrase", role="emotion", group_id="shy"),
+                    PatternSpec("sentinel_seductive_gaze", "phrase", role="banned", group_id="shy"),
+                ),
+                "pos_atoms": [
+                    PromptAtom(atom_id="a0", text="sentinel_shy_emotion", span_type=SpanType.PLAIN, source_slot="expression", origin=None, facts=SemanticFacts(), tag_order=0, span_order=0),
+                    PromptAtom(atom_id="a1", text="sentinel_seductive_gaze", span_type=SpanType.PLAIN, source_slot="expression", origin=None, facts=SemanticFacts(), tag_order=1, span_order=1),
+                ],
+                "neg_atoms": [
+                    PromptAtom(atom_id="a0", text="shy", span_type=SpanType.PLAIN, source_slot="expression", origin=None, facts=SemanticFacts(), tag_order=0, span_order=0),
+                    PromptAtom(atom_id="a1", text="seductive smile", span_type=SpanType.PLAIN, source_slot="expression", origin=None, facts=SemanticFacts(), tag_order=1, span_order=1),
+                ],
+            },
+            "gaze_mutual_exclusion": {
+                "pos_patterns": (
+                    PatternSpec("sentinel_stare_straight", "phrase", role="exclusive_a", group_id="pair_sentinel"),
+                    PatternSpec("sentinel_look_sideways", "phrase", role="exclusive_b", group_id="pair_sentinel"),
+                ),
+                "pos_atoms": [
+                    PromptAtom(atom_id="a0", text="sentinel_stare_straight", span_type=SpanType.PLAIN, source_slot="expression", origin=None, facts=SemanticFacts(), tag_order=0, span_order=0),
+                    PromptAtom(atom_id="a1", text="sentinel_look_sideways", span_type=SpanType.PLAIN, source_slot="expression", origin=None, facts=SemanticFacts(), tag_order=1, span_order=1),
+                ],
+                "neg_atoms": [
+                    PromptAtom(atom_id="a0", text="looking at viewer", span_type=SpanType.PLAIN, source_slot="expression", origin=None, facts=SemanticFacts(), tag_order=0, span_order=0),
+                    PromptAtom(atom_id="a1", text="looking away", span_type=SpanType.PLAIN, source_slot="expression", origin=None, facts=SemanticFacts(), tag_order=1, span_order=1),
+                ],
+            },
+            "liquid_restrictions": {
+                "pos_patterns": (
+                    PatternSpec("sentinel_cum_eyes", "phrase", role="trigger", group_id="cum_eyes"),
+                ),
+                "pos_atoms": [
+                    PromptAtom(atom_id="a0", text="sentinel_cum_eyes", span_type=SpanType.PLAIN, source_slot="liquids", origin=None, facts=SemanticFacts(), tag_order=0, span_order=0),
+                ],
+                "neg_atoms": [
+                    PromptAtom(atom_id="a0", text="cum on closed eyes", span_type=SpanType.PLAIN, source_slot="liquids", origin=None, facts=SemanticFacts(), tag_order=0, span_order=0),
+                ],
+            },
+            "tattoo_dermal_fusion": {
+                "pos_patterns": (
+                    PatternSpec("sentinel_dragon_ink", "phrase", role="tattoo", group_id="tattoo"),
+                ),
+                "pos_atoms": [
+                    PromptAtom(atom_id="a0", text="sentinel_dragon_ink", span_type=SpanType.PLAIN, source_slot="clothing", origin=None, facts=SemanticFacts(), tag_order=0, span_order=0),
+                ],
+                "neg_atoms": [
+                    PromptAtom(atom_id="a0", text="dragon tattoo", span_type=SpanType.PLAIN, source_slot="clothing", origin=None, facts=SemanticFacts(), tag_order=0, span_order=0),
+                ],
+            },
+        }
+
+        for rid in self.resolver.registry.doc.execution_order:
+            self.assertIn(rid, sentinel_fixtures, f"Sentinel fixture missing for rule {rid}")
+            fixture = sentinel_fixtures[rid]
+            rule_item = self.resolver.registry.get_rule_item(rid)
+            handler = getattr(self.resolver, f"_resolve_{rid}_atoms")
+
+            # 1. Positive: text_fallback 仅有 sentinel pattern，旧 handler 集合保持不变 -> 必须触发
+            pos_tf = TextFallbackSpec(
+                strategy="pattern_match",
+                enabled=True,
+                target_slots=rule_item.spec.text_fallback.target_slots,
+                patterns=fixture["pos_patterns"],
+            )
+            pos_item = replace(rule_item, text_fallback=pos_tf, spec=replace(rule_item.spec, text_fallback=pos_tf))
+            pos_idx = OneTimeIndex(fixture["pos_atoms"])
+            pos_ledger = DecisionLedger(self.resolver.registry)
+            handler(fixture["pos_atoms"], pos_item, pos_ledger, Random(42), pos_idx, None)
+            self.assertGreater(
+                len(pos_ledger.decisions),
+                0,
+                f"[{rid}] Positive sentinel failed: declared fallback patterns must trigger rule without touching old collections",
+            )
+
+            # 2. Negative: text_fallback 清空，旧 handler 集合保持不变 -> 旧词绝不触发 (Fail-Closed)
+            neg_tf = TextFallbackSpec(
+                strategy="pattern_match",
+                enabled=True,
+                target_slots=rule_item.spec.text_fallback.target_slots,
+                patterns=(),
+            )
+            neg_item = replace(rule_item, text_fallback=neg_tf, spec=replace(rule_item.spec, text_fallback=neg_tf))
+            neg_idx = OneTimeIndex(fixture["neg_atoms"])
+            neg_ledger = DecisionLedger(self.resolver.registry)
+            handler(fixture["neg_atoms"], neg_item, neg_ledger, Random(42), neg_idx, None)
+            self.assertEqual(
+                len(neg_ledger.decisions),
+                0,
+                f"[{rid}] Negative sentinel failed: empty fallback declaration must NOT trigger old handler collections",
+            )
+
+
+
+    def test_group_id_fail_closed_contract_validation(self):
+        """验证 group_id 契约 Fail-Closed：拒绝未知 group_id、拼写错误、单侧重组、孤立分组与缺失成对 role。"""
+        from lib.rule_contract import FROZEN_RULE_GROUPS, parse_rule_document
+
+        raw_rules = json.loads((self.data_dir / "conflict_rules.json").read_text(encoding="utf-8"))
+
+        # 1. 负向变异 1: 未知 group_id / 拼写错误 (indor vs indoor) -> 必须被拦截
+        bad_rules_1 = copy.deepcopy(raw_rules)
+        for r in bad_rules_1["rules"]:
+            if r["id"] == "spatial_environmental_mutual_exclusion":
+                r["text_fallback"]["patterns"][0]["group_id"] = "indor"
+        with self.assertRaises(RuleConfigurationError) as ctx:
+            parse_rule_document(bad_rules_1)
+        self.assertIn("Unknown or invalid group_id 'indor'", str(ctx.exception))
+
+        # 2. 负向变异 2: 非法 role/group 组合 (在 indoor 组声明 outdoor role) -> 必须被拦截
+        bad_rules_2 = copy.deepcopy(raw_rules)
+        for r in bad_rules_2["rules"]:
+            if r["id"] == "spatial_environmental_mutual_exclusion":
+                r["text_fallback"]["patterns"][0]["role"] = "outdoor"
+        with self.assertRaises(RuleConfigurationError) as ctx:
+            parse_rule_document(bad_rules_2)
+        self.assertIn("Invalid role 'outdoor' for group 'indoor'", str(ctx.exception))
+
+        # 3. 负向变异 3: 缺少必需分组 / 孤立分组 (剔除 pants 分组) -> 必须被拦截
+        bad_rules_3 = copy.deepcopy(raw_rules)
+        for r in bad_rules_3["rules"]:
+            if r["id"] == "clothing_style_state_coherence":
+                r["text_fallback"]["patterns"] = [
+                    p for p in r["text_fallback"]["patterns"] if p["group_id"] != "pants"
+                ]
+        with self.assertRaises(RuleConfigurationError) as ctx:
+            parse_rule_document(bad_rules_3)
+        self.assertIn("missing required groups", str(ctx.exception))
+
+        # 4. 负向变异 4: 缺失成对 role (conflict_0 组仅有 trigger，丢失 banned) -> 必须被拦截
+        bad_rules_4 = copy.deepcopy(raw_rules)
+        for r in bad_rules_4["rules"]:
+            if r["id"] == "nudity_clothing_conflicts":
+                r["text_fallback"]["patterns"] = [
+                    p for p in r["text_fallback"]["patterns"]
+                    if not (p["group_id"] == "conflict_0" and p["role"] == "banned")
+                ]
+        with self.assertRaises(RuleConfigurationError) as ctx:
+            parse_rule_document(bad_rules_4)
+        self.assertIn("missing required paired roles", str(ctx.exception))
+
+        # 5. 负向变异 5: 固定单组规则使用错误组名 (material_penetration 组名不是 material) -> 必须被拦截
+        bad_rules_5 = copy.deepcopy(raw_rules)
+        for r in bad_rules_5["rules"]:
+            if r["id"] == "material_penetration":
+                for p in r["text_fallback"]["patterns"]:
+                    p["group_id"] = "general_material"
+        with self.assertRaises(RuleConfigurationError) as ctx:
+            parse_rule_document(bad_rules_5)
+        self.assertIn("Unknown or invalid group_id 'general_material'", str(ctx.exception))
+
+        # 6. 负向变异 6: 基数违规 (L6 组基数超过上限或为 0) -> 必须被拦截
+        bad_rules_6 = copy.deepcopy(raw_rules)
+        for r in bad_rules_6["rules"]:
+            if r["id"] == "nudity_clothing_conflicts":
+                r["text_fallback"]["patterns"] = [
+                    p for p in r["text_fallback"]["patterns"] if p["group_id"] != "L6"
+                ]
+        with self.assertRaises(RuleConfigurationError) as ctx:
+            parse_rule_document(bad_rules_6)
+        self.assertIn("missing required groups", str(ctx.exception))
+
+        # 7. 负向变异 7: 完全重复 pattern 声明 (同规则内声明重复的 pattern, match_mode, role, group_id) -> 必须被拦截 (P2)
+        bad_rules_7 = copy.deepcopy(raw_rules)
+        for r in bad_rules_7["rules"]:
+            if r["id"] == "spatial_environmental_mutual_exclusion":
+                r["text_fallback"]["patterns"].append(copy.deepcopy(r["text_fallback"]["patterns"][0]))
+        with self.assertRaises(RuleConfigurationError) as ctx:
+            parse_rule_document(bad_rules_7)
+        self.assertIn("Duplicate fallback pattern declaration", str(ctx.exception))
+
+        # 8. 负向变异 8: 尝试篡改深度不可变冻结 group 契约 (P2)
+        with self.assertRaises(TypeError):
+            FROZEN_RULE_GROUPS["spatial_environmental_mutual_exclusion"] = {}
+
+        with self.assertRaises(TypeError):
+            FROZEN_RULE_GROUPS["spatial_environmental_mutual_exclusion"]["allowed_groups"] = ()
+
+        with self.assertRaises(TypeError):
+            FROZEN_RULE_GROUPS["spatial_environmental_mutual_exclusion"]["group_required_roles"]["indoor"] = ()
+
+        with self.assertRaises(TypeError):
+            FROZEN_RULE_GROUPS["spatial_environmental_mutual_exclusion"]["role_cardinality"][("indoor", "indoor")] = (0, 0)
+
+        with self.assertRaises(TypeError):
+            del FROZEN_RULE_GROUPS["spatial_environmental_mutual_exclusion"]
+
+    def test_501_patterns_bijective_partition_and_reachability(self):
+        """证明全部 501 个 fallback pattern 均被且仅被一个生产 selector 消费，且每个 selector 均消费 >= 1 个 pattern。"""
+        raw_rules = json.loads((self.data_dir / "conflict_rules.json").read_text(encoding="utf-8"))
+        rule_map = {r["id"]: r for r in raw_rules["rules"]}
+
+        production_selectors = [
+            # 1. spatial
+            ("spatial_environmental_mutual_exclusion", "indoor", "indoor"),
+            ("spatial_environmental_mutual_exclusion", "outdoor", "outdoor"),
+            ("spatial_environmental_mutual_exclusion", "school", "venue"),
+            ("spatial_environmental_mutual_exclusion", "bedroom", "venue"),
+            ("spatial_environmental_mutual_exclusion", "office", "venue"),
+            ("spatial_environmental_mutual_exclusion", "dining", "venue"),
+            ("spatial_environmental_mutual_exclusion", "onsen", "venue"),
+            ("spatial_environmental_mutual_exclusion", "transport", "venue"),
+            # 2. nudity
+            ("nudity_clothing_conflicts", "L1", "banned"),
+            ("nudity_clothing_conflicts", "L2", "banned"),
+            ("nudity_clothing_conflicts", "L3", "banned"),
+            ("nudity_clothing_conflicts", "L4", "banned"),
+            ("nudity_clothing_conflicts", "L5", "banned"),
+            ("nudity_clothing_conflicts", "L6", "banned"),
+            ("nudity_clothing_conflicts", "conflict_0", "trigger"),
+            ("nudity_clothing_conflicts", "conflict_0", "banned"),
+            ("nudity_clothing_conflicts", "conflict_1", "trigger"),
+            ("nudity_clothing_conflicts", "conflict_1", "banned"),
+            ("nudity_clothing_conflicts", "conflict_2", "trigger"),
+            ("nudity_clothing_conflicts", "conflict_2", "banned"),
+            ("nudity_clothing_conflicts", "conflict_3", "trigger"),
+            ("nudity_clothing_conflicts", "conflict_3", "banned"),
+            # 3. material
+            ("material_penetration", "material", "banned"),
+            # 4. clothing
+            ("clothing_style_state_coherence", "one_piece", "trigger"),
+            ("clothing_style_state_coherence", "one_piece", "banned"),
+            ("clothing_style_state_coherence", "pants", "trigger"),
+            ("clothing_style_state_coherence", "pants", "banned"),
+            # 5. gaze_angle
+            ("gaze_angle_geometry", "high_angle", "angle"),
+            ("gaze_angle_geometry", "high_angle", "banned"),
+            ("gaze_angle_geometry", "low_angle", "angle"),
+            ("gaze_angle_geometry", "low_angle", "banned"),
+            ("gaze_angle_geometry", "pov", "angle"),
+            # 6. gaze_mutual
+            ("gaze_mutual_exclusion", "pair_0", "exclusive_a"),
+            ("gaze_mutual_exclusion", "pair_0", "exclusive_b"),
+            ("gaze_mutual_exclusion", "pair_1", "exclusive_a"),
+            ("gaze_mutual_exclusion", "pair_1", "exclusive_b"),
+            ("gaze_mutual_exclusion", "pair_2", "exclusive_a"),
+            ("gaze_mutual_exclusion", "pair_2", "exclusive_b"),
+            # 7. occlusion
+            ("accessory_occlusion_gaze_coherence", "occlusion", "trigger"),
+            ("accessory_occlusion_gaze_coherence", "occlusion", "banned"),
+            # 8. framing
+            ("framing_lower_body_coherence", "framing", "trigger"),
+            ("framing_lower_body_coherence", "framing", "banned"),
+            # 9. liquid
+            ("liquid_restrictions", "cum_eyes", "trigger"),
+            ("liquid_restrictions", "opaque_paint", "trigger"),
+            ("liquid_restrictions", "pussy_juice", "trigger"),
+            ("liquid_restrictions", "liquid_words", "liquid"),
+            # 10. device
+            ("device_quality_compatibility", "analog_film", "device"),
+            ("device_quality_compatibility", "analog_film", "banned"),
+            ("device_quality_compatibility", "cctv", "device"),
+            ("device_quality_compatibility", "cctv", "banned"),
+            ("device_quality_compatibility", "phone", "device"),
+            ("device_quality_compatibility", "phone", "banned"),
+            ("device_quality_compatibility", "webcam", "device"),
+            ("device_quality_compatibility", "webcam", "banned"),
+            # 11. tattoo
+            ("tattoo_dermal_fusion", "tattoo", "tattoo"),
+            # 12. pose
+            ("pose_hand_occupation", "pose_hand", "trigger"),
+            ("pose_hand_occupation", "pose_hand", "handheld"),
+            # 13. handheld
+            ("handheld_props_single_holder", "handheld", "handheld"),
+            # 14. emotion
+            ("emotion_gaze_affinity", "shy", "emotion"),
+            ("emotion_gaze_affinity", "shy", "banned"),
+            ("emotion_gaze_affinity", "bored", "emotion"),
+            ("emotion_gaze_affinity", "bored", "banned"),
+            # 15. lighting
+            ("environmental_lighting_coherence", "daylight", "trigger"),
+            ("environmental_lighting_coherence", "daylight", "banned"),
+            # 16. monochrome
+            ("monochrome_film_chroma_coherence", "monochrome", "trigger"),
+            ("monochrome_film_chroma_coherence", "monochrome", "banned"),
+            # 17. makeup
+            ("makeup_details_coherence", "no_makeup", "trigger"),
+            ("makeup_details_coherence", "no_makeup", "banned"),
+        ]
+
+        total_patterns_in_rules = 0
+        all_pattern_identities = set()
+
+        for r in raw_rules["rules"]:
+            tf = r.get("text_fallback")
+            if tf:
+                for p in tf.get("patterns", []):
+                    total_patterns_in_rules += 1
+                    p_id = (r["id"], p["pattern"], p["match_mode"], p["group_id"], p["role"])
+                    self.assertNotIn(p_id, all_pattern_identities, f"Duplicate pattern declaration: {p_id}")
+                    all_pattern_identities.add(p_id)
+
+        self.assertEqual(total_patterns_in_rules, 501, f"Expected 501 total fallback patterns, got {total_patterns_in_rules}")
+
+        consumed_pattern_identities = set()
+        for rid, gid, role in production_selectors:
+            rule = rule_map[rid]
+            pats = rule["text_fallback"]["patterns"]
+            matched = [p for p in pats if p.get("group_id") == gid and p.get("role") == role]
+            # 强断言每个生产 selector 至少消费 1 个 pattern
+            self.assertGreaterEqual(len(matched), 1, f"Selector ({rid}, {gid}, {role}) consumed 0 patterns!")
+            for p in matched:
+                p_id = (rid, p["pattern"], p["match_mode"], gid, role)
+                # 强断言两两互斥 (单射)
+                self.assertNotIn(p_id, consumed_pattern_identities, f"Pattern {p_id} consumed by multiple selectors!")
+                consumed_pattern_identities.add(p_id)
+
+        # 强断言满射：全部 501 个 pattern 均被消费
+        self.assertEqual(
+            consumed_pattern_identities,
+            all_pattern_identities,
+            f"Unconsumed patterns: {all_pattern_identities - consumed_pattern_identities}"
+        )
+        self.assertEqual(len(consumed_pattern_identities), 501)
 
 
 if __name__ == "__main__":

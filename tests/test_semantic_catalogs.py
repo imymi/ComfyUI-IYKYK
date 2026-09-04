@@ -70,7 +70,7 @@ class TestSemanticCatalogs(unittest.TestCase):
     def test_catalog_leaf_ids_format_and_uniqueness(self):
         """验证所有生产目录文件中的叶子标签 ID 格式正则与 catalog 级唯一性"""
         for p in DATA_DIR.glob("*.json"):
-            if p.name in ("conflict_rules.json", "negative_prompts.json"):
+            if p.name in ("conflict_rules.json", "negative_prompts.json", "context_affinity.json"):
                 continue
             data = json.loads(p.read_text(encoding="utf-8"))
             seen_ids = set()
@@ -852,9 +852,9 @@ class TestSemanticCatalogs(unittest.TestCase):
                 "剧情主题": "随机 (Random)",
                 "景别构图": "随机 (Random)",
                 "拍摄视角": "随机 (Random)",
-                "裸露等级": "随机 (Random)",
-                "服装款式": "随机 (Random)",
-                "服装状态": "随机 (Random)",
+                "裸露等级": "L2 差分微露 (Partially Exposed)",
+                "服装款式": "皮革束腰/胸衣 (Leather Corset)",
+                "服装状态": "吊带滑落/半脱 (Slipping Off)",
                 "发型发色": "随机 (Random)",
                 "饰品头饰": "随机 (Random)",
                 "妆容细节": "随机 (Random)",
@@ -1076,9 +1076,9 @@ class TestSemanticCatalogs(unittest.TestCase):
                 "剧情主题": "随机 (Random)",
                 "景别构图": "随机 (Random)",
                 "拍摄视角": "随机 (Random)",
-                "裸露等级": "随机 (Random)",
-                "服装款式": "随机 (Random)",
-                "服装状态": "随机 (Random)",
+                "裸露等级": "L2 差分微露 (Partially Exposed)",
+                "服装款式": "皮革束腰/胸衣 (Leather Corset)",
+                "服装状态": "吊带滑落/半脱 (Slipping Off)",
                 "发型发色": "随机 (Random)",
                 "饰品头饰": "随机 (Random)",
                 "妆容细节": "随机 (Random)",

@@ -1,5 +1,5 @@
 """
-runtime_manifest.py — 单一事实来源：ComfyUI-IYKYK 运行时必需文件清单 (严格 38 个文件)
+runtime_manifest.py — 单一事实来源：ComfyUI-IYKYK 运行时必需文件清单 (Commit B: 20 份数据文件)
 """
 from __future__ import annotations
 
@@ -19,9 +19,11 @@ RUNTIME_LIB_FILES: Tuple[str, ...] = (
     "assembler.py",
     "atomizer.py",
     "conflict_resolver.py",
+    "context_affinity.py",
     "errors.py",
     "lexer.py",
     "models.py",
+    "rng.py",
     "rule_contract.py",
     "runtime_manifest.py",
     "sampler.py",
@@ -38,6 +40,7 @@ RUNTIME_DATA_FILES: Tuple[str, ...] = (
     "characters.json",
     "clothing.json",
     "conflict_rules.json",
+    "context_affinity.json",
     "expressions.json",
     "film_stocks.json",
     "imperfections.json",
@@ -55,7 +58,7 @@ RUNTIME_DATA_FILES: Tuple[str, ...] = (
     "themes.json",
 )
 
-# 严格 38 个运行时文件列表 (相对仓库根目录路径)
+# 运行时文件列表 (相对仓库根目录路径)
 RUNTIME_PACKAGE_FILES: Tuple[str, ...] = tuple(
     sorted(
         list(RUNTIME_ROOT_FILES)
@@ -65,4 +68,4 @@ RUNTIME_PACKAGE_FILES: Tuple[str, ...] = tuple(
     )
 )
 
-TOTAL_RUNTIME_FILES_COUNT: int = len(RUNTIME_PACKAGE_FILES)  # 严格为 38
+TOTAL_RUNTIME_FILES_COUNT: int = len(RUNTIME_PACKAGE_FILES)

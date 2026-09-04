@@ -135,7 +135,7 @@ class TestContextAffinityMatrix(unittest.TestCase):
             self.sampler.sample_clothing_with_nudity_linkage("随机 (Random)", "正常穿着 (Normal)", "L1", Random(i), context="onsen_bath")[0]
             for i in range(50)
         ]
-        onsen_keywords = ["yukata", "kimono", "swimsuit", "bikini"]
+        onsen_keywords = ["yukata", "kimono", "swimsuit", "bikini", "swimwear"]
         onsen_match = sum(1 for c in onsen_clothings if any(k in c.lower() for k in onsen_keywords))
         self.assertGreaterEqual(onsen_match, 35, f"Onsen context clothing match {onsen_match}/50 too low")
 

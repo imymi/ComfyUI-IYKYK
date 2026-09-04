@@ -454,7 +454,7 @@
           "text": "patient care",
           "facts": {
             "semantic_role": "selector",
-            "space_kind": "outdoor",
+            "space_kind": "indoor",
             "venue_ids": []
           }
         },
@@ -2358,7 +2358,10 @@
           "facts": {
             "semantic_role": "selector",
             "space_kind": null,
-            "venue_ids": []
+            "venue_ids": [],
+            "visible_regions": [
+              "intimate_lower_body"
+            ]
           }
         }
       ],
@@ -3424,7 +3427,10 @@
           "facts": {
             "semantic_role": "selector",
             "space_kind": null,
-            "venue_ids": []
+            "venue_ids": [],
+            "visible_regions": [
+              "intimate_lower_body"
+            ]
           }
         },
         {
@@ -3750,7 +3756,10 @@
           "facts": {
             "semantic_role": "selector",
             "space_kind": null,
-            "venue_ids": []
+            "venue_ids": [],
+            "visible_regions": [
+              "intimate_lower_body"
+            ]
           }
         },
         {
@@ -3822,7 +3831,10 @@
           "facts": {
             "semantic_role": "selector",
             "space_kind": null,
-            "venue_ids": []
+            "venue_ids": [],
+            "visible_regions": [
+              "intimate_lower_body"
+            ]
           }
         }
       ],
@@ -4039,7 +4051,10 @@
           "facts": {
             "semantic_role": "selector",
             "space_kind": "outdoor",
-            "venue_ids": []
+            "venue_ids": [],
+            "visible_regions": [
+              "intimate_lower_body"
+            ]
           }
         },
         {
@@ -4048,7 +4063,10 @@
           "facts": {
             "semantic_role": "selector",
             "space_kind": "outdoor",
-            "venue_ids": []
+            "venue_ids": [],
+            "visible_regions": [
+              "intimate_lower_body"
+            ]
           }
         },
         {
@@ -5316,7 +5334,10 @@
           "facts": {
             "semantic_role": "selector",
             "space_kind": null,
-            "venue_ids": []
+            "venue_ids": [],
+            "visible_regions": [
+              "upper_body"
+            ]
           }
         },
         {
@@ -5397,7 +5418,10 @@
           "facts": {
             "semantic_role": "selector",
             "space_kind": null,
-            "venue_ids": []
+            "venue_ids": [],
+            "visible_regions": [
+              "upper_body"
+            ]
           }
         },
         {
@@ -5688,7 +5712,10 @@
           "facts": {
             "semantic_role": "selector",
             "space_kind": null,
-            "venue_ids": []
+            "venue_ids": [],
+            "visible_regions": [
+              "intimate_lower_body"
+            ]
           }
         },
         {
@@ -5697,7 +5724,10 @@
           "facts": {
             "semantic_role": "selector",
             "space_kind": null,
-            "venue_ids": []
+            "venue_ids": [],
+            "visible_regions": [
+              "intimate_lower_body"
+            ]
           }
         },
         {
@@ -5715,7 +5745,10 @@
           "facts": {
             "semantic_role": "selector",
             "space_kind": "indoor",
-            "venue_ids": []
+            "venue_ids": [],
+            "visible_regions": [
+              "intimate_lower_body"
+            ]
           }
         },
         {

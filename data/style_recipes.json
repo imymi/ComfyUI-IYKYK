@@ -143,7 +143,8 @@
           "slot": "pose",
           "text": "standing S-curve pose",
           "facts": {
-            "semantic_role": "selector"
+            "semantic_role": "selector",
+            "hand_state": "free"
           },
           "origin": {
             "entry_point": "preset_browser",
@@ -161,7 +162,8 @@
           "slot": "pose",
           "text": "leaning forward slightly",
           "facts": {
-            "semantic_role": "selector"
+            "semantic_role": "selector",
+            "hand_state": "free"
           },
           "origin": {
             "entry_point": "preset_browser",
@@ -179,7 +181,8 @@
           "slot": "makeup",
           "text": "gravure idol makeup",
           "facts": {
-            "semantic_role": "selector"
+            "semantic_role": "selector",
+            "makeup_base": "natural"
           },
           "origin": {
             "entry_point": "preset_browser",
@@ -197,7 +200,8 @@
           "slot": "makeup",
           "text": "glossy pink lips",
           "facts": {
-            "semantic_role": "selector"
+            "semantic_role": "selector",
+            "makeup_base": "natural"
           },
           "origin": {
             "entry_point": "preset_browser",
@@ -215,7 +219,9 @@
           "slot": "expression",
           "text": "looking at viewer",
           "facts": {
-            "semantic_role": "selector"
+            "semantic_role": "selector",
+            "gaze": "camera",
+            "emotion": "neutral"
           },
           "origin": {
             "entry_point": "preset_browser",
@@ -233,7 +239,9 @@
           "slot": "expression",
           "text": "confident smile",
           "facts": {
-            "semantic_role": "selector"
+            "semantic_role": "selector",
+            "gaze": "neutral",
+            "emotion": "playful"
           },
           "origin": {
             "entry_point": "preset_browser",
@@ -251,7 +259,9 @@
           "slot": "expression",
           "text": "slight blush",
           "facts": {
-            "semantic_role": "selector"
+            "semantic_role": "selector",
+            "gaze": "neutral",
+            "emotion": "playful"
           },
           "origin": {
             "entry_point": "preset_browser",
@@ -445,7 +455,8 @@
           "slot": "pose",
           "text": "unaware body pose",
           "facts": {
-            "semantic_role": "selector"
+            "semantic_role": "selector",
+            "hand_state": "free"
           },
           "origin": {
             "entry_point": "preset_browser",
@@ -463,7 +474,8 @@
           "slot": "pose",
           "text": "bending over desk",
           "facts": {
-            "semantic_role": "selector"
+            "semantic_role": "selector",
+            "hand_state": "free"
           },
           "origin": {
             "entry_point": "preset_browser",
@@ -481,7 +493,8 @@
           "slot": "pose",
           "text": "looking down",
           "facts": {
-            "semantic_role": "selector"
+            "semantic_role": "selector",
+            "hand_state": "free"
           },
           "origin": {
             "entry_point": "preset_browser",
@@ -499,7 +512,8 @@
           "slot": "makeup",
           "text": "bare face",
           "facts": {
-            "semantic_role": "selector"
+            "semantic_role": "selector",
+            "makeup_base": "clean"
           },
           "origin": {
             "entry_point": "preset_browser",
@@ -517,7 +531,8 @@
           "slot": "makeup",
           "text": "sweat-glistened skin",
           "facts": {
-            "semantic_role": "selector"
+            "semantic_role": "selector",
+            "makeup_base": "natural"
           },
           "origin": {
             "entry_point": "preset_browser",
@@ -535,7 +550,8 @@
           "slot": "makeup",
           "text": "exhausted look",
           "facts": {
-            "semantic_role": "selector"
+            "semantic_role": "selector",
+            "makeup_base": "natural"
           },
           "origin": {
             "entry_point": "preset_browser",
@@ -553,7 +569,9 @@
           "slot": "expression",
           "text": "looking down",
           "facts": {
-            "semantic_role": "selector"
+            "semantic_role": "selector",
+            "gaze": "camera",
+            "emotion": "neutral"
           },
           "origin": {
             "entry_point": "preset_browser",
@@ -571,7 +589,9 @@
           "slot": "expression",
           "text": "startled expression",
           "facts": {
-            "semantic_role": "selector"
+            "semantic_role": "selector",
+            "gaze": "neutral",
+            "emotion": "neutral"
           },
           "origin": {
             "entry_point": "preset_browser",
@@ -589,7 +609,9 @@
           "slot": "expression",
           "text": "wide eyes",
           "facts": {
-            "semantic_role": "selector"
+            "semantic_role": "selector",
+            "gaze": "neutral",
+            "emotion": "neutral"
           },
           "origin": {
             "entry_point": "preset_browser",
@@ -801,7 +823,8 @@
           "slot": "pose",
           "text": "holding phone for mirror selfie",
           "facts": {
-            "semantic_role": "selector"
+            "semantic_role": "selector",
+            "hand_state": "one_busy"
           },
           "origin": {
             "entry_point": "preset_browser",
@@ -819,7 +842,8 @@
           "slot": "pose",
           "text": "one leg slightly bent",
           "facts": {
-            "semantic_role": "selector"
+            "semantic_role": "selector",
+            "hand_state": "free"
           },
           "origin": {
             "entry_point": "preset_browser",
@@ -837,7 +861,8 @@
           "slot": "makeup",
           "text": "casual makeup",
           "facts": {
-            "semantic_role": "selector"
+            "semantic_role": "selector",
+            "makeup_base": "natural"
           },
           "origin": {
             "entry_point": "preset_browser",
@@ -855,7 +880,8 @@
           "slot": "makeup",
           "text": "slightly messy hair",
           "facts": {
-            "semantic_role": "selector"
+            "semantic_role": "selector",
+            "makeup_base": "natural"
           },
           "origin": {
             "entry_point": "preset_browser",
@@ -873,7 +899,9 @@
           "slot": "expression",
           "text": "looking at screen",
           "facts": {
-            "semantic_role": "selector"
+            "semantic_role": "selector",
+            "gaze": "camera",
+            "emotion": "neutral"
           },
           "origin": {
             "entry_point": "preset_browser",
@@ -891,7 +919,9 @@
           "slot": "expression",
           "text": "seductive smile",
           "facts": {
-            "semantic_role": "selector"
+            "semantic_role": "selector",
+            "gaze": "neutral",
+            "emotion": "playful"
           },
           "origin": {
             "entry_point": "preset_browser",
@@ -909,7 +939,9 @@
           "slot": "expression",
           "text": "shy gaze",
           "facts": {
-            "semantic_role": "selector"
+            "semantic_role": "selector",
+            "gaze": "neutral",
+            "emotion": "shy"
           },
           "origin": {
             "entry_point": "preset_browser",
@@ -1085,7 +1117,8 @@
           "slot": "pose",
           "text": "lounging on velvet sofa",
           "facts": {
-            "semantic_role": "selector"
+            "semantic_role": "selector",
+            "hand_state": "free"
           },
           "origin": {
             "entry_point": "preset_browser",
@@ -1103,7 +1136,8 @@
           "slot": "pose",
           "text": "relaxed head rest",
           "facts": {
-            "semantic_role": "selector"
+            "semantic_role": "selector",
+            "hand_state": "free"
           },
           "origin": {
             "entry_point": "preset_browser",
@@ -1121,7 +1155,8 @@
           "slot": "pose",
           "text": "bare shoulder",
           "facts": {
-            "semantic_role": "selector"
+            "semantic_role": "selector",
+            "hand_state": "free"
           },
           "origin": {
             "entry_point": "preset_browser",
@@ -1139,7 +1174,8 @@
           "slot": "makeup",
           "text": "retro makeup",
           "facts": {
-            "semantic_role": "selector"
+            "semantic_role": "selector",
+            "makeup_base": "natural"
           },
           "origin": {
             "entry_point": "preset_browser",
@@ -1157,7 +1193,8 @@
           "slot": "makeup",
           "text": "matte skin",
           "facts": {
-            "semantic_role": "selector"
+            "semantic_role": "selector",
+            "makeup_base": "natural"
           },
           "origin": {
             "entry_point": "preset_browser",
@@ -1175,7 +1212,8 @@
           "slot": "makeup",
           "text": "bold red lipstick",
           "facts": {
-            "semantic_role": "selector"
+            "semantic_role": "selector",
+            "makeup_base": "natural"
           },
           "origin": {
             "entry_point": "preset_browser",
@@ -1193,7 +1231,9 @@
           "slot": "expression",
           "text": "gazing into distance",
           "facts": {
-            "semantic_role": "selector"
+            "semantic_role": "selector",
+            "gaze": "away",
+            "emotion": "neutral"
           },
           "origin": {
             "entry_point": "preset_browser",
@@ -1211,7 +1251,9 @@
           "slot": "expression",
           "text": "melancholy look",
           "facts": {
-            "semantic_role": "selector"
+            "semantic_role": "selector",
+            "gaze": "camera",
+            "emotion": "detached"
           },
           "origin": {
             "entry_point": "preset_browser",
@@ -1229,7 +1271,9 @@
           "slot": "expression",
           "text": "parted lips",
           "facts": {
-            "semantic_role": "selector"
+            "semantic_role": "selector",
+            "gaze": "neutral",
+            "emotion": "neutral"
           },
           "origin": {
             "entry_point": "preset_browser",
@@ -1423,7 +1467,8 @@
           "slot": "pose",
           "text": "sitting cross-legged",
           "facts": {
-            "semantic_role": "selector"
+            "semantic_role": "selector",
+            "hand_state": "free"
           },
           "origin": {
             "entry_point": "preset_browser",
@@ -1441,7 +1486,8 @@
           "slot": "pose",
           "text": "arched back",
           "facts": {
-            "semantic_role": "selector"
+            "semantic_role": "selector",
+            "hand_state": "free"
           },
           "origin": {
             "entry_point": "preset_browser",
@@ -1459,7 +1505,8 @@
           "slot": "pose",
           "text": "dynamic silhouette",
           "facts": {
-            "semantic_role": "selector"
+            "semantic_role": "selector",
+            "hand_state": "free"
           },
           "origin": {
             "entry_point": "preset_browser",
@@ -1477,7 +1524,8 @@
           "slot": "makeup",
           "text": "nightclub heavy makeup",
           "facts": {
-            "semantic_role": "selector"
+            "semantic_role": "selector",
+            "makeup_base": "full"
           },
           "origin": {
             "entry_point": "preset_browser",
@@ -1495,7 +1543,8 @@
           "slot": "makeup",
           "text": "dark eyeliner",
           "facts": {
-            "semantic_role": "selector"
+            "semantic_role": "selector",
+            "makeup_base": "full"
           },
           "origin": {
             "entry_point": "preset_browser",
@@ -1513,7 +1562,8 @@
           "slot": "makeup",
           "text": "glossy lips",
           "facts": {
-            "semantic_role": "selector"
+            "semantic_role": "selector",
+            "makeup_base": "natural"
           },
           "origin": {
             "entry_point": "preset_browser",
@@ -1531,7 +1581,9 @@
           "slot": "expression",
           "text": "dilated pupils",
           "facts": {
-            "semantic_role": "selector"
+            "semantic_role": "selector",
+            "gaze": "neutral",
+            "emotion": "neutral"
           },
           "origin": {
             "entry_point": "preset_browser",
@@ -1549,7 +1601,9 @@
           "slot": "expression",
           "text": "heavy lidded eyes",
           "facts": {
-            "semantic_role": "selector"
+            "semantic_role": "selector",
+            "gaze": "neutral",
+            "emotion": "neutral"
           },
           "origin": {
             "entry_point": "preset_browser",
@@ -1567,7 +1621,9 @@
           "slot": "expression",
           "text": "sensual gaze",
           "facts": {
-            "semantic_role": "selector"
+            "semantic_role": "selector",
+            "gaze": "neutral",
+            "emotion": "seductive"
           },
           "origin": {
             "entry_point": "preset_browser",
@@ -1743,7 +1799,8 @@
           "slot": "pose",
           "text": "crouching on floor",
           "facts": {
-            "semantic_role": "selector"
+            "semantic_role": "selector",
+            "hand_state": "free"
           },
           "origin": {
             "entry_point": "preset_browser",
@@ -1761,7 +1818,8 @@
           "slot": "pose",
           "text": "arms wrapping knees",
           "facts": {
-            "semantic_role": "selector"
+            "semantic_role": "selector",
+            "hand_state": "free"
           },
           "origin": {
             "entry_point": "preset_browser",
@@ -1779,7 +1837,8 @@
           "slot": "pose",
           "text": "stretched spine",
           "facts": {
-            "semantic_role": "selector"
+            "semantic_role": "selector",
+            "hand_state": "free"
           },
           "origin": {
             "entry_point": "preset_browser",
@@ -1797,7 +1856,8 @@
           "slot": "makeup",
           "text": "completely bare face",
           "facts": {
-            "semantic_role": "selector"
+            "semantic_role": "selector",
+            "makeup_base": "clean"
           },
           "origin": {
             "entry_point": "preset_browser",
@@ -1815,7 +1875,8 @@
           "slot": "makeup",
           "text": "natural skin textures",
           "facts": {
-            "semantic_role": "selector"
+            "semantic_role": "selector",
+            "makeup_base": "natural"
           },
           "origin": {
             "entry_point": "preset_browser",
@@ -1833,7 +1894,9 @@
           "slot": "expression",
           "text": "empty gaze",
           "facts": {
-            "semantic_role": "selector"
+            "semantic_role": "selector",
+            "gaze": "neutral",
+            "emotion": "neutral"
           },
           "origin": {
             "entry_point": "preset_browser",
@@ -1851,7 +1914,9 @@
           "slot": "expression",
           "text": "staring into space",
           "facts": {
-            "semantic_role": "selector"
+            "semantic_role": "selector",
+            "gaze": "away",
+            "emotion": "neutral"
           },
           "origin": {
             "entry_point": "preset_browser",
@@ -1869,7 +1934,9 @@
           "slot": "expression",
           "text": "neutral face",
           "facts": {
-            "semantic_role": "selector"
+            "semantic_role": "selector",
+            "gaze": "neutral",
+            "emotion": "neutral"
           },
           "origin": {
             "entry_point": "preset_browser",
@@ -2063,7 +2130,8 @@
           "slot": "pose",
           "text": "sitting on edge of unmade bed",
           "facts": {
-            "semantic_role": "selector"
+            "semantic_role": "selector",
+            "hand_state": "free"
           },
           "origin": {
             "entry_point": "preset_browser",
@@ -2081,7 +2149,8 @@
           "slot": "pose",
           "text": "hugging pillow",
           "facts": {
-            "semantic_role": "selector"
+            "semantic_role": "selector",
+            "hand_state": "free"
           },
           "origin": {
             "entry_point": "preset_browser",
@@ -2099,7 +2168,8 @@
           "slot": "pose",
           "text": "looking back",
           "facts": {
-            "semantic_role": "selector"
+            "semantic_role": "selector",
+            "hand_state": "free"
           },
           "origin": {
             "entry_point": "preset_browser",
@@ -2117,7 +2187,8 @@
           "slot": "makeup",
           "text": "morning dewy skin",
           "facts": {
-            "semantic_role": "selector"
+            "semantic_role": "selector",
+            "makeup_base": "natural"
           },
           "origin": {
             "entry_point": "preset_browser",
@@ -2135,7 +2206,8 @@
           "slot": "makeup",
           "text": "natural flush",
           "facts": {
-            "semantic_role": "selector"
+            "semantic_role": "selector",
+            "makeup_base": "natural"
           },
           "origin": {
             "entry_point": "preset_browser",
@@ -2153,7 +2225,8 @@
           "slot": "makeup",
           "text": "gentle lips",
           "facts": {
-            "semantic_role": "selector"
+            "semantic_role": "selector",
+            "makeup_base": "natural"
           },
           "origin": {
             "entry_point": "preset_browser",
@@ -2171,7 +2244,9 @@
           "slot": "expression",
           "text": "shy affectionate smile",
           "facts": {
-            "semantic_role": "selector"
+            "semantic_role": "selector",
+            "gaze": "neutral",
+            "emotion": "playful"
           },
           "origin": {
             "entry_point": "preset_browser",
@@ -2189,7 +2264,9 @@
           "slot": "expression",
           "text": "sleepy morning eyes",
           "facts": {
-            "semantic_role": "selector"
+            "semantic_role": "selector",
+            "gaze": "neutral",
+            "emotion": "neutral"
           },
           "origin": {
             "entry_point": "preset_browser",
@@ -2401,7 +2478,8 @@
           "slot": "pose",
           "text": "kneeling on tatami floor",
           "facts": {
-            "semantic_role": "selector"
+            "semantic_role": "selector",
+            "hand_state": "free"
           },
           "origin": {
             "entry_point": "preset_browser",
@@ -2419,7 +2497,8 @@
           "slot": "pose",
           "text": "resting chin on hands",
           "facts": {
-            "semantic_role": "selector"
+            "semantic_role": "selector",
+            "hand_state": "one_busy"
           },
           "origin": {
             "entry_point": "preset_browser",
@@ -2437,7 +2516,8 @@
           "slot": "makeup",
           "text": "subtle Japanese makeup",
           "facts": {
-            "semantic_role": "selector"
+            "semantic_role": "selector",
+            "makeup_base": "natural"
           },
           "origin": {
             "entry_point": "preset_browser",
@@ -2455,7 +2535,8 @@
           "slot": "makeup",
           "text": "light pink blush",
           "facts": {
-            "semantic_role": "selector"
+            "semantic_role": "selector",
+            "makeup_base": "natural"
           },
           "origin": {
             "entry_point": "preset_browser",
@@ -2473,7 +2554,8 @@
           "slot": "makeup",
           "text": "sheer gloss",
           "facts": {
-            "semantic_role": "selector"
+            "semantic_role": "selector",
+            "makeup_base": "natural"
           },
           "origin": {
             "entry_point": "preset_browser",
@@ -2491,7 +2573,9 @@
           "slot": "expression",
           "text": "gentle direct gaze at camera",
           "facts": {
-            "semantic_role": "selector"
+            "semantic_role": "selector",
+            "gaze": "camera",
+            "emotion": "neutral"
           },
           "origin": {
             "entry_point": "preset_browser",
@@ -2509,7 +2593,9 @@
           "slot": "expression",
           "text": "tranquil calm mood",
           "facts": {
-            "semantic_role": "selector"
+            "semantic_role": "selector",
+            "gaze": "neutral",
+            "emotion": "neutral"
           },
           "origin": {
             "entry_point": "preset_browser",

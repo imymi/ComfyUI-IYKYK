@@ -1,0 +1,222 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "ContextAffinityConfiguration",
+  "description": "ComfyUI-IYKYK 多信号情境亲和度配置 Schema (严格 14×14 恰好 196 单元封闭联合)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "contexts",
+    "slots",
+    "signal_weights",
+    "mixture",
+    "matrix"
+  ],
+  "definitions": {
+    "weighted_cell": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["mode", "candidates"],
+      "properties": {
+        "mode": {
+          "type": "string",
+          "const": "weighted"
+        },
+        "candidates": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["id", "weight"],
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[a-z][a-z0-9_]{1,63}$"
+              },
+              "weight": {
+                "type": "number",
+                "exclusiveMinimum": 0
+              }
+            }
+          }
+        }
+      }
+    },
+    "neutral_cell": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["mode"],
+      "properties": {
+        "mode": {
+          "type": "string",
+          "const": "neutral"
+        }
+      }
+    },
+    "cell": {
+      "oneOf": [
+        {"$ref": "#/definitions/weighted_cell"},
+        {"$ref": "#/definitions/neutral_cell"}
+      ]
+    },
+    "context_row": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "clothing",
+        "character",
+        "makeup",
+        "hairstyle",
+        "jewelry",
+        "props",
+        "tattoo",
+        "liquids",
+        "pose",
+        "expression",
+        "lighting",
+        "film",
+        "shot_type",
+        "camera_angle"
+      ],
+      "properties": {
+        "clothing": {"$ref": "#/definitions/cell"},
+        "character": {"$ref": "#/definitions/cell"},
+        "makeup": {"$ref": "#/definitions/cell"},
+        "hairstyle": {"$ref": "#/definitions/cell"},
+        "jewelry": {"$ref": "#/definitions/cell"},
+        "props": {"$ref": "#/definitions/cell"},
+        "tattoo": {"$ref": "#/definitions/cell"},
+        "liquids": {"$ref": "#/definitions/cell"},
+        "pose": {"$ref": "#/definitions/cell"},
+        "expression": {"$ref": "#/definitions/cell"},
+        "lighting": {"$ref": "#/definitions/cell"},
+        "film": {"$ref": "#/definitions/cell"},
+        "shot_type": {"$ref": "#/definitions/cell"},
+        "camera_angle": {"$ref": "#/definitions/cell"}
+      }
+    }
+  },
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "const": "1.0"
+    },
+    "contexts": {
+      "type": "array",
+      "minItems": 14,
+      "maxItems": 14,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "enum": [
+          "school",
+          "office",
+          "medical",
+          "onsen_bath",
+          "bondage_sm",
+          "traditional",
+          "nightlife",
+          "domestic",
+          "transit",
+          "outdoor",
+          "dining",
+          "adult",
+          "special",
+          "generic"
+        ]
+      }
+    },
+    "slots": {
+      "type": "array",
+      "minItems": 14,
+      "maxItems": 14,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "enum": [
+          "clothing",
+          "character",
+          "makeup",
+          "hairstyle",
+          "jewelry",
+          "props",
+          "tattoo",
+          "liquids",
+          "pose",
+          "expression",
+          "lighting",
+          "film",
+          "shot_type",
+          "camera_angle"
+        ]
+      }
+    },
+    "signal_weights": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["scene", "theme"],
+      "properties": {
+        "scene": {
+          "type": "number",
+          "const": 1.0
+        },
+        "theme": {
+          "type": "number",
+          "const": 0.6
+        }
+      }
+    },
+    "mixture": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["global", "affinity"],
+      "properties": {
+        "global": {
+          "type": "number",
+          "const": 0.15
+        },
+        "affinity": {
+          "type": "number",
+          "const": 0.85
+        }
+      }
+    },
+    "matrix": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "school",
+        "office",
+        "medical",
+        "onsen_bath",
+        "bondage_sm",
+        "traditional",
+        "nightlife",
+        "domestic",
+        "transit",
+        "outdoor",
+        "dining",
+        "adult",
+        "special",
+        "generic"
+      ],
+      "properties": {
+        "school": {"$ref": "#/definitions/context_row"},
+        "office": {"$ref": "#/definitions/context_row"},
+        "medical": {"$ref": "#/definitions/context_row"},
+        "onsen_bath": {"$ref": "#/definitions/context_row"},
+        "bondage_sm": {"$ref": "#/definitions/context_row"},
+        "traditional": {"$ref": "#/definitions/context_row"},
+        "nightlife": {"$ref": "#/definitions/context_row"},
+        "domestic": {"$ref": "#/definitions/context_row"},
+        "transit": {"$ref": "#/definitions/context_row"},
+        "outdoor": {"$ref": "#/definitions/context_row"},
+        "dining": {"$ref": "#/definitions/context_row"},
+        "adult": {"$ref": "#/definitions/context_row"},
+        "special": {"$ref": "#/definitions/context_row"},
+        "generic": {"$ref": "#/definitions/context_row"}
+      }
+    }
+  }
+}

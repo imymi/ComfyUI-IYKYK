@@ -19,9 +19,16 @@ from random import Random
 from typing import Any, Dict, List, Optional, Sequence, Tuple
 
 if __package__:
+    from .context_affinity import (
+        ContextAffinityRegistry,
+        compute_context_profile,
+        compute_slot_distribution,
+        sample_categorical,
+    )
     from .errors import CatalogIndexingError, DataLoadError, DataSelectionError
     from .models import (
         ClothingSampleResult,
+        ContextProfile,
         SampleResult,
         SampledTag,
         SemanticFacts,
@@ -29,9 +36,16 @@ if __package__:
         ThemeSampleResult,
     )
 else:
+    from lib.context_affinity import (
+        ContextAffinityRegistry,
+        compute_context_profile,
+        compute_slot_distribution,
+        sample_categorical,
+    )
     from lib.errors import CatalogIndexingError, DataLoadError, DataSelectionError
     from lib.models import (
         ClothingSampleResult,
+        ContextProfile,
         SampleResult,
         SampledTag,
         SemanticFacts,
@@ -78,141 +92,27 @@ def get_selection_mode(val: Any) -> str:
     return SelectionMode.EXPLICIT
 
 
-# 全量 14 大情境亲和度映射表（基于项目 24 场景分类与 15 槽位交叉规范）
-CONTEXT_AFFINITY = {
-    "school": {
-        "clothing": ["jk_seifuku", "blazer_uniform", "gym_uniform", "korean_school"],
-        "characters": ["jk_schoolgirl", "strict_teacher"],
-        "makeup": ["natural_pure", "cute_peachy", "sweet_peach_milk", "clear_water_bare"],
-        "hairstyles": ["twin_tails", "high_ponytail", "long_straight_black", "braided_twins", "bob_cut"],
-        "headwear_jewelry": ["ribbon_bow", "gold_collarbone_chain"],
-        "props": ["glasses_reading", "smartphone_recording", "sex_toy_vibrator", "plush_doll_teddy"],
-        "liquids": ["sweat_glistening", "none"],
-    },
-    "office": {
-        "clothing": ["ol_suit", "knit_sweater", "evening_dress", "street_casual"],
-        "characters": ["ol_subordinate", "female_boss", "strict_teacher"],
-        "makeup": ["mature_wife", "sultry_smoky", "natural_pure", "asian_hybrid_contour"],
-        "hairstyles": ["low_ponytail", "collarbone_lob", "big_wavy_curls", "messy_bun"],
-        "headwear_jewelry": ["pearl_necklace", "gold_collarbone_chain", "leather_choker"],
-        "props": ["glasses_reading", "wine_glass_bottle", "smartphone_recording", "digital_camera_record"],
-        "liquids": ["sweat_glistening", "none"],
-    },
-    "medical": {
-        "clothing": ["nurse_uniform"],
-        "characters": ["kind_nurse"],
-        "makeup": ["natural_pure", "cute_peachy", "clear_water_bare"],
-        "hairstyles": ["low_ponytail", "bob_cut", "twin_tails", "messy_bun"],
-        "headwear_jewelry": ["nurse_cap"],
-        "props": ["glasses_reading", "smartphone_recording"],
-        "liquids": ["sweat_glistening", "body_oil_lube"],
-    },
-    "onsen_bath": {
-        "clothing": ["yukata", "kimono", "one_piece_swimsuit", "bikini_micro"],
-        "characters": ["married_housewife", "neighbor_girlfriend", "gravure_idol"],
-        "makeup": ["wet_dewy", "natural_pure", "climax_flush", "drunken_milky_youth"],
-        "hairstyles": ["wet_hair_face", "messy_bun", "low_ponytail"],
-        "headwear_jewelry": ["gold_collarbone_chain", "pearl_necklace", "ankle_bracelet"],
-        "props": ["wine_glass_bottle", "ice_cubes", "rose_petals_candles"],
-        "liquids": ["wet_water_drops", "sweat_glistening"],
-    },
-    "bondage_sm": {
-        "clothing": ["latex_catsuit", "leather_corset", "lingerie_lace"],
-        "characters": ["french_maid", "ol_subordinate", "female_boss"],
-        "makeup": ["submissive_marked", "ruined_crying", "climax_flush", "gothic_dark"],
-        "hairstyles": ["messy_bedhead", "twin_tails", "hair_in_mouth"],
-        "headwear_jewelry": ["leather_choker", "lace_blindfold", "nipple_rings", "body_chain"],
-        "tattoos": ["lewd_womb_pubic", "barcode_serial_number", "tally_marks_inner_thigh"],
-        "props": ["bondage_rope_collar", "sex_toy_vibrator", "ice_cubes"],
-        "liquids": ["saliva_drool", "sweat_glistening", "cum_splatter", "body_oil_lube"],
-    },
-    "traditional": {
-        "clothing": ["kimono", "yukata", "furisode", "qipao", "hanfu", "modern_chinese", "hanbok"],
-        "characters": ["married_housewife", "neighbor_girlfriend"],
-        "makeup": ["vintage_retro", "chinese_vermilion", "natural_pure", "mature_wife"],
-        "hairstyles": ["long_straight_black", "hime_cut", "low_ponytail", "braided_twins"],
-        "headwear_jewelry": ["pearl_necklace", "gold_collarbone_chain", "ribbon_bow"],
-        "tattoos": ["japanese_irezumi_dragon", "cherry_blossom_shoulder"],
-        "props": ["oriental_fan_umbrella", "wine_glass_bottle", "flower_bouquet_petals"],
-        "liquids": ["sweat_glistening", "none"],
-    },
-    "nightlife": {
-        "clothing": ["bunny_suit", "party_club", "lingerie_lace", "latex_catsuit", "evening_dress"],
-        "characters": ["hostess_cabaret", "gravure_idol"],
-        "makeup": ["sultry_smoky", "climax_flush", "ruined_crying", "gothic_dark"],
-        "hairstyles": ["big_wavy_curls", "twin_tails", "hime_cut", "hair_in_mouth"],
-        "headwear_jewelry": ["leather_choker", "body_chain", "bunny_ears", "cat_ears"],
-        "props": ["wine_glass_bottle", "sex_toy_vibrator", "smartphone_recording", "digital_camera_record"],
-        "liquids": ["sweat_glistening", "saliva_drool"],
-    },
-    "domestic": {
-        "clothing": ["silk_robe", "camisole_slip", "knit_sweater", "street_casual", "lingerie_lace"],
-        "characters": ["married_housewife", "neighbor_girlfriend"],
-        "makeup": ["mature_wife", "natural_pure", "climax_flush", "pure_desire_white_peach"],
-        "hairstyles": ["messy_bedhead", "messy_bun", "long_straight_black", "hair_over_breast"],
-        "headwear_jewelry": ["gold_collarbone_chain", "ribbon_bow", "ankle_bracelet"],
-        "props": ["cute_cat_on_bed", "pillow_clutching", "game_controller", "wine_glass_bottle", "rose_petals_candles"],
-        "liquids": ["sweat_glistening", "saliva_drool"],
-    },
-    "transit": {
-        "clothing": ["jk_seifuku", "blazer_uniform", "ol_suit", "street_casual", "knit_sweater"],
-        "characters": ["jk_schoolgirl", "ol_subordinate", "neighbor_girlfriend"],
-        "makeup": ["natural_pure", "cute_peachy", "climax_flush"],
-        "hairstyles": ["low_ponytail", "high_ponytail", "long_straight_black", "collarbone_lob"],
-        "headwear_jewelry": ["gold_collarbone_chain", "ribbon_bow"],
-        "props": ["smartphone_recording", "glasses_reading"],
-        "liquids": ["sweat_glistening", "none"],
-    },
-    "outdoor": {
-        "clothing": ["bikini_micro", "one_piece_swimsuit", "street_casual", "gym_uniform", "cheerleader"],
-        "characters": ["gravure_idol", "neighbor_girlfriend"],
-        "makeup": ["natural_pure", "cute_peachy", "wet_dewy", "sun_kissed"],
-        "hairstyles": ["high_ponytail", "twin_tails", "space_buns", "messy_bun"],
-        "headwear_jewelry": ["ribbon_bow", "gold_collarbone_chain", "ankle_bracelet"],
-        "props": ["camera_tripod_flash", "oriental_fan_umbrella", "smartphone_recording", "flower_bouquet_petals"],
-        "liquids": ["wet_water_drops", "sweat_glistening"],
-    },
-    "dining": {
-        "clothing": ["maid_dress", "waitress_uniform", "street_casual", "qipao", "kimono"],
-        "characters": ["french_maid", "neighbor_girlfriend", "ol_subordinate", "married_housewife"],
-        "makeup": ["cute_peachy", "natural_pure", "mature_wife", "sweet_peach_milk"],
-        "hairstyles": ["messy_bun", "collarbone_lob", "twin_tails", "bob_cut"],
-        "headwear_jewelry": ["maid_headdress", "pearl_necklace", "gold_collarbone_chain"],
-        "props": ["wine_glass_bottle", "glasses_reading", "smartphone_recording"],
-        "liquids": ["none", "sweat_glistening"],
-    },
-    "adult": {
-        "clothing": ["bunny_suit", "maid_dress", "latex_catsuit", "leather_corset", "bikini_micro", "lingerie_lace"],
-        "characters": ["hostess_cabaret", "gravure_idol", "french_maid"],
-        "makeup": ["sultry_smoky", "climax_flush", "ruined_crying", "submissive_marked"],
-        "hairstyles": ["twin_tails", "big_wavy_curls", "wet_hair_face", "hair_in_mouth"],
-        "headwear_jewelry": ["bunny_ears", "cat_ears", "maid_headdress", "lace_blindfold", "leather_choker", "nipple_rings", "body_chain"],
-        "tattoos": ["lewd_womb_pubic", "barcode_serial_number", "tally_marks_inner_thigh", "butterfly_lower_back"],
-        "props": ["sex_toy_vibrator", "camera_tripod_flash", "bondage_rope_collar", "ice_cubes"],
-        "liquids": ["pussy_juice", "cum_splatter", "body_oil_lube", "saliva_drool"],
-    },
-    "special": {
-        "clothing": ["latex_catsuit", "leather_corset", "lingerie_lace"],
-        "characters": ["female_boss", "kind_nurse", "strict_teacher"],
-        "makeup": ["submissive_marked", "sultry_smoky", "ruined_crying", "gothic_dark"],
-        "hairstyles": ["hime_cut", "long_straight_black", "messy_bedhead"],
-        "headwear_jewelry": ["leather_choker", "lace_blindfold", "body_chain"],
-        "tattoos": ["barcode_serial_number", "snake_coiling", "spine_vertical_script"],
-        "props": ["bondage_rope_collar", "camera_tripod_flash", "sex_toy_vibrator"],
-        "liquids": ["saliva_drool", "sweat_glistening", "cum_splatter"],
-    },
-    "generic": {
-        "clothing": ["street_casual", "knit_sweater", "camisole_slip", "silk_robe"],
-        "characters": ["neighbor_girlfriend", "married_housewife", "jk_schoolgirl"],
-        "makeup": ["natural_pure", "cute_peachy", "mature_wife", "pure_desire_white_peach"],
-        "hairstyles": ["long_straight_black", "high_ponytail", "low_ponytail", "collarbone_lob"],
-        "headwear_jewelry": ["gold_collarbone_chain", "ribbon_bow", "pearl_necklace"],
-        "props": ["smartphone_recording", "cute_cat_on_bed", "pillow_clutching"],
-        "liquids": ["none", "sweat_glistening"],
-    },
-}
+def _load_affinity_matrix(data_dir: Path) -> Dict[str, Dict[str, List[str]]]:
+    affinity_file = data_dir / "context_affinity.json"
+    if not affinity_file.exists():
+        return {}
+    try:
+        data = json.loads(affinity_file.read_text(encoding="utf-8"))
+        matrix = data.get("matrix", {})
+        result = {}
+        for ctx, slots in matrix.items():
+            result[ctx] = {}
+            for slot, cell in slots.items():
+                if cell.get("mode") == "weighted":
+                    result[ctx][slot] = [c["id"] for c in cell.get("candidates", []) if "id" in c]
+                else:
+                    result[ctx][slot] = []
+        return result
+    except Exception:
+        return {}
 
-# 14 大情境直通映射表
+DATA_DIR_DEFAULT = Path(__file__).resolve().parent.parent / "data"
+CONTEXT_AFFINITY = _load_affinity_matrix(DATA_DIR_DEFAULT)
 CONTEXT_PARENT_MAPPING = {k: k for k in CONTEXT_AFFINITY.keys()}
 
 
@@ -301,6 +201,7 @@ class DataSampler:
         self._all_scene_items: List[Dict[str, Any]] = []
         self._scenes_indexed: bool = False
         self._catalog_indices: Dict[str, ExactCatalogIndex] = {}
+        self.affinity_registry = ContextAffinityRegistry(self.data_dir)
 
 
     def _get_catalog_index(self, name: str, items: Sequence[Dict[str, Any]]) -> ExactCatalogIndex:
@@ -347,6 +248,39 @@ class DataSampler:
                     if alias:
                         self._scene_by_alias[alias] = item
         self._scenes_indexed = True
+
+    def _sample_from_candidates(
+        self,
+        slot_name: str,
+        candidates: Sequence[Dict[str, Any]],
+        rng: Random,
+        profile: Optional[ContextProfile] = None,
+        context: Optional[str] = None,
+    ) -> Optional[Dict[str, Any]]:
+        if not candidates:
+            return None
+        cand_map = {c.get("id"): c for c in candidates if "id" in c}
+        cand_ids = [c["id"] for c in candidates if "id" in c]
+        if not cand_ids:
+            return self._pick_one(list(candidates), rng)
+
+        if profile is None:
+            if context:
+                profile = compute_context_profile([context], [])
+            else:
+                profile = compute_context_profile([], [])
+
+        if hasattr(self, "affinity_registry") and slot_name in self.affinity_registry.matrix.get("generic", {}):
+            dist = compute_slot_distribution(
+                slot_name,
+                profile,
+                cand_ids,
+                self.affinity_registry.matrix,
+            )
+            chosen_id = sample_categorical(dist, rng)
+            return cand_map.get(chosen_id, self._pick_one(list(candidates), rng))
+        else:
+            return self._pick_one(list(candidates), rng)
 
     @staticmethod
     def _get_affinity_ids(context: Optional[str], slot_key: str) -> List[str]:
@@ -649,7 +583,7 @@ class DataSampler:
 
     # ─── 槽位 2: 景别 + 视角 + 画质/设备 ───
 
-    def sample_shot_type_result(self, shot_type: str, rng: Random) -> Optional[SampleResult]:
+    def sample_shot_type_result(self, shot_type: str, rng: Random, context_profile: Optional[ContextProfile] = None) -> Optional[SampleResult]:
         if _is_none(shot_type):
             return None
         data = self._load("shot_types")
@@ -658,7 +592,7 @@ class DataSampler:
             return None
 
         if _is_random(shot_type) or _is_auto(shot_type):
-            chosen = self._pick_one(shots, rng)
+            chosen = self._sample_from_candidates("shot_type", shots, rng, profile=context_profile)
         else:
             chosen = _match_item(shots, shot_type, "shot_types")
             if not chosen:
@@ -684,7 +618,7 @@ class DataSampler:
         res = self.sample_shot_type_result(shot_type, rng)
         return list(res.tags) if res else []
 
-    def sample_camera_angle_result(self, angle: str, rng: Random) -> Optional[SampleResult]:
+    def sample_camera_angle_result(self, angle: str, rng: Random, context_profile: Optional[ContextProfile] = None) -> Optional[SampleResult]:
         if _is_none(angle):
             return None
         data = self._load("shot_types")
@@ -693,7 +627,7 @@ class DataSampler:
             return None
 
         if _is_random(angle) or _is_auto(angle):
-            chosen = self._pick_one(angles, rng)
+            chosen = self._sample_from_candidates("camera_angle", angles, rng, profile=context_profile)
         else:
             chosen = _match_item(angles, angle, "camera_angles")
             if not chosen:
@@ -826,7 +760,8 @@ class DataSampler:
         state: str,
         nudity_level_code: str,
         rng: Random,
-        context: Optional[str] = None
+        context: Optional[str] = None,
+        context_profile: Optional[ContextProfile] = None,
     ) -> ClothingSampleResult:
         """
         结构化采样服装标签及语义 Provenance，彻底解耦 DataSampler 与 PromptFragment。
@@ -847,12 +782,7 @@ class DataSampler:
         # 1. 确定服装款式对象
         style_mode = get_selection_mode(style)
         if style_mode == SelectionMode.RANDOM:
-            aff_ids = self._get_affinity_ids(context, "clothing")
-            if aff_ids and rng.random() < 0.85:
-                pool = [c for c in styles if c.get("id") in aff_ids]
-                chosen_style = self._pick_one(pool if pool else styles, rng)
-            else:
-                chosen_style = self._pick_one(styles, rng)
+            chosen_style = self._sample_from_candidates("clothing", styles, rng, profile=context_profile, context=context)
         else:
             chosen_style = _match_item(styles, style)
             if not chosen_style:
@@ -1117,12 +1047,35 @@ class DataSampler:
 
     # ─── 槽位 5: 光影氛围 ───
 
-    def sample_lighting_result(self, preset: str, rng: Random, nudity_level_code: Optional[str] = None) -> Optional[SampleResult]:
+    def sample_lighting_result(self, preset: str, rng: Random, nudity_level_code: Optional[str] = None, context_profile: Optional[ContextProfile] = None) -> Optional[SampleResult]:
         if _is_none(preset):
             return None
         data = self._load("lighting")
 
         if _is_auto(preset) or _is_random(preset):
+            combos = data.get("preset_combos", [])
+            if combos and hasattr(self, "affinity_registry"):
+                chosen_combo = self._sample_from_candidates("lighting", combos, rng, profile=context_profile)
+                if chosen_combo:
+                    chosen_id = chosen_combo.get("id", "lighting_combo")
+                    parts = []
+                    for k in ["main_light", "modifier_light", "atmosphere"]:
+                        v = chosen_combo.get(k, "")
+                        if v:
+                            parts.extend([t.strip() for t in v.split(",") if t.strip()])
+                    prov = TagProvenance(item_id=chosen_id, kind="lighting", semantic_ids=(f"lighting:{chosen_id}",), parent_ids=(chosen_id,))
+                    sampled_tags: List[SampledTag] = []
+                    for idx, t_text in enumerate(parts):
+                        sampled_tags.append(
+                            SampledTag(
+                                text=t_text,
+                                provenance=prov,
+                                id=f"{chosen_id}__tag_{idx:03d}",
+                                facts=SemanticFacts(semantic_role="selector"),
+                            )
+                        )
+                    return SampleResult(tags=tuple(parts), item_id=chosen_id, provenance=prov, sampled_tags=tuple(sampled_tags))
+
             raw_result: List[Any] = []
             chosen_id = "lighting_auto"
             techniques = data.get("professional_lighting", [])
@@ -1141,7 +1094,7 @@ class DataSampler:
                 t_tags = self._flatten_tags(temp)
                 if t_tags:
                     raw_result.append(t_tags[0])
-            prov = TagProvenance(item_id=chosen_id, kind="lighting", semantic_ids=(f"lighting:{chosen_id}",))
+            prov = TagProvenance(item_id=chosen_id, kind="lighting", semantic_ids=(f"lighting:{chosen_id}",), parent_ids=(chosen_id,))
             tags_str: List[str] = []
             sampled_tags: List[SampledTag] = []
             for idx, item in enumerate(raw_result):
@@ -1149,10 +1102,12 @@ class DataSampler:
                     t_text = item.get("text", "")
                     t_id = item.get("id", f"{chosen_id}__tag_{idx:03d}")
                     t_facts = SemanticFacts.from_dict(item.get("facts", {}))
+                    if t_facts.semantic_role is None:
+                        t_facts = SemanticFacts.from_dict({**item.get("facts", {}), "semantic_role": "selector"})
                 else:
                     t_text = str(item).strip()
                     t_id = f"{chosen_id}__tag_{idx:03d}"
-                    t_facts = SemanticFacts()
+                    t_facts = SemanticFacts(semantic_role="selector")
                 tags_str.append(t_text)
                 sampled_tags.append(
                     SampledTag(
@@ -1179,8 +1134,17 @@ class DataSampler:
                 if v:
                     parts.extend([t.strip() for t in v.split(",") if t.strip()])
             chosen_id = p.get("id", "lighting_combo")
-            prov = TagProvenance(item_id=chosen_id, kind="lighting", semantic_ids=(f"lighting:{chosen_id}",))
-            return SampleResult(tags=tuple(parts), item_id=chosen_id, provenance=prov)
+            prov = TagProvenance(item_id=chosen_id, kind="lighting", semantic_ids=(f"lighting:{chosen_id}",), parent_ids=(chosen_id,))
+            sampled_tags = [
+                SampledTag(
+                    text=t,
+                    provenance=prov,
+                    id=f"{chosen_id}__tag_{idx:03d}",
+                    facts=SemanticFacts(semantic_role="selector"),
+                )
+                for idx, t in enumerate(parts)
+            ]
+            return SampleResult(tags=tuple(parts), item_id=chosen_id, provenance=prov, sampled_tags=tuple(sampled_tags))
 
         all_other = []
         for sec in ["professional_lighting", "cinematic_lighting", "special_effects", "erotic_lighting"]:
@@ -1231,7 +1195,7 @@ class DataSampler:
 
     # ─── 槽位 6: 姿势动作 ───
 
-    def sample_pose_result(self, category: str, rng: Random, nudity_level_code: Optional[str] = None) -> Optional[SampleResult]:
+    def sample_pose_result(self, category: str, rng: Random, nudity_level_code: Optional[str] = None, context_profile: Optional[ContextProfile] = None) -> Optional[SampleResult]:
         if _is_none(category):
             return None
         data = self._load("poses")
@@ -1240,7 +1204,7 @@ class DataSampler:
             return None
 
         if _is_random(category):
-            cat = self._pick_one(categories, rng)
+            cat = self._sample_from_candidates("pose", categories, rng, profile=context_profile)
         else:
             cat = _match_item(categories, category, "poses")
             if not cat:
@@ -1292,7 +1256,7 @@ class DataSampler:
 
     # ─── 槽位 7: 表情眼神 ───
 
-    def sample_expression_result(self, mood: str, rng: Random) -> Optional[SampleResult]:
+    def sample_expression_result(self, mood: str, rng: Random, context_profile: Optional[ContextProfile] = None) -> Optional[SampleResult]:
         if _is_none(mood):
             return None
         data = self._load("expressions")
@@ -1301,7 +1265,7 @@ class DataSampler:
             return None
 
         if _is_random(mood):
-            cat = self._pick_one(categories, rng)
+            cat = self._sample_from_candidates("expression", categories, rng, profile=context_profile)
         else:
             cat = _match_item(categories, mood, "expressions")
             if not cat:
@@ -1320,7 +1284,7 @@ class DataSampler:
 
     # ─── 槽位 8: 风格/胶片 ───
 
-    def sample_film_result(self, stock: str, rng: Random) -> Optional[SampleResult]:
+    def sample_film_result(self, stock: str, rng: Random, context_profile: Optional[ContextProfile] = None) -> Optional[SampleResult]:
         if _is_none(stock):
             return None
         data = self._load("film_stocks")
@@ -1336,7 +1300,7 @@ class DataSampler:
 
         if _is_random(stock):
             film_list = data.get("film_stocks", all_items)
-            chosen_film = self._pick_one(film_list, rng)
+            chosen_film = self._sample_from_candidates("film", film_list, rng, profile=context_profile)
         else:
             chosen_film = _match_item(all_items, stock)
             if not chosen_film:
@@ -1367,7 +1331,7 @@ class DataSampler:
 
     # ─── 槽位 9: 妆容细节 ───
 
-    def sample_makeup_result(self, makeup_style: str, rng: Random, context: Optional[str] = None) -> Optional[SampleResult]:
+    def sample_makeup_result(self, makeup_style: str, rng: Random, context: Optional[str] = None, context_profile: Optional[ContextProfile] = None) -> Optional[SampleResult]:
         if _is_none(makeup_style):
             return None
         data = self._load("makeup")
@@ -1380,12 +1344,7 @@ class DataSampler:
             return None
 
         if _is_random(makeup_style):
-            aff_ids = self._get_affinity_ids(context, "makeup")
-            if aff_ids and rng.random() < 0.85:
-                pool = [m for m in styles if m.get("id") in aff_ids]
-                chosen = self._pick_one(pool if pool else styles, rng)
-            else:
-                chosen = self._pick_one(styles, rng)
+            chosen = self._sample_from_candidates("makeup", styles, rng, profile=context_profile, context=context)
         else:
             chosen = _match_item(styles, makeup_style, "makeup")
             if not chosen:
@@ -1404,7 +1363,7 @@ class DataSampler:
 
     # ─── 槽位 10: 发型与饰品 ───
 
-    def sample_hairstyle_result(self, hairstyle: str, rng: Random, context: Optional[str] = None) -> Optional[SampleResult]:
+    def sample_hairstyle_result(self, hairstyle: str, rng: Random, context: Optional[str] = None, context_profile: Optional[ContextProfile] = None) -> Optional[SampleResult]:
         if _is_none(hairstyle):
             return None
         data = self._load("accessories")
@@ -1413,12 +1372,7 @@ class DataSampler:
             return None
 
         if _is_random(hairstyle):
-            aff_ids = self._get_affinity_ids(context, "hairstyles")
-            if aff_ids and rng.random() < 0.85:
-                pool = [h for h in styles if h.get("id") in aff_ids]
-                chosen = self._pick_one(pool if pool else styles, rng)
-            else:
-                chosen = self._pick_one(styles, rng)
+            chosen = self._sample_from_candidates("hairstyle", styles, rng, profile=context_profile, context=context)
         else:
             chosen = _match_item(styles, hairstyle, "hairstyles")
             if not chosen:
@@ -1436,7 +1390,7 @@ class DataSampler:
         return list(res.tags) if res else []
 
     def sample_jewelry_result(
-        self, jewelry_style: str, rng: Random, context: Optional[str] = None
+        self, jewelry_style: str, rng: Random, context: Optional[str] = None, context_profile: Optional[ContextProfile] = None
     ) -> Optional[SampleResult]:
         if _is_none(jewelry_style):
             return None
@@ -1446,12 +1400,7 @@ class DataSampler:
             return None
 
         if _is_random(jewelry_style):
-            aff_ids = self._get_affinity_ids(context, "headwear_jewelry")
-            if aff_ids and rng.random() < 0.85:
-                pool = [j for j in items if j.get("id") in aff_ids]
-                chosen = self._pick_one(pool if pool else items, rng)
-            else:
-                chosen = self._pick_one(items, rng)
+            chosen = self._sample_from_candidates("jewelry", items, rng, profile=context_profile, context=context)
         else:
             chosen = _match_item(items, jewelry_style)
             if not chosen:
@@ -1511,7 +1460,7 @@ class DataSampler:
     # ─── 槽位 12: 纹身标记与皮肤融合 ───
 
     def sample_tattoo_result(
-        self, tattoo_style: str, rng: Random, context: Optional[str] = None
+        self, tattoo_style: str, rng: Random, context: Optional[str] = None, context_profile: Optional[ContextProfile] = None
     ) -> Optional[SampleResult]:
         if _is_none(tattoo_style):
             return None
@@ -1521,13 +1470,8 @@ class DataSampler:
             return None
 
         if _is_random(tattoo_style):
-            aff_ids = self._get_affinity_ids(context, "tattoos")
-            if aff_ids and rng.random() < 0.85:
-                pool = [t for t in tattoos if t.get("id") in aff_ids and t.get("id") != "none"]
-                chosen = self._pick_one(pool if pool else tattoos, rng)
-            else:
-                pool = [t for t in tattoos if t.get("id") != "none"]
-                chosen = self._pick_one(pool, rng)
+            pool = [t for t in tattoos if t.get("id") != "none"]
+            chosen = self._sample_from_candidates("tattoo", pool, rng, profile=context_profile, context=context)
         else:
             chosen = _match_item(tattoos, tattoo_style)
             if not chosen:
@@ -1558,7 +1502,7 @@ class DataSampler:
 
     # ─── 槽位 13: 道具宠物 ───
 
-    def sample_prop_result(self, prop_style: str, rng: Random, context: Optional[str] = None) -> Optional[SampleResult]:
+    def sample_prop_result(self, prop_style: str, rng: Random, context: Optional[str] = None, context_profile: Optional[ContextProfile] = None) -> Optional[SampleResult]:
         if _is_none(prop_style):
             return None
         data = self._load("props")
@@ -1567,13 +1511,8 @@ class DataSampler:
             return None
 
         if _is_random(prop_style):
-            aff_ids = self._get_affinity_ids(context, "props")
-            if aff_ids and rng.random() < 0.85:
-                pool = [p for p in props if p.get("id") in aff_ids and p.get("id") != "none"]
-                chosen = self._pick_one(pool if pool else props, rng)
-            else:
-                pool = [p for p in props if p.get("id") != "none"]
-                chosen = self._pick_one(pool, rng)
+            pool = [p for p in props if p.get("id") != "none"]
+            chosen = self._sample_from_candidates("props", pool, rng, profile=context_profile, context=context)
         else:
             chosen = _match_item(props, prop_style)
             if not chosen:
@@ -1696,7 +1635,7 @@ class DataSampler:
 
     # ─── 槽位 14: 人格角色卡 ───
 
-    def sample_character_result(self, character_role: str, rng: Random, context: Optional[str] = None) -> Optional[SampleResult]:
+    def sample_character_result(self, character_role: str, rng: Random, context: Optional[str] = None, context_profile: Optional[ContextProfile] = None) -> Optional[SampleResult]:
         if _is_none(character_role):
             return None
         data = self._load("characters")
@@ -1705,13 +1644,8 @@ class DataSampler:
             return None
 
         if _is_random(character_role):
-            aff_ids = self._get_affinity_ids(context, "characters")
-            if aff_ids and rng.random() < 0.85:
-                pool = [c for c in chars if c.get("id") in aff_ids and c.get("id") != "none"]
-                chosen = self._pick_one(pool if pool else chars, rng)
-            else:
-                pool = [c for c in chars if c.get("id") != "none"]
-                chosen = self._pick_one(pool, rng)
+            pool = [c for c in chars if c.get("id") != "none"]
+            chosen = self._sample_from_candidates("character", pool, rng, profile=context_profile, context=context)
         else:
             chosen = _match_item(chars, character_role)
             if not chosen:
@@ -1733,7 +1667,7 @@ class DataSampler:
 
     # ─── 槽位 15: 液体体液系统 ───
 
-    def sample_liquid_result(self, liquid_effect: str, rng: Random, context: Optional[str] = None) -> Optional[SampleResult]:
+    def sample_liquid_result(self, liquid_effect: str, rng: Random, context: Optional[str] = None, context_profile: Optional[ContextProfile] = None) -> Optional[SampleResult]:
         if _is_none(liquid_effect):
             return None
         data = self._load("nudity_levels")
@@ -1744,13 +1678,8 @@ class DataSampler:
             return None
 
         if _is_random(liquid_effect):
-            aff_ids = self._get_affinity_ids(context, "liquids")
-            if aff_ids and rng.random() < 0.85:
-                pool = [liq for liq in liquids if liq.get("id") in aff_ids and liq.get("id") != "none"]
-                chosen = self._pick_one(pool if pool else liquids, rng)
-            else:
-                pool = [liq for liq in liquids if liq.get("id") != "none"]
-                chosen = self._pick_one(pool, rng)
+            pool = [liq for liq in liquids if liq.get("id") != "none"]
+            chosen = self._sample_from_candidates("liquids", pool, rng, profile=context_profile, context=context)
         else:
             chosen = _match_item(liquids, liquid_effect)
             if not chosen:

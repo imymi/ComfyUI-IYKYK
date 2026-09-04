@@ -16,15 +16,19 @@ from __future__ import annotations
 import hashlib
 import random
 from pathlib import Path
-from typing import Any, Dict, List, Sequence, Tuple
+from typing import Any, Dict, List, Optional, Sequence, Tuple
 
 if __package__:
     from .lib.assembler import PromptAssembler, assemble_result, split_top_level_tags
+    from .lib.context_affinity import compute_context_profile
     from .lib.models import GenerationResult, PromptAtom, PromptFragment, SelectionOrigin, SemanticFacts, TagProvenance
+    from .lib.rng import derive_substream_rng, recover_effective_seed
     from .lib.sampler import DataSampler, _is_none, get_selection_mode
 else:
     from lib.assembler import PromptAssembler, assemble_result, split_top_level_tags
+    from lib.context_affinity import compute_context_profile
     from lib.models import GenerationResult, PromptAtom, PromptFragment, SelectionOrigin, SemanticFacts, TagProvenance
+    from lib.rng import derive_substream_rng, recover_effective_seed
     from lib.sampler import DataSampler, _is_none, get_selection_mode
 
 DATA_DIR = Path(__file__).parent / "data"
@@ -37,7 +41,9 @@ def _get_rng(prompt_seed: int) -> Tuple[random.Random, int]:
         effective_seed = random.randint(0, 0x7FFFFFFF)
     else:
         effective_seed = int(prompt_seed)
-    return random.Random(effective_seed), effective_seed
+    rng = random.Random(effective_seed)
+    rng._effective_seed = effective_seed
+    return rng, effective_seed
 
 
 def _compute_is_changed(prompt_seed: int, inputs: Dict[str, Any]) -> Any:
@@ -195,6 +201,7 @@ def _generate_structured(
     inputs: Dict[str, Any],
     rng: random.Random,
     entry_point: str = "generator",
+    effective_seed: Optional[int] = None,
 ) -> GenerationResult:
     """提示词生成纯函数流水线 (修订 7 纯函数与丰富 Provenance 契约)。
 
@@ -202,6 +209,15 @@ def _generate_structured(
     - 无副作用、无类/实例级可变状态存储；
     - 统一返回不可变 GenerationResult 对象，携带 positive, negative, description, atoms 与 rules_applied。
     """
+    if effective_seed is None:
+        effective_seed = getattr(rng, "_effective_seed", None)
+        if effective_seed is None:
+            effective_seed = recover_effective_seed(rng)
+        if effective_seed is None and "prompt_seed" in inputs and inputs["prompt_seed"] != -1:
+            effective_seed = int(inputs["prompt_seed"])
+        if effective_seed is None:
+            effective_seed = rng.getrandbits(32)
+
     预设模板 = inputs.get("预设模板", "无 (None)")
     风格配方 = inputs.get("风格配方", "无 (None)")
     场景大类 = inputs.get("场景大类", "随机 (Random)")
@@ -227,9 +243,11 @@ def _generate_structured(
 
     # 1. 检查是否使用预设模板
     if not _is_none(预设模板):
-        preset = sampler.get_preset(预设模板, rng)
+        rng_preset = derive_substream_rng(effective_seed, "selector:preset_core")
+        preset = sampler.get_preset(预设模板, rng_preset)
         if preset:
-            recipe = sampler.get_style_recipe(风格配方, rng) if not _is_none(风格配方) else None
+            rng_recipe = derive_substream_rng(effective_seed, "selector:style_recipe")
+            recipe = sampler.get_style_recipe(风格配方, rng_recipe) if not _is_none(风格配方) else None
             assembly_res = assembler.assemble_preset(preset, recipe, 画质等级, rng=rng, entry_point=entry_point)
             neg = sampler.get_negative_prompt()
             desc = f"【预设模板】{preset.get('id', '')} {preset.get('name_zh', '')}"
@@ -243,82 +261,111 @@ def _generate_structured(
                 atoms=assembly_res.accepted_atoms,
                 rules_applied=assembly_res.rules_applied,
                 source_atoms=assembly_res.source_atoms,
+                effective_seed=effective_seed,
+                context_profile=assembly_res.context_profile,
                 selections=selections,
+                resolution_report=assembly_res.resolution_report,
             )
 
     # 2. 采样 15 槽位
     # 槽位 1: 场景 + 主题
-    scene_res = sampler.sample_scene_result(场景大类, rng)
+    rng_scene = derive_substream_rng(effective_seed, "selector:scene_theme")
+    scene_res = sampler.sample_scene_result(场景大类, rng_scene)
     slots: Dict[str, List[Any]] = {}
 
     slots["scene_theme"] = _make_slot_fragments(scene_res, "scene_theme", 场景大类, entry_point)
 
-    theme_res = sampler.sample_theme_result(剧情主题, rng)
+    rng_theme = derive_substream_rng(effective_seed, "selector:theme")
+    theme_res = sampler.sample_theme_result(剧情主题, rng_theme)
     if theme_res:
         slots["scene_theme"].extend(_make_slot_fragments(theme_res, "scene_theme", 剧情主题, entry_point))
+
+    scene_cids = scene_res.context_ids if (scene_res and hasattr(scene_res, "context_ids")) else ()
+    theme_cids = theme_res.context_ids if (theme_res and hasattr(theme_res, "context_ids")) else ()
+    scene_item_id = getattr(scene_res, "item_id", None)
+    theme_item_id = getattr(theme_res, "theme_id", getattr(theme_res, "item_id", None))
+    context_profile = compute_context_profile(scene_cids, theme_cids, scene_item_id, theme_item_id)
 
     primary_context = scene_res.context_ids[0] if (scene_res and scene_res.context_ids) else "generic"
     context = primary_context if primary_context != "generic" else sampler.detect_context(场景大类, 剧情主题)
 
     # 槽位 2: 景别 + 视角
-    shot_res = sampler.sample_shot_type_result(景别构图, rng)
+    rng_shot = derive_substream_rng(effective_seed, "selector:shot_type")
+    shot_res = sampler.sample_shot_type_result(景别构图, rng_shot, context_profile=context_profile)
     slots["shot_type"] = _make_slot_fragments(shot_res, "shot_type", 景别构图, entry_point)
 
-    angle_res = sampler.sample_camera_angle_result(拍摄视角, rng)
+    rng_angle = derive_substream_rng(effective_seed, "selector:camera_angle")
+    angle_res = sampler.sample_camera_angle_result(拍摄视角, rng_angle, context_profile=context_profile)
     slots["camera_angle"] = _make_slot_fragments(angle_res, "camera_angle", 拍摄视角, entry_point)
 
     # 槽位 3 & 4: 裸露等级与服装穿脱联动
-    nudity_res, lvl_code = sampler.sample_nudity_result(裸露等级, rng)
+    rng_nudity = derive_substream_rng(effective_seed, "selector:nudity")
+    nudity_res, lvl_code = sampler.sample_nudity_result(裸露等级, rng_nudity)
     slots["nudity"] = _make_slot_fragments(nudity_res, "nudity", 裸露等级, entry_point)
+
+    rng_clothing = derive_substream_rng(effective_seed, "selector:clothing")
     clothing_res = sampler.sample_clothing_result(
-        服装款式, 服装状态, lvl_code, rng, context=context
+        服装款式, 服装状态, lvl_code, rng_clothing, context=context, context_profile=context_profile
     )
     slots["clothing"] = _make_slot_fragments(clothing_res, "clothing", 服装款式, entry_point)
 
     # 槽位 5: 光影氛围
-    lighting_res = sampler.sample_lighting_result(光影预设, rng, nudity_level_code=lvl_code)
+    rng_lighting = derive_substream_rng(effective_seed, "selector:lighting")
+    lighting_res = sampler.sample_lighting_result(光影预设, rng_lighting, nudity_level_code=lvl_code, context_profile=context_profile)
     slots["lighting"] = _make_slot_fragments(lighting_res, "lighting", 光影预设, entry_point)
 
     # 槽位 6: 姿势动作
-    pose_res = sampler.sample_pose_result(姿势动作, rng, nudity_level_code=lvl_code)
+    rng_pose = derive_substream_rng(effective_seed, "selector:pose")
+    pose_res = sampler.sample_pose_result(姿势动作, rng_pose, nudity_level_code=lvl_code, context_profile=context_profile)
     slots["pose"] = _make_slot_fragments(pose_res, "pose", 姿势动作, entry_point)
 
     # 槽位 7: 表情眼神
-    expression_res = sampler.sample_expression_result(情绪表情, rng)
+    rng_expr = derive_substream_rng(effective_seed, "selector:expression")
+    expression_res = sampler.sample_expression_result(情绪表情, rng_expr, context_profile=context_profile)
     slots["expression"] = _make_slot_fragments(expression_res, "expression", 情绪表情, entry_point)
 
     # 槽位 8: 风格胶片
-    film_res = sampler.sample_film_result(胶片风格, rng)
+    rng_film = derive_substream_rng(effective_seed, "selector:film")
+    film_res = sampler.sample_film_result(胶片风格, rng_film, context_profile=context_profile)
     slots["film"] = _make_slot_fragments(film_res, "film", 胶片风格, entry_point)
 
     # 槽位 9: 妆容细节
-    makeup_res = sampler.sample_makeup_result(妆容细节, rng, context=context)
+    rng_makeup = derive_substream_rng(effective_seed, "selector:makeup")
+    makeup_res = sampler.sample_makeup_result(妆容细节, rng_makeup, context=context, context_profile=context_profile)
     slots["makeup"] = _make_slot_fragments(makeup_res, "makeup", 妆容细节, entry_point)
 
     # 槽位 10: 发型与饰品
-    hairstyle_res = sampler.sample_hairstyle_result(发型发色, rng, context=context)
+    rng_hair = derive_substream_rng(effective_seed, "selector:hairstyle")
+    hairstyle_res = sampler.sample_hairstyle_result(发型发色, rng_hair, context=context, context_profile=context_profile)
     slots["hairstyle"] = _make_slot_fragments(hairstyle_res, "hairstyle", 发型发色, entry_point)
-    jewelry_res = sampler.sample_jewelry_result(饰品头饰, rng, context=context)
+
+    rng_jewel = derive_substream_rng(effective_seed, "selector:jewelry")
+    jewelry_res = sampler.sample_jewelry_result(饰品头饰, rng_jewel, context=context, context_profile=context_profile)
     slots["jewelry"] = _make_slot_fragments(jewelry_res, "jewelry", 饰品头饰, entry_point)
 
     # 槽位 11: 真实微瑕
-    imperfection_res = sampler.sample_imperfections_result(真实微瑕, rng)
+    rng_imp = derive_substream_rng(effective_seed, "selector:imperfections")
+    imperfection_res = sampler.sample_imperfections_result(真实微瑕, rng_imp)
     slots["imperfections"] = _make_slot_fragments(imperfection_res, "imperfections", 真实微瑕, entry_point)
 
     # 槽位 12: 纹身标记（仅在显式配置时生效）
-    tattoo_res = sampler.sample_tattoo_result(纹身标记, rng, context=context)
+    rng_tat = derive_substream_rng(effective_seed, "selector:tattoo")
+    tattoo_res = sampler.sample_tattoo_result(纹身标记, rng_tat, context=context, context_profile=context_profile)
     slots["tattoo"] = _make_slot_fragments(tattoo_res, "tattoo", 纹身标记, entry_point)
 
     # 槽位 13: 道具物件
-    prop_res = sampler.sample_prop_result(道具物件, rng, context=context)
+    rng_prop = derive_substream_rng(effective_seed, "selector:props")
+    prop_res = sampler.sample_prop_result(道具物件, rng_prop, context=context, context_profile=context_profile)
     slots["props"] = _make_slot_fragments(prop_res, "props", 道具物件, entry_point)
 
     # 槽位 14: 人格角色
-    character_res = sampler.sample_character_result(角色设定, rng, context=context)
+    rng_char = derive_substream_rng(effective_seed, "selector:character")
+    character_res = sampler.sample_character_result(角色设定, rng_char, context=context, context_profile=context_profile)
     slots["character"] = _make_slot_fragments(character_res, "character", 角色设定, entry_point)
 
     # 槽位 15: 液体体液
-    liquid_res = sampler.sample_liquid_result(液体效果, rng, context=context)
+    rng_liq = derive_substream_rng(effective_seed, "selector:liquids")
+    liquid_res = sampler.sample_liquid_result(液体效果, rng_liq, context=context, context_profile=context_profile)
     slots["liquids"] = _make_slot_fragments(liquid_res, "liquids", 液体效果, entry_point)
 
     # 画质强化锚点
@@ -326,7 +373,8 @@ def _generate_structured(
     slots["quality"] = _make_slot_fragments(quality_res, "quality", 画质等级, entry_point)
 
     # 3. 叠加风格配方
-    recipe = sampler.get_style_recipe(风格配方, rng) if not _is_none(风格配方) else None
+    rng_recipe = derive_substream_rng(effective_seed, "selector:style_recipe")
+    recipe = sampler.get_style_recipe(风格配方, rng_recipe) if not _is_none(风格配方) else None
     if recipe:
         recipe_id = recipe.get("id", "recipe_custom")
         recipe_frags = recipe.get("fragments")
@@ -390,7 +438,7 @@ def _generate_structured(
                             )
 
     # 4. 组装、冲突消解与统一 Finalize
-    positive_prompt, atoms, rules_applied, source_atoms = assembler.assemble_result_with_sources(slots, rng=rng)
+    assembly_res = assembler.assemble_slots(slots, rng=rng, context_profile=context_profile)
     negative_prompt = sampler.get_negative_prompt()
 
     # 5. 生成中文概要
@@ -412,15 +460,18 @@ def _generate_structured(
         desc_parts.append(f"配方: {recipe.get('style_name', recipe.get('name_zh', ''))}")
 
     chinese_desc = " | ".join(desc_parts)
-    selections = _extract_ordered_selections(source_atoms)
+    selections = _extract_ordered_selections(assembly_res.source_atoms)
     return GenerationResult(
-        positive=positive_prompt,
+        positive=assembly_res.prompt,
         negative=negative_prompt,
         description=chinese_desc,
-        atoms=atoms,
-        rules_applied=rules_applied,
-        source_atoms=source_atoms,
+        atoms=assembly_res.accepted_atoms,
+        rules_applied=assembly_res.rules_applied,
+        source_atoms=assembly_res.source_atoms,
+        effective_seed=effective_seed,
+        context_profile=context_profile,
         selections=selections,
+        resolution_report=assembly_res.resolution_report,
     )
 
 
@@ -555,19 +606,9 @@ class IYKYKPromptGenerator:
             },
             rng=rng,
             entry_point="generator",
-        )
-        return GenerationResult(
-            positive=res.positive,
-            negative=res.negative,
-            description=res.description,
-            atoms=res.atoms,
-            rules_applied=res.rules_applied,
-            source_atoms=res.source_atoms,
             effective_seed=effective_seed,
-            context_profile=res.context_profile,
-            selections=res.selections,
-            resolution_report=res.resolution_report,
         )
+        return res
 
     def generate(
         self,

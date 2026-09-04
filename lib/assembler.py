@@ -17,14 +17,14 @@ if __package__:
     from .conflict_resolver import ConflictResolver
     from .errors import PromptValidationError
     from .lexer import split_top_level_tags, validate_prompt_syntax
-    from .models import AssemblyResult, PromptAtom, PromptFragment, SampledTag, SelectionOrigin, SemanticFacts, TagProvenance
+    from .models import AssemblyResult, ContextProfile, PromptAtom, PromptFragment, SampledTag, SelectionOrigin, SemanticFacts, TagProvenance
     from .slot_contract import AUXILIARY_SLOT_ORDER, SLOT_ORDER, normalize_slot_mapping
 else:
     from lib.atomizer import PromptTag, atoms_to_tags, deduplicate_tags, fragments_to_atoms
     from lib.conflict_resolver import ConflictResolver
     from lib.errors import PromptValidationError
     from lib.lexer import split_top_level_tags, validate_prompt_syntax
-    from lib.models import AssemblyResult, PromptAtom, PromptFragment, SampledTag, SelectionOrigin, SemanticFacts, TagProvenance
+    from lib.models import AssemblyResult, ContextProfile, PromptAtom, PromptFragment, SampledTag, SelectionOrigin, SemanticFacts, TagProvenance
     from lib.slot_contract import AUXILIARY_SLOT_ORDER, SLOT_ORDER, normalize_slot_mapping
 
 MAX_PROMPT_WORDS = 250
@@ -51,7 +51,8 @@ def assemble_result(
     data_dir: str | Path,
     rng: Optional[Random] = None,
     max_words: int = MAX_PROMPT_WORDS,
-    resolver: Optional[ConflictResolver] = None
+    resolver: Optional[ConflictResolver] = None,
+    context_profile: Optional[ContextProfile] = None,
 ) -> AssemblyResult:
     """核心统一入口：执行原子化、冲突消解、去重与截断，返回强类型不可变 AssemblyResult。"""
     if isinstance(max_words, bool) or not isinstance(max_words, int) or max_words < 0:
@@ -109,7 +110,9 @@ def assemble_result(
     # 2. 结构化冲突消解 (支持外部注入复用 Resolver，避免重复加载大型规则配置)
     if resolver is None:
         resolver = ConflictResolver(data_dir)
-    resolved_atoms, rules_applied = resolver.resolve_atoms_with_report(raw_atoms, rng)
+    resolved_atoms, rules_applied, resolution_report = resolver.resolve_atoms_with_full_report(
+        raw_atoms, rng, context_profile
+    )
 
     # 3. 按 tag_order 汇聚为 PromptTag，并执行完整 Tag 级保序去重
     resolved_tags = atoms_to_tags(resolved_atoms)
@@ -159,6 +162,8 @@ def assemble_result(
         accepted_atoms=tuple(accepted_atoms),
         source_atoms=source_atoms,
         rules_applied=rules_applied,
+        context_profile=context_profile,
+        resolution_report=resolution_report,
     )
 
 
@@ -301,20 +306,29 @@ class PromptAssembler:
         self,
         slot_fragments: Dict[str, List[Any]],
         rng: Optional[Random] = None,
-        max_words: int = MAX_PROMPT_WORDS
+        max_words: int = MAX_PROMPT_WORDS,
+        context_profile: Optional[ContextProfile] = None,
     ) -> AssemblyResult:
         """从各槽位片段字典执行装配，返回强类型 AssemblyResult。"""
         fragments = list(iter_normalized_slot_fragments(slot_fragments))
-        return assemble_result(fragments, self.data_dir, rng, max_words, resolver=self.resolver)
+        return assemble_result(
+            fragments,
+            self.data_dir,
+            rng,
+            max_words,
+            resolver=self.resolver,
+            context_profile=context_profile,
+        )
 
     def assemble_result_with_sources(
         self,
         slot_fragments: Dict[str, List[Any]],
         rng: Optional[Random] = None,
-        max_words: int = MAX_PROMPT_WORDS
+        max_words: int = MAX_PROMPT_WORDS,
+        context_profile: Optional[ContextProfile] = None,
     ) -> Tuple[str, Tuple[PromptAtom, ...], Tuple[str, ...], Tuple[PromptAtom, ...]]:
         """兼容接口：从各槽位片段字典执行装配，返回 (prompt_str, atoms, rules_applied, source_atoms)。"""
-        res = self.assemble_slots(slot_fragments, rng, max_words)
+        res = self.assemble_slots(slot_fragments, rng, max_words, context_profile=context_profile)
         return res.prompt, res.accepted_atoms, res.rules_applied, res.source_atoms
 
     def assemble_result(

@@ -345,6 +345,7 @@ class SemanticFacts:
 
 VALID_ENTRY_POINTS: Tuple[str, ...] = ("generator", "preset_browser", "custom_combiner", "diagnostics")
 VALID_SELECTION_MODES: Tuple[str, ...] = ("none", "random", "auto", "explicit", "preset", "recipe", "custom", "resolver")
+FORMAL_ORIGIN_MODES: Tuple[str, ...] = ("random", "auto", "explicit", "preset", "recipe")
 
 CANONICAL_SLOT_SELECTORS: Tuple[str, ...] = (
     "scene", "theme", "scene_theme", "shot", "shot_type", "camera", "camera_angle",
@@ -851,6 +852,8 @@ class PromptAtom:
 
     @property
     def can_detect(self) -> bool:
+        if self.origin and self.origin.mode in ("preset", "recipe", "explicit") and self.facts and self.facts.explicit_fields:
+            return True
         return self.span_type in (SpanType.PLAIN, SpanType.PAREN, SpanType.BRACKET)
 
     @property

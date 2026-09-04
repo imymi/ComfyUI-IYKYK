@@ -1,63 +1,402 @@
 """
-conflict_resolver.py — 结构化提示词冲突检测与消解引擎 (PromptAtom 生产级贯穿与 17 规则 SSOT)
+conflict_resolver.py — 冲突消解引擎权威执行器 (Python SSOT)
 
-严格实现 17 大多规则物理与语义自洽冲突消解：
-1. spatial_environmental_mutual_exclusion: 空间与环境自洽互斥
-2. nudity_clothing_conflicts: 裸露与内衣/衣物状态互斥 (无 clothing None 伪合成词)
-3. material_penetration: 材质穿透伪影消解 (官方 clothing_extension Provenance 免杀)
-4. clothing_style_state_coherence: 服装款式与解构状态互斥 (连体衣禁止掀裙解扣，长裤禁止裙摆)
-5. gaze_angle_geometry: 视线与镜头角度几何匹配
-6. gaze_mutual_exclusion: 视线方向唯一性 (直视与移开视线互斥)
-7. accessory_occlusion_gaze_coherence: 饰品遮挡与视线面部动作自洽 (蒙眼禁止对视眨眼)
-8. framing_lower_body_coherence: 景别特写与下肢足部元素自洽 (面部特写剔除鞋袜，保留非下肢词)
-9. liquid_restrictions: 液体微量与安全法则 (先执行 banned_combos 替换，再添加微量量词)
-10. device_quality_compatibility: 设备与画质等级兼容 (手机/监控自拍过滤 8k/单反/写真)
-11. tattoo_dermal_fusion: 纹身真皮层融合
-12. pose_hand_occupation: 姿势手部占用与手持道具互斥
-13. handheld_props_single_holder: 多手持道具唯一性消解 (保留首个手持动作)
-14. emotion_gaze_affinity: 情绪表情与眼神方向一致性
-15. environmental_lighting_coherence: 光照环境与黑夜白昼物理自洽
-16. monochrome_film_chroma_coherence: 黑白胶片与高饱和色彩互斥
-17. makeup_details_coherence: 妆容与细节自洽 (素颜无妆与糊妆浓妆互斥)
+严格遵循 DAG 拓扑执行顺序 (17 条规则)，不可变规则契约 (lib/rule_contract.py)，
+多信号情境亲和度接入 (lib/context_affinity.py) 与全链路零旁路账本闭环。
 """
 from __future__ import annotations
 
-import json
+from collections.abc import Mapping
+import dataclasses
 from dataclasses import replace
+import hashlib
+import json
 from pathlib import Path
 from random import Random
-from typing import Any, Dict, List, Optional, Sequence, Tuple
+from typing import Any, Dict, List, Optional, Sequence, Set, Tuple
 
 if __package__:
-    from .atomizer import atoms_to_fragments, fragments_to_atoms
-    from .errors import RuleConfigurationError
-    from .models import PromptAtom, PromptFragment, SpanType, TagProvenance
+    from .errors import RuleConfigurationError, UnresolvedConflictError
+    from .models import (
+        FORMAL_ORIGIN_MODES,
+        ContextProfile,
+        PromptAtom,
+        PromptFragment,
+        ResolutionDecision,
+        ResolutionReport,
+        SelectionOrigin,
+        SemanticFacts,
+        SpanType,
+        TagProvenance,
+    )
+    from .rng import derive_substream_rng, recover_effective_seed
     from .rule_contract import (
-        STABLE_RULE_ORDER,
         AngleGazeMappingSpec,
         BannedComboSpec,
         DeviceConstraintSpec,
-        LevelRuleSpec,
+        EmotionGazeConflictSpec,
         PatternSpec,
-        ReplacementSpec,
         RuleDocument,
+        RuleItem,
+        TriggerBanConflictSpec,
         parse_rule_document,
     )
+    from .slot_contract import SLOT_ALIASES, normalize_slot_name
 else:
-    from lib.atomizer import atoms_to_fragments, fragments_to_atoms
-    from lib.errors import RuleConfigurationError
-    from lib.models import PromptAtom, PromptFragment, SpanType, TagProvenance
+    from lib.errors import RuleConfigurationError, UnresolvedConflictError
+    from lib.models import (
+        FORMAL_ORIGIN_MODES,
+        ContextProfile,
+        PromptAtom,
+        PromptFragment,
+        ResolutionDecision,
+        ResolutionReport,
+        SelectionOrigin,
+        SemanticFacts,
+        SpanType,
+        TagProvenance,
+    )
+    from lib.rng import derive_substream_rng, recover_effective_seed
     from lib.rule_contract import (
-        STABLE_RULE_ORDER,
         AngleGazeMappingSpec,
         BannedComboSpec,
         DeviceConstraintSpec,
-        LevelRuleSpec,
+        EmotionGazeConflictSpec,
         PatternSpec,
-        ReplacementSpec,
         RuleDocument,
+        RuleItem,
+        TriggerBanConflictSpec,
         parse_rule_document,
     )
+    from lib.slot_contract import SLOT_ALIASES, normalize_slot_name
+
+
+# 预编译常量匹配模式 (R2-N09: 零运行时 re.compile 调用)
+LVL_REGEX_MAP = {
+    "L6": r"\b(?:l6|extreme nude|explicitly naked|explicit nude|full naked)\b",
+    "L5": r"\b(?:l5|completely naked|full nude|bare body|unclothed|stripped bare)\b",
+    "L4": r"\b(?:l4|micro bikini|sling bikini|minimal covering|pasties|tape)\b",
+    "L3": r"\b(?:l3|lingerie|underwear|bra|panties|bikini|swimsuit)\b",
+    "L2": r"\b(?:l2|cleavage|deep v-neck|plunging neckline|see-through|translucent|sheer)\b",
+    "L1": r"\b(?:l1|fully clothed|neatly worn|casual wear|suit|coat|jacket)\b",
+}
+LVL_PATTERN_SPECS: Dict[str, PatternSpec] = {
+    lvl: PatternSpec(pattern=LVL_REGEX_MAP[lvl], match_mode="regex")
+    for lvl in ("L6", "L5", "L4", "L3", "L2", "L1")
+}
+for ps in LVL_PATTERN_SPECS.values():
+    ps.compile()
+
+
+def is_formal_atom(a: PromptAtom) -> bool:
+    """判断是否为正式目录/预设/配方产出的 Atom。"""
+    if a.origin is None or not a.origin.mode:
+        return False
+    return a.origin.mode in FORMAL_ORIGIN_MODES
+
+
+def make_replaced_atom(
+    target: PromptAtom,
+    new_text: str,
+    rule_id: str,
+    new_facts: Optional[SemanticFacts] = None,
+) -> PromptAtom:
+    """每次替换生成新的、确定性的 Atom ID，保留 target、produced 和 parent 闭环 (R2-P1-003)。"""
+    new_atom_id = f"{target.atom_id}__r_{rule_id}"
+    new_parents = (target.atom_id,) + tuple(p for p in target.provenance.parent_ids if p != target.atom_id)
+    new_prov = replace(target.provenance, parent_ids=new_parents, rule_id=rule_id)
+    new_origin = None
+    if target.origin:
+        origin_parents = (target.atom_id,) + tuple(p for p in target.origin.parent_ids if p != target.atom_id)
+        new_origin = replace(target.origin, parent_ids=origin_parents)
+    return replace(
+        target,
+        atom_id=new_atom_id,
+        text=new_text,
+        provenance=new_prov,
+        origin=new_origin,
+        facts=new_facts if new_facts is not None else target.facts,
+    )
+
+
+def compute_atoms_hash(atoms: Sequence[PromptAtom]) -> str:
+    """计算原子序列的确定性 SHA-256 哈希。"""
+    h = hashlib.sha256()
+    for a in atoms:
+        h.update(f"{a.atom_id}:{a.text}:{a.source_slot}:{a.tag_order}:{a.span_order}".encode("utf-8"))
+    return h.hexdigest()
+
+
+class OneTimeIndex:
+    """单次扫描构建的快速索引容器，支持规则共享高效查询与 tombstone 跟踪 (R2-P2-001, R2R2-P3-001)。"""
+    def __init__(self, atoms: Sequence[PromptAtom]):
+        self._all_atoms: List[PromptAtom] = list(atoms)
+        self._tombstones: Set[str] = set()
+        self._indexed_atom_ids: Set[str] = set()
+        self.by_slot: Dict[str, List[PromptAtom]] = {}
+        self.by_item_id: Dict[str, List[PromptAtom]] = {}
+        self.by_origin_mode: Dict[str, List[PromptAtom]] = {}
+        self.by_mutex_group: Dict[str, List[PromptAtom]] = {}
+        self.by_parent_source_id: Dict[str, List[PromptAtom]] = {}
+        self.by_fact: Dict[Tuple[str, Any], List[PromptAtom]] = {}
+        self.ordered_detectable_atoms: List[PromptAtom] = []
+
+        for a in atoms:
+            self._index_atom(a)
+
+    def _index_atom(self, a: PromptAtom) -> None:
+        if a.atom_id in self._indexed_atom_ids:
+            return
+        self._indexed_atom_ids.add(a.atom_id)
+        norm_slot = normalize_slot_name(a.source_slot)
+        slots_to_index = {a.source_slot, norm_slot}
+        if a.source_slot == "scene_theme" or norm_slot == "scene_theme":
+            slots_to_index.update(("scene", "theme"))
+        for alias, canonical in SLOT_ALIASES.items():
+            if canonical == a.source_slot or canonical == norm_slot:
+                slots_to_index.add(alias)
+        for s in slots_to_index:
+            self.by_slot.setdefault(s, []).append(a)
+        if a.source_item_id:
+            self.by_item_id.setdefault(a.source_item_id, []).append(a)
+        if a.origin and a.origin.mode:
+            self.by_origin_mode.setdefault(a.origin.mode, []).append(a)
+        if a.exclusive_group:
+            self.by_mutex_group.setdefault(a.exclusive_group, []).append(a)
+        if a.facts:
+            if a.facts.mutex_groups:
+                for mg in a.facts.mutex_groups:
+                    self.by_mutex_group.setdefault(mg, []).append(a)
+            for k in ("space_kind", "hand_state", "prop_usage", "emotion", "gaze", "occlusion",
+                      "time_of_day", "capture_device", "quality_class", "makeup_base", "liquid_kind", "liquid_amount"):
+                v = getattr(a.facts, k, None)
+                if v:
+                    self.by_fact.setdefault((k, v), []).append(a)
+            for k in ("venue_ids", "visible_regions", "garment_topologies", "garment_states",
+                      "light_sources", "color_modes", "makeup_effects", "liquid_locations"):
+                v_list = getattr(a.facts, k, ())
+                for v in v_list:
+                    self.by_fact.setdefault((k, v), []).append(a)
+        if a.provenance:
+            if a.provenance.item_id:
+                self.by_item_id.setdefault(a.provenance.item_id, []).append(a)
+            for pid in a.provenance.parent_ids:
+                self.by_parent_source_id.setdefault(pid, []).append(a)
+        if a.can_detect:
+            self.ordered_detectable_atoms.append(a)
+
+    def is_active(self, a: Any) -> bool:
+        atom_id = a if isinstance(a, str) else getattr(a, "atom_id", str(a))
+        return atom_id not in self._tombstones
+
+    def drop(self, atom_id: str) -> None:
+        self._tombstones.add(atom_id)
+
+    def tombstone(self, atom_id: str) -> None:
+        self._tombstones.add(atom_id)
+
+    def replace(self, old_atom_id: str, new_atom: PromptAtom) -> None:
+        self._tombstones.add(old_atom_id)
+        self._all_atoms.append(new_atom)
+        self._index_atom(new_atom)
+
+    def inject(self, new_atom: PromptAtom) -> None:
+        self._all_atoms.append(new_atom)
+        self._index_atom(new_atom)
+
+    def get_active_by_slot(self, slot: str) -> List[PromptAtom]:
+        return [a for a in self.by_slot.get(slot, []) if a.atom_id not in self._tombstones]
+
+    def get_active_by_slots(self, *slots: str) -> List[PromptAtom]:
+        seen = set()
+        res = []
+        for s in slots:
+            for a in self.by_slot.get(s, []):
+                if a.atom_id not in self._tombstones and a.atom_id not in seen:
+                    seen.add(a.atom_id)
+                    res.append(a)
+        return res
+
+    def get_active_by_fact(self, key_or_pair: Any, val: Any = None) -> List[PromptAtom]:
+        """按语义事实键值查询活跃原子，支持 (key, val) 单一元组或双参数调用 (R2R2-P3-001)。"""
+        if isinstance(key_or_pair, tuple) and val is None:
+            k, v = key_or_pair
+        else:
+            k, v = key_or_pair, val
+        seen = set()
+        res = []
+        for a in self.by_fact.get((k, v), []):
+            if a.atom_id not in self._tombstones and a.atom_id not in seen:
+                seen.add(a.atom_id)
+                res.append(a)
+        return res
+
+    def get_active_by_item_id(self, item_id: str) -> List[PromptAtom]:
+        """按 item ID 查询活跃原子 (R2R2-P3-001)。"""
+        seen = set()
+        res = []
+        for a in self.by_item_id.get(item_id, []):
+            if a.atom_id not in self._tombstones and a.atom_id not in seen:
+                seen.add(a.atom_id)
+                res.append(a)
+        return res
+
+    def get_active_by_mutex_group(self, group: str) -> List[PromptAtom]:
+        """按互斥组查询活跃原子 (R2R2-P3-001)。"""
+        seen = set()
+        res = []
+        for a in self.by_mutex_group.get(group, []):
+            if a.atom_id not in self._tombstones and a.atom_id not in seen:
+                seen.add(a.atom_id)
+                res.append(a)
+        return res
+
+    def get_active_detectable(self) -> List[PromptAtom]:
+        return [a for a in self.ordered_detectable_atoms if a.atom_id not in self._tombstones]
+
+    def get_all_active_ordered(self) -> List[PromptAtom]:
+        return sorted([a for a in self._all_atoms if a.atom_id not in self._tombstones], key=lambda x: (x.tag_order, x.span_order))
+
+
+class DecisionLedger:
+    """原子级消解决策审计账本。"""
+    def __init__(self, rule_registry: Optional[RuleRegistry] = None):
+        self.decisions: List[ResolutionDecision] = []
+        self._seq = 0
+        self._registry = rule_registry
+
+    def _validate_reason_code(self, rule_id: str, reason_code: str) -> None:
+        if self._registry:
+            rule = self._registry.get_rule(rule_id)
+            if reason_code not in rule.reason_codes:
+                raise RuleConfigurationError(
+                    f"Reason code '{reason_code}' is not declared in rule '{rule_id}' reason_codes: {rule.reason_codes}"
+                )
+
+    def record_drop(
+        self,
+        rule_id: str,
+        phase: str,
+        reason_code: str,
+        winner_atom_ids: Sequence[str],
+        target_atom: PromptAtom,
+        parent_source_ids: Sequence[str] = (),
+    ) -> ResolutionDecision:
+        self._validate_reason_code(rule_id, reason_code)
+        seq = self._seq
+        self._seq += 1
+        p_ids = tuple(parent_source_ids or target_atom.provenance.parent_ids)
+        dec = ResolutionDecision(
+            decision_id=f"dec_{seq:04d}_{rule_id}_drop",
+            sequence=seq,
+            rule_id=rule_id,
+            phase=phase,
+            action="drop",
+            reason_code=reason_code,
+            winner_atom_ids=tuple(winner_atom_ids),
+            target_atom_id=target_atom.atom_id,
+            produced_atom_ids=(),
+            before_text=target_atom.text,
+            after_text=None,
+            parent_source_ids=p_ids,
+        )
+        self.decisions.append(dec)
+        return dec
+
+    def record_replace(
+        self,
+        rule_id: str,
+        phase: str,
+        reason_code: str,
+        winner_atom_ids: Sequence[str],
+        target_atom: PromptAtom,
+        produced_atoms: Sequence[PromptAtom],
+        parent_source_ids: Sequence[str] = (),
+    ) -> ResolutionDecision:
+        self._validate_reason_code(rule_id, reason_code)
+        seq = self._seq
+        self._seq += 1
+        produced_ids = tuple(a.atom_id for a in produced_atoms)
+        after_text = ", ".join(a.text for a in produced_atoms)
+        p_ids = tuple(parent_source_ids) if parent_source_ids else ((target_atom.atom_id,) + tuple(p for p in target_atom.provenance.parent_ids if p != target_atom.atom_id))
+        dec = ResolutionDecision(
+            decision_id=f"dec_{seq:04d}_{rule_id}_replace",
+            sequence=seq,
+            rule_id=rule_id,
+            phase=phase,
+            action="replace",
+            reason_code=reason_code,
+            winner_atom_ids=tuple(winner_atom_ids),
+            target_atom_id=target_atom.atom_id,
+            produced_atom_ids=produced_ids,
+            before_text=target_atom.text,
+            after_text=after_text,
+            parent_source_ids=p_ids,
+        )
+        self.decisions.append(dec)
+        return dec
+
+    def record_inject(
+        self,
+        rule_id: str,
+        phase: str,
+        reason_code: str,
+        winner_atom_ids: Sequence[str],
+        produced_atoms: Sequence[PromptAtom],
+        parent_source_ids: Sequence[str] = (),
+    ) -> ResolutionDecision:
+        self._validate_reason_code(rule_id, reason_code)
+        seq = self._seq
+        self._seq += 1
+        produced_ids = tuple(a.atom_id for a in produced_atoms)
+        after_text = ", ".join(a.text for a in produced_atoms)
+        dec = ResolutionDecision(
+            decision_id=f"dec_{seq:04d}_{rule_id}_inject",
+            sequence=seq,
+            rule_id=rule_id,
+            phase=phase,
+            action="inject",
+            reason_code=reason_code,
+            winner_atom_ids=tuple(winner_atom_ids),
+            target_atom_id=None,
+            produced_atom_ids=produced_ids,
+            before_text=None,
+            after_text=after_text,
+            parent_source_ids=tuple(parent_source_ids),
+        )
+        self.decisions.append(dec)
+        return dec
+
+
+def verify_provenance_closure(
+    source_atoms: Sequence[PromptAtom],
+    final_atoms: Sequence[PromptAtom],
+    decisions: Sequence[ResolutionDecision],
+) -> bool:
+    """递归验证 source/decision/produced/final 的完整溯源闭环 (R2R-P1-003)。"""
+    valid_ids: Set[str] = {a.atom_id for a in source_atoms}
+    source_parent_ids: Set[str] = set()
+    for a in source_atoms:
+        if a.provenance:
+            source_parent_ids.update(a.provenance.parent_ids)
+
+    for d in decisions:
+        if d.target_atom_id and d.target_atom_id not in valid_ids:
+            return False
+        for pid in d.parent_source_ids:
+            if pid not in valid_ids and pid not in source_parent_ids:
+                return False
+        for prod_id in d.produced_atom_ids:
+            valid_ids.add(prod_id)
+
+    for a in final_atoms:
+        if not a.provenance or not a.provenance.parent_ids:
+            return False
+        for pid in a.provenance.parent_ids:
+            if pid not in valid_ids and pid not in source_parent_ids:
+                return False
+
+    return True
 
 
 def match_pattern(pattern: str, text: str, mode: str = "phrase") -> bool:
@@ -68,78 +407,611 @@ def match_pattern(pattern: str, text: str, mode: str = "phrase") -> bool:
     return ps.matches(text)
 
 
-class RuleRegistry:
-    """强类型规则注册中心：直接消费 RuleDocument 统一解析结果。"""
 
-    def __init__(self, data_dir: str | Path):
+def build_canonical_catalog_facts(data_dir: Path) -> Dict[Tuple[str, str], SemanticFacts]:
+    """单次加载构建 (slot, stable_leaf_id) -> canonical SemanticFacts 权威映射表 (R2R2-P1-001)。"""
+    data_dir = Path(data_dir)
+    FILE_SLOT_MAP = {
+        "accessories.json": ["jewelry", "accessories"],
+        "characters.json": ["character"],
+        "clothing.json": ["clothing", "clothing_state", "clothing_extension", "underwear"],
+        "expressions.json": ["expression", "expressions"],
+        "film_stocks.json": ["film", "film_stock"],
+        "imperfections.json": ["imperfections"],
+        "lighting.json": ["lighting", "lighting_palette"],
+        "makeup.json": ["makeup"],
+        "nudity_levels.json": ["nudity", "liquids", "liquid"],
+        "poses.json": ["pose", "poses"],
+        "props.json": ["props", "prop"],
+        "scenes.json": ["scene_theme", "scene", "theme"],
+        "shot_types.json": ["shot_type", "shot", "camera_angle", "camera", "angle", "view"],
+        "style_recipes.json": ["style_recipe", "recipe"],
+        "tattoos.json": ["tattoo", "tattoos"],
+        "themes.json": ["scene_theme", "scene", "theme"],
+    }
+    catalog_facts: Dict[Tuple[str, str], SemanticFacts] = {}
+    for fname, slots in FILE_SLOT_MAP.items():
+        p = data_dir / fname
+        if not p.exists():
+            continue
+        data = json.loads(p.read_text(encoding="utf-8"))
+        def walk(obj, current_slot=None):
+            if isinstance(obj, dict):
+                slot_override = obj.get("slot", current_slot)
+                if "id" in obj and "facts" in obj and isinstance(obj["id"], str):
+                    lid = obj["id"]
+                    try:
+                        facts = SemanticFacts.from_dict(obj["facts"])
+                        target_slots = [slot_override] if slot_override else slots
+                        for s in target_slots:
+                            norm_s = normalize_slot_name(s)
+                            catalog_facts[(norm_s, lid)] = facts
+                            catalog_facts[(s, lid)] = facts
+                    except Exception:
+                        pass
+                if fname == "clothing.json" and "id" in obj and isinstance(obj["id"], str) and "tags" in obj and isinstance(obj["tags"], list):
+                    lid = obj["id"]
+                    combined: Dict[str, Any] = {}
+                    for t in obj["tags"]:
+                        if isinstance(t, dict) and "facts" in t:
+                            for k, v in t["facts"].items():
+                                if isinstance(v, list):
+                                    if k not in combined:
+                                        combined[k] = list(v)
+                                    else:
+                                        for x in v:
+                                            if x not in combined[k]:
+                                                combined[k].append(x)
+                                else:
+                                    if k not in combined:
+                                        combined[k] = v
+                                    elif combined[k] != v:
+                                        combined[k] = None
+                    combined = {k: v for k, v in combined.items() if v is not None}
+                    if combined:
+                        try:
+                            facts = SemanticFacts.from_dict(combined)
+                            target_slots = [slot_override] if slot_override else slots
+                            for s in target_slots:
+                                norm_s = normalize_slot_name(s)
+                                if (norm_s, lid) not in catalog_facts:
+                                    catalog_facts[(norm_s, lid)] = facts
+                                    catalog_facts[(s, lid)] = facts
+                        except Exception:
+                            pass
+                for k, v in obj.items():
+                    walk(v, slot_override)
+            elif isinstance(obj, list):
+                for itm in obj:
+                    walk(itm, current_slot)
+        walk(data)
+
+    presets_file = data_dir / "presets.json"
+    if presets_file.exists():
+        p_data = json.loads(presets_file.read_text(encoding="utf-8"))
+        for pr in p_data.get("presets", []):
+            for fr in pr.get("fragments", []):
+                fid = fr.get("id")
+                fslot = fr.get("slot")
+                if fid and fslot and "facts" in fr:
+                    try:
+                        facts = SemanticFacts.from_dict(fr["facts"])
+                        norm_s = normalize_slot_name(fslot)
+                        if (norm_s, fid) not in catalog_facts:
+                            catalog_facts[(norm_s, fid)] = facts
+                            catalog_facts[(fslot, fid)] = facts
+                    except Exception:
+                        pass
+    return catalog_facts
+
+
+def select_fallback_patterns(
+    tf_patterns: Sequence[PatternSpec],
+    role: Optional[str] = None,
+    group_id: Optional[str] = None,
+) -> Tuple[PatternSpec, ...]:
+    """严格根据 RuleItem.spec.text_fallback.patterns 单一来源获取运行时可用模式 (R2R5-P1-001)。
+    - 禁止接收或求交 banned_words、catalog_*、custom_* 等平行集合；
+    - 所有关键词只能来自当前 RuleItem 的 text_fallback 声明 (tf_patterns)；
+    - 若 tf_patterns 为空，直接返回空元组 () (Fail-Closed)；
+    - 按 role 与 group_id 过滤。若指定了 role，必须匹配；若指定了 group_id，必须匹配；
+    - 向后兼容：若 tf_patterns 中的所有模式均未指定 role (或 group_id)，降级跳过该维度过滤；
+    - 若指定了但无任何匹配项，Fail-Closed 返回 ()。
+    """
+    if not tf_patterns:
+        return ()
+    effective_role = role
+    if role is not None and all(getattr(p, "role", None) is None for p in tf_patterns):
+        effective_role = None
+
+    effective_group_id = group_id
+    if group_id is not None and all(getattr(p, "group_id", None) is None for p in tf_patterns):
+        effective_group_id = None
+
+    res = []
+    for p in tf_patterns:
+        if effective_role is not None and getattr(p, "role", None) != effective_role:
+            continue
+        if effective_group_id is not None and getattr(p, "group_id", None) != effective_group_id:
+            continue
+        res.append(p)
+    return tuple(res)
+
+
+def get_fallback_group_ids(
+    tf_patterns: Sequence[PatternSpec],
+    role: Optional[str] = None,
+) -> Tuple[str, ...]:
+    """获取指定 role 下存在的所有 group_id (保持出现顺序且去重) (R2R5-P1-001)。"""
+    seen = set()
+    order = []
+    for p in tf_patterns:
+        if role is not None and getattr(p, "role", None) != role:
+            continue
+        gid = getattr(p, "group_id", None)
+        if gid and gid not in seen:
+            seen.add(gid)
+            order.append(gid)
+    return tuple(order)
+
+
+def filter_active_patterns(
+    patterns: Sequence[PatternSpec],
+    tf_patterns: Sequence[PatternSpec],
+    role: Optional[str] = None,
+    group_id: Optional[str] = None,
+) -> Tuple[PatternSpec, ...]:
+    """向后兼容别名：仅代理调用 select_fallback_patterns，禁止消费平行集合 patterns (R2R5-P1-001)。"""
+    return select_fallback_patterns(tf_patterns, role=role, group_id=group_id)
+
+
+class RuleRegistry:
+    """冲突规则注册表：从 JSON 数据文件加载并按契约解析构建 17 个规则规格对象。"""
+    def __init__(self, data_dir: Path | str):
         self.data_dir = Path(data_dir)
+        self.rules_file = self.data_dir / "conflict_rules.json"
         self.doc: RuleDocument = self._load_rules()
+        self._rules_by_id: Dict[str, Any] = {r.id: r.spec for r in self.doc.rules}
+        self._rule_items_by_id: Dict[str, RuleItem] = {r.id: r for r in self.doc.rules}
+        (
+            self.total_precompiled_patterns,
+            self.precompiled_fallback_count,
+            self.uncompiled_patterns_count,
+        ) = self._precompile_all_patterns()
+        self.precompiled_count: int = self.precompiled_fallback_count
+
+    def _precompile_all_patterns(self) -> Tuple[int, int, int]:
+        """深度遍历 RuleDocument，支持 collections.abc.Mapping、dataclass 字段和 visited 集合。
+        遍历全部 1,078 个 PatternSpec 并完成预编译，确保未编译数为 0 (P1)。
+        返回 (total_patterns, fallback_patterns, uncompiled_count)。
+        """
+        visited = set()
+        all_patterns: List[PatternSpec] = []
+
+        def _walk(obj: Any) -> None:
+            if obj is None:
+                return
+            oid = id(obj)
+            if oid in visited:
+                return
+            visited.add(oid)
+
+            if isinstance(obj, PatternSpec):
+                all_patterns.append(obj)
+                return
+
+            if dataclasses.is_dataclass(obj) and not isinstance(obj, type):
+                for f in dataclasses.fields(obj):
+                    _walk(getattr(obj, f.name))
+                return
+
+            if isinstance(obj, Mapping):
+                for v in obj.values():
+                    _walk(v)
+                return
+
+            if isinstance(obj, (list, tuple, set, frozenset)):
+                for item in obj:
+                    _walk(item)
+                return
+
+        _walk(self.doc)
+
+        fallback_count = 0
+        for r in self.doc.rules:
+            rtf = getattr(r.spec, "text_fallback", None)
+            if rtf and rtf.patterns:
+                fallback_count += len(rtf.patterns)
+
+        for p in all_patterns:
+            p.compile()
+
+        uncompiled_count = sum(1 for p in all_patterns if getattr(p, "_compiled", None) is None)
+        return len(all_patterns), fallback_count, uncompiled_count
 
     def _load_rules(self) -> RuleDocument:
-        rules_file = self.data_dir / "conflict_rules.json"
-        if not rules_file.exists():
-            raise RuleConfigurationError(f"Conflict rules file not found: {rules_file}")
+        if not self.rules_file.exists():
+            raise RuleConfigurationError(f"conflict_rules.json not found in {self.data_dir}")
 
+        import json
         try:
-            with open(rules_file, "r", encoding="utf-8") as f:
-                data = json.load(f)
+            raw_data = json.loads(self.rules_file.read_text(encoding="utf-8"))
         except Exception as e:
-            raise RuleConfigurationError(f"Failed to parse conflict_rules.json: {e}") from e
+            raise RuleConfigurationError(f"Failed to parse {self.rules_file}: {e}") from e
 
-        # 消费权威 SSOT 统一强类型解析器 (Fail-Closed)
-        return parse_rule_document(data)
+        return parse_rule_document(raw_data)
 
     def get_rule(self, rule_id: str) -> Any:
-        item = self.doc.get_rule(rule_id)
-        if item is None:
+        if rule_id not in self._rules_by_id:
             raise RuleConfigurationError(f"Rule {rule_id!r} not found in registry")
-        return item.spec
+        return self._rules_by_id[rule_id]
+
+    def get_rule_item(self, rule_id: str) -> RuleItem:
+        if rule_id not in self._rule_items_by_id:
+            raise RuleConfigurationError(f"RuleItem {rule_id!r} not found in registry")
+        return self._rule_items_by_id[rule_id]
 
 
 class ConflictResolver:
-    """17 大冲突规则消解引擎。"""
-
-    def __init__(self, data_dir: str | Path):
-        self.data_dir = Path(data_dir)
+    """ComfyUI-IYKYK v1.1.0-rc8 冲突消解引擎权威执行器。"""
+    def __init__(self, data_dir: Path):
+        self.data_dir = data_dir
         self.registry = RuleRegistry(data_dir)
+        self.canonical_catalog_facts: Dict[Tuple[str, str], SemanticFacts] = build_canonical_catalog_facts(data_dir)
+        self.text_fallback_hits: int = 0
+        self.last_report: Optional[ResolutionReport] = None
+
+    def _validate_formal_atom(self, a: PromptAtom, rule_id: str) -> None:
+        """验证正式目录/预设/配方原子是否携带当前规则所需的基础语义事实。若事实缺失则 Fail-Closed (R2R2-P1-001)。"""
+        if not is_formal_atom(a):
+            return
+
+        rule_item = self.registry.get_rule_item(rule_id)
+        sc = getattr(rule_item.spec, "semantic_constraints", None)
+        if sc:
+            rule_target_slots = set(sc.target_slots)
+            norm_target_slots = {normalize_slot_name(s) for s in rule_target_slots} | rule_target_slots
+            rule_fact_fields = set(sc.fact_fields)
+
+            norm_slot = normalize_slot_name(a.source_slot)
+            is_relevant = (norm_slot in norm_target_slots) or (a.source_slot in norm_target_slots)
+            if not is_relevant and a.facts:
+                is_relevant = any(bool(getattr(a.facts, ff, None)) for ff in rule_fact_fields)
+
+            if not is_relevant:
+                return
+
+        candidate_ids = []
+        if a.id:
+            candidate_ids.append(a.id)
+        if a.provenance and a.provenance.item_id and a.provenance.item_id not in candidate_ids:
+            candidate_ids.append(a.provenance.item_id)
+        if a.source_item_id and a.source_item_id not in candidate_ids:
+            candidate_ids.append(a.source_item_id)
+        if a.origin and a.origin.selected_id and a.origin.selected_id not in candidate_ids:
+            candidate_ids.append(a.origin.selected_id)
+
+        norm_slot = normalize_slot_name(a.source_slot)
+
+        # 1. 权威事实匹配与未知 ID Fail-Closed
+        canon: Optional[SemanticFacts] = None
+        matched_id: Optional[str] = None
+        for cid in candidate_ids:
+            found = self.canonical_catalog_facts.get((norm_slot, cid)) or self.canonical_catalog_facts.get((a.source_slot, cid))
+            if not found:
+                for alias in (a.source_slot, norm_slot):
+                    found = self.canonical_catalog_facts.get((alias, cid))
+                    if found:
+                        break
+            if found:
+                canon = found
+                matched_id = cid
+                break
+
+        # 未知正式 ID + 缺失或空 facts 必须 Fail-Closed
+        if candidate_ids and not canon:
+            if a.facts is None or not a.facts.explicit_fields:
+                raise RuleConfigurationError(
+                    f"Formal atom '{a.atom_id}' has unrecognized item ID {candidate_ids[0]!r} in slot '{a.source_slot}' with empty/insufficient facts for rule '{rule_id}'"
+                )
+
+        # 2. 事实冲突检测与事实补全
+        leaf_id = matched_id or (candidate_ids[0] if candidate_ids else "")
+        if canon and a.facts:
+            scalar_fields = (
+                "space_kind", "hand_state", "prop_usage", "emotion", "gaze", "occlusion",
+                "time_of_day", "capture_device", "quality_class", "makeup_base", "liquid_kind", "liquid_amount"
+            )
+            for sf in scalar_fields:
+                av = getattr(a.facts, sf, None)
+                cv = getattr(canon, sf, None)
+                if av is not None and cv is not None and av != cv:
+                    raise RuleConfigurationError(
+                        f"Formal atom '{a.atom_id}' ({leaf_id}) fact '{sf}' conflicts with catalog: atom={av!r} vs catalog={cv!r}"
+                    )
+            if a.facts.hands_required != 0 and canon.hands_required != 0 and a.facts.hands_required != canon.hands_required:
+                raise RuleConfigurationError(
+                    f"Formal atom '{a.atom_id}' ({leaf_id}) hands_required conflicts with catalog: atom={a.facts.hands_required} vs catalog={canon.hands_required}"
+                )
+            object.__setattr__(a, "facts", canon.merge(a.facts))
+        elif canon and a.facts is None:
+            object.__setattr__(a, "facts", canon)
+
+        if a.facts is None:
+            raise RuleConfigurationError(
+                f"Formal atom '{a.atom_id}' (slot='{a.source_slot}', mode='{a.origin.mode}') is missing SemanticFacts for rule '{rule_id}'"
+            )
+
+        slot = a.source_slot
+        facts = a.facts
+
+        # 3. 严格按规则契约校验必要事实字段 (Fail-Closed)
+        if rule_id == "spatial_environmental_mutual_exclusion" and slot == "scene":
+            if not facts.space_kind:
+                raise RuleConfigurationError(
+                    f"Formal scene atom '{a.atom_id}' missing required 'space_kind' fact for rule '{rule_id}'"
+                )
+        elif rule_id == "nudity_clothing_conflicts":
+            if slot == "nudity":
+                if not (facts.visible_regions or facts.garment_topologies or canon):
+                    raise RuleConfigurationError(
+                        f"Formal nudity atom '{a.atom_id}' missing required facts for rule '{rule_id}'"
+                    )
+            elif slot in ("clothing", "clothing_state", "clothing_extension", "underwear"):
+                if not (facts.garment_topologies or facts.garment_states or facts.visible_regions or canon):
+                    raise RuleConfigurationError(
+                        f"Formal clothing atom '{a.atom_id}' missing required facts for rule '{rule_id}'"
+                    )
+        elif rule_id == "framing_lower_body_coherence":
+            if slot in ("shot_type", "shot"):
+                item_id = leaf_id.lower() if leaf_id else ""
+                if item_id in ("close_up", "extreme_close_up", "macro") or facts.visible_regions:
+                    if not (facts.visible_regions or canon):
+                        raise RuleConfigurationError(
+                            f"Formal shot atom '{a.atom_id}' missing required facts for rule '{rule_id}'"
+                        )
+            elif slot in ("clothing", "clothing_state", "clothing_extension", "underwear"):
+                if not (facts.visible_regions or facts.garment_topologies or canon):
+                    raise RuleConfigurationError(
+                        f"Formal clothing atom '{a.atom_id}' missing required visible_regions for rule '{rule_id}'"
+                    )
+        elif rule_id == "pose_hand_occupation":
+            if slot == "pose":
+                if not facts.hand_state:
+                    raise RuleConfigurationError(
+                        f"Formal pose atom '{a.atom_id}' missing required 'hand_state' fact for rule '{rule_id}'"
+                    )
+            elif slot == "props":
+                if facts.hands_required == 0 and not facts.prop_usage:
+                    raise RuleConfigurationError(
+                        f"Formal prop atom '{a.atom_id}' missing required prop facts for rule '{rule_id}'"
+                    )
+        elif rule_id == "handheld_props_single_holder":
+            if slot == "props":
+                if facts.hands_required == 0 and not facts.prop_usage:
+                    raise RuleConfigurationError(
+                        f"Formal prop atom '{a.atom_id}' missing required prop facts for rule '{rule_id}'"
+                    )
+        elif rule_id == "clothing_style_state_coherence":
+            if slot in ("clothing", "clothing_state", "clothing_extension", "underwear"):
+                if not (facts.garment_topologies or facts.garment_states or facts.visible_regions or canon):
+                    raise RuleConfigurationError(
+                        f"Formal clothing atom '{a.atom_id}' missing required garment facts for rule '{rule_id}'"
+                    )
+        elif rule_id == "material_penetration":
+            if slot in ("clothing", "clothing_state"):
+                if not (facts.garment_states or facts.garment_topologies or facts.visible_regions or canon):
+                    raise RuleConfigurationError(
+                        f"Formal clothing atom '{a.atom_id}' missing required garment_states for rule '{rule_id}'"
+                    )
+        elif rule_id == "device_quality_compatibility":
+            if slot in ("shot_type", "shot"):
+                item_id = leaf_id.lower() if leaf_id else ""
+                if item_id in ("cctv", "vhs", "polaroid", "webcam") or facts.capture_device:
+                    if not facts.capture_device:
+                        raise RuleConfigurationError(
+                            f"Formal shot atom '{a.atom_id}' missing required 'capture_device' fact for rule '{rule_id}'"
+                        )
+            elif slot == "quality":
+                if not facts.quality_class:
+                    raise RuleConfigurationError(
+                        f"Formal quality atom '{a.atom_id}' missing required 'quality_class' fact for rule '{rule_id}'"
+                    )
+        elif rule_id == "environmental_lighting_coherence":
+            if slot in ("scene", "scene_theme", "theme"):
+                if not (facts.time_of_day or facts.space_kind or facts.venue_ids or canon):
+                    raise RuleConfigurationError(
+                        f"Formal scene atom '{a.atom_id}' missing required 'time_of_day' fact for rule '{rule_id}'"
+                    )
+            elif slot in ("lighting", "lighting_palette"):
+                if a.origin and a.origin.mode == "recipe":
+                    pass
+                else:
+                    item_id = leaf_id.lower() if leaf_id else ""
+                    if any(k in item_id for k in ("sunlight", "daylight", "morning_sun", "golden_hour")) or facts.light_sources:
+                        if not (facts.light_sources or facts.time_of_day or canon):
+                            raise RuleConfigurationError(
+                                f"Formal lighting atom '{a.atom_id}' missing required 'light_sources' fact for rule '{rule_id}'"
+                            )
+        elif rule_id == "monochrome_film_chroma_coherence":
+            if slot in ("film", "film_stock"):
+                if not facts.color_modes:
+                    raise RuleConfigurationError(
+                        f"Formal film atom '{a.atom_id}' missing required color_modes for rule '{rule_id}'"
+                    )
+        elif rule_id == "makeup_details_coherence":
+            if slot == "makeup":
+                if not (facts.makeup_base or facts.makeup_effects):
+                    raise RuleConfigurationError(
+                        f"Formal makeup atom '{a.atom_id}' missing required makeup facts for rule '{rule_id}'"
+                    )
+        elif rule_id == "gaze_angle_geometry":
+            if slot in ("camera", "camera_angle", "angle", "shot", "view"):
+                item_id = leaf_id.lower() if leaf_id else ""
+                if item_id in ("overhead", "top_down", "birds_eye", "low_angle", "eye_level") or facts.gaze:
+                    if not facts.gaze:
+                        raise RuleConfigurationError(
+                            f"Formal camera atom '{a.atom_id}' missing required camera angle facts for rule '{rule_id}'"
+                        )
+            elif slot in ("expression", "expressions"):
+                item_id = leaf_id.lower() if leaf_id else ""
+                if "gaze" in item_id or facts.gaze or any(k in item_id for k in ("eye", "look")):
+                    if not facts.gaze:
+                        raise RuleConfigurationError(
+                            f"Formal expression atom '{a.atom_id}' missing required gaze facts for rule '{rule_id}'"
+                        )
+        elif rule_id == "accessory_occlusion_gaze_coherence":
+            if slot in ("jewelry", "accessories"):
+                item_id = leaf_id.lower() if leaf_id else ""
+                if item_id in ("blindfold", "sunglasses", "eyepatch", "mask") or facts.occlusion:
+                    if not facts.occlusion:
+                        raise RuleConfigurationError(
+                            f"Formal jewelry atom '{a.atom_id}' missing required facts for rule '{rule_id}'"
+                        )
+            elif slot in ("expression", "expressions"):
+                item_id = leaf_id.lower() if leaf_id else ""
+                if "gaze" in item_id or facts.gaze or any(k in item_id for k in ("eye", "look")):
+                    if not facts.gaze:
+                        raise RuleConfigurationError(
+                            f"Formal expression atom '{a.atom_id}' missing required gaze facts for rule '{rule_id}'"
+                        )
+        elif rule_id == "emotion_gaze_affinity":
+            if slot in ("expression", "expressions"):
+                if not (facts.emotion or facts.gaze):
+                    raise RuleConfigurationError(
+                        f"Formal expression atom '{a.atom_id}' missing required emotion facts for rule '{rule_id}'"
+                    )
+        elif rule_id == "gaze_mutual_exclusion":
+            if slot in ("expression", "expressions"):
+                item_id = leaf_id.lower() if leaf_id else ""
+                if "gaze" in item_id or facts.gaze or any(k in item_id for k in ("eye", "look")):
+                    if not facts.gaze:
+                        raise RuleConfigurationError(
+                            f"Formal expression atom '{a.atom_id}' missing required gaze facts for rule '{rule_id}'"
+                        )
+        elif rule_id == "liquid_restrictions":
+            if slot in ("liquids", "liquid"):
+                if not (facts.liquid_kind or facts.liquid_locations or facts.liquid_amount):
+                    raise RuleConfigurationError(
+                        f"Formal liquid atom '{a.atom_id}' missing required liquid facts for rule '{rule_id}'"
+                    )
+
+    def resolve_atoms_with_full_report(
+        self,
+        atoms: Sequence[PromptAtom],
+        rng: Optional[Random] = None,
+        context_profile: Optional[ContextProfile] = None,
+        effective_seed: Optional[int] = None,
+    ) -> Tuple[List[PromptAtom], Tuple[str, ...], ResolutionReport]:
+        """按 DAG 冻结顺序执行 17 条冲突消解规则并产出完备审计报告与零硬冲突闭环。"""
+        if rng is None:
+            rng = Random(42)
+
+        self.text_fallback_hits = 0
+
+        # R2-P1-002: 提取或恢复 effective seed
+        if effective_seed is None:
+            effective_seed = getattr(rng, "_effective_seed", None)
+        if effective_seed is None:
+            effective_seed = recover_effective_seed(rng)
+        if effective_seed is None:
+            state = rng.getstate()
+            if isinstance(state, tuple) and len(state) >= 2 and isinstance(state[1], tuple) and len(state[1]) >= 2:
+                effective_seed = state[1][1]
+            else:
+                effective_seed = 42
+
+        input_hash = compute_atoms_hash(atoms)
+        current_atoms = list(atoms)
+        ledger = DecisionLedger(rule_registry=self.registry)
+        rules_applied: List[str] = []
+
+        # 1. 针对输入原子构建单次扫描不可变快速索引
+        index = OneTimeIndex(atoms)
+
+        # 2. 依次按 execution_order (DAG 拓扑顺序) 执行 17 条规则，使用独立派生 RNG 子流
+        for rule_id in self.registry.doc.execution_order:
+            rule_item = self.registry.get_rule_item(rule_id)
+            resolver_fn = getattr(self, f"_resolve_{rule_id}_atoms", None)
+            if resolver_fn is None:
+                continue
+
+            rule_rng = derive_substream_rng(effective_seed, f"rule:{rule_item.id}")
+            dec_count_before = len(ledger.decisions)
+            current_atoms = resolver_fn(current_atoms, rule_item, ledger, rule_rng, index, context_profile)
+            if len(ledger.decisions) > dec_count_before:
+                if rule_id not in rules_applied:
+                    rules_applied.append(rule_id)
+
+
+        # 3. 计算产出哈希与构建决策报告
+        current_atoms = index.get_all_active_ordered()
+        output_hash = compute_atoms_hash(current_atoms)
+        actual_dropped = sum(1 for d in ledger.decisions if d.action == "drop")
+        actual_replaced = sum(1 for d in ledger.decisions if d.action == "replace")
+        actual_injected = sum(1 for d in ledger.decisions if d.action == "inject")
+
+        report = ResolutionReport(
+            schema_version="1.0",
+            input_atom_hash=input_hash,
+            output_atom_hash=output_hash,
+            input_count=len(atoms),
+            output_count=len(current_atoms),
+            dropped_count=actual_dropped,
+            replaced_count=actual_replaced,
+            injected_count=actual_injected,
+            rules_applied=tuple(rules_applied),
+            decisions=tuple(ledger.decisions),
+            unresolved_conflicts=(),
+        )
+
+        # 4. 只读最终零硬冲突检测 (detect_hard_conflicts)
+        residual_conflicts, has_protected = self.detect_hard_conflicts(current_atoms)
+        if residual_conflicts:
+            reason = "protected_syntax_conflict" if has_protected else "unresolved_hard_conflict"
+            unres_report = replace(report, unresolved_conflicts=tuple(residual_conflicts))
+            self.last_report = unres_report
+            raise UnresolvedConflictError(
+                reason=reason,
+                unresolved_conflicts=tuple(residual_conflicts),
+                report=unres_report,
+            )
+
+        self.last_report = report
+        return current_atoms, tuple(rules_applied), report
 
     def resolve_atoms_with_report(
         self,
         atoms: Sequence[PromptAtom],
-        rng: Optional[Random] = None
+        rng: Optional[Random] = None,
+        context_profile: Optional[ContextProfile] = None,
     ) -> Tuple[List[PromptAtom], Tuple[str, ...]]:
-        """按 STABLE_RULE_ORDER 执行 17 条冲突消解规则并报告实际触发的规则 ID 列表。"""
-        if rng is None:
-            rng = Random(42)
-
-        current_atoms = list(atoms)
-        rules_applied: List[str] = []
-        for rule_id in STABLE_RULE_ORDER:
-            rule = self.registry.get_rule(rule_id)
-            resolver_fn = getattr(self, f"_resolve_{rule_id}_atoms")
-            before_texts = [a.text for a in current_atoms]
-            current_atoms = resolver_fn(current_atoms, rule, rng)
-            after_texts = [a.text for a in current_atoms]
-            if before_texts != after_texts:
-                rules_applied.append(rule_id)
-
-        return current_atoms, tuple(rules_applied)
+        """向后兼容接口：执行消解并返回 (resolved_atoms, rules_applied)。"""
+        resolved, rules_applied, _ = self.resolve_atoms_with_full_report(atoms, rng, context_profile)
+        return resolved, rules_applied
 
     def resolve_atoms(
         self,
         atoms: Sequence[PromptAtom],
-        rng: Optional[Random] = None
+        rng: Optional[Random] = None,
+        context_profile: Optional[ContextProfile] = None,
     ) -> List[PromptAtom]:
-        """按 STABLE_RULE_ORDER 执行 17 条冲突消解规则。"""
-        resolved, _ = self.resolve_atoms_with_report(atoms, rng)
+        """向后兼容接口：执行消解并返回 resolved_atoms 列表。"""
+        resolved, _ = self.resolve_atoms_with_report(atoms, rng, context_profile)
         return resolved
 
     def resolve_fragments(
         self,
-        fragments: Sequence[PromptFragment | str],
-        rng: Optional[Random] = None
+        fragments: Sequence[PromptFragment],
+        rng: Optional[Random] = None,
     ) -> List[PromptFragment]:
-        """兼容接口：将 PromptFragment 列表通过 atomizer 转换为 PromptAtom 执行消解后，按完整 Tag 重新聚合返回。"""
+        """向后兼容接口：消解 PromptFragment 列表。"""
+        if not fragments:
+            return []
+        if rng is None:
+            rng = Random(42)
+
+        from .atomizer import atoms_to_fragments, fragments_to_atoms
         _, atoms = fragments_to_atoms(fragments)
         resolved_atoms = self.resolve_atoms(atoms, rng)
         return atoms_to_fragments(resolved_atoms)
@@ -147,9 +1019,9 @@ class ConflictResolver:
     def resolve(
         self,
         slots: Dict[str, Sequence[str]],
-        rng: Optional[Random] = None
+        rng: Optional[Random] = None,
     ) -> Dict[str, List[str]]:
-        """兼容接口：接收槽位字典并返回消解后的槽位字典。"""
+        """向后兼容字典接口。"""
         if rng is None:
             rng = Random(42)
 
@@ -183,521 +1055,2006 @@ class ConflictResolver:
 
         return new_slots
 
-    # ─── 规则 1: spatial_environmental_mutual_exclusion ───
+    # ─── 规则 1: spatial_environmental_mutual_exclusion (anchors, 100) ───
 
     def _resolve_spatial_environmental_mutual_exclusion_atoms(
         self,
         atoms: List[PromptAtom],
-        rule: Dict[str, Any],
-        rng: Random
+        rule_item: RuleItem,
+        ledger: DecisionLedger,
+        rng: Random,
+        index: OneTimeIndex,
+        context_profile: Optional[ContextProfile],
     ) -> List[PromptAtom]:
-        venue_clusters: Dict[str, List[PatternSpec]] = rule["venue_clusters"]
-        outdoor_exclusive: List[PatternSpec] = rule["outdoor_exclusive"]
-        indoor_exclusive: List[PatternSpec] = rule["indoor_exclusive"]
-        deprecated_tags: List[ReplacementSpec] = rule.get("deprecated_tags", [])
+        rule = rule_item.spec
+        tf = rule_item.spec.text_fallback
+        tf_patterns = tf.patterns
+        venue_cluster_names = tuple(rule.get("venue_clusters", {}).keys()) or get_fallback_group_ids(tf_patterns)
+        venue_clusters: Dict[str, Tuple[PatternSpec, ...]] = {
+            vname: select_fallback_patterns(tf_patterns, role="venue", group_id=vname)
+            for vname in venue_cluster_names
+        }
+        outdoor_exclusive: Tuple[PatternSpec, ...] = select_fallback_patterns(tf_patterns, role="outdoor", group_id="outdoor")
+        indoor_exclusive: Tuple[PatternSpec, ...] = select_fallback_patterns(tf_patterns, role="indoor", group_id="indoor")
+        deprecated_tags = [
+            d for d in rule.get("deprecated_tags", ())
+            if (d.banned.pattern, d.banned.match_mode) in {(p.pattern, p.match_mode) for p in tf_patterns}
+        ]
+        _fact_indoors = index.get_active_by_fact("space_kind", "indoor")
+        _fact_outdoors = index.get_active_by_fact("space_kind", "outdoor")
 
-        # 1. 替换废弃或歧义词条 (仅允许修改 PLAIN 内部字节)
-        result: List[PromptAtom] = []
-        for a in atoms:
-            if a.can_modify_internal:
-                txt = a.text
-                for rep in deprecated_tags:
-                    if rep.banned.matches(txt):
-                        txt = rep.banned.substitute(txt, rep.replacement)
-                result.append(replace(a, text=txt))
-            else:
-                result.append(a)
-        atoms = result
+        # 1. 废弃词无缝迁移 (仅 custom fallback)
+        if tf.enabled and deprecated_tags:
+            for a in index.get_all_active_ordered():
+                if not is_formal_atom(a) and a.can_modify_internal:
+                    txt = a.text
+                    replaced_any = False
+                    for rep in deprecated_tags:
+                        if rep.banned.matches(txt):
+                            txt = rep.banned.substitute(txt, rep.replacement)
+                            replaced_any = True
+                    if replaced_any and txt != a.text:
+                        new_a = make_replaced_atom(a, txt, rule_item.id)
+                        self.text_fallback_hits += 1
+                        ledger.record_replace(
+                            rule_item.id,
+                            rule_item.phase,
+                            "deprecated_tag_replaced",
+                            (),
+                            a,
+                            (new_a,),
+                        )
+                        index.replace(a.atom_id, new_a)
 
-        # 2. 场所集群互斥
-        active_venues: List[Tuple[int, str]] = []
+        # 2. 场所集群互斥 (首个出现的 cluster 胜出)
+        active_venues: List[Tuple[int, int, str, PromptAtom]] = []
         for vname, vtags in venue_clusters.items():
-            for a in atoms:
-                if a.can_detect and any(vt.matches(a.text) for vt in vtags):
-                    active_venues.append((a.tag_order, vname))
-                    break
+            for a in index.get_active_by_slot("scene"):
+                if a.can_detect and index.is_active(a):
+                    self._validate_formal_atom(a, rule_item.id)
+                    matched = False
+                    if is_formal_atom(a):
+                        if a.facts and a.facts.venue_ids:
+                            matched = any(vname == vid or vname in vid for vid in a.facts.venue_ids)
+                    elif tf.enabled:
+                        matched = any(vt.matches(a.text) for vt in vtags)
+                    if matched:
+                        active_venues.append((a.tag_order, a.span_order, vname, a))
+                        break
 
-        if len(set(v for _, v in active_venues)) > 1:
-            active_venues.sort(key=lambda x: x[0])
-            dominant_venue = active_venues[0][1]
-            banned_venues = [v for _, v in active_venues if v != dominant_venue]
+        active_cluster_names = list(dict.fromkeys(v[2] for v in active_venues))
+        if len(active_cluster_names) > 1:
+            active_venues.sort(key=lambda x: (x[0], x[1]))
+            dominant_venue = active_venues[0][2]
+            dominant_atom = active_venues[0][3]
+            banned_venues = [v for v in active_cluster_names if v != dominant_venue]
             banned_tags_all: List[PatternSpec] = []
             for bv in banned_venues:
                 banned_tags_all.extend(venue_clusters[bv])
 
-            atoms = [
-                a for a in atoms
-                if not a.can_delete_atom or not any(bt.matches(a.text) for bt in banned_tags_all)
-            ]
+            for a in index.get_active_by_slot("scene"):
+                if not a.can_detect or not index.is_active(a):
+                    continue
+                is_loser = False
+                is_fallback = False
+                if is_formal_atom(a):
+                    if a.facts and a.facts.venue_ids:
+                        if any(bv in a.facts.venue_ids for bv in banned_venues):
+                            is_loser = True
+                elif tf.enabled:
+                    if any(bt.matches(a.text) for bt in banned_tags_all):
+                        is_loser = True
+                        is_fallback = True
 
-        # 3. 室内 / 室外二元互斥
-        indoor_first_order = next((a.tag_order for a in atoms if a.can_detect and any(w.matches(a.text) for w in indoor_exclusive)), None)
-        outdoor_first_order = next((a.tag_order for a in atoms if a.can_detect and any(w.matches(a.text) for w in outdoor_exclusive)), None)
+                if is_loser:
+                    if not a.can_delete_atom:
+                        continue
+                    if is_fallback:
+                        self.text_fallback_hits += 1
+                    index.drop(a.atom_id)
+                    ledger.record_drop(
+                        rule_item.id,
+                        rule_item.phase,
+                        "venue_cluster_mutex",
+                        (dominant_atom.atom_id,),
+                        a,
+                    )
 
-        if indoor_first_order is not None and outdoor_first_order is not None:
-            if indoor_first_order <= outdoor_first_order:
-                atoms = [a for a in atoms if not a.can_delete_atom or not any(w.matches(a.text) for w in outdoor_exclusive)]
+        # 3. 室内 / 室外二元互斥 (实际消费事实索引 R2R3-P3-001)
+        indoor_atoms = [a for a in index.get_active_by_fact("space_kind", "indoor") if a.can_detect and index.is_active(a)]
+        outdoor_atoms = [a for a in index.get_active_by_fact("space_kind", "outdoor") if a.can_detect and index.is_active(a)]
+        for a in indoor_atoms + outdoor_atoms:
+            self._validate_formal_atom(a, rule_item.id)
+
+        seen_scene_ids = {a.atom_id for a in indoor_atoms + outdoor_atoms}
+        for a in index.get_active_by_slot("scene"):
+            if a.atom_id in seen_scene_ids or not a.can_detect or not index.is_active(a):
+                continue
+            self._validate_formal_atom(a, rule_item.id)
+            if is_formal_atom(a):
+                if a.facts and a.facts.space_kind == "indoor":
+                    indoor_atoms.append(a)
+                elif a.facts and a.facts.space_kind == "outdoor":
+                    outdoor_atoms.append(a)
+            elif tf.enabled:
+                if any(w.matches(a.text) for w in outdoor_exclusive):
+                    outdoor_atoms.append(a)
+                elif any(w.matches(a.text) for w in indoor_exclusive) or any(any(vt.matches(a.text) for vt in vtags) for vtags in venue_clusters.values()):
+                    indoor_atoms.append(a)
+
+        if indoor_atoms and outdoor_atoms:
+            first_in = min(indoor_atoms, key=lambda x: (x.tag_order, x.span_order))
+            first_out = min(outdoor_atoms, key=lambda x: (x.tag_order, x.span_order))
+
+            if (first_in.tag_order, first_in.span_order) <= (first_out.tag_order, first_out.span_order):
+                winner = first_in
+                losers = outdoor_atoms
+                loser_exclusive_tags = outdoor_exclusive
             else:
-                atoms = [a for a in atoms if not a.can_delete_atom or not any(w.matches(a.text) for w in indoor_exclusive)]
+                winner = first_out
+                losers = indoor_atoms
+                loser_exclusive_tags = indoor_exclusive
 
-        return atoms
+            for a in index.get_active_by_slot("scene"):
+                if not a.can_detect or not index.is_active(a):
+                    continue
+                is_loser = False
+                is_fallback = False
+                if a in losers:
+                    is_loser = True
+                    is_fallback = not is_formal_atom(a)
+                elif tf.enabled and any(w.matches(a.text) for w in loser_exclusive_tags):
+                    is_loser = True
+                    is_fallback = True
 
-    # ─── 规则 2: nudity_clothing_conflicts ───
+                if is_loser:
+                    if not a.can_delete_atom:
+                        continue
+                    if is_fallback:
+                        self.text_fallback_hits += 1
+                    index.drop(a.atom_id)
+                    ledger.record_drop(
+                        rule_item.id,
+                        rule_item.phase,
+                        "indoor_outdoor_mutex",
+                        (winner.atom_id,),
+                        a,
+                    )
+
+        return index.get_all_active_ordered()
+
+    # ─── 规则 2: nudity_clothing_conflicts (anchors, 110) ───
 
     def _resolve_nudity_clothing_conflicts_atoms(
         self,
         atoms: List[PromptAtom],
-        rule: Dict[str, Any],
-        rng: Random
+        rule_item: RuleItem,
+        ledger: DecisionLedger,
+        rng: Random,
+        index: OneTimeIndex,
+        context_profile: Optional[ContextProfile],
     ) -> List[PromptAtom]:
-        level_rules: Dict[str, LevelRuleSpec] = rule.get("level_rules", {})
-
-        # 识别当前激活的裸露等级
-        active_level: Optional[str] = None
-        for a in atoms:
-            if a.source_slot == "nudity":
-                for lvl_code in ("L6", "L5", "L4", "L3", "L2", "L1"):
-                    raw_id = (a.source_item_id or "").upper()
-                    if lvl_code in raw_id or any(f"nudity:{lvl_code.lower()}" in s.lower() for s in a.provenance.semantic_ids) or PatternSpec(pattern=lvl_code, match_mode="phrase").matches(a.text):
-                        active_level = lvl_code
-                        break
-            if active_level:
-                break
-
-        if not active_level:
-            return atoms
-
-        lvl_conf = level_rules.get(active_level)
-        if lvl_conf:
-            result: List[PromptAtom] = []
-            for a in atoms:
-                if a.source_slot != "nudity" and a.can_delete_atom:
-                    if any(b.matches(a.text) for b in lvl_conf.banned_patterns):
-                        continue
-                result.append(a)
-            atoms = result
-
-        return atoms
-
-    # ─── 规则 3: material_penetration ───
-
-    def _resolve_material_penetration_atoms(
-        self,
-        atoms: List[PromptAtom],
-        rule: Dict[str, Any],
-        rng: Random
-    ) -> List[PromptAtom]:
-        banned_words: List[PatternSpec] = rule["banned_words"]
-        replacements: List[str] = rule["replacements"]
-        target_slots: Tuple[str, ...] = tuple(rule.get("target_slots", ("clothing",)))
-        target_provenance_kinds: Tuple[str, ...] = tuple(
-            rule.get("target_provenance_kinds", ("base_clothing", "clothing_state"))
-        )
-
-        result: List[PromptAtom] = []
-        for a in atoms:
-            # 1. clothing_extension 优先豁免
-            if a.provenance and a.provenance.kind == "clothing_extension":
-                result.append(a)
-                continue
-
-            # 2. 作用域限制：必须满足 source_slot in target_slots OR provenance.kind in target_provenance_kinds
-            is_target = (a.source_slot in target_slots) or (
-                a.provenance is not None and a.provenance.kind in target_provenance_kinds
+        rule = rule_item.spec
+        tf = rule_item.spec.text_fallback
+        tf_patterns = tf.patterns
+        level_rules = {
+            lvl: replace(lr, banned_patterns=select_fallback_patterns(tf_patterns, role="banned", group_id=lvl))
+            for lvl, lr in rule.level_rules.items()
+        }
+        conflicts = [
+            TriggerBanConflictSpec(
+                trigger=select_fallback_patterns(tf_patterns, role="trigger", group_id=gid),
+                ban=select_fallback_patterns(tf_patterns, role="banned", group_id=gid),
             )
-            if not is_target:
-                result.append(a)
+            for gid in get_fallback_group_ids(tf_patterns, role="trigger")
+        ]
+        active_lvl_specs = {
+            lvl: ps for lvl, ps in LVL_PATTERN_SPECS.items()
+            if (ps.pattern, ps.match_mode) in {(p.pattern, p.match_mode) for p in tf_patterns}
+        }
+        _nude_fact_atoms = index.get_active_by_fact("coverage_level", "L6")
+
+        # 1. 裸露等级决定允许的最大服装穿着
+        nudity_atoms = index.get_active_by_slot("nudity")
+        detected_nudity: List[Tuple[str, PromptAtom]] = []
+
+        for a in nudity_atoms:
+            if not a.can_detect or not index.is_active(a):
                 continue
+            self._validate_formal_atom(a, rule_item.id)
+            matched_lvl = None
+            if is_formal_atom(a):
+                raw_id = (((a.provenance.item_id if a.provenance else "") or "") + " " + (a.source_item_id or "") + " " + ((a.origin.selected_id if a.origin else "") or "")).upper()
+                for lvl in ("L6", "L5", "L4", "L3", "L2", "L1"):
+                    if lvl in raw_id:
+                        matched_lvl = lvl
+                        break
+                if not matched_lvl and a.facts:
+                    if "full_body" in a.facts.visible_regions:
+                        matched_lvl = "L5"
+                    elif any(r in a.facts.visible_regions for r in ("crotch", "buttocks")):
+                        matched_lvl = "L5"
+                    elif any(r in a.facts.visible_regions for r in ("breasts", "topless")):
+                        matched_lvl = "L4"
+                    elif any(r in a.facts.visible_regions for r in ("cleavage", "midriff")):
+                        matched_lvl = "L2"
+            elif tf.enabled:
+                for lvl, ps in active_lvl_specs.items():
+                    if ps.matches(a.text):
+                        matched_lvl = lvl
+                        break
+            if matched_lvl:
+                detected_nudity.append((matched_lvl, a))
 
-            if not a.can_modify_internal:
-                result.append(a)
-                continue
+        if detected_nudity:
+            detected_nudity.sort(key=lambda x: (x[1].tag_order, x[1].span_order))
+            dominant_lvl, nudity_winner = detected_nudity[0]
 
-            txt = a.text
-            matched = any(bw.matches(txt) for bw in banned_words)
-
-            if matched and replacements:
-                rep = rng.choice(replacements)
-                # 保留原 provenance，且绝不覆盖既有 rule_id (P1-2)
-                result.append(replace(a, text=rep))
-            else:
-                result.append(a)
-
-        return result
-
-    # ─── 规则 4: clothing_style_state_coherence ───
-
-    def _resolve_clothing_style_state_coherence_atoms(
-        self,
-        atoms: List[PromptAtom],
-        rule: Dict[str, Any],
-        rng: Random
-    ) -> List[PromptAtom]:
-        one_piece_triggers: List[PatternSpec] = rule["one_piece_triggers"]
-        one_piece_banned: List[PatternSpec] = rule["one_piece_banned_states"]
-        pants_triggers: List[PatternSpec] = rule.get("pants_triggers", [])
-        pants_banned: List[PatternSpec] = rule.get("pants_banned_states", [])
-
-        has_one_piece = any(a.can_detect and any(t.matches(a.text) for t in one_piece_triggers) for a in atoms)
-        has_pants = any(a.can_detect and any(t.matches(a.text) for t in pants_triggers) for a in atoms)
-
-        result: List[PromptAtom] = []
-        for a in atoms:
-            if not a.can_delete_atom:
-                result.append(a)
-                continue
-
-            if has_one_piece and any(b.matches(a.text) for b in one_piece_banned):
-                continue
-
-            if has_pants and any(b.matches(a.text) for b in pants_banned):
-                continue
-
-            result.append(a)
-
-        return result
-
-    # ─── 规则 5: gaze_angle_geometry ───
-
-    def _resolve_gaze_angle_geometry_atoms(
-        self,
-        atoms: List[PromptAtom],
-        rule: Dict[str, Any],
-        rng: Random
-    ) -> List[PromptAtom]:
-        mappings: List[AngleGazeMappingSpec] = rule["mappings"]
-
-        matched_mapping: Optional[AngleGazeMappingSpec] = None
-        for m in mappings:
-            for a in atoms:
-                if a.can_detect and any(ang.matches(a.text) for ang in m.angles):
-                    matched_mapping = m
-                    break
-            if matched_mapping:
-                break
-
-        if not matched_mapping:
-            return atoms
-
-        # 过滤被禁止的视角动作
-        result: List[PromptAtom] = []
-        for a in atoms:
-            if a.can_delete_atom and any(bg.matches(a.text) for bg in matched_mapping.banned_gaze):
-                continue
-            result.append(a)
-
-        return result
-
-    # ─── 规则 6: gaze_mutual_exclusion ───
-
-    def _resolve_gaze_mutual_exclusion_atoms(
-        self,
-        atoms: List[PromptAtom],
-        rule: Dict[str, Any],
-        rng: Random
-    ) -> List[PromptAtom]:
-        exclusive_pairs: List[Tuple[PatternSpec, PatternSpec]] = rule["exclusive_pairs"]
-
-        for p1, p2 in exclusive_pairs:
-            atom1 = next((a for a in atoms if a.can_detect and p1.matches(a.text)), None)
-            atom2 = next((a for a in atoms if a.can_detect and p2.matches(a.text)), None)
-
-            if atom1 and atom2:
-                # 冲突发生：保留 tag_order 较小者
-                loser = atom2 if atom1.tag_order <= atom2.tag_order else atom1
-                if loser.can_delete_atom:
-                    atoms = [a for a in atoms if a is not loser]
-
-        return atoms
-
-    # ─── 规则 7: accessory_occlusion_gaze_coherence ───
-
-    def _resolve_accessory_occlusion_gaze_coherence_atoms(
-        self,
-        atoms: List[PromptAtom],
-        rule: Dict[str, Any],
-        rng: Random
-    ) -> List[PromptAtom]:
-        occlusion_triggers: List[PatternSpec] = rule["occlusion_triggers"]
-        banned_gaze_actions: List[PatternSpec] = rule["banned_gaze_actions"]
-
-        has_occlusion = any(a.can_detect and any(ot.matches(a.text) for ot in occlusion_triggers) for a in atoms)
-        if has_occlusion:
-            atoms = [
-                a for a in atoms
-                if not a.can_delete_atom or not any(bg.matches(a.text) for bg in banned_gaze_actions)
+            candidates = [
+                a for a in index.get_all_active_ordered()
+                if a.source_slot != "nudity" and a.atom_id != nudity_winner.atom_id
             ]
 
-        return atoms
+            for a in candidates:
+                if not a.can_detect or not index.is_active(a):
+                    continue
+                self._validate_formal_atom(a, rule_item.id)
+                should_drop = False
+                is_fallback = False
 
-    # ─── 规则 8: framing_lower_body_coherence ───
+                if dominant_lvl in ("L6", "L5"):
+                    # 全裸与极致全裸：禁止一切常规穿着
+                    if is_formal_atom(a):
+                        if a.facts and (a.facts.garment_topologies or a.facts.garment_states):
+                            should_drop = True
+                        elif a.source_slot in ("clothing", "clothing_state", "clothing_extension", "underwear"):
+                            should_drop = True
+                    elif tf.enabled:
+                        if any(b.matches(a.text) for b in level_rules["L5"].banned_patterns):
+                            should_drop = True
+                            is_fallback = True
+                elif dominant_lvl == "L4":
+                    # 微型覆盖/比基尼：禁止外穿大衣/整套长裙，但不删轻量内衣
+                    if is_formal_atom(a):
+                        if a.facts and any(t in a.facts.garment_topologies for t in ("suit", "coat", "jacket", "hoodie", "one_piece", "pants", "blazer", "sweater")):
+                            should_drop = True
+                    elif tf.enabled:
+                        if any(b.matches(a.text) for b in level_rules["L4"].banned_patterns):
+                            should_drop = True
+                            is_fallback = True
+                elif dominant_lvl == "L3":
+                    if is_formal_atom(a):
+                        if a.facts and any(r in a.facts.visible_regions for r in ("crotch", "buttocks", "intimate_lower_body")):
+                            should_drop = True
+                    elif tf.enabled:
+                        if any(b.matches(a.text) for b in level_rules["L3"].banned_patterns):
+                            should_drop = True
+                            is_fallback = True
+                elif dominant_lvl in ("L1", "L2"):
+                    if is_formal_atom(a):
+                        item_id = ((a.source_item_id or "") + " " + ((a.provenance.item_id or "") if a.provenance else "") + " " + ((a.origin.selected_id or "") if a.origin else "")).lower()
+                        if a.facts and any(r in a.facts.visible_regions for r in ("intimate_lower_body",)):
+                            should_drop = True
+                        elif dominant_lvl == "L1" and (
+                            "erotic_close_up" in item_id
+                            or (a.facts and any(s in a.facts.garment_states for s in ("lifted", "opened", "removed", "lifted_skirt")))
+                            or (a.facts and any(r in a.facts.visible_regions for r in ("cleavage", "breasts", "crotch", "buttocks", "underboob", "sideboob")))
+                        ):
+                            should_drop = True
+                    elif tf.enabled:
+                        lvl_rule = level_rules.get(dominant_lvl)
+                        if lvl_rule and any(b.matches(a.text) for b in lvl_rule.banned_patterns):
+                            should_drop = True
+                            is_fallback = True
+
+                if should_drop:
+                    if not a.can_delete_atom:
+                        continue
+                    if is_fallback:
+                        self.text_fallback_hits += 1
+                    is_underwear = (
+                        "underwear" in a.source_slot
+                        or (a.facts and any(t in a.facts.garment_topologies for t in ("underwear", "panties", "bra", "bikini", "lingerie")))
+                        or any(u in (a.source_item_id or "").lower() for u in ("underwear", "bikini", "panties", "bra", "lingerie"))
+                        or any(u in ((a.provenance.item_id if a.provenance else "") or "").lower() for u in ("underwear", "bikini", "panties", "bra", "lingerie"))
+                    )
+                    rc = "nudity_removes_underwear" if is_underwear else "nudity_removes_clothing"
+                    index.drop(a.atom_id)
+                    ledger.record_drop(
+                        rule_item.id,
+                        rule_item.phase,
+                        rc,
+                        (nudity_winner.atom_id,),
+                        a,
+                    )
+
+        # 2. Trigger-Ban 细粒度互斥 (R2-N07: 不直接裸露抛错，保护结构留给最终检测器)
+        if conflicts:
+            for c in conflicts:
+                triggers = c.trigger
+                bans = c.ban
+                trig_atoms = []
+                for a in index.get_all_active_ordered():
+                    if not a.can_detect or not index.is_active(a):
+                        continue
+                    if is_formal_atom(a):
+                        if a.facts and any(r in a.facts.visible_regions for r in ("crotch", "breasts", "buttocks", "pubic", "full_body")):
+                            trig_atoms.append(a)
+                    elif tf.enabled:
+                        if any(t.matches(a.text) for t in triggers):
+                            trig_atoms.append(a)
+
+                if trig_atoms:
+                    first_trig = min(trig_atoms, key=lambda x: (x.tag_order, x.span_order))
+                    for a in index.get_all_active_ordered():
+                        if a in trig_atoms or not a.can_detect or not index.is_active(a):
+                            continue
+                        is_banned = False
+                        is_fallback = False
+                        if is_formal_atom(a):
+                            if a.facts and any(t in a.facts.garment_topologies for t in ("panties", "bra", "underwear", "suit", "blouse", "dress")):
+                                is_banned = True
+                        elif tf.enabled:
+                            if any(b.matches(a.text) for b in bans):
+                                is_banned = True
+                                is_fallback = True
+
+                        if is_banned:
+                            if not a.can_delete_atom:
+                                continue
+                            if is_fallback:
+                                self.text_fallback_hits += 1
+                            index.drop(a.atom_id)
+                            ledger.record_drop(
+                                rule_item.id,
+                                rule_item.phase,
+                                "nudity_removes_underwear",
+                                (first_trig.atom_id,),
+                                a,
+                            )
+
+        return index.get_all_active_ordered()
+
+    # ─── 规则 3: framing_lower_body_coherence (anchors, 120) ───
 
     def _resolve_framing_lower_body_coherence_atoms(
         self,
         atoms: List[PromptAtom],
-        rule: Dict[str, Any],
-        rng: Random
+        rule_item: RuleItem,
+        ledger: DecisionLedger,
+        rng: Random,
+        index: OneTimeIndex,
+        context_profile: Optional[ContextProfile],
     ) -> List[PromptAtom]:
-        close_up_triggers: List[PatternSpec] = rule["close_up_triggers"]
-        banned_lower_body: List[PatternSpec] = rule["banned_lower_body"]
+        tf = rule_item.spec.text_fallback
+        tf_patterns = tf.patterns
+        all_cu_triggers = select_fallback_patterns(tf_patterns, role="trigger", group_id="framing")
+        all_lb_patterns = select_fallback_patterns(tf_patterns, role="banned", group_id="framing")
+        cu_atoms = [
+            a for a in (index.get_active_by_item_id("extreme_close_up") + index.get_active_by_item_id("close_up"))
+            if a.can_detect and index.is_active(a)
+        ]
+        cu_ids = {a.atom_id for a in cu_atoms}
+        for a in (index.get_active_by_slot("shot_type") + index.get_active_by_slot("shot")):
+            if a.atom_id in cu_ids or not a.can_detect or not index.is_active(a):
+                continue
+            self._validate_formal_atom(a, rule_item.id)
+            if is_formal_atom(a):
+                item_id = (a.provenance.item_id or a.source_item_id or "") if a.provenance else (a.source_item_id or "")
+                if item_id in ("extreme_close_up", "close_up"):
+                    cu_atoms.append(a)
+                    cu_ids.add(a.atom_id)
+                elif item_id in ("medium_close_up", "medium_shot", "cowboy_shot", "full_body", "wide_shot", "extreme_wide"):
+                    pass
+                elif a.facts and "face" in a.facts.visible_regions and not any(r in a.facts.visible_regions for r in ("upper_body", "lower_body", "legs", "feet")):
+                    cu_atoms.append(a)
+                    cu_ids.add(a.atom_id)
+            elif tf.enabled:
+                if any(t.matches(a.text) for t in all_cu_triggers):
+                    cu_atoms.append(a)
+                    cu_ids.add(a.atom_id)
 
-        is_close_up = any(a.can_detect and any(cut.matches(a.text) for cut in close_up_triggers) for a in atoms)
-        if is_close_up:
-            atoms = [
-                a for a in atoms
-                if not a.can_delete_atom or not any(bl.matches(a.text) for bl in banned_lower_body)
-            ]
+        if cu_atoms:
+            cu_winner = min(cu_atoms, key=lambda x: (x.tag_order, x.span_order))
+            for a in index.get_active_by_slot("clothing"):
+                if a in cu_atoms or not a.can_detect or not index.is_active(a):
+                    continue
+                self._validate_formal_atom(a, rule_item.id)
+                is_loser = False
+                is_fallback = False
+                if is_formal_atom(a):
+                    if a.facts and any(r in a.facts.visible_regions for r in ("feet", "legs", "lower_body", "shoes")):
+                        is_loser = True
+                elif tf.enabled:
+                    if any(p.matches(a.text) for p in all_lb_patterns):
+                        is_loser = True
+                        is_fallback = True
 
-        return atoms
-
-    # ─── 规则 9: liquid_restrictions ───
-
-    def _resolve_liquid_restrictions_atoms(
-        self,
-        atoms: List[PromptAtom],
-        rule: Dict[str, Any],
-        rng: Random
-    ) -> List[PromptAtom]:
-        liquid_words: List[PatternSpec] = rule["liquid_words"]
-        modifiers: List[str] = rule["modifiers"]
-        banned_combos: List[BannedComboSpec] = rule["banned_combos"]
-
-        # 1. 替换高危组合
-        replaced_atoms: List[PromptAtom] = []
-        for a in atoms:
-            if a.can_modify_internal:
-                txt = a.text
-                for bc in banned_combos:
-                    for trig in bc.triggers:
-                        if trig.matches(txt):
-                            txt = trig.substitute(txt, bc.replace)
-                replaced_atoms.append(replace(a, text=txt))
-            else:
-                replaced_atoms.append(a)
-        atoms = replaced_atoms
-
-        # 2. 对微量液体应用量词修饰
-        result: List[PromptAtom] = []
-        for a in atoms:
-            if a.source_slot == "liquids" and a.can_modify_internal:
-                txt = a.text
-                has_mod = any(m in txt.lower() for m in modifiers)
-                if not has_mod and any(lw.matches(txt) for lw in liquid_words):
-                    mod = rng.choice(modifiers)
-                    txt = f"{mod} {txt}"
-                result.append(replace(a, text=txt))
-            else:
-                result.append(a)
-
-        return result
-
-    # ─── 规则 10: device_quality_compatibility ───
-
-    def _resolve_device_quality_compatibility_atoms(
-        self,
-        atoms: List[PromptAtom],
-        rule: Dict[str, Any],
-        rng: Random
-    ) -> List[PromptAtom]:
-        device_constraints: List[DeviceConstraintSpec] = rule["device_constraints"]
-
-        banned_tags_all: List[PatternSpec] = []
-        for dc in device_constraints:
-            if any(a.can_detect and any(d.matches(a.text) for d in dc.devices) for a in atoms):
-                banned_tags_all.extend(dc.banned_tags)
-
-        if banned_tags_all:
-            atoms = [
-                a for a in atoms
-                if not a.can_delete_atom or not any(bt.matches(a.text) for bt in banned_tags_all)
-            ]
-
-        return atoms
-
-    # ─── 规则 11: tattoo_dermal_fusion ───
-
-    def _resolve_tattoo_dermal_fusion_atoms(
-        self,
-        atoms: List[PromptAtom],
-        rule: Dict[str, Any],
-        rng: Random
-    ) -> List[PromptAtom]:
-        tattoo_indicators: List[PatternSpec] = rule["tattoo_indicators"]
-        fusion_tags: List[str] = rule["fusion_tags"]
-
-        has_tattoo_slot = any(a.source_slot in ("tattoo", "tattoos") for a in atoms)
-        has_tattoo_text = any(a.can_detect and any(ti.matches(a.text) for ti in tattoo_indicators) for a in atoms)
-
-        if (has_tattoo_slot or has_tattoo_text) and fusion_tags:
-            all_text = " ".join(a.text.lower() for a in atoms if a.can_detect)
-            has_fusion = any(ft.lower() in all_text for ft in fusion_tags)
-            if not has_fusion:
-                parent_atom = next(
-                    (a for a in atoms if a.source_slot in ("tattoo", "tattoos") or (a.can_detect and any(ti.matches(a.text) for ti in tattoo_indicators))),
-                    None
-                )
-                parent_ids = (parent_atom.atom_id,) if (parent_atom and parent_atom.atom_id) else ()
-                chosen_fusion = rng.choice(fusion_tags)
-                max_order = max((a.tag_order for a in atoms), default=0) + 1
-                atoms.append(
-                    PromptAtom(
-                        text=chosen_fusion,
-                        span_type=SpanType.PLAIN,
-                        source_slot="tattoo",
-                        tag_order=max_order,
-                        span_order=0,
-                        provenance=TagProvenance(
-                            kind="resolver_generated",
-                            rule_id="tattoo_dermal_fusion",
-                            item_id=chosen_fusion,
-                            parent_ids=parent_ids,
-                        ),
-                        atom_id=f"atom_resolver_tattoo_dermal_fusion_{max_order}_0",
+                if is_loser:
+                    if not a.can_delete_atom:
+                        continue
+                    if is_fallback:
+                        self.text_fallback_hits += 1
+                    index.drop(a.atom_id)
+                    ledger.record_drop(
+                        rule_item.id,
+                        rule_item.phase,
+                        "close_up_removes_lower_body",
+                        (cu_winner.atom_id,),
+                        a,
                     )
-                )
 
-        return atoms
+        return index.get_all_active_ordered()
 
-    # ─── 规则 12: pose_hand_occupation ───
+    # ─── 规则 4: pose_hand_occupation (physical, 200) ───
 
     def _resolve_pose_hand_occupation_atoms(
         self,
         atoms: List[PromptAtom],
-        rule: Dict[str, Any],
-        rng: Random
+        rule_item: RuleItem,
+        ledger: DecisionLedger,
+        rng: Random,
+        index: OneTimeIndex,
+        context_profile: Optional[ContextProfile],
     ) -> List[PromptAtom]:
-        busy_triggers: List[PatternSpec] = rule["busy_pose_triggers"]
-        banned_handheld: List[PatternSpec] = rule["banned_handheld_patterns"]
+        tf = rule_item.spec.text_fallback
+        tf_patterns = tf.patterns
+        all_busy_pose = select_fallback_patterns(tf_patterns, role="trigger", group_id="pose_hand")
+        all_handheld = select_fallback_patterns(tf_patterns, role="handheld", group_id="pose_hand")
+        busy_fact_atoms = (
+            index.get_active_by_fact("hand_state", "both_busy")
+            + index.get_active_by_fact("hand_state", "one_busy")
+            + index.get_active_by_mutex_group("busy_hands")
+        )
 
-        is_busy = any(a.can_detect and any(bt.matches(a.text) for bt in busy_triggers) for a in atoms)
-        if is_busy:
-            atoms = [
-                a for a in atoms
-                if not a.can_delete_atom or not any(bh.matches(a.text) for bh in banned_handheld)
-            ]
+        busy_atoms = []
+        seen_busy_ids = set()
+        for a in busy_fact_atoms:
+            if not a.can_detect or not index.is_active(a):
+                continue
+            self._validate_formal_atom(a, rule_item.id)
+            seen_busy_ids.add(a.atom_id)
+            busy_atoms.append(a)
 
-        return atoms
+        for a in index.get_active_by_slot("pose"):
+            if a.atom_id in seen_busy_ids:
+                continue
+            if not a.can_detect or not index.is_active(a):
+                continue
+            self._validate_formal_atom(a, rule_item.id)
+            if is_formal_atom(a):
+                if a.facts and a.facts.hand_state == "both_busy":
+                    busy_atoms.append(a)
+            elif tf.enabled:
+                if any(t.matches(a.text) for t in all_busy_pose):
+                    busy_atoms.append(a)
 
-    # ─── 规则 13: handheld_props_single_holder ───
+        if busy_atoms:
+            pose_winner = min(busy_atoms, key=lambda x: (x.tag_order, x.span_order))
+            for a in index.get_active_by_slot("props"):
+                if a in busy_atoms or not a.can_detect or not index.is_active(a):
+                    continue
+                self._validate_formal_atom(a, rule_item.id)
+                is_loser = False
+                is_fallback = False
+                if is_formal_atom(a):
+                    if a.facts and (a.facts.hands_required > 0 or a.facts.prop_usage == "handheld"):
+                        is_loser = True
+                elif tf.enabled:
+                    if any(p.matches(a.text) for p in all_handheld):
+                        is_loser = True
+                        is_fallback = True
+
+                if is_loser:
+                    if not a.can_delete_atom:
+                        continue
+                    if is_fallback:
+                        self.text_fallback_hits += 1
+                    index.drop(a.atom_id)
+                    ledger.record_drop(
+                        rule_item.id,
+                        rule_item.phase,
+                        "busy_hands_remove_props",
+                        (pose_winner.atom_id,),
+                        a,
+                    )
+
+        return index.get_all_active_ordered()
+
+    # ─── 规则 5: handheld_props_single_holder (physical, 210) ───
 
     def _resolve_handheld_props_single_holder_atoms(
         self,
         atoms: List[PromptAtom],
-        rule: Dict[str, Any],
-        rng: Random
+        rule_item: RuleItem,
+        ledger: DecisionLedger,
+        rng: Random,
+        index: OneTimeIndex,
+        context_profile: Optional[ContextProfile],
     ) -> List[PromptAtom]:
-        handheld_patterns: List[PatternSpec] = rule["handheld_patterns"]
+        tf = rule_item.spec.text_fallback
+        tf_patterns = tf.patterns if (tf and tf.enabled) else ()
+        handheld_patterns = select_fallback_patterns(tf_patterns, role="handheld", group_id="handheld")
 
-        handheld_atoms = [
-            a for a in atoms
-            if a.can_detect and any(hp.matches(a.text) for hp in handheld_patterns)
-        ]
+        # 实际消费事实索引 (R2R3-P3-001)
+        hh_fact_atoms = index.get_active_by_fact("prop_usage", "handheld")
+        detected_hh: List[Tuple[PromptAtom, bool]] = []
+        seen_ids = set()
 
-        if len(handheld_atoms) > 1:
-            handheld_atoms.sort(key=lambda x: (x.tag_order, x.span_order))
-            to_remove = set(handheld_atoms[1:])
-            atoms = [a for a in atoms if a not in to_remove or not a.can_delete_atom]
+        for a in hh_fact_atoms:
+            if not a.can_detect or not index.is_active(a):
+                continue
+            self._validate_formal_atom(a, rule_item.id)
+            seen_ids.add(a.atom_id)
+            detected_hh.append((a, False))
 
-        return atoms
+        for a in index.get_active_by_slot("props"):
+            if a.atom_id in seen_ids or not a.can_detect or not index.is_active(a):
+                continue
+            self._validate_formal_atom(a, rule_item.id)
+            if is_formal_atom(a):
+                if a.facts and (a.facts.hands_required > 0 or a.facts.prop_usage == "handheld"):
+                    seen_ids.add(a.atom_id)
+                    detected_hh.append((a, False))
+            elif tf.enabled:
+                if any(hp.matches(a.text) for hp in handheld_patterns):
+                    seen_ids.add(a.atom_id)
+                    detected_hh.append((a, True))
 
-    # ─── 规则 14: emotion_gaze_affinity ───
+        if len(detected_hh) > 1:
+            detected_hh.sort(key=lambda x: (x[0].tag_order, x[0].span_order))
+            winner_atom, _ = detected_hh[0]
+            for loser_atom, is_fallback in detected_hh[1:]:
+                if not loser_atom.can_delete_atom or not index.is_active(loser_atom):
+                    continue
+                if is_fallback:
+                    self.text_fallback_hits += 1
+                index.drop(loser_atom.atom_id)
+                ledger.record_drop(
+                    rule_item.id,
+                    rule_item.phase,
+                    "single_handheld_prop_limit",
+                    (winner_atom.atom_id,),
+                    loser_atom,
+                )
 
-    def _resolve_emotion_gaze_affinity_atoms(
+        return index.get_all_active_ordered()
+
+    # ─── 规则 6: clothing_style_state_coherence (physical, 220) ───
+
+    def _resolve_clothing_style_state_coherence_atoms(
         self,
         atoms: List[PromptAtom],
-        rule: Dict[str, Any],
-        rng: Random
+        rule_item: RuleItem,
+        ledger: DecisionLedger,
+        rng: Random,
+        index: OneTimeIndex,
+        context_profile: Optional[ContextProfile],
     ) -> List[PromptAtom]:
-        conflicts = rule["conflicts"]
+        tf = rule_item.spec.text_fallback
+        tf_patterns = tf.patterns
+        one_piece_triggers = select_fallback_patterns(tf_patterns, role="trigger", group_id="one_piece")
+        one_piece_banned_states = select_fallback_patterns(tf_patterns, role="banned", group_id="one_piece")
+        pants_triggers = select_fallback_patterns(tf_patterns, role="trigger", group_id="pants")
+        pants_banned_states = select_fallback_patterns(tf_patterns, role="banned", group_id="pants")
+        _op_fact_atoms = index.get_active_by_fact("garment_topologies", "one_piece")
 
-        for c in conflicts:
-            emotion_triggers: List[PatternSpec] = c["emotion_triggers"]
-            banned_gaze: List[PatternSpec] = c["banned_gaze"]
+        op_atoms = []
+        clothing_atoms = index.get_active_by_slots("clothing", "clothing_state")
+        for a in clothing_atoms:
+            if not a.can_detect or not index.is_active(a):
+                continue
+            self._validate_formal_atom(a, rule_item.id)
+            if is_formal_atom(a):
+                if a.facts and "one_piece" in a.facts.garment_topologies:
+                    op_atoms.append(a)
+            elif tf.enabled:
+                if any(opt.matches(a.text) for opt in one_piece_triggers):
+                    op_atoms.append(a)
 
-            has_emotion = any(a.can_detect and any(et.matches(a.text) for et in emotion_triggers) for a in atoms)
-            if has_emotion:
-                atoms = [
-                    a for a in atoms
-                    if not a.can_delete_atom or not any(bg.matches(a.text) for bg in banned_gaze)
-                ]
+        if op_atoms:
+            op_winner = min(op_atoms, key=lambda x: (x.tag_order, x.span_order))
+            for a in clothing_atoms:
+                if a in op_atoms or not a.can_detect or not index.is_active(a):
+                    continue
+                is_loser = False
+                is_fallback = False
+                if is_formal_atom(a):
+                    if a.facts and any(s in a.facts.garment_states for s in ("unbuttoned", "lifted_skirt", "opened", "removed")):
+                        is_loser = True
+                elif tf.enabled:
+                    if any(bs.matches(a.text) for bs in one_piece_banned_states):
+                        is_loser = True
+                        is_fallback = True
 
-        return atoms
+                if is_loser:
+                    if not a.can_delete_atom:
+                        continue
+                    if is_fallback:
+                        self.text_fallback_hits += 1
+                    index.drop(a.atom_id)
+                    ledger.record_drop(
+                        rule_item.id,
+                        rule_item.phase,
+                        "one_piece_state_conflict",
+                        (op_winner.atom_id,),
+                        a,
+                    )
 
-    # ─── 规则 15: environmental_lighting_coherence ───
+        if pants_triggers and pants_banned_states:
+            pants_atoms = []
+            for a in clothing_atoms:
+                if not a.can_detect or not index.is_active(a):
+                    continue
+                self._validate_formal_atom(a, rule_item.id)
+                if is_formal_atom(a):
+                    if a.facts and any(t in a.facts.garment_topologies for t in ("pants", "jeans", "shorts", "trousers")):
+                        pants_atoms.append(a)
+                elif tf.enabled:
+                    if any(pt.matches(a.text) for pt in pants_triggers):
+                        pants_atoms.append(a)
+
+            if pants_atoms:
+                pants_winner = min(pants_atoms, key=lambda x: (x.tag_order, x.span_order))
+                for a in clothing_atoms:
+                    if a in pants_atoms or not a.can_detect or not index.is_active(a):
+                        continue
+                    is_loser = False
+                    is_fallback = False
+                    if is_formal_atom(a):
+                        if a.facts and any(s in a.facts.garment_states for s in ("skirt_slit", "pleated_skirt", "skirt_floating", "slit", "lifted_skirt")):
+                            is_loser = True
+                    elif tf.enabled:
+                        if any(bs.matches(a.text) for bs in pants_banned_states):
+                            is_loser = True
+                            is_fallback = True
+
+                    if is_loser:
+                        if not a.can_delete_atom:
+                            continue
+                        if is_fallback:
+                            self.text_fallback_hits += 1
+                        index.drop(a.atom_id)
+                        ledger.record_drop(
+                            rule_item.id,
+                            rule_item.phase,
+                            "pants_state_conflict",
+                            (pants_winner.atom_id,),
+                            a,
+                        )
+
+        return index.get_all_active_ordered()
+
+    # ─── 规则 7: material_penetration (physical, 230) ───
+
+    def _resolve_material_penetration_atoms(
+        self,
+        atoms: List[PromptAtom],
+        rule_item: RuleItem,
+        ledger: DecisionLedger,
+        rng: Random,
+        index: OneTimeIndex,
+        context_profile: Optional[ContextProfile],
+    ) -> List[PromptAtom]:
+        rule = rule_item.spec
+        tf = rule_item.spec.text_fallback
+        tf_patterns = tf.patterns
+        banned_words = select_fallback_patterns(tf_patterns, role="banned", group_id="material")
+        replacements = rule.replacements
+        _sheer_fact_atoms = index.get_active_by_fact("garment_states", "sheer")
+
+        clothing_atoms = index.get_active_by_slot("clothing") + index.get_active_by_slot("clothing_state")
+        for a in clothing_atoms:
+            if not index.is_active(a) or not a.can_modify_internal or not a.can_detect:
+                continue
+            if (
+                a.source_slot == "clothing_extension"
+                or (a.provenance and a.provenance.kind == "clothing_extension")
+            ):
+                continue
+
+            self._validate_formal_atom(a, rule_item.id)
+            matched = False
+            is_fallback = False
+            if is_formal_atom(a):
+                if a.facts and any(s in a.facts.garment_states for s in ("sheer", "see_through", "transparent", "translucent", "wet_clinging")):
+                    matched = True
+                elif a.source_item_id in ("sheer_chiffon", "sheer_mesh", "semi_translucent"):
+                    matched = True
+            elif tf.enabled:
+                if any(bw.matches(a.text) for bw in banned_words):
+                    matched = True
+                    is_fallback = True
+
+            if matched and replacements:
+                rep_text = rng.choice(replacements)
+                new_facts = None
+                if a.facts:
+                    clean_states = tuple(s for s in a.facts.garment_states if s not in ("sheer", "see_through", "transparent", "translucent", "wet_clinging"))
+                    new_facts = replace(a.facts, garment_states=clean_states)
+                new_a = make_replaced_atom(a, rep_text, rule_item.id, new_facts=new_facts)
+                if is_fallback:
+                    self.text_fallback_hits += 1
+                index.replace(a.atom_id, new_a)
+                ledger.record_replace(
+                    rule_item.id,
+                    rule_item.phase,
+                    "material_penetration_replaced",
+                    (),
+                    a,
+                    (new_a,),
+                )
+
+        return index.get_all_active_ordered()
+
+    # ─── 规则 8: device_quality_compatibility (physical, 240) ───
+
+    def _resolve_device_quality_compatibility_atoms(
+        self,
+        atoms: List[PromptAtom],
+        rule_item: RuleItem,
+        ledger: DecisionLedger,
+        rng: Random,
+        index: OneTimeIndex,
+        context_profile: Optional[ContextProfile],
+    ) -> List[PromptAtom]:
+        tf = rule_item.spec.text_fallback
+        tf_patterns = tf.patterns
+        constraints: Tuple[DeviceConstraintSpec, ...] = tuple(
+            DeviceConstraintSpec(
+                devices=select_fallback_patterns(tf_patterns, role="device", group_id=gid),
+                banned_tags=select_fallback_patterns(tf_patterns, role="banned", group_id=gid),
+            )
+            for gid in get_fallback_group_ids(tf_patterns, role="device")
+        )
+        cctv_fact_atoms = index.get_active_by_fact("capture_device", "cctv")
+
+        dev_atoms = []
+        seen_dev_ids = set()
+        for a in cctv_fact_atoms:
+            if not a.can_detect or not index.is_active(a):
+                continue
+            self._validate_formal_atom(a, rule_item.id)
+            seen_dev_ids.add(a.atom_id)
+            dev_atoms.append(a)
+
+        for a in (index.get_active_by_slot("shot_type") + index.get_active_by_slot("shot")):
+            if a.atom_id in seen_dev_ids:
+                continue
+            if not a.can_detect or not index.is_active(a):
+                continue
+            self._validate_formal_atom(a, rule_item.id)
+            matched = False
+            if is_formal_atom(a):
+                if a.facts and a.facts.capture_device in ("cctv", "vhs", "polaroid", "webcam"):
+                    matched = True
+                elif a.source_item_id in ("cctv", "vhs", "polaroid", "webcam"):
+                    matched = True
+            elif tf.enabled:
+                for c in constraints:
+                    if any(dp.matches(a.text) for dp in c.devices):
+                        matched = True
+                        break
+            if matched:
+                dev_atoms.append(a)
+
+        if dev_atoms:
+            dev_winner = min(dev_atoms, key=lambda x: (x.tag_order, x.span_order))
+            for a in index.get_active_by_slot("quality"):
+                if a in dev_atoms or not a.can_detect or not index.is_active(a):
+                    continue
+                self._validate_formal_atom(a, rule_item.id)
+                is_loser = False
+                is_fallback = False
+                if is_formal_atom(a):
+                    if a.facts and a.facts.quality_class in ("masterpiece", "ultra_detailed", "high_res", "best_quality"):
+                        is_loser = True
+                elif tf.enabled:
+                    for c in constraints:
+                        if any(bt.matches(a.text) for bt in c.banned_tags):
+                            is_loser = True
+                            is_fallback = True
+                            break
+
+                if is_loser:
+                    if not a.can_delete_atom:
+                        continue
+                    if is_fallback:
+                        self.text_fallback_hits += 1
+                    index.drop(a.atom_id)
+                    ledger.record_drop(
+                        rule_item.id,
+                        rule_item.phase,
+                        "device_removes_conflicting_quality",
+                        (dev_winner.atom_id,),
+                        a,
+                    )
+
+        return index.get_all_active_ordered()
+
+    # ─── 规则 9: environmental_lighting_coherence (physical, 250) ───
 
     def _resolve_environmental_lighting_coherence_atoms(
         self,
         atoms: List[PromptAtom],
-        rule: Dict[str, Any],
-        rng: Random
+        rule_item: RuleItem,
+        ledger: DecisionLedger,
+        rng: Random,
+        index: OneTimeIndex,
+        context_profile: Optional[ContextProfile],
     ) -> List[PromptAtom]:
-        daylight_triggers: List[PatternSpec] = rule["daylight_triggers"]
-        banned_night: List[PatternSpec] = rule["banned_night_elements"]
+        tf = rule_item.spec.text_fallback
+        tf_patterns = tf.patterns
+        all_daylight = select_fallback_patterns(tf_patterns, role="trigger", group_id="daylight")
+        all_night = select_fallback_patterns(tf_patterns, role="banned", group_id="daylight")
+        _night_atoms = index.get_active_by_fact("time_of_day", "night")
+        _day_atoms = index.get_active_by_fact("time_of_day", "day")
 
-        has_night_scene = any(
-            a.can_detect and a.source_slot in ("scene_theme", "scene", "theme") and
-            any(bn.matches(a.text) for bn in banned_night)
-            for a in atoms
-        )
-        has_daylight_lighting = any(
-            a.can_detect and a.source_slot in ("lighting", "lighting_palette") and
-            any(dt.matches(a.text) for dt in daylight_triggers)
-            for a in atoms
-        )
+        night_scene_atoms = []
+        for a in index.get_active_by_slots("scene", "scene_theme", "theme"):
+            if not a.can_detect or not index.is_active(a):
+                continue
+            self._validate_formal_atom(a, rule_item.id)
+            if is_formal_atom(a):
+                if a.facts and a.facts.time_of_day in ("night", "midnight", "late_night"):
+                    night_scene_atoms.append(a)
+            elif tf.enabled:
+                if any(nt.matches(a.text) for nt in all_night):
+                    night_scene_atoms.append(a)
 
-        # 优先级：场景主锚点 (scene_theme) > 环境光影 (lighting)
-        if has_night_scene and has_daylight_lighting:
-            # 夜景为主场所：保留夜景场景，剔除冲突的日间光照
-            return [
-                a for a in atoms
-                if not (a.can_delete_atom and a.source_slot in ("lighting", "lighting_palette") and any(dt.matches(a.text) for dt in daylight_triggers))
-            ]
+        if night_scene_atoms:
+            night_winner = min(night_scene_atoms, key=lambda x: (x.tag_order, x.span_order))
+            for a in index.get_active_by_slots("lighting", "lighting_palette"):
+                if a in night_scene_atoms or not a.can_detect or not index.is_active(a):
+                    continue
+                self._validate_formal_atom(a, rule_item.id)
+                is_loser = False
+                is_fallback = False
+                if is_formal_atom(a):
+                    if a.facts and (a.facts.time_of_day in ("morning", "noon", "afternoon", "day") or any(ls in ("sunlight", "daylight", "direct_sun") for ls in a.facts.light_sources)):
+                        is_loser = True
+                elif tf.enabled:
+                    if any(dt.matches(a.text) for dt in all_daylight):
+                        is_loser = True
+                        is_fallback = True
 
-        has_daylight = any(a.can_detect and any(dt.matches(a.text) for dt in daylight_triggers) for a in atoms)
-        if has_daylight:
-            atoms = [
-                a for a in atoms
-                if not (a.can_delete_atom and any(bn.matches(a.text) for bn in banned_night))
-            ]
+                if is_loser:
+                    if not a.can_delete_atom:
+                        continue
+                    if is_fallback:
+                        self.text_fallback_hits += 1
+                    index.drop(a.atom_id)
+                    ledger.record_drop(
+                        rule_item.id,
+                        rule_item.phase,
+                        "night_scene_removes_daylight",
+                        (night_winner.atom_id,),
+                        a,
+                    )
+        else:
+            daylight_atoms = []
+            for a in index.get_active_by_slots("scene", "scene_theme", "theme", "lighting", "lighting_palette"):
+                if not a.can_detect or not index.is_active(a):
+                    continue
+                self._validate_formal_atom(a, rule_item.id)
+                if is_formal_atom(a):
+                    if a.facts and (a.facts.time_of_day in ("morning", "noon", "afternoon", "day") or any(ls in ("sunlight", "daylight", "direct_sun") for ls in a.facts.light_sources)):
+                        daylight_atoms.append(a)
+                elif tf.enabled:
+                    if any(dt.matches(a.text) for dt in all_daylight):
+                        daylight_atoms.append(a)
 
-        return atoms
+            if daylight_atoms:
+                daylight_winner = min(daylight_atoms, key=lambda x: (x.tag_order, x.span_order))
+                for a in index.get_active_by_slots("lighting", "lighting_palette"):
+                    if a in daylight_atoms or not a.can_detect or not index.is_active(a):
+                        continue
+                    self._validate_formal_atom(a, rule_item.id)
+                    is_loser = False
+                    is_fallback = False
+                    if is_formal_atom(a):
+                        if a.facts and a.facts.time_of_day in ("night", "midnight", "late_night"):
+                            is_loser = True
+                    elif tf.enabled:
+                        if any(nt.matches(a.text) for nt in all_night):
+                            is_loser = True
+                            is_fallback = True
 
-    # ─── 规则 16: monochrome_film_chroma_coherence ───
+                    if is_loser:
+                        if not a.can_delete_atom:
+                            continue
+                        if is_fallback:
+                            self.text_fallback_hits += 1
+                        index.drop(a.atom_id)
+                        ledger.record_drop(
+                            rule_item.id,
+                            rule_item.phase,
+                            "daylight_removes_night",
+                            (daylight_winner.atom_id,),
+                            a,
+                        )
+
+        return index.get_all_active_ordered()
+
+    # ─── 规则 10: monochrome_film_chroma_coherence (physical, 260) ───
 
     def _resolve_monochrome_film_chroma_coherence_atoms(
         self,
         atoms: List[PromptAtom],
-        rule: Dict[str, Any],
-        rng: Random
+        rule_item: RuleItem,
+        ledger: DecisionLedger,
+        rng: Random,
+        index: OneTimeIndex,
+        context_profile: Optional[ContextProfile],
     ) -> List[PromptAtom]:
-        monochrome_triggers: List[PatternSpec] = rule["monochrome_triggers"]
-        banned_chroma: List[PatternSpec] = rule["banned_chroma"]
+        tf = rule_item.spec.text_fallback
+        tf_patterns = tf.patterns
+        monochrome_triggers = select_fallback_patterns(tf_patterns, role="trigger", group_id="monochrome")
+        banned_chroma = select_fallback_patterns(tf_patterns, role="banned", group_id="monochrome")
+        mono_fact_atoms = index.get_active_by_fact("color_modes", "monochrome")
 
-        has_mono = any(a.can_detect and any(mt.matches(a.text) for mt in monochrome_triggers) for a in atoms)
-        if has_mono:
-            atoms = [
-                a for a in atoms
-                if not a.can_delete_atom or not any(bc.matches(a.text) for bc in banned_chroma)
-            ]
+        mono_atoms = []
+        seen_mono_ids = set()
+        for a in mono_fact_atoms:
+            if not a.can_detect or not index.is_active(a):
+                continue
+            self._validate_formal_atom(a, rule_item.id)
+            seen_mono_ids.add(a.atom_id)
+            mono_atoms.append(a)
 
-        return atoms
+        for a in index.get_active_by_slots("film", "film_stock"):
+            if a.atom_id in seen_mono_ids or not a.can_detect or not index.is_active(a):
+                continue
+            self._validate_formal_atom(a, rule_item.id)
+            if is_formal_atom(a):
+                if a.facts and "monochrome" in a.facts.color_modes:
+                    seen_mono_ids.add(a.atom_id)
+                    mono_atoms.append(a)
+            elif tf.enabled:
+                if any(t.matches(a.text) for t in monochrome_triggers):
+                    seen_mono_ids.add(a.atom_id)
+                    mono_atoms.append(a)
 
-    # ─── 规则 17: makeup_details_coherence ───
+        if mono_atoms:
+            mono_winner = min(mono_atoms, key=lambda x: (x.tag_order, x.span_order))
+            for a in index.get_active_by_slots("lighting", "lighting_palette", "film", "film_stock"):
+                if a in mono_atoms or not a.can_detect or not index.is_active(a):
+                    continue
+                self._validate_formal_atom(a, rule_item.id)
+                is_loser = False
+                is_fallback = False
+                if is_formal_atom(a):
+                    if a.facts and any(c in a.facts.color_modes for c in ("color", "high_saturation", "neon")):
+                        is_loser = True
+                elif tf.enabled:
+                    if any(b.matches(a.text) for b in banned_chroma):
+                        is_loser = True
+                        is_fallback = True
+
+                if is_loser:
+                    if not a.can_delete_atom:
+                        continue
+                    if is_fallback:
+                        self.text_fallback_hits += 1
+                    index.drop(a.atom_id)
+                    ledger.record_drop(
+                        rule_item.id,
+                        rule_item.phase,
+                        "monochrome_film_removes_chroma",
+                        (mono_winner.atom_id,),
+                        a,
+                    )
+
+        return index.get_all_active_ordered()
+
+    # ─── 规则 11: makeup_details_coherence (physical, 270) ───
 
     def _resolve_makeup_details_coherence_atoms(
         self,
         atoms: List[PromptAtom],
-        rule: Dict[str, Any],
-        rng: Random
+        rule_item: RuleItem,
+        ledger: DecisionLedger,
+        rng: Random,
+        index: OneTimeIndex,
+        context_profile: Optional[ContextProfile],
     ) -> List[PromptAtom]:
-        no_makeup_triggers: List[PatternSpec] = rule["no_makeup_triggers"]
-        banned_makeup_smudge: List[PatternSpec] = rule["banned_makeup_smudge"]
+        tf = rule_item.spec.text_fallback
+        tf_patterns = tf.patterns
+        no_makeup_triggers = select_fallback_patterns(tf_patterns, role="trigger", group_id="no_makeup")
+        banned_makeup_smudge = select_fallback_patterns(tf_patterns, role="banned", group_id="no_makeup")
+        bare_fact_atoms = index.get_active_by_fact("makeup_base", "bare")
 
-        has_no_makeup = any(a.can_detect and any(nmt.matches(a.text) for nmt in no_makeup_triggers) for a in atoms)
-        if has_no_makeup:
-            atoms = [
-                a for a in atoms
-                if not a.can_delete_atom or not any(bms.matches(a.text) for bms in banned_makeup_smudge)
+        clean_atoms = []
+        seen_clean_ids = set()
+        for a in bare_fact_atoms:
+            if not a.can_detect or not index.is_active(a):
+                continue
+            self._validate_formal_atom(a, rule_item.id)
+            seen_clean_ids.add(a.atom_id)
+            clean_atoms.append(a)
+
+        makeup_atoms = index.get_active_by_slot("makeup")
+        for a in makeup_atoms:
+            if a.atom_id in seen_clean_ids:
+                continue
+            if not a.can_detect or not index.is_active(a):
+                continue
+            self._validate_formal_atom(a, rule_item.id)
+            if is_formal_atom(a):
+                if a.facts and a.facts.makeup_base in ("bare", "clean", "natural"):
+                    clean_atoms.append(a)
+            elif tf.enabled:
+                if any(t.matches(a.text) for t in no_makeup_triggers):
+                    clean_atoms.append(a)
+
+        if clean_atoms:
+            clean_winner = min(clean_atoms, key=lambda x: (x.tag_order, x.span_order))
+            for a in makeup_atoms:
+                if a.atom_id == clean_winner.atom_id or not a.can_detect or not index.is_active(a):
+                    continue
+                is_loser = False
+                is_fallback = False
+                if is_formal_atom(a):
+                    if a.facts and any(e in a.facts.makeup_effects for e in ("heavy", "smudged", "runny", "smeared")):
+                        is_loser = True
+                elif tf.enabled:
+                    if any(b.matches(a.text) for b in banned_makeup_smudge):
+                        is_loser = True
+                        is_fallback = True
+
+                if is_loser:
+                    if not a.can_delete_atom:
+                        continue
+                    if is_fallback:
+                        self.text_fallback_hits += 1
+                    index.drop(a.atom_id)
+                    ledger.record_drop(
+                        rule_item.id,
+                        rule_item.phase,
+                        "clean_base_removes_heavy_makeup",
+                        (clean_winner.atom_id,),
+                        a,
+                    )
+
+        return index.get_all_active_ordered()
+
+    # ─── 规则 12: gaze_angle_geometry (semantic, 300) ───
+
+    def _resolve_gaze_angle_geometry_atoms(
+        self,
+        atoms: List[PromptAtom],
+        rule_item: RuleItem,
+        ledger: DecisionLedger,
+        rng: Random,
+        index: OneTimeIndex,
+        context_profile: Optional[ContextProfile],
+    ) -> List[PromptAtom]:
+        tf = rule_item.spec.text_fallback
+        tf_patterns = tf.patterns
+        mappings: Tuple[AngleGazeMappingSpec, ...] = tuple(
+            AngleGazeMappingSpec(
+                angles=select_fallback_patterns(tf_patterns, role="angle", group_id=gid),
+                banned_gaze=select_fallback_patterns(tf_patterns, role="banned", group_id=gid),
+            )
+            for gid in get_fallback_group_ids(tf_patterns, role="angle")
+        )
+        _angle_down_atoms = index.get_active_by_fact("gaze", "down")
+
+        camera_atoms = (
+            index.get_active_by_slot("camera_angle")
+            + index.get_active_by_slot("camera")
+            + index.get_active_by_slot("shot_type")
+        )
+        expression_atoms = index.get_active_by_slot("expression")
+
+        for mapping in mappings:
+            ang_atoms = []
+            for a in camera_atoms:
+                if not a.can_detect or not index.is_active(a):
+                    continue
+                self._validate_formal_atom(a, rule_item.id)
+                if is_formal_atom(a):
+                    item_id = (a.provenance.item_id or a.source_item_id or "") if a.provenance else (a.source_item_id or "")
+                    if item_id in ("overhead", "top_down", "birds_eye") or (a.facts and a.facts.gaze in ("down", "looking_down_from_above")):
+                        ang_atoms.append(a)
+                elif tf.enabled:
+                    if any(ag.matches(a.text) for ag in mapping.angles):
+                        ang_atoms.append(a)
+
+            if ang_atoms:
+                ang_winner = min(ang_atoms, key=lambda x: (x.tag_order, x.span_order))
+                for a in expression_atoms:
+                    if a in ang_atoms or not a.can_detect or not index.is_active(a):
+                        continue
+                    self._validate_formal_atom(a, rule_item.id)
+                    is_loser = False
+                    is_fallback = False
+                    if is_formal_atom(a):
+                        if a.facts and a.facts.gaze in ("down", "looking_down_from_above"):
+                            is_loser = True
+                    elif tf.enabled:
+                        if any(bg.matches(a.text) for bg in mapping.banned_gaze):
+                            is_loser = True
+                            is_fallback = True
+
+                    if is_loser:
+                        if not a.can_delete_atom:
+                            continue
+                        if is_fallback:
+                            self.text_fallback_hits += 1
+                        index.drop(a.atom_id)
+                        ledger.record_drop(
+                            rule_item.id,
+                            rule_item.phase,
+                            "camera_angle_removes_impossible_gaze",
+                            (ang_winner.atom_id,),
+                            a,
+                        )
+
+        return index.get_all_active_ordered()
+
+    # ─── 规则 13: accessory_occlusion_gaze_coherence (semantic, 310) ───
+
+    def _resolve_accessory_occlusion_gaze_coherence_atoms(
+        self,
+        atoms: List[PromptAtom],
+        rule_item: RuleItem,
+        ledger: DecisionLedger,
+        rng: Random,
+        index: OneTimeIndex,
+        context_profile: Optional[ContextProfile],
+    ) -> List[PromptAtom]:
+        tf = rule_item.spec.text_fallback
+        tf_patterns = tf.patterns
+        occlusion_triggers = select_fallback_patterns(tf_patterns, role="trigger", group_id="occlusion")
+        banned_gaze_actions = select_fallback_patterns(tf_patterns, role="banned", group_id="occlusion")
+        _occ_eyes_atoms = index.get_active_by_fact("occlusion", "eyes")
+
+        occ_atoms = []
+        jewelry_atoms = index.get_active_by_slots("jewelry", "accessories")
+        expression_atoms = index.get_active_by_slots("expression", "expressions")
+
+        for a in jewelry_atoms:
+            if not a.can_detect or not index.is_active(a):
+                continue
+            self._validate_formal_atom(a, rule_item.id)
+            if is_formal_atom(a):
+                if a.facts and a.facts.occlusion in ("eyes", "face"):
+                    occ_atoms.append(a)
+            elif tf.enabled:
+                if any(t.matches(a.text) for t in occlusion_triggers):
+                    occ_atoms.append(a)
+
+        if occ_atoms:
+            occ_winner = min(occ_atoms, key=lambda x: (x.tag_order, x.span_order))
+            for a in expression_atoms:
+                if a in occ_atoms or not a.can_detect or not index.is_active(a):
+                    continue
+                self._validate_formal_atom(a, rule_item.id)
+                is_loser = False
+                is_fallback = False
+                if is_formal_atom(a):
+                    if a.facts and a.facts.gaze in ("camera", "viewer", "direct"):
+                        is_loser = True
+                elif tf.enabled:
+                    if any(b.matches(a.text) for b in banned_gaze_actions):
+                        is_loser = True
+                        is_fallback = True
+
+                if is_loser:
+                    if not a.can_delete_atom:
+                        continue
+                    if is_fallback:
+                        self.text_fallback_hits += 1
+                    index.drop(a.atom_id)
+                    ledger.record_drop(
+                        rule_item.id,
+                        rule_item.phase,
+                        "eye_occlusion_removes_gaze",
+                        (occ_winner.atom_id,),
+                        a,
+                    )
+
+        return index.get_all_active_ordered()
+
+    # ─── 规则 14: emotion_gaze_affinity (semantic, 320) ───
+
+    def _resolve_emotion_gaze_affinity_atoms(
+        self,
+        atoms: List[PromptAtom],
+        rule_item: RuleItem,
+        ledger: DecisionLedger,
+        rng: Random,
+        index: OneTimeIndex,
+        context_profile: Optional[ContextProfile],
+    ) -> List[PromptAtom]:
+        tf = rule_item.spec.text_fallback
+        tf_patterns = tf.patterns
+        conflicts: Tuple[EmotionGazeConflictSpec, ...] = tuple(
+            EmotionGazeConflictSpec(
+                catalog_emotion_triggers=(),
+                custom_emotion_triggers=select_fallback_patterns(tf_patterns, role="emotion", group_id=gid),
+                catalog_banned_gaze=(),
+                custom_banned_gaze=select_fallback_patterns(tf_patterns, role="banned", group_id=gid),
+            )
+            for gid in get_fallback_group_ids(tf_patterns, role="emotion")
+        )
+        shy_fact_atoms = [a for a in index.get_active_by_fact("emotion", "shy") if a.can_detect and index.is_active(a)]
+        all_active = index.get_all_active_ordered()
+
+        for c in conflicts:
+            emo_atoms = list(shy_fact_atoms)
+            seen_emo_ids = {a.atom_id for a in emo_atoms}
+            for a in all_active:
+                if a.atom_id in seen_emo_ids or not a.can_detect or not index.is_active(a):
+                    continue
+                self._validate_formal_atom(a, rule_item.id)
+                if is_formal_atom(a):
+                    if a.facts and a.facts.emotion == "shy":
+                        seen_emo_ids.add(a.atom_id)
+                        emo_atoms.append(a)
+                elif tf.enabled:
+                    if any(t.matches(a.text) for t in c.emotion_triggers):
+                        seen_emo_ids.add(a.atom_id)
+                        emo_atoms.append(a)
+
+            if emo_atoms:
+                emo_winner = min(emo_atoms, key=lambda x: (x.tag_order, x.span_order))
+                for a in all_active:
+                    if a in emo_atoms or not a.can_detect or not index.is_active(a):
+                        continue
+                    self._validate_formal_atom(a, rule_item.id)
+                    is_loser = False
+                    is_fallback = False
+                    if is_formal_atom(a):
+                        if a.facts and a.facts.emotion in ("seductive", "dominant"):
+                            is_loser = True
+                    elif tf.enabled:
+                        if any(b.matches(a.text) for b in c.banned_gaze):
+                            is_loser = True
+                            is_fallback = True
+
+                    if is_loser:
+                        if not a.can_delete_atom:
+                            continue
+                        if is_fallback:
+                            self.text_fallback_hits += 1
+                        index.drop(a.atom_id)
+                        ledger.record_drop(
+                            rule_item.id,
+                            rule_item.phase,
+                            "emotion_removes_conflicting_gaze",
+                            (emo_winner.atom_id,),
+                            a,
+                        )
+
+        return index.get_all_active_ordered()
+
+    # ─── 规则 15: gaze_mutual_exclusion (semantic, 330) ───
+
+    def _resolve_gaze_mutual_exclusion_atoms(
+        self,
+        atoms: List[PromptAtom],
+        rule_item: RuleItem,
+        ledger: DecisionLedger,
+        rng: Random,
+        index: OneTimeIndex,
+        context_profile: Optional[ContextProfile],
+    ) -> List[PromptAtom]:
+        tf = rule_item.spec.text_fallback
+        tf_patterns = tf.patterns
+        pairs = [
+            (p1[0], p2[0])
+            for gid in get_fallback_group_ids(tf_patterns, role="exclusive_a")
+            for p1 in [select_fallback_patterns(tf_patterns, role="exclusive_a", group_id=gid)]
+            for p2 in [select_fallback_patterns(tf_patterns, role="exclusive_b", group_id=gid)]
+            if p1 and p2
+        ]
+        _gaze_slot_atoms = index.get_active_by_slot("expression")
+        expression_atoms = index.get_active_by_slot("expression")
+
+        for a in expression_atoms:
+            self._validate_formal_atom(a, rule_item.id)
+
+        # 结构化事实消解：同一 slot 出现相互矛盾的 gaze 方向，保留首个
+        formal_gazes = [a for a in expression_atoms if a.can_detect and index.is_active(a) and is_formal_atom(a) and a.facts and a.facts.gaze]
+        if len(formal_gazes) > 1:
+            first_gaze = formal_gazes[0]
+            for later_gaze in formal_gazes[1:]:
+                if later_gaze.facts.gaze != first_gaze.facts.gaze:
+                    if not later_gaze.can_delete_atom or not index.is_active(later_gaze):
+                        continue
+                    index.drop(later_gaze.atom_id)
+                    ledger.record_drop(
+                        rule_item.id,
+                        rule_item.phase,
+                        "gaze_mutual_exclusion_preserved_first",
+                        (first_gaze.atom_id,),
+                        later_gaze,
+                    )
+
+        # 自由文本消解 (仅 custom fallback)
+        if tf.enabled:
+            for p1, p2 in pairs:
+                m1 = [a for a in expression_atoms if a.can_detect and index.is_active(a) and not is_formal_atom(a) and p1.matches(a.text)]
+                m2 = [a for a in expression_atoms if a.can_detect and index.is_active(a) and not is_formal_atom(a) and p2.matches(a.text)]
+                if m1 and m2:
+                    m1.sort(key=lambda x: (x.tag_order, x.span_order))
+                    m2.sort(key=lambda x: (x.tag_order, x.span_order))
+                    if (m1[0].tag_order, m1[0].span_order) <= (m2[0].tag_order, m2[0].span_order):
+                        winner = m1[0]
+                        losers = m2
+                    else:
+                        winner = m2[0]
+                        losers = m1
+
+                    for loser in losers:
+                        if not loser.can_delete_atom or not index.is_active(loser):
+                            continue
+                        self.text_fallback_hits += 1
+                        index.drop(loser.atom_id)
+                        ledger.record_drop(
+                            rule_item.id,
+                            rule_item.phase,
+                            "gaze_mutual_exclusion_preserved_first",
+                            (winner.atom_id,),
+                            loser,
+                        )
+
+        return index.get_all_active_ordered()
+
+    # ─── 规则 16: liquid_restrictions (effects, 400) ───
+
+    def _resolve_liquid_restrictions_atoms(
+        self,
+        atoms: List[PromptAtom],
+        rule_item: RuleItem,
+        ledger: DecisionLedger,
+        rng: Random,
+        index: OneTimeIndex,
+        context_profile: Optional[ContextProfile],
+    ) -> List[PromptAtom]:
+        rule = rule_item.spec
+        tf = rule_item.spec.text_fallback
+        tf_patterns = tf.patterns
+        combo_replacements = {
+            "cum_eyes": "cum on cheek",
+            "opaque_paint": "translucent slightly viscous fluid",
+            "pussy_juice": "clear glistening moisture trail",
+        }
+        banned_combos: Tuple[BannedComboSpec, ...] = tuple(
+            BannedComboSpec(
+                triggers=select_fallback_patterns(tf_patterns, role="trigger", group_id=gid),
+                replace=combo_replacements.get(gid, "clear fluid"),
+            )
+            for gid in get_fallback_group_ids(tf_patterns, role="trigger")
+        )
+        modifiers: Tuple[str, ...] = rule.modifiers
+        liquid_words: Tuple[PatternSpec, ...] = select_fallback_patterns(tf_patterns, role="liquid", group_id="liquid_words")
+        _sexual_fluid_atoms = index.get_active_by_fact("liquid_kind", "sexual_fluid")
+
+        liquid_atoms = index.get_active_by_slot("liquids") + index.get_active_by_slot("liquid")
+        for a in liquid_atoms:
+            if not index.is_active(a) or not a.can_modify_internal:
+                continue
+            self._validate_formal_atom(a, rule_item.id)
+
+            # 1. 替换高危组合
+            if is_formal_atom(a):
+                if a.facts and a.facts.liquid_kind in ("sexual_fluid", "cum", "semen") and any(loc in a.facts.liquid_locations for loc in ("eyes", "closed_eyes", "face")):
+                    new_text = "few drops of semen on stomach"
+                    new_facts = replace(a.facts, liquid_locations=("torso",))
+                    new_a = make_replaced_atom(a, new_text, rule_item.id, new_facts=new_facts)
+                    index.replace(a.atom_id, new_a)
+                    ledger.record_replace(
+                        rule_item.id,
+                        rule_item.phase,
+                        "liquid_combo_replaced",
+                        (),
+                        a,
+                        (new_a,),
+                    )
+            elif tf.enabled:
+                txt = a.text
+                did_replace = False
+                for bc in banned_combos:
+                    for trig in bc.triggers:
+                        if trig.matches(txt):
+                            txt = trig.substitute(txt, bc.replace)
+                            did_replace = True
+                if did_replace and txt != a.text:
+                    new_a = make_replaced_atom(a, txt, rule_item.id)
+                    self.text_fallback_hits += 1
+                    index.replace(a.atom_id, new_a)
+                    ledger.record_replace(
+                        rule_item.id,
+                        rule_item.phase,
+                        "liquid_combo_replaced",
+                        (),
+                        a,
+                        (new_a,),
+                    )
+
+        # 2. 对微量液体应用量词修饰
+        for a in (index.get_active_by_slot("liquids") + index.get_active_by_slot("liquid")):
+            if not index.is_active(a) or not a.can_modify_internal:
+                continue
+            if is_formal_atom(a):
+                if a.facts and not a.facts.liquid_amount:
+                    mod = rng.choice(modifiers)
+                    mod_text = f"{mod} {a.text}"
+                    new_facts = replace(a.facts, liquid_amount="trace")
+                    new_a = make_replaced_atom(a, mod_text, rule_item.id, new_facts=new_facts)
+                    index.replace(a.atom_id, new_a)
+                    ledger.record_replace(
+                        rule_item.id,
+                        rule_item.phase,
+                        "liquid_quantifier_added",
+                        (),
+                        a,
+                        (new_a,),
+                    )
+            elif tf.enabled:
+                txt = a.text
+                has_mod = any(m in txt.lower() for m in modifiers)
+                if not has_mod and any(lw.matches(txt) for lw in liquid_words):
+                    mod = rng.choice(modifiers)
+                    mod_text = f"{mod} {txt}"
+                    new_a = make_replaced_atom(a, mod_text, rule_item.id)
+                    self.text_fallback_hits += 1
+                    index.replace(a.atom_id, new_a)
+                    ledger.record_replace(
+                        rule_item.id,
+                        rule_item.phase,
+                        "liquid_quantifier_added",
+                        (),
+                        a,
+                        (new_a,),
+                    )
+
+        return index.get_all_active_ordered()
+
+    # ─── 规则 17: tattoo_dermal_fusion (effects, 410) ───
+
+    def _resolve_tattoo_dermal_fusion_atoms(
+        self,
+        atoms: List[PromptAtom],
+        rule_item: RuleItem,
+        ledger: DecisionLedger,
+        rng: Random,
+        index: OneTimeIndex,
+        context_profile: Optional[ContextProfile],
+    ) -> List[PromptAtom]:
+        rule = rule_item.spec
+        tf = rule_item.spec.text_fallback
+        tf_patterns = tf.patterns
+        tattoo_indicators = select_fallback_patterns(tf_patterns, role="tattoo", group_id="tattoo")
+        fusion_tags = rule.fusion_tags
+        _tattoo_slot_atoms = index.get_active_by_slot("tattoo")
+
+        tattoo_source_atoms = index.get_active_by_slot("tattoo")
+        has_tattoo = len(tattoo_source_atoms) > 0
+        if not has_tattoo and tf.enabled:
+            for a in index.get_all_active_ordered():
+                if a.can_detect and index.is_active(a):
+                    if not is_formal_atom(a) and any(ti.matches(a.text) for ti in tattoo_indicators):
+                        has_tattoo = True
+                        tattoo_source_atoms.append(a)
+        already_injected = any(
+            (a.provenance and a.provenance.rule_id == rule_item.id) or (a.text in fusion_tags)
+            for a in tattoo_source_atoms
+        )
+        if has_tattoo and not already_injected:
+            fusion_text = rng.choice(fusion_tags)
+            ref_atom = min(tattoo_source_atoms, key=lambda x: (x.tag_order, x.span_order))
+            next_order = max((a.tag_order for a in index.get_all_active_ordered()), default=0) + 1
+            injected_atom = PromptAtom(
+                atom_id=f"atom_injected_{ref_atom.atom_id}_{rule_item.id}",
+                text=fusion_text,
+                span_type=SpanType.PLAIN,
+                source_slot="tattoo",
+                source_item_id=f"{rule_item.id}_fusion",
+                tag_order=next_order,
+                span_order=0,
+                provenance=TagProvenance(
+                    item_id=f"{rule_item.id}_fusion",
+                    parent_ids=(ref_atom.atom_id,),
+                    rule_id=rule_item.id,
+                    kind="resolver_generated",
+                ),
+                origin=SelectionOrigin(
+                    mode="resolver",
+                    selector="tattoo",
+                    parent_ids=(ref_atom.atom_id,),
+                ),
+                facts=SemanticFacts(),
+            )
+            if any(not is_formal_atom(a) and a.source_slot != "tattoo" for a in tattoo_source_atoms):
+                self.text_fallback_hits += 1
+            index.inject(injected_atom)
+            ledger.record_inject(
+                rule_item.id,
+                rule_item.phase,
+                "tattoo_dermal_fusion_injected",
+                (ref_atom.atom_id,),
+                (injected_atom,),
+                parent_source_ids=(ref_atom.atom_id,),
+            )
+
+        return index.get_all_active_ordered()
+
+    # ─── 只读最终硬冲突检测器 (detect_hard_conflicts) ───
+
+    def detect_hard_conflicts(self, atoms: Sequence[PromptAtom]) -> Tuple[Tuple[Tuple[str, ...], ...], bool]:
+        """只读检测输出原子列表中是否存在任何残留硬冲突，返回 (conflicts, has_protected)。
+        覆盖全部 17 大规则硬不变量。
+        仅当实际 loser 受保护（不可删除或含黑盒）时，has_protected 为 True。
+        纯 ANGLE 与 QUOTED 黑盒原子完全不透明，绝不被内部文本命中。
+        严格消费各规则声明式 text_fallback.patterns，杜绝第二套模式事实源 (R2R3-P1-001)。"""
+        rule_tf_map: Dict[str, Tuple[PatternSpec, ...]] = {}
+        for ritem in self.registry.doc.rules:
+            rid = ritem.id
+            rtf = ritem.spec.text_fallback
+            rule_tf_map[rid] = tuple(rtf.patterns) if rtf else ()
+
+        conflicts: List[Tuple[str, ...]] = []
+        detectable = [a for a in atoms if a.can_detect]
+        protected_losers: List[PromptAtom] = []
+
+        def _is_loser_protected(loser: PromptAtom) -> bool:
+            return not loser.can_delete_atom or loser.contains_blackbox or not loser.can_modify_internal
+
+
+        # 1. 空间环境：室内 vs 室外
+        r1_tf = rule_tf_map["spatial_environmental_mutual_exclusion"]
+        r1_in_pats = select_fallback_patterns(r1_tf, role="indoor", group_id="indoor")
+        r1_out_pats = select_fallback_patterns(r1_tf, role="outdoor", group_id="outdoor")
+        r1_venue_pats = select_fallback_patterns(r1_tf, role="venue")
+        outdoor_atoms = [
+            a for a in detectable
+            if (is_formal_atom(a) and a.facts and a.facts.space_kind == "outdoor")
+            or (not is_formal_atom(a) and any(w.matches(a.text) for w in r1_out_pats))
+        ]
+        indoor_atoms = [
+            a for a in detectable
+            if (is_formal_atom(a) and a.facts and a.facts.space_kind == "indoor")
+            or (not is_formal_atom(a) and not any(w.matches(a.text) for w in r1_out_pats) and (any(w.matches(a.text) for w in r1_in_pats) or any(w.matches(a.text) for w in r1_venue_pats)))
+        ]
+        if indoor_atoms and outdoor_atoms:
+            first_in = min(indoor_atoms, key=lambda x: (x.tag_order, x.span_order))
+            first_out = min(outdoor_atoms, key=lambda x: (x.tag_order, x.span_order))
+            if first_in.atom_id != first_out.atom_id:
+                if (first_in.tag_order, first_in.span_order) <= (first_out.tag_order, first_out.span_order):
+                    winner, loser = first_in, first_out
+                else:
+                    winner, loser = first_out, first_in
+                conflicts.append(("residual_indoor_outdoor_conflict", "spatial_environmental_mutual_exclusion", "indoor_outdoor_mutex", winner.atom_id, loser.atom_id))
+                if _is_loser_protected(loser):
+                    protected_losers.append(loser)
+
+        # 2. 裸露 vs 服装
+        r2_tf = rule_tf_map["nudity_clothing_conflicts"]
+        r2_l5_banned = select_fallback_patterns(r2_tf, role="banned", group_id="L5")
+        nude_atoms = [a for a in detectable if a.source_slot == "nudity"]
+        if nude_atoms:
+            first_nude = min(nude_atoms, key=lambda x: (x.tag_order, x.span_order))
+            is_full_nude = False
+            raw_id = ((first_nude.source_item_id or "") + " " + ((first_nude.provenance.item_id or "") if first_nude.provenance else "") + " " + ((first_nude.origin.selected_id or "") if first_nude.origin else "")).upper()
+            if is_formal_atom(first_nude):
+                is_full_nude = any(lvl in raw_id for lvl in ("L5", "L6"))
+            else:
+                if any(lvl in raw_id for lvl in ("L5", "L6")) or any(s in first_nude.text.lower() for s in ("completely naked", "full nude", "bare body", "no clothes")):
+                    is_full_nude = True
+            if is_full_nude:
+                clothing_atoms = [
+                    a for a in detectable
+                    if a.source_slot in ("clothing", "clothing_state", "clothing_extension")
+                    or (not is_formal_atom(a) and any(b.matches(a.text) for b in r2_l5_banned))
+                ]
+                clothing_atoms = [a for a in clothing_atoms if a.atom_id != first_nude.atom_id]
+                if clothing_atoms:
+                    first_cloth = min(clothing_atoms, key=lambda x: (x.tag_order, x.span_order))
+                    conflicts.append(("residual_nudity_clothing_conflict", "nudity_clothing_conflicts", "nudity_removes_clothing", first_nude.atom_id, first_cloth.atom_id))
+                    if _is_loser_protected(first_cloth):
+                        protected_losers.append(first_cloth)
+
+        for gid in get_fallback_group_ids(r2_tf, role="trigger"):
+            c_trig = select_fallback_patterns(r2_tf, role="trigger", group_id=gid)
+            c_ban = select_fallback_patterns(r2_tf, role="banned", group_id=gid)
+            trig_atoms = [
+                a for a in detectable
+                if (is_formal_atom(a) and a.facts and any(r in a.facts.visible_regions for r in ("crotch", "breasts", "buttocks", "pubic", "full_body")))
+                or (not is_formal_atom(a) and any(t.matches(a.text) for t in c_trig))
             ]
+            ban_atoms = [
+                a for a in detectable
+                if (is_formal_atom(a) and a.facts and any(t in a.facts.garment_topologies for t in ("panties", "bra", "underwear", "suit", "blouse", "dress")))
+                or (not is_formal_atom(a) and any(b.matches(a.text) for b in c_ban))
+            ]
+            if trig_atoms and ban_atoms:
+                first_trig = min(trig_atoms, key=lambda x: (x.tag_order, x.span_order))
+                first_ban = min(ban_atoms, key=lambda x: (x.tag_order, x.span_order))
+                if first_trig.atom_id != first_ban.atom_id:
+                    conflicts.append(("residual_nudity_underwear_conflict", "nudity_clothing_conflicts", "nudity_removes_underwear", first_trig.atom_id, first_ban.atom_id))
+                    if _is_loser_protected(first_ban):
+                        protected_losers.append(first_ban)
+                    break
 
-        return atoms
+        # 3. 景别 vs 下半身
+        r3_tf = rule_tf_map["framing_lower_body_coherence"]
+        r3_cu_pats = select_fallback_patterns(r3_tf, role="trigger", group_id="framing")
+        r3_lb_pats = select_fallback_patterns(r3_tf, role="banned", group_id="framing")
+        cu_atoms = []
+        for a in detectable:
+            if is_formal_atom(a):
+                if a.source_slot in ("shot_type", "shot"):
+                    item_id = (a.provenance.item_id or a.source_item_id or "") if a.provenance else (a.source_item_id or "")
+                    if item_id in ("extreme_close_up", "close_up"):
+                        cu_atoms.append(a)
+                    elif item_id in ("medium_close_up", "medium_shot", "cowboy_shot", "full_body", "wide_shot", "extreme_wide"):
+                        pass
+                    elif a.facts and "face" in a.facts.visible_regions and not any(r in a.facts.visible_regions for r in ("upper_body", "lower_body", "legs", "feet")):
+                        cu_atoms.append(a)
+            else:
+                if any(t.matches(a.text) for t in r3_cu_pats):
+                    cu_atoms.append(a)
+        lb_atoms = [
+            a for a in detectable
+            if (
+                is_formal_atom(a)
+                and a.source_slot == "clothing"
+                and a.facts
+                and any(r in a.facts.visible_regions for r in ("feet", "legs", "lower_body", "shoes"))
+            )
+            or (not is_formal_atom(a) and any(b.matches(a.text) for b in r3_lb_pats))
+        ]
+        if cu_atoms and lb_atoms:
+            first_cu = min(cu_atoms, key=lambda x: (x.tag_order, x.span_order))
+            first_lb = min(lb_atoms, key=lambda x: (x.tag_order, x.span_order))
+            if first_cu.atom_id != first_lb.atom_id:
+                conflicts.append(("residual_framing_lower_body_conflict", "framing_lower_body_coherence", "close_up_removes_lower_body", first_cu.atom_id, first_lb.atom_id))
+                if _is_loser_protected(first_lb):
+                    protected_losers.append(first_lb)
+
+        # 4. 姿态双手占用 vs 手持道具
+        r4_tf = rule_tf_map["pose_hand_occupation"]
+        r4_busy_pats = select_fallback_patterns(r4_tf, role="trigger", group_id="pose_hand")
+        r4_hh_pats = select_fallback_patterns(r4_tf, role="handheld", group_id="pose_hand")
+        busy_atoms = [
+            a for a in detectable
+            if (is_formal_atom(a) and a.facts and a.facts.hand_state == "both_busy")
+            or (not is_formal_atom(a) and any(t.matches(a.text) for t in r4_busy_pats))
+        ]
+        prop_atoms = [
+            a for a in detectable
+            if (is_formal_atom(a) and a.source_slot == "props" and a.facts and (a.facts.hands_required > 0 or a.facts.prop_usage == "handheld"))
+            or (not is_formal_atom(a) and any(p.matches(a.text) for p in r4_hh_pats))
+        ]
+        if busy_atoms and prop_atoms:
+            first_busy = min(busy_atoms, key=lambda x: (x.tag_order, x.span_order))
+            first_prop = min(prop_atoms, key=lambda x: (x.tag_order, x.span_order))
+            if first_busy.atom_id != first_prop.atom_id:
+                conflicts.append(("residual_hand_occupation_conflict", "pose_hand_occupation", "busy_hands_remove_props", first_busy.atom_id, first_prop.atom_id))
+                if _is_loser_protected(first_prop):
+                    protected_losers.append(first_prop)
+
+        # 5. 单持道具上限
+        r5_tf = rule_tf_map["handheld_props_single_holder"]
+        r5_pats = select_fallback_patterns(r5_tf, role="handheld", group_id="handheld")
+        hh_atoms = [
+            a for a in detectable
+            if (is_formal_atom(a) and a.source_slot == "props" and a.facts and (a.facts.hands_required > 0 or a.facts.prop_usage == "handheld"))
+            or (not is_formal_atom(a) and any(hp.matches(a.text) for hp in r5_pats))
+        ]
+        if len(hh_atoms) > 1:
+            hh_atoms.sort(key=lambda x: (x.tag_order, x.span_order))
+            first_hh = hh_atoms[0]
+            second_hh = hh_atoms[1]
+            conflicts.append(("residual_single_handheld_prop_conflict", "handheld_props_single_holder", "single_handheld_prop_limit", first_hh.atom_id, second_hh.atom_id))
+            if _is_loser_protected(second_hh):
+                protected_losers.append(second_hh)
+
+        # 6. 连体衣结构状态
+        r6_tf = rule_tf_map["clothing_style_state_coherence"]
+        r6_op_trig = select_fallback_patterns(r6_tf, role="trigger", group_id="one_piece")
+        r6_op_ban = select_fallback_patterns(r6_tf, role="banned", group_id="one_piece")
+        op_atoms = [
+            a for a in detectable
+            if (is_formal_atom(a) and a.facts and "one_piece" in a.facts.garment_topologies)
+            or (not is_formal_atom(a) and any(opt.matches(a.text) for opt in r6_op_trig))
+        ]
+        op_state_losers = [
+            a for a in detectable
+            if (is_formal_atom(a) and a.facts and any(s in a.facts.garment_states for s in ("unbuttoned", "lifted_skirt", "opened", "removed")))
+            or (not is_formal_atom(a) and any(bs.matches(a.text) for bs in r6_op_ban))
+        ]
+        if op_atoms and op_state_losers:
+            first_op = min(op_atoms, key=lambda x: (x.tag_order, x.span_order))
+            first_loser = min(op_state_losers, key=lambda x: (x.tag_order, x.span_order))
+            if first_op.atom_id != first_loser.atom_id:
+                conflicts.append(("residual_one_piece_state_conflict", "clothing_style_state_coherence", "one_piece_state_conflict", first_op.atom_id, first_loser.atom_id))
+                if _is_loser_protected(first_loser):
+                    protected_losers.append(first_loser)
+
+        r6_pants_trig = select_fallback_patterns(r6_tf, role="trigger", group_id="pants")
+        r6_pants_ban = select_fallback_patterns(r6_tf, role="banned", group_id="pants")
+        if r6_pants_trig and r6_pants_ban:
+            pants_atoms = [
+                a for a in detectable
+                if (is_formal_atom(a) and a.facts and any(t in a.facts.garment_topologies for t in ("pants", "jeans", "shorts", "trousers")))
+                or (not is_formal_atom(a) and any(pt.matches(a.text) for pt in r6_pants_trig))
+            ]
+            pants_state_losers = [
+                a for a in detectable
+                if (is_formal_atom(a) and a.facts and any(s in a.facts.garment_states for s in ("skirt_slit", "pleated_skirt", "skirt_floating", "slit", "lifted_skirt")))
+                or (not is_formal_atom(a) and any(bs.matches(a.text) for bs in r6_pants_ban))
+            ]
+            if pants_atoms and pants_state_losers:
+                first_pants = min(pants_atoms, key=lambda x: (x.tag_order, x.span_order))
+                first_loser = min(pants_state_losers, key=lambda x: (x.tag_order, x.span_order))
+                if first_pants.atom_id != first_loser.atom_id:
+                    conflicts.append(("residual_pants_state_conflict", "clothing_style_state_coherence", "pants_state_conflict", first_pants.atom_id, first_loser.atom_id))
+                    if _is_loser_protected(first_loser):
+                        protected_losers.append(first_loser)
+
+        # 7. 材质穿透
+        r7 = self.registry.get_rule("material_penetration")
+        r7_tf = rule_tf_map["material_penetration"]
+        r7_banned = select_fallback_patterns(r7_tf, role="banned", group_id="material")
+        sheer_atoms = [
+            a for a in detectable
+            if not (a.source_slot == "clothing_extension" or (a.provenance and a.provenance.kind == "clothing_extension"))
+            and (a.source_slot in getattr(r7, "target_slots", ()) or a.source_slot in ("clothing", "clothing_state"))
+            and (
+                (is_formal_atom(a) and a.facts and any(s in a.facts.garment_states for s in ("sheer", "see_through", "transparent", "translucent", "wet_clinging")))
+                or (is_formal_atom(a) and a.source_item_id in ("sheer_chiffon", "sheer_mesh", "semi_translucent"))
+                or (not is_formal_atom(a) and any(bw.matches(a.text) for bw in r7_banned))
+            )
+        ]
+        if sheer_atoms:
+            first_sheer = min(sheer_atoms, key=lambda x: (x.tag_order, x.span_order))
+            conflicts.append(("residual_material_penetration_conflict", "material_penetration", "material_penetration_removed", first_sheer.atom_id, first_sheer.atom_id))
+            if _is_loser_protected(first_sheer):
+                protected_losers.append(first_sheer)
+
+        # 8. 拍摄设备与画质词冲突
+        r8_tf = rule_tf_map["device_quality_compatibility"]
+        dev_atoms = [
+            a for a in detectable
+            if (is_formal_atom(a) and a.facts and a.facts.capture_device in ("cctv", "vhs", "polaroid", "webcam"))
+            or (not is_formal_atom(a) and any(dp.matches(a.text) for gid in get_fallback_group_ids(r8_tf, role="device") for dp in select_fallback_patterns(r8_tf, role="device", group_id=gid)))
+        ]
+        quality_atoms = [
+            a for a in detectable
+            if (is_formal_atom(a) and a.facts and a.facts.quality_class in ("masterpiece", "ultra_detailed", "high_res", "best_quality"))
+            or (not is_formal_atom(a) and any(bt.matches(a.text) for gid in get_fallback_group_ids(r8_tf, role="banned") for bt in select_fallback_patterns(r8_tf, role="banned", group_id=gid)))
+        ]
+        if dev_atoms and quality_atoms:
+            first_dev = min(dev_atoms, key=lambda x: (x.tag_order, x.span_order))
+            first_qual = min(quality_atoms, key=lambda x: (x.tag_order, x.span_order))
+            if first_dev.atom_id != first_qual.atom_id:
+                conflicts.append(("residual_device_quality_conflict", "device_quality_compatibility", "device_removes_conflicting_quality", first_dev.atom_id, first_qual.atom_id))
+                if _is_loser_protected(first_qual):
+                    protected_losers.append(first_qual)
+
+        # 9. 昼夜环境与光影
+        r9_tf = rule_tf_map["environmental_lighting_coherence"]
+        r9_night_pats = select_fallback_patterns(r9_tf, role="banned", group_id="daylight")
+        r9_day_pats = select_fallback_patterns(r9_tf, role="trigger", group_id="daylight")
+        night_scene_atoms = [
+            a for a in detectable
+            if a.source_slot in ("scene", "scene_theme", "theme") and (
+                (is_formal_atom(a) and a.facts and a.facts.time_of_day in ("night", "midnight", "late_night"))
+                or (not is_formal_atom(a) and any(nt.matches(a.text) for nt in r9_night_pats))
+            )
+        ]
+        daylight_lighting_atoms = [
+            a for a in detectable
+            if a.source_slot in ("lighting", "lighting_palette") and (
+                (is_formal_atom(a) and a.facts and (a.facts.time_of_day in ("morning", "noon", "afternoon", "day") or any(ls in ("sunlight", "daylight", "direct_sun") for ls in a.facts.light_sources)))
+                or (not is_formal_atom(a) and any(dt.matches(a.text) for dt in r9_day_pats))
+            )
+        ]
+        if night_scene_atoms and daylight_lighting_atoms:
+            first_night = min(night_scene_atoms, key=lambda x: (x.tag_order, x.span_order))
+            first_day = min(daylight_lighting_atoms, key=lambda x: (x.tag_order, x.span_order))
+            conflicts.append(("residual_lighting_night_day_conflict", "environmental_lighting_coherence", "night_scene_removes_daylight", first_night.atom_id, first_day.atom_id))
+            if _is_loser_protected(first_day):
+                protected_losers.append(first_day)
+        else:
+            daylight_scene_atoms = [
+                a for a in detectable
+                if a.source_slot in ("scene", "scene_theme", "theme") and (
+                    (is_formal_atom(a) and a.facts and a.facts.time_of_day in ("morning", "noon", "afternoon", "day"))
+                    or (not is_formal_atom(a) and any(dt.matches(a.text) for dt in r9_day_pats))
+                )
+            ]
+            night_lighting_atoms = [
+                a for a in detectable
+                if a.source_slot in ("lighting", "lighting_palette") and (
+                    (is_formal_atom(a) and a.facts and a.facts.time_of_day in ("night", "midnight", "late_night"))
+                    or (not is_formal_atom(a) and any(nt.matches(a.text) for nt in r9_night_pats))
+                )
+            ]
+            if daylight_scene_atoms and night_lighting_atoms:
+                first_day = min(daylight_scene_atoms, key=lambda x: (x.tag_order, x.span_order))
+                first_night = min(night_lighting_atoms, key=lambda x: (x.tag_order, x.span_order))
+                conflicts.append(("residual_lighting_night_day_conflict", "environmental_lighting_coherence", "daylight_removes_night", first_day.atom_id, first_night.atom_id))
+                if _is_loser_protected(first_night):
+                    protected_losers.append(first_night)
+
+        # 10. 黑白胶片与色彩
+        r10_tf = rule_tf_map["monochrome_film_chroma_coherence"]
+        r10_mono_pats = select_fallback_patterns(r10_tf, role="trigger", group_id="monochrome")
+        r10_chroma_pats = select_fallback_patterns(r10_tf, role="banned", group_id="monochrome")
+        mono_atoms = [
+            a for a in detectable
+            if a.source_slot in ("film", "film_stock") and (
+                (is_formal_atom(a) and a.facts and "monochrome" in a.facts.color_modes)
+                or (not is_formal_atom(a) and any(t.matches(a.text) for t in r10_mono_pats))
+            )
+        ]
+        chroma_atoms = [
+            a for a in detectable
+            if a.source_slot in ("lighting", "lighting_palette", "film", "film_stock") and (
+                (is_formal_atom(a) and a.facts and any(c in a.facts.color_modes for c in ("color", "high_saturation", "neon")))
+                or (not is_formal_atom(a) and any(b.matches(a.text) for b in r10_chroma_pats))
+            )
+        ]
+        if mono_atoms and chroma_atoms:
+            first_mono = min(mono_atoms, key=lambda x: (x.tag_order, x.span_order))
+            first_chroma = min(chroma_atoms, key=lambda x: (x.tag_order, x.span_order))
+            if first_mono.atom_id != first_chroma.atom_id:
+                conflicts.append(("residual_monochrome_chroma_conflict", "monochrome_film_chroma_coherence", "monochrome_film_removes_chroma", first_mono.atom_id, first_chroma.atom_id))
+                if _is_loser_protected(first_chroma):
+                    protected_losers.append(first_chroma)
+
+        # 11. 妆容细节
+        r11_tf = rule_tf_map["makeup_details_coherence"]
+        r11_bare_pats = select_fallback_patterns(r11_tf, role="trigger", group_id="no_makeup")
+        r11_heavy_pats = select_fallback_patterns(r11_tf, role="banned", group_id="no_makeup")
+        bare_atoms = [
+            a for a in detectable
+            if (is_formal_atom(a) and a.facts and a.facts.makeup_base in ("bare", "clean", "natural"))
+            or (not is_formal_atom(a) and any(t.matches(a.text) for t in r11_bare_pats))
+        ]
+        heavy_atoms = [
+            a for a in detectable
+            if (is_formal_atom(a) and a.facts and any(e in a.facts.makeup_effects for e in ("heavy", "smudged", "runny", "smeared")))
+            or (not is_formal_atom(a) and any(b.matches(a.text) for b in r11_heavy_pats))
+        ]
+        if bare_atoms and heavy_atoms:
+            first_bare = min(bare_atoms, key=lambda x: (x.tag_order, x.span_order))
+            first_heavy = min(heavy_atoms, key=lambda x: (x.tag_order, x.span_order))
+            if first_bare.atom_id != first_heavy.atom_id:
+                conflicts.append(("residual_makeup_details_conflict", "makeup_details_coherence", "clean_base_removes_heavy_makeup", first_bare.atom_id, first_heavy.atom_id))
+                if _is_loser_protected(first_heavy):
+                    protected_losers.append(first_heavy)
+
+        # 12. 视线几何
+        r12_tf = rule_tf_map["gaze_angle_geometry"]
+        for gid in get_fallback_group_ids(r12_tf, role="angle"):
+            map_angles = select_fallback_patterns(r12_tf, role="angle", group_id=gid)
+            map_banned = select_fallback_patterns(r12_tf, role="banned", group_id=gid)
+            ang_atoms = [
+                a for a in detectable
+                if a.source_slot in ("camera_angle", "camera", "shot_type")
+                and (
+                    (is_formal_atom(a) and ((a.source_item_id in ("overhead", "top_down", "birds_eye")) or (a.provenance and a.provenance.item_id in ("overhead", "top_down", "birds_eye")) or (a.facts and a.facts.gaze in ("down", "looking_down_from_above"))))
+                    or (not is_formal_atom(a) and any(ag.matches(a.text) for ag in map_angles))
+                )
+            ]
+            gaze_atoms = [
+                a for a in detectable
+                if a.source_slot == "expression"
+                and (
+                    (is_formal_atom(a) and a.facts and a.facts.gaze in ("down", "looking_down_from_above"))
+                    or (not is_formal_atom(a) and any(bg.matches(a.text) for bg in map_banned))
+                )
+            ]
+            if ang_atoms and gaze_atoms:
+                first_ang = min(ang_atoms, key=lambda x: (x.tag_order, x.span_order))
+                first_gaze = min(gaze_atoms, key=lambda x: (x.tag_order, x.span_order))
+                if first_ang.atom_id != first_gaze.atom_id:
+                    conflicts.append(("residual_gaze_angle_conflict", "gaze_angle_geometry", "camera_angle_removes_impossible_gaze", first_ang.atom_id, first_gaze.atom_id))
+                    if _is_loser_protected(first_gaze):
+                        protected_losers.append(first_gaze)
+                    break
+
+        # 13. 饰品遮挡视线
+        r13_tf = rule_tf_map["accessory_occlusion_gaze_coherence"]
+        r13_occ_pats = select_fallback_patterns(r13_tf, role="trigger", group_id="occlusion")
+        r13_gaze_pats = select_fallback_patterns(r13_tf, role="banned", group_id="occlusion")
+        occ_atoms = [
+            a for a in detectable
+            if a.source_slot in ("jewelry", "accessories") and (
+                (is_formal_atom(a) and a.facts and a.facts.occlusion in ("eyes", "face"))
+                or (not is_formal_atom(a) and any(t.matches(a.text) for t in r13_occ_pats))
+            )
+        ]
+        gaze_atoms = [
+            a for a in detectable
+            if a.source_slot in ("expression", "expressions") and (
+                (is_formal_atom(a) and a.facts and a.facts.gaze in ("camera", "viewer", "direct"))
+                or (not is_formal_atom(a) and any(b.matches(a.text) for b in r13_gaze_pats))
+            )
+        ]
+        if occ_atoms and gaze_atoms:
+            first_occ = min(occ_atoms, key=lambda x: (x.tag_order, x.span_order))
+            first_gaze = min(gaze_atoms, key=lambda x: (x.tag_order, x.span_order))
+            if first_occ.atom_id != first_gaze.atom_id:
+                conflicts.append(("residual_accessory_occlusion_conflict", "accessory_occlusion_gaze_coherence", "eye_occlusion_removes_gaze", first_occ.atom_id, first_gaze.atom_id))
+                if _is_loser_protected(first_gaze):
+                    protected_losers.append(first_gaze)
+
+        # 14. 情绪与视线
+        r14_tf = rule_tf_map["emotion_gaze_affinity"]
+        for gid in get_fallback_group_ids(r14_tf, role="emotion"):
+            c_emo_pats = select_fallback_patterns(r14_tf, role="emotion", group_id=gid)
+            c_ban_pats = select_fallback_patterns(r14_tf, role="banned", group_id=gid)
+            emo_atoms = [
+                a for a in detectable
+                if (is_formal_atom(a) and a.facts and a.facts.emotion == "shy")
+                or (not is_formal_atom(a) and any(t.matches(a.text) for t in c_emo_pats))
+            ]
+            banned_gaze = [
+                a for a in detectable
+                if (is_formal_atom(a) and a.facts and a.facts.emotion in ("seductive", "dominant"))
+                or (not is_formal_atom(a) and any(b.matches(a.text) for b in c_ban_pats))
+            ]
+            if emo_atoms and banned_gaze:
+                first_emo = min(emo_atoms, key=lambda x: (x.tag_order, x.span_order))
+                first_bg = min(banned_gaze, key=lambda x: (x.tag_order, x.span_order))
+                if first_emo.atom_id != first_bg.atom_id:
+                    conflicts.append(("residual_emotion_gaze_conflict", "emotion_gaze_affinity", "emotion_removes_conflicting_gaze", first_emo.atom_id, first_bg.atom_id))
+                    if _is_loser_protected(first_bg):
+                        protected_losers.append(first_bg)
+                    break
+
+        # 15. 视线互斥
+        r15_tf = rule_tf_map["gaze_mutual_exclusion"]
+        formal_gazes = [a for a in detectable if is_formal_atom(a) and a.facts and a.facts.gaze and a.source_slot == "expression"]
+        if len(formal_gazes) > 1:
+            first_g = formal_gazes[0]
+            for later_g in formal_gazes[1:]:
+                if later_g.facts.gaze != first_g.facts.gaze:
+                    conflicts.append(("residual_gaze_mutual_exclusion_conflict", "gaze_mutual_exclusion", "gaze_mutual_exclusion_preserved_first", first_g.atom_id, later_g.atom_id))
+                    if _is_loser_protected(later_g):
+                        protected_losers.append(later_g)
+        active_exclusive_pairs = [
+            (p1[0], p2[0])
+            for gid in get_fallback_group_ids(r15_tf, role="exclusive_a")
+            for p1 in [select_fallback_patterns(r15_tf, role="exclusive_a", group_id=gid)]
+            for p2 in [select_fallback_patterns(r15_tf, role="exclusive_b", group_id=gid)]
+            if p1 and p2
+        ]
+        for p1, p2 in active_exclusive_pairs:
+            m1 = [a for a in detectable if not is_formal_atom(a) and p1.matches(a.text)]
+            m2 = [a for a in detectable if not is_formal_atom(a) and p2.matches(a.text)]
+            if m1 and m2:
+                m1.sort(key=lambda x: (x.tag_order, x.span_order))
+                m2.sort(key=lambda x: (x.tag_order, x.span_order))
+                if (m1[0].tag_order, m1[0].span_order) <= (m2[0].tag_order, m2[0].span_order):
+                    winner, loser = m1[0], m2[0]
+                else:
+                    winner, loser = m2[0], m1[0]
+                conflicts.append(("residual_gaze_mutual_exclusion_conflict", "gaze_mutual_exclusion", "gaze_mutual_exclusion_preserved_first", winner.atom_id, loser.atom_id))
+                if _is_loser_protected(loser):
+                    protected_losers.append(loser)
+
+        # 16. 液体高危组合残留
+        r16_tf = rule_tf_map["liquid_restrictions"]
+        for gid in get_fallback_group_ids(r16_tf, role="trigger"):
+            combo_triggers = select_fallback_patterns(r16_tf, role="trigger", group_id=gid)
+            combo_atoms = [
+                a for a in detectable
+                if (is_formal_atom(a) and a.facts and a.facts.liquid_kind in ("sexual_fluid", "cum", "semen") and any(loc in a.facts.liquid_locations for loc in ("eyes", "closed_eyes", "face")))
+                or (not is_formal_atom(a) and any(trig.matches(a.text) for trig in combo_triggers))
+            ]
+            if combo_atoms:
+                first_cb = min(combo_atoms, key=lambda x: (x.tag_order, x.span_order))
+                conflicts.append(("residual_liquid_combo_conflict", "liquid_restrictions", "liquid_combo_replaced", first_cb.atom_id, first_cb.atom_id))
+                if _is_loser_protected(first_cb):
+                    protected_losers.append(first_cb)
+
+        return tuple(conflicts), len(protected_losers) > 0

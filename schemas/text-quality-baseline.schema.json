@@ -1,0 +1,278 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "TextQualityBaselineSchema",
+  "description": "Schema for rc7_text_quality_baseline.json test fixture with closed validation rules.",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "git_commit",
+    "total_cases",
+    "content_sha256",
+    "cases"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "enum": ["1.0"]
+    },
+    "git_commit": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{40}$"
+    },
+    "total_cases": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "content_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "cases": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "context",
+          "category",
+          "inputs",
+          "oracle",
+          "baseline_output"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "context": {
+            "type": "string",
+            "enum": [
+              "school",
+              "office",
+              "medical",
+              "onsen_bath",
+              "bondage_sm",
+              "traditional",
+              "nightlife",
+              "domestic",
+              "transit",
+              "outdoor",
+              "dining",
+              "adult",
+              "special",
+              "generic"
+            ]
+          },
+          "category": {
+            "type": "string",
+            "enum": ["normal", "conflict"]
+          },
+          "inputs": {
+            "type": "object",
+            "required": [
+              "预设模板",
+              "风格配方",
+              "场景大类",
+              "剧情主题",
+              "景别构图",
+              "拍摄视角",
+              "裸露等级",
+              "服装款式",
+              "服装状态",
+              "发型发色",
+              "饰品头饰",
+              "妆容细节",
+              "姿势动作",
+              "情绪表情",
+              "光影预设",
+              "胶片风格",
+              "液体效果",
+              "纹身标记",
+              "道具物件",
+              "角色设定",
+              "真实微瑕",
+              "画质等级",
+              "prompt_seed"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "预设模板": { "type": "string" },
+              "风格配方": { "type": "string" },
+              "场景大类": { "type": "string" },
+              "剧情主题": { "type": "string" },
+              "景别构图": { "type": "string" },
+              "拍摄视角": { "type": "string" },
+              "裸露等级": { "type": "string" },
+              "服装款式": { "type": "string" },
+              "服装状态": { "type": "string" },
+              "发型发色": { "type": "string" },
+              "饰品头饰": { "type": "string" },
+              "妆容细节": { "type": "string" },
+              "姿势动作": { "type": "string" },
+              "情绪表情": { "type": "string" },
+              "光影预设": { "type": "string" },
+              "胶片风格": { "type": "string" },
+              "液体效果": { "type": "string" },
+              "纹身标记": { "type": "string" },
+              "道具物件": { "type": "string" },
+              "角色设定": { "type": "string" },
+              "真实微瑕": { "type": "string" },
+              "画质等级": { "type": "string" },
+              "prompt_seed": { "type": "integer" }
+            }
+          },
+          "oracle": {
+            "type": "object",
+            "required": [
+              "expected_context",
+              "has_conflict",
+              "protected_explicit_tags",
+              "allowed_drops",
+              "allowed_replaces",
+              "rc7_drop_count",
+              "new_hard_conflict_evidence"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "expected_context": { "type": "string" },
+              "conflict_type": { "type": "string" },
+              "expected_clothing": { "type": "string" },
+              "expected_nudity": { "type": "string" },
+              "has_conflict": { "type": "boolean" },
+              "protected_explicit_tags": {
+                "type": "array",
+                "items": { "type": "string", "minLength": 1 },
+                "minItems": 1
+              },
+              "allowed_drops": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "required": [
+                    "rule_id",
+                    "reason_code",
+                    "before_text",
+                    "target_atom_id",
+                    "winner_atom_ids"
+                  ],
+                  "additionalProperties": false,
+                  "properties": {
+                    "rule_id": { "type": "string", "minLength": 1 },
+                    "reason_code": { "type": "string", "minLength": 1 },
+                    "before_text": { "type": "string", "minLength": 1 },
+                    "target_atom_id": { "type": "string", "minLength": 1 },
+                    "winner_atom_ids": {
+                      "type": "array",
+                      "items": { "type": "string", "minLength": 1 },
+                      "minItems": 1
+                    }
+                  }
+                }
+              },
+              "allowed_replaces": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "required": [
+                    "rule_id",
+                    "reason_code",
+                    "before_text",
+                    "after_text",
+                    "target_atom_id",
+                    "winner_atom_ids",
+                    "produced_atom_ids"
+                  ],
+                  "additionalProperties": false,
+                  "properties": {
+                    "rule_id": { "type": "string", "minLength": 1 },
+                    "reason_code": { "type": "string", "minLength": 1 },
+                    "before_text": { "type": "string", "minLength": 1 },
+                    "after_text": { "type": "string", "minLength": 1 },
+                    "target_atom_id": { "type": "string", "minLength": 1 },
+                    "winner_atom_ids": {
+                      "type": "array",
+                      "items": { "type": "string", "minLength": 1 }
+                    },
+                    "produced_atom_ids": {
+                      "type": "array",
+                      "items": { "type": "string", "minLength": 1 },
+                      "minItems": 1
+                    }
+                  }
+                }
+              },
+              "rc7_drop_count": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "new_hard_conflict_evidence": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "required": [
+                    "rule_id",
+                    "reason_code",
+                    "physical_domain",
+                    "violated_invariant",
+                    "target_atom_id",
+                    "winner_atom_ids",
+                    "winner_texts",
+                    "loser_text",
+                    "before_text",
+                    "after_text",
+                    "winner_semantic_facts",
+                    "loser_semantic_facts"
+                  ],
+                  "additionalProperties": false,
+                  "properties": {
+                    "rule_id": { "type": "string", "minLength": 1 },
+                    "reason_code": { "type": "string", "minLength": 1 },
+                    "physical_domain": { "type": "string", "minLength": 1 },
+                    "violated_invariant": { "type": "string", "minLength": 1 },
+                    "target_atom_id": { "type": "string", "minLength": 1 },
+                    "winner_atom_ids": {
+                      "type": "array",
+                      "items": { "type": "string", "minLength": 1 },
+                      "minItems": 1
+                    },
+                    "winner_texts": {
+                      "type": "array",
+                      "items": { "type": "string", "minLength": 1 },
+                      "minItems": 1
+                    },
+                    "loser_text": { "type": "string", "minLength": 1 },
+                    "before_text": { "type": "string", "minLength": 1 },
+                    "after_text": {
+                      "type": ["string", "null"]
+                    },
+                    "winner_semantic_facts": {
+                      "type": "object",
+                      "minProperties": 1
+                    },
+                    "loser_semantic_facts": {
+                      "type": "object",
+                      "minProperties": 1
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "baseline_output": {
+            "type": "object",
+            "required": ["positive", "negative", "description"],
+            "additionalProperties": false,
+            "properties": {
+              "positive": { "type": "string" },
+              "negative": { "type": "string" },
+              "description": { "type": "string" }
+            }
+          }
+        }
+      }
+    }
+  }
+}

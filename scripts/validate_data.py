@@ -28,6 +28,7 @@ except ImportError:
 REPO_DIR = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(REPO_DIR))
 
+from lib.context_affinity import ContextAffinityRegistry
 from lib.lexer import split_top_level_tags
 from lib.models import CANONICAL_RECIPE_SELECTORS, SelectionOrigin, SemanticFacts
 from lib.rule_contract import validate_rule_document
@@ -421,7 +422,7 @@ def validate_all(
     known_facts_fields = set(SemanticFacts.__dataclass_fields__.keys())
 
     for fname, fcontent in data_cache.items():
-        if fname in ("conflict_rules.json", "negative_prompts.json", "presets.json", "style_recipes.json"):
+        if fname in ("conflict_rules.json", "context_affinity.json", "negative_prompts.json", "presets.json", "style_recipes.json"):
             continue
         catalog_id_registry: Dict[str, Tuple[str, str]] = {}
 
@@ -547,6 +548,15 @@ def validate_all(
             result.errors.append(f"[ERROR] conflict_rules.json: {e}")
     else:
         result.errors.append("[ERROR] conflict_rules.json: File not found in data directory")
+
+    # 10. 校验 context_affinity.json 196 单元与跨目录选择器引用 (自主 Fail-Closed 校验)
+    if "context_affinity.json" in data_cache:
+        try:
+            ContextAffinityRegistry(data_dir)
+        except Exception as e:
+            result.errors.append(f"[ERROR] context_affinity.json: {e}")
+    else:
+        result.errors.append("[ERROR] context_affinity.json: File not found in data directory")
 
     return result
 

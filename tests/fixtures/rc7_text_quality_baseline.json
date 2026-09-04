@@ -1,0 +1,3563 @@
+{
+  "schema_version": "1.0",
+  "git_commit": "fe881856f4e8bd5d89928601ba3564c73dbc1ebb",
+  "total_cases": 28,
+  "cases": [
+    {
+      "id": "rc7_school_normal",
+      "context": "school",
+      "category": "normal",
+      "inputs": {
+        "预设模板": "无 (None)",
+        "风格配方": "无 (None)",
+        "场景大类": "教室",
+        "剧情主题": "教师/学生系列",
+        "景别构图": "自动 (Auto)",
+        "拍摄视角": "自动 (Auto)",
+        "裸露等级": "L1 包裹暗示 (Fully Clothed / Suggestive)",
+        "服装款式": "水手服 (JK Sailor Suit)",
+        "服装状态": "整齐穿着 (Neat)",
+        "发型发色": "随机 (Random)",
+        "饰品头饰": "无 (None)",
+        "妆容细节": "无 (None)",
+        "姿势动作": "随机 (Random)",
+        "情绪表情": "随机 (Random)",
+        "光影预设": "自动 (Auto)",
+        "胶片风格": "无 (None)",
+        "液体效果": "无 (None)",
+        "纹身标记": "无 (None)",
+        "道具物件": "无 (None)",
+        "角色设定": "无 (None)",
+        "真实微瑕": "无 (None)",
+        "画质等级": "高清写真 (High)",
+        "prompt_seed": 1000
+      },
+      "oracle": {
+        "expected_context": "school",
+        "expected_clothing": "水手服 (JK Sailor Suit)",
+        "expected_nudity": "L1",
+        "has_conflict": false,
+        "protected_explicit_tags": [
+          "classroom",
+          "strict teacher",
+          "dressed",
+          "neatly worn sailor uniform",
+          "best quality",
+          "podium",
+          "student council",
+          "fabric hugging curves",
+          "tucked white shirt",
+          "detailed",
+          "classroom window",
+          "body outline visible through fabric",
+          "crisp pleated skirt",
+          "photorealistic"
+        ],
+        "allowed_drops": [],
+        "allowed_replaces": [],
+        "rc7_drop_count": 0,
+        "new_hard_conflict_evidence": []
+      },
+      "baseline_output": {
+        "positive": "empty classroom, podium, tutor, teacher lounge, after school lesson, medium long shot, knee-up shot, over the shoulder shot, modest outfit, nothing exposed, neatly worn sailor uniform, tucked white shirt, crisp pleated skirt, lit side to camera, full face lighting, twirling with hair whipping, eyes squeezed shut in pleasure, arched eyebrows, chin length bob, sleek modern bob, best quality, detailed, photorealistic",
+        "negative": "low quality, worst quality, blurry, jpeg artifacts, watermark, deformed, bad anatomy, bad mouth, bad teeth, weird tongue, distorted lips, extra limbs, extra fingers, mutated hands, bad proportions, ugly, disfigured, cropped, out of frame",
+        "description": "场景: 教室 | 主题: 教师/学生系列 | 服装: 水手服 (JK Sailor Suit) | 裸露: L1 | 发型: 随机 (Random)"
+      }
+    },
+    {
+      "id": "rc7_school_conflict",
+      "context": "school",
+      "category": "conflict",
+      "inputs": {
+        "预设模板": "无 (None)",
+        "风格配方": "无 (None)",
+        "场景大类": "教室",
+        "剧情主题": "教师/学生系列",
+        "景别构图": "近景 CU (面部表情/眼神)",
+        "拍摄视角": "自动 (Auto)",
+        "裸露等级": "L5 极致全裸 (Full Nude)",
+        "服装款式": "水手服 (JK Sailor Suit)",
+        "服装状态": "整齐穿着 (Normal Wearing)",
+        "发型发色": "随机 (Random)",
+        "饰品头饰": "无 (None)",
+        "妆容细节": "无 (None)",
+        "姿势动作": "🧎 跪姿系列",
+        "情绪表情": "😖 痛苦/折磨（SM·凌辱专用）",
+        "光影预设": "自动 (Auto)",
+        "胶片风格": "无 (None)",
+        "液体效果": "🥛 颜射/精液残留 (Cum Splatter & Semen Residual)",
+        "纹身标记": "无 (None)",
+        "道具物件": "无 (None)",
+        "角色设定": "无 (None)",
+        "真实微瑕": "无 (None)",
+        "画质等级": "高清写真 (High)",
+        "prompt_seed": 6000
+      },
+      "oracle": {
+        "expected_context": "school",
+        "conflict_type": "nudity_clothing_or_shot_anatomy",
+        "has_conflict": true,
+        "protected_explicit_tags": [
+          "empty classroom",
+          "after school lesson",
+          "close-up",
+          "completely unclothed",
+          "wrists bound behind",
+          "furrowed brows",
+          "traces of white cum on skin",
+          "best quality",
+          "teacher desk",
+          "detention with student",
+          "face shot filling frame",
+          "naked",
+          "arms at sides",
+          "whimpering expression",
+          "milky white fluid glistening",
+          "detailed",
+          "podium",
+          "private lesson",
+          "grimacing",
+          "photorealistic"
+        ],
+        "allowed_drops": [
+          {
+            "rule_id": "nudity_clothing_conflicts",
+            "reason_code": "nudity_removes_clothing",
+            "before_text": "fully nude",
+            "target_atom_id": "atom_e1a6b2007d0596cf1a1703d5",
+            "winner_atom_ids": [
+              "atom_585315f7416920dc0bfbfd17"
+            ]
+          },
+          {
+            "rule_id": "nudity_clothing_conflicts",
+            "reason_code": "nudity_removes_clothing",
+            "before_text": "sailor uniform and skirt tossed aside on desk",
+            "target_atom_id": "atom_fa48ee45fcf49f2518c5837f",
+            "winner_atom_ids": [
+              "atom_585315f7416920dc0bfbfd17"
+            ]
+          },
+          {
+            "rule_id": "nudity_clothing_conflicts",
+            "reason_code": "nudity_removes_clothing",
+            "before_text": "completely bare skin",
+            "target_atom_id": "atom_1412d6e47d9401a6e345ca3c",
+            "winner_atom_ids": [
+              "atom_585315f7416920dc0bfbfd17"
+            ]
+          },
+          {
+            "rule_id": "nudity_clothing_conflicts",
+            "reason_code": "nudity_removes_clothing",
+            "before_text": "loose socks",
+            "target_atom_id": "atom_10a27e67862fb59578ff4493",
+            "winner_atom_ids": [
+              "atom_585315f7416920dc0bfbfd17"
+            ]
+          }
+        ],
+        "allowed_replaces": [],
+        "rc7_drop_count": 0,
+        "new_hard_conflict_evidence": [
+          {
+            "rule_id": "nudity_clothing_conflicts",
+            "reason_code": "nudity_removes_clothing",
+            "physical_domain": "nudity_coverage",
+            "violated_invariant": "Worn garments or underwear cannot coexist with full body nudity",
+            "target_atom_id": "atom_e1a6b2007d0596cf1a1703d5",
+            "winner_atom_ids": [
+              "atom_585315f7416920dc0bfbfd17"
+            ],
+            "winner_texts": [
+              "completely unclothed"
+            ],
+            "loser_text": "fully nude",
+            "before_text": "fully nude",
+            "after_text": null,
+            "winner_semantic_facts": {
+              "semantic_role": "selector",
+              "visible_regions": [
+                "upper_body"
+              ]
+            },
+            "loser_semantic_facts": {
+              "semantic_role": "selector",
+              "garment_topologies": [
+                "bottom_skirt",
+                "top"
+              ]
+            }
+          },
+          {
+            "rule_id": "nudity_clothing_conflicts",
+            "reason_code": "nudity_removes_clothing",
+            "physical_domain": "nudity_coverage",
+            "violated_invariant": "Worn garments or underwear cannot coexist with full body nudity",
+            "target_atom_id": "atom_fa48ee45fcf49f2518c5837f",
+            "winner_atom_ids": [
+              "atom_585315f7416920dc0bfbfd17"
+            ],
+            "winner_texts": [
+              "completely unclothed"
+            ],
+            "loser_text": "sailor uniform and skirt tossed aside on desk",
+            "before_text": "sailor uniform and skirt tossed aside on desk",
+            "after_text": null,
+            "winner_semantic_facts": {
+              "semantic_role": "selector",
+              "visible_regions": [
+                "upper_body"
+              ]
+            },
+            "loser_semantic_facts": {
+              "semantic_role": "selector",
+              "garment_topologies": [
+                "bottom_skirt",
+                "top"
+              ]
+            }
+          },
+          {
+            "rule_id": "nudity_clothing_conflicts",
+            "reason_code": "nudity_removes_clothing",
+            "physical_domain": "nudity_coverage",
+            "violated_invariant": "Worn garments or underwear cannot coexist with full body nudity",
+            "target_atom_id": "atom_1412d6e47d9401a6e345ca3c",
+            "winner_atom_ids": [
+              "atom_585315f7416920dc0bfbfd17"
+            ],
+            "winner_texts": [
+              "completely unclothed"
+            ],
+            "loser_text": "completely bare skin",
+            "before_text": "completely bare skin",
+            "after_text": null,
+            "winner_semantic_facts": {
+              "semantic_role": "selector",
+              "visible_regions": [
+                "upper_body"
+              ]
+            },
+            "loser_semantic_facts": {
+              "semantic_role": "selector",
+              "garment_topologies": [
+                "bottom_skirt",
+                "top"
+              ]
+            }
+          },
+          {
+            "rule_id": "nudity_clothing_conflicts",
+            "reason_code": "nudity_removes_clothing",
+            "physical_domain": "nudity_coverage",
+            "violated_invariant": "Worn garments or underwear cannot coexist with full body nudity",
+            "target_atom_id": "atom_10a27e67862fb59578ff4493",
+            "winner_atom_ids": [
+              "atom_585315f7416920dc0bfbfd17"
+            ],
+            "winner_texts": [
+              "completely unclothed"
+            ],
+            "loser_text": "loose socks",
+            "before_text": "loose socks",
+            "after_text": null,
+            "winner_semantic_facts": {
+              "semantic_role": "selector",
+              "visible_regions": [
+                "upper_body"
+              ]
+            },
+            "loser_semantic_facts": {
+              "semantic_role": "selector",
+              "garment_topologies": [
+                "bottom_skirt",
+                "top"
+              ]
+            }
+          }
+        ]
+      },
+      "baseline_output": {
+        "positive": "classroom, blackboard, hallway, class president, after school lesson, female teacher, close-up, face shot filling frame, over the shoulder shot, completely unclothed, stripped bare, body fully exposed, fully nude, sailor uniform and skirt tossed aside on desk, completely bare skin, loose socks, delicate room glow with no harsh shadows, seamless soft ambient light, submissive posture, tongue out, pained expression, biting lip to endure, tears forming from pain, twin braids, braided pigtails resting on shoulders, few drops of drops of semen dripping on stomach, subtle trace of milky white fluid glistening, best quality, detailed, photorealistic",
+        "negative": "low quality, worst quality, blurry, jpeg artifacts, watermark, deformed, bad anatomy, bad mouth, bad teeth, weird tongue, distorted lips, extra limbs, extra fingers, mutated hands, bad proportions, ugly, disfigured, cropped, out of frame",
+        "description": "场景: 教室 | 主题: 教师/学生系列 | 服装: 水手服 (JK Sailor Suit) | 裸露: L5 | 发型: 随机 (Random) | 体液: 🥛 颜射/精液残留 (Cum Splatter & Semen Residual)"
+      }
+    },
+    {
+      "id": "rc7_office_normal",
+      "context": "office",
+      "category": "normal",
+      "inputs": {
+        "预设模板": "无 (None)",
+        "风格配方": "无 (None)",
+        "场景大类": "办公室",
+        "剧情主题": "OL/职场系列",
+        "景别构图": "自动 (Auto)",
+        "拍摄视角": "自动 (Auto)",
+        "裸露等级": "L1 包裹暗示 (Fully Clothed / Suggestive)",
+        "服装款式": "职场OL西装 (Office Lady Suit)",
+        "服装状态": "整齐穿着 (Neat)",
+        "发型发色": "随机 (Random)",
+        "饰品头饰": "无 (None)",
+        "妆容细节": "无 (None)",
+        "姿势动作": "随机 (Random)",
+        "情绪表情": "随机 (Random)",
+        "光影预设": "自动 (Auto)",
+        "胶片风格": "无 (None)",
+        "液体效果": "无 (None)",
+        "纹身标记": "无 (None)",
+        "道具物件": "无 (None)",
+        "角色设定": "无 (None)",
+        "真实微瑕": "无 (None)",
+        "画质等级": "高清写真 (High)",
+        "prompt_seed": 1001
+      },
+      "oracle": {
+        "expected_context": "office",
+        "expected_clothing": "职场OL西装 (Office Lady Suit)",
+        "expected_nudity": "L1",
+        "has_conflict": false,
+        "protected_explicit_tags": [
+          "cubicle",
+          "copy room quickie",
+          "figure visible under clothes",
+          "fitted black blazer",
+          "best quality",
+          "personal desk",
+          "secretary under desk",
+          "dressed",
+          "buttoned-up white blouse",
+          "detailed",
+          "boss desk",
+          "business trip hotel",
+          "clothed body",
+          "tight pencil skirt",
+          "photorealistic"
+        ],
+        "allowed_drops": [],
+        "allowed_replaces": [],
+        "rc7_drop_count": 0,
+        "new_hard_conflict_evidence": []
+      },
+      "baseline_output": {
+        "positive": "office, personal desk, subordinate, after work drinking, boss secretary, full body shot, wide shot, dutch angle, dressed to the nines, fabric hugging curves, modest outfit, fitted black blazer, buttoned-up white blouse, tight pencil skirt, back side light, quarter back light, standing straight, flat expression, looking away uninterested, messy bun, hair in a high bun, best quality, detailed, photorealistic",
+        "negative": "low quality, worst quality, blurry, jpeg artifacts, watermark, deformed, bad anatomy, bad mouth, bad teeth, weird tongue, distorted lips, extra limbs, extra fingers, mutated hands, bad proportions, ugly, disfigured, cropped, out of frame",
+        "description": "场景: 办公室 | 主题: OL/职场系列 | 服装: 职场OL西装 (Office Lady Suit) | 裸露: L1 | 发型: 随机 (Random)"
+      }
+    },
+    {
+      "id": "rc7_office_conflict",
+      "context": "office",
+      "category": "conflict",
+      "inputs": {
+        "预设模板": "无 (None)",
+        "风格配方": "无 (None)",
+        "场景大类": "办公室",
+        "剧情主题": "OL/职场系列",
+        "景别构图": "近景 CU (面部表情/眼神)",
+        "拍摄视角": "自动 (Auto)",
+        "裸露等级": "L5 极致全裸 (Full Nude)",
+        "服装款式": "职场OL西装 (Office Lady Suit)",
+        "服装状态": "整齐穿着 (Normal Wearing)",
+        "发型发色": "随机 (Random)",
+        "饰品头饰": "无 (None)",
+        "妆容细节": "无 (None)",
+        "姿势动作": "🧎 跪姿系列",
+        "情绪表情": "😖 痛苦/折磨（SM·凌辱专用）",
+        "光影预设": "自动 (Auto)",
+        "胶片风格": "无 (None)",
+        "液体效果": "🥛 颜射/精液残留 (Cum Splatter & Semen Residual)",
+        "纹身标记": "无 (None)",
+        "道具物件": "无 (None)",
+        "角色设定": "无 (None)",
+        "真实微瑕": "无 (None)",
+        "画质等级": "高清写真 (High)",
+        "prompt_seed": 6001
+      },
+      "oracle": {
+        "expected_context": "office",
+        "conflict_type": "nudity_clothing_or_shot_anatomy",
+        "has_conflict": true,
+        "protected_explicit_tags": [
+          "cubicle",
+          "workplace harassment",
+          "close-up",
+          "every inch of skin visible",
+          "knees shoulder-width apart",
+          "biting lip to endure",
+          "drops of semen dripping on stomach",
+          "best quality",
+          "personal desk",
+          "boss secretary",
+          "face shot filling frame",
+          "back arched",
+          "sharp intake breath face",
+          "traces of white cum on skin",
+          "detailed",
+          "business woman",
+          "tears forming from pain",
+          "photorealistic"
+        ],
+        "allowed_drops": [
+          {
+            "rule_id": "nudity_clothing_conflicts",
+            "reason_code": "nudity_removes_clothing",
+            "before_text": "all clothes removed",
+            "target_atom_id": "atom_3a38056bc57873e710bae171",
+            "winner_atom_ids": [
+              "atom_b16a8b778f74eb2de636dcb9"
+            ]
+          },
+          {
+            "rule_id": "nudity_clothing_conflicts",
+            "reason_code": "nudity_removes_clothing",
+            "before_text": "blazer and blouse discarded on chair",
+            "target_atom_id": "atom_7d9e1db3810c68f641018c00",
+            "winner_atom_ids": [
+              "atom_b16a8b778f74eb2de636dcb9"
+            ]
+          },
+          {
+            "rule_id": "nudity_clothing_conflicts",
+            "reason_code": "nudity_removes_clothing",
+            "before_text": "completely naked body",
+            "target_atom_id": "atom_25692442f6125ccc74093b35",
+            "winner_atom_ids": [
+              "atom_b16a8b778f74eb2de636dcb9"
+            ]
+          },
+          {
+            "rule_id": "nudity_clothing_conflicts",
+            "reason_code": "nudity_removes_clothing",
+            "before_text": "black high heels",
+            "target_atom_id": "atom_0b277eaa60e927c72c9f8aa7",
+            "winner_atom_ids": [
+              "atom_b16a8b778f74eb2de636dcb9"
+            ]
+          }
+        ],
+        "allowed_replaces": [],
+        "rc7_drop_count": 0,
+        "new_hard_conflict_evidence": [
+          {
+            "rule_id": "nudity_clothing_conflicts",
+            "reason_code": "nudity_removes_clothing",
+            "physical_domain": "nudity_coverage",
+            "violated_invariant": "Worn garments or underwear cannot coexist with full body nudity",
+            "target_atom_id": "atom_3a38056bc57873e710bae171",
+            "winner_atom_ids": [
+              "atom_b16a8b778f74eb2de636dcb9"
+            ],
+            "winner_texts": [
+              "every inch of skin visible"
+            ],
+            "loser_text": "all clothes removed",
+            "before_text": "all clothes removed",
+            "after_text": null,
+            "winner_semantic_facts": {
+              "semantic_role": "selector",
+              "visible_regions": [
+                "upper_body"
+              ]
+            },
+            "loser_semantic_facts": {
+              "semantic_role": "selector",
+              "garment_topologies": [
+                "bottom_skirt",
+                "top"
+              ]
+            }
+          },
+          {
+            "rule_id": "nudity_clothing_conflicts",
+            "reason_code": "nudity_removes_clothing",
+            "physical_domain": "nudity_coverage",
+            "violated_invariant": "Worn garments or underwear cannot coexist with full body nudity",
+            "target_atom_id": "atom_7d9e1db3810c68f641018c00",
+            "winner_atom_ids": [
+              "atom_b16a8b778f74eb2de636dcb9"
+            ],
+            "winner_texts": [
+              "every inch of skin visible"
+            ],
+            "loser_text": "blazer and blouse discarded on chair",
+            "before_text": "blazer and blouse discarded on chair",
+            "after_text": null,
+            "winner_semantic_facts": {
+              "semantic_role": "selector",
+              "visible_regions": [
+                "upper_body"
+              ]
+            },
+            "loser_semantic_facts": {
+              "semantic_role": "selector",
+              "garment_topologies": [
+                "bottom_skirt",
+                "top"
+              ]
+            }
+          },
+          {
+            "rule_id": "nudity_clothing_conflicts",
+            "reason_code": "nudity_removes_clothing",
+            "physical_domain": "nudity_coverage",
+            "violated_invariant": "Worn garments or underwear cannot coexist with full body nudity",
+            "target_atom_id": "atom_25692442f6125ccc74093b35",
+            "winner_atom_ids": [
+              "atom_b16a8b778f74eb2de636dcb9"
+            ],
+            "winner_texts": [
+              "every inch of skin visible"
+            ],
+            "loser_text": "completely naked body",
+            "before_text": "completely naked body",
+            "after_text": null,
+            "winner_semantic_facts": {
+              "semantic_role": "selector",
+              "visible_regions": [
+                "upper_body"
+              ]
+            },
+            "loser_semantic_facts": {
+              "semantic_role": "selector",
+              "garment_topologies": [
+                "bottom_skirt",
+                "top"
+              ]
+            }
+          },
+          {
+            "rule_id": "nudity_clothing_conflicts",
+            "reason_code": "nudity_removes_clothing",
+            "physical_domain": "nudity_coverage",
+            "violated_invariant": "Worn garments or underwear cannot coexist with full body nudity",
+            "target_atom_id": "atom_0b277eaa60e927c72c9f8aa7",
+            "winner_atom_ids": [
+              "atom_b16a8b778f74eb2de636dcb9"
+            ],
+            "winner_texts": [
+              "every inch of skin visible"
+            ],
+            "loser_text": "black high heels",
+            "before_text": "black high heels",
+            "after_text": null,
+            "winner_semantic_facts": {
+              "semantic_role": "selector",
+              "visible_regions": [
+                "upper_body"
+              ]
+            },
+            "loser_semantic_facts": {
+              "semantic_role": "selector",
+              "garment_topologies": [
+                "bottom_skirt",
+                "top"
+              ]
+            }
+          }
+        ]
+      },
+      "baseline_output": {
+        "positive": "open office, boss desk, new employee, after work drinking, secretary under desk, close-up, face shot filling frame, dutch angle, body fully exposed, every inch of skin visible, all clothes removed, blazer and blouse discarded on chair, completely naked body, warm golden rim lighting on body edges, amber evening glow, hands gripping sheets, thighs spread, pained yet aroused, tears forming from pain, biting lip to endure, big loose waves, voluminous bouncy curls, subtle trace of traces of white cum on skin, few drops of milky white fluid glistening, best quality, detailed, photorealistic",
+        "negative": "low quality, worst quality, blurry, jpeg artifacts, watermark, deformed, bad anatomy, bad mouth, bad teeth, weird tongue, distorted lips, extra limbs, extra fingers, mutated hands, bad proportions, ugly, disfigured, cropped, out of frame",
+        "description": "场景: 办公室 | 主题: OL/职场系列 | 服装: 职场OL西装 (Office Lady Suit) | 裸露: L5 | 发型: 随机 (Random) | 体液: 🥛 颜射/精液残留 (Cum Splatter & Semen Residual)"
+      }
+    },
+    {
+      "id": "rc7_medical_normal",
+      "context": "medical",
+      "category": "normal",
+      "inputs": {
+        "预设模板": "无 (None)",
+        "风格配方": "无 (None)",
+        "场景大类": "医院",
+        "剧情主题": "护士/医疗系列",
+        "景别构图": "自动 (Auto)",
+        "拍摄视角": "自动 (Auto)",
+        "裸露等级": "L1 包裹暗示 (Fully Clothed / Suggestive)",
+        "服装款式": "护士服 (Nurse Uniform)",
+        "服装状态": "整齐穿着 (Neat)",
+        "发型发色": "随机 (Random)",
+        "饰品头饰": "无 (None)",
+        "妆容细节": "无 (None)",
+        "姿势动作": "随机 (Random)",
+        "情绪表情": "随机 (Random)",
+        "光影预设": "自动 (Auto)",
+        "胶片风格": "无 (None)",
+        "液体效果": "无 (None)",
+        "纹身标记": "无 (None)",
+        "道具物件": "无 (None)",
+        "角色设定": "无 (None)",
+        "真实微瑕": "无 (None)",
+        "画质等级": "高清写真 (High)",
+        "prompt_seed": 1002
+      },
+      "oracle": {
+        "expected_context": "medical",
+        "expected_clothing": "护士服 (Nurse Uniform)",
+        "expected_nudity": "L1",
+        "has_conflict": false,
+        "protected_explicit_tags": [
+          "hospital room",
+          "hospital gown",
+          "clothes clinging to body",
+          "buttoned white nurse dress",
+          "best quality",
+          "waiting room",
+          "nurse changing",
+          "fully clothed",
+          "clean nurse uniform",
+          "detailed",
+          "bed bath",
+          "body outline visible through fabric",
+          "nurse cap",
+          "photorealistic"
+        ],
+        "allowed_drops": [],
+        "allowed_replaces": [],
+        "rc7_drop_count": 0,
+        "new_hard_conflict_evidence": []
+      },
+      "baseline_output": {
+        "positive": "doctor office, waiting room, hospital corridor, doctor nurse, bed bath, close-up, face shot filling frame, between legs angle, everything covered, body outline visible through fabric, buttoned white nurse dress, clean nurse uniform, nurse cap, direct backlight creating radiant glowing outline, bright rim light from behind, hands behind back, hands clasped, trying to stay quiet, tensed jaw, messy bun, hair in a high bun, best quality, detailed, photorealistic",
+        "negative": "low quality, worst quality, blurry, jpeg artifacts, watermark, deformed, bad anatomy, bad mouth, bad teeth, weird tongue, distorted lips, extra limbs, extra fingers, mutated hands, bad proportions, ugly, disfigured, cropped, out of frame",
+        "description": "场景: 医院 | 主题: 护士/医疗系列 | 服装: 护士服 (Nurse Uniform) | 裸露: L1 | 发型: 随机 (Random)"
+      }
+    },
+    {
+      "id": "rc7_medical_conflict",
+      "context": "medical",
+      "category": "conflict",
+      "inputs": {
+        "预设模板": "无 (None)",
+        "风格配方": "无 (None)",
+        "场景大类": "医院",
+        "剧情主题": "护士/医疗系列",
+        "景别构图": "近景 CU (面部表情/眼神)",
+        "拍摄视角": "自动 (Auto)",
+        "裸露等级": "L4 重点暴露 (Topless / Bottomless)",
+        "服装款式": "护士服 (Nurse Uniform)",
+        "服装状态": "整齐穿着 (Normal Wearing)",
+        "发型发色": "随机 (Random)",
+        "饰品头饰": "无 (None)",
+        "妆容细节": "无 (None)",
+        "姿势动作": "🧎 跪姿系列",
+        "情绪表情": "😖 痛苦/折磨（SM·凌辱专用）",
+        "光影预设": "自动 (Auto)",
+        "胶片风格": "无 (None)",
+        "液体效果": "🥛 颜射/精液残留 (Cum Splatter & Semen Residual)",
+        "纹身标记": "无 (None)",
+        "道具物件": "无 (None)",
+        "角色设定": "无 (None)",
+        "真实微瑕": "无 (None)",
+        "画质等级": "高清写真 (High)",
+        "prompt_seed": 6002
+      },
+      "oracle": {
+        "expected_context": "medical",
+        "conflict_type": "nudity_clothing_or_shot_anatomy",
+        "has_conflict": true,
+        "protected_explicit_tags": [
+          "examination room",
+          "patient care",
+          "close-up",
+          "sheet barely covering",
+          "nurse cap with red cross",
+          "tongue out",
+          "grimacing",
+          "milky white fluid glistening",
+          "best quality",
+          "recovery room",
+          "hospital gown",
+          "face shot filling frame",
+          "garter belt only",
+          "white stockings",
+          "tearful eyes ─ 束缚暴露",
+          "sharp intake breath face",
+          "drops of semen dripping on stomach",
+          "detailed",
+          "hospital bed",
+          "health check",
+          "completely bare except wristwatch",
+          "furrowed brows",
+          "photorealistic"
+        ],
+        "allowed_drops": [
+          {
+            "rule_id": "framing_lower_body_coherence",
+            "reason_code": "close_up_removes_lower_body",
+            "before_text": "crisp clothing",
+            "target_atom_id": "atom_9629bc832cfa4ed6c70babe8",
+            "winner_atom_ids": [
+              "atom_0486afa88fe59a67d34b5528"
+            ]
+          },
+          {
+            "rule_id": "framing_lower_body_coherence",
+            "reason_code": "close_up_removes_lower_body",
+            "before_text": "neatly dressed",
+            "target_atom_id": "atom_ee151e9ee224893a5c4ce45f",
+            "winner_atom_ids": [
+              "atom_0486afa88fe59a67d34b5528"
+            ]
+          },
+          {
+            "rule_id": "framing_lower_body_coherence",
+            "reason_code": "close_up_removes_lower_body",
+            "before_text": "open-gusset lace panties",
+            "target_atom_id": "atom_28456513e6563af9712e2b8b",
+            "winner_atom_ids": [
+              "atom_0486afa88fe59a67d34b5528"
+            ]
+          },
+          {
+            "rule_id": "framing_lower_body_coherence",
+            "reason_code": "close_up_removes_lower_body",
+            "before_text": "crotchless lingerie teddy",
+            "target_atom_id": "atom_b86b03afebf6dc14a5322bfa",
+            "winner_atom_ids": [
+              "atom_0486afa88fe59a67d34b5528"
+            ]
+          }
+        ],
+        "allowed_replaces": [],
+        "rc7_drop_count": 0,
+        "new_hard_conflict_evidence": [
+          {
+            "rule_id": "framing_lower_body_coherence",
+            "reason_code": "close_up_removes_lower_body",
+            "physical_domain": "framing_composition",
+            "violated_invariant": "Lower body garments and states cannot be visible in close-up face framing",
+            "target_atom_id": "atom_9629bc832cfa4ed6c70babe8",
+            "winner_atom_ids": [
+              "atom_0486afa88fe59a67d34b5528"
+            ],
+            "winner_texts": [
+              "close-up"
+            ],
+            "loser_text": "crisp clothing",
+            "before_text": "crisp clothing",
+            "after_text": null,
+            "winner_semantic_facts": {
+              "semantic_role": "selector",
+              "visible_regions": [
+                "face"
+              ]
+            },
+            "loser_semantic_facts": {
+              "semantic_role": "selector",
+              "visible_regions": [
+                "lower_body",
+                "upper_body"
+              ],
+              "garment_states": [
+                "worn"
+              ]
+            }
+          },
+          {
+            "rule_id": "framing_lower_body_coherence",
+            "reason_code": "close_up_removes_lower_body",
+            "physical_domain": "framing_composition",
+            "violated_invariant": "Lower body garments and states cannot be visible in close-up face framing",
+            "target_atom_id": "atom_ee151e9ee224893a5c4ce45f",
+            "winner_atom_ids": [
+              "atom_0486afa88fe59a67d34b5528"
+            ],
+            "winner_texts": [
+              "close-up"
+            ],
+            "loser_text": "neatly dressed",
+            "before_text": "neatly dressed",
+            "after_text": null,
+            "winner_semantic_facts": {
+              "semantic_role": "selector",
+              "visible_regions": [
+                "face"
+              ]
+            },
+            "loser_semantic_facts": {
+              "semantic_role": "selector",
+              "visible_regions": [
+                "lower_body",
+                "upper_body"
+              ],
+              "garment_states": [
+                "worn"
+              ]
+            }
+          },
+          {
+            "rule_id": "framing_lower_body_coherence",
+            "reason_code": "close_up_removes_lower_body",
+            "physical_domain": "framing_composition",
+            "violated_invariant": "Lower body garments and states cannot be visible in close-up face framing",
+            "target_atom_id": "atom_28456513e6563af9712e2b8b",
+            "winner_atom_ids": [
+              "atom_0486afa88fe59a67d34b5528"
+            ],
+            "winner_texts": [
+              "close-up"
+            ],
+            "loser_text": "open-gusset lace panties",
+            "before_text": "open-gusset lace panties",
+            "after_text": null,
+            "winner_semantic_facts": {
+              "semantic_role": "selector",
+              "visible_regions": [
+                "face"
+              ]
+            },
+            "loser_semantic_facts": {
+              "semantic_role": "selector",
+              "visible_regions": [
+                "lower_body",
+                "upper_body"
+              ],
+              "garment_topologies": [
+                "underwear"
+              ]
+            }
+          },
+          {
+            "rule_id": "framing_lower_body_coherence",
+            "reason_code": "close_up_removes_lower_body",
+            "physical_domain": "framing_composition",
+            "violated_invariant": "Lower body garments and states cannot be visible in close-up face framing",
+            "target_atom_id": "atom_b86b03afebf6dc14a5322bfa",
+            "winner_atom_ids": [
+              "atom_0486afa88fe59a67d34b5528"
+            ],
+            "winner_texts": [
+              "close-up"
+            ],
+            "loser_text": "crotchless lingerie teddy",
+            "before_text": "crotchless lingerie teddy",
+            "after_text": null,
+            "winner_semantic_facts": {
+              "semantic_role": "selector",
+              "visible_regions": [
+                "face"
+              ]
+            },
+            "loser_semantic_facts": {
+              "semantic_role": "selector",
+              "visible_regions": [
+                "lower_body",
+                "upper_body"
+              ],
+              "garment_topologies": [
+                "underwear"
+              ]
+            }
+          }
+        ]
+      },
+      "baseline_output": {
+        "positive": "hospital room, hospital shower, night shift nurse, health check, close-up, face shot filling frame, dutch angle, only panties remaining, collar only, completely naked except socks, nurse cap with red cross, white stockings, crisp clothing, plunging backless design down to lower spine and waist, shadow side creating mystery, narrow face lighting, arms tied above head, pained expression, face contorted in pain, low ponytail gathered at nape, loose elegant ponytail, few drops of milky white fluid glistening, thin streak of drops of semen dripping on stomach, best quality, detailed, photorealistic",
+        "negative": "low quality, worst quality, blurry, jpeg artifacts, watermark, deformed, bad anatomy, bad mouth, bad teeth, weird tongue, distorted lips, extra limbs, extra fingers, mutated hands, bad proportions, ugly, disfigured, cropped, out of frame",
+        "description": "场景: 医院 | 主题: 护士/医疗系列 | 服装: 护士服 (Nurse Uniform) | 裸露: L4 | 发型: 随机 (Random) | 体液: 🥛 颜射/精液残留 (Cum Splatter & Semen Residual)"
+      }
+    },
+    {
+      "id": "rc7_onsen_bath_normal",
+      "context": "onsen_bath",
+      "category": "normal",
+      "inputs": {
+        "预设模板": "无 (None)",
+        "风格配方": "无 (None)",
+        "场景大类": "家庭浴室",
+        "剧情主题": "温泉/旅行系列",
+        "景别构图": "自动 (Auto)",
+        "拍摄视角": "自动 (Auto)",
+        "裸露等级": "L1 包裹暗示 (Fully Clothed / Suggestive)",
+        "服装款式": "浴衣 (Yukata)",
+        "服装状态": "整齐穿着 (Neat)",
+        "发型发色": "随机 (Random)",
+        "饰品头饰": "无 (None)",
+        "妆容细节": "无 (None)",
+        "姿势动作": "随机 (Random)",
+        "情绪表情": "随机 (Random)",
+        "光影预设": "自动 (Auto)",
+        "胶片风格": "无 (None)",
+        "液体效果": "无 (None)",
+        "纹身标记": "无 (None)",
+        "道具物件": "无 (None)",
+        "角色设定": "无 (None)",
+        "真实微瑕": "无 (None)",
+        "画质等级": "高清写真 (High)",
+        "prompt_seed": 1003
+      },
+      "oracle": {
+        "expected_context": "onsen_bath",
+        "expected_clothing": "浴衣 (Yukata)",
+        "expected_nudity": "L1",
+        "has_conflict": false,
+        "protected_explicit_tags": [
+          "shower room",
+          "couples room",
+          "body outline visible through fabric",
+          "neatly wrapped summer yukata",
+          "best quality",
+          "shower curtain",
+          "yukata",
+          "figure visible under clothes",
+          "tight obi belt",
+          "detailed",
+          "bathroom mirror fogged",
+          "fabric hugging curves",
+          "traditional cotton yukata",
+          "photorealistic"
+        ],
+        "allowed_drops": [],
+        "allowed_replaces": [],
+        "rc7_drop_count": 0,
+        "new_hard_conflict_evidence": []
+      },
+      "baseline_output": {
+        "positive": "shower room, bathroom mirror fogged, bathroom stool, couples room, business trip affair, hot spring town, medium shot, waist-up framing, eye level angle, dressed, figure visible under clothes, clothes clinging to body, neatly wrapped summer yukata, tight obi belt, traditional cotton yukata, dappled sunlight filtering through tree canopy, flickering leaf shadow patterns on body and floor, knees apart, veins on neck from restraint, holding back face, wet hair clinging to face and neck, damp strands sticking to sweaty skin, best quality, detailed, photorealistic",
+        "negative": "low quality, worst quality, blurry, jpeg artifacts, watermark, deformed, bad anatomy, bad mouth, bad teeth, weird tongue, distorted lips, extra limbs, extra fingers, mutated hands, bad proportions, ugly, disfigured, cropped, out of frame",
+        "description": "场景: 家庭浴室 | 主题: 温泉/旅行系列 | 服装: 浴衣 (Yukata) | 裸露: L1 | 发型: 随机 (Random)"
+      }
+    },
+    {
+      "id": "rc7_onsen_bath_conflict",
+      "context": "onsen_bath",
+      "category": "conflict",
+      "inputs": {
+        "预设模板": "无 (None)",
+        "风格配方": "无 (None)",
+        "场景大类": "家庭浴室",
+        "剧情主题": "放置/野外系列（JAV经典暴露主题）",
+        "景别构图": "近景 CU (面部表情/眼神)",
+        "拍摄视角": "自动 (Auto)",
+        "裸露等级": "L3 半裸诱惑 (Half Nude)",
+        "服装款式": "浴衣 (Yukata)",
+        "服装状态": "整齐穿着 (Normal Wearing)",
+        "发型发色": "随机 (Random)",
+        "饰品头饰": "无 (None)",
+        "妆容细节": "无 (None)",
+        "姿势动作": "🧎 跪姿系列",
+        "情绪表情": "😖 痛苦/折磨（SM·凌辱专用）",
+        "光影预设": "自动 (Auto)",
+        "胶片风格": "无 (None)",
+        "液体效果": "🥛 颜射/精液残留 (Cum Splatter & Semen Residual)",
+        "纹身标记": "无 (None)",
+        "道具物件": "无 (None)",
+        "角色设定": "无 (None)",
+        "真实微瑕": "无 (None)",
+        "画质等级": "高清写真 (High)",
+        "prompt_seed": 6003
+      },
+      "oracle": {
+        "expected_context": "onsen_bath",
+        "conflict_type": "nudity_clothing_or_shot_anatomy",
+        "has_conflict": true,
+        "protected_explicit_tags": [
+          "bathtub",
+          "close-up",
+          "shirt open showing bare breasts",
+          "onsen bath yukata",
+          "kneeling under desk",
+          "pained yet aroused",
+          "traces of white cum on skin",
+          "best quality",
+          "bubble bath",
+          "face shot filling frame",
+          "tank top raised showing breasts",
+          "untied obi sash",
+          "wincing",
+          "drops of semen dripping on stomach",
+          "detailed",
+          "dress pulled down to waist",
+          "whimpering expression",
+          "photorealistic"
+        ],
+        "allowed_drops": [
+          {
+            "rule_id": "spatial_environmental_mutual_exclusion",
+            "reason_code": "indoor_outdoor_mutex",
+            "before_text": "train station flashing",
+            "target_atom_id": "atom_052969ca992ef349690bd6d9",
+            "winner_atom_ids": [
+              "atom_946c1c338ebf294ffa4ab551"
+            ]
+          },
+          {
+            "rule_id": "spatial_environmental_mutual_exclusion",
+            "reason_code": "indoor_outdoor_mutex",
+            "before_text": "rooftop public",
+            "target_atom_id": "atom_3d81fbd60f21b1c73a4c9574",
+            "winner_atom_ids": [
+              "atom_946c1c338ebf294ffa4ab551"
+            ]
+          },
+          {
+            "rule_id": "framing_lower_body_coherence",
+            "reason_code": "close_up_removes_lower_body",
+            "before_text": "neatly dressed",
+            "target_atom_id": "atom_5b420d78da696ee3db9741ab",
+            "winner_atom_ids": [
+              "atom_0486afa88fe59a67d34b5528"
+            ]
+          },
+          {
+            "rule_id": "framing_lower_body_coherence",
+            "reason_code": "close_up_removes_lower_body",
+            "before_text": "crisp clothing",
+            "target_atom_id": "atom_ad1779b818d7fab9d05b606e",
+            "winner_atom_ids": [
+              "atom_0486afa88fe59a67d34b5528"
+            ]
+          }
+        ],
+        "allowed_replaces": [],
+        "rc7_drop_count": 0,
+        "new_hard_conflict_evidence": [
+          {
+            "rule_id": "spatial_environmental_mutual_exclusion",
+            "reason_code": "indoor_outdoor_mutex",
+            "physical_domain": "spatial_environment",
+            "violated_invariant": "Indoor and outdoor spatial environments cannot coexist simultaneously",
+            "target_atom_id": "atom_052969ca992ef349690bd6d9",
+            "winner_atom_ids": [
+              "atom_946c1c338ebf294ffa4ab551"
+            ],
+            "winner_texts": [
+              "bathtub"
+            ],
+            "loser_text": "train station flashing",
+            "before_text": "train station flashing",
+            "after_text": null,
+            "winner_semantic_facts": {
+              "semantic_role": "scene_anchor",
+              "space_kind": "indoor",
+              "venue_ids": [
+                "bathroom"
+              ],
+              "time_of_day": "day"
+            },
+            "loser_semantic_facts": {
+              "semantic_role": "selector",
+              "space_kind": "outdoor"
+            }
+          },
+          {
+            "rule_id": "spatial_environmental_mutual_exclusion",
+            "reason_code": "indoor_outdoor_mutex",
+            "physical_domain": "spatial_environment",
+            "violated_invariant": "Indoor and outdoor spatial environments cannot coexist simultaneously",
+            "target_atom_id": "atom_3d81fbd60f21b1c73a4c9574",
+            "winner_atom_ids": [
+              "atom_946c1c338ebf294ffa4ab551"
+            ],
+            "winner_texts": [
+              "bathtub"
+            ],
+            "loser_text": "rooftop public",
+            "before_text": "rooftop public",
+            "after_text": null,
+            "winner_semantic_facts": {
+              "semantic_role": "scene_anchor",
+              "space_kind": "indoor",
+              "venue_ids": [
+                "bathroom"
+              ],
+              "time_of_day": "day"
+            },
+            "loser_semantic_facts": {
+              "semantic_role": "selector",
+              "space_kind": "outdoor"
+            }
+          },
+          {
+            "rule_id": "framing_lower_body_coherence",
+            "reason_code": "close_up_removes_lower_body",
+            "physical_domain": "framing_composition",
+            "violated_invariant": "Lower body garments and states cannot be visible in close-up face framing",
+            "target_atom_id": "atom_5b420d78da696ee3db9741ab",
+            "winner_atom_ids": [
+              "atom_0486afa88fe59a67d34b5528"
+            ],
+            "winner_texts": [
+              "close-up"
+            ],
+            "loser_text": "neatly dressed",
+            "before_text": "neatly dressed",
+            "after_text": null,
+            "winner_semantic_facts": {
+              "semantic_role": "selector",
+              "visible_regions": [
+                "face"
+              ]
+            },
+            "loser_semantic_facts": {
+              "semantic_role": "selector",
+              "visible_regions": [
+                "lower_body",
+                "upper_body"
+              ],
+              "garment_states": [
+                "worn"
+              ]
+            }
+          },
+          {
+            "rule_id": "framing_lower_body_coherence",
+            "reason_code": "close_up_removes_lower_body",
+            "physical_domain": "framing_composition",
+            "violated_invariant": "Lower body garments and states cannot be visible in close-up face framing",
+            "target_atom_id": "atom_ad1779b818d7fab9d05b606e",
+            "winner_atom_ids": [
+              "atom_0486afa88fe59a67d34b5528"
+            ],
+            "winner_texts": [
+              "close-up"
+            ],
+            "loser_text": "crisp clothing",
+            "before_text": "crisp clothing",
+            "after_text": null,
+            "winner_semantic_facts": {
+              "semantic_role": "selector",
+              "visible_regions": [
+                "face"
+              ]
+            },
+            "loser_semantic_facts": {
+              "semantic_role": "selector",
+              "visible_regions": [
+                "lower_body",
+                "upper_body"
+              ],
+              "garment_states": [
+                "worn"
+              ]
+            }
+          }
+        ]
+      },
+      "baseline_output": {
+        "positive": "shower room, shower curtain, steamy shower, onishi, public arousal, park public sex, close-up, face shot filling frame, eye level angle, bra removed blouse still open, panties only, onsen bath yukata, open collar yukata, crisp clothing, neatly dressed, face turned toward light, full face lighting, wrists crossed, avoiding eye contact, tears forming from pain, pained expression, pained yet aroused, wet hair clinging to face and neck, damp strands sticking to sweaty skin, single drop of milky white fluid glistening, few drops of traces of white cum on skin, best quality, detailed, photorealistic",
+        "negative": "low quality, worst quality, blurry, jpeg artifacts, watermark, deformed, bad anatomy, bad mouth, bad teeth, weird tongue, distorted lips, extra limbs, extra fingers, mutated hands, bad proportions, ugly, disfigured, cropped, out of frame",
+        "description": "场景: 家庭浴室 | 主题: 放置/野外系列（JAV经典暴露主题） | 服装: 浴衣 (Yukata) | 裸露: L3 | 发型: 随机 (Random) | 体液: 🥛 颜射/精液残留 (Cum Splatter & Semen Residual)"
+      }
+    },
+    {
+      "id": "rc7_bondage_sm_normal",
+      "context": "bondage_sm",
+      "category": "normal",
+      "inputs": {
+        "预设模板": "无 (None)",
+        "风格配方": "无 (None)",
+        "场景大类": "监禁",
+        "剧情主题": "凌辱/调教系列",
+        "景别构图": "自动 (Auto)",
+        "拍摄视角": "自动 (Auto)",
+        "裸露等级": "L1 包裹暗示 (Fully Clothed / Suggestive)",
+        "服装款式": "乳胶紧身衣 (Latex Catsuit)",
+        "服装状态": "整齐穿着 (Neat)",
+        "发型发色": "随机 (Random)",
+        "饰品头饰": "无 (None)",
+        "妆容细节": "无 (None)",
+        "姿势动作": "随机 (Random)",
+        "情绪表情": "随机 (Random)",
+        "光影预设": "自动 (Auto)",
+        "胶片风格": "无 (None)",
+        "液体效果": "无 (None)",
+        "纹身标记": "无 (None)",
+        "道具物件": "无 (None)",
+        "角色设定": "无 (None)",
+        "真实微瑕": "无 (None)",
+        "画质等级": "高清写真 (High)",
+        "prompt_seed": 1004
+      },
+      "oracle": {
+        "expected_context": "bondage_sm",
+        "expected_clothing": "乳胶紧身衣 (Latex Catsuit)",
+        "expected_nudity": "L1",
+        "has_conflict": false,
+        "protected_explicit_tags": [
+          "locked room",
+          "rope marks",
+          "clothes clinging to body",
+          "glossy black latex catsuit",
+          "best quality",
+          "windowless room",
+          "begging for more",
+          "figure visible under clothes",
+          "fully zipped bodysuit",
+          "detailed",
+          "underground room",
+          "punishment",
+          "form-fitting rubber suit",
+          "photorealistic"
+        ],
+        "allowed_drops": [],
+        "allowed_replaces": [],
+        "rc7_drop_count": 0,
+        "new_hard_conflict_evidence": []
+      },
+      "baseline_output": {
+        "positive": "basement room, sealed room, gentle force, spanking, full body shot, wide shot, eye level angle, fabric hugging curves, form-fitting clothes, glossy black latex catsuit, fully zipped bodysuit, form-fitting rubber suit, classical portrait light, dramatic side lighting, sitting cross-legged, cross-eyed from ecstasy, biting lip in pleasure, twin tails, pigtails tied high, best quality, detailed, photorealistic",
+        "negative": "low quality, worst quality, blurry, jpeg artifacts, watermark, deformed, bad anatomy, bad mouth, bad teeth, weird tongue, distorted lips, extra limbs, extra fingers, mutated hands, bad proportions, ugly, disfigured, cropped, out of frame",
+        "description": "场景: 监禁 | 主题: 凌辱/调教系列 | 服装: 乳胶紧身衣 (Latex Catsuit) | 裸露: L1 | 发型: 随机 (Random)"
+      }
+    },
+    {
+      "id": "rc7_bondage_sm_conflict",
+      "context": "bondage_sm",
+      "category": "conflict",
+      "inputs": {
+        "预设模板": "无 (None)",
+        "风格配方": "无 (None)",
+        "场景大类": "监禁",
+        "剧情主题": "凌辱/调教系列",
+        "景别构图": "近景 CU (面部表情/眼神)",
+        "拍摄视角": "自动 (Auto)",
+        "裸露等级": "L2 差分微露 (Partially Exposed)",
+        "服装款式": "乳胶紧身衣 (Latex Catsuit)",
+        "服装状态": "裙摆掀起 (Skirt Lifted Up)",
+        "发型发色": "随机 (Random)",
+        "饰品头饰": "无 (None)",
+        "妆容细节": "无 (None)",
+        "姿势动作": "🧎 跪姿系列",
+        "情绪表情": "😖 痛苦/折磨（SM·凌辱专用）",
+        "光影预设": "自动 (Auto)",
+        "胶片风格": "无 (None)",
+        "液体效果": "🥛 颜射/精液残留 (Cum Splatter & Semen Residual)",
+        "纹身标记": "无 (None)",
+        "道具物件": "无 (None)",
+        "角色设定": "无 (None)",
+        "真实微瑕": "无 (None)",
+        "画质等级": "高清写真 (High)",
+        "prompt_seed": 6004
+      },
+      "oracle": {
+        "expected_context": "bondage_sm",
+        "conflict_type": "nudity_clothing_or_shot_anatomy",
+        "has_conflict": true,
+        "protected_explicit_tags": [
+          "warehouse",
+          "spanking",
+          "close-up",
+          "collarbone exposed",
+          "glossy black latex catsuit",
+          "tongue out",
+          "furrowed brows",
+          "milky white fluid glistening",
+          "best quality",
+          "hidden room",
+          "submissive",
+          "face shot filling frame",
+          "wrist exposed from pushed sleeve",
+          "shiny PVC bodysuit",
+          "face contorted in pain",
+          "traces of white cum on skin",
+          "detailed",
+          "abandoned factory",
+          "ankle visible",
+          "photorealistic"
+        ],
+        "allowed_drops": [
+          {
+            "rule_id": "framing_lower_body_coherence",
+            "reason_code": "close_up_removes_lower_body",
+            "before_text": "skirt hiked up to waist",
+            "target_atom_id": "atom_9de39dc891dc99895f0eef43",
+            "winner_atom_ids": [
+              "atom_0486afa88fe59a67d34b5528"
+            ]
+          },
+          {
+            "rule_id": "framing_lower_body_coherence",
+            "reason_code": "close_up_removes_lower_body",
+            "before_text": "skirt pulled up revealing panties",
+            "target_atom_id": "atom_ca9881ed52a7719149f7a6be",
+            "winner_atom_ids": [
+              "atom_0486afa88fe59a67d34b5528"
+            ]
+          },
+          {
+            "rule_id": "framing_lower_body_coherence",
+            "reason_code": "close_up_removes_lower_body",
+            "before_text": "longitudinal cutout neckline exposing collarbones and upper chest",
+            "target_atom_id": "atom_9af3ecb70b5b5ea4dd917e92",
+            "winner_atom_ids": [
+              "atom_0486afa88fe59a67d34b5528"
+            ]
+          },
+          {
+            "rule_id": "framing_lower_body_coherence",
+            "reason_code": "close_up_removes_lower_body",
+            "before_text": "semi-translucent fabric creating hazy skin contours",
+            "target_atom_id": "atom_0bf38c3d1e7fc87254aa0b90",
+            "winner_atom_ids": [
+              "atom_0486afa88fe59a67d34b5528"
+            ]
+          }
+        ],
+        "allowed_replaces": [],
+        "rc7_drop_count": 0,
+        "new_hard_conflict_evidence": [
+          {
+            "rule_id": "framing_lower_body_coherence",
+            "reason_code": "close_up_removes_lower_body",
+            "physical_domain": "framing_composition",
+            "violated_invariant": "Lower body garments and states cannot be visible in close-up face framing",
+            "target_atom_id": "atom_9de39dc891dc99895f0eef43",
+            "winner_atom_ids": [
+              "atom_0486afa88fe59a67d34b5528"
+            ],
+            "winner_texts": [
+              "close-up"
+            ],
+            "loser_text": "skirt hiked up to waist",
+            "before_text": "skirt hiked up to waist",
+            "after_text": null,
+            "winner_semantic_facts": {
+              "semantic_role": "selector",
+              "visible_regions": [
+                "face"
+              ]
+            },
+            "loser_semantic_facts": {
+              "semantic_role": "selector",
+              "visible_regions": [
+                "lower_body",
+                "upper_body"
+              ],
+              "garment_states": [
+                "lifted"
+              ]
+            }
+          },
+          {
+            "rule_id": "framing_lower_body_coherence",
+            "reason_code": "close_up_removes_lower_body",
+            "physical_domain": "framing_composition",
+            "violated_invariant": "Lower body garments and states cannot be visible in close-up face framing",
+            "target_atom_id": "atom_ca9881ed52a7719149f7a6be",
+            "winner_atom_ids": [
+              "atom_0486afa88fe59a67d34b5528"
+            ],
+            "winner_texts": [
+              "close-up"
+            ],
+            "loser_text": "skirt pulled up revealing panties",
+            "before_text": "skirt pulled up revealing panties",
+            "after_text": null,
+            "winner_semantic_facts": {
+              "semantic_role": "selector",
+              "visible_regions": [
+                "face"
+              ]
+            },
+            "loser_semantic_facts": {
+              "semantic_role": "selector",
+              "visible_regions": [
+                "lower_body",
+                "upper_body"
+              ],
+              "garment_states": [
+                "lifted"
+              ]
+            }
+          },
+          {
+            "rule_id": "framing_lower_body_coherence",
+            "reason_code": "close_up_removes_lower_body",
+            "physical_domain": "framing_composition",
+            "violated_invariant": "Lower body garments and states cannot be visible in close-up face framing",
+            "target_atom_id": "atom_9af3ecb70b5b5ea4dd917e92",
+            "winner_atom_ids": [
+              "atom_0486afa88fe59a67d34b5528"
+            ],
+            "winner_texts": [
+              "close-up"
+            ],
+            "loser_text": "longitudinal cutout neckline exposing collarbones and upper chest",
+            "before_text": "longitudinal cutout neckline exposing collarbones and upper chest",
+            "after_text": null,
+            "winner_semantic_facts": {
+              "semantic_role": "selector",
+              "visible_regions": [
+                "face"
+              ]
+            },
+            "loser_semantic_facts": {
+              "semantic_role": "selector",
+              "visible_regions": [
+                "lower_body",
+                "upper_body"
+              ]
+            }
+          },
+          {
+            "rule_id": "framing_lower_body_coherence",
+            "reason_code": "close_up_removes_lower_body",
+            "physical_domain": "framing_composition",
+            "violated_invariant": "Lower body garments and states cannot be visible in close-up face framing",
+            "target_atom_id": "atom_0bf38c3d1e7fc87254aa0b90",
+            "winner_atom_ids": [
+              "atom_0486afa88fe59a67d34b5528"
+            ],
+            "winner_texts": [
+              "close-up"
+            ],
+            "loser_text": "semi-translucent fabric creating hazy skin contours",
+            "before_text": "semi-translucent fabric creating hazy skin contours",
+            "after_text": null,
+            "winner_semantic_facts": {
+              "semantic_role": "selector",
+              "visible_regions": [
+                "face"
+              ]
+            },
+            "loser_semantic_facts": {
+              "semantic_role": "selector",
+              "visible_regions": [
+                "lower_body",
+                "upper_body"
+              ],
+              "garment_states": [
+                "wet_clinging"
+              ]
+            }
+          }
+        ]
+      },
+      "baseline_output": {
+        "positive": "warehouse, windowless room, secret room, spanking, collar and leash, gentle force, close-up, face shot filling frame, between legs angle, collarbone exposed, zipper down front, form-fitting rubber suit, dress hitched up, soft nose shadow, soft loop light on face, mouth open, kneeling, tears forming from pain, sharp intake breath face, pained yet aroused, messy disheveled hair, tousled bedhead hair, fine perspiration traces of white cum on skin, subtle trace of drops of semen dripping on stomach, best quality, detailed, photorealistic",
+        "negative": "low quality, worst quality, blurry, jpeg artifacts, watermark, deformed, bad anatomy, bad mouth, bad teeth, weird tongue, distorted lips, extra limbs, extra fingers, mutated hands, bad proportions, ugly, disfigured, cropped, out of frame",
+        "description": "场景: 监禁 | 主题: 凌辱/调教系列 | 服装: 乳胶紧身衣 (Latex Catsuit) | 裸露: L2 | 发型: 随机 (Random) | 体液: 🥛 颜射/精液残留 (Cum Splatter & Semen Residual)"
+      }
+    },
+    {
+      "id": "rc7_traditional_normal",
+      "context": "traditional",
+      "category": "normal",
+      "inputs": {
+        "预设模板": "无 (None)",
+        "风格配方": "无 (None)",
+        "场景大类": "和室",
+        "剧情主题": "紧缚/和式SM系列",
+        "景别构图": "自动 (Auto)",
+        "拍摄视角": "自动 (Auto)",
+        "裸露等级": "L1 包裹暗示 (Fully Clothed / Suggestive)",
+        "服装款式": "和服 (Kimono)",
+        "服装状态": "整齐穿着 (Neat)",
+        "发型发色": "随机 (Random)",
+        "饰品头饰": "无 (None)",
+        "妆容细节": "无 (None)",
+        "姿势动作": "随机 (Random)",
+        "情绪表情": "随机 (Random)",
+        "光影预设": "自动 (Auto)",
+        "胶片风格": "无 (None)",
+        "液体效果": "无 (None)",
+        "纹身标记": "无 (None)",
+        "道具物件": "无 (None)",
+        "角色设定": "无 (None)",
+        "真实微瑕": "无 (None)",
+        "画质等级": "高清写真 (High)",
+        "prompt_seed": 1005
+      },
+      "oracle": {
+        "expected_context": "traditional",
+        "expected_clothing": "和服 (Kimono)",
+        "expected_nudity": "L1",
+        "has_conflict": false,
+        "protected_explicit_tags": [
+          "shoji screen room",
+          "rope marks on skin",
+          "figure visible under clothes",
+          "formal Japanese kimono",
+          "best quality",
+          "kotatsu table",
+          "shibari",
+          "fabric hugging curves",
+          "tightly tied obi sash",
+          "detailed",
+          "chabudai table",
+          "suspended rope",
+          "elegant traditional robe",
+          "photorealistic"
+        ],
+        "allowed_drops": [],
+        "allowed_replaces": [],
+        "rc7_drop_count": 0,
+        "new_hard_conflict_evidence": []
+      },
+      "baseline_output": {
+        "positive": "shoji screen room, futon on tatami, kotatsu table, suspended rope, kinbaku-bi, bound and helpless, close-up, face shot filling frame, point of view, fabric hugging curves, form-fitting clothes, formal Japanese kimono, tightly tied obi sash, elegant traditional robe, dark outline, silhouette lighting, arms at sides, leaning in, intoxicated look, clouded vision, long straight black hair, pin-straight hair, best quality, detailed, photorealistic",
+        "negative": "low quality, worst quality, blurry, jpeg artifacts, watermark, deformed, bad anatomy, bad mouth, bad teeth, weird tongue, distorted lips, extra limbs, extra fingers, mutated hands, bad proportions, ugly, disfigured, cropped, out of frame",
+        "description": "场景: 和室 | 主题: 紧缚/和式SM系列 | 服装: 和服 (Kimono) | 裸露: L1 | 发型: 随机 (Random)"
+      }
+    },
+    {
+      "id": "rc7_traditional_conflict",
+      "context": "traditional",
+      "category": "conflict",
+      "inputs": {
+        "预设模板": "无 (None)",
+        "风格配方": "无 (None)",
+        "场景大类": "和室",
+        "剧情主题": "紧缚/和式SM系列",
+        "景别构图": "近景 CU (面部表情/眼神)",
+        "拍摄视角": "自动 (Auto)",
+        "裸露等级": "L5 极致全裸 (Full Nude)",
+        "服装款式": "和服 (Kimono)",
+        "服装状态": "整齐穿着 (Normal Wearing)",
+        "发型发色": "随机 (Random)",
+        "饰品头饰": "无 (None)",
+        "妆容细节": "无 (None)",
+        "姿势动作": "🧎 跪姿系列",
+        "情绪表情": "😖 痛苦/折磨（SM·凌辱专用）",
+        "光影预设": "自动 (Auto)",
+        "胶片风格": "无 (None)",
+        "液体效果": "🥛 颜射/精液残留 (Cum Splatter & Semen Residual)",
+        "纹身标记": "无 (None)",
+        "道具物件": "无 (None)",
+        "角色设定": "无 (None)",
+        "真实微瑕": "无 (None)",
+        "画质等级": "高清写真 (High)",
+        "prompt_seed": 6005
+      },
+      "oracle": {
+        "expected_context": "traditional",
+        "conflict_type": "nudity_clothing_or_shot_anatomy",
+        "has_conflict": true,
+        "protected_explicit_tags": [
+          "tatami room",
+          "rope marks on skin",
+          "close-up",
+          "birthday suit",
+          "submissive posture",
+          "face contorted in pain",
+          "traces of white cum on skin",
+          "best quality",
+          "chabudai table",
+          "bound and helpless",
+          "face shot filling frame",
+          "stripped bare",
+          "kneeling on bed",
+          "pained expression",
+          "milky white fluid glistening",
+          "detailed",
+          "kinbaku-bi",
+          "photorealistic"
+        ],
+        "allowed_drops": [
+          {
+            "rule_id": "nudity_clothing_conflicts",
+            "reason_code": "nudity_removes_clothing",
+            "before_text": "kimono spread on tatami floor as backdrop",
+            "target_atom_id": "atom_f4a13c756412ef9ee67518eb",
+            "winner_atom_ids": [
+              "atom_3fbf43a6fe165b607887ad28"
+            ]
+          },
+          {
+            "rule_id": "nudity_clothing_conflicts",
+            "reason_code": "nudity_removes_clothing",
+            "before_text": "completely nude body",
+            "target_atom_id": "atom_1e7ab00072c108a36a07be06",
+            "winner_atom_ids": [
+              "atom_3fbf43a6fe165b607887ad28"
+            ]
+          },
+          {
+            "rule_id": "nudity_clothing_conflicts",
+            "reason_code": "nudity_removes_clothing",
+            "before_text": "bare skin glowing",
+            "target_atom_id": "atom_377cfbce04d75131044fd9ea",
+            "winner_atom_ids": [
+              "atom_3fbf43a6fe165b607887ad28"
+            ]
+          }
+        ],
+        "allowed_replaces": [],
+        "rc7_drop_count": 0,
+        "new_hard_conflict_evidence": [
+          {
+            "rule_id": "nudity_clothing_conflicts",
+            "reason_code": "nudity_removes_clothing",
+            "physical_domain": "nudity_coverage",
+            "violated_invariant": "Worn garments or underwear cannot coexist with full body nudity",
+            "target_atom_id": "atom_f4a13c756412ef9ee67518eb",
+            "winner_atom_ids": [
+              "atom_3fbf43a6fe165b607887ad28"
+            ],
+            "winner_texts": [
+              "birthday suit"
+            ],
+            "loser_text": "kimono spread on tatami floor as backdrop",
+            "before_text": "kimono spread on tatami floor as backdrop",
+            "after_text": null,
+            "winner_semantic_facts": {
+              "semantic_role": "selector",
+              "visible_regions": [
+                "upper_body"
+              ]
+            },
+            "loser_semantic_facts": {
+              "semantic_role": "selector",
+              "garment_topologies": [
+                "one_piece"
+              ]
+            }
+          },
+          {
+            "rule_id": "nudity_clothing_conflicts",
+            "reason_code": "nudity_removes_clothing",
+            "physical_domain": "nudity_coverage",
+            "violated_invariant": "Worn garments or underwear cannot coexist with full body nudity",
+            "target_atom_id": "atom_1e7ab00072c108a36a07be06",
+            "winner_atom_ids": [
+              "atom_3fbf43a6fe165b607887ad28"
+            ],
+            "winner_texts": [
+              "birthday suit"
+            ],
+            "loser_text": "completely nude body",
+            "before_text": "completely nude body",
+            "after_text": null,
+            "winner_semantic_facts": {
+              "semantic_role": "selector",
+              "visible_regions": [
+                "upper_body"
+              ]
+            },
+            "loser_semantic_facts": {
+              "semantic_role": "selector",
+              "garment_topologies": [
+                "one_piece"
+              ]
+            }
+          },
+          {
+            "rule_id": "nudity_clothing_conflicts",
+            "reason_code": "nudity_removes_clothing",
+            "physical_domain": "nudity_coverage",
+            "violated_invariant": "Worn garments or underwear cannot coexist with full body nudity",
+            "target_atom_id": "atom_377cfbce04d75131044fd9ea",
+            "winner_atom_ids": [
+              "atom_3fbf43a6fe165b607887ad28"
+            ],
+            "winner_texts": [
+              "birthday suit"
+            ],
+            "loser_text": "bare skin glowing",
+            "before_text": "bare skin glowing",
+            "after_text": null,
+            "winner_semantic_facts": {
+              "semantic_role": "selector",
+              "visible_regions": [
+                "upper_body"
+              ]
+            },
+            "loser_semantic_facts": {
+              "semantic_role": "selector",
+              "garment_topologies": [
+                "one_piece"
+              ]
+            }
+          }
+        ]
+      },
+      "baseline_output": {
+        "positive": "tatami room, kotatsu table, chabudai table, rope dress, hemp rope patterns, close-up, face shot filling frame, voyeur angle, completely unclothed, body fully exposed, fully nude, kimono spread on tatami floor as backdrop, completely nude body, bare skin glowing, gentle diffused indoor illumination, delicate room glow with no harsh shadows, modest, hands on thighs, biting lip to endure, pained expression, hime cut, princess cut with blunt side pieces framing cheeks, thin streak of milky white fluid glistening, fine perspiration traces of white cum on skin, best quality, detailed, photorealistic",
+        "negative": "low quality, worst quality, blurry, jpeg artifacts, watermark, deformed, bad anatomy, bad mouth, bad teeth, weird tongue, distorted lips, extra limbs, extra fingers, mutated hands, bad proportions, ugly, disfigured, cropped, out of frame",
+        "description": "场景: 和室 | 主题: 紧缚/和式SM系列 | 服装: 和服 (Kimono) | 裸露: L5 | 发型: 随机 (Random) | 体液: 🥛 颜射/精液残留 (Cum Splatter & Semen Residual)"
+      }
+    },
+    {
+      "id": "rc7_nightlife_normal",
+      "context": "nightlife",
+      "category": "normal",
+      "inputs": {
+        "预设模板": "无 (None)",
+        "风格配方": "无 (None)",
+        "场景大类": "风俗店",
+        "剧情主题": "偶像/艺人系列",
+        "景别构图": "自动 (Auto)",
+        "拍摄视角": "自动 (Auto)",
+        "裸露等级": "L1 包裹暗示 (Fully Clothed / Suggestive)",
+        "服装款式": "露背晚礼服 (Backless Evening Gown)",
+        "服装状态": "整齐穿着 (Neat)",
+        "发型发色": "随机 (Random)",
+        "饰品头饰": "无 (None)",
+        "妆容细节": "无 (None)",
+        "姿势动作": "随机 (Random)",
+        "情绪表情": "随机 (Random)",
+        "光影预设": "自动 (Auto)",
+        "胶片风格": "无 (None)",
+        "液体效果": "无 (None)",
+        "纹身标记": "无 (None)",
+        "道具物件": "无 (None)",
+        "角色设定": "无 (None)",
+        "真实微瑕": "无 (None)",
+        "画质等级": "高清写真 (High)",
+        "prompt_seed": 1006
+      },
+      "oracle": {
+        "expected_context": "nightlife",
+        "expected_clothing": "露背晚礼服 (Backless Evening Gown)",
+        "expected_nudity": "L1",
+        "has_conflict": false,
+        "protected_explicit_tags": [
+          "pink salon booth",
+          "audition",
+          "nothing exposed",
+          "elegant floor-length evening gown",
+          "best quality",
+          "host club",
+          "AV actress",
+          "clothed body",
+          "fitted formal dress",
+          "detailed",
+          "sleek silhouette",
+          "photorealistic"
+        ],
+        "allowed_drops": [],
+        "allowed_replaces": [],
+        "rc7_drop_count": 0,
+        "new_hard_conflict_evidence": []
+      },
+      "baseline_output": {
+        "positive": "soapland reception, SM club, idol girl, porn star, gravure shoot behind scenes, full body shot, wide shot, eye level angle, clothes clinging to body, tight dress showing silhouette, elegant floor-length evening gown, fitted formal dress, sleek silhouette, dramatic left-right contrast, half face lit, kneeling, face at crotch level, ears turning red, can't hold eye contact, shy expression, hime cut, princess cut with blunt side pieces framing cheeks, best quality, detailed, photorealistic",
+        "negative": "low quality, worst quality, blurry, jpeg artifacts, watermark, deformed, bad anatomy, bad mouth, bad teeth, weird tongue, distorted lips, extra limbs, extra fingers, mutated hands, bad proportions, ugly, disfigured, cropped, out of frame",
+        "description": "场景: 风俗店 | 主题: 偶像/艺人系列 | 服装: 露背晚礼服 (Backless Evening Gown) | 裸露: L1 | 发型: 随机 (Random)"
+      }
+    },
+    {
+      "id": "rc7_nightlife_conflict",
+      "context": "nightlife",
+      "category": "conflict",
+      "inputs": {
+        "预设模板": "无 (None)",
+        "风格配方": "无 (None)",
+        "场景大类": "风俗店",
+        "剧情主题": "偶像/艺人系列",
+        "景别构图": "近景 CU (面部表情/眼神)",
+        "拍摄视角": "自动 (Auto)",
+        "裸露等级": "L5 极致全裸 (Full Nude)",
+        "服装款式": "露背晚礼服 (Backless Evening Gown)",
+        "服装状态": "整齐穿着 (Normal Wearing)",
+        "发型发色": "随机 (Random)",
+        "饰品头饰": "无 (None)",
+        "妆容细节": "无 (None)",
+        "姿势动作": "🧎 跪姿系列",
+        "情绪表情": "😖 痛苦/折磨（SM·凌辱专用）",
+        "光影预设": "自动 (Auto)",
+        "胶片风格": "无 (None)",
+        "液体效果": "🥛 颜射/精液残留 (Cum Splatter & Semen Residual)",
+        "纹身标记": "无 (None)",
+        "道具物件": "无 (None)",
+        "角色设定": "无 (None)",
+        "真实微瑕": "无 (None)",
+        "画质等级": "高清写真 (High)",
+        "prompt_seed": 6006
+      },
+      "oracle": {
+        "expected_context": "nightlife",
+        "conflict_type": "nudity_clothing_or_shot_anatomy",
+        "has_conflict": true,
+        "protected_explicit_tags": [
+          "soapland reception",
+          "cam girl",
+          "close-up",
+          "all clothes removed",
+          "arms at sides",
+          "sharp intake breath face",
+          "milky white fluid glistening",
+          "best quality",
+          "image club room",
+          "local idol",
+          "face shot filling frame",
+          "full body naked",
+          "looking up at viewer",
+          "pained but enduring",
+          "traces of white cum on skin",
+          "detailed",
+          "AV actress",
+          "bare everything",
+          "wincing",
+          "photorealistic"
+        ],
+        "allowed_drops": [
+          {
+            "rule_id": "nudity_clothing_conflicts",
+            "reason_code": "nudity_removes_clothing",
+            "before_text": "completely nude",
+            "target_atom_id": "atom_3fd34306831afb7127314b1d",
+            "winner_atom_ids": [
+              "atom_9160d96effe2ca68784cc292"
+            ]
+          },
+          {
+            "rule_id": "nudity_clothing_conflicts",
+            "reason_code": "nudity_removes_clothing",
+            "before_text": "silk evening gown pooled at feet",
+            "target_atom_id": "atom_6788a039ebc4d38afb2dbfb6",
+            "winner_atom_ids": [
+              "atom_9160d96effe2ca68784cc292"
+            ]
+          },
+          {
+            "rule_id": "nudity_clothing_conflicts",
+            "reason_code": "nudity_removes_clothing",
+            "before_text": "fully bare glowing body",
+            "target_atom_id": "atom_c237b971cf3517f446729338",
+            "winner_atom_ids": [
+              "atom_9160d96effe2ca68784cc292"
+            ]
+          }
+        ],
+        "allowed_replaces": [],
+        "rc7_drop_count": 0,
+        "new_hard_conflict_evidence": [
+          {
+            "rule_id": "nudity_clothing_conflicts",
+            "reason_code": "nudity_removes_clothing",
+            "physical_domain": "nudity_coverage",
+            "violated_invariant": "Worn garments or underwear cannot coexist with full body nudity",
+            "target_atom_id": "atom_3fd34306831afb7127314b1d",
+            "winner_atom_ids": [
+              "atom_9160d96effe2ca68784cc292"
+            ],
+            "winner_texts": [
+              "all clothes removed"
+            ],
+            "loser_text": "completely nude",
+            "before_text": "completely nude",
+            "after_text": null,
+            "winner_semantic_facts": {
+              "semantic_role": "selector",
+              "visible_regions": [
+                "upper_body"
+              ]
+            },
+            "loser_semantic_facts": {
+              "semantic_role": "selector",
+              "garment_topologies": [
+                "one_piece"
+              ]
+            }
+          },
+          {
+            "rule_id": "nudity_clothing_conflicts",
+            "reason_code": "nudity_removes_clothing",
+            "physical_domain": "nudity_coverage",
+            "violated_invariant": "Worn garments or underwear cannot coexist with full body nudity",
+            "target_atom_id": "atom_6788a039ebc4d38afb2dbfb6",
+            "winner_atom_ids": [
+              "atom_9160d96effe2ca68784cc292"
+            ],
+            "winner_texts": [
+              "all clothes removed"
+            ],
+            "loser_text": "silk evening gown pooled at feet",
+            "before_text": "silk evening gown pooled at feet",
+            "after_text": null,
+            "winner_semantic_facts": {
+              "semantic_role": "selector",
+              "visible_regions": [
+                "upper_body"
+              ]
+            },
+            "loser_semantic_facts": {
+              "semantic_role": "selector",
+              "garment_topologies": [
+                "one_piece"
+              ]
+            }
+          },
+          {
+            "rule_id": "nudity_clothing_conflicts",
+            "reason_code": "nudity_removes_clothing",
+            "physical_domain": "nudity_coverage",
+            "violated_invariant": "Worn garments or underwear cannot coexist with full body nudity",
+            "target_atom_id": "atom_c237b971cf3517f446729338",
+            "winner_atom_ids": [
+              "atom_9160d96effe2ca68784cc292"
+            ],
+            "winner_texts": [
+              "all clothes removed"
+            ],
+            "loser_text": "fully bare glowing body",
+            "before_text": "fully bare glowing body",
+            "after_text": null,
+            "winner_semantic_facts": {
+              "semantic_role": "selector",
+              "visible_regions": [
+                "upper_body"
+              ]
+            },
+            "loser_semantic_facts": {
+              "semantic_role": "selector",
+              "garment_topologies": [
+                "one_piece"
+              ]
+            }
+          }
+        ]
+      },
+      "baseline_output": {
+        "positive": "soapland room, host club, idol girl, gravure DVD shoot, close-up, face shot filling frame, worm eye view, nude, body fully exposed, nothing on, completely nude, silk evening gown pooled at feet, fully bare glowing body, backlit hair glow, glowing edges, wet hair ─ 浴室淋水, caught, pained but enduring, tears forming from pain, biting lip to endure, strand of hair between parted lips, biting hair sensually, fine perspiration traces of white cum on skin, subtle trace of drops of semen dripping on stomach, best quality, detailed, photorealistic",
+        "negative": "low quality, worst quality, blurry, jpeg artifacts, watermark, deformed, bad anatomy, bad mouth, bad teeth, weird tongue, distorted lips, extra limbs, extra fingers, mutated hands, bad proportions, ugly, disfigured, cropped, out of frame",
+        "description": "场景: 风俗店 | 主题: 偶像/艺人系列 | 服装: 露背晚礼服 (Backless Evening Gown) | 裸露: L5 | 发型: 随机 (Random) | 体液: 🥛 颜射/精液残留 (Cum Splatter & Semen Residual)"
+      }
+    },
+    {
+      "id": "rc7_domestic_normal",
+      "context": "domestic",
+      "category": "normal",
+      "inputs": {
+        "预设模板": "无 (None)",
+        "风格配方": "无 (None)",
+        "场景大类": "卧室私密",
+        "剧情主题": "人妻/出轨系列",
+        "景别构图": "自动 (Auto)",
+        "拍摄视角": "自动 (Auto)",
+        "裸露等级": "L1 包裹暗示 (Fully Clothed / Suggestive)",
+        "服装款式": "丝绸睡袍/晨袍 (Silk Robe)",
+        "服装状态": "整齐穿着 (Neat)",
+        "发型发色": "随机 (Random)",
+        "饰品头饰": "无 (None)",
+        "妆容细节": "无 (None)",
+        "姿势动作": "随机 (Random)",
+        "情绪表情": "随机 (Random)",
+        "光影预设": "自动 (Auto)",
+        "胶片风格": "无 (None)",
+        "液体效果": "无 (None)",
+        "纹身标记": "无 (None)",
+        "道具物件": "无 (None)",
+        "角色设定": "无 (None)",
+        "真实微瑕": "无 (None)",
+        "画质等级": "高清写真 (High)",
+        "prompt_seed": 1007
+      },
+      "oracle": {
+        "expected_context": "domestic",
+        "expected_clothing": "丝绸睡袍/晨袍 (Silk Robe)",
+        "expected_nudity": "L1",
+        "has_conflict": false,
+        "protected_explicit_tags": [
+          "bedroom",
+          "lonely wife",
+          "fabric hugging curves",
+          "silk robe tightly wrapped with sash tied",
+          "best quality",
+          "pillow fight aftermath",
+          "cheating wife",
+          "dressed to the nines",
+          "satin loungewear hugging silhouette",
+          "detailed",
+          "morning after bed",
+          "clothed body",
+          "photorealistic"
+        ],
+        "allowed_drops": [],
+        "allowed_replaces": [],
+        "rc7_drop_count": 0,
+        "new_hard_conflict_evidence": []
+      },
+      "baseline_output": {
+        "positive": "bedroom, pillow fight aftermath, affair with boss, husband's friend, extreme close-up, macro detail shot, overhead top-down shot, figure visible under clothes, fabric hugging curves, silk robe tightly wrapped with sash tied, satin loungewear hugging silhouette, dramatic hard light, intense shadow edge, pleading expression, exposed, knowing smirk, sultry pout, messy disheveled hair, tousled bedhead hair, best quality, detailed, photorealistic",
+        "negative": "low quality, worst quality, blurry, jpeg artifacts, watermark, deformed, bad anatomy, bad mouth, bad teeth, weird tongue, distorted lips, extra limbs, extra fingers, mutated hands, bad proportions, ugly, disfigured, cropped, out of frame",
+        "description": "场景: 卧室私密 | 主题: 人妻/出轨系列 | 服装: 丝绸睡袍/晨袍 (Silk Robe) | 裸露: L1 | 发型: 随机 (Random)"
+      }
+    },
+    {
+      "id": "rc7_domestic_conflict",
+      "context": "domestic",
+      "category": "conflict",
+      "inputs": {
+        "预设模板": "无 (None)",
+        "风格配方": "无 (None)",
+        "场景大类": "卧室私密",
+        "剧情主题": "人妻/出轨系列",
+        "景别构图": "近景 CU (面部表情/眼神)",
+        "拍摄视角": "自动 (Auto)",
+        "裸露等级": "L5 极致全裸 (Full Nude)",
+        "服装款式": "丝绸睡袍/晨袍 (Silk Robe)",
+        "服装状态": "整齐穿着 (Normal Wearing)",
+        "发型发色": "随机 (Random)",
+        "饰品头饰": "无 (None)",
+        "妆容细节": "无 (None)",
+        "姿势动作": "🧎 跪姿系列",
+        "情绪表情": "😖 痛苦/折磨（SM·凌辱专用）",
+        "光影预设": "自动 (Auto)",
+        "胶片风格": "无 (None)",
+        "液体效果": "🥛 颜射/精液残留 (Cum Splatter & Semen Residual)",
+        "纹身标记": "无 (None)",
+        "道具物件": "无 (None)",
+        "角色设定": "无 (None)",
+        "真实微瑕": "无 (None)",
+        "画质等级": "高清写真 (High)",
+        "prompt_seed": 6007
+      },
+      "oracle": {
+        "expected_context": "domestic",
+        "conflict_type": "nudity_clothing_or_shot_anatomy",
+        "has_conflict": true,
+        "protected_explicit_tags": [
+          "hotel room",
+          "married woman",
+          "close-up",
+          "completely unclothed",
+          "submissive posture",
+          "biting lip to endure",
+          "milky white fluid glistening",
+          "best quality",
+          "unmade sheets",
+          "PTA mom",
+          "face shot filling frame",
+          "completely naked",
+          "pained but enduring",
+          "traces of white cum on skin",
+          "detailed",
+          "pained expression",
+          "photorealistic"
+        ],
+        "allowed_drops": [
+          {
+            "rule_id": "nudity_clothing_conflicts",
+            "reason_code": "nudity_removes_clothing",
+            "before_text": "completely naked on bed sheets",
+            "target_atom_id": "atom_2d7fd33f6718ce29147a739c",
+            "winner_atom_ids": [
+              "atom_585315f7416920dc0bfbfd17"
+            ]
+          },
+          {
+            "rule_id": "nudity_clothing_conflicts",
+            "reason_code": "nudity_removes_clothing",
+            "before_text": "silk nightie cast aside on floor",
+            "target_atom_id": "atom_6bea03abac415e6dcf938858",
+            "winner_atom_ids": [
+              "atom_585315f7416920dc0bfbfd17"
+            ]
+          }
+        ],
+        "allowed_replaces": [],
+        "rc7_drop_count": 0,
+        "new_hard_conflict_evidence": [
+          {
+            "rule_id": "nudity_clothing_conflicts",
+            "reason_code": "nudity_removes_clothing",
+            "physical_domain": "nudity_coverage",
+            "violated_invariant": "Worn garments or underwear cannot coexist with full body nudity",
+            "target_atom_id": "atom_2d7fd33f6718ce29147a739c",
+            "winner_atom_ids": [
+              "atom_585315f7416920dc0bfbfd17"
+            ],
+            "winner_texts": [
+              "completely unclothed"
+            ],
+            "loser_text": "completely naked on bed sheets",
+            "before_text": "completely naked on bed sheets",
+            "after_text": null,
+            "winner_semantic_facts": {
+              "semantic_role": "selector",
+              "visible_regions": [
+                "upper_body"
+              ]
+            },
+            "loser_semantic_facts": {
+              "semantic_role": "selector",
+              "garment_topologies": [
+                "bottom_skirt",
+                "top"
+              ]
+            }
+          },
+          {
+            "rule_id": "nudity_clothing_conflicts",
+            "reason_code": "nudity_removes_clothing",
+            "physical_domain": "nudity_coverage",
+            "violated_invariant": "Worn garments or underwear cannot coexist with full body nudity",
+            "target_atom_id": "atom_6bea03abac415e6dcf938858",
+            "winner_atom_ids": [
+              "atom_585315f7416920dc0bfbfd17"
+            ],
+            "winner_texts": [
+              "completely unclothed"
+            ],
+            "loser_text": "silk nightie cast aside on floor",
+            "before_text": "silk nightie cast aside on floor",
+            "after_text": null,
+            "winner_semantic_facts": {
+              "semantic_role": "selector",
+              "visible_regions": [
+                "upper_body"
+              ]
+            },
+            "loser_semantic_facts": {
+              "semantic_role": "selector",
+              "garment_topologies": [
+                "bottom_skirt",
+                "top"
+              ]
+            }
+          }
+        ]
+      },
+      "baseline_output": {
+        "positive": "hotel room, morning after bed, single apartment, PTA mom, adultery, housewife, close-up, face shot filling frame, worm eye view, nothing on, stripped bare, completely naked on bed sheets, silk nightie cast aside on floor, face split by shadow, half shadow portrait, hands clasped in front, face contorted in pain, whimpering expression, messy disheveled hair, tousled bedhead hair, fine perspiration traces of white cum on skin, glistening beads of drops of semen dripping on stomach, best quality, detailed, photorealistic",
+        "negative": "low quality, worst quality, blurry, jpeg artifacts, watermark, deformed, bad anatomy, bad mouth, bad teeth, weird tongue, distorted lips, extra limbs, extra fingers, mutated hands, bad proportions, ugly, disfigured, cropped, out of frame",
+        "description": "场景: 卧室私密 | 主题: 人妻/出轨系列 | 服装: 丝绸睡袍/晨袍 (Silk Robe) | 裸露: L5 | 发型: 随机 (Random) | 体液: 🥛 颜射/精液残留 (Cum Splatter & Semen Residual)"
+      }
+    },
+    {
+      "id": "rc7_transit_normal",
+      "context": "transit",
+      "category": "normal",
+      "inputs": {
+        "预设模板": "无 (None)",
+        "风格配方": "无 (None)",
+        "场景大类": "电车/地铁",
+        "剧情主题": "痴汉/NTR系列",
+        "景别构图": "自动 (Auto)",
+        "拍摄视角": "自动 (Auto)",
+        "裸露等级": "L1 包裹暗示 (Fully Clothed / Suggestive)",
+        "服装款式": "职场OL西装 (Office Lady Suit)",
+        "服装状态": "整齐穿着 (Neat)",
+        "发型发色": "随机 (Random)",
+        "饰品头饰": "无 (None)",
+        "妆容细节": "无 (None)",
+        "姿势动作": "随机 (Random)",
+        "情绪表情": "随机 (Random)",
+        "光影预设": "自动 (Auto)",
+        "胶片风格": "无 (None)",
+        "液体效果": "无 (None)",
+        "纹身标记": "无 (None)",
+        "道具物件": "无 (None)",
+        "角色设定": "无 (None)",
+        "真实微瑕": "无 (None)",
+        "画质等级": "高清写真 (High)",
+        "prompt_seed": 1008
+      },
+      "oracle": {
+        "expected_context": "transit",
+        "expected_clothing": "职场OL西装 (Office Lady Suit)",
+        "expected_nudity": "L1",
+        "has_conflict": false,
+        "protected_explicit_tags": [
+          "train seat",
+          "forced to watch",
+          "dressed",
+          "fitted black blazer",
+          "best quality",
+          "train door area",
+          "blackmail",
+          "clothes clinging to body",
+          "buttoned-up white blouse",
+          "detailed",
+          "train priority seat",
+          "hidden camera",
+          "dressed to the nines",
+          "tight pencil skirt",
+          "photorealistic"
+        ],
+        "allowed_drops": [],
+        "allowed_replaces": [],
+        "rc7_drop_count": 0,
+        "new_hard_conflict_evidence": []
+      },
+      "baseline_output": {
+        "positive": "train seat, train priority seat, last train, chikan, forced to watch, full body shot, wide shot, high angle shot, fabric hugging curves, form-fitting clothes, fitted black blazer, buttoned-up white blouse, tight pencil skirt, golden outline on body, light wrapping around curves, bending at waist, standing with feet apart, pleading eyes, helpless expression, long straight black hair, pin-straight hair, best quality, detailed, photorealistic",
+        "negative": "low quality, worst quality, blurry, jpeg artifacts, watermark, deformed, bad anatomy, bad mouth, bad teeth, weird tongue, distorted lips, extra limbs, extra fingers, mutated hands, bad proportions, ugly, disfigured, cropped, out of frame",
+        "description": "场景: 电车/地铁 | 主题: 痴汉/NTR系列 | 服装: 职场OL西装 (Office Lady Suit) | 裸露: L1 | 发型: 随机 (Random)"
+      }
+    },
+    {
+      "id": "rc7_transit_conflict",
+      "context": "transit",
+      "category": "conflict",
+      "inputs": {
+        "预设模板": "无 (None)",
+        "风格配方": "无 (None)",
+        "场景大类": "电车/地铁",
+        "剧情主题": "痴汉/NTR系列",
+        "景别构图": "近景 CU (面部表情/眼神)",
+        "拍摄视角": "自动 (Auto)",
+        "裸露等级": "L5 极致全裸 (Full Nude)",
+        "服装款式": "职场OL西装 (Office Lady Suit)",
+        "服装状态": "整齐穿着 (Normal Wearing)",
+        "发型发色": "随机 (Random)",
+        "饰品头饰": "无 (None)",
+        "妆容细节": "无 (None)",
+        "姿势动作": "🧎 跪姿系列",
+        "情绪表情": "😖 痛苦/折磨（SM·凌辱专用）",
+        "光影预设": "自动 (Auto)",
+        "胶片风格": "无 (None)",
+        "液体效果": "🥛 颜射/精液残留 (Cum Splatter & Semen Residual)",
+        "纹身标记": "无 (None)",
+        "道具物件": "无 (None)",
+        "角色设定": "无 (None)",
+        "真实微瑕": "无 (None)",
+        "画质等级": "高清写真 (High)",
+        "prompt_seed": 6008
+      },
+      "oracle": {
+        "expected_context": "transit",
+        "conflict_type": "nudity_clothing_or_shot_anatomy",
+        "has_conflict": true,
+        "protected_explicit_tags": [
+          "train interior",
+          "forced to watch",
+          "close-up",
+          "completely unclothed",
+          "hands clasped in front",
+          "pained yet aroused",
+          "drops of semen dripping on stomach",
+          "best quality",
+          "train priority seat",
+          "watching wife",
+          "face shot filling frame",
+          "fully nude",
+          "kneeling in shower",
+          "pained expression",
+          "traces of white cum on skin",
+          "detailed",
+          "empty train at night",
+          "forbidden touch",
+          "grimacing",
+          "photorealistic"
+        ],
+        "allowed_drops": [
+          {
+            "rule_id": "nudity_clothing_conflicts",
+            "reason_code": "nudity_removes_clothing",
+            "before_text": "all clothes removed",
+            "target_atom_id": "atom_3a38056bc57873e710bae171",
+            "winner_atom_ids": [
+              "atom_585315f7416920dc0bfbfd17"
+            ]
+          },
+          {
+            "rule_id": "nudity_clothing_conflicts",
+            "reason_code": "nudity_removes_clothing",
+            "before_text": "blazer and blouse discarded on chair",
+            "target_atom_id": "atom_7d9e1db3810c68f641018c00",
+            "winner_atom_ids": [
+              "atom_585315f7416920dc0bfbfd17"
+            ]
+          },
+          {
+            "rule_id": "nudity_clothing_conflicts",
+            "reason_code": "nudity_removes_clothing",
+            "before_text": "completely naked body",
+            "target_atom_id": "atom_d093873af25b6eea8bd8f69d",
+            "winner_atom_ids": [
+              "atom_585315f7416920dc0bfbfd17"
+            ]
+          },
+          {
+            "rule_id": "nudity_clothing_conflicts",
+            "reason_code": "nudity_removes_clothing",
+            "before_text": "black high heels",
+            "target_atom_id": "atom_3d0b344d1775eb4102669c5d",
+            "winner_atom_ids": [
+              "atom_585315f7416920dc0bfbfd17"
+            ]
+          }
+        ],
+        "allowed_replaces": [],
+        "rc7_drop_count": 0,
+        "new_hard_conflict_evidence": [
+          {
+            "rule_id": "nudity_clothing_conflicts",
+            "reason_code": "nudity_removes_clothing",
+            "physical_domain": "nudity_coverage",
+            "violated_invariant": "Worn garments or underwear cannot coexist with full body nudity",
+            "target_atom_id": "atom_3a38056bc57873e710bae171",
+            "winner_atom_ids": [
+              "atom_585315f7416920dc0bfbfd17"
+            ],
+            "winner_texts": [
+              "completely unclothed"
+            ],
+            "loser_text": "all clothes removed",
+            "before_text": "all clothes removed",
+            "after_text": null,
+            "winner_semantic_facts": {
+              "semantic_role": "selector",
+              "visible_regions": [
+                "upper_body"
+              ]
+            },
+            "loser_semantic_facts": {
+              "semantic_role": "selector",
+              "garment_topologies": [
+                "bottom_skirt",
+                "top"
+              ]
+            }
+          },
+          {
+            "rule_id": "nudity_clothing_conflicts",
+            "reason_code": "nudity_removes_clothing",
+            "physical_domain": "nudity_coverage",
+            "violated_invariant": "Worn garments or underwear cannot coexist with full body nudity",
+            "target_atom_id": "atom_7d9e1db3810c68f641018c00",
+            "winner_atom_ids": [
+              "atom_585315f7416920dc0bfbfd17"
+            ],
+            "winner_texts": [
+              "completely unclothed"
+            ],
+            "loser_text": "blazer and blouse discarded on chair",
+            "before_text": "blazer and blouse discarded on chair",
+            "after_text": null,
+            "winner_semantic_facts": {
+              "semantic_role": "selector",
+              "visible_regions": [
+                "upper_body"
+              ]
+            },
+            "loser_semantic_facts": {
+              "semantic_role": "selector",
+              "garment_topologies": [
+                "bottom_skirt",
+                "top"
+              ]
+            }
+          },
+          {
+            "rule_id": "nudity_clothing_conflicts",
+            "reason_code": "nudity_removes_clothing",
+            "physical_domain": "nudity_coverage",
+            "violated_invariant": "Worn garments or underwear cannot coexist with full body nudity",
+            "target_atom_id": "atom_d093873af25b6eea8bd8f69d",
+            "winner_atom_ids": [
+              "atom_585315f7416920dc0bfbfd17"
+            ],
+            "winner_texts": [
+              "completely unclothed"
+            ],
+            "loser_text": "completely naked body",
+            "before_text": "completely naked body",
+            "after_text": null,
+            "winner_semantic_facts": {
+              "semantic_role": "selector",
+              "visible_regions": [
+                "upper_body"
+              ]
+            },
+            "loser_semantic_facts": {
+              "semantic_role": "selector",
+              "garment_topologies": [
+                "bottom_skirt",
+                "top"
+              ]
+            }
+          },
+          {
+            "rule_id": "nudity_clothing_conflicts",
+            "reason_code": "nudity_removes_clothing",
+            "physical_domain": "nudity_coverage",
+            "violated_invariant": "Worn garments or underwear cannot coexist with full body nudity",
+            "target_atom_id": "atom_3d0b344d1775eb4102669c5d",
+            "winner_atom_ids": [
+              "atom_585315f7416920dc0bfbfd17"
+            ],
+            "winner_texts": [
+              "completely unclothed"
+            ],
+            "loser_text": "black high heels",
+            "before_text": "black high heels",
+            "after_text": null,
+            "winner_semantic_facts": {
+              "semantic_role": "selector",
+              "visible_regions": [
+                "upper_body"
+              ]
+            },
+            "loser_semantic_facts": {
+              "semantic_role": "selector",
+              "garment_topologies": [
+                "bottom_skirt",
+                "top"
+              ]
+            }
+          }
+        ]
+      },
+      "baseline_output": {
+        "positive": "train interior, train priority seat, train handrail, stolen kiss, caught in act, close-up, face shot filling frame, low angle shot, all clothes removed, bare skin, every inch of skin visible, blazer and blouse discarded on chair, completely naked body, seamless soft ambient light, gentle diffused indoor illumination, exposed, suffering face, tears forming from pain, hime cut, princess cut with blunt side pieces framing cheeks, single drop of milky white fluid glistening, few drops of drops of semen dripping on stomach, best quality, detailed, photorealistic",
+        "negative": "low quality, worst quality, blurry, jpeg artifacts, watermark, deformed, bad anatomy, bad mouth, bad teeth, weird tongue, distorted lips, extra limbs, extra fingers, mutated hands, bad proportions, ugly, disfigured, cropped, out of frame",
+        "description": "场景: 电车/地铁 | 主题: 痴汉/NTR系列 | 服装: 职场OL西装 (Office Lady Suit) | 裸露: L5 | 发型: 随机 (Random) | 体液: 🥛 颜射/精液残留 (Cum Splatter & Semen Residual)"
+      }
+    },
+    {
+      "id": "rc7_outdoor_normal",
+      "context": "outdoor",
+      "category": "normal",
+      "inputs": {
+        "预设模板": "无 (None)",
+        "风格配方": "无 (None)",
+        "场景大类": "公园/野外",
+        "剧情主题": "放置/野外系列（JAV经典暴露主题）",
+        "景别构图": "自动 (Auto)",
+        "拍摄视角": "自动 (Auto)",
+        "裸露等级": "L1 包裹暗示 (Fully Clothed / Suggestive)",
+        "服装款式": "街头随性/日常T恤",
+        "服装状态": "整齐穿着 (Neat)",
+        "发型发色": "随机 (Random)",
+        "饰品头饰": "无 (None)",
+        "妆容细节": "无 (None)",
+        "姿势动作": "随机 (Random)",
+        "情绪表情": "随机 (Random)",
+        "光影预设": "自动 (Auto)",
+        "胶片风格": "无 (None)",
+        "液体效果": "无 (None)",
+        "纹身标记": "无 (None)",
+        "道具物件": "无 (None)",
+        "角色设定": "无 (None)",
+        "真实微瑕": "无 (None)",
+        "画质等级": "高清写真 (High)",
+        "prompt_seed": 1009
+      },
+      "oracle": {
+        "expected_context": "outdoor",
+        "expected_clothing": "街头随性/日常T恤",
+        "expected_nudity": "L1",
+        "has_conflict": false,
+        "protected_explicit_tags": [
+          "park bathroom",
+          "crowded place flashing",
+          "dressed",
+          "fitted graphic t-shirt",
+          "best quality",
+          "street corner at night",
+          "exhibitionism",
+          "body outline visible through fabric",
+          "denim pants",
+          "detailed",
+          "dressed to the nines",
+          "casual neat outfit",
+          "photorealistic"
+        ],
+        "allowed_drops": [],
+        "allowed_replaces": [],
+        "rc7_drop_count": 0,
+        "new_hard_conflict_evidence": []
+      },
+      "baseline_output": {
+        "positive": "park at night, construction site at night, downblouse, rooftop public, medium shot, waist-up framing, high angle shot, modest outfit, tight dress showing silhouette, fitted graphic t-shirt, denim pants, casual neat outfit, Rembrandt lighting, dramatic side lighting, doggy position, face down ass up, come-hither look, sultry gaze, fuck-me eyes, strands partially covering breasts, best quality, detailed, photorealistic",
+        "negative": "low quality, worst quality, blurry, jpeg artifacts, watermark, deformed, bad anatomy, bad mouth, bad teeth, weird tongue, distorted lips, extra limbs, extra fingers, mutated hands, bad proportions, ugly, disfigured, cropped, out of frame",
+        "description": "场景: 公园/野外 | 主题: 放置/野外系列（JAV经典暴露主题） | 服装: 街头随性/日常T恤 | 裸露: L1 | 发型: 随机 (Random)"
+      }
+    },
+    {
+      "id": "rc7_outdoor_conflict",
+      "context": "outdoor",
+      "category": "conflict",
+      "inputs": {
+        "预设模板": "无 (None)",
+        "风格配方": "无 (None)",
+        "场景大类": "公园/野外",
+        "剧情主题": "放置/野外系列（JAV经典暴露主题）",
+        "景别构图": "近景 CU (面部表情/眼神)",
+        "拍摄视角": "自动 (Auto)",
+        "裸露等级": "L5 极致全裸 (Full Nude)",
+        "服装款式": "街头随性/日常T恤",
+        "服装状态": "整齐穿着 (Normal Wearing)",
+        "发型发色": "随机 (Random)",
+        "饰品头饰": "无 (None)",
+        "妆容细节": "无 (None)",
+        "姿势动作": "🧎 跪姿系列",
+        "情绪表情": "😖 痛苦/折磨（SM·凌辱专用）",
+        "光影预设": "自动 (Auto)",
+        "胶片风格": "无 (None)",
+        "液体效果": "🥛 颜射/精液残留 (Cum Splatter & Semen Residual)",
+        "纹身标记": "无 (None)",
+        "道具物件": "无 (None)",
+        "角色设定": "无 (None)",
+        "真实微瑕": "无 (None)",
+        "画质等级": "高清写真 (High)",
+        "prompt_seed": 6009
+      },
+      "oracle": {
+        "expected_context": "outdoor",
+        "conflict_type": "nudity_clothing_or_shot_anatomy",
+        "has_conflict": true,
+        "protected_explicit_tags": [
+          "park bathroom",
+          "outdoor flashing",
+          "close-up",
+          "birthday suit",
+          "accepting",
+          "wincing",
+          "traces of white cum on skin",
+          "best quality",
+          "riverbank",
+          "streaking",
+          "face shot filling frame",
+          "no clothing at all",
+          "submissive ─ 卧室臣服",
+          "face contorted in pain",
+          "milky white fluid glistening",
+          "detailed",
+          "construction site at night",
+          "downblouse",
+          "photorealistic"
+        ],
+        "allowed_drops": [
+          {
+            "rule_id": "nudity_clothing_conflicts",
+            "reason_code": "nudity_removes_clothing",
+            "before_text": "completely naked",
+            "target_atom_id": "atom_c54fe9a0a508b5921114e60d",
+            "winner_atom_ids": [
+              "atom_3fbf43a6fe165b607887ad28"
+            ]
+          },
+          {
+            "rule_id": "nudity_clothing_conflicts",
+            "reason_code": "nudity_removes_clothing",
+            "before_text": "clothes scattered on bedroom floor",
+            "target_atom_id": "atom_530a292ca43d21637ed62504",
+            "winner_atom_ids": [
+              "atom_3fbf43a6fe165b607887ad28"
+            ]
+          },
+          {
+            "rule_id": "nudity_clothing_conflicts",
+            "reason_code": "nudity_removes_clothing",
+            "before_text": "fully bare skin",
+            "target_atom_id": "atom_539d3b7d4a477cf24b20510b",
+            "winner_atom_ids": [
+              "atom_3fbf43a6fe165b607887ad28"
+            ]
+          }
+        ],
+        "allowed_replaces": [],
+        "rc7_drop_count": 0,
+        "new_hard_conflict_evidence": [
+          {
+            "rule_id": "nudity_clothing_conflicts",
+            "reason_code": "nudity_removes_clothing",
+            "physical_domain": "nudity_coverage",
+            "violated_invariant": "Worn garments or underwear cannot coexist with full body nudity",
+            "target_atom_id": "atom_c54fe9a0a508b5921114e60d",
+            "winner_atom_ids": [
+              "atom_3fbf43a6fe165b607887ad28"
+            ],
+            "winner_texts": [
+              "birthday suit"
+            ],
+            "loser_text": "completely naked",
+            "before_text": "completely naked",
+            "after_text": null,
+            "winner_semantic_facts": {
+              "semantic_role": "selector",
+              "visible_regions": [
+                "upper_body"
+              ]
+            },
+            "loser_semantic_facts": {
+              "semantic_role": "selector",
+              "garment_topologies": [
+                "bottom_skirt",
+                "top"
+              ]
+            }
+          },
+          {
+            "rule_id": "nudity_clothing_conflicts",
+            "reason_code": "nudity_removes_clothing",
+            "physical_domain": "nudity_coverage",
+            "violated_invariant": "Worn garments or underwear cannot coexist with full body nudity",
+            "target_atom_id": "atom_530a292ca43d21637ed62504",
+            "winner_atom_ids": [
+              "atom_3fbf43a6fe165b607887ad28"
+            ],
+            "winner_texts": [
+              "birthday suit"
+            ],
+            "loser_text": "clothes scattered on bedroom floor",
+            "before_text": "clothes scattered on bedroom floor",
+            "after_text": null,
+            "winner_semantic_facts": {
+              "semantic_role": "selector",
+              "visible_regions": [
+                "upper_body"
+              ]
+            },
+            "loser_semantic_facts": {
+              "semantic_role": "selector",
+              "garment_topologies": [
+                "bottom_skirt",
+                "top"
+              ]
+            }
+          },
+          {
+            "rule_id": "nudity_clothing_conflicts",
+            "reason_code": "nudity_removes_clothing",
+            "physical_domain": "nudity_coverage",
+            "violated_invariant": "Worn garments or underwear cannot coexist with full body nudity",
+            "target_atom_id": "atom_539d3b7d4a477cf24b20510b",
+            "winner_atom_ids": [
+              "atom_3fbf43a6fe165b607887ad28"
+            ],
+            "winner_texts": [
+              "birthday suit"
+            ],
+            "loser_text": "fully bare skin",
+            "before_text": "fully bare skin",
+            "after_text": null,
+            "winner_semantic_facts": {
+              "semantic_role": "selector",
+              "visible_regions": [
+                "upper_body"
+              ]
+            },
+            "loser_semantic_facts": {
+              "semantic_role": "selector",
+              "garment_topologies": [
+                "bottom_skirt",
+                "top"
+              ]
+            }
+          }
+        ]
+      },
+      "baseline_output": {
+        "positive": "park bathroom, outdoor sex, outdoors flashing skirt, close-up, face shot filling frame, voyeur angle, stripped bare, full body naked, completely naked, fully bare skin, soft sunlight filtered through sheer curtains, gentle diffused indoor illumination, rope, face contorted in pain, sharp intake breath face, biting lip to endure, twin tails, pigtails tied high, thin streak of milky white fluid glistening, fine perspiration drops of semen dripping on stomach, best quality, detailed, photorealistic",
+        "negative": "low quality, worst quality, blurry, jpeg artifacts, watermark, deformed, bad anatomy, bad mouth, bad teeth, weird tongue, distorted lips, extra limbs, extra fingers, mutated hands, bad proportions, ugly, disfigured, cropped, out of frame",
+        "description": "场景: 公园/野外 | 主题: 放置/野外系列（JAV经典暴露主题） | 服装: 街头随性/日常T恤 | 裸露: L5 | 发型: 随机 (Random) | 体液: 🥛 颜射/精液残留 (Cum Splatter & Semen Residual)"
+      }
+    },
+    {
+      "id": "rc7_dining_normal",
+      "context": "dining",
+      "category": "normal",
+      "inputs": {
+        "预设模板": "无 (None)",
+        "风格配方": "无 (None)",
+        "场景大类": "餐饮娱乐",
+        "剧情主题": "女仆/制服系列",
+        "景别构图": "自动 (Auto)",
+        "拍摄视角": "自动 (Auto)",
+        "裸露等级": "L1 包裹暗示 (Fully Clothed / Suggestive)",
+        "服装款式": "女仆装 (Maid Dress)",
+        "服装状态": "整齐穿着 (Neat)",
+        "发型发色": "随机 (Random)",
+        "饰品头饰": "无 (None)",
+        "妆容细节": "无 (None)",
+        "姿势动作": "随机 (Random)",
+        "情绪表情": "随机 (Random)",
+        "光影预设": "自动 (Auto)",
+        "胶片风格": "无 (None)",
+        "液体效果": "无 (None)",
+        "纹身标记": "无 (None)",
+        "道具物件": "无 (None)",
+        "角色设定": "无 (None)",
+        "真实微瑕": "无 (None)",
+        "画质等级": "高清写真 (High)",
+        "prompt_seed": 1010
+      },
+      "oracle": {
+        "expected_context": "dining",
+        "expected_clothing": "女仆装 (Maid Dress)",
+        "expected_nudity": "L1",
+        "has_conflict": false,
+        "protected_explicit_tags": [
+          "izakaya back room",
+          "cabin attendant",
+          "everything covered",
+          "neat French maid dress",
+          "best quality",
+          "restaurant bathroom",
+          "policewoman",
+          "fabric hugging curves",
+          "crisp white apron",
+          "detailed",
+          "maid",
+          "clothed body",
+          "buttoned maid uniform",
+          "photorealistic"
+        ],
+        "allowed_drops": [],
+        "allowed_replaces": [],
+        "rc7_drop_count": 0,
+        "new_hard_conflict_evidence": []
+      },
+      "baseline_output": {
+        "positive": "karaoke room, family restaurant booth, elevator girl, hostess, medium shot, waist-up framing, high angle shot, body outline visible through fabric, everything covered, neat French maid dress, crisp white apron, buttoned maid uniform, short lighting, shadow toward camera, clean entry, eating something, eyes squeezed shut in pleasure, biting lip in pleasure, pleasure face, chin length bob, sleek modern bob, best quality, detailed, photorealistic",
+        "negative": "low quality, worst quality, blurry, jpeg artifacts, watermark, deformed, bad anatomy, bad mouth, bad teeth, weird tongue, distorted lips, extra limbs, extra fingers, mutated hands, bad proportions, ugly, disfigured, cropped, out of frame",
+        "description": "场景: 餐饮娱乐 | 主题: 女仆/制服系列 | 服装: 女仆装 (Maid Dress) | 裸露: L1 | 发型: 随机 (Random)"
+      }
+    },
+    {
+      "id": "rc7_dining_conflict",
+      "context": "dining",
+      "category": "conflict",
+      "inputs": {
+        "预设模板": "无 (None)",
+        "风格配方": "无 (None)",
+        "场景大类": "餐饮娱乐",
+        "剧情主题": "女仆/制服系列",
+        "景别构图": "近景 CU (面部表情/眼神)",
+        "拍摄视角": "自动 (Auto)",
+        "裸露等级": "L5 极致全裸 (Full Nude)",
+        "服装款式": "女仆装 (Maid Dress)",
+        "服装状态": "整齐穿着 (Normal Wearing)",
+        "发型发色": "随机 (Random)",
+        "饰品头饰": "无 (None)",
+        "妆容细节": "无 (None)",
+        "姿势动作": "🧎 跪姿系列",
+        "情绪表情": "😖 痛苦/折磨（SM·凌辱专用）",
+        "光影预设": "自动 (Auto)",
+        "胶片风格": "无 (None)",
+        "液体效果": "🥛 颜射/精液残留 (Cum Splatter & Semen Residual)",
+        "纹身标记": "无 (None)",
+        "道具物件": "无 (None)",
+        "角色设定": "无 (None)",
+        "真实微瑕": "无 (None)",
+        "画质等级": "高清写真 (High)",
+        "prompt_seed": 6010
+      },
+      "oracle": {
+        "expected_context": "dining",
+        "conflict_type": "nudity_clothing_or_shot_anatomy",
+        "has_conflict": true,
+        "protected_explicit_tags": [
+          "izakaya back room",
+          "waitress",
+          "close-up",
+          "fully nude",
+          "knees together",
+          "furrowed brows",
+          "traces of white cum on skin",
+          "best quality",
+          "snack bar",
+          "cat ears",
+          "face shot filling frame",
+          "naked",
+          "kneeling",
+          "suffering face",
+          "drops of semen dripping on stomach",
+          "detailed",
+          "photorealistic"
+        ],
+        "allowed_drops": [
+          {
+            "rule_id": "nudity_clothing_conflicts",
+            "reason_code": "nudity_removes_clothing",
+            "before_text": "completely naked",
+            "target_atom_id": "atom_d92a410f6c977d655ba0788c",
+            "winner_atom_ids": [
+              "atom_3631ce56a911849ee7700070"
+            ]
+          },
+          {
+            "rule_id": "nudity_clothing_conflicts",
+            "reason_code": "nudity_removes_clothing",
+            "before_text": "maid dress and apron tossed aside on sofa",
+            "target_atom_id": "atom_34bb4c1abb3f20c025401446",
+            "winner_atom_ids": [
+              "atom_3631ce56a911849ee7700070"
+            ]
+          },
+          {
+            "rule_id": "nudity_clothing_conflicts",
+            "reason_code": "nudity_removes_clothing",
+            "before_text": "fully bare body",
+            "target_atom_id": "atom_db7890d060e029de55712b13",
+            "winner_atom_ids": [
+              "atom_3631ce56a911849ee7700070"
+            ]
+          }
+        ],
+        "allowed_replaces": [],
+        "rc7_drop_count": 0,
+        "new_hard_conflict_evidence": [
+          {
+            "rule_id": "nudity_clothing_conflicts",
+            "reason_code": "nudity_removes_clothing",
+            "physical_domain": "nudity_coverage",
+            "violated_invariant": "Worn garments or underwear cannot coexist with full body nudity",
+            "target_atom_id": "atom_d92a410f6c977d655ba0788c",
+            "winner_atom_ids": [
+              "atom_3631ce56a911849ee7700070"
+            ],
+            "winner_texts": [
+              "fully nude"
+            ],
+            "loser_text": "completely naked",
+            "before_text": "completely naked",
+            "after_text": null,
+            "winner_semantic_facts": {
+              "semantic_role": "selector",
+              "visible_regions": [
+                "full_body"
+              ]
+            },
+            "loser_semantic_facts": {
+              "semantic_role": "selector",
+              "garment_topologies": [
+                "one_piece"
+              ]
+            }
+          },
+          {
+            "rule_id": "nudity_clothing_conflicts",
+            "reason_code": "nudity_removes_clothing",
+            "physical_domain": "nudity_coverage",
+            "violated_invariant": "Worn garments or underwear cannot coexist with full body nudity",
+            "target_atom_id": "atom_34bb4c1abb3f20c025401446",
+            "winner_atom_ids": [
+              "atom_3631ce56a911849ee7700070"
+            ],
+            "winner_texts": [
+              "fully nude"
+            ],
+            "loser_text": "maid dress and apron tossed aside on sofa",
+            "before_text": "maid dress and apron tossed aside on sofa",
+            "after_text": null,
+            "winner_semantic_facts": {
+              "semantic_role": "selector",
+              "visible_regions": [
+                "full_body"
+              ]
+            },
+            "loser_semantic_facts": {
+              "semantic_role": "selector",
+              "garment_topologies": [
+                "one_piece"
+              ]
+            }
+          },
+          {
+            "rule_id": "nudity_clothing_conflicts",
+            "reason_code": "nudity_removes_clothing",
+            "physical_domain": "nudity_coverage",
+            "violated_invariant": "Worn garments or underwear cannot coexist with full body nudity",
+            "target_atom_id": "atom_db7890d060e029de55712b13",
+            "winner_atom_ids": [
+              "atom_3631ce56a911849ee7700070"
+            ],
+            "winner_texts": [
+              "fully nude"
+            ],
+            "loser_text": "fully bare body",
+            "before_text": "fully bare body",
+            "after_text": null,
+            "winner_semantic_facts": {
+              "semantic_role": "selector",
+              "visible_regions": [
+                "full_body"
+              ]
+            },
+            "loser_semantic_facts": {
+              "semantic_role": "selector",
+              "garment_topologies": [
+                "one_piece"
+              ]
+            }
+          }
+        ]
+      },
+      "baseline_output": {
+        "positive": "izakaya back room, kyabakura, hostess, cat ears, close-up, face shot filling frame, over the shoulder shot, full frontal nudity, no clothing at all, completely naked, maid dress and apron tossed aside on sofa, fully bare body, short lighting slimming face, narrow face lighting, leaning in, mouth open, suffering face, whimpering expression, pained yet aroused, messy bun, hair in a high bun, single drop of milky white fluid glistening, fine perspiration drops of semen dripping on stomach, best quality, detailed, photorealistic",
+        "negative": "low quality, worst quality, blurry, jpeg artifacts, watermark, deformed, bad anatomy, bad mouth, bad teeth, weird tongue, distorted lips, extra limbs, extra fingers, mutated hands, bad proportions, ugly, disfigured, cropped, out of frame",
+        "description": "场景: 餐饮娱乐 | 主题: 女仆/制服系列 | 服装: 女仆装 (Maid Dress) | 裸露: L5 | 发型: 随机 (Random) | 体液: 🥛 颜射/精液残留 (Cum Splatter & Semen Residual)"
+      }
+    },
+    {
+      "id": "rc7_adult_normal",
+      "context": "adult",
+      "category": "normal",
+      "inputs": {
+        "预设模板": "无 (None)",
+        "风格配方": "无 (None)",
+        "场景大类": "摄影棚",
+        "剧情主题": "人妻/出轨系列",
+        "景别构图": "自动 (Auto)",
+        "拍摄视角": "自动 (Auto)",
+        "裸露等级": "L1 包裹暗示 (Fully Clothed / Suggestive)",
+        "服装款式": "微型比基尼 (Micro Bikini)",
+        "服装状态": "整齐穿着 (Neat)",
+        "发型发色": "随机 (Random)",
+        "饰品头饰": "无 (None)",
+        "妆容细节": "无 (None)",
+        "姿势动作": "随机 (Random)",
+        "情绪表情": "随机 (Random)",
+        "光影预设": "自动 (Auto)",
+        "胶片风格": "无 (None)",
+        "液体效果": "无 (None)",
+        "纹身标记": "无 (None)",
+        "道具物件": "无 (None)",
+        "角色设定": "无 (None)",
+        "真实微瑕": "无 (None)",
+        "画质等级": "高清写真 (High)",
+        "prompt_seed": 1011
+      },
+      "oracle": {
+        "expected_context": "adult",
+        "expected_clothing": "微型比基尼 (Micro Bikini)",
+        "expected_nudity": "L1",
+        "has_conflict": false,
+        "protected_explicit_tags": [
+          "AV studio",
+          "cheating wife",
+          "body outline visible through fabric",
+          "fitted sporty swimwear",
+          "best quality",
+          "green screen studio",
+          "adultery",
+          "clothes clinging to body",
+          "full coverage rashguard",
+          "detailed",
+          "white backdrop studio",
+          "dressed",
+          "tight beachwear",
+          "photorealistic"
+        ],
+        "allowed_drops": [],
+        "allowed_replaces": [],
+        "rc7_drop_count": 0,
+        "new_hard_conflict_evidence": []
+      },
+      "baseline_output": {
+        "positive": "photo studio, white backdrop studio, clapperboard, apartment wife, forbidden desire, erotic close-up, point of view, clothed body, dressed, figure visible under clothes, fitted sporty swimwear, full coverage rashguard, tight beachwear, dramatic hard light, harsh sun, back arched, on hands and knees, hand to mouth in surprise, shocked expression, caught red-handed face, twin tails, pigtails tied high, best quality, detailed, photorealistic",
+        "negative": "low quality, worst quality, blurry, jpeg artifacts, watermark, deformed, bad anatomy, bad mouth, bad teeth, weird tongue, distorted lips, extra limbs, extra fingers, mutated hands, bad proportions, ugly, disfigured, cropped, out of frame",
+        "description": "场景: 摄影棚 | 主题: 人妻/出轨系列 | 服装: 微型比基尼 (Micro Bikini) | 裸露: L1 | 发型: 随机 (Random)"
+      }
+    },
+    {
+      "id": "rc7_adult_conflict",
+      "context": "adult",
+      "category": "conflict",
+      "inputs": {
+        "预设模板": "无 (None)",
+        "风格配方": "无 (None)",
+        "场景大类": "摄影棚",
+        "剧情主题": "人妻/出轨系列",
+        "景别构图": "近景 CU (面部表情/眼神)",
+        "拍摄视角": "自动 (Auto)",
+        "裸露等级": "L5 极致全裸 (Full Nude)",
+        "服装款式": "微型比基尼 (Micro Bikini)",
+        "服装状态": "整齐穿着 (Normal Wearing)",
+        "发型发色": "随机 (Random)",
+        "饰品头饰": "无 (None)",
+        "妆容细节": "无 (None)",
+        "姿势动作": "🧎 跪姿系列",
+        "情绪表情": "😖 痛苦/折磨（SM·凌辱专用）",
+        "光影预设": "自动 (Auto)",
+        "胶片风格": "无 (None)",
+        "液体效果": "🥛 颜射/精液残留 (Cum Splatter & Semen Residual)",
+        "纹身标记": "无 (None)",
+        "道具物件": "无 (None)",
+        "角色设定": "无 (None)",
+        "真实微瑕": "无 (None)",
+        "画质等级": "高清写真 (High)",
+        "prompt_seed": 6011
+      },
+      "oracle": {
+        "expected_context": "adult",
+        "conflict_type": "nudity_clothing_or_shot_anatomy",
+        "has_conflict": true,
+        "protected_explicit_tags": [
+          "AV studio",
+          "wedding ring still on",
+          "close-up",
+          "body fully exposed",
+          "thighs spread wide",
+          "wincing",
+          "traces of white cum on skin",
+          "best quality",
+          "monitor screen showing live feed",
+          "cheating wife",
+          "face shot filling frame",
+          "full body naked",
+          "hands gripping sheets",
+          "pained but enduring",
+          "drops of semen dripping on stomach",
+          "detailed",
+          "forbidden desire",
+          "completely unclothed",
+          "tears forming from pain",
+          "photorealistic"
+        ],
+        "allowed_drops": [
+          {
+            "rule_id": "nudity_clothing_conflicts",
+            "reason_code": "nudity_removes_underwear",
+            "before_text": "completely naked",
+            "target_atom_id": "atom_114149ff69b8ec4e857f1670",
+            "winner_atom_ids": [
+              "atom_2fe503b1cda7f56a049a250b"
+            ]
+          },
+          {
+            "rule_id": "nudity_clothing_conflicts",
+            "reason_code": "nudity_removes_underwear",
+            "before_text": "micro bikini discarded on beach towel",
+            "target_atom_id": "atom_46d67091aeac6422fe2d364c",
+            "winner_atom_ids": [
+              "atom_2fe503b1cda7f56a049a250b"
+            ]
+          },
+          {
+            "rule_id": "nudity_clothing_conflicts",
+            "reason_code": "nudity_removes_underwear",
+            "before_text": "fully bare sun-kissed skin",
+            "target_atom_id": "atom_96ab9e76b466c2ed3077d425",
+            "winner_atom_ids": [
+              "atom_2fe503b1cda7f56a049a250b"
+            ]
+          }
+        ],
+        "allowed_replaces": [],
+        "rc7_drop_count": 0,
+        "new_hard_conflict_evidence": [
+          {
+            "rule_id": "nudity_clothing_conflicts",
+            "reason_code": "nudity_removes_underwear",
+            "physical_domain": "nudity_coverage",
+            "violated_invariant": "Worn garments or underwear cannot coexist with full body nudity",
+            "target_atom_id": "atom_114149ff69b8ec4e857f1670",
+            "winner_atom_ids": [
+              "atom_2fe503b1cda7f56a049a250b"
+            ],
+            "winner_texts": [
+              "body fully exposed"
+            ],
+            "loser_text": "completely naked",
+            "before_text": "completely naked",
+            "after_text": null,
+            "winner_semantic_facts": {
+              "semantic_role": "selector",
+              "visible_regions": [
+                "full_body"
+              ]
+            },
+            "loser_semantic_facts": {
+              "semantic_role": "selector",
+              "garment_topologies": [
+                "underwear"
+              ]
+            }
+          },
+          {
+            "rule_id": "nudity_clothing_conflicts",
+            "reason_code": "nudity_removes_underwear",
+            "physical_domain": "nudity_coverage",
+            "violated_invariant": "Worn garments or underwear cannot coexist with full body nudity",
+            "target_atom_id": "atom_46d67091aeac6422fe2d364c",
+            "winner_atom_ids": [
+              "atom_2fe503b1cda7f56a049a250b"
+            ],
+            "winner_texts": [
+              "body fully exposed"
+            ],
+            "loser_text": "micro bikini discarded on beach towel",
+            "before_text": "micro bikini discarded on beach towel",
+            "after_text": null,
+            "winner_semantic_facts": {
+              "semantic_role": "selector",
+              "visible_regions": [
+                "full_body"
+              ]
+            },
+            "loser_semantic_facts": {
+              "semantic_role": "selector",
+              "garment_topologies": [
+                "underwear"
+              ]
+            }
+          },
+          {
+            "rule_id": "nudity_clothing_conflicts",
+            "reason_code": "nudity_removes_underwear",
+            "physical_domain": "nudity_coverage",
+            "violated_invariant": "Worn garments or underwear cannot coexist with full body nudity",
+            "target_atom_id": "atom_96ab9e76b466c2ed3077d425",
+            "winner_atom_ids": [
+              "atom_2fe503b1cda7f56a049a250b"
+            ],
+            "winner_texts": [
+              "body fully exposed"
+            ],
+            "loser_text": "fully bare sun-kissed skin",
+            "before_text": "fully bare sun-kissed skin",
+            "after_text": null,
+            "winner_semantic_facts": {
+              "semantic_role": "selector",
+              "visible_regions": [
+                "full_body"
+              ]
+            },
+            "loser_semantic_facts": {
+              "semantic_role": "selector",
+              "garment_topologies": [
+                "underwear"
+              ]
+            }
+          }
+        ]
+      },
+      "baseline_output": {
+        "positive": "photo studio, clapperboard, wedding ring still on, part-time job affair, apartment wife, close-up, face shot filling frame, between legs angle, naked, every inch of skin visible, completely naked, micro bikini discarded on beach towel, fully bare sun-kissed skin, open bright body study, lit side to camera, kneeling between legs, biting lip to endure, pained expression, strand of hair between parted lips, biting hair sensually, single drop of milky white fluid glistening, single drop of drops of semen dripping on stomach, best quality, detailed, photorealistic",
+        "negative": "low quality, worst quality, blurry, jpeg artifacts, watermark, deformed, bad anatomy, bad mouth, bad teeth, weird tongue, distorted lips, extra limbs, extra fingers, mutated hands, bad proportions, ugly, disfigured, cropped, out of frame",
+        "description": "场景: 摄影棚 | 主题: 人妻/出轨系列 | 服装: 微型比基尼 (Micro Bikini) | 裸露: L5 | 发型: 随机 (Random) | 体液: 🥛 颜射/精液残留 (Cum Splatter & Semen Residual)"
+      }
+    },
+    {
+      "id": "rc7_special_normal",
+      "context": "special",
+      "category": "normal",
+      "inputs": {
+        "预设模板": "无 (None)",
+        "风格配方": "无 (None)",
+        "场景大类": "监禁",
+        "剧情主题": "特殊状态系列",
+        "景别构图": "自动 (Auto)",
+        "拍摄视角": "自动 (Auto)",
+        "裸露等级": "L1 包裹暗示 (Fully Clothed / Suggestive)",
+        "服装款式": "乳胶紧身衣 (Latex Catsuit)",
+        "服装状态": "整齐穿着 (Neat)",
+        "发型发色": "随机 (Random)",
+        "饰品头饰": "无 (None)",
+        "妆容细节": "无 (None)",
+        "姿势动作": "随机 (Random)",
+        "情绪表情": "随机 (Random)",
+        "光影预设": "自动 (Auto)",
+        "胶片风格": "无 (None)",
+        "液体效果": "无 (None)",
+        "纹身标记": "无 (None)",
+        "道具物件": "无 (None)",
+        "角色设定": "无 (None)",
+        "真实微瑕": "无 (None)",
+        "画质等级": "高清写真 (High)",
+        "prompt_seed": 1012
+      },
+      "oracle": {
+        "expected_context": "special",
+        "expected_clothing": "乳胶紧身衣 (Latex Catsuit)",
+        "expected_nudity": "L1",
+        "has_conflict": false,
+        "protected_explicit_tags": [
+          "warehouse",
+          "hypnotized",
+          "nothing exposed",
+          "glossy black latex catsuit",
+          "best quality",
+          "soundproof room",
+          "invisible man",
+          "form-fitting clothes",
+          "fully zipped bodysuit",
+          "detailed",
+          "form-fitting rubber suit",
+          "photorealistic"
+        ],
+        "allowed_drops": [],
+        "allowed_replaces": [],
+        "rc7_drop_count": 0,
+        "new_hard_conflict_evidence": []
+      },
+      "baseline_output": {
+        "positive": "basement room, soundproof room, mind break, after sex, drunk girl, medium close-up, chest-up shot, worm eye view, clothes clinging to body, fabric hugging curves, modest outfit, glossy black latex catsuit, fully zipped bodysuit, form-fitting rubber suit, body half-lit, face split by shadow, mid-thrust, flat expression, emotionally detached, twin tails, pigtails tied high, best quality, detailed, photorealistic",
+        "negative": "low quality, worst quality, blurry, jpeg artifacts, watermark, deformed, bad anatomy, bad mouth, bad teeth, weird tongue, distorted lips, extra limbs, extra fingers, mutated hands, bad proportions, ugly, disfigured, cropped, out of frame",
+        "description": "场景: 监禁 | 主题: 特殊状态系列 | 服装: 乳胶紧身衣 (Latex Catsuit) | 裸露: L1 | 发型: 随机 (Random)"
+      }
+    },
+    {
+      "id": "rc7_special_conflict",
+      "context": "special",
+      "category": "conflict",
+      "inputs": {
+        "预设模板": "无 (None)",
+        "风格配方": "无 (None)",
+        "场景大类": "监禁",
+        "剧情主题": "特殊状态系列",
+        "景别构图": "近景 CU (面部表情/眼神)",
+        "拍摄视角": "自动 (Auto)",
+        "裸露等级": "L2 差分微露 (Partially Exposed)",
+        "服装款式": "乳胶紧身衣 (Latex Catsuit)",
+        "服装状态": "裙摆掀起 (Skirt Lifted Up)",
+        "发型发色": "随机 (Random)",
+        "饰品头饰": "无 (None)",
+        "妆容细节": "无 (None)",
+        "姿势动作": "🧎 跪姿系列",
+        "情绪表情": "😖 痛苦/折磨（SM·凌辱专用）",
+        "光影预设": "自动 (Auto)",
+        "胶片风格": "无 (None)",
+        "液体效果": "🥛 颜射/精液残留 (Cum Splatter & Semen Residual)",
+        "纹身标记": "无 (None)",
+        "道具物件": "无 (None)",
+        "角色设定": "无 (None)",
+        "真实微瑕": "无 (None)",
+        "画质等级": "高清写真 (High)",
+        "prompt_seed": 6012
+      },
+      "oracle": {
+        "expected_context": "special",
+        "conflict_type": "nudity_clothing_or_shot_anatomy",
+        "has_conflict": true,
+        "protected_explicit_tags": [
+          "locked room",
+          "used goods",
+          "close-up",
+          "backless dress showing spine",
+          "glossy black latex catsuit",
+          "thighs spread wide",
+          "pained but enduring",
+          "drops of semen dripping on stomach",
+          "best quality",
+          "secret room",
+          "knocked up",
+          "face shot filling frame",
+          "low neckline revealing upper chest",
+          "form-fitting rubber suit",
+          "sharp intake breath face",
+          "milky white fluid glistening",
+          "detailed",
+          "aphrodisiac",
+          "photorealistic"
+        ],
+        "allowed_drops": [
+          {
+            "rule_id": "framing_lower_body_coherence",
+            "reason_code": "close_up_removes_lower_body",
+            "before_text": "dress hitched up",
+            "target_atom_id": "atom_706f2624ada6c555b50d274a",
+            "winner_atom_ids": [
+              "atom_0486afa88fe59a67d34b5528"
+            ]
+          },
+          {
+            "rule_id": "framing_lower_body_coherence",
+            "reason_code": "close_up_removes_lower_body",
+            "before_text": "skirt pulled up revealing panties",
+            "target_atom_id": "atom_65ae283bdd1af913fb46f775",
+            "winner_atom_ids": [
+              "atom_0486afa88fe59a67d34b5528"
+            ]
+          }
+        ],
+        "allowed_replaces": [],
+        "rc7_drop_count": 0,
+        "new_hard_conflict_evidence": [
+          {
+            "rule_id": "framing_lower_body_coherence",
+            "reason_code": "close_up_removes_lower_body",
+            "physical_domain": "framing_composition",
+            "violated_invariant": "Lower body garments and states cannot be visible in close-up face framing",
+            "target_atom_id": "atom_706f2624ada6c555b50d274a",
+            "winner_atom_ids": [
+              "atom_0486afa88fe59a67d34b5528"
+            ],
+            "winner_texts": [
+              "close-up"
+            ],
+            "loser_text": "dress hitched up",
+            "before_text": "dress hitched up",
+            "after_text": null,
+            "winner_semantic_facts": {
+              "semantic_role": "selector",
+              "visible_regions": [
+                "face"
+              ]
+            },
+            "loser_semantic_facts": {
+              "semantic_role": "selector",
+              "visible_regions": [
+                "lower_body",
+                "upper_body"
+              ],
+              "garment_states": [
+                "lifted"
+              ]
+            }
+          },
+          {
+            "rule_id": "framing_lower_body_coherence",
+            "reason_code": "close_up_removes_lower_body",
+            "physical_domain": "framing_composition",
+            "violated_invariant": "Lower body garments and states cannot be visible in close-up face framing",
+            "target_atom_id": "atom_65ae283bdd1af913fb46f775",
+            "winner_atom_ids": [
+              "atom_0486afa88fe59a67d34b5528"
+            ],
+            "winner_texts": [
+              "close-up"
+            ],
+            "loser_text": "skirt pulled up revealing panties",
+            "before_text": "skirt pulled up revealing panties",
+            "after_text": null,
+            "winner_semantic_facts": {
+              "semantic_role": "selector",
+              "visible_regions": [
+                "face"
+              ]
+            },
+            "loser_semantic_facts": {
+              "semantic_role": "selector",
+              "visible_regions": [
+                "lower_body",
+                "upper_body"
+              ],
+              "garment_states": [
+                "lifted"
+              ]
+            }
+          }
+        ]
+      },
+      "baseline_output": {
+        "positive": "warehouse, sealed room, pregnant, sloppy seconds, close-up, face shot filling frame, voyeur angle, skirt slit revealing thigh, cleavage visible through collar, form-fitting rubber suit, zipper down front, Old Master light, Rembrandt light on face, knees together, suffering face, face contorted in pain, long hair draped over bare chest, strands partially covering breasts, few drops of milky white fluid glistening, single drop of drops of semen dripping on stomach, best quality, detailed, photorealistic",
+        "negative": "low quality, worst quality, blurry, jpeg artifacts, watermark, deformed, bad anatomy, bad mouth, bad teeth, weird tongue, distorted lips, extra limbs, extra fingers, mutated hands, bad proportions, ugly, disfigured, cropped, out of frame",
+        "description": "场景: 监禁 | 主题: 特殊状态系列 | 服装: 乳胶紧身衣 (Latex Catsuit) | 裸露: L2 | 发型: 随机 (Random) | 体液: 🥛 颜射/精液残留 (Cum Splatter & Semen Residual)"
+      }
+    },
+    {
+      "id": "rc7_generic_normal",
+      "context": "generic",
+      "category": "normal",
+      "inputs": {
+        "预设模板": "无 (None)",
+        "风格配方": "无 (None)",
+        "场景大类": "便利店/超市",
+        "剧情主题": "素人/女友系列",
+        "景别构图": "自动 (Auto)",
+        "拍摄视角": "自动 (Auto)",
+        "裸露等级": "L1 包裹暗示 (Fully Clothed / Suggestive)",
+        "服装款式": "街头随性/日常T恤",
+        "服装状态": "整齐穿着 (Neat)",
+        "发型发色": "随机 (Random)",
+        "饰品头饰": "无 (None)",
+        "妆容细节": "无 (None)",
+        "姿势动作": "随机 (Random)",
+        "情绪表情": "随机 (Random)",
+        "光影预设": "自动 (Auto)",
+        "胶片风格": "无 (None)",
+        "液体效果": "无 (None)",
+        "纹身标记": "无 (None)",
+        "道具物件": "无 (None)",
+        "角色设定": "无 (None)",
+        "真实微瑕": "无 (None)",
+        "画质等级": "高清写真 (High)",
+        "prompt_seed": 1013
+      },
+      "oracle": {
+        "expected_context": "generic",
+        "expected_clothing": "街头随性/日常T恤",
+        "expected_nudity": "L1",
+        "has_conflict": false,
+        "protected_explicit_tags": [
+          "convenience store back room",
+          "online date",
+          "body outline visible through fabric",
+          "fitted graphic t-shirt",
+          "best quality",
+          "supermarket stockroom",
+          "innocent turned wild",
+          "fabric hugging curves",
+          "denim pants",
+          "detailed",
+          "casual neat outfit",
+          "photorealistic"
+        ],
+        "allowed_drops": [],
+        "allowed_replaces": [],
+        "rc7_drop_count": 0,
+        "new_hard_conflict_evidence": []
+      },
+      "baseline_output": {
+        "positive": "konbini, supermarket stockroom, store at night, girlfriend experience, amateur girl, medium shot, waist-up framing, overhead top-down shot, fully clothed, nothing exposed, form-fitting clothes, fitted graphic t-shirt, denim pants, casual neat outfit, Caravaggio-style lighting, shadow triangle under eye, presenting ass, bright smile, laughing, high ponytail, hair pulled up tight, best quality, detailed, photorealistic",
+        "negative": "low quality, worst quality, blurry, jpeg artifacts, watermark, deformed, bad anatomy, bad mouth, bad teeth, weird tongue, distorted lips, extra limbs, extra fingers, mutated hands, bad proportions, ugly, disfigured, cropped, out of frame",
+        "description": "场景: 便利店/超市 | 主题: 素人/女友系列 | 服装: 街头随性/日常T恤 | 裸露: L1 | 发型: 随机 (Random)"
+      }
+    },
+    {
+      "id": "rc7_generic_conflict",
+      "context": "generic",
+      "category": "conflict",
+      "inputs": {
+        "预设模板": "无 (None)",
+        "风格配方": "无 (None)",
+        "场景大类": "便利店/超市",
+        "剧情主题": "素人/女友系列",
+        "景别构图": "近景 CU (面部表情/眼神)",
+        "拍摄视角": "自动 (Auto)",
+        "裸露等级": "L5 极致全裸 (Full Nude)",
+        "服装款式": "街头随性/日常T恤",
+        "服装状态": "整齐穿着 (Normal Wearing)",
+        "发型发色": "随机 (Random)",
+        "饰品头饰": "无 (None)",
+        "妆容细节": "无 (None)",
+        "姿势动作": "🧎 跪姿系列",
+        "情绪表情": "😖 痛苦/折磨（SM·凌辱专用）",
+        "光影预设": "自动 (Auto)",
+        "胶片风格": "无 (None)",
+        "液体效果": "🥛 颜射/精液残留 (Cum Splatter & Semen Residual)",
+        "纹身标记": "无 (None)",
+        "道具物件": "无 (None)",
+        "角色设定": "无 (None)",
+        "真实微瑕": "无 (None)",
+        "画质等级": "高清写真 (High)",
+        "prompt_seed": 6013
+      },
+      "oracle": {
+        "expected_context": "generic",
+        "conflict_type": "nudity_clothing_or_shot_anatomy",
+        "has_conflict": true,
+        "protected_explicit_tags": [
+          "convenience store",
+          "everyday girl",
+          "close-up",
+          "fully nude",
+          "palms up on thighs",
+          "face contorted in pain",
+          "traces of white cum on skin",
+          "best quality",
+          "supermarket stockroom",
+          "matching app girl",
+          "face shot filling frame",
+          "naked",
+          "hands behind back",
+          "tears forming from pain",
+          "drops of semen dripping on stomach",
+          "detailed",
+          "store at night",
+          "biting lip to endure",
+          "photorealistic"
+        ],
+        "allowed_drops": [
+          {
+            "rule_id": "nudity_clothing_conflicts",
+            "reason_code": "nudity_removes_clothing",
+            "before_text": "completely naked",
+            "target_atom_id": "atom_c54fe9a0a508b5921114e60d",
+            "winner_atom_ids": [
+              "atom_3631ce56a911849ee7700070"
+            ]
+          },
+          {
+            "rule_id": "nudity_clothing_conflicts",
+            "reason_code": "nudity_removes_clothing",
+            "before_text": "clothes scattered on bedroom floor",
+            "target_atom_id": "atom_530a292ca43d21637ed62504",
+            "winner_atom_ids": [
+              "atom_3631ce56a911849ee7700070"
+            ]
+          },
+          {
+            "rule_id": "nudity_clothing_conflicts",
+            "reason_code": "nudity_removes_clothing",
+            "before_text": "fully bare skin",
+            "target_atom_id": "atom_f6e14d35232af27246172a1c",
+            "winner_atom_ids": [
+              "atom_3631ce56a911849ee7700070"
+            ]
+          }
+        ],
+        "allowed_replaces": [],
+        "rc7_drop_count": 0,
+        "new_hard_conflict_evidence": [
+          {
+            "rule_id": "nudity_clothing_conflicts",
+            "reason_code": "nudity_removes_clothing",
+            "physical_domain": "nudity_coverage",
+            "violated_invariant": "Worn garments or underwear cannot coexist with full body nudity",
+            "target_atom_id": "atom_c54fe9a0a508b5921114e60d",
+            "winner_atom_ids": [
+              "atom_3631ce56a911849ee7700070"
+            ],
+            "winner_texts": [
+              "fully nude"
+            ],
+            "loser_text": "completely naked",
+            "before_text": "completely naked",
+            "after_text": null,
+            "winner_semantic_facts": {
+              "semantic_role": "selector",
+              "visible_regions": [
+                "full_body"
+              ]
+            },
+            "loser_semantic_facts": {
+              "semantic_role": "selector",
+              "garment_topologies": [
+                "bottom_skirt",
+                "top"
+              ]
+            }
+          },
+          {
+            "rule_id": "nudity_clothing_conflicts",
+            "reason_code": "nudity_removes_clothing",
+            "physical_domain": "nudity_coverage",
+            "violated_invariant": "Worn garments or underwear cannot coexist with full body nudity",
+            "target_atom_id": "atom_530a292ca43d21637ed62504",
+            "winner_atom_ids": [
+              "atom_3631ce56a911849ee7700070"
+            ],
+            "winner_texts": [
+              "fully nude"
+            ],
+            "loser_text": "clothes scattered on bedroom floor",
+            "before_text": "clothes scattered on bedroom floor",
+            "after_text": null,
+            "winner_semantic_facts": {
+              "semantic_role": "selector",
+              "visible_regions": [
+                "full_body"
+              ]
+            },
+            "loser_semantic_facts": {
+              "semantic_role": "selector",
+              "garment_topologies": [
+                "bottom_skirt",
+                "top"
+              ]
+            }
+          },
+          {
+            "rule_id": "nudity_clothing_conflicts",
+            "reason_code": "nudity_removes_clothing",
+            "physical_domain": "nudity_coverage",
+            "violated_invariant": "Worn garments or underwear cannot coexist with full body nudity",
+            "target_atom_id": "atom_f6e14d35232af27246172a1c",
+            "winner_atom_ids": [
+              "atom_3631ce56a911849ee7700070"
+            ],
+            "winner_texts": [
+              "fully nude"
+            ],
+            "loser_text": "fully bare skin",
+            "before_text": "fully bare skin",
+            "after_text": null,
+            "winner_semantic_facts": {
+              "semantic_role": "selector",
+              "visible_regions": [
+                "full_body"
+              ]
+            },
+            "loser_semantic_facts": {
+              "semantic_role": "selector",
+              "garment_topologies": [
+                "bottom_skirt",
+                "top"
+              ]
+            }
+          }
+        ]
+      },
+      "baseline_output": {
+        "positive": "convenience store back room, store bathroom, girlfriend experience, no makeup shy, innocent turned wild, close-up, face shot filling frame, worm eye view, unclothed, naked, birthday suit, completely naked, clothes scattered on bedroom floor, fully bare skin, face turned toward light, broad lighting, deep bow, eyes closed, face contorted in pain, wincing, collarbone length hair, soft layered lob, few drops of traces of white cum on skin, single drop of milky white fluid glistening, best quality, detailed, photorealistic",
+        "negative": "low quality, worst quality, blurry, jpeg artifacts, watermark, deformed, bad anatomy, bad mouth, bad teeth, weird tongue, distorted lips, extra limbs, extra fingers, mutated hands, bad proportions, ugly, disfigured, cropped, out of frame",
+        "description": "场景: 便利店/超市 | 主题: 素人/女友系列 | 服装: 街头随性/日常T恤 | 裸露: L5 | 发型: 随机 (Random) | 体液: 🥛 颜射/精液残留 (Cum Splatter & Semen Residual)"
+      }
+    }
+  ],
+  "content_sha256": "779aca4d52238cabd9eaa8d4f5411654a8b01bb19f3519cff60eff7cc9541783"
+}

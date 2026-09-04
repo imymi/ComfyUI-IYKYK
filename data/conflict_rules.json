@@ -776,6 +776,777 @@
             }
           ]
         }
+      },
+      "phase": "anchors",
+      "priority": 110,
+      "depends_on": [],
+      "reason_codes": [
+        "nudity_removes_clothing",
+        "nudity_removes_underwear"
+      ],
+      "semantic_constraints": {
+        "domain": "nudity_clothing",
+        "winner": "nudity_level",
+        "loser": "clothing_coverage",
+        "target_slots": [
+          "nudity",
+          "clothing",
+          "underwear"
+        ],
+        "fact_fields": [
+          "visible_regions",
+          "garment_topologies",
+          "garment_states"
+        ]
+      },
+      "text_fallback": {
+        "strategy": "pattern_match",
+        "enabled": true,
+        "target_slots": [
+          "nudity",
+          "clothing",
+          "underwear"
+        ],
+        "patterns": [
+          {
+            "pattern": "pussy visible",
+            "match_mode": "phrase",
+            "role": "trigger",
+            "group_id": "conflict_0"
+          },
+          {
+            "pattern": "exposed vagina",
+            "match_mode": "phrase",
+            "role": "trigger",
+            "group_id": "conflict_0"
+          },
+          {
+            "pattern": "spread pussy",
+            "match_mode": "phrase",
+            "role": "trigger",
+            "group_id": "conflict_0"
+          },
+          {
+            "pattern": "bare pussy",
+            "match_mode": "phrase",
+            "role": "trigger",
+            "group_id": "conflict_0"
+          },
+          {
+            "pattern": "panties showing",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "conflict_0"
+          },
+          {
+            "pattern": "visible panties",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "conflict_0"
+          },
+          {
+            "pattern": "wearing panties",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "conflict_0"
+          },
+          {
+            "pattern": "wearing underwear",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "conflict_0"
+          },
+          {
+            "pattern": "lace panties on",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "conflict_0"
+          },
+          {
+            "pattern": "topless",
+            "match_mode": "word",
+            "role": "trigger",
+            "group_id": "conflict_1"
+          },
+          {
+            "pattern": "bare breasts",
+            "match_mode": "phrase",
+            "role": "trigger",
+            "group_id": "conflict_1"
+          },
+          {
+            "pattern": "exposed breasts",
+            "match_mode": "phrase",
+            "role": "trigger",
+            "group_id": "conflict_1"
+          },
+          {
+            "pattern": "uncovered breasts",
+            "match_mode": "phrase",
+            "role": "trigger",
+            "group_id": "conflict_1"
+          },
+          {
+            "pattern": "wearing bra",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "conflict_1"
+          },
+          {
+            "pattern": "bra on",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "conflict_1"
+          },
+          {
+            "pattern": "wearing blouse",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "conflict_1"
+          },
+          {
+            "pattern": "wearing shirt",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "conflict_1"
+          },
+          {
+            "pattern": "completely naked",
+            "match_mode": "phrase",
+            "role": "trigger",
+            "group_id": "conflict_2"
+          },
+          {
+            "pattern": "full nude",
+            "match_mode": "phrase",
+            "role": "trigger",
+            "group_id": "conflict_2"
+          },
+          {
+            "pattern": "bare body",
+            "match_mode": "phrase",
+            "role": "trigger",
+            "group_id": "conflict_2"
+          },
+          {
+            "pattern": "no clothes",
+            "match_mode": "phrase",
+            "role": "trigger",
+            "group_id": "conflict_2"
+          },
+          {
+            "pattern": "wearing blazer",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "conflict_2"
+          },
+          {
+            "pattern": "wearing skirt",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "conflict_2"
+          },
+          {
+            "pattern": "wearing uniform",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "conflict_2"
+          },
+          {
+            "pattern": "wearing dress",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "conflict_2"
+          },
+          {
+            "pattern": "wearing sweater",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "conflict_2"
+          },
+          {
+            "pattern": "no panties",
+            "match_mode": "phrase",
+            "role": "trigger",
+            "group_id": "conflict_3"
+          },
+          {
+            "pattern": "cameltoe",
+            "match_mode": "word",
+            "role": "banned",
+            "group_id": "conflict_3"
+          },
+          {
+            "pattern": "skirt pulled up",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "L1"
+          },
+          {
+            "pattern": "skirt hiked up",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "L1"
+          },
+          {
+            "pattern": "skirt lifted",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "L1"
+          },
+          {
+            "pattern": "skirt riding up",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "L1"
+          },
+          {
+            "pattern": "dress hitched up",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "L1"
+          },
+          {
+            "pattern": "dress pulled up",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "L1"
+          },
+          {
+            "pattern": "revealing panties",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "L1"
+          },
+          {
+            "pattern": "showing panties",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "L1"
+          },
+          {
+            "pattern": "panties visible",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "L1"
+          },
+          {
+            "pattern": "panties pulled",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "L1"
+          },
+          {
+            "pattern": "pulling panties",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "L1"
+          },
+          {
+            "pattern": "upskirt",
+            "match_mode": "word",
+            "role": "banned",
+            "group_id": "L1"
+          },
+          {
+            "pattern": "flashing skirt",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "L1"
+          },
+          {
+            "pattern": "stepping out of skirt",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "L1"
+          },
+          {
+            "pattern": "skirt pooled at feet",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "L1"
+          },
+          {
+            "pattern": "lifting skirt",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "L1"
+          },
+          {
+            "pattern": "panties only",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "L2"
+          },
+          {
+            "pattern": "only panties",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "L2"
+          },
+          {
+            "pattern": "only lace panties",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "L1"
+          },
+          {
+            "pattern": "only underwear",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "L1"
+          },
+          {
+            "pattern": "bra visible",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "L1"
+          },
+          {
+            "pattern": "bra slipping",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "L1"
+          },
+          {
+            "pattern": "bra removed",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "L2"
+          },
+          {
+            "pattern": "bra pushed up",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "L1"
+          },
+          {
+            "pattern": "bra pulled down",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "L1"
+          },
+          {
+            "pattern": "adjusting bra",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "L1"
+          },
+          {
+            "pattern": "unclasped bra",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "L1"
+          },
+          {
+            "pattern": "lace bra",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "L1"
+          },
+          {
+            "pattern": "thong",
+            "match_mode": "word",
+            "role": "banned",
+            "group_id": "L1"
+          },
+          {
+            "pattern": "bare chest",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "L1"
+          },
+          {
+            "pattern": "breasts bare",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "L2"
+          },
+          {
+            "pattern": "chest exposed",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "L1"
+          },
+          {
+            "pattern": "cleavage",
+            "match_mode": "word",
+            "role": "banned",
+            "group_id": "L1"
+          },
+          {
+            "pattern": "underboob",
+            "match_mode": "word",
+            "role": "banned",
+            "group_id": "L1"
+          },
+          {
+            "pattern": "sideboob",
+            "match_mode": "word",
+            "role": "banned",
+            "group_id": "L1"
+          },
+          {
+            "pattern": "nipple",
+            "match_mode": "word",
+            "role": "banned",
+            "group_id": "L1"
+          },
+          {
+            "pattern": "pussy",
+            "match_mode": "word",
+            "role": "banned",
+            "group_id": "L2"
+          },
+          {
+            "pattern": "vagina",
+            "match_mode": "word",
+            "role": "banned",
+            "group_id": "L2"
+          },
+          {
+            "pattern": "genitals",
+            "match_mode": "word",
+            "role": "banned",
+            "group_id": "L1"
+          },
+          {
+            "pattern": "labia",
+            "match_mode": "word",
+            "role": "banned",
+            "group_id": "L2"
+          },
+          {
+            "pattern": "crotch close-up",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "L1"
+          },
+          {
+            "pattern": "spread legs",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "L2"
+          },
+          {
+            "pattern": "spreading labia",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "L4"
+          },
+          {
+            "pattern": "thighs spread",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "L1"
+          },
+          {
+            "pattern": "thighs bare",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "L1"
+          },
+          {
+            "pattern": "cock sliding",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "L2"
+          },
+          {
+            "pattern": "penetrated",
+            "match_mode": "word",
+            "role": "banned",
+            "group_id": "L2"
+          },
+          {
+            "pattern": "face-fucked",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "L1"
+          },
+          {
+            "pattern": "cum dripping down thigh",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "L1"
+          },
+          {
+            "pattern": "dripping on breasts",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "L1"
+          },
+          {
+            "pattern": "cupping breasts",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "L1"
+          },
+          {
+            "pattern": "hands on breasts",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "L1"
+          },
+          {
+            "pattern": "gripping breasts",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "L1"
+          },
+          {
+            "pattern": "breasts bouncing",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "L1"
+          },
+          {
+            "pattern": "nude",
+            "match_mode": "word",
+            "role": "banned",
+            "group_id": "L1"
+          },
+          {
+            "pattern": "naked",
+            "match_mode": "word",
+            "role": "banned",
+            "group_id": "L1"
+          },
+          {
+            "pattern": "fully nude",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "L2"
+          },
+          {
+            "pattern": "full frontal nudity",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "L3"
+          },
+          {
+            "pattern": "all clothes removed",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "L2"
+          },
+          {
+            "pattern": "stripped bare",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "L2"
+          },
+          {
+            "pattern": "unclothed",
+            "match_mode": "word",
+            "role": "banned",
+            "group_id": "L1"
+          },
+          {
+            "pattern": "birthday suit",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "L3"
+          },
+          {
+            "pattern": "nude photo",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "L1"
+          },
+          {
+            "pattern": "nude outline",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "L1"
+          },
+          {
+            "pattern": "nude silhouette",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "L1"
+          },
+          {
+            "pattern": "painterly nude",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "L1"
+          },
+          {
+            "pattern": "half-lit nude",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "L1"
+          },
+          {
+            "pattern": "high contrast nude",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "L1"
+          },
+          {
+            "pattern": "flattering nude lighting",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "L1"
+          },
+          {
+            "pattern": "angelic nude lighting",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "L1"
+          },
+          {
+            "pattern": "unbuttoned",
+            "match_mode": "word",
+            "role": "banned",
+            "group_id": "L1"
+          },
+          {
+            "pattern": "blouse open",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "L1"
+          },
+          {
+            "pattern": "shirt open",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "L1"
+          },
+          {
+            "pattern": "slipping off shoulder",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "L1"
+          },
+          {
+            "pattern": "dress slipping off",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "L1"
+          },
+          {
+            "pattern": "panties",
+            "match_mode": "word",
+            "role": "banned",
+            "group_id": "L1"
+          },
+          {
+            "pattern": "matching lace panties",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "L1"
+          },
+          {
+            "pattern": "underwear",
+            "match_mode": "word",
+            "role": "banned",
+            "group_id": "L1"
+          },
+          {
+            "pattern": "shirt open showing bare breasts",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "L2"
+          },
+          {
+            "pattern": "bra pushed up above breasts",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "L2"
+          },
+          {
+            "pattern": "skirt pulled up revealing panties",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "L2"
+          },
+          {
+            "pattern": "skirt hiked up to waist",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "L2"
+          },
+          {
+            "pattern": "pulling panties down",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "L2"
+          },
+          {
+            "pattern": "spread labia",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "L3"
+          },
+          {
+            "pattern": "vaginal opening",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "L3"
+          },
+          {
+            "pattern": "wearing coat",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "L4"
+          },
+          {
+            "pattern": "wearing jacket",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "L4"
+          },
+          {
+            "pattern": "fully clothed",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "L6"
+          },
+          {
+            "pattern": "neatly dressed",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "L6"
+          },
+          {
+            "pattern": "formal kimono",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "L4"
+          },
+          {
+            "pattern": "buttoned-up blouse",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "L4"
+          },
+          {
+            "pattern": "vaginal opening exposed",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "L4"
+          },
+          {
+            "pattern": "wearing pantyhose",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "L5"
+          },
+          {
+            "pattern": "crisp clothing",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "L5"
+          },
+          {
+            "pattern": "modest outfit",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "L6"
+          }
+        ]
       }
     },
     {
@@ -819,7 +1590,74 @@
       "target_provenance_kinds": [
         "base_clothing",
         "clothing_state"
-      ]
+      ],
+      "phase": "physical",
+      "priority": 230,
+      "depends_on": [
+        "clothing_style_state_coherence"
+      ],
+      "reason_codes": [
+        "material_penetration_removed",
+        "material_penetration_replaced"
+      ],
+      "semantic_constraints": {
+        "domain": "material_penetration",
+        "protect": "clothing_extension",
+        "target_slots": [
+          "clothing",
+          "clothing_state"
+        ],
+        "fact_fields": [
+          "garment_states",
+          "garment_topologies"
+        ]
+      },
+      "text_fallback": {
+        "strategy": "pattern_match",
+        "enabled": true,
+        "target_slots": [
+          "clothing",
+          "clothing_state"
+        ],
+        "patterns": [
+          {
+            "pattern": "sheer",
+            "match_mode": "word",
+            "role": "banned",
+            "group_id": "material"
+          },
+          {
+            "pattern": "see-through",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "material"
+          },
+          {
+            "pattern": "transparent fabric",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "material"
+          },
+          {
+            "pattern": "see through",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "material"
+          },
+          {
+            "pattern": "sheer fabric",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "material"
+          },
+          {
+            "pattern": "translucent dress",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "material"
+          }
+        ]
+      }
     },
     {
       "id": "gaze_angle_geometry",
@@ -906,7 +1744,141 @@
           ],
           "banned_gaze": []
         }
-      ]
+      ],
+      "phase": "semantic",
+      "priority": 300,
+      "depends_on": [
+        "framing_lower_body_coherence"
+      ],
+      "reason_codes": [
+        "camera_angle_removes_impossible_gaze"
+      ],
+      "semantic_constraints": {
+        "domain": "gaze_geometry",
+        "winner": "camera_angle",
+        "loser": "impossible_gaze",
+        "target_slots": [
+          "camera",
+          "camera_angle",
+          "angle",
+          "shot",
+          "view",
+          "expression"
+        ],
+        "fact_fields": [
+          "gaze"
+        ]
+      },
+      "text_fallback": {
+        "strategy": "pattern_match",
+        "enabled": true,
+        "target_slots": [
+          "camera",
+          "camera_angle",
+          "angle",
+          "shot",
+          "view",
+          "expression"
+        ],
+        "patterns": [
+          {
+            "pattern": "low angle",
+            "match_mode": "phrase",
+            "role": "angle",
+            "group_id": "low_angle"
+          },
+          {
+            "pattern": "from below",
+            "match_mode": "phrase",
+            "role": "angle",
+            "group_id": "low_angle"
+          },
+          {
+            "pattern": "worm eye view",
+            "match_mode": "phrase",
+            "role": "angle",
+            "group_id": "low_angle"
+          },
+          {
+            "pattern": "looking up from below",
+            "match_mode": "phrase",
+            "role": "angle",
+            "group_id": "low_angle"
+          },
+          {
+            "pattern": "looking up at camera",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "low_angle"
+          },
+          {
+            "pattern": "looking up",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "low_angle"
+          },
+          {
+            "pattern": "high angle",
+            "match_mode": "phrase",
+            "role": "angle",
+            "group_id": "high_angle"
+          },
+          {
+            "pattern": "from above",
+            "match_mode": "phrase",
+            "role": "angle",
+            "group_id": "high_angle"
+          },
+          {
+            "pattern": "overhead",
+            "match_mode": "word",
+            "role": "angle",
+            "group_id": "high_angle"
+          },
+          {
+            "pattern": "bird eye view",
+            "match_mode": "phrase",
+            "role": "angle",
+            "group_id": "high_angle"
+          },
+          {
+            "pattern": "top-down",
+            "match_mode": "phrase",
+            "role": "angle",
+            "group_id": "high_angle"
+          },
+          {
+            "pattern": "looking down at camera",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "high_angle"
+          },
+          {
+            "pattern": "looking down",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "high_angle"
+          },
+          {
+            "pattern": "point of view",
+            "match_mode": "phrase",
+            "role": "angle",
+            "group_id": "pov"
+          },
+          {
+            "pattern": "pov",
+            "match_mode": "word",
+            "role": "angle",
+            "group_id": "pov"
+          },
+          {
+            "pattern": "selfie",
+            "match_mode": "word",
+            "role": "angle",
+            "group_id": "pov"
+          }
+        ]
+      }
     },
     {
       "id": "gaze_mutual_exclusion",
@@ -942,7 +1914,73 @@
             "match_mode": "phrase"
           }
         ]
-      ]
+      ],
+      "phase": "semantic",
+      "priority": 330,
+      "depends_on": [
+        "gaze_angle_geometry",
+        "accessory_occlusion_gaze_coherence",
+        "emotion_gaze_affinity"
+      ],
+      "reason_codes": [
+        "gaze_mutual_exclusion_preserved_first"
+      ],
+      "semantic_constraints": {
+        "domain": "gaze_direction",
+        "winner": "first_gaze_action",
+        "loser": "conflicting_gaze_action",
+        "target_slots": [
+          "expression"
+        ],
+        "fact_fields": [
+          "gaze"
+        ]
+      },
+      "text_fallback": {
+        "strategy": "pattern_match",
+        "enabled": true,
+        "target_slots": [
+          "expression"
+        ],
+        "patterns": [
+          {
+            "pattern": "direct eye contact",
+            "match_mode": "phrase",
+            "role": "exclusive_a",
+            "group_id": "pair_0"
+          },
+          {
+            "pattern": "looking away",
+            "match_mode": "phrase",
+            "role": "exclusive_b",
+            "group_id": "pair_0"
+          },
+          {
+            "pattern": "looking at camera",
+            "match_mode": "phrase",
+            "role": "exclusive_a",
+            "group_id": "pair_1"
+          },
+          {
+            "pattern": "eyes averted",
+            "match_mode": "phrase",
+            "role": "exclusive_b",
+            "group_id": "pair_1"
+          },
+          {
+            "pattern": "locking eyes",
+            "match_mode": "phrase",
+            "role": "exclusive_a",
+            "group_id": "pair_2"
+          },
+          {
+            "pattern": "looking away shyly",
+            "match_mode": "phrase",
+            "role": "exclusive_b",
+            "group_id": "pair_2"
+          }
+        ]
+      }
     },
     {
       "id": "liquid_restrictions",
@@ -1025,7 +2063,116 @@
           ],
           "replace": "clear glistening moisture trail"
         }
-      ]
+      ],
+      "phase": "effects",
+      "priority": 400,
+      "depends_on": [
+        "nudity_clothing_conflicts"
+      ],
+      "reason_codes": [
+        "liquid_combo_replaced",
+        "liquid_quantifier_added"
+      ],
+      "semantic_constraints": {
+        "domain": "liquid_bounds",
+        "target_slots": [
+          "liquids",
+          "liquid"
+        ],
+        "fact_fields": [
+          "liquid_kind",
+          "liquid_locations",
+          "liquid_amount"
+        ]
+      },
+      "text_fallback": {
+        "strategy": "pattern_match",
+        "enabled": true,
+        "target_slots": [
+          "liquids",
+          "liquid"
+        ],
+        "patterns": [
+          {
+            "pattern": "cum",
+            "match_mode": "word",
+            "role": "liquid",
+            "group_id": "liquid_words"
+          },
+          {
+            "pattern": "semen",
+            "match_mode": "word",
+            "role": "liquid",
+            "group_id": "liquid_words"
+          },
+          {
+            "pattern": "saliva",
+            "match_mode": "word",
+            "role": "liquid",
+            "group_id": "liquid_words"
+          },
+          {
+            "pattern": "drool",
+            "match_mode": "word",
+            "role": "liquid",
+            "group_id": "liquid_words"
+          },
+          {
+            "pattern": "pussy juice",
+            "match_mode": "phrase",
+            "role": "liquid",
+            "group_id": "liquid_words"
+          },
+          {
+            "pattern": "breast milk",
+            "match_mode": "phrase",
+            "role": "liquid",
+            "group_id": "liquid_words"
+          },
+          {
+            "pattern": "fluid",
+            "match_mode": "word",
+            "role": "liquid",
+            "group_id": "liquid_words"
+          },
+          {
+            "pattern": "sweat",
+            "match_mode": "word",
+            "role": "liquid",
+            "group_id": "liquid_words"
+          },
+          {
+            "pattern": "cum on closed eyes",
+            "match_mode": "phrase",
+            "role": "trigger",
+            "group_id": "cum_eyes"
+          },
+          {
+            "pattern": "semen in eyes",
+            "match_mode": "phrase",
+            "role": "trigger",
+            "group_id": "cum_eyes"
+          },
+          {
+            "pattern": "pure white paint-like cum",
+            "match_mode": "phrase",
+            "role": "trigger",
+            "group_id": "opaque_paint"
+          },
+          {
+            "pattern": "thick opaque white paint",
+            "match_mode": "phrase",
+            "role": "trigger",
+            "group_id": "opaque_paint"
+          },
+          {
+            "pattern": "milky opaque pussy juice",
+            "match_mode": "phrase",
+            "role": "trigger",
+            "group_id": "pussy_juice"
+          }
+        ]
+      }
     },
     {
       "id": "device_quality_compatibility",
@@ -1187,7 +2334,210 @@
             }
           ]
         }
-      ]
+      ],
+      "phase": "physical",
+      "priority": 240,
+      "depends_on": [],
+      "reason_codes": [
+        "device_removes_conflicting_quality"
+      ],
+      "semantic_constraints": {
+        "domain": "device_quality",
+        "winner": "capture_device",
+        "loser": "quality_modifier",
+        "target_slots": [
+          "shot_type",
+          "quality"
+        ],
+        "fact_fields": [
+          "capture_device",
+          "quality_class"
+        ]
+      },
+      "text_fallback": {
+        "strategy": "pattern_match",
+        "enabled": true,
+        "target_slots": [
+          "shot_type",
+          "quality"
+        ],
+        "patterns": [
+          {
+            "pattern": "cctv",
+            "match_mode": "word",
+            "role": "device",
+            "group_id": "cctv"
+          },
+          {
+            "pattern": "surveillance",
+            "match_mode": "word",
+            "role": "device",
+            "group_id": "cctv"
+          },
+          {
+            "pattern": "security camera",
+            "match_mode": "phrase",
+            "role": "device",
+            "group_id": "cctv"
+          },
+          {
+            "pattern": "masterpiece",
+            "match_mode": "word",
+            "role": "banned",
+            "group_id": "webcam"
+          },
+          {
+            "pattern": "8k",
+            "match_mode": "word",
+            "role": "banned",
+            "group_id": "webcam"
+          },
+          {
+            "pattern": "ultra detailed",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "cctv"
+          },
+          {
+            "pattern": "professional photography",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "webcam"
+          },
+          {
+            "pattern": "studio lighting",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "cctv"
+          },
+          {
+            "pattern": "bokeh background",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "cctv"
+          },
+          {
+            "pattern": "film grain",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "cctv"
+          },
+          {
+            "pattern": "phone camera",
+            "match_mode": "phrase",
+            "role": "device",
+            "group_id": "phone"
+          },
+          {
+            "pattern": "selfie",
+            "match_mode": "word",
+            "role": "device",
+            "group_id": "phone"
+          },
+          {
+            "pattern": "iphone photo",
+            "match_mode": "phrase",
+            "role": "device",
+            "group_id": "phone"
+          },
+          {
+            "pattern": "smartphone",
+            "match_mode": "word",
+            "role": "device",
+            "group_id": "phone"
+          },
+          {
+            "pattern": "85mm lens",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "phone"
+          },
+          {
+            "pattern": "dslr photo",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "phone"
+          },
+          {
+            "pattern": "full frame camera",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "phone"
+          },
+          {
+            "pattern": "studio softbox",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "phone"
+          },
+          {
+            "pattern": "medium format",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "phone"
+          },
+          {
+            "pattern": "35mm film",
+            "match_mode": "phrase",
+            "role": "device",
+            "group_id": "analog_film"
+          },
+          {
+            "pattern": "analog camera",
+            "match_mode": "phrase",
+            "role": "device",
+            "group_id": "analog_film"
+          },
+          {
+            "pattern": "film photography",
+            "match_mode": "phrase",
+            "role": "device",
+            "group_id": "analog_film"
+          },
+          {
+            "pattern": "ultrahd",
+            "match_mode": "word",
+            "role": "banned",
+            "group_id": "analog_film"
+          },
+          {
+            "pattern": "digital rendering",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "analog_film"
+          },
+          {
+            "pattern": "cgi",
+            "match_mode": "word",
+            "role": "banned",
+            "group_id": "analog_film"
+          },
+          {
+            "pattern": "webcam",
+            "match_mode": "word",
+            "role": "device",
+            "group_id": "webcam"
+          },
+          {
+            "pattern": "hidden spy camera",
+            "match_mode": "phrase",
+            "role": "device",
+            "group_id": "webcam"
+          },
+          {
+            "pattern": "pinhole camera",
+            "match_mode": "phrase",
+            "role": "device",
+            "group_id": "webcam"
+          },
+          {
+            "pattern": "sharp focus",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "webcam"
+          }
+        ]
+      }
     },
     {
       "id": "tattoo_dermal_fusion",
@@ -1225,7 +2575,65 @@
         "follows body contours",
         "slightly faded edges",
         "pores visible through ink"
-      ]
+      ],
+      "phase": "effects",
+      "priority": 410,
+      "depends_on": [],
+      "reason_codes": [
+        "tattoo_dermal_fusion_injected"
+      ],
+      "semantic_constraints": {
+        "domain": "tattoo_fusion",
+        "target_slots": [
+          "tattoo"
+        ],
+        "fact_fields": []
+      },
+      "text_fallback": {
+        "strategy": "pattern_match",
+        "enabled": true,
+        "target_slots": [
+          "tattoo"
+        ],
+        "patterns": [
+          {
+            "pattern": "tattoo",
+            "match_mode": "word",
+            "role": "tattoo",
+            "group_id": "tattoo"
+          },
+          {
+            "pattern": "tattooed",
+            "match_mode": "word",
+            "role": "tattoo",
+            "group_id": "tattoo"
+          },
+          {
+            "pattern": "ink",
+            "match_mode": "word",
+            "role": "tattoo",
+            "group_id": "tattoo"
+          },
+          {
+            "pattern": "irezumi",
+            "match_mode": "word",
+            "role": "tattoo",
+            "group_id": "tattoo"
+          },
+          {
+            "pattern": "tally marks",
+            "match_mode": "phrase",
+            "role": "tattoo",
+            "group_id": "tattoo"
+          },
+          {
+            "pattern": "body art",
+            "match_mode": "phrase",
+            "role": "tattoo",
+            "group_id": "tattoo"
+          }
+        ]
+      }
     },
     {
       "id": "spatial_environmental_mutual_exclusion",
@@ -1598,7 +3006,462 @@
           "pattern": "spinning room",
           "match_mode": "phrase"
         }
-      ]
+      ],
+      "phase": "anchors",
+      "priority": 100,
+      "depends_on": [],
+      "reason_codes": [
+        "indoor_outdoor_mutex",
+        "venue_cluster_mutex",
+        "deprecated_tag_replaced"
+      ],
+      "semantic_constraints": {
+        "domain": "spatial",
+        "winner": "scene_anchor",
+        "loser": "scene_detail",
+        "target_slots": [
+          "scene"
+        ],
+        "fact_fields": [
+          "space_kind",
+          "venue_ids"
+        ]
+      },
+      "text_fallback": {
+        "strategy": "pattern_match",
+        "enabled": true,
+        "target_slots": [
+          "scene"
+        ],
+        "patterns": [
+          {
+            "pattern": "spinning room",
+            "match_mode": "phrase",
+            "role": "indoor",
+            "group_id": "indoor"
+          },
+          {
+            "pattern": "onsen",
+            "match_mode": "word",
+            "role": "venue",
+            "group_id": "onsen"
+          },
+          {
+            "pattern": "hot spring",
+            "match_mode": "phrase",
+            "role": "venue",
+            "group_id": "onsen"
+          },
+          {
+            "pattern": "rotenburo",
+            "match_mode": "word",
+            "role": "outdoor",
+            "group_id": "outdoor"
+          },
+          {
+            "pattern": "ryokan bath",
+            "match_mode": "phrase",
+            "role": "venue",
+            "group_id": "onsen"
+          },
+          {
+            "pattern": "public bath",
+            "match_mode": "phrase",
+            "role": "venue",
+            "group_id": "onsen"
+          },
+          {
+            "pattern": "sento",
+            "match_mode": "word",
+            "role": "venue",
+            "group_id": "onsen"
+          },
+          {
+            "pattern": "sauna",
+            "match_mode": "word",
+            "role": "venue",
+            "group_id": "onsen"
+          },
+          {
+            "pattern": "jacuzzi",
+            "match_mode": "word",
+            "role": "venue",
+            "group_id": "onsen"
+          },
+          {
+            "pattern": "soapland bath",
+            "match_mode": "phrase",
+            "role": "venue",
+            "group_id": "onsen"
+          },
+          {
+            "pattern": "cafe booth",
+            "match_mode": "phrase",
+            "role": "venue",
+            "group_id": "dining"
+          },
+          {
+            "pattern": "coffee shop",
+            "match_mode": "phrase",
+            "role": "venue",
+            "group_id": "dining"
+          },
+          {
+            "pattern": "yatai stall",
+            "match_mode": "phrase",
+            "role": "venue",
+            "group_id": "dining"
+          },
+          {
+            "pattern": "street food cart",
+            "match_mode": "phrase",
+            "role": "venue",
+            "group_id": "dining"
+          },
+          {
+            "pattern": "ramen shop",
+            "match_mode": "phrase",
+            "role": "venue",
+            "group_id": "dining"
+          },
+          {
+            "pattern": "izakaya",
+            "match_mode": "word",
+            "role": "venue",
+            "group_id": "dining"
+          },
+          {
+            "pattern": "bar counter",
+            "match_mode": "phrase",
+            "role": "venue",
+            "group_id": "dining"
+          },
+          {
+            "pattern": "love hotel restaurant",
+            "match_mode": "phrase",
+            "role": "venue",
+            "group_id": "dining"
+          },
+          {
+            "pattern": "food stall with curtain",
+            "match_mode": "phrase",
+            "role": "venue",
+            "group_id": "dining"
+          },
+          {
+            "pattern": "classroom",
+            "match_mode": "word",
+            "role": "venue",
+            "group_id": "school"
+          },
+          {
+            "pattern": "blackboard",
+            "match_mode": "word",
+            "role": "venue",
+            "group_id": "school"
+          },
+          {
+            "pattern": "student desk",
+            "match_mode": "phrase",
+            "role": "venue",
+            "group_id": "school"
+          },
+          {
+            "pattern": "teacher desk",
+            "match_mode": "phrase",
+            "role": "venue",
+            "group_id": "school"
+          },
+          {
+            "pattern": "school library",
+            "match_mode": "phrase",
+            "role": "venue",
+            "group_id": "school"
+          },
+          {
+            "pattern": "gym storage",
+            "match_mode": "phrase",
+            "role": "venue",
+            "group_id": "school"
+          },
+          {
+            "pattern": "infirmary",
+            "match_mode": "word",
+            "role": "venue",
+            "group_id": "school"
+          },
+          {
+            "pattern": "office cubicle",
+            "match_mode": "phrase",
+            "role": "venue",
+            "group_id": "office"
+          },
+          {
+            "pattern": "conference room",
+            "match_mode": "phrase",
+            "role": "venue",
+            "group_id": "office"
+          },
+          {
+            "pattern": "executive desk",
+            "match_mode": "phrase",
+            "role": "venue",
+            "group_id": "office"
+          },
+          {
+            "pattern": "office elevator",
+            "match_mode": "phrase",
+            "role": "venue",
+            "group_id": "office"
+          },
+          {
+            "pattern": "break room",
+            "match_mode": "phrase",
+            "role": "venue",
+            "group_id": "office"
+          },
+          {
+            "pattern": "corporate office",
+            "match_mode": "phrase",
+            "role": "venue",
+            "group_id": "office"
+          },
+          {
+            "pattern": "subway car",
+            "match_mode": "phrase",
+            "role": "venue",
+            "group_id": "transport"
+          },
+          {
+            "pattern": "train seat",
+            "match_mode": "phrase",
+            "role": "venue",
+            "group_id": "transport"
+          },
+          {
+            "pattern": "train door",
+            "match_mode": "phrase",
+            "role": "venue",
+            "group_id": "transport"
+          },
+          {
+            "pattern": "train interior",
+            "match_mode": "phrase",
+            "role": "venue",
+            "group_id": "transport"
+          },
+          {
+            "pattern": "airplane cabin",
+            "match_mode": "phrase",
+            "role": "venue",
+            "group_id": "transport"
+          },
+          {
+            "pattern": "car backseat",
+            "match_mode": "phrase",
+            "role": "venue",
+            "group_id": "transport"
+          },
+          {
+            "pattern": "bus interior",
+            "match_mode": "phrase",
+            "role": "venue",
+            "group_id": "transport"
+          },
+          {
+            "pattern": "shinkansen",
+            "match_mode": "word",
+            "role": "venue",
+            "group_id": "transport"
+          },
+          {
+            "pattern": "riverbank",
+            "match_mode": "word",
+            "role": "outdoor",
+            "group_id": "outdoor"
+          },
+          {
+            "pattern": "embankment",
+            "match_mode": "word",
+            "role": "outdoor",
+            "group_id": "outdoor"
+          },
+          {
+            "pattern": "behind bushes",
+            "match_mode": "phrase",
+            "role": "outdoor",
+            "group_id": "outdoor"
+          },
+          {
+            "pattern": "under bridge",
+            "match_mode": "phrase",
+            "role": "outdoor",
+            "group_id": "outdoor"
+          },
+          {
+            "pattern": "park at night",
+            "match_mode": "phrase",
+            "role": "outdoor",
+            "group_id": "outdoor"
+          },
+          {
+            "pattern": "beach at night",
+            "match_mode": "phrase",
+            "role": "outdoor",
+            "group_id": "outdoor"
+          },
+          {
+            "pattern": "forest clearing",
+            "match_mode": "phrase",
+            "role": "outdoor",
+            "group_id": "outdoor"
+          },
+          {
+            "pattern": "mountain trail",
+            "match_mode": "phrase",
+            "role": "outdoor",
+            "group_id": "outdoor"
+          },
+          {
+            "pattern": "seaside cave",
+            "match_mode": "phrase",
+            "role": "outdoor",
+            "group_id": "outdoor"
+          },
+          {
+            "pattern": "bedroom",
+            "match_mode": "word",
+            "role": "venue",
+            "group_id": "bedroom"
+          },
+          {
+            "pattern": "love hotel room",
+            "match_mode": "phrase",
+            "role": "venue",
+            "group_id": "bedroom"
+          },
+          {
+            "pattern": "tatami futon",
+            "match_mode": "phrase",
+            "role": "venue",
+            "group_id": "bedroom"
+          },
+          {
+            "pattern": "messy bed",
+            "match_mode": "phrase",
+            "role": "venue",
+            "group_id": "bedroom"
+          },
+          {
+            "pattern": "hotel room bed",
+            "match_mode": "phrase",
+            "role": "venue",
+            "group_id": "bedroom"
+          },
+          {
+            "pattern": "outdoor bath",
+            "match_mode": "phrase",
+            "role": "outdoor",
+            "group_id": "outdoor"
+          },
+          {
+            "pattern": "open-air bath",
+            "match_mode": "phrase",
+            "role": "outdoor",
+            "group_id": "outdoor"
+          },
+          {
+            "pattern": "onsen with snow view",
+            "match_mode": "phrase",
+            "role": "outdoor",
+            "group_id": "outdoor"
+          },
+          {
+            "pattern": "snow view",
+            "match_mode": "phrase",
+            "role": "outdoor",
+            "group_id": "outdoor"
+          },
+          {
+            "pattern": "outdoor hot spring",
+            "match_mode": "phrase",
+            "role": "outdoor",
+            "group_id": "outdoor"
+          },
+          {
+            "pattern": "indoor onsen",
+            "match_mode": "phrase",
+            "role": "indoor",
+            "group_id": "indoor"
+          },
+          {
+            "pattern": "private onsen",
+            "match_mode": "phrase",
+            "role": "indoor",
+            "group_id": "indoor"
+          },
+          {
+            "pattern": "onsen changing room",
+            "match_mode": "phrase",
+            "role": "indoor",
+            "group_id": "indoor"
+          },
+          {
+            "pattern": "changing room",
+            "match_mode": "phrase",
+            "role": "indoor",
+            "group_id": "indoor"
+          },
+          {
+            "pattern": "locker room",
+            "match_mode": "phrase",
+            "role": "indoor",
+            "group_id": "indoor"
+          },
+          {
+            "pattern": "bathroom",
+            "match_mode": "word",
+            "role": "indoor",
+            "group_id": "indoor"
+          },
+          {
+            "pattern": "shower room",
+            "match_mode": "phrase",
+            "role": "indoor",
+            "group_id": "indoor"
+          },
+          {
+            "pattern": "living room",
+            "match_mode": "phrase",
+            "role": "indoor",
+            "group_id": "indoor"
+          },
+          {
+            "pattern": "kitchen",
+            "match_mode": "word",
+            "role": "indoor",
+            "group_id": "indoor"
+          },
+          {
+            "pattern": "elevator",
+            "match_mode": "word",
+            "role": "indoor",
+            "group_id": "indoor"
+          },
+          {
+            "pattern": "dressing room",
+            "match_mode": "phrase",
+            "role": "indoor",
+            "group_id": "indoor"
+          },
+          {
+            "pattern": "shower stall",
+            "match_mode": "phrase",
+            "role": "indoor",
+            "group_id": "indoor"
+          }
+        ]
+      }
     },
     {
       "id": "pose_hand_occupation",
@@ -1846,7 +3709,391 @@
           "pattern": "holding tray",
           "match_mode": "phrase"
         }
-      ]
+      ],
+      "phase": "physical",
+      "priority": 200,
+      "depends_on": [],
+      "reason_codes": [
+        "busy_hands_remove_props"
+      ],
+      "semantic_constraints": {
+        "domain": "hand_occupation",
+        "winner": "pose_hand_state",
+        "loser": "handheld_props",
+        "target_slots": [
+          "pose",
+          "props"
+        ],
+        "fact_fields": [
+          "hand_state",
+          "hands_required",
+          "prop_usage"
+        ]
+      },
+      "text_fallback": {
+        "strategy": "pattern_match",
+        "enabled": true,
+        "target_slots": [
+          "pose",
+          "props"
+        ],
+        "patterns": [
+          {
+            "pattern": "hands behind back",
+            "match_mode": "phrase",
+            "role": "trigger",
+            "group_id": "pose_hand"
+          },
+          {
+            "pattern": "arms above head",
+            "match_mode": "phrase",
+            "role": "trigger",
+            "group_id": "pose_hand"
+          },
+          {
+            "pattern": "lying with arms above head",
+            "match_mode": "phrase",
+            "role": "trigger",
+            "group_id": "pose_hand"
+          },
+          {
+            "pattern": "hands behind head",
+            "match_mode": "phrase",
+            "role": "trigger",
+            "group_id": "pose_hand"
+          },
+          {
+            "pattern": "gripping sheets",
+            "match_mode": "phrase",
+            "role": "trigger",
+            "group_id": "pose_hand"
+          },
+          {
+            "pattern": "pulling shirt over head",
+            "match_mode": "phrase",
+            "role": "trigger",
+            "group_id": "pose_hand"
+          },
+          {
+            "pattern": "on all fours",
+            "match_mode": "phrase",
+            "role": "trigger",
+            "group_id": "pose_hand"
+          },
+          {
+            "pattern": "on hands and knees",
+            "match_mode": "phrase",
+            "role": "trigger",
+            "group_id": "pose_hand"
+          },
+          {
+            "pattern": "spreading labia",
+            "match_mode": "phrase",
+            "role": "trigger",
+            "group_id": "pose_hand"
+          },
+          {
+            "pattern": "hands clasped",
+            "match_mode": "phrase",
+            "role": "trigger",
+            "group_id": "pose_hand"
+          },
+          {
+            "pattern": "spreading labia with both hands",
+            "match_mode": "phrase",
+            "role": "trigger",
+            "group_id": "pose_hand"
+          },
+          {
+            "pattern": "hands clasped behind back",
+            "match_mode": "phrase",
+            "role": "trigger",
+            "group_id": "pose_hand"
+          },
+          {
+            "pattern": "hands clasped in prayer",
+            "match_mode": "phrase",
+            "role": "trigger",
+            "group_id": "pose_hand"
+          },
+          {
+            "pattern": "hands tied behind back",
+            "match_mode": "phrase",
+            "role": "trigger",
+            "group_id": "pose_hand"
+          },
+          {
+            "pattern": "hands bound",
+            "match_mode": "phrase",
+            "role": "trigger",
+            "group_id": "pose_hand"
+          },
+          {
+            "pattern": "arms raised high above head",
+            "match_mode": "phrase",
+            "role": "trigger",
+            "group_id": "pose_hand"
+          },
+          {
+            "pattern": "hands on head",
+            "match_mode": "phrase",
+            "role": "trigger",
+            "group_id": "pose_hand"
+          },
+          {
+            "pattern": "gripping bedsheet",
+            "match_mode": "phrase",
+            "role": "trigger",
+            "group_id": "pose_hand"
+          },
+          {
+            "pattern": "clutching pillow with both hands",
+            "match_mode": "phrase",
+            "role": "trigger",
+            "group_id": "pose_hand"
+          },
+          {
+            "pattern": "unhooking bra behind back",
+            "match_mode": "phrase",
+            "role": "trigger",
+            "group_id": "pose_hand"
+          },
+          {
+            "pattern": "pulling panties down with both hands",
+            "match_mode": "phrase",
+            "role": "trigger",
+            "group_id": "pose_hand"
+          },
+          {
+            "pattern": "hands on floor",
+            "match_mode": "phrase",
+            "role": "trigger",
+            "group_id": "pose_hand"
+          },
+          {
+            "pattern": "crawling on floor",
+            "match_mode": "phrase",
+            "role": "trigger",
+            "group_id": "pose_hand"
+          },
+          {
+            "pattern": "holding legs open",
+            "match_mode": "phrase",
+            "role": "trigger",
+            "group_id": "pose_hand"
+          },
+          {
+            "pattern": "arms wrapped around neck",
+            "match_mode": "phrase",
+            "role": "trigger",
+            "group_id": "pose_hand"
+          },
+          {
+            "pattern": "hands braced on chest",
+            "match_mode": "phrase",
+            "role": "trigger",
+            "group_id": "pose_hand"
+          },
+          {
+            "pattern": "covering eyes with both hands",
+            "match_mode": "phrase",
+            "role": "trigger",
+            "group_id": "pose_hand"
+          },
+          {
+            "pattern": "hands over mouth to silence",
+            "match_mode": "phrase",
+            "role": "trigger",
+            "group_id": "pose_hand"
+          },
+          {
+            "pattern": "compact camera in hand",
+            "match_mode": "phrase",
+            "role": "handheld",
+            "group_id": "pose_hand"
+          },
+          {
+            "pattern": "arms wrapped around cute stuffed animal",
+            "match_mode": "phrase",
+            "role": "handheld",
+            "group_id": "pose_hand"
+          },
+          {
+            "pattern": "holding black compact digital camera",
+            "match_mode": "phrase",
+            "role": "handheld",
+            "group_id": "pose_hand"
+          },
+          {
+            "pattern": "smartphone in hand recording",
+            "match_mode": "phrase",
+            "role": "handheld",
+            "group_id": "pose_hand"
+          },
+          {
+            "pattern": "holding game controller",
+            "match_mode": "phrase",
+            "role": "handheld",
+            "group_id": "pose_hand"
+          },
+          {
+            "pattern": "holding embroidered round silk fan",
+            "match_mode": "phrase",
+            "role": "handheld",
+            "group_id": "pose_hand"
+          },
+          {
+            "pattern": "holding oiled paper umbrella propped on shoulder",
+            "match_mode": "phrase",
+            "role": "handheld",
+            "group_id": "pose_hand"
+          },
+          {
+            "pattern": "holding lush fresh floral bouquet",
+            "match_mode": "phrase",
+            "role": "handheld",
+            "group_id": "pose_hand"
+          },
+          {
+            "pattern": "hugging large fluffy plush teddy bear",
+            "match_mode": "phrase",
+            "role": "handheld",
+            "group_id": "pose_hand"
+          },
+          {
+            "pattern": "holding smartphone",
+            "match_mode": "phrase",
+            "role": "handheld",
+            "group_id": "pose_hand"
+          },
+          {
+            "pattern": "phone held in hand",
+            "match_mode": "phrase",
+            "role": "handheld",
+            "group_id": "pose_hand"
+          },
+          {
+            "pattern": "holding camera",
+            "match_mode": "phrase",
+            "role": "handheld",
+            "group_id": "pose_hand"
+          },
+          {
+            "pattern": "holding folding fan",
+            "match_mode": "phrase",
+            "role": "handheld",
+            "group_id": "pose_hand"
+          },
+          {
+            "pattern": "holding round fan",
+            "match_mode": "phrase",
+            "role": "handheld",
+            "group_id": "pose_hand"
+          },
+          {
+            "pattern": "holding fan in hand",
+            "match_mode": "phrase",
+            "role": "handheld",
+            "group_id": "pose_hand"
+          },
+          {
+            "pattern": "holding oil paper umbrella",
+            "match_mode": "phrase",
+            "role": "handheld",
+            "group_id": "pose_hand"
+          },
+          {
+            "pattern": "holding umbrella in hand",
+            "match_mode": "phrase",
+            "role": "handheld",
+            "group_id": "pose_hand"
+          },
+          {
+            "pattern": "holding flower bouquet",
+            "match_mode": "phrase",
+            "role": "handheld",
+            "group_id": "pose_hand"
+          },
+          {
+            "pattern": "holding wine glass in hand",
+            "match_mode": "phrase",
+            "role": "handheld",
+            "group_id": "pose_hand"
+          },
+          {
+            "pattern": "holding wine glass",
+            "match_mode": "phrase",
+            "role": "handheld",
+            "group_id": "pose_hand"
+          },
+          {
+            "pattern": "holding champagne glass",
+            "match_mode": "phrase",
+            "role": "handheld",
+            "group_id": "pose_hand"
+          },
+          {
+            "pattern": "wine glass in hand",
+            "match_mode": "phrase",
+            "role": "handheld",
+            "group_id": "pose_hand"
+          },
+          {
+            "pattern": "swirling glass in hand",
+            "match_mode": "phrase",
+            "role": "handheld",
+            "group_id": "pose_hand"
+          },
+          {
+            "pattern": "holding wand vibrator",
+            "match_mode": "phrase",
+            "role": "handheld",
+            "group_id": "pose_hand"
+          },
+          {
+            "pattern": "holding controller",
+            "match_mode": "phrase",
+            "role": "handheld",
+            "group_id": "pose_hand"
+          },
+          {
+            "pattern": "holding tea cup",
+            "match_mode": "phrase",
+            "role": "handheld",
+            "group_id": "pose_hand"
+          },
+          {
+            "pattern": "holding cigarette",
+            "match_mode": "phrase",
+            "role": "handheld",
+            "group_id": "pose_hand"
+          },
+          {
+            "pattern": "cigarette between fingers",
+            "match_mode": "phrase",
+            "role": "handheld",
+            "group_id": "pose_hand"
+          },
+          {
+            "pattern": "holding sword",
+            "match_mode": "phrase",
+            "role": "handheld",
+            "group_id": "pose_hand"
+          },
+          {
+            "pattern": "holding microphone",
+            "match_mode": "phrase",
+            "role": "handheld",
+            "group_id": "pose_hand"
+          },
+          {
+            "pattern": "holding tray",
+            "match_mode": "phrase",
+            "role": "handheld",
+            "group_id": "pose_hand"
+          }
+        ]
+      }
     },
     {
       "id": "emotion_gaze_affinity",
@@ -1980,7 +4227,192 @@
             }
           ]
         }
-      ]
+      ],
+      "phase": "semantic",
+      "priority": 320,
+      "depends_on": [
+        "accessory_occlusion_gaze_coherence"
+      ],
+      "reason_codes": [
+        "emotion_removes_conflicting_gaze"
+      ],
+      "semantic_constraints": {
+        "domain": "persona_emotion_gaze",
+        "winner": "emotion",
+        "loser": "gaze_action",
+        "target_slots": [
+          "expression"
+        ],
+        "fact_fields": [
+          "emotion",
+          "gaze"
+        ]
+      },
+      "text_fallback": {
+        "strategy": "pattern_match",
+        "enabled": true,
+        "target_slots": [
+          "expression"
+        ],
+        "patterns": [
+          {
+            "pattern": "shy expression",
+            "match_mode": "phrase",
+            "role": "emotion",
+            "group_id": "shy"
+          },
+          {
+            "pattern": "blushing cheeks",
+            "match_mode": "phrase",
+            "role": "emotion",
+            "group_id": "shy"
+          },
+          {
+            "pattern": "shy smile",
+            "match_mode": "phrase",
+            "role": "emotion",
+            "group_id": "shy"
+          },
+          {
+            "pattern": "timid look",
+            "match_mode": "phrase",
+            "role": "emotion",
+            "group_id": "shy"
+          },
+          {
+            "pattern": "blushing shyly",
+            "match_mode": "phrase",
+            "role": "emotion",
+            "group_id": "shy"
+          },
+          {
+            "pattern": "bashful expression",
+            "match_mode": "phrase",
+            "role": "emotion",
+            "group_id": "shy"
+          },
+          {
+            "pattern": "seductive smile",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "shy"
+          },
+          {
+            "pattern": "sultry gaze",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "shy"
+          },
+          {
+            "pattern": "predatory inviting gaze",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "shy"
+          },
+          {
+            "pattern": "eye-fucking",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "shy"
+          },
+          {
+            "pattern": "challenging dominant gaze",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "shy"
+          },
+          {
+            "pattern": "winking",
+            "match_mode": "word",
+            "role": "banned",
+            "group_id": "bored"
+          },
+          {
+            "pattern": "winking cheekily",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "shy"
+          },
+          {
+            "pattern": "direct eye-contact",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "shy"
+          },
+          {
+            "pattern": "direct eye contact",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "shy"
+          },
+          {
+            "pattern": "predatory gaze",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "shy"
+          },
+          {
+            "pattern": "bold seductive stare",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "shy"
+          },
+          {
+            "pattern": "bored expression",
+            "match_mode": "phrase",
+            "role": "emotion",
+            "group_id": "bored"
+          },
+          {
+            "pattern": "deadpan face",
+            "match_mode": "phrase",
+            "role": "emotion",
+            "group_id": "bored"
+          },
+          {
+            "pattern": "cold aloof expression",
+            "match_mode": "phrase",
+            "role": "emotion",
+            "group_id": "bored"
+          },
+          {
+            "pattern": "emotionless face",
+            "match_mode": "phrase",
+            "role": "emotion",
+            "group_id": "bored"
+          },
+          {
+            "pattern": "winking playfully",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "bored"
+          },
+          {
+            "pattern": "playful wink",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "bored"
+          },
+          {
+            "pattern": "sweet smile",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "bored"
+          },
+          {
+            "pattern": "gleeful eyes",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "bored"
+          },
+          {
+            "pattern": "flirty wink",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "bored"
+          }
+        ]
+      }
     },
     {
       "id": "environmental_lighting_coherence",
@@ -2048,7 +4480,123 @@
           "pattern": "pitch black background",
           "match_mode": "phrase"
         }
-      ]
+      ],
+      "phase": "physical",
+      "priority": 250,
+      "depends_on": [
+        "spatial_environmental_mutual_exclusion"
+      ],
+      "reason_codes": [
+        "night_scene_removes_daylight",
+        "daylight_removes_night"
+      ],
+      "semantic_constraints": {
+        "domain": "day_night",
+        "winner": "scene_day_night",
+        "loser": "light_source",
+        "target_slots": [
+          "scene",
+          "lighting"
+        ],
+        "fact_fields": [
+          "time_of_day",
+          "light_sources"
+        ]
+      },
+      "text_fallback": {
+        "strategy": "pattern_match",
+        "enabled": true,
+        "target_slots": [
+          "scene",
+          "lighting"
+        ],
+        "patterns": [
+          {
+            "pattern": "soft sunlight filtered through sheer curtains",
+            "match_mode": "phrase",
+            "role": "trigger",
+            "group_id": "daylight"
+          },
+          {
+            "pattern": "dappled sunlight filtering through tree canopy",
+            "match_mode": "phrase",
+            "role": "trigger",
+            "group_id": "daylight"
+          },
+          {
+            "pattern": "golden hour",
+            "match_mode": "phrase",
+            "role": "trigger",
+            "group_id": "daylight"
+          },
+          {
+            "pattern": "natural daylight",
+            "match_mode": "phrase",
+            "role": "trigger",
+            "group_id": "daylight"
+          },
+          {
+            "pattern": "morning sunlight",
+            "match_mode": "phrase",
+            "role": "trigger",
+            "group_id": "daylight"
+          },
+          {
+            "pattern": "golden hour sunset sidelight",
+            "match_mode": "phrase",
+            "role": "trigger",
+            "group_id": "daylight"
+          },
+          {
+            "pattern": "hotel balcony night",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "daylight"
+          },
+          {
+            "pattern": "park at night",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "daylight"
+          },
+          {
+            "pattern": "beach at night",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "daylight"
+          },
+          {
+            "pattern": "hotel corridor late night",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "daylight"
+          },
+          {
+            "pattern": "nightclub",
+            "match_mode": "word",
+            "role": "banned",
+            "group_id": "daylight"
+          },
+          {
+            "pattern": "back alley",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "daylight"
+          },
+          {
+            "pattern": "deep dark night",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "daylight"
+          },
+          {
+            "pattern": "pitch black background",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "daylight"
+          }
+        ]
+      }
     },
     {
       "id": "makeup_details_coherence",
@@ -2094,7 +4642,88 @@
           "match_mode": "phrase"
         }
       ],
-      "custom_banned_makeup_smudge": []
+      "custom_banned_makeup_smudge": [],
+      "phase": "physical",
+      "priority": 270,
+      "depends_on": [],
+      "reason_codes": [
+        "clean_base_removes_heavy_makeup"
+      ],
+      "semantic_constraints": {
+        "domain": "makeup",
+        "winner": "base_makeup",
+        "loser": "smudged_effects",
+        "target_slots": [
+          "makeup"
+        ],
+        "fact_fields": [
+          "makeup_base",
+          "makeup_effects"
+        ]
+      },
+      "text_fallback": {
+        "strategy": "pattern_match",
+        "enabled": true,
+        "target_slots": [
+          "makeup"
+        ],
+        "patterns": [
+          {
+            "pattern": "natural makeup",
+            "match_mode": "phrase",
+            "role": "trigger",
+            "group_id": "no_makeup"
+          },
+          {
+            "pattern": "pure face",
+            "match_mode": "phrase",
+            "role": "trigger",
+            "group_id": "no_makeup"
+          },
+          {
+            "pattern": "clean beauty",
+            "match_mode": "phrase",
+            "role": "trigger",
+            "group_id": "no_makeup"
+          },
+          {
+            "pattern": "low-saturation clear glass skin",
+            "match_mode": "phrase",
+            "role": "trigger",
+            "group_id": "no_makeup"
+          },
+          {
+            "pattern": "minimal makeup",
+            "match_mode": "phrase",
+            "role": "trigger",
+            "group_id": "no_makeup"
+          },
+          {
+            "pattern": "smeared lipstick on cheek",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "no_makeup"
+          },
+          {
+            "pattern": "smudged eyeliner",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "no_makeup"
+          },
+          {
+            "pattern": "smudged kohl eyeliner",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "no_makeup"
+          },
+          {
+            "pattern": "ruined makeup",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "no_makeup"
+          }
+        ]
+      }
     },
     {
       "id": "framing_lower_body_coherence",
@@ -2191,7 +4820,161 @@
           "pattern": "kneeling on tatami",
           "match_mode": "phrase"
         }
-      ]
+      ],
+      "phase": "anchors",
+      "priority": 120,
+      "depends_on": [],
+      "reason_codes": [
+        "close_up_removes_lower_body"
+      ],
+      "semantic_constraints": {
+        "domain": "framing_lower_body",
+        "winner": "shot_type",
+        "loser": "lower_body_elements",
+        "target_slots": [
+          "shot_type",
+          "clothing"
+        ],
+        "fact_fields": [
+          "visible_regions"
+        ]
+      },
+      "text_fallback": {
+        "strategy": "pattern_match",
+        "enabled": true,
+        "target_slots": [
+          "shot_type",
+          "clothing"
+        ],
+        "patterns": [
+          {
+            "pattern": "extreme close-up",
+            "match_mode": "phrase",
+            "role": "trigger",
+            "group_id": "framing"
+          },
+          {
+            "pattern": "macro detail shot",
+            "match_mode": "phrase",
+            "role": "trigger",
+            "group_id": "framing"
+          },
+          {
+            "pattern": "close-up",
+            "match_mode": "phrase",
+            "role": "trigger",
+            "group_id": "framing"
+          },
+          {
+            "pattern": "face shot filling frame",
+            "match_mode": "phrase",
+            "role": "trigger",
+            "group_id": "framing"
+          },
+          {
+            "pattern": "focused on facial expression",
+            "match_mode": "phrase",
+            "role": "trigger",
+            "group_id": "framing"
+          },
+          {
+            "pattern": "portrait close-up",
+            "match_mode": "phrase",
+            "role": "trigger",
+            "group_id": "framing"
+          },
+          {
+            "pattern": "tight headshot",
+            "match_mode": "phrase",
+            "role": "trigger",
+            "group_id": "framing"
+          },
+          {
+            "pattern": "macro shot of lips",
+            "match_mode": "phrase",
+            "role": "trigger",
+            "group_id": "framing"
+          },
+          {
+            "pattern": "eyes close-up",
+            "match_mode": "phrase",
+            "role": "trigger",
+            "group_id": "framing"
+          },
+          {
+            "pattern": "facial macro shot",
+            "match_mode": "phrase",
+            "role": "trigger",
+            "group_id": "framing"
+          },
+          {
+            "pattern": "garter straps",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "framing"
+          },
+          {
+            "pattern": "garter belt",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "framing"
+          },
+          {
+            "pattern": "high heels",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "framing"
+          },
+          {
+            "pattern": "thigh-high stockings",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "framing"
+          },
+          {
+            "pattern": "garter_stockings",
+            "match_mode": "word",
+            "role": "banned",
+            "group_id": "framing"
+          },
+          {
+            "pattern": "bare feet",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "framing"
+          },
+          {
+            "pattern": "stiletto heels",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "framing"
+          },
+          {
+            "pattern": "knee-high boots",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "framing"
+          },
+          {
+            "pattern": "strappy sandals",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "framing"
+          },
+          {
+            "pattern": "feet visible",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "framing"
+          },
+          {
+            "pattern": "kneeling on tatami",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "framing"
+          }
+        ]
+      }
     },
     {
       "id": "accessory_occlusion_gaze_coherence",
@@ -2312,7 +5095,200 @@
           "pattern": "intense eye contact",
           "match_mode": "phrase"
         }
-      ]
+      ],
+      "phase": "semantic",
+      "priority": 310,
+      "depends_on": [
+        "gaze_angle_geometry"
+      ],
+      "reason_codes": [
+        "eye_occlusion_removes_gaze"
+      ],
+      "semantic_constraints": {
+        "domain": "occlusion_gaze",
+        "winner": "eye_occlusion",
+        "loser": "gaze_action",
+        "target_slots": [
+          "jewelry",
+          "expression"
+        ],
+        "fact_fields": [
+          "occlusion",
+          "gaze"
+        ]
+      },
+      "text_fallback": {
+        "strategy": "pattern_match",
+        "enabled": true,
+        "target_slots": [
+          "jewelry",
+          "expression"
+        ],
+        "patterns": [
+          {
+            "pattern": "black lace blindfold covering eyes",
+            "match_mode": "phrase",
+            "role": "trigger",
+            "group_id": "occlusion"
+          },
+          {
+            "pattern": "sheer patterned eye mask",
+            "match_mode": "phrase",
+            "role": "trigger",
+            "group_id": "occlusion"
+          },
+          {
+            "pattern": "blindfold",
+            "match_mode": "word",
+            "role": "trigger",
+            "group_id": "occlusion"
+          },
+          {
+            "pattern": "eyes closed in ecstasy",
+            "match_mode": "phrase",
+            "role": "trigger",
+            "group_id": "occlusion"
+          },
+          {
+            "pattern": "sleeping with eyes closed",
+            "match_mode": "phrase",
+            "role": "trigger",
+            "group_id": "occlusion"
+          },
+          {
+            "pattern": "eyes blindfolded",
+            "match_mode": "phrase",
+            "role": "trigger",
+            "group_id": "occlusion"
+          },
+          {
+            "pattern": "silk blindfold",
+            "match_mode": "phrase",
+            "role": "trigger",
+            "group_id": "occlusion"
+          },
+          {
+            "pattern": "covering eyes with hands",
+            "match_mode": "phrase",
+            "role": "trigger",
+            "group_id": "occlusion"
+          },
+          {
+            "pattern": "covering eyes with both hands",
+            "match_mode": "phrase",
+            "role": "trigger",
+            "group_id": "occlusion"
+          },
+          {
+            "pattern": "hands over eyes",
+            "match_mode": "phrase",
+            "role": "trigger",
+            "group_id": "occlusion"
+          },
+          {
+            "pattern": "making eye contact with camera then breaking away shyly",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "occlusion"
+          },
+          {
+            "pattern": "eye-fucking the viewer",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "occlusion"
+          },
+          {
+            "pattern": "predatory inviting gaze",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "occlusion"
+          },
+          {
+            "pattern": "devouring hungry stare",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "occlusion"
+          },
+          {
+            "pattern": "challenging dominant gaze",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "occlusion"
+          },
+          {
+            "pattern": "lustful stare",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "occlusion"
+          },
+          {
+            "pattern": "winking",
+            "match_mode": "word",
+            "role": "banned",
+            "group_id": "occlusion"
+          },
+          {
+            "pattern": "direct eye contact",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "occlusion"
+          },
+          {
+            "pattern": "direct eye contact with camera",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "occlusion"
+          },
+          {
+            "pattern": "looking at viewer",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "occlusion"
+          },
+          {
+            "pattern": "looking up at camera",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "occlusion"
+          },
+          {
+            "pattern": "looking down at camera",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "occlusion"
+          },
+          {
+            "pattern": "playful wink",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "occlusion"
+          },
+          {
+            "pattern": "staring into lens",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "occlusion"
+          },
+          {
+            "pattern": "dilated pupils",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "occlusion"
+          },
+          {
+            "pattern": "sparkling eyes",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "occlusion"
+          },
+          {
+            "pattern": "intense eye contact",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "occlusion"
+          }
+        ]
+      }
     },
     {
       "id": "monochrome_film_chroma_coherence",
@@ -2441,7 +5417,209 @@
           "pattern": "electric purple rim light",
           "match_mode": "phrase"
         }
-      ]
+      ],
+      "phase": "physical",
+      "priority": 260,
+      "depends_on": [],
+      "reason_codes": [
+        "monochrome_film_removes_chroma"
+      ],
+      "semantic_constraints": {
+        "domain": "color_mode",
+        "winner": "film_color_mode",
+        "loser": "chroma_effects",
+        "target_slots": [
+          "film",
+          "lighting"
+        ],
+        "fact_fields": [
+          "color_modes"
+        ]
+      },
+      "text_fallback": {
+        "strategy": "pattern_match",
+        "enabled": true,
+        "target_slots": [
+          "film",
+          "lighting"
+        ],
+        "patterns": [
+          {
+            "pattern": "high contrast B&W",
+            "match_mode": "phrase",
+            "role": "trigger",
+            "group_id": "monochrome"
+          },
+          {
+            "pattern": "fine grain B&W",
+            "match_mode": "phrase",
+            "role": "trigger",
+            "group_id": "monochrome"
+          },
+          {
+            "pattern": "classic monochrome",
+            "match_mode": "phrase",
+            "role": "trigger",
+            "group_id": "monochrome"
+          },
+          {
+            "pattern": "professional monochrome",
+            "match_mode": "phrase",
+            "role": "trigger",
+            "group_id": "monochrome"
+          },
+          {
+            "pattern": "rich tonal B&W",
+            "match_mode": "phrase",
+            "role": "trigger",
+            "group_id": "monochrome"
+          },
+          {
+            "pattern": "cinematic B&W",
+            "match_mode": "phrase",
+            "role": "trigger",
+            "group_id": "monochrome"
+          },
+          {
+            "pattern": "warm brown monochrome",
+            "match_mode": "phrase",
+            "role": "trigger",
+            "group_id": "monochrome"
+          },
+          {
+            "pattern": "kodak tri-x 400",
+            "match_mode": "phrase",
+            "role": "trigger",
+            "group_id": "monochrome"
+          },
+          {
+            "pattern": "ilford hp5 plus",
+            "match_mode": "phrase",
+            "role": "trigger",
+            "group_id": "monochrome"
+          },
+          {
+            "pattern": "fujifilm acros 100",
+            "match_mode": "phrase",
+            "role": "trigger",
+            "group_id": "monochrome"
+          },
+          {
+            "pattern": "black and white film",
+            "match_mode": "phrase",
+            "role": "trigger",
+            "group_id": "monochrome"
+          },
+          {
+            "pattern": "monochrome photography",
+            "match_mode": "phrase",
+            "role": "trigger",
+            "group_id": "monochrome"
+          },
+          {
+            "pattern": "b&w film stock",
+            "match_mode": "phrase",
+            "role": "trigger",
+            "group_id": "monochrome"
+          },
+          {
+            "pattern": "neon rim light",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "monochrome"
+          },
+          {
+            "pattern": "neon reflection on skin",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "monochrome"
+          },
+          {
+            "pattern": "magenta and cyan",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "monochrome"
+          },
+          {
+            "pattern": "love hotel neon glow",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "monochrome"
+          },
+          {
+            "pattern": "sunset warmth",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "monochrome"
+          },
+          {
+            "pattern": "vibrant neon glow",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "monochrome"
+          },
+          {
+            "pattern": "neon rim lighting",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "monochrome"
+          },
+          {
+            "pattern": "cyan and magenta lighting",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "monochrome"
+          },
+          {
+            "pattern": "rainbow prism flares",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "monochrome"
+          },
+          {
+            "pattern": "colorful reflections",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "monochrome"
+          },
+          {
+            "pattern": "sunset orange warmth",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "monochrome"
+          },
+          {
+            "pattern": "vibrant neon cyan and magenta",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "monochrome"
+          },
+          {
+            "pattern": "cyberpunk neon glow",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "monochrome"
+          },
+          {
+            "pattern": "bright saturated colors",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "monochrome"
+          },
+          {
+            "pattern": "pastel candy palette",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "monochrome"
+          },
+          {
+            "pattern": "electric purple rim light",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "monochrome"
+          }
+        ]
+      }
     },
     {
       "id": "clothing_style_state_coherence",
@@ -2570,7 +5748,211 @@
           "pattern": "skirt blown by wind",
           "match_mode": "phrase"
         }
-      ]
+      ],
+      "phase": "physical",
+      "priority": 220,
+      "depends_on": [
+        "nudity_clothing_conflicts"
+      ],
+      "reason_codes": [
+        "one_piece_state_conflict",
+        "pants_state_conflict"
+      ],
+      "semantic_constraints": {
+        "domain": "clothing_structure",
+        "winner": "garment_topology",
+        "loser": "garment_state_action",
+        "target_slots": [
+          "clothing"
+        ],
+        "fact_fields": [
+          "garment_topologies",
+          "garment_states"
+        ]
+      },
+      "text_fallback": {
+        "strategy": "pattern_match",
+        "enabled": true,
+        "target_slots": [
+          "clothing"
+        ],
+        "patterns": [
+          {
+            "pattern": "one-piece swimsuit",
+            "match_mode": "phrase",
+            "role": "trigger",
+            "group_id": "one_piece"
+          },
+          {
+            "pattern": "school swimsuit (sukumizu)",
+            "match_mode": "phrase",
+            "role": "trigger",
+            "group_id": "one_piece"
+          },
+          {
+            "pattern": "sukumizu",
+            "match_mode": "word",
+            "role": "trigger",
+            "group_id": "one_piece"
+          },
+          {
+            "pattern": "competition swimsuit",
+            "match_mode": "phrase",
+            "role": "trigger",
+            "group_id": "one_piece"
+          },
+          {
+            "pattern": "leotard",
+            "match_mode": "word",
+            "role": "trigger",
+            "group_id": "one_piece"
+          },
+          {
+            "pattern": "bodysuit",
+            "match_mode": "word",
+            "role": "trigger",
+            "group_id": "one_piece"
+          },
+          {
+            "pattern": "bodystocking",
+            "match_mode": "word",
+            "role": "trigger",
+            "group_id": "one_piece"
+          },
+          {
+            "pattern": "unbuttoned dress shirt",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "one_piece"
+          },
+          {
+            "pattern": "unbuttoned blouse",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "one_piece"
+          },
+          {
+            "pattern": "unbuttoning shirt",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "one_piece"
+          },
+          {
+            "pattern": "skirt lifted",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "one_piece"
+          },
+          {
+            "pattern": "skirt hiked up",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "one_piece"
+          },
+          {
+            "pattern": "skirt slit revealing",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "one_piece"
+          },
+          {
+            "pattern": "lifting pleated skirt",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "one_piece"
+          },
+          {
+            "pattern": "unzipped jeans",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "one_piece"
+          },
+          {
+            "pattern": "unzipping pants",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "one_piece"
+          },
+          {
+            "pattern": "button undone",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "one_piece"
+          },
+          {
+            "pattern": "skinny jeans",
+            "match_mode": "phrase",
+            "role": "trigger",
+            "group_id": "pants"
+          },
+          {
+            "pattern": "denim jeans",
+            "match_mode": "phrase",
+            "role": "trigger",
+            "group_id": "pants"
+          },
+          {
+            "pattern": "leather pants",
+            "match_mode": "phrase",
+            "role": "trigger",
+            "group_id": "pants"
+          },
+          {
+            "pattern": "cargo pants",
+            "match_mode": "phrase",
+            "role": "trigger",
+            "group_id": "pants"
+          },
+          {
+            "pattern": "tailored trousers",
+            "match_mode": "phrase",
+            "role": "trigger",
+            "group_id": "pants"
+          },
+          {
+            "pattern": "denim shorts",
+            "match_mode": "phrase",
+            "role": "trigger",
+            "group_id": "pants"
+          },
+          {
+            "pattern": "hot pants",
+            "match_mode": "phrase",
+            "role": "trigger",
+            "group_id": "pants"
+          },
+          {
+            "pattern": "skirt slit revealing",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "pants"
+          },
+          {
+            "pattern": "lifting skirt",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "pants"
+          },
+          {
+            "pattern": "skirt hiked up to waist",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "pants"
+          },
+          {
+            "pattern": "pleated skirt floating",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "pants"
+          },
+          {
+            "pattern": "skirt blown by wind",
+            "match_mode": "phrase",
+            "role": "banned",
+            "group_id": "pants"
+          }
+        ]
+      }
     },
     {
       "id": "handheld_props_single_holder",
@@ -2645,7 +6027,138 @@
           "pattern": "holding oiled paper umbrella",
           "match_mode": "phrase"
         }
-      ]
+      ],
+      "phase": "physical",
+      "priority": 210,
+      "depends_on": [
+        "pose_hand_occupation"
+      ],
+      "reason_codes": [
+        "single_handheld_prop_limit"
+      ],
+      "semantic_constraints": {
+        "domain": "handheld_props",
+        "winner": "first_handheld_prop",
+        "loser": "subsequent_handheld_props",
+        "target_slots": [
+          "props"
+        ],
+        "fact_fields": [
+          "hands_required",
+          "prop_usage"
+        ]
+      },
+      "text_fallback": {
+        "strategy": "pattern_match",
+        "enabled": true,
+        "target_slots": [
+          "props"
+        ],
+        "patterns": [
+          {
+            "pattern": "holding smartphone",
+            "match_mode": "phrase",
+            "role": "handheld",
+            "group_id": "handheld"
+          },
+          {
+            "pattern": "holding camera",
+            "match_mode": "phrase",
+            "role": "handheld",
+            "group_id": "handheld"
+          },
+          {
+            "pattern": "holding folding fan",
+            "match_mode": "phrase",
+            "role": "handheld",
+            "group_id": "handheld"
+          },
+          {
+            "pattern": "holding round silk fan",
+            "match_mode": "phrase",
+            "role": "handheld",
+            "group_id": "handheld"
+          },
+          {
+            "pattern": "holding round fan",
+            "match_mode": "phrase",
+            "role": "handheld",
+            "group_id": "handheld"
+          },
+          {
+            "pattern": "holding umbrella",
+            "match_mode": "phrase",
+            "role": "handheld",
+            "group_id": "handheld"
+          },
+          {
+            "pattern": "holding bouquet",
+            "match_mode": "phrase",
+            "role": "handheld",
+            "group_id": "handheld"
+          },
+          {
+            "pattern": "holding wine glass",
+            "match_mode": "phrase",
+            "role": "handheld",
+            "group_id": "handheld"
+          },
+          {
+            "pattern": "holding champagne glass",
+            "match_mode": "phrase",
+            "role": "handheld",
+            "group_id": "handheld"
+          },
+          {
+            "pattern": "holding tea cup",
+            "match_mode": "phrase",
+            "role": "handheld",
+            "group_id": "handheld"
+          },
+          {
+            "pattern": "holding sword",
+            "match_mode": "phrase",
+            "role": "handheld",
+            "group_id": "handheld"
+          },
+          {
+            "pattern": "holding wand vibrator",
+            "match_mode": "phrase",
+            "role": "handheld",
+            "group_id": "handheld"
+          },
+          {
+            "pattern": "holding microphone",
+            "match_mode": "phrase",
+            "role": "handheld",
+            "group_id": "handheld"
+          },
+          {
+            "pattern": "holding tray",
+            "match_mode": "phrase",
+            "role": "handheld",
+            "group_id": "handheld"
+          },
+          {
+            "pattern": "holding game controller",
+            "match_mode": "phrase",
+            "role": "handheld",
+            "group_id": "handheld"
+          },
+          {
+            "pattern": "holding black compact digital camera",
+            "match_mode": "phrase",
+            "role": "handheld",
+            "group_id": "handheld"
+          },
+          {
+            "pattern": "holding oiled paper umbrella",
+            "match_mode": "phrase",
+            "role": "handheld",
+            "group_id": "handheld"
+          }
+        ]
+      }
     }
   ]
 }

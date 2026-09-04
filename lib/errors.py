@@ -1,8 +1,10 @@
 """
 errors.py — 统一异常体系定义
-包含提示词校验、词法语法错误、数据选择器契约异常与规则配置异常。
+包含提示词校验、词法语法错误、数据选择器契约异常、规则配置异常、亲和度配置异常与未消解冲突异常。
 """
 from __future__ import annotations
+
+from typing import Any, Optional, Tuple
 
 
 class PromptValidationError(Exception):
@@ -33,3 +35,25 @@ class CatalogIndexingError(RuntimeError):
 class DataLoadError(RuntimeError):
     """当必需的数据文件缺失或 JSON 解析失败时抛出。"""
     pass
+
+
+class AffinityConfigurationError(RuntimeError):
+    """情境亲和度配置缺失、非法或候选与有效词库交集为空时抛出 (Fail-Closed)。"""
+    pass
+
+
+class UnresolvedConflictError(RuntimeError):
+    """消解后仍存在残余硬冲突或受保护黑盒冲突时抛出 (Fail-Closed)。"""
+
+    def __init__(
+        self,
+        message: str = "",
+        reason: Optional[str] = None,
+        unresolved_conflicts: Tuple[Any, ...] = (),
+        report: Optional[Any] = None,
+    ):
+        full_msg = message or f"Unresolved conflict (reason={reason})"
+        super().__init__(full_msg)
+        self.reason = reason
+        self.unresolved_conflicts = tuple(unresolved_conflicts)
+        self.report = report

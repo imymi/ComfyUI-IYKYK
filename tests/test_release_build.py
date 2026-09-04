@@ -197,15 +197,15 @@ class TestReleaseBuild(unittest.TestCase):
 
             self.assertEqual(manifest_a["sha256"], manifest_b["sha256"], "Dual builds produced different SHA256 hashes!")
             self.assertTrue(len(manifest_a["source_commit"]) >= 40)
-            self.assertEqual(manifest_a["files_count"], 38)
-            self.assertEqual(len(manifest_a["files_sha256"]), 38)
+            self.assertEqual(manifest_a["files_count"], TOTAL_RUNTIME_FILES_COUNT)
+            self.assertEqual(len(manifest_a["files_sha256"]), TOTAL_RUNTIME_FILES_COUNT)
 
             # 校验 ZIP 内文件
             pointer_a = json.loads((Path(out_a) / "CURRENT.json").read_text(encoding="utf-8"))
             zip_v_a = Path(out_a) / pointer_a["generation_dir"] / f"ComfyUI-IYKYK-{pointer_a['version']}.zip"
             with zipfile.ZipFile(zip_v_a, "r") as zf:
                 namelist = zf.namelist()
-                self.assertEqual(len(namelist), 38)
+                self.assertEqual(len(namelist), TOTAL_RUNTIME_FILES_COUNT)
                 for df in RUNTIME_DATA_FILES:
                     self.assertIn(f"ComfyUI-IYKYK/data/{df}", namelist)
 
