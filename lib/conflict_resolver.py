@@ -18,6 +18,7 @@ from typing import Any, Dict, List, Optional, Sequence, Set, Tuple
 if __package__:
     from .errors import RuleConfigurationError, UnresolvedConflictError
     from .models import (
+        CANONICAL_SELECTORS_BY_ENTRY_POINT,
         FORMAL_ORIGIN_MODES,
         ContextProfile,
         PromptAtom,
@@ -45,6 +46,7 @@ if __package__:
 else:
     from lib.errors import RuleConfigurationError, UnresolvedConflictError
     from lib.models import (
+        CANONICAL_SELECTORS_BY_ENTRY_POINT,
         FORMAL_ORIGIN_MODES,
         ContextProfile,
         PromptAtom,
@@ -89,10 +91,13 @@ for ps in LVL_PATTERN_SPECS.values():
 
 
 def is_formal_atom(a: PromptAtom) -> bool:
-    """判断是否为正式目录/预设/配方产出的 Atom。"""
-    if a.origin is None or not a.origin.mode:
-        return False
-    return a.origin.mode in FORMAL_ORIGIN_MODES
+    """判断是否为正式目录/预设/配方产出的 Atom。仅信任封闭来源模式。"""
+    if a.origin is not None and a.origin.mode in FORMAL_ORIGIN_MODES:
+        return True
+    src_mode = getattr(a.provenance, "source_mode", None)
+    if src_mode in FORMAL_ORIGIN_MODES:
+        return True
+    return False
 
 
 def make_replaced_atom(
@@ -101,14 +106,29 @@ def make_replaced_atom(
     rule_id: str,
     new_facts: Optional[SemanticFacts] = None,
 ) -> PromptAtom:
-    """每次替换生成新的、确定性的 Atom ID，保留 target、produced 和 parent 闭环 (R2-P1-003)。"""
+    """每次替换生成新的、确定性的 Atom ID，保留 target、produced 和 parent 闭环 (R2-P1-003, R3-P1-005)。"""
     new_atom_id = f"{target.atom_id}__r_{rule_id}"
     new_parents = (target.atom_id,) + tuple(p for p in target.provenance.parent_ids if p != target.atom_id)
-    new_prov = replace(target.provenance, parent_ids=new_parents, rule_id=rule_id)
-    new_origin = None
-    if target.origin:
-        origin_parents = (target.atom_id,) + tuple(p for p in target.origin.parent_ids if p != target.atom_id)
-        new_origin = replace(target.origin, parent_ids=origin_parents)
+    orig_source_mode = target.provenance.source_mode
+    if not orig_source_mode:
+        if target.origin and target.origin.mode in FORMAL_ORIGIN_MODES:
+            orig_source_mode = target.origin.mode
+        elif target.origin and target.origin.mode in ("custom", "none"):
+            orig_source_mode = target.origin.mode
+        elif target.provenance and target.provenance.kind in ("custom", "user_input"):
+            orig_source_mode = target.provenance.kind
+    new_prov = replace(target.provenance, parent_ids=new_parents, rule_id=rule_id, source_mode=orig_source_mode)
+    tgt_selector = target.origin.selector if target.origin else target.source_slot
+    if tgt_selector not in CANONICAL_SELECTORS_BY_ENTRY_POINT.get("generator", ()):
+        tgt_selector = "custom"
+    new_origin = SelectionOrigin(
+        entry_point=target.origin.entry_point if target.origin else "generator",
+        mode="resolver",
+        selector=tgt_selector,
+        selected_id=f"rule:{rule_id}",
+        raw_value=target.origin.raw_value if target.origin else target.text,
+        parent_ids=(target.atom_id,),
+    )
     return replace(
         target,
         atom_id=new_atom_id,
@@ -195,10 +215,39 @@ class OneTimeIndex:
     def tombstone(self, atom_id: str) -> None:
         self._tombstones.add(atom_id)
 
+    def _update_active_atom(self, updated: PromptAtom) -> None:
+        """更新活跃原子的实例对象并同步索引容器。"""
+        aid = updated.atom_id
+        norm_slot = normalize_slot_name(updated.source_slot)
+        slots = {updated.source_slot, norm_slot}
+        if updated.source_slot == "scene_theme" or norm_slot == "scene_theme":
+            slots.update(("scene", "theme"))
+        for s in slots:
+            if s in self.by_slot:
+                for j, at in enumerate(self.by_slot[s]):
+                    if at.atom_id == aid:
+                        self.by_slot[s][j] = updated
+        for j, at in enumerate(self.ordered_detectable_atoms):
+            if at.atom_id == aid:
+                self.ordered_detectable_atoms[j] = updated
+        if updated.origin and updated.origin.mode:
+            self.by_origin_mode.setdefault(updated.origin.mode, []).append(updated)
+
     def replace(self, old_atom_id: str, new_atom: PromptAtom) -> None:
         self._tombstones.add(old_atom_id)
         self._all_atoms.append(new_atom)
         self._index_atom(new_atom)
+        # 同步同一 Tag (tag_order) 的所有存活 sibling spans 的 Tag 级元数据 (origin, facts, id)
+        for i, a in enumerate(self._all_atoms):
+            if a.atom_id not in self._tombstones and a.tag_order == new_atom.tag_order and a.atom_id != new_atom.atom_id:
+                updated_sibling = replace(
+                    a,
+                    origin=new_atom.origin,
+                    facts=new_atom.facts,
+                    id=new_atom.id,
+                )
+                self._all_atoms[i] = updated_sibling
+                self._update_active_atom(updated_sibling)
 
     def inject(self, new_atom: PromptAtom) -> None:
         self._all_atoms.append(new_atom)
@@ -262,6 +311,7 @@ class DecisionLedger:
     """原子级消解决策审计账本。"""
     def __init__(self, rule_registry: Optional[RuleRegistry] = None):
         self.decisions: List[ResolutionDecision] = []
+        self.produced_atoms: List[PromptAtom] = []
         self._seq = 0
         self._registry = rule_registry
 
@@ -316,6 +366,7 @@ class DecisionLedger:
         self._validate_reason_code(rule_id, reason_code)
         seq = self._seq
         self._seq += 1
+        self.produced_atoms.extend(produced_atoms)
         produced_ids = tuple(a.atom_id for a in produced_atoms)
         after_text = ", ".join(a.text for a in produced_atoms)
         p_ids = tuple(parent_source_ids) if parent_source_ids else ((target_atom.atom_id,) + tuple(p for p in target_atom.provenance.parent_ids if p != target_atom.atom_id))
@@ -348,6 +399,7 @@ class DecisionLedger:
         self._validate_reason_code(rule_id, reason_code)
         seq = self._seq
         self._seq += 1
+        self.produced_atoms.extend(produced_atoms)
         produced_ids = tuple(a.atom_id for a in produced_atoms)
         after_text = ", ".join(a.text for a in produced_atoms)
         dec = ResolutionDecision(
@@ -689,7 +741,8 @@ class ConflictResolver:
         if a.source_item_id and a.source_item_id not in candidate_ids:
             candidate_ids.append(a.source_item_id)
         if a.origin and a.origin.selected_id and a.origin.selected_id not in candidate_ids:
-            candidate_ids.append(a.origin.selected_id)
+            if not a.origin.selected_id.startswith("rule:"):
+                candidate_ids.append(a.origin.selected_id)
 
         norm_slot = normalize_slot_name(a.source_slot)
 
@@ -824,7 +877,7 @@ class ConflictResolver:
                         f"Formal scene atom '{a.atom_id}' missing required 'time_of_day' fact for rule '{rule_id}'"
                     )
             elif slot in ("lighting", "lighting_palette"):
-                if a.origin and a.origin.mode == "recipe":
+                if (a.origin and a.origin.mode == "recipe") or getattr(a.provenance, "source_mode", None) == "recipe":
                     pass
                 else:
                     item_id = leaf_id.lower() if leaf_id else ""
@@ -963,6 +1016,7 @@ class ConflictResolver:
             rules_applied=tuple(rules_applied),
             decisions=tuple(ledger.decisions),
             unresolved_conflicts=(),
+            produced_atoms=tuple(ledger.produced_atoms),
         )
 
         # 4. 只读最终零硬冲突检测 (detect_hard_conflicts)
@@ -1135,6 +1189,11 @@ class ConflictResolver:
             for a in index.get_active_by_slot("scene"):
                 if not a.can_detect or not index.is_active(a):
                     continue
+                if a.atom_id == dominant_atom.atom_id:
+                    # A multi-venue anchor may mention both the dominant and a
+                    # banned cluster. The selected winner itself must remain
+                    # active for this and subsequent decisions.
+                    continue
                 is_loser = False
                 is_fallback = False
                 if is_formal_atom(a):
@@ -1203,7 +1262,11 @@ class ConflictResolver:
                 if a in losers:
                     is_loser = True
                     is_fallback = not is_formal_atom(a)
-                elif tf.enabled and any(w.matches(a.text) for w in loser_exclusive_tags):
+                elif (
+                    not is_formal_atom(a)
+                    and tf.enabled
+                    and any(w.matches(a.text) for w in loser_exclusive_tags)
+                ):
                     is_loser = True
                     is_fallback = True
 
@@ -2563,8 +2626,10 @@ class ConflictResolver:
                     kind="resolver_generated",
                 ),
                 origin=SelectionOrigin(
+                    entry_point=ref_atom.origin.entry_point if (ref_atom.origin and ref_atom.origin.entry_point) else "generator",
                     mode="resolver",
                     selector="tattoo",
+                    raw_value=ref_atom.origin.raw_value if ref_atom.origin else None,
                     parent_ids=(ref_atom.atom_id,),
                 ),
                 facts=SemanticFacts(),

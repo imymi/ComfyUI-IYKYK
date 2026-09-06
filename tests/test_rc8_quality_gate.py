@@ -12,18 +12,24 @@ import unittest
 from pathlib import Path
 from random import Random
 
-import jsonschema
+try:
+    import jsonschema
+    HAS_JSONSCHEMA = True
+except ImportError:
+    HAS_JSONSCHEMA = False
 
 from lib.conflict_resolver import ConflictResolver
 from lib.lexer import validate_prompt_syntax
 from lib.models import GenerationResult, ResolutionDecision
 import nodes
+from tests.audit_oracle import validate_audit_json_oracle
 
 from lib.conflict_resolver import build_canonical_catalog_facts
 
 DATA_DIR = Path(__file__).parent.parent / "data"
 SCHEMAS_DIR = Path(__file__).parent.parent / "schemas"
 FIXTURES_DIR = Path(__file__).parent / "fixtures"
+DIAGNOSTICS_SCHEMA_DOC = json.loads((SCHEMAS_DIR / "diagnostics.schema.json").read_text(encoding="utf-8"))
 EXPECTED_BASELINE_CONTENT_SHA256 = "779aca4d52238cabd9eaa8d4f5411654a8b01bb19f3519cff60eff7cc9541783"
 
 FROZEN_RULE_CONTRACTS = {
@@ -216,6 +222,7 @@ def _verify_provenance_dag(res: GenerationResult, valid_roots: set[str] | None =
 
 def _worker_seed_batch(start_seed: int, count: int) -> tuple[int, int, list[tuple[int, str]], int | None]:
     g = nodes.IYKYKPromptGenerator()
+    diag = nodes.IYKYKPromptDiagnostics()
     inputs = {
         "预设模板": "无 (None)",
         "风格配方": "无 (None)",
@@ -246,8 +253,21 @@ def _worker_seed_batch(start_seed: int, count: int) -> tuple[int, int, list[tupl
     for s in range(start_seed, start_seed + count):
         r1 = g.generate_structured(**inputs, prompt_seed=s)
         r2 = g.generate_structured(**inputs, prompt_seed=s)
-        # 1. 两次生成绝对一致
-        if r1.positive != r2.positive or r1.negative != r2.negative:
+        # 1. 两次生成绝对一致，且与诊断节点前三个输出逐字节一致
+        d_pos, d_neg, d_desc, d_audit = diag.diagnose(**inputs, prompt_seed=s)
+        if r1.positive != r2.positive or r1.negative != r2.negative or d_pos != r1.positive or d_neg != r1.negative or d_desc != r1.description:
+            if first_fail is None:
+                first_fail = s
+                break
+        # 1b. 诊断审计 JSON 完整解析与闭包 Oracle 校验 (R3-P2-001)
+        try:
+            validate_audit_json_oracle(
+                d_audit,
+                schema_doc=DIAGNOSTICS_SCHEMA_DOC,
+                expected_positive=r1.positive,
+                trusted_inputs=inputs,
+            )
+        except Exception:
             if first_fail is None:
                 first_fail = s
                 break
@@ -301,6 +321,8 @@ class TestRC8QualityGate(unittest.TestCase):
         self.assertEqual(doc.get("git_commit"), "fe881856f4e8bd5d89928601ba3564c73dbc1ebb")
 
         # 校验 Schema 自身与 fixture 合法性
+        if not HAS_JSONSCHEMA:
+            self.skipTest("jsonschema not installed")
         schema_file = SCHEMAS_DIR / "text-quality-baseline.schema.json"
         self.assertTrue(schema_file.exists(), f"Schema file missing: {schema_file}")
         schema_doc = json.loads(schema_file.read_text(encoding="utf-8"))
@@ -530,6 +552,8 @@ class TestRC8QualityGate(unittest.TestCase):
         """Oracle 负向变异门禁测试：清空受保护集合、篡改证据、注入垃圾 replace、篡改基线 SHA、断裂 provenance 均必须 Fail-Closed (R2R3-P1-003)。"""
         from lib.models import PromptAtom, ResolutionDecision, ResolutionReport, SpanType, TagProvenance
 
+        if not HAS_JSONSCHEMA:
+            self.skipTest("jsonschema not installed")
         baseline_file = FIXTURES_DIR / "rc7_text_quality_baseline.json"
         doc = json.loads(baseline_file.read_text(encoding="utf-8"))
         schema_file = SCHEMAS_DIR / "text-quality-baseline.schema.json"
@@ -1018,7 +1042,7 @@ class TestRC8QualityGate(unittest.TestCase):
         batch_hash = hashlib.sha256("".join(ordered_hashes).encode("utf-8")).hexdigest()
         self.assertEqual(
             batch_hash,
-            "188ebfa35ecfa3f2a1f50352f5ba9a4531caf461f2c74648ab603963f6794f3c",
+            "9abc8a1a5863a5380f78c2527b19a8020a1a952913c31a03645de327fdf23208",
             "Seed gate 0..9999 summary hash drifted!",
         )
 

@@ -35,7 +35,7 @@ from typing import Optional
 REPO_DIR = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(REPO_DIR))
 
-from lib.runtime_manifest import RUNTIME_PACKAGE_FILES, TOTAL_RUNTIME_FILES_COUNT
+from lib.runtime_manifest import RUNTIME_PACKAGE_FILES, RUNTIME_SCHEMA_FILES, TOTAL_RUNTIME_FILES_COUNT
 
 
 class PlatformNotSupportedError(RuntimeError):
@@ -543,6 +543,16 @@ def collect_files_to_pack(repo_dir: Path) -> list[tuple[Path, str]]:
             if rel not in RUNTIME_PACKAGE_FILES:
                 raise RuntimeError(f"Strict source tree gate failed: untracked runtime candidate file found: {rel}")
 
+    schemas_dir = repo_dir / "schemas"
+    if schemas_dir.is_dir():
+        for s_name in RUNTIME_SCHEMA_FILES:
+            s_path = schemas_dir / s_name
+            if not s_path.is_file():
+                raise RuntimeError(f"Strict source tree gate failed: missing required runtime schema: schemas/{s_name}")
+            rel = f"schemas/{s_name}"
+            if rel not in RUNTIME_PACKAGE_FILES:
+                raise RuntimeError(f"Strict source tree gate failed: untracked runtime schema file: {rel}")
+
     if len(files) != TOTAL_RUNTIME_FILES_COUNT:
         raise ValueError(
             f"Files count mismatch: expected {TOTAL_RUNTIME_FILES_COUNT}, got {len(files)}"
@@ -638,13 +648,15 @@ for name, cls in nodes.NODE_CLASS_MAPPINGS.items():
     types = cls.INPUT_TYPES()
     assert isinstance(types, dict), f"INPUT_TYPES failed for {{name}}"
 
-# 6. 验证 3 个节点的 IS_CHANGED
+# 6. 验证 4 个节点的 IS_CHANGED
 h1 = nodes.IYKYKPromptGenerator.IS_CHANGED(prompt_seed=42)
 h2 = nodes.IYKYKPresetBrowser.IS_CHANGED(prompt_seed=42)
 h3 = nodes.IYKYKCustomSlotCombiner.IS_CHANGED(prompt_seed=42)
+h4 = nodes.IYKYKPromptDiagnostics.IS_CHANGED(prompt_seed=42)
 assert isinstance(h1, str) and len(h1) == 64
 assert isinstance(h2, str) and len(h2) == 64
 assert isinstance(h3, str) and len(h3) == 64
+assert isinstance(h4, str) and len(h4) == 64
 
 # 7. 验证主生成器
 gen = nodes.IYKYKPromptGenerator()
@@ -691,7 +703,49 @@ assert len(c_pos) > 0
 c_res = comb.combine_structured(prompt_seed=42, 场景主题='onsen')
 assert len(c_res.positive) > 0 and len(c_res.source_atoms) > 0
 
-print('   ✅ Package generation smoke test passed for all 3 nodes (including combine_structured).')
+# 10. 验证提示词诊断节点 (含 diagnose 与 diagnose_structured)
+diag = nodes.IYKYKPromptDiagnostics()
+d_pos, d_neg, d_desc, d_audit = diag.diagnose(
+    预设模板='无 (None)',
+    风格配方='无 (None)',
+    场景大类='随机 (Random)',
+    剧情主题='随机 (Random)',
+    景别构图='自动 (Auto)',
+    拍摄视角='自动 (Auto)',
+    裸露等级='随机 (Random)',
+    服装款式='随机 (Random)',
+    服装状态='自动联动裸露等级 (Auto Link Nudity)',
+    发型发色='随机 (Random)',
+    饰品头饰='无 (None)',
+    妆容细节='无 (None)',
+    姿势动作='随机 (Random)',
+    情绪表情='随机 (Random)',
+    光影预设='自动 (Auto)',
+    胶片风格='无 (None)',
+    液体效果='无 (None)',
+    纹身标记='无 (None)',
+    道具物件='无 (None)',
+    角色设定='无 (None)',
+    真实微瑕='无 (None)',
+    画质等级='高清写真 (High)',
+    prompt_seed=42
+)
+assert len(d_pos) > 0
+audit_obj = json.loads(d_audit)
+assert "schema_version" in audit_obj and "counts" in audit_obj and "decisions" in audit_obj
+
+# 11. 验证 schemas/ 目录与包内 Schema，使用包内 schema 严格校验实际 diagnose() 输出 (R3-P1-003, R3-P2-002)
+schema_path = test_dir / "schemas" / "diagnostics.schema.json"
+assert schema_path.is_file(), f"Packaged schema missing at {{schema_path}}"
+schema_doc = json.loads(schema_path.read_text(encoding="utf-8"))
+assert schema_doc.get("$schema") == "http://json-schema.org/draft-07/schema#"
+import jsonschema
+jsonschema.Draft7Validator.check_schema(schema_doc)
+validator = jsonschema.Draft7Validator(schema_doc)
+errors = list(validator.iter_errors(audit_obj))
+assert len(errors) == 0, f"Packaged schema validation failed on actual diagnose output: {{errors}}"
+
+print('   ✅ Package generation smoke test passed for all 4 nodes (including diagnose and packaged Draft-7 schema validation).')
 """
         isolated_env = {"PATH": os.environ.get("PATH", "")}
         res = subprocess.run([sys.executable, "-I", "-c", script], cwd=str(test_dir), env=isolated_env, capture_output=True, text=True)

@@ -14,6 +14,7 @@ nodes.py — ComfyUI 原生自定义节点定义与注册
 from __future__ import annotations
 
 import hashlib
+import json
 import random
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Sequence, Tuple
@@ -74,32 +75,52 @@ def _make_slot_fragments(
     slot_name: str,
     user_input_val: str,
     entry_point: str = "generator",
+    selector: Optional[str] = None,
 ) -> List[PromptFragment]:
     if not res:
         return []
     mode = get_selection_mode(user_input_val)
+    item_id = (
+        getattr(res, "style_id", None)
+        or getattr(res, "theme_id", None)
+        or getattr(res, "item_id", None)
+    )
+    actual_selector = selector if selector is not None else slot_name
+    slot_origin = SelectionOrigin(
+        entry_point=entry_point,
+        mode=mode,
+        selector=actual_selector,
+        selected_id=item_id,
+        raw_value=user_input_val,
+        parent_ids=(item_id,) if item_id else (),
+    )
     frags: List[PromptFragment] = []
 
-    # ClothingSampleResult
+    # ClothingSampleResult (if somehow called directly)
     if hasattr(res, "all_tags"):
         for order, stag in enumerate(res.all_tags):
+            tag_item_id = (
+                (stag.provenance.item_id if stag.provenance and stag.provenance.item_id else None)
+                or item_id
+            )
+            tag_origin = SelectionOrigin(
+                entry_point=entry_point,
+                mode=mode,
+                selector=actual_selector,
+                selected_id=tag_item_id,
+                raw_value=user_input_val,
+                parent_ids=(tag_item_id,) if tag_item_id else (),
+            )
             frags.append(
                 PromptFragment(
                     text=stag.text,
                     source_slot=slot_name,
-                    source_item_id=stag.provenance.item_id or getattr(res, "style_id", None),
+                    source_item_id=tag_item_id,
                     order=order,
                     provenance=stag.provenance,
                     id=stag.id,
                     facts=stag.facts,
-                    origin=stag.origin or SelectionOrigin(
-                        entry_point=entry_point,
-                        mode=mode,
-                        selector=slot_name,
-                        selected_id=stag.provenance.item_id or getattr(res, "style_id", None),
-                        raw_value=stag.text,
-                        parent_ids=(stag.provenance.item_id,) if stag.provenance.item_id else (),
-                    ),
+                    origin=stag.origin or tag_origin,
                 )
             )
         return frags
@@ -111,20 +132,13 @@ def _make_slot_fragments(
                 PromptFragment(
                     text=stag.text,
                     source_slot=slot_name,
-                    source_item_id=res.theme_id,
+                    source_item_id=item_id,
                     context_ids=getattr(res, "context_ids", ()),
                     order=order,
                     provenance=stag.provenance,
                     id=stag.id,
                     facts=stag.facts,
-                    origin=stag.origin or SelectionOrigin(
-                        entry_point=entry_point,
-                        mode=mode,
-                        selector=slot_name,
-                        selected_id=res.theme_id,
-                        raw_value=stag.text,
-                        parent_ids=(res.theme_id,),
-                    ),
+                    origin=slot_origin,
                 )
             )
         return frags
@@ -136,28 +150,20 @@ def _make_slot_fragments(
                 PromptFragment(
                     text=stag.text,
                     source_slot=slot_name,
-                    source_item_id=res.item_id,
+                    source_item_id=item_id,
                     context_ids=getattr(res, "context_ids", ()),
                     exclusive_group=getattr(res, "exclusive_group", None),
                     order=order,
                     provenance=stag.provenance,
                     id=stag.id,
                     facts=stag.facts,
-                    origin=stag.origin or SelectionOrigin(
-                        entry_point=entry_point,
-                        mode=mode,
-                        selector=slot_name,
-                        selected_id=res.item_id,
-                        raw_value=stag.text,
-                        parent_ids=(res.item_id,) if res.item_id else (),
-                    ),
+                    origin=slot_origin,
                 )
             )
         return frags
 
     # Fallback to tags (str or SampledTag)
     tags = getattr(res, "tags", ())
-    item_id = getattr(res, "item_id", None)
     for order, t in enumerate(tags):
         t_text = t.text if hasattr(t, "text") else str(t)
         t_id = getattr(t, "id", f"{item_id}__tag_{order:03d}" if item_id else "")
@@ -167,9 +173,9 @@ def _make_slot_fragments(
             prov_item_id = item_id if item_id else t_id
             t_prov = TagProvenance(
                 item_id=prov_item_id,
-                kind=slot_name,
+                kind=actual_selector,
                 parent_ids=(item_id,) if item_id else (),
-                semantic_ids=((f"{slot_name}:{item_id}",) if item_id else ()),
+                semantic_ids=((f"{actual_selector}:{item_id}",) if item_id else ()),
             )
         frags.append(
             PromptFragment(
@@ -182,16 +188,167 @@ def _make_slot_fragments(
                 provenance=t_prov,
                 id=t_id,
                 facts=t_facts,
-                origin=getattr(t, "origin", None) or SelectionOrigin(
-                    entry_point=entry_point,
-                    mode=mode,
-                    selector=slot_name,
-                    selected_id=item_id,
-                    raw_value=t_text,
-                    parent_ids=(item_id,) if item_id else (),
-                ),
+                origin=slot_origin,
             )
         )
+    return frags
+
+
+def _make_clothing_fragments(
+    res: Any,
+    clothing_style_val: str,
+    clothing_state_val: str,
+    entry_point: str = "generator",
+) -> List[PromptFragment]:
+    if not res:
+        return []
+    frags: List[PromptFragment] = []
+
+    style_mode = get_selection_mode(clothing_style_val)
+    style_id = getattr(res, "style_id", None)
+    clothing_origin = SelectionOrigin(
+        entry_point=entry_point,
+        mode=style_mode,
+        selector="clothing",
+        selected_id=style_id,
+        raw_value=clothing_style_val,
+        parent_ids=(style_id,) if style_id else (),
+    )
+
+    state_mode = get_selection_mode(clothing_state_val)
+    state_id = getattr(res, "state_id", None)
+    clothing_state_origin = SelectionOrigin(
+        entry_point=entry_point,
+        mode=state_mode,
+        selector="clothing_state",
+        selected_id=state_id,
+        raw_value=clothing_state_val,
+        parent_ids=(state_id,) if state_id else (),
+    )
+
+    order = 0
+    # base_tags -> clothing_origin
+    base_tags = getattr(res, "base_tags", ())
+    for stag in base_tags:
+        t_text = stag.text if hasattr(stag, "text") else str(stag)
+        t_id = getattr(stag, "id", f"{style_id}__tag_{order:03d}" if style_id else "")
+        t_facts = getattr(stag, "facts", SemanticFacts())
+        t_prov = getattr(stag, "provenance", None)
+        if not t_prov or not t_prov.item_id:
+            prov_item_id = style_id if style_id else t_id
+            t_prov = TagProvenance(
+                item_id=prov_item_id,
+                kind="clothing",
+                parent_ids=(style_id,) if style_id else (),
+                semantic_ids=((f"clothing:{style_id}",) if style_id else ()),
+            )
+        frags.append(
+            PromptFragment(
+                text=t_text,
+                source_slot="clothing",
+                source_item_id=style_id,
+                order=order,
+                provenance=t_prov,
+                id=t_id,
+                facts=t_facts,
+                origin=clothing_origin,
+            )
+        )
+        order += 1
+
+    # state_tags -> clothing_state_origin (unless linkage_override, which overrides clothing style tags)
+    state_tags = getattr(res, "state_tags", ())
+    is_linkage_override = (state_id == "linkage_override")
+    for stag in state_tags:
+        t_text = stag.text if hasattr(stag, "text") else str(stag)
+        t_id = getattr(stag, "id", f"{state_id}__tag_{order:03d}" if state_id else "")
+        t_facts = getattr(stag, "facts", SemanticFacts())
+        t_prov = getattr(stag, "provenance", None)
+        if is_linkage_override:
+            effective_origin = clothing_origin
+            effective_slot = "clothing"
+            effective_item_id = style_id
+            if not t_prov or not t_prov.item_id:
+                t_prov = TagProvenance(
+                    item_id=style_id or t_id,
+                    kind="clothing",
+                    parent_ids=(style_id,) if style_id else (),
+                    semantic_ids=((f"clothing:{style_id}",) if style_id else ()),
+                )
+        else:
+            effective_origin = clothing_state_origin
+            effective_slot = "clothing"
+            effective_item_id = state_id or style_id
+            if not t_prov or not t_prov.item_id:
+                t_prov = TagProvenance(
+                    item_id=state_id if state_id else (style_id or t_id),
+                    kind="clothing_state",
+                    parent_ids=(state_id,) if state_id else ((style_id,) if style_id else ()),
+                    semantic_ids=((f"clothing_state:{state_id}",) if state_id else ()),
+                )
+        frags.append(
+            PromptFragment(
+                text=t_text,
+                source_slot=effective_slot,
+                source_item_id=effective_item_id,
+                order=order,
+                provenance=t_prov,
+                id=t_id,
+                facts=t_facts,
+                origin=effective_origin,
+            )
+        )
+        order += 1
+
+    # extension_tags -> clothing_origin (extensions of clothing style)
+    extension_tags = getattr(res, "extension_tags", ())
+    for stag in extension_tags:
+        t_text = stag.text if hasattr(stag, "text") else str(stag)
+        t_facts = getattr(stag, "facts", SemanticFacts())
+        t_prov = getattr(stag, "provenance", None)
+        item_id = t_prov.item_id if (t_prov and t_prov.item_id) else style_id
+        t_id = getattr(stag, "id", f"{item_id}__ext_{order:03d}" if item_id else "")
+        if not t_prov or not t_prov.item_id:
+            prov_item_id = style_id if style_id else t_id
+            t_prov = TagProvenance(
+                item_id=prov_item_id,
+                kind="clothing",
+                parent_ids=(style_id,) if style_id else (),
+                semantic_ids=((f"clothing:{style_id}",) if style_id else ()),
+            )
+        frags.append(
+            PromptFragment(
+                text=t_text,
+                source_slot="clothing",
+                source_item_id=item_id,
+                order=order,
+                provenance=t_prov,
+                id=t_id,
+                facts=t_facts,
+                origin=clothing_origin,
+            )
+        )
+        order += 1
+
+    # Fallback if res didn't have base_tags/state_tags/extension_tags
+    if not base_tags and not state_tags and not extension_tags and hasattr(res, "all_tags"):
+        for stag in getattr(res, "all_tags", ()):
+            t_text = stag.text if hasattr(stag, "text") else str(stag)
+            t_id = getattr(stag, "id", f"{style_id}__tag_{order:03d}" if style_id else "")
+            frags.append(
+                PromptFragment(
+                    text=t_text,
+                    source_slot="clothing",
+                    source_item_id=style_id,
+                    order=order,
+                    provenance=getattr(stag, "provenance", None),
+                    id=t_id,
+                    facts=getattr(stag, "facts", SemanticFacts()),
+                    origin=clothing_origin,
+                )
+            )
+            order += 1
+
     return frags
 
 
@@ -248,7 +405,15 @@ def _generate_structured(
         if preset:
             rng_recipe = derive_substream_rng(effective_seed, "selector:style_recipe")
             recipe = sampler.get_style_recipe(风格配方, rng_recipe) if not _is_none(风格配方) else None
-            assembly_res = assembler.assemble_preset(preset, recipe, 画质等级, rng=rng, entry_point=entry_point)
+            assembly_res = assembler.assemble_preset(
+                preset,
+                recipe,
+                画质等级,
+                rng=rng,
+                entry_point=entry_point,
+                preset_raw_value=预设模板,
+                recipe_raw_value=风格配方 if not _is_none(风格配方) else None,
+            )
             neg = sampler.get_negative_prompt()
             desc = f"【预设模板】{preset.get('id', '')} {preset.get('name_zh', '')}"
             if recipe:
@@ -265,6 +430,10 @@ def _generate_structured(
                 context_profile=assembly_res.context_profile,
                 selections=selections,
                 resolution_report=assembly_res.resolution_report,
+                deduplicated_atoms=assembly_res.deduplicated_atoms,
+                budget_filtered_atoms=assembly_res.budget_filtered_atoms,
+                deduplication_records=assembly_res.deduplication_records,
+                budget_filter_records=assembly_res.budget_filter_records,
             )
 
     # 2. 采样 15 槽位
@@ -273,12 +442,12 @@ def _generate_structured(
     scene_res = sampler.sample_scene_result(场景大类, rng_scene)
     slots: Dict[str, List[Any]] = {}
 
-    slots["scene_theme"] = _make_slot_fragments(scene_res, "scene_theme", 场景大类, entry_point)
+    slots["scene_theme"] = _make_slot_fragments(scene_res, "scene_theme", 场景大类, entry_point, selector="scene")
 
     rng_theme = derive_substream_rng(effective_seed, "selector:theme")
     theme_res = sampler.sample_theme_result(剧情主题, rng_theme)
     if theme_res:
-        slots["scene_theme"].extend(_make_slot_fragments(theme_res, "scene_theme", 剧情主题, entry_point))
+        slots["scene_theme"].extend(_make_slot_fragments(theme_res, "scene_theme", 剧情主题, entry_point, selector="theme"))
 
     scene_cids = scene_res.context_ids if (scene_res and hasattr(scene_res, "context_ids")) else ()
     theme_cids = theme_res.context_ids if (theme_res and hasattr(theme_res, "context_ids")) else ()
@@ -307,7 +476,7 @@ def _generate_structured(
     clothing_res = sampler.sample_clothing_result(
         服装款式, 服装状态, lvl_code, rng_clothing, context=context, context_profile=context_profile
     )
-    slots["clothing"] = _make_slot_fragments(clothing_res, "clothing", 服装款式, entry_point)
+    slots["clothing"] = _make_clothing_fragments(clothing_res, 服装款式, 服装状态, entry_point)
 
     # 槽位 5: 光影氛围
     rng_lighting = derive_substream_rng(effective_seed, "selector:lighting")
@@ -377,6 +546,15 @@ def _generate_structured(
     recipe = sampler.get_style_recipe(风格配方, rng_recipe) if not _is_none(风格配方) else None
     if recipe:
         recipe_id = recipe.get("id", "recipe_custom")
+        raw_r = 风格配方 if not _is_none(风格配方) else (recipe.get("style_name") or recipe.get("name_zh") or recipe_id)
+        recipe_origin = SelectionOrigin(
+            entry_point=entry_point,
+            mode="recipe",
+            selector="style_recipe",
+            selected_id=recipe_id,
+            raw_value=raw_r,
+            parent_ids=(recipe_id,),
+        )
         recipe_frags = recipe.get("fragments")
         if recipe_frags and isinstance(recipe_frags, list):
             for f_data in recipe_frags:
@@ -385,15 +563,6 @@ def _generate_structured(
                     f_id = f_data.get("id", "")
                     f_slot = f_data.get("slot", "style_recipe")
                     f_facts = SemanticFacts.from_dict(f_data.get("facts", {}))
-                    origin_d = f_data.get("origin", {})
-                    f_origin = SelectionOrigin(
-                        entry_point=entry_point,
-                        mode=origin_d.get("mode", "recipe"),
-                        selector=origin_d.get("selector", f_slot),
-                        selected_id=origin_d.get("selected_id", recipe_id),
-                        raw_value=origin_d.get("raw_value", text),
-                        parent_ids=tuple(origin_d.get("parent_ids", (recipe_id,))),
-                    )
                     slots.setdefault("style_recipe", []).append(
                         PromptFragment(
                             text=text,
@@ -407,7 +576,7 @@ def _generate_structured(
                             ),
                             id=f_id,
                             facts=f_facts,
-                            origin=f_origin,
+                            origin=recipe_origin,
                         )
                     )
         else:
@@ -426,14 +595,7 @@ def _generate_structured(
                                         kind="style_recipe",
                                         semantic_ids=(f"recipe:{recipe_id}",),
                                     ),
-                                    origin=SelectionOrigin(
-                                        entry_point=entry_point,
-                                        mode="recipe",
-                                        selector=k,
-                                        selected_id=recipe_id,
-                                        raw_value=t,
-                                        parent_ids=(recipe_id,),
-                                    ),
+                                    origin=recipe_origin,
                                 )
                             )
 
@@ -472,6 +634,10 @@ def _generate_structured(
         context_profile=context_profile,
         selections=selections,
         resolution_report=assembly_res.resolution_report,
+        deduplicated_atoms=assembly_res.deduplicated_atoms,
+        budget_filtered_atoms=assembly_res.budget_filtered_atoms,
+        deduplication_records=assembly_res.deduplication_records,
+        budget_filter_records=assembly_res.budget_filter_records,
     )
 
 
@@ -552,58 +718,61 @@ class IYKYKPromptGenerator:
 
     def generate_structured(
         self,
-        预设模板: str,
-        风格配方: str,
-        场景大类: str,
-        剧情主题: str,
-        景别构图: str,
-        拍摄视角: str,
-        裸露等级: str,
-        服装款式: str,
-        服装状态: str,
-        发型发色: str,
-        饰品头饰: str,
-        妆容细节: str,
-        姿势动作: str,
-        情绪表情: str,
-        光影预设: str,
-        胶片风格: str,
-        液体效果: str,
-        纹身标记: str,
-        道具物件: str,
-        角色设定: str,
-        真实微瑕: str,
-        画质等级: str,
+        预设模板: str = "无 (None)",
+        风格配方: str = "无 (None)",
+        场景大类: str = "随机 (Random)",
+        剧情主题: str = "随机 (Random)",
+        景别构图: str = "自动 (Auto)",
+        拍摄视角: str = "自动 (Auto)",
+        裸露等级: str = "随机 (Random)",
+        服装款式: str = "随机 (Random)",
+        服装状态: str = "自动联动裸露等级 (Auto Link Nudity)",
+        发型发色: str = "随机 (Random)",
+        饰品头饰: str = "无 (None)",
+        妆容细节: str = "无 (None)",
+        姿势动作: str = "随机 (Random)",
+        情绪表情: str = "随机 (Random)",
+        光影预设: str = "自动 (Auto)",
+        胶片风格: str = "无 (None)",
+        液体效果: str = "无 (None)",
+        纹身标记: str = "无 (None)",
+        道具物件: str = "无 (None)",
+        角色设定: str = "无 (None)",
+        真实微瑕: str = "无 (None)",
+        画质等级: str = "高清写真 (High)",
         prompt_seed: int = -1,
+        **kwargs: Any,
     ) -> GenerationResult:
         rng, effective_seed = _get_rng(prompt_seed)
+        inputs = {
+            "预设模板": 预设模板,
+            "风格配方": 风格配方,
+            "场景大类": 场景大类,
+            "剧情主题": 剧情主题,
+            "景别构图": 景别构图,
+            "拍摄视角": 拍摄视角,
+            "裸露等级": 裸露等级,
+            "服装款式": 服装款式,
+            "服装状态": 服装状态,
+            "发型发色": 发型发色,
+            "饰品头饰": 饰品头饰,
+            "妆容细节": 妆容细节,
+            "姿势动作": 姿势动作,
+            "情绪表情": 情绪表情,
+            "光影预设": 光影预设,
+            "胶片风格": 胶片风格,
+            "液体效果": 液体效果,
+            "纹身标记": 纹身标记,
+            "道具物件": 道具物件,
+            "角色设定": 角色设定,
+            "真实微瑕": 真实微瑕,
+            "画质等级": 画质等级,
+        }
+        inputs.update(kwargs)
         res = _generate_structured(
             sampler=_sampler,
             assembler=_assembler,
-            inputs={
-                "预设模板": 预设模板,
-                "风格配方": 风格配方,
-                "场景大类": 场景大类,
-                "剧情主题": 剧情主题,
-                "景别构图": 景别构图,
-                "拍摄视角": 拍摄视角,
-                "裸露等级": 裸露等级,
-                "服装款式": 服装款式,
-                "服装状态": 服装状态,
-                "发型发色": 发型发色,
-                "饰品头饰": 饰品头饰,
-                "妆容细节": 妆容细节,
-                "姿势动作": 姿势动作,
-                "情绪表情": 情绪表情,
-                "光影预设": 光影预设,
-                "胶片风格": 胶片风格,
-                "液体效果": 液体效果,
-                "纹身标记": 纹身标记,
-                "道具物件": 道具物件,
-                "角色设定": 角色设定,
-                "真实微瑕": 真实微瑕,
-                "画质等级": 画质等级,
-            },
+            inputs=inputs,
             rng=rng,
             entry_point="generator",
             effective_seed=effective_seed,
@@ -612,35 +781,56 @@ class IYKYKPromptGenerator:
 
     def generate(
         self,
-        预设模板: str,
-        风格配方: str,
-        场景大类: str,
-        剧情主题: str,
-        景别构图: str,
-        拍摄视角: str,
-        裸露等级: str,
-        服装款式: str,
-        服装状态: str,
-        发型发色: str,
-        饰品头饰: str,
-        妆容细节: str,
-        姿势动作: str,
-        情绪表情: str,
-        光影预设: str,
-        胶片风格: str,
-        液体效果: str,
-        纹身标记: str,
-        道具物件: str,
-        角色设定: str,
-        真实微瑕: str,
-        画质等级: str,
+        预设模板: str = "无 (None)",
+        风格配方: str = "无 (None)",
+        场景大类: str = "随机 (Random)",
+        剧情主题: str = "随机 (Random)",
+        景别构图: str = "自动 (Auto)",
+        拍摄视角: str = "自动 (Auto)",
+        裸露等级: str = "随机 (Random)",
+        服装款式: str = "随机 (Random)",
+        服装状态: str = "自动联动裸露等级 (Auto Link Nudity)",
+        发型发色: str = "随机 (Random)",
+        饰品头饰: str = "无 (None)",
+        妆容细节: str = "无 (None)",
+        姿势动作: str = "随机 (Random)",
+        情绪表情: str = "随机 (Random)",
+        光影预设: str = "自动 (Auto)",
+        胶片风格: str = "无 (None)",
+        液体效果: str = "无 (None)",
+        纹身标记: str = "无 (None)",
+        道具物件: str = "无 (None)",
+        角色设定: str = "无 (None)",
+        真实微瑕: str = "无 (None)",
+        画质等级: str = "高清写真 (High)",
         prompt_seed: int = -1,
+        **kwargs: Any,
     ) -> Tuple[str, str, str]:
         res = self.generate_structured(
-            预设模板, 风格配方, 场景大类, 剧情主题, 景别构图, 拍摄视角, 裸露等级,
-            服装款式, 服装状态, 发型发色, 饰品头饰, 妆容细节, 姿势动作, 情绪表情,
-            光影预设, 胶片风格, 液体效果, 纹身标记, 道具物件, 角色设定, 真实微瑕,
-            画质等级, prompt_seed
+            预设模板=预设模板,
+            风格配方=风格配方,
+            场景大类=场景大类,
+            剧情主题=剧情主题,
+            景别构图=景别构图,
+            拍摄视角=拍摄视角,
+            裸露等级=裸露等级,
+            服装款式=服装款式,
+            服装状态=服装状态,
+            发型发色=发型发色,
+            饰品头饰=饰品头饰,
+            妆容细节=妆容细节,
+            姿势动作=姿势动作,
+            情绪表情=情绪表情,
+            光影预设=光影预设,
+            胶片风格=胶片风格,
+            液体效果=液体效果,
+            纹身标记=纹身标记,
+            道具物件=道具物件,
+            角色设定=角色设定,
+            真实微瑕=真实微瑕,
+            画质等级=画质等级,
+            prompt_seed=prompt_seed,
+            **kwargs,
         )
         return (res.positive, res.negative, res.description)
 
@@ -706,7 +896,15 @@ class IYKYKPresetBrowser:
             )
 
         recipe = _sampler.get_style_recipe(风格配方, rng) if not _is_none(风格配方) else None
-        assembly_res = _assembler.assemble_preset(preset, recipe, 画质等级, rng=rng, entry_point="preset_browser")
+        assembly_res = _assembler.assemble_preset(
+            preset,
+            recipe,
+            画质等级,
+            rng=rng,
+            entry_point="preset_browser",
+            preset_raw_value=预设模板,
+            recipe_raw_value=风格配方 if not _is_none(风格配方) else None,
+        )
         neg = _sampler.get_negative_prompt()
 
         desc = f"【预设模板】{preset.get('id', '')} {preset.get('name_zh', '')}"
@@ -725,6 +923,10 @@ class IYKYKPresetBrowser:
             context_profile=assembly_res.context_profile,
             selections=selections,
             resolution_report=assembly_res.resolution_report,
+            deduplicated_atoms=assembly_res.deduplicated_atoms,
+            budget_filtered_atoms=assembly_res.budget_filtered_atoms,
+            deduplication_records=assembly_res.deduplication_records,
+            budget_filter_records=assembly_res.budget_filter_records,
         )
 
     def browse(
@@ -812,7 +1014,14 @@ class IYKYKCustomSlotCombiner:
             val = kwargs.get(user_key, "")
             if val and str(val).strip():
                 active_count += 1
-                tags = split_top_level_tags(str(val))
+                slot_raw_val = str(val)
+                slot_origin = SelectionOrigin(
+                    entry_point="custom_combiner",
+                    mode="custom",
+                    selector=slot_name,
+                    raw_value=slot_raw_val,
+                )
+                tags = split_top_level_tags(slot_raw_val.strip())
                 for t in tags:
                     fragments.append(
                         PromptFragment(
@@ -820,12 +1029,7 @@ class IYKYKCustomSlotCombiner:
                             source_slot=slot_name,
                             order=order,
                             provenance=TagProvenance(kind="user_input", semantic_ids=(f"slot:{slot_name}",)),
-                            origin=SelectionOrigin(
-                                entry_point="custom_combiner",
-                                mode="custom",
-                                selector=slot_name,
-                                raw_value=t,
-                            ),
+                            origin=slot_origin,
                         )
                     )
                     order += 1
@@ -846,6 +1050,10 @@ class IYKYKCustomSlotCombiner:
             context_profile=assembly_res.context_profile,
             selections=selections,
             resolution_report=assembly_res.resolution_report,
+            deduplicated_atoms=assembly_res.deduplicated_atoms,
+            budget_filtered_atoms=assembly_res.budget_filtered_atoms,
+            deduplication_records=assembly_res.deduplication_records,
+            budget_filter_records=assembly_res.budget_filter_records,
         )
 
     def combine(self, prompt_seed: int = -1, **kwargs) -> Tuple[str, str, str]:
@@ -853,14 +1061,356 @@ class IYKYKCustomSlotCombiner:
         return (res.positive, res.negative, res.description)
 
 
+# ═══════════════════════════════════════════════════════════════════════════
+# 审计 JSON 确定性格式化器
+# ═══════════════════════════════════════════════════════════════════════════
+
+def _quantize_weight(w: float) -> float:
+    """对情境权重精确四舍五入至小数点后 12 位，并消除负零 (-0.0 -> 0.0)。"""
+    q = round(float(w), 12)
+    return 0.0 if q == 0.0 else q
+
+
+def _serialize_atom_item(a: PromptAtom, is_accepted: bool) -> Dict[str, Any]:
+    """序列化原子 Span 身份、层级序号与完整来源元数据。"""
+    return {
+        "atom_id": a.atom_id,
+        "id": a.id,
+        "is_accepted": is_accepted,
+        "parent_ids": list(a.provenance.parent_ids),
+        "semantic_ids": list(a.provenance.semantic_ids),
+        "source_item_id": a.source_item_id,
+        "source_slot": a.source_slot,
+        "span_order": a.span_order,
+        "tag_order": a.tag_order,
+        "text": a.text,
+    }
+
+
+def format_diagnostics_dict(res: GenerationResult) -> Dict[str, Any]:
+    """构建符合 schemas/diagnostics.schema.json 契约的结构化字典 (8 大顶层字段)。"""
+    # 1. context_profile (空配置输出 {})
+    if res.context_profile is not None:
+        cp_dict: Dict[str, Any] = {
+            "schema_version": res.context_profile.schema_version,
+            "scene_context_ids": list(res.context_profile.scene_context_ids),
+            "scene_item_id": res.context_profile.scene_item_id,
+            "theme_context_ids": list(res.context_profile.theme_context_ids),
+            "theme_id": res.context_profile.theme_id,
+            "weights": {
+                c: _quantize_weight(w)
+                for c, w in res.context_profile.weights
+            },
+        }
+    else:
+        cp_dict = {}
+
+    # 2. selections (携带 Atom/source/produced/accepted 身份与 provenance 闭环)
+    accepted_atom_ids = {a.atom_id for a in res.atoms}
+    rep = res.resolution_report
+    all_source_atoms = list(res.source_atoms)
+    all_produced_atoms = list(rep.produced_atoms if rep and hasattr(rep, "produced_atoms") else ())
+
+    # 建立 Atom ID 到 SelectionOrigin 的映射，供去重与预算记录归并
+    atom_origin_map: Dict[str, SelectionOrigin] = {}
+    for a in all_source_atoms:
+        if a.origin is not None:
+            atom_origin_map[a.atom_id] = a.origin
+    for a in all_produced_atoms:
+        if a.origin is not None:
+            atom_origin_map[a.atom_id] = a.origin
+
+    seen_origins: set[SelectionOrigin] = set()
+    ordered_origins: List[SelectionOrigin] = []
+
+    for a in all_source_atoms:
+        if a.origin is not None and a.origin not in seen_origins:
+            seen_origins.add(a.origin)
+            ordered_origins.append(a.origin)
+
+    for a in all_produced_atoms:
+        if a.origin is not None and a.origin not in seen_origins:
+            seen_origins.add(a.origin)
+            ordered_origins.append(a.origin)
+
+    for a in res.atoms:
+        if a.origin is not None and a.origin not in seen_origins:
+            seen_origins.add(a.origin)
+            ordered_origins.append(a.origin)
+
+    selections_list = []
+    for s in ordered_origins:
+        source_atoms_for_s = [a for a in all_source_atoms if a.origin == s]
+        produced_atoms_for_s = [a for a in all_produced_atoms if a.origin == s]
+        # Retained source spans remain owned by their original selection even
+        # when a sibling in the same protected tag was replaced.
+        accepted_atoms_for_s = [
+            a for a in res.atoms
+            if atom_origin_map.get(a.atom_id, a.origin) == s
+        ]
+        dedup_records_for_s = [r for r in res.deduplication_records if atom_origin_map.get(r.atom_id) == s]
+        budget_records_for_s = [r for r in res.budget_filter_records if atom_origin_map.get(r.atom_id) == s]
+
+        selections_list.append({
+            "accepted_atoms": [
+                _serialize_atom_item(a, True)
+                for a in accepted_atoms_for_s
+            ],
+            "budget_filtered_records": [
+                {
+                    "atom_id": r.atom_id,
+                    "candidate_words": r.candidate_words,
+                    "reason": r.reason,
+                    "used_words": r.used_words,
+                    "word_budget": r.word_budget,
+                }
+                for r in budget_records_for_s
+            ],
+            "deduplicated_records": [
+                {
+                    "atom_id": r.atom_id,
+                    "basis": r.basis,
+                    "retained_atom_id": r.retained_atom_id,
+                    "retained_tag_text": r.retained_tag_text,
+                }
+                for r in dedup_records_for_s
+            ],
+            "entry_point": s.entry_point,
+            "mode": s.mode,
+            "parent_ids": list(s.parent_ids),
+            "produced_atoms": [
+                _serialize_atom_item(a, a.atom_id in accepted_atom_ids)
+                for a in produced_atoms_for_s
+            ],
+            "raw_value": s.raw_value,
+            "selected_id": s.selected_id,
+            "selector": s.selector,
+            "source_atoms": [
+                _serialize_atom_item(a, a.atom_id in accepted_atom_ids)
+                for a in source_atoms_for_s
+            ],
+        })
+
+    # 3. decisions (完整输出冻结模型的 12 个字段)
+    decisions_list = []
+    if rep and rep.decisions:
+        for d in rep.decisions:
+            decisions_list.append({
+                "action": d.action,
+                "after_text": d.after_text,
+                "before_text": d.before_text,
+                "decision_id": d.decision_id,
+                "parent_source_ids": list(d.parent_source_ids),
+                "phase": d.phase,
+                "produced_atom_ids": list(d.produced_atom_ids),
+                "reason_code": d.reason_code,
+                "rule_id": d.rule_id,
+                "sequence": d.sequence,
+                "target_atom_id": d.target_atom_id,
+                "winner_atom_ids": list(d.winner_atom_ids),
+            })
+
+    # 4. rules_applied
+    rules_applied_list = list(res.rules_applied)
+
+    # 5. unresolved_conflicts
+    unresolved_list = [
+        list(c) if isinstance(c, (list, tuple)) else c
+        for c in (rep.unresolved_conflicts if rep else ())
+    ]
+
+    # 6. counts (精确由集合分区推导)
+    counts_dict = {
+        "accepted_atoms": len(res.atoms),
+        "budget_filtered": len(res.budget_filter_records),
+        "deduplicated": len(res.deduplication_records),
+        "dropped": rep.dropped_count if rep else 0,
+        "injected": rep.injected_count if rep else 0,
+        "produced": len(all_produced_atoms),
+        "replaced": rep.replaced_count if rep else 0,
+        "source_atoms": len(all_source_atoms),
+    }
+
+    audit_dict = {
+        "context_profile": cp_dict,
+        "counts": counts_dict,
+        "decisions": decisions_list,
+        "effective_seed": int(res.effective_seed if res.effective_seed is not None else 0),
+        "rules_applied": rules_applied_list,
+        "schema_version": "1.0",
+        "selections": selections_list,
+        "unresolved_conflicts": unresolved_list,
+    }
+    return audit_dict
+
+
+def format_diagnostics_json(res: GenerationResult) -> str:
+    """确定性序列化为紧凑 UTF-8 审计报告 JSON 字符串 (键字典序、紧凑无空、无结尾换行)。"""
+    d = format_diagnostics_dict(res)
+    return json.dumps(
+        d,
+        ensure_ascii=False,
+        sort_keys=True,
+        separators=(",", ":"),
+        allow_nan=False,
+    )
+
+
+# ═══════════════════════════════════════════════════════════════════════════
+# 节点 4: 🔎 IYKYK 提示词诊断
+# ═══════════════════════════════════════════════════════════════════════════
+
+class IYKYKPromptDiagnostics:
+    """提示词诊断节点 (ComfyUI-IYKYK 审计与可解释性节点)"""
+
+    @classmethod
+    def INPUT_TYPES(cls):
+        return IYKYKPromptGenerator.INPUT_TYPES()
+
+    RETURN_TYPES = ("STRING", "STRING", "STRING", "STRING")
+    RETURN_NAMES = (
+        "正面提示词 (STRING)",
+        "负面提示词 (STRING)",
+        "中文场景描述 (STRING)",
+        "审计报告 JSON (STRING)",
+    )
+    FUNCTION = "diagnose"
+    CATEGORY = "IYKYK / 提示词生成"
+
+    @classmethod
+    def IS_CHANGED(cls, prompt_seed: int = -1, **kwargs) -> Any:
+        return _compute_is_changed(prompt_seed, kwargs)
+
+    def diagnose_structured(
+        self,
+        预设模板: str = "无 (None)",
+        风格配方: str = "无 (None)",
+        场景大类: str = "随机 (Random)",
+        剧情主题: str = "随机 (Random)",
+        景别构图: str = "自动 (Auto)",
+        拍摄视角: str = "自动 (Auto)",
+        裸露等级: str = "随机 (Random)",
+        服装款式: str = "随机 (Random)",
+        服装状态: str = "自动联动裸露等级 (Auto Link Nudity)",
+        发型发色: str = "随机 (Random)",
+        饰品头饰: str = "无 (None)",
+        妆容细节: str = "无 (None)",
+        姿势动作: str = "随机 (Random)",
+        情绪表情: str = "随机 (Random)",
+        光影预设: str = "自动 (Auto)",
+        胶片风格: str = "无 (None)",
+        液体效果: str = "无 (None)",
+        纹身标记: str = "无 (None)",
+        道具物件: str = "无 (None)",
+        角色设定: str = "无 (None)",
+        真实微瑕: str = "无 (None)",
+        画质等级: str = "高清写真 (High)",
+        prompt_seed: int = -1,
+        **kwargs: Any,
+    ) -> Tuple[GenerationResult, str]:
+        rng, effective_seed = _get_rng(prompt_seed)
+        inputs = {
+            "预设模板": 预设模板,
+            "风格配方": 风格配方,
+            "场景大类": 场景大类,
+            "剧情主题": 剧情主题,
+            "景别构图": 景别构图,
+            "拍摄视角": 拍摄视角,
+            "裸露等级": 裸露等级,
+            "服装款式": 服装款式,
+            "服装状态": 服装状态,
+            "发型发色": 发型发色,
+            "饰品头饰": 饰品头饰,
+            "妆容细节": 妆容细节,
+            "姿势动作": 姿势动作,
+            "情绪表情": 情绪表情,
+            "光影预设": 光影预设,
+            "胶片风格": 胶片风格,
+            "液体效果": 液体效果,
+            "纹身标记": 纹身标记,
+            "道具物件": 道具物件,
+            "角色设定": 角色设定,
+            "真实微瑕": 真实微瑕,
+            "画质等级": 画质等级,
+        }
+        inputs.update(kwargs)
+        res = _generate_structured(
+            sampler=_sampler,
+            assembler=_assembler,
+            inputs=inputs,
+            rng=rng,
+            entry_point="diagnostics",
+            effective_seed=effective_seed,
+        )
+        audit_json = format_diagnostics_json(res)
+        return res, audit_json
+
+    def diagnose(
+        self,
+        预设模板: str = "无 (None)",
+        风格配方: str = "无 (None)",
+        场景大类: str = "随机 (Random)",
+        剧情主题: str = "随机 (Random)",
+        景别构图: str = "自动 (Auto)",
+        拍摄视角: str = "自动 (Auto)",
+        裸露等级: str = "随机 (Random)",
+        服装款式: str = "随机 (Random)",
+        服装状态: str = "自动联动裸露等级 (Auto Link Nudity)",
+        发型发色: str = "随机 (Random)",
+        饰品头饰: str = "无 (None)",
+        妆容细节: str = "无 (None)",
+        姿势动作: str = "随机 (Random)",
+        情绪表情: str = "随机 (Random)",
+        光影预设: str = "自动 (Auto)",
+        胶片风格: str = "无 (None)",
+        液体效果: str = "无 (None)",
+        纹身标记: str = "无 (None)",
+        道具物件: str = "无 (None)",
+        角色设定: str = "无 (None)",
+        真实微瑕: str = "无 (None)",
+        画质等级: str = "高清写真 (High)",
+        prompt_seed: int = -1,
+        **kwargs: Any,
+    ) -> Tuple[str, str, str, str]:
+        res, audit_json = self.diagnose_structured(
+            预设模板=预设模板,
+            风格配方=风格配方,
+            场景大类=场景大类,
+            剧情主题=剧情主题,
+            景别构图=景别构图,
+            拍摄视角=拍摄视角,
+            裸露等级=裸露等级,
+            服装款式=服装款式,
+            服装状态=服装状态,
+            发型发色=发型发色,
+            饰品头饰=饰品头饰,
+            妆容细节=妆容细节,
+            姿势动作=姿势动作,
+            情绪表情=情绪表情,
+            光影预设=光影预设,
+            胶片风格=胶片风格,
+            液体效果=液体效果,
+            纹身标记=纹身标记,
+            道具物件=道具物件,
+            角色设定=角色设定,
+            真实微瑕=真实微瑕,
+            画质等级=画质等级,
+            prompt_seed=prompt_seed,
+            **kwargs,
+        )
+        return (res.positive, res.negative, res.description, audit_json)
+
+
 NODE_CLASS_MAPPINGS = {
     "IYKYKPromptGenerator": IYKYKPromptGenerator,
     "IYKYKPresetBrowser": IYKYKPresetBrowser,
     "IYKYKCustomSlotCombiner": IYKYKCustomSlotCombiner,
+    "IYKYKPromptDiagnostics": IYKYKPromptDiagnostics,
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
     "IYKYKPromptGenerator": "🎴 IYKYK 15槽位提示词生成器",
     "IYKYKPresetBrowser": "📋 IYKYK 模板浏览器",
     "IYKYKCustomSlotCombiner": "🧩 IYKYK 自定义槽位拼装器",
+    "IYKYKPromptDiagnostics": "🔎 IYKYK 提示词诊断",
 }

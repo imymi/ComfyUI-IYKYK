@@ -1,0 +1,691 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "IYKYKPromptDiagnosticsAudit",
+  "description": "ComfyUI-IYKYK 诊断节点审计报告 JSON 契约 (Draft-7, 8 大顶层字段, 全对象 Fail-Closed)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "effective_seed",
+    "context_profile",
+    "selections",
+    "decisions",
+    "rules_applied",
+    "unresolved_conflicts",
+    "counts"
+  ],
+  "definitions": {
+    "context_id": {
+      "type": "string",
+      "enum": [
+        "adult",
+        "bondage_sm",
+        "dining",
+        "domestic",
+        "generic",
+        "medical",
+        "nightlife",
+        "office",
+        "onsen_bath",
+        "outdoor",
+        "school",
+        "special",
+        "traditional",
+        "transit"
+      ]
+    },
+    "rule_id": {
+      "type": "string",
+      "enum": [
+        "spatial_environmental_mutual_exclusion",
+        "nudity_clothing_conflicts",
+        "framing_lower_body_coherence",
+        "pose_hand_occupation",
+        "handheld_props_single_holder",
+        "clothing_style_state_coherence",
+        "material_penetration",
+        "device_quality_compatibility",
+        "environmental_lighting_coherence",
+        "monochrome_film_chroma_coherence",
+        "makeup_details_coherence",
+        "gaze_angle_geometry",
+        "accessory_occlusion_gaze_coherence",
+        "emotion_gaze_affinity",
+        "gaze_mutual_exclusion",
+        "liquid_restrictions",
+        "tattoo_dermal_fusion"
+      ]
+    },
+    "atom_entry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "atom_id",
+        "id",
+        "is_accepted",
+        "parent_ids",
+        "semantic_ids",
+        "source_item_id",
+        "source_slot",
+        "span_order",
+        "tag_order",
+        "text"
+      ],
+      "properties": {
+        "atom_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "id": {
+          "type": "string"
+        },
+        "is_accepted": {
+          "type": "boolean"
+        },
+        "parent_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "semantic_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "source_item_id": {
+          "type": ["string", "null"]
+        },
+        "source_slot": {
+          "type": "string"
+        },
+        "span_order": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "tag_order": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "text": {
+          "type": "string"
+        }
+      }
+    },
+    "deduplicated_record": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "atom_id",
+        "basis",
+        "retained_atom_id",
+        "retained_tag_text"
+      ],
+      "properties": {
+        "atom_id": {
+          "type": "string"
+        },
+        "basis": {
+          "type": "string"
+        },
+        "retained_atom_id": {
+          "type": "string"
+        },
+        "retained_tag_text": {
+          "type": "string"
+        }
+      }
+    },
+    "budget_filtered_record": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "atom_id",
+        "candidate_words",
+        "reason",
+        "used_words",
+        "word_budget"
+      ],
+      "properties": {
+        "atom_id": {
+          "type": "string"
+        },
+        "candidate_words": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "reason": {
+          "type": "string",
+          "enum": ["word_budget_exceeded"]
+        },
+        "used_words": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "word_budget": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "selection_entry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "accepted_atoms",
+        "budget_filtered_records",
+        "deduplicated_records",
+        "entry_point",
+        "mode",
+        "parent_ids",
+        "produced_atoms",
+        "raw_value",
+        "selected_id",
+        "selector",
+        "source_atoms"
+      ],
+      "properties": {
+        "accepted_atoms": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/atom_entry"
+          }
+        },
+        "budget_filtered_records": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/budget_filtered_record"
+          }
+        },
+        "deduplicated_records": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/deduplicated_record"
+          }
+        },
+        "entry_point": {
+          "type": "string",
+          "enum": ["generator", "preset_browser", "custom_combiner", "diagnostics"]
+        },
+        "mode": {
+          "type": "string",
+          "enum": ["none", "random", "auto", "explicit", "preset", "recipe", "custom", "resolver"]
+        },
+        "parent_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "produced_atoms": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/atom_entry"
+          }
+        },
+        "raw_value": {
+          "type": ["string", "null"]
+        },
+        "selected_id": {
+          "type": ["string", "null"]
+        },
+        "selector": {
+          "type": "string"
+        },
+        "source_atoms": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/atom_entry"
+          }
+        }
+      }
+    },
+    "drop_decision": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "action",
+        "after_text",
+        "before_text",
+        "decision_id",
+        "parent_source_ids",
+        "phase",
+        "produced_atom_ids",
+        "reason_code",
+        "rule_id",
+        "sequence",
+        "target_atom_id",
+        "winner_atom_ids"
+      ],
+      "properties": {
+        "action": {
+          "type": "string",
+          "const": "drop"
+        },
+        "after_text": {
+          "type": "null"
+        },
+        "before_text": {
+          "type": "string",
+          "minLength": 1
+        },
+        "decision_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "parent_source_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "phase": {
+          "type": "string",
+          "enum": ["anchors", "physical", "semantic", "effects"]
+        },
+        "produced_atom_ids": {
+          "type": "array",
+          "maxItems": 0
+        },
+        "reason_code": {
+          "type": "string",
+          "minLength": 1
+        },
+        "rule_id": {
+          "$ref": "#/definitions/rule_id"
+        },
+        "sequence": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "target_atom_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "winner_atom_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "replace_decision": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "action",
+        "after_text",
+        "before_text",
+        "decision_id",
+        "parent_source_ids",
+        "phase",
+        "produced_atom_ids",
+        "reason_code",
+        "rule_id",
+        "sequence",
+        "target_atom_id",
+        "winner_atom_ids"
+      ],
+      "properties": {
+        "action": {
+          "type": "string",
+          "const": "replace"
+        },
+        "after_text": {
+          "type": "string",
+          "minLength": 1
+        },
+        "before_text": {
+          "type": "string",
+          "minLength": 1
+        },
+        "decision_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "parent_source_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "phase": {
+          "type": "string",
+          "enum": ["anchors", "physical", "semantic", "effects"]
+        },
+        "produced_atom_ids": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string"
+          }
+        },
+        "reason_code": {
+          "type": "string",
+          "minLength": 1
+        },
+        "rule_id": {
+          "$ref": "#/definitions/rule_id"
+        },
+        "sequence": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "target_atom_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "winner_atom_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "inject_decision": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "action",
+        "after_text",
+        "before_text",
+        "decision_id",
+        "parent_source_ids",
+        "phase",
+        "produced_atom_ids",
+        "reason_code",
+        "rule_id",
+        "sequence",
+        "target_atom_id",
+        "winner_atom_ids"
+      ],
+      "properties": {
+        "action": {
+          "type": "string",
+          "const": "inject"
+        },
+        "after_text": {
+          "type": "string",
+          "minLength": 1
+        },
+        "before_text": {
+          "type": "null"
+        },
+        "decision_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "parent_source_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "phase": {
+          "type": "string",
+          "enum": ["anchors", "physical", "semantic", "effects"]
+        },
+        "produced_atom_ids": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string"
+          }
+        },
+        "reason_code": {
+          "type": "string",
+          "minLength": 1
+        },
+        "rule_id": {
+          "$ref": "#/definitions/rule_id"
+        },
+        "sequence": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "target_atom_id": {
+          "type": "null"
+        },
+        "winner_atom_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "decision_entry": {
+      "oneOf": [
+        {
+          "$ref": "#/definitions/drop_decision"
+        },
+        {
+          "$ref": "#/definitions/replace_decision"
+        },
+        {
+          "$ref": "#/definitions/inject_decision"
+        }
+      ]
+    },
+    "context_weights": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "adult": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 1.0
+        },
+        "bondage_sm": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 1.0
+        },
+        "dining": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 1.0
+        },
+        "domestic": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 1.0
+        },
+        "generic": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 1.0
+        },
+        "medical": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 1.0
+        },
+        "nightlife": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 1.0
+        },
+        "office": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 1.0
+        },
+        "onsen_bath": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 1.0
+        },
+        "outdoor": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 1.0
+        },
+        "school": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 1.0
+        },
+        "special": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 1.0
+        },
+        "traditional": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 1.0
+        },
+        "transit": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 1.0
+        }
+      }
+    },
+    "context_profile_active": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "scene_context_ids",
+        "scene_item_id",
+        "theme_context_ids",
+        "theme_id",
+        "weights"
+      ],
+      "properties": {
+        "schema_version": {
+          "type": "string",
+          "const": "1.0"
+        },
+        "scene_context_ids": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/context_id"
+          }
+        },
+        "scene_item_id": {
+          "type": ["string", "null"]
+        },
+        "theme_context_ids": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/context_id"
+          }
+        },
+        "theme_id": {
+          "type": ["string", "null"]
+        },
+        "weights": {
+          "$ref": "#/definitions/context_weights"
+        }
+      }
+    },
+    "context_profile_empty": {
+      "type": "object",
+      "maxProperties": 0,
+      "additionalProperties": false
+    },
+    "counts_entry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "accepted_atoms",
+        "budget_filtered",
+        "deduplicated",
+        "dropped",
+        "injected",
+        "produced",
+        "replaced",
+        "source_atoms"
+      ],
+      "properties": {
+        "accepted_atoms": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "budget_filtered": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "deduplicated": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "dropped": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "injected": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "produced": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "replaced": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "source_atoms": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    }
+  },
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "const": "1.0"
+    },
+    "effective_seed": {
+      "type": "integer"
+    },
+    "context_profile": {
+      "oneOf": [
+        {
+          "$ref": "#/definitions/context_profile_active"
+        },
+        {
+          "$ref": "#/definitions/context_profile_empty"
+        }
+      ]
+    },
+    "selections": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/selection_entry"
+      }
+    },
+    "decisions": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/decision_entry"
+      }
+    },
+    "rules_applied": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/rule_id"
+      }
+    },
+    "unresolved_conflicts": {
+      "type": "array",
+      "items": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        }
+      }
+    },
+    "counts": {
+      "$ref": "#/definitions/counts_entry"
+    }
+  }
+}

@@ -12,6 +12,7 @@ import subprocess
 import sys
 import tempfile
 import unittest
+from unittest.mock import patch
 import zipfile
 from pathlib import Path
 
@@ -252,6 +253,10 @@ class TestReleaseBuild(unittest.TestCase):
             repo = Path(tmp) / "repo"
             make_clean_git_repo(repo)
 
+            from scripts.build_release import get_project_version
+            version = get_project_version(repo)
+            tag_name = f"v{version}"
+
             # 1. 无 tag 下 --mode release 失败
             res1 = subprocess.run(
                 [sys.executable, "scripts/build_release.py", "--mode", "release", "--output-dir", out_dir],
@@ -262,8 +267,8 @@ class TestReleaseBuild(unittest.TestCase):
             self.assertNotEqual(res1.returncode, 0)
             self.assertIn("requires annotated tag", res1.stderr or res1.stdout)
 
-            # 2. 轻量 tag (git tag v1.1.0-rc7) 失败
-            subprocess.run(["git", "tag", "v1.1.0-rc7"], cwd=repo, check=True, capture_output=True)
+            # 2. 轻量 tag (git tag <tag_name>) 失败
+            subprocess.run(["git", "tag", tag_name], cwd=repo, check=True, capture_output=True)
             res2 = subprocess.run(
                 [sys.executable, "scripts/build_release.py", "--mode", "release", "--output-dir", out_dir],
                 cwd=repo,
@@ -273,9 +278,9 @@ class TestReleaseBuild(unittest.TestCase):
             self.assertNotEqual(res2.returncode, 0)
             self.assertIn("lightweight tag", res2.stderr or res2.stdout)
 
-            # 3. 删除轻量 tag，打 annotated tag (git tag -a v1.1.0-rc7 -m "msg") 成功
-            subprocess.run(["git", "tag", "-d", "v1.1.0-rc7"], cwd=repo, check=True, capture_output=True)
-            subprocess.run(["git", "tag", "-a", "v1.1.0-rc7", "-m", "Release rc7"], cwd=repo, check=True, capture_output=True)
+            # 3. 删除轻量 tag，打 annotated tag (git tag -a <tag_name> -m "msg") 成功
+            subprocess.run(["git", "tag", "-d", tag_name], cwd=repo, check=True, capture_output=True)
+            subprocess.run(["git", "tag", "-a", tag_name, "-m", f"Release {version}"], cwd=repo, check=True, capture_output=True)
             res3 = subprocess.run(
                 [sys.executable, "scripts/build_release.py", "--mode", "release", "--output-dir", out_dir],
                 cwd=repo,
@@ -1117,6 +1122,123 @@ class TestReleaseBuild(unittest.TestCase):
             self.assertNotEqual(res_c.returncode, 0, "Build should fail when data/ is symlink to outside")
             self.assertIn("symlink", res_c.stderr.lower() + res_c.stdout.lower())
             self.assertEqual((Path(out_dir) / "CURRENT.json").read_bytes(), orig_pointer_bytes)
+
+    def test_schema_packaging_and_mutation_fault_injection(self):
+        """测试 schemas/ 目录在发布打包中的严格白名单、完整性校验与故障注入 (R3-P1-003)。"""
+        with tempfile.TemporaryDirectory() as tmp:
+            repo = Path(tmp) / "ComfyUI-IYKYK"
+            make_clean_git_repo(repo)
+            out_dir = str(Path(tmp) / "dist")
+
+            # 1. 正常构建成功，且解压后的 ZIP 包含 schemas/diagnostics.schema.json
+            res = subprocess.run(
+                [sys.executable, "scripts/build_release.py", "--mode", "verify", "--output-dir", out_dir],
+                cwd=repo,
+                capture_output=True,
+                text=True,
+            )
+            self.assertEqual(res.returncode, 0, f"Normal build failed: {res.stderr}\n{res.stdout}")
+            pointer = json.loads((Path(out_dir) / "CURRENT.json").read_text(encoding="utf-8"))
+            gen_dir = Path(out_dir) / pointer["generation_dir"]
+            zip_path = gen_dir / f"ComfyUI-IYKYK-{pointer['version']}.zip"
+            with zipfile.ZipFile(zip_path, "r") as zf:
+                namelist = zf.namelist()
+                self.assertIn("ComfyUI-IYKYK/schemas/diagnostics.schema.json", namelist)
+
+            # 2. 故障注入 A: 删除 schemas/diagnostics.schema.json 并提交保持干净工作区，构建必须失败
+            schema_file = repo / "schemas" / "diagnostics.schema.json"
+            orig_schema_bytes = schema_file.read_bytes()
+            schema_file.unlink()
+            env = {
+                **os.environ,
+                "GIT_AUTHOR_NAME": "Tester",
+                "GIT_AUTHOR_EMAIL": "tester@example.com",
+                "GIT_COMMITTER_NAME": "Tester",
+                "GIT_COMMITTER_EMAIL": "tester@example.com",
+            }
+            subprocess.run(["git", "commit", "-am", "Remove schema file"], cwd=repo, check=True, capture_output=True, env=env)
+            res_a = subprocess.run(
+                [sys.executable, "scripts/build_release.py", "--mode", "verify", "--output-dir", out_dir],
+                cwd=repo,
+                capture_output=True,
+                text=True,
+            )
+            self.assertNotEqual(res_a.returncode, 0, "Build must fail when required schema file is missing")
+
+            # 恢复 schema 文件
+            schema_file.write_bytes(orig_schema_bytes)
+            subprocess.run(["git", "add", "-A"], cwd=repo, check=True, capture_output=True, env=env)
+            subprocess.run(["git", "commit", "-m", "Restore schema file"], cwd=repo, check=True, capture_output=True, env=env)
+
+            # 3. 故障注入 B: 篡改 schema 文件为非法内容
+            schema_file.write_text("NOT_VALID_JSON{{{")
+            subprocess.run(["git", "commit", "-am", "Corrupt schema file"], cwd=repo, check=True, capture_output=True, env=env)
+            res_b = subprocess.run(
+                [sys.executable, "scripts/build_release.py", "--mode", "verify", "--output-dir", out_dir],
+                cwd=repo,
+                capture_output=True,
+                text=True,
+            )
+            self.assertNotEqual(res_b.returncode, 0, "Build must fail when schema file is corrupted")
+
+            # 恢复 schema 文件
+            schema_file.write_bytes(orig_schema_bytes)
+            subprocess.run(["git", "add", "-A"], cwd=repo, check=True, capture_output=True, env=env)
+            subprocess.run(["git", "commit", "-m", "Restore schema file again"], cwd=repo, check=True, capture_output=True, env=env)
+
+            # 4. 故障注入 C: manifest 中缺少 diagnostics.schema.json 登记，构建必须失败
+            manifest_file = repo / "lib" / "runtime_manifest.py"
+            orig_manifest_content = manifest_file.read_text(encoding="utf-8")
+            tampered_manifest = orig_manifest_content.replace(
+                '"diagnostics.schema.json",\n', ""
+            )
+            manifest_file.write_text(tampered_manifest, encoding="utf-8")
+            subprocess.run(["git", "commit", "-am", "Untrack schema from manifest"], cwd=repo, check=True, capture_output=True, env=env)
+            res_c = subprocess.run(
+                [sys.executable, "scripts/build_release.py", "--mode", "verify", "--output-dir", out_dir],
+                cwd=repo,
+                capture_output=True,
+                text=True,
+            )
+            self.assertNotEqual(res_c.returncode, 0, "Build must fail when required schema is untracked in manifest")
+
+    def test_smoke_test_fails_explicitly_if_jsonschema_missing(self):
+        """测试发布包烟测在缺失 jsonschema 时明确失败 (Fail-Closed, R3-P2-002)"""
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_repo = Path(tmp) / "ComfyUI-IYKYK"
+            make_clean_git_repo(tmp_repo)
+            out_dir = Path(tmp) / "dist"
+
+            # 1. 先构建生成合法 ZIP
+            res = subprocess.run(
+                [sys.executable, "scripts/build_release.py", "--mode", "verify", "--output-dir", str(out_dir)],
+                cwd=tmp_repo,
+                capture_output=True,
+                text=True,
+            )
+            self.assertEqual(res.returncode, 0, f"Baseline build failed: {res.stderr}")
+            pointer = json.loads((out_dir / "CURRENT.json").read_text(encoding="utf-8"))
+            zip_path = out_dir / pointer["generation_dir"] / "ComfyUI-IYKYK.zip"
+            self.assertTrue(zip_path.is_file())
+
+            # 2. 构造禁用 jsonschema 的 Python 包装器
+            mock_py = Path(tmp) / "mock_python"
+            mock_py.write_text(f"""#!{sys.executable}
+import sys, subprocess
+args = list(sys.argv[1:])
+if "-c" in args:
+    idx = args.index("-c")
+    args[idx + 1] = "import sys; sys.modules['jsonschema'] = None;\\n" + args[idx + 1]
+res = subprocess.run([{sys.executable!r}] + args)
+sys.exit(res.returncode)
+""")
+            mock_py.chmod(mock_py.stat().st_mode | stat.S_IEXEC)
+
+            # 3. 运行 smoke_test_package，断言抛出 RuntimeError (R3-P2-002: 绝不吞掉 ImportError)
+            import scripts.build_release as br
+            with patch.object(sys, "executable", str(mock_py)):
+                with self.assertRaises(RuntimeError):
+                    br.smoke_test_package(zip_path)
 
 
 if __name__ == "__main__":

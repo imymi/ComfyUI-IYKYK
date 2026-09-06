@@ -8,17 +8,33 @@ atomizer.py — 提示词原子化与标签容器转换模块 (零循环依赖)
 from __future__ import annotations
 
 import hashlib
-from dataclasses import dataclass, field
-from typing import List, Optional, Sequence, Set, Tuple
+from dataclasses import dataclass, field, replace
+from typing import Dict, List, Optional, Sequence, Tuple
 
 if __package__:
     from .errors import PromptValidationError
     from .lexer import parse_prompt
-    from .models import PromptAtom, PromptFragment, SelectionOrigin, SemanticFacts, TagProvenance
+    from .models import (
+        DeduplicationRecord,
+        PromptAtom,
+        PromptFragment,
+        SelectionOrigin,
+        SemanticFacts,
+        TagProvenance,
+        VALID_SOURCE_MODES,
+    )
 else:
     from lib.errors import PromptValidationError
     from lib.lexer import parse_prompt
-    from lib.models import PromptAtom, PromptFragment, SelectionOrigin, SemanticFacts, TagProvenance
+    from lib.models import (
+        DeduplicationRecord,
+        PromptAtom,
+        PromptFragment,
+        SelectionOrigin,
+        SemanticFacts,
+        TagProvenance,
+        VALID_SOURCE_MODES,
+    )
 
 
 @dataclass(frozen=True)
@@ -123,6 +139,11 @@ def fragments_to_atoms(
             f_text = f_text.get("text", "")
         if not f_text or not f_text.strip():
             continue
+
+        # source_mode records the immutable original selection mode. Resolver
+        # is an action origin and must never be promoted to an original source.
+        if not f_prov.source_mode and f_origin and f_origin.mode in VALID_SOURCE_MODES:
+            f_prov = replace(f_prov, source_mode=f_origin.mode)
 
         # 单次解析：一次扫描完成语法校验、span 生成与精确 tag 原文切片
         parsed = parse_prompt(f_text)
@@ -240,14 +261,19 @@ def atoms_to_fragments(atoms: Sequence[PromptAtom]) -> List[PromptFragment]:
     return frags
 
 
-def deduplicate_tags(tags: Sequence[PromptTag]) -> List[PromptTag]:
+def deduplicate_tags_with_records(
+    tags: Sequence[PromptTag],
+) -> Tuple[List[PromptTag], List[PromptTag], List[DeduplicationRecord]]:
     """
-    执行完整 Tag 级保序去重：
+    执行完整 Tag 级保序去重并返回 (保留Tags, 被去重剔除Tags, 去重记录清单)：
     - 若 Tag 为受保护（包含 ANGLE 或 QUOTED），绝对免疫去重，原样保留；
-    - 若 Tag 为全 Plain，按规范化完整文本全局首见去重（跨槽位普通 Tag 首次保留、后续剔除）。
+    - 若 Tag 为全 Plain，按规范化完整文本全局首见去重（跨槽位普通 Tag 首次保留、后续剔除）；
+    - 针对剔除 Tag 的每个 Atom，生成精确绑定保留目标与原因依据的 DeduplicationRecord (R3-P1-002)。
     """
-    seen_plain_texts: Set[str] = set()
+    seen_plain_texts: Dict[str, PromptTag] = {}
     result: List[PromptTag] = []
+    dropped: List[PromptTag] = []
+    records: List[DeduplicationRecord] = []
 
     for t in tags:
         if t.is_protected:
@@ -260,7 +286,41 @@ def deduplicate_tags(tags: Sequence[PromptTag]) -> List[PromptTag]:
             continue
 
         if norm_text not in seen_plain_texts:
-            seen_plain_texts.add(norm_text)
+            seen_plain_texts[norm_text] = t
             result.append(t)
+        else:
+            dropped.append(t)
+            retained_tag = seen_plain_texts[norm_text]
+            retained_atom_id = retained_tag.atoms[0].atom_id if retained_tag.atoms else ""
+            retained_text = retained_tag.text
+            for a in t.atoms:
+                records.append(
+                    DeduplicationRecord(
+                        atom_id=a.atom_id,
+                        retained_atom_id=retained_atom_id,
+                        retained_tag_text=retained_text,
+                        basis="normalized_exact_tag_duplicate",
+                    )
+                )
 
-    return result
+    return result, dropped, records
+
+
+def deduplicate_tags_with_dropped(tags: Sequence[PromptTag]) -> Tuple[List[PromptTag], List[PromptTag]]:
+    """
+    执行完整 Tag 级保序去重并返回 (保留Tags, 被去重剔除Tags)：
+    - 若 Tag 为受保护（包含 ANGLE 或 QUOTED），绝对免疫去重，原样保留；
+    - 若 Tag 为全 Plain，按规范化完整文本全局首见去重（跨槽位普通 Tag 首次保留、后续剔除）。
+    """
+    result, dropped, _ = deduplicate_tags_with_records(tags)
+    return result, dropped
+
+
+def deduplicate_tags(tags: Sequence[PromptTag]) -> List[PromptTag]:
+    """
+    执行完整 Tag 级保序去重：
+    - 若 Tag 为受保护（包含 ANGLE 或 QUOTED），绝对免疫去重，原样保留；
+    - 若 Tag 为全 Plain，按规范化完整文本全局首见去重（跨槽位普通 Tag 首次保留、后续剔除）。
+    """
+    res, _ = deduplicate_tags_with_dropped(tags)
+    return res

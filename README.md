@@ -1,10 +1,10 @@
 # ComfyUI-IYKYK
 
 <p align="center">
-  <img src="https://img.shields.io/badge/version-1.1.0--rc7-blue.svg?style=flat-square" alt="Version">
+  <img src="https://img.shields.io/badge/version-1.1.0--rc8-blue.svg?style=flat-square" alt="Version">
   <img src="https://img.shields.io/badge/ComfyUI-Extension-orange.svg?style=flat-square" alt="ComfyUI">
   <img src="https://img.shields.io/badge/Python-3.9+-green.svg?style=flat-square" alt="Python">
-  <img src="https://img.shields.io/badge/Tests-169%20passed%20(100%25)-brightgreen.svg?style=flat-square" alt="Tests">
+  <img src="https://img.shields.io/badge/Tests-287%20passed%20(100%25)-brightgreen.svg?style=flat-square" alt="Tests">
   <img src="https://img.shields.io/badge/Schema-Draft--7%20Strict-blueviolet.svg?style=flat-square" alt="Draft-7">
   <img src="https://img.shields.io/badge/License-Apache--2.0-lightgrey.svg?style=flat-square" alt="License">
 </p>
@@ -27,6 +27,7 @@
   - [1. 🎴 IYKYK 22槽位全功能生成器 (`IYKYKPromptGenerator`)](#1--iykyk-22槽位全功能生成器-iykykpromptgenerator)
   - [2. 📋 IYKYK 模板浏览器 (`IYKYKPresetBrowser`)](#2--iykyk-模板浏览器-iykykpresetbrowser)
   - [3. 🧩 IYKYK 自定义槽位拼装器 (`IYKYKCustomSlotCombiner`)](#3--iykyk-自定义槽位拼装器-iykykcustomslotcombiner)
+  - [4. 🔎 IYKYK 提示词诊断 (`IYKYKPromptDiagnostics`)](#4--iykyk-提示词诊断-iykykpromptdiagnostics)
 - [🚀 详细安装指南](#-详细安装指南)
 - [🧪 工程规范与质量门禁](#-工程规范与质量门禁)
 - [❓ 常见问题 (FAQ)](#-常见问题-faq)
@@ -88,27 +89,29 @@ graph TD
 
 ## 🛡️ 17 大多规则物理与语义冲突消解引擎
 
-插件内置基于 `PromptFragment` 结构化管道的 17 大规则冲突消解引擎，在生成前自动分析并修复提示词内部的各种物理与视觉崩图矛盾：
+插件内置基于不可变有向无环图（Conflict DAG）的 17 大规则冲突消解引擎，在生成前自动分析并修复提示词内部的各种物理与视觉崩图矛盾：
 
-| 规则编号 | 规则标识 | 消解原理与保护机制 |
-| :--- | :--- | :--- |
-| **Rule 1** | **空间环境自洽互斥**<br>`spatial_environmental_mutual_exclusion` | 全部 122 个场景子分类绑定唯一 `exclusive_group`，按片段顺序锁定首个主场景，杜绝“温泉与餐厅并存”、“室内温泉与露天雪景并存”等跨空间矛盾。 |
-| **Rule 2** | **裸露与内衣状态互斥**<br>`nudity_clothing_conflicts` | 严格划分 L1～L6 裸露等级：私处暴露时自动剔除内裤，全裸（L5/L6）时自动剔除穿着描述并将衣物转换为散落背景描述。 |
-| **Rule 3** | **材质穿透伪影消解**<br>`material_penetration` | 自动拦截服装易崩图词条（如 `sheer`, `see-through`），智能替换为真实物理脱法（如解纽扣、滑落、湿身紧贴），严格限定服装作用域，杜绝误杀妆容、光照与场景词条。 |
-| **Rule 4** | **视线与镜头角度几何对齐**<br>`gaze_angle_geometry` | 仰拍（低角度）强制俯视下看镜头，俯拍（高角度）强制仰视上看镜头，POV 视角强制直视镜头。 |
-| **Rule 5** | **视线方向唯一性**<br>`gaze_mutual_exclusion` | 消解“直视镜头（direct eye contact）”与“移开视线/看向他处（looking away）”之间的方向互斥。 |
-| **Rule 6** | **液体微量与安全法则**<br>`liquid_restrictions` | 自动添加微量修饰词（如 `faint trace of`, `thin streak of`），杜绝眼部液体引发白内障畸形。 |
-| **Rule 7** | **设备与画质兼容性**<br>`device_quality_compatibility` | 监控（CCTV）/手机自拍模式下自动过滤 8K、单反、摄影写真等高保真冲突词。 |
-| **Rule 8** | **纹身真皮层融合**<br>`tattoo_dermal_fusion` | 严格作用于纹身槽位，自动注入 6 词真皮层融合描述，杜绝 `pink`/`drink`/`link` 等子串误触发。 |
-| **Rule 9** | **姿势手部占用与道具互斥**<br>`pose_hand_occupation` | 双手抱头、双手被绑、双手撑地等占用姿势下，自动剔除手持手机/相机/扇子/酒杯等动作，根除多手伪影。 |
-| **Rule 10** | **情绪表情与眼神方向一致**<br>`emotion_gaze_affinity` | 消解害羞与直视对视、冷淡与挑逗眨眼等割裂人设。 |
-| **Rule 11** | **环境光照与黑夜白昼自洽**<br>`environmental_lighting_coherence` | 场景主锚点优先：夜景场所与深夜天气下自动过滤日光/阳光透过窗户等日间光照词条。 |
-| **Rule 12** | **妆容与细节自洽**<br>`makeup_details_coherence` | 素颜无妆状态下自动剔除睫毛膏融化、口红涂抹晕开等糊妆词。 |
-| **Rule 13** | **景别特写与下肢足部自洽**<br>`framing_lower_body_coherence` | 头部/面部极致特写时自动剔除高跟鞋、大腿袜、吊袜带、足部描述，防止构图注意力割裂与背景畸形肢体。 |
-| **Rule 14** | **饰品遮挡与视线动作自洽**<br>`accessory_occlusion_gaze_coherence` | 蒙眼布/遮眼/闭眼状态下自动剔除直视镜头、眨眼等动作，消除布条上强行画眼睛的视觉伪影。 |
-| **Rule 15** | **黑白胶片与高饱和色彩互斥**<br>`monochrome_film_chroma_coherence` | 黑白/单色胶片下消解彩虹/高饱和 RGB 霓虹色彩，保留纯正明暗与影调反差。 |
-| **Rule 16** | **服装款式与解构状态互斥**<br>`clothing_style_state_coherence` | 连体泳衣/死库水禁止解纽扣/掀裙；牛仔裤/长裤禁止裙开衩与裙摆飘动。 |
-| **Rule 17** | **多手持道具唯一性消解**<br>`handheld_props_single_holder` | 同时出现多个手持动作时仅保留首个主手持动作，彻底消除 AI 生成 3 只手以上的畸形。 |
+> 💡 **DAG 拓扑执行说明**：历史版本中的人工编号（如“Rule 1～Rule 17”）仅为撰写参考序号，**绝不代表**底层的实际执行顺序。v1.1.0-rc8 起全面升级为强类型不可变 DAG 调度，严格依据稳定规则 ID、执行阶段（`phase`：`anchors` → `physical` → `semantic` → `effects`）及优先级（`priority`）构成的偏序无旁路消解。
+
+| 稳定规则 ID (`rule_id`) | 执行阶段 (`phase`) | 优先级 (`priority`) | 中文名称与消解原理 |
+| :--- | :--- | :--- | :--- |
+| `spatial_environmental_mutual_exclusion` | `anchors` | 100 | **空间环境自洽互斥**：全部 122 个场景子分类绑定唯一 `exclusive_group`，按片段顺序锁定首个主场景，杜绝“温泉与餐厅并存”、“室内温泉与露天雪景并存”等跨空间矛盾。 |
+| `nudity_clothing_conflicts` | `anchors` | 110 | **裸露与内衣状态互斥**：严格划分 L1～L6 裸露等级：私处暴露时自动剔除内裤，全裸（L5/L6）时自动剔除穿着描述并将衣物转换为散落背景描述。 |
+| `framing_lower_body_coherence` | `anchors` | 120 | **景别特写与下肢足部自洽**：头部/面部极致特写时自动剔除高跟鞋、大腿袜、吊袜带、足部描述，防止构图注意力割裂与背景畸形肢体。 |
+| `pose_hand_occupation` | `physical` | 200 | **姿势手部占用与道具互斥**：双手抱头、双手被绑、双手撑地等占用姿势下，自动剔除手持手机/相机/扇子/酒杯等动作，根除多手伪影。 |
+| `handheld_props_single_holder` | `physical` | 210 | **多手持道具唯一性消解**：同时出现多个手持动作时仅保留首个主手持动作，彻底消除 AI 生成 3 只手以上的畸形。 |
+| `clothing_style_state_coherence` | `physical` | 220 | **服装款式与解构状态互斥**：连体泳衣/死库水禁止解纽扣/掀裙；牛仔裤/长裤禁止裙开衩与裙摆飘动。 |
+| `material_penetration` | `physical` | 230 | **材质穿透伪影消解**：自动拦截服装易崩图词条（如 `sheer`, `see-through`），智能替换为真实物理脱法（如解纽扣、滑落、湿身紧贴），严格限定服装作用域，杜绝误杀妆容、光照与场景词条。 |
+| `device_quality_compatibility` | `physical` | 240 | **设备与画质兼容性**：监控（CCTV）/手机自拍模式下自动过滤 8K、单反、摄影写真等高保真冲突词。 |
+| `environmental_lighting_coherence` | `physical` | 250 | **环境光照与黑夜白昼自洽**：场景主锚点优先：夜景场所与深夜天气下自动过滤日光/阳光透过窗户等日间光照词条。 |
+| `monochrome_film_chroma_coherence` | `physical` | 260 | **黑白胶片与高饱和色彩互斥**：黑白/单色胶片下消解彩虹/高饱和 RGB 霓虹色彩，保留纯正明暗与影调反差。 |
+| `makeup_details_coherence` | `physical` | 270 | **妆容与细节自洽**：素颜无妆状态下自动剔除睫毛膏融化、口红涂抹晕开等糊妆词。 |
+| `gaze_angle_geometry` | `semantic` | 300 | **视线与镜头角度几何对齐**：仰拍（低角度）强制俯视下看镜头，俯拍（高角度）强制仰视上看镜头，POV 视角强制直视镜头。 |
+| `accessory_occlusion_gaze_coherence` | `semantic` | 310 | **饰品遮挡与视线动作自洽**：蒙眼布/遮眼/闭眼状态下自动剔除直视镜头、眨眼等动作，消除布条上强行画眼睛的视觉伪影。 |
+| `emotion_gaze_affinity` | `semantic` | 320 | **情绪表情与眼神方向一致**：消解害羞与直视对视、冷淡与挑逗眨眼等割裂人设。 |
+| `gaze_mutual_exclusion` | `semantic` | 330 | **视线方向唯一性**：消解“直视镜头（direct eye contact）”与“移开视线/看向他处（looking away）”之间的方向互斥。 |
+| `liquid_restrictions` | `effects` | 400 | **液体微量与安全法则**：自动添加微量修饰词（如 `faint trace of`, `thin streak of`），杜绝眼部液体引发白内障畸形。 |
+| `tattoo_dermal_fusion` | `effects` | 410 | **纹身真皮层融合**：严格作用于纹身槽位，自动注入 6 词真皮层融合描述，杜绝 `pink`/`drink`/`link` 等子串误触发。 |
 
 ---
 
@@ -264,6 +267,41 @@ clothing.json
 
 ---
 
+### 4. 🔎 IYKYK 提示词诊断 (`IYKYKPromptDiagnostics`)
+
+面向工程测试、质量审计与工作流监控的高级诊断节点。内部与主生成器共享同一套纯函数采样与消解流水线，单次采样、单次消解，杜绝二次采样漂移。
+
+#### 输入端口
+与 `IYKYKPromptGenerator`（主生成器）保持 100% 结构对齐与复用，涵盖 22 个核心控制槽位下拉菜单（含 `预设模板`、`风格配方`、`裸露等级`、`服装款式` 等）以及 `prompt_seed` 种子整数控件。
+
+#### 输出端口
+1. **`正面提示词 (STRING)`**：最终装配采纳的高质量正向 Prompt。在固定 seed 下，与 `IYKYKPromptGenerator` 逐字节完全一致；
+2. **`负面提示词 (STRING)`**：防崩清洗负向 Prompt。在固定 seed 下，与 `IYKYKPromptGenerator` 逐字节完全一致；
+3. **`中文场景描述 (STRING)`**：当前画面的中文概要解析。在固定 seed 下，与 `IYKYKPromptGenerator` 逐字节完全一致；
+4. **`审计报告 JSON (STRING)`**：机器可读的结构化审计报告，严格符合 Draft-7 Schema（`schemas/diagnostics.schema.json`）规范。
+
+#### 确定性审计 JSON 规范
+审计 JSON 严格固定为 **8 个顶层字段**，严禁引入第 9 个顶层字段或非确定性临时数据：
+- `schema_version`: 审计规范协议版本（固定为 `"1.0"`）；
+- `effective_seed`: 本次生成实际生效的 32 位无符号确定性种子（`int`）；
+- `context_profile`: 推断得到的场景与主题情境画像字典（包含已量化至 12 位小数并消除负零的上下文权重）；
+- `selections`: 槽位采样原语及来源溯源序列。每个元素携带 `source_atoms`（初始原子集）、`produced_atoms`（消解产生原子集）、`accepted_atoms`（最终采纳原子集）、`deduplicated_records`（Tag 去重记录）与 `budget_filtered_records`（词数预算截断记录），完整暴露 `atom_id`、`id`、`text`、`source_slot`、`source_item_id`、`tag_order`、`span_order`、`parent_ids`、`semantic_ids` 与 `is_accepted`，使用户无需调用 Python 代码即可直接在审计 JSON 内部闭合图关系；
+- `decisions`: 冲突消解执行决策全量追踪列表。动作类型强区分约束：
+  - `drop`: 必须提供 `target_atom_id` 与 `before_text`，`after_text` 为 `null`，`produced_atom_ids` 为空数组；
+  - `replace`: 必须提供 `target_atom_id`、`before_text`、`after_text`，`produced_atom_ids` 为非空数组；
+  - `inject`: `target_atom_id` 与 `before_text` 为 `null`，必须提供 `after_text` 与非空 `produced_atom_ids`；
+- `rules_applied`: 本次实际命中并执行消解的稳定规则 ID 列表；
+- `unresolved_conflicts`: 未消解的硬冲突记录（正常情况下为空列表 `[]`）；
+- `counts`: 原子级统计快照，严格包含 8 个整数计数：`source_atoms`、`produced`、`accepted_atoms`、`dropped`、`replaced`、`injected`、`deduplicated`、`budget_filtered`。全局严格满足原子数量守恒方程：
+  $$\text{source\_atoms} + \text{produced} = \text{accepted\_atoms} + \text{dropped} + \text{replaced} + \text{deduplicated} + \text{budget\_filtered}$$
+  其中 $\text{produced} = \text{replaced} + \text{injected}$。
+
+> 🔒 **确定性序列化协议**：审计 JSON 采用 UTF-8 字符原生输出（汉字不发生 `\uXXXX` 转义）、键按字典序排序、紧凑分隔符（无冒号与逗号后多余空格）、结尾无换行符，且绝不包含时间戳、内存地址、UUID 或系统临时路径。
+>
+> ⚠️ **跨版本提示词确定性说明**：v1.1.0-rc8 对冲突消解进行了有向无环图（DAG）拓扑重构与预编译加速，相同种子在 rc7 与 rc8 下生成的提示词可能存在细微差异，此属预期的架构升级优化；在 rc8 内部，相同 seed 的生成输出保持 100% 确定性与可复现性。
+
+---
+
 ## 🚀 详细安装指南
 
 > [!IMPORTANT]
@@ -295,7 +333,7 @@ git clone https://github.com/imymi/ComfyUI-IYKYK.git
 
 ### 方法 3：手动下载发布包
 
-1. 前往 GitHub [Releases](https://github.com/imymi/ComfyUI-IYKYK/releases) 页面下载最新的发布包 `ComfyUI-IYKYK-v1.1.0-rc7.zip`；
+1. 前往 GitHub [Releases](https://github.com/imymi/ComfyUI-IYKYK/releases) 页面下载最新的发布包 `ComfyUI-IYKYK-v1.1.0-rc8.zip`；
 2. 解压到 `ComfyUI/custom_nodes/ComfyUI-IYKYK` 目录下；
 3. 重启 ComfyUI。
 

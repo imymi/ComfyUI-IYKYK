@@ -346,6 +346,9 @@ class SemanticFacts:
 VALID_ENTRY_POINTS: Tuple[str, ...] = ("generator", "preset_browser", "custom_combiner", "diagnostics")
 VALID_SELECTION_MODES: Tuple[str, ...] = ("none", "random", "auto", "explicit", "preset", "recipe", "custom", "resolver")
 FORMAL_ORIGIN_MODES: Tuple[str, ...] = ("random", "auto", "explicit", "preset", "recipe")
+VALID_SOURCE_MODES: Tuple[str, ...] = (
+    "none", "random", "auto", "explicit", "preset", "recipe", "custom", "user_input"
+)
 
 CANONICAL_SLOT_SELECTORS: Tuple[str, ...] = (
     "scene", "theme", "scene_theme", "shot", "shot_type", "camera", "camera_angle",
@@ -369,8 +372,8 @@ CANONICAL_RECIPE_SELECTORS: Tuple[str, ...] = (
 
 CANONICAL_SELECTORS_BY_ENTRY_POINT: Dict[str, Tuple[str, ...]] = {
     "preset_browser": CANONICAL_PRESET_SELECTORS + CANONICAL_RECIPE_SELECTORS,
-    "generator": CANONICAL_SLOT_SELECTORS + CANONICAL_RECIPE_SELECTORS,
-    "diagnostics": CANONICAL_SLOT_SELECTORS + CANONICAL_RECIPE_SELECTORS,
+    "generator": CANONICAL_PRESET_SELECTORS + CANONICAL_SLOT_SELECTORS + CANONICAL_RECIPE_SELECTORS,
+    "diagnostics": CANONICAL_PRESET_SELECTORS + CANONICAL_SLOT_SELECTORS + CANONICAL_RECIPE_SELECTORS,
     "custom_combiner": CANONICAL_SLOT_SELECTORS + CANONICAL_RECIPE_SELECTORS + ("custom",),
 }
 
@@ -623,6 +626,45 @@ def _deep_freeze_unresolved(item: Any) -> Any:
 
 
 @dataclass(frozen=True)
+class DeduplicationRecord:
+    """去重过滤记录模型 (R3-P1-002: 记录被去重目标、保留原子/标签与去重依据)。"""
+    atom_id: str
+    retained_atom_id: str
+    retained_tag_text: str
+    basis: str = "normalized_exact_tag_duplicate"
+
+    def __post_init__(self) -> None:
+        for fld in ("atom_id", "retained_atom_id", "retained_tag_text", "basis"):
+            val = getattr(self, fld)
+            if not isinstance(val, str) or isinstance(val, bool) or not val.strip():
+                raise TypeError(f"DeduplicationRecord.{fld} must be non-empty str, got {val!r}")
+
+
+@dataclass(frozen=True)
+class BudgetFilterRecord:
+    """词数预算超限过滤记录模型 (R3-P1-002: 记录被过滤目标、上限、当时已用词数/候选成本及原因)。"""
+    atom_id: str
+    word_budget: int
+    used_words: int
+    candidate_words: int
+    reason: str = "word_budget_exceeded"
+
+    def __post_init__(self) -> None:
+        for fld in ("atom_id", "reason"):
+            val = getattr(self, fld)
+            if not isinstance(val, str) or isinstance(val, bool) or not val.strip():
+                raise TypeError(f"BudgetFilterRecord.{fld} must be non-empty str, got {val!r}")
+        for fld in ("word_budget", "used_words", "candidate_words"):
+            val = getattr(self, fld)
+            if not isinstance(val, int) or isinstance(val, bool) or val < 0:
+                raise TypeError(f"BudgetFilterRecord.{fld} must be non-negative int, got {val!r}")
+        if self.reason != "word_budget_exceeded":
+            raise ValueError(
+                f"BudgetFilterRecord.reason must be 'word_budget_exceeded', got {self.reason!r}"
+            )
+
+
+@dataclass(frozen=True)
 class ResolutionReport:
     """完整消解审计报告 (rc8 诊断闭环模型)。"""
     schema_version: str = "1.0"
@@ -636,6 +678,7 @@ class ResolutionReport:
     dropped_count: int = 0
     replaced_count: int = 0
     injected_count: int = 0
+    produced_atoms: Tuple[PromptAtom, ...] = ()
 
     def __post_init__(self) -> None:
         if not isinstance(self.schema_version, str) or isinstance(self.schema_version, bool):
@@ -703,6 +746,18 @@ class ResolutionReport:
             if d.rule_id not in rules_applied_set:
                 raise ValueError(f"Decision rule_id '{d.rule_id}' not found in rules_applied")
 
+        # produced_atoms: tuple of PromptAtom
+        p_val = self.produced_atoms
+        if p_val is None:
+            object.__setattr__(self, "produced_atoms", ())
+        elif isinstance(p_val, (list, tuple)):
+            for a in p_val:
+                if not isinstance(a, PromptAtom):
+                    raise TypeError(f"Elements of produced_atoms must be PromptAtom, got {type(a).__name__}")
+            object.__setattr__(self, "produced_atoms", tuple(p_val))
+        else:
+            raise TypeError(f"produced_atoms must be a tuple or list of PromptAtom, got {type(p_val).__name__}")
+
         # Verify input_count vs output_count relationship
         produced_count = sum(len(d.produced_atom_ids) for d in self.decisions if d.action in ("replace", "inject"))
         expected_output = self.input_count - self.dropped_count - self.replaced_count + produced_count
@@ -727,9 +782,10 @@ class TagProvenance:
     kind: Optional[str] = None
     rule_id: Optional[str] = None
     parent_ids: Tuple[str, ...] = ()
+    source_mode: Optional[str] = None
 
     def __post_init__(self) -> None:
-        for fld in ("item_id", "kind", "rule_id"):
+        for fld in ("item_id", "kind", "rule_id", "source_mode"):
             val = getattr(self, fld)
             if val is not None and (not isinstance(val, str) or isinstance(val, bool)):
                 raise TypeError(f"TagProvenance.{fld} must be str or None, got {type(val).__name__}")
@@ -737,6 +793,15 @@ class TagProvenance:
         for fld in ("semantic_ids", "parent_ids"):
             val = getattr(self, fld)
             object.__setattr__(self, fld, _normalize_ordered_str_tuple(val, f"TagProvenance.{fld}"))
+
+        if self.source_mode is not None:
+            if not self.source_mode.strip():
+                raise ValueError("TagProvenance.source_mode must be a non-empty original source mode")
+            if self.source_mode not in VALID_SOURCE_MODES:
+                raise ValueError(
+                    f"Invalid TagProvenance.source_mode: {self.source_mode!r}; "
+                    f"expected one of {VALID_SOURCE_MODES!r}"
+                )
 
 
 @dataclass(frozen=True)
@@ -891,6 +956,10 @@ class GenerationResult:
     context_profile: Optional[ContextProfile] = None
     selections: Tuple[SelectionOrigin, ...] = ()
     resolution_report: Optional[ResolutionReport] = None
+    deduplicated_atoms: Tuple[PromptAtom, ...] = ()
+    budget_filtered_atoms: Tuple[PromptAtom, ...] = ()
+    deduplication_records: Tuple[DeduplicationRecord, ...] = ()
+    budget_filter_records: Tuple[BudgetFilterRecord, ...] = ()
 
 
 @dataclass(frozen=True)
@@ -902,7 +971,11 @@ class AssemblyResult:
     - prompt：最终装配完成的提示词文本；
     - accepted_atoms：最终被采纳的 PromptAtom 序列；
     - source_atoms：流水线初始全量原始 PromptAtom 权威源注册表；
-    - rules_applied：本次消解触发的应用规则清单。
+    - rules_applied：本次消解触发的应用规则清单；
+    - deduplicated_atoms：因保序去重被剔除的原子序列；
+    - budget_filtered_atoms：因词数上限预算超限被截断的原子序列；
+    - deduplication_records：去重过滤具体记录 (R3-P1-002)；
+    - budget_filter_records：预算过滤具体记录 (R3-P1-002)。
     """
     prompt: str
     accepted_atoms: Tuple[PromptAtom, ...] = ()
@@ -910,3 +983,7 @@ class AssemblyResult:
     rules_applied: Tuple[str, ...] = ()
     context_profile: Optional[ContextProfile] = None
     resolution_report: Optional[ResolutionReport] = None
+    deduplicated_atoms: Tuple[PromptAtom, ...] = ()
+    budget_filtered_atoms: Tuple[PromptAtom, ...] = ()
+    deduplication_records: Tuple[DeduplicationRecord, ...] = ()
+    budget_filter_records: Tuple[BudgetFilterRecord, ...] = ()

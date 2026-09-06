@@ -58,6 +58,10 @@ RUNTIME_DATA_FILES: Tuple[str, ...] = (
     "themes.json",
 )
 
+RUNTIME_SCHEMA_FILES: Tuple[str, ...] = (
+    "diagnostics.schema.json",
+)
+
 # 运行时文件列表 (相对仓库根目录路径)
 RUNTIME_PACKAGE_FILES: Tuple[str, ...] = tuple(
     sorted(
@@ -65,6 +69,7 @@ RUNTIME_PACKAGE_FILES: Tuple[str, ...] = tuple(
         + [f"lib/{f}" for f in RUNTIME_LIB_FILES]
         + [f"js/{f}" for f in RUNTIME_JS_FILES]
         + [f"data/{f}" for f in RUNTIME_DATA_FILES]
+        + [f"schemas/{f}" for f in RUNTIME_SCHEMA_FILES]
     )
 )
 

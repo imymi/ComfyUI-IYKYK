@@ -13,18 +13,48 @@ from random import Random
 from typing import Any, Dict, Iterator, List, Optional, Sequence, Tuple
 
 if __package__:
-    from .atomizer import PromptTag, atoms_to_tags, deduplicate_tags, fragments_to_atoms
+    from .atomizer import (
+        PromptTag,
+        atoms_to_tags,
+        deduplicate_tags_with_records,
+        fragments_to_atoms,
+    )
     from .conflict_resolver import ConflictResolver
     from .errors import PromptValidationError
     from .lexer import split_top_level_tags, validate_prompt_syntax
-    from .models import AssemblyResult, ContextProfile, PromptAtom, PromptFragment, SampledTag, SelectionOrigin, SemanticFacts, TagProvenance
+    from .models import (
+        AssemblyResult,
+        BudgetFilterRecord,
+        ContextProfile,
+        PromptAtom,
+        PromptFragment,
+        SampledTag,
+        SelectionOrigin,
+        SemanticFacts,
+        TagProvenance,
+    )
     from .slot_contract import AUXILIARY_SLOT_ORDER, SLOT_ORDER, normalize_slot_mapping
 else:
-    from lib.atomizer import PromptTag, atoms_to_tags, deduplicate_tags, fragments_to_atoms
+    from lib.atomizer import (
+        PromptTag,
+        atoms_to_tags,
+        deduplicate_tags_with_records,
+        fragments_to_atoms,
+    )
     from lib.conflict_resolver import ConflictResolver
     from lib.errors import PromptValidationError
     from lib.lexer import split_top_level_tags, validate_prompt_syntax
-    from lib.models import AssemblyResult, ContextProfile, PromptAtom, PromptFragment, SampledTag, SelectionOrigin, SemanticFacts, TagProvenance
+    from lib.models import (
+        AssemblyResult,
+        BudgetFilterRecord,
+        ContextProfile,
+        PromptAtom,
+        PromptFragment,
+        SampledTag,
+        SelectionOrigin,
+        SemanticFacts,
+        TagProvenance,
+    )
     from lib.slot_contract import AUXILIARY_SLOT_ORDER, SLOT_ORDER, normalize_slot_mapping
 
 MAX_PROMPT_WORDS = 250
@@ -100,11 +130,23 @@ def assemble_result(
     source_atoms = tuple(raw_atoms)
 
     if max_words == 0:
+        budget_records = tuple(
+            BudgetFilterRecord(
+                atom_id=a.atom_id,
+                word_budget=0,
+                used_words=0,
+                candidate_words=len(a.text.split()),
+                reason="word_budget_exceeded",
+            )
+            for a in source_atoms
+        )
         return AssemblyResult(
             prompt="",
             accepted_atoms=(),
             source_atoms=source_atoms,
             rules_applied=(),
+            budget_filtered_atoms=source_atoms,
+            budget_filter_records=budget_records,
         )
 
     # 2. 结构化冲突消解 (支持外部注入复用 Resolver，避免重复加载大型规则配置)
@@ -116,11 +158,14 @@ def assemble_result(
 
     # 3. 按 tag_order 汇聚为 PromptTag，并执行完整 Tag 级保序去重
     resolved_tags = atoms_to_tags(resolved_atoms)
-    deduped_tags = deduplicate_tags(resolved_tags)
+    deduped_tags, dropped_dedup_tags, dedup_records = deduplicate_tags_with_records(resolved_tags)
+    deduplicated_atoms = [a for t in dropped_dedup_tags for a in t.atoms]
 
     # 4. 严谨的词数原子预算管理 (硬约束)
     accepted_atoms: List[PromptAtom] = []
     accepted_tag_texts: List[str] = []
+    budget_filtered_atoms: List[PromptAtom] = []
+    budget_filter_records: List[BudgetFilterRecord] = []
     current_word_count = 0
 
     for tag in deduped_tags:
@@ -143,7 +188,18 @@ def assemble_result(
             accepted_tag_texts.append(tag_text)
             current_word_count += tag_words
         else:
-            # 原子 tag 无法完整装入：整块跳过
+            # 原子 tag 无法完整装入：整块跳过并记录预算截断原子与详细记录 (R3-P1-002)
+            budget_filtered_atoms.extend(tag.atoms)
+            for a in tag.atoms:
+                budget_filter_records.append(
+                    BudgetFilterRecord(
+                        atom_id=a.atom_id,
+                        word_budget=max_words,
+                        used_words=current_word_count,
+                        candidate_words=tag_words,
+                        reason="word_budget_exceeded",
+                    )
+                )
             continue
 
     sanitized = ", ".join(accepted_tag_texts)
@@ -164,6 +220,10 @@ def assemble_result(
         rules_applied=rules_applied,
         context_profile=context_profile,
         resolution_report=resolution_report,
+        deduplicated_atoms=tuple(deduplicated_atoms),
+        budget_filtered_atoms=tuple(budget_filtered_atoms),
+        deduplication_records=tuple(dedup_records),
+        budget_filter_records=tuple(budget_filter_records),
     )
 
 
@@ -281,13 +341,20 @@ def iter_normalized_slot_fragments(
                     origin=item.origin,
                 )
             elif isinstance(item, str):
-                for st in split_top_level_tags(item):
+                raw_item = item
+                custom_origin = SelectionOrigin(
+                    entry_point="custom_combiner",
+                    mode="custom",
+                    selector=slot_name,
+                    raw_value=raw_item,
+                )
+                for st in split_top_level_tags(item.strip()):
                     if st:
                         yield PromptFragment(
                             text=st,
                             source_slot=slot_name,
                             provenance=TagProvenance(kind="user_input", semantic_ids=(f"slot:{slot_name}",)),
-                            origin=SelectionOrigin(entry_point="custom_combiner", mode="custom", selector=slot_name, raw_value=st),
+                            origin=custom_origin,
                         )
 
 
@@ -383,6 +450,8 @@ class PromptAssembler:
         rng: Optional[Random] = None,
         max_words: int = MAX_PROMPT_WORDS,
         entry_point: str = "preset_browser",
+        preset_raw_value: Optional[str] = None,
+        recipe_raw_value: Optional[str] = None,
     ) -> AssemblyResult:
         """预设模板与风格配方统一装配接口，返回包含 source_atoms 的不可变 AssemblyResult。"""
         if rng is None:
@@ -393,6 +462,15 @@ class PromptAssembler:
 
         # 1. 预设核心 Prompt (优先消费结构化 fragments)
         preset_id = preset.get("id", "preset_custom")
+        raw_p = preset_raw_value or preset.get("ui_name") or preset.get("name_zh") or preset_id
+        preset_origin = SelectionOrigin(
+            entry_point=entry_point,
+            mode="preset",
+            selector="preset_core",
+            selected_id=preset_id,
+            raw_value=raw_p,
+            parent_ids=(preset_id,),
+        )
         preset_frags = preset.get("fragments")
         if preset_frags and isinstance(preset_frags, list):
             for f_data in preset_frags:
@@ -401,15 +479,6 @@ class PromptAssembler:
                     f_id = f_data.get("id", "")
                     f_slot = f_data.get("slot", "preset_core")
                     f_facts = SemanticFacts.from_dict(f_data.get("facts", {}))
-                    origin_d = f_data.get("origin", {})
-                    f_origin = SelectionOrigin(
-                        entry_point=entry_point,
-                        mode=origin_d.get("mode", "preset"),
-                        selector=origin_d.get("selector", "preset_core"),
-                        selected_id=origin_d.get("selected_id", preset_id),
-                        raw_value=origin_d.get("raw_value", text),
-                        parent_ids=tuple(origin_d.get("parent_ids", (preset_id,))),
-                    )
                     fragments.append(
                         PromptFragment(
                             text=text,
@@ -424,7 +493,7 @@ class PromptAssembler:
                             ),
                             id=f_id,
                             facts=f_facts,
-                            origin=f_origin,
+                            origin=preset_origin,
                         )
                     )
                     order += 1
@@ -442,15 +511,9 @@ class PromptAssembler:
                                 item_id=preset_id,
                                 kind="preset",
                                 semantic_ids=(f"preset:{preset_id}",),
-                            ),
-                            origin=SelectionOrigin(
-                                entry_point=entry_point,
-                                mode="preset",
-                                selector="preset_core",
-                                selected_id=preset_id,
-                                raw_value=t,
                                 parent_ids=(preset_id,),
                             ),
+                            origin=preset_origin,
                         )
                     )
                     order += 1
@@ -458,6 +521,15 @@ class PromptAssembler:
         # 2. 风格配方叠加 (优先消费结构化 fragments)
         if style_recipe:
             recipe_id = style_recipe.get("id", "recipe_custom")
+            raw_r = recipe_raw_value or style_recipe.get("ui_name") or style_recipe.get("style_name") or style_recipe.get("name_zh") or recipe_id
+            recipe_origin = SelectionOrigin(
+                entry_point=entry_point,
+                mode="recipe",
+                selector="style_recipe",
+                selected_id=recipe_id,
+                raw_value=raw_r,
+                parent_ids=(recipe_id,),
+            )
             recipe_frags = style_recipe.get("fragments")
             if recipe_frags and isinstance(recipe_frags, list):
                 for f_data in recipe_frags:
@@ -466,15 +538,6 @@ class PromptAssembler:
                         f_id = f_data.get("id", "")
                         f_slot = f_data.get("slot", "style_recipe")
                         f_facts = SemanticFacts.from_dict(f_data.get("facts", {}))
-                        origin_d = f_data.get("origin", {})
-                        f_origin = SelectionOrigin(
-                            entry_point=entry_point,
-                            mode=origin_d.get("mode", "recipe"),
-                            selector=origin_d.get("selector", f_slot),
-                            selected_id=origin_d.get("selected_id", recipe_id),
-                            raw_value=origin_d.get("raw_value", text),
-                            parent_ids=tuple(origin_d.get("parent_ids", (recipe_id,))),
-                        )
                         fragments.append(
                             PromptFragment(
                                 text=text,
@@ -489,7 +552,7 @@ class PromptAssembler:
                                 ),
                                 id=f_id,
                                 facts=f_facts,
-                                origin=f_origin,
+                                origin=recipe_origin,
                             )
                         )
                         order += 1
@@ -510,14 +573,7 @@ class PromptAssembler:
                                             kind="style_recipe",
                                             semantic_ids=(f"recipe:{recipe_id}",),
                                         ),
-                                        origin=SelectionOrigin(
-                                            entry_point=entry_point,
-                                            mode="recipe",
-                                            selector=k,
-                                            selected_id=recipe_id,
-                                            raw_value=t,
-                                            parent_ids=(recipe_id,),
-                                        ),
+                                        origin=recipe_origin,
                                     )
                                 )
                                 order += 1
@@ -541,6 +597,15 @@ class PromptAssembler:
             q_tags = ["best quality", "masterpiece", "high resolution", "photorealistic"]
             q_facts = SemanticFacts(semantic_role="quality", quality_class="standard", capture_device="professional")
 
+        quality_origin = SelectionOrigin(
+            entry_point=entry_point,
+            mode="explicit",
+            selector="quality",
+            selected_id=quality_id,
+            raw_value=quality_tier,
+            parent_ids=(quality_id,),
+        )
+
         for q in q_tags:
             fragments.append(
                 PromptFragment(
@@ -555,13 +620,7 @@ class PromptAssembler:
                     ),
                     id=f"{quality_id}__tag_{order:03d}",
                     facts=q_facts,
-                    origin=SelectionOrigin(
-                        entry_point=entry_point,
-                        mode="explicit",
-                        selector="quality",
-                        selected_id=quality_id,
-                        raw_value=q,
-                    ),
+                    origin=quality_origin,
                 )
             )
             order += 1
@@ -575,9 +634,19 @@ class PromptAssembler:
         quality_tier: str,
         rng: Optional[Random] = None,
         entry_point: str = "preset_browser",
+        preset_raw_value: Optional[str] = None,
+        recipe_raw_value: Optional[str] = None,
     ) -> Tuple[str, Tuple[PromptAtom, ...], Tuple[str, ...]]:
         """兼容包装器：投影 AssemblyResult 为 (prompt_str, accepted_atoms, rules_applied)。"""
-        res = self.assemble_preset(preset, style_recipe, quality_tier, rng, entry_point=entry_point)
+        res = self.assemble_preset(
+            preset,
+            style_recipe,
+            quality_tier,
+            rng,
+            entry_point=entry_point,
+            preset_raw_value=preset_raw_value,
+            recipe_raw_value=recipe_raw_value,
+        )
         return res.prompt, res.accepted_atoms, res.rules_applied
 
 

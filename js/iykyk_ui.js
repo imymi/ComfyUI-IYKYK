@@ -58,6 +58,34 @@ const NODE_DEFAULTS = {
         "角色体液": "",
         "画质修饰": "best quality, masterpiece",
         "自定义追加": ""
+    },
+
+    // 🔎 节点 4: IYKYK 提示词诊断
+    "IYKYKPromptDiagnostics": {
+        "预设模板": "无 (None)",
+        "风格配方": "无 (None)",
+        "场景大类": "随机 (Random)",
+        "剧情主题": "随机 (Random)",
+        "景别构图": "自动 (Auto)",
+        "拍摄视角": "自动 (Auto)",
+        "裸露等级": "随机 (Random)",
+        "服装款式": "随机 (Random)",
+        "服装状态": "自动联动裸露等级 (Auto Link Nudity)",
+        "发型发色": "随机 (Random)",
+        "饰品头饰": "无 (None)",
+        "妆容细节": "无 (None)",
+        "姿势动作": "随机 (Random)",
+        "情绪表情": "随机 (Random)",
+        "光影预设": "自动 (Auto)",
+        "胶片风格": "无 (None)",
+        "液体效果": "无 (None)",
+        "纹身标记": "无 (None)",
+        "道具物件": "无 (None)",
+        "角色设定": "无 (None)",
+        "真实微瑕": "无 (None)",
+        "画质等级": "高清写真 (High)",
+        "prompt_seed": -1,
+        "control_after_generate": "fixed"
     }
 };
 

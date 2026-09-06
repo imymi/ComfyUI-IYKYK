@@ -6,7 +6,15 @@ from __future__ import annotations
 import unittest
 from pathlib import Path
 
-from lib.assembler import PromptAssembler, assemble_prompt, finalize_prompt, finalize_prompt_atoms, sanitize_prompt
+from lib.assembler import (
+    PromptAssembler,
+    assemble_prompt,
+    assemble_result,
+    finalize_prompt,
+    finalize_prompt_atoms,
+    sanitize_prompt,
+)
+from lib.atomizer import atoms_to_fragments, atoms_to_tags
 from lib.errors import PromptSyntaxError, PromptValidationError
 from lib.lexer import (
     ParsedPrompt,
@@ -18,7 +26,7 @@ from lib.lexer import (
     tokenize_prompt_spans,
     validate_prompt_syntax,
 )
-from lib.models import PromptAtom, PromptFragment, TagProvenance
+from lib.models import PromptAtom, PromptFragment, SelectionOrigin, SemanticFacts, TagProvenance
 
 
 class TestLexerAndSpans(unittest.TestCase):
@@ -146,6 +154,176 @@ class TestLexerAndSpans(unittest.TestCase):
             self.assertIn(expected_preserved_span, rendered, f"Protected span was modified in: {rendered}")
             # 断言外部普通文本正确发生了冲突消解替换
             self.assertIn(expected_replaced_text, rendered, f"Plain text was not replaced in: {rendered}")
+
+    def test_mixed_tag_head_middle_tail_plain_replaced_and_protected_flanked(self):
+        """
+        审核报告第 8.6 节阻断项 R3C3-P1-001 专项回归契约：
+        1. 首 PLAIN 被改写、后接受保护 span；
+        2. 尾 PLAIN 被改写、前接受保护 span；
+        3. 中 PLAIN 被改写、两侧夹 ANGLE/QUOTED 受保护 span；
+        4. 双侧受保护 span 夹持 PLAIN。
+        断言：受保护字节 100% 原样保留，Tag 级 (id, facts, origin) 一致，
+        Atom 级 provenance 无损保留，且二次消解幂等 (0 规则再次触发)。
+        """
+        cases = [
+            # 1. 首 PLAIN 被改写，后接 ANGLE
+            (
+                "spinning room <lora:spinning room:1.0>",
+                "<lora:spinning room:1.0>",
+                "drunken stupor",
+            ),
+            # 2. 尾 PLAIN 被改写，前接 ANGLE
+            (
+                "<lora:spinning room:1.0> spinning room",
+                "<lora:spinning room:1.0>",
+                "drunken stupor",
+            ),
+            # 3. 中 PLAIN 被改写，两侧为 ANGLE 和 QUOTED
+            (
+                '<lora:spinning room:1.0> spinning room "spinning room"',
+                '<lora:spinning room:1.0> drunken stupor "spinning room"',
+                "drunken stupor",
+            ),
+            # 4. 双侧 ANGLE 夹持 PLAIN
+            (
+                "<lora:foo:1.0> spinning room <lora:bar:1.0>",
+                "<lora:foo:1.0> drunken stupor <lora:bar:1.0>",
+                "drunken stupor",
+            ),
+        ]
+
+        for input_text, expected_preserved_or_full, expected_replaced in cases:
+            frag = PromptFragment(
+                text=input_text,
+                source_slot="scene_theme",
+                origin=SelectionOrigin(entry_point="generator", mode="custom", selector="scene_theme", raw_value=input_text),
+            )
+            res1 = assemble_result([frag], data_dir=self.data_dir)
+
+            # 1. 文本级断言
+            if expected_preserved_or_full.startswith("<") or expected_preserved_or_full.startswith('"'):
+                self.assertIn(expected_preserved_or_full, res1.prompt)
+            self.assertIn(expected_replaced, res1.prompt)
+
+            # 2. Tag 级一致性断言：atoms_to_tags 必须无异常成功组装
+            tags = atoms_to_tags(res1.accepted_atoms)
+            self.assertEqual(len(tags), 1)
+            tag = tags[0]
+
+            # 3. 同一 Tag 内所有 spans 必须严格具备一致的 Tag 级 (id, facts, origin)
+            first_a = tag.atoms[0]
+            for other_a in tag.atoms[1:]:
+                self.assertEqual(other_a.id, first_a.id)
+                self.assertEqual(other_a.facts, first_a.facts)
+                self.assertEqual(other_a.origin, first_a.origin)
+
+            # 4. 被替换 Tag 的 origin.mode 必须为 "resolver"，且指向触发规则
+            self.assertEqual(first_a.origin.mode, "resolver")
+            self.assertEqual(first_a.origin.selected_id, "rule:spatial_environmental_mutual_exclusion")
+
+            # 5. 受保护 Span 的内部字节与 SpanType 必须绝对未被修改
+            for a in tag.atoms:
+                if a.is_blackbox:
+                    self.assertIn(a.span_type, (SpanType.ANGLE, SpanType.QUOTED))
+                    self.assertFalse(a.can_modify_internal)
+                    self.assertFalse(a.can_delete_atom)
+
+            # 6. 二次消解幂等性强断言：回转后的 fragments 再次组装结果必须逐字全等且 0 规则命中
+            frags2 = atoms_to_fragments(res1.accepted_atoms)
+            res2 = assemble_result(frags2, data_dir=self.data_dir)
+            self.assertEqual(res1.prompt, res2.prompt)
+            self.assertEqual(res2.rules_applied, ())
+
+    def test_mixed_tag_two_replaces_on_same_tag(self):
+        """
+        审核报告第 8.6 节专项回归：
+        验证同一个 Tag 内发生两次替换时，全部 spans 维持一致的 Tag 级来源元数据，
+        受保护 span 绝不被修改，且二次消解幂等。
+        """
+        # 同一 Tag 中有两个可替换 plain span，中间夹一个受保护 ANGLE span
+        text = "spinning room <lora:foo:1.0> spinning room"
+        frag = PromptFragment(
+            text=text,
+            source_slot="scene_theme",
+            origin=SelectionOrigin(entry_point="generator", mode="custom", selector="scene_theme", raw_value=text),
+        )
+        res = assemble_result([frag], data_dir=self.data_dir)
+
+        # 预期两个 spinning room 均被替换为 drunken stupor，中间的 <lora:foo:1.0> 完好保留
+        expected = "drunken stupor <lora:foo:1.0> drunken stupor"
+        self.assertEqual(res.prompt, expected)
+
+        # 验证所有 spans 共享相同的 Tag 级 resolver origin
+        tags = atoms_to_tags(res.accepted_atoms)
+        self.assertEqual(len(tags), 1)
+        tag = tags[0]
+        self.assertEqual(len(tag.atoms), 3)
+        self.assertEqual(tag.atoms[0].text, "drunken stupor ")
+        self.assertEqual(tag.atoms[1].text, "<lora:foo:1.0>")
+        self.assertEqual(tag.atoms[2].text, " drunken stupor")
+        self.assertEqual(tag.atoms[1].span_type, SpanType.ANGLE)
+
+        first_origin = tag.atoms[0].origin
+        self.assertEqual(first_origin.mode, "resolver")
+        for a in tag.atoms:
+            self.assertEqual(a.origin, first_origin)
+            self.assertEqual(a.facts, tag.atoms[0].facts)
+
+        # 二次消解幂等
+        frags2 = atoms_to_fragments(res.accepted_atoms)
+        res2 = assemble_result(frags2, data_dir=self.data_dir)
+        self.assertEqual(res2.prompt, expected)
+        self.assertEqual(res2.rules_applied, ())
+
+    def test_mixed_tag_deduplication_after_replace(self):
+        """
+        审核报告第 8.6 节专项回归：
+        验证多 Span 混合 Tag 替换后的去重语义：
+        - 纯 Plain 替换后相同内容正确被去重剔除并生成 DeduplicationRecord；
+        - 包含受保护 Span 的替换后 Tag 免疫去重，原样保留。
+        """
+        # 1. 纯 Plain 替换后去重
+        frags_plain = [
+            PromptFragment(text="prefix spinning room", source_slot="scene_theme"),
+            PromptFragment(text="prefix spinning room", source_slot="scene_theme"),
+        ]
+        res_plain = assemble_result(frags_plain, data_dir=self.data_dir)
+        self.assertEqual(res_plain.prompt, "prefix drunken stupor")
+        self.assertEqual(len(res_plain.deduplication_records), 1)
+        self.assertEqual(res_plain.deduplication_records[0].retained_tag_text, "prefix drunken stupor")
+        self.assertEqual(len(res_plain.deduplicated_atoms), 1)
+
+        # 2. 混合受保护 Span 替换后免疫去重
+        frags_mixed = [
+            PromptFragment(text='prefix spinning room "spinning room"', source_slot="scene_theme"),
+            PromptFragment(text='prefix spinning room "spinning room"', source_slot="scene_theme"),
+        ]
+        res_mixed = assemble_result(frags_mixed, data_dir=self.data_dir)
+        expected_mixed = 'prefix drunken stupor "spinning room", prefix drunken stupor "spinning room"'
+        self.assertEqual(res_mixed.prompt, expected_mixed)
+        self.assertEqual(len(res_mixed.deduplication_records), 0)
+        self.assertEqual(len(res_mixed.deduplicated_atoms), 0)
+
+    def test_mixed_tag_budget_truncation_after_replace(self):
+        """
+        审核报告第 8.6 节专项回归：
+        验证多 Span 混合 Tag 替换后的词数预算截断语义：
+        - 若替换后的多 Span Tag 无法装入剩余预算，必须整 Tag 跳过；
+        - Tag 内的每一个 Atom 均生成对应的 BudgetFilterRecord。
+        """
+        # 替换后为 5 个词：prefix(1) drunken(2) stupor(3) <lora:test:1.0>(4,5)
+        frag = PromptFragment(text="prefix spinning room <lora:test:1.0>", source_slot="scene_theme")
+        # 限制预算为 3 词，无法完整装入该 5 词 Tag
+        res = assemble_result([frag], data_dir=self.data_dir, max_words=3)
+        self.assertEqual(res.prompt, "")
+        self.assertEqual(len(res.accepted_atoms), 0)
+        # 该 Tag 包含 2 个 spans（1 个替换后的 PLAIN，1 个受保护的 ANGLE），均须记录在截断记录中
+        self.assertEqual(len(res.budget_filtered_atoms), 2)
+        self.assertEqual(len(res.budget_filter_records), 2)
+        for rec in res.budget_filter_records:
+            self.assertEqual(rec.reason, "word_budget_exceeded")
+            self.assertEqual(rec.word_budget, 3)
+            self.assertEqual(rec.candidate_words, 4)
 
     def test_budget_truncation_semantics(self):
         """

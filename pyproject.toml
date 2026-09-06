@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "comfyui-iykyk"
-version = "1.1.0-rc7"
+version = "1.1.0-rc8"
 description = "ComfyUI Advanced Japanese/Asian Themed Realistic & SFW/NSFW Prompt Generator with Hierarchical Context Flow"
 readme = "README.md"
 requires-python = ">=3.9"

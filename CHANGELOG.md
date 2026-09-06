@@ -4,6 +4,44 @@
 
 ---
 
+## [v1.1.0-rc8] - 2026-09-06
+
+### 🌟 冲突消解 DAG 拓扑重构、提示词诊断节点与确定性审计协议 (Commit B & C)
+
+> 💡 **规则标识与执行顺序说明**：本版本中所有消解规则一律采用稳定规则 ID、执行阶段（`phase`）与优先级（`priority`）进行声明与调度。旧版本更新日志中出现的历史规则编号（如“Rule 1～Rule 17”）仅为人工撰写时的阅读索引，**不代表**底层冲突消解有向无环图（DAG）的真实拓扑执行顺序。
+
+#### 1. 17 大规则冲突消解 DAG 拓扑执行引擎 (Commit B)
+- 建立不可变有向无环图（Conflict DAG），按 4 大阶段与静态优先级强依赖调度：
+  - `anchors` 阶段 (100–120): `spatial_environmental_mutual_exclusion` (100) → `nudity_clothing_conflicts` (110) → `framing_lower_body_coherence` (120)；
+  - `physical` 阶段 (200–270): `pose_hand_occupation` (200) → `handheld_props_single_holder` (210) → `clothing_style_state_coherence` (220) → `material_penetration` (230) → `device_quality_compatibility` (240) → `environmental_lighting_coherence` (250) → `monochrome_film_chroma_coherence` (260) → `makeup_details_coherence` (270)；
+  - `semantic` 阶段 (300–330): `gaze_angle_geometry` (300) → `accessory_occlusion_gaze_coherence` (310) → `emotion_gaze_affinity` (320) → `gaze_mutual_exclusion` (330)；
+  - `effects` 阶段 (400–410): `liquid_restrictions` (400) → `tattoo_dermal_fusion` (410)。
+- 彻底剔除生产代码旁路：移除 `skip_rules` 参数与运行期中间状态缓存，D6 反事实变异严格隔离在独立测试 Harness；
+- 规则级 `group_id` Fail-Closed 强校验：在冻结规则契约中声明每条规则允许的 `group_id` 集合，严格限制必需 role 与基数，拒绝未知 group；
+- 1,078 个 `PatternSpec`（含 17 条规则的 501 个 text_fallback 模式）在 RuleRegistry 加载期显式全量预编译，确保运行期零 `re.compile()`；
+- 10,000 随机种子确定性回归测试：确认跨规则级联消解一致性，摘要 SHA-256 哈希精确为 `9abc8a1a5863a5380f78c2527b19a8020a1a952913c31a03645de327fdf23208`；
+- 独立单源情境亲和数据：引入第 20 份独立运行时数据文件 `data/context_affinity.json` 并对齐权威清单。
+
+#### 2. 提示词诊断节点与纯函数单次消解架构 (Commit C)
+- 新增 `IYKYKPromptDiagnostics` 节点，注册为套件第 4 个原生节点（`🔎 IYKYK 提示词诊断`）；
+- 完整复用 `IYKYKPromptGenerator.INPUT_TYPES()` 22 槽位接口与 ComfyUI 控件属性；
+- 核心算法共享纯函数 `_generate_structured`，单次采样、单次消解，彻底杜绝重复随机或二次消解带来的状态漂移；
+- 固定 seed 下前三个输出（`正面提示词`、`负面提示词`、`中文场景描述`）与主生成器保持逐字节一致；
+- 完成 77 预设 × (8 配方 + None) = 693 组全矩阵跨节点逐字节一致性测试。
+
+#### 3. 确定性审计报告 JSON 与 Draft-7 Schema 契约 (Commit C v3)
+- 审计 JSON 严格固定为 8 个顶层字段（`schema_version`, `effective_seed`, `context_profile`, `selections`, `decisions`, `rules_applied`, `unresolved_conflicts`, `counts`），严禁扩展第 9 个顶层字段；
+- 补全 Atom 逐生命周期去向追踪：在 8 大顶层字段内为每个 source 与 produced Atom 提供唯一、完整快照；明确区分消解 drop、消解 replace、Tag 去重与词数预算截断；`selections` 扩展 `produced_atoms`、`deduplicated_records`（关联目标、保留 Tag/Atom 与依据）与 `budget_filtered_records`（记录上限、用量、候选成本与原因）；
+- 8 计数守恒方程：严格满足 $\text{source\_atoms} + \text{produced} = \text{accepted\_atoms} + \text{dropped} + \text{replaced} + \text{deduplicated} + \text{budget\_filtered}$（其中 $\text{produced} = \text{replaced} + \text{injected}$），所有计数直接由集合唯一分区精确推导；
+- 规则产生物身份隔离（R3-P1-005）：替换与注入原子采用 `mode="resolver"`、`selected_id="rule:{rule_id}"`，通过 parent/target 保持向原 UI 选项的无损溯源；
+- 原始 UI 输入保真（R3-P1-001）：`SelectionOrigin.raw_value` 在自定义组合器与装配器中 100% 逐字节保留原始字符串，多叶 Atom 统一聚合至单条 selection；
+- Fail-Closed 重放 Oracle（R3-P2-001）：制定 `schemas/diagnostics.schema.json` Draft-7 强类型校验模式，并通过重放状态机严厉拦截 C2-N01～C2-N12 全部 12 项负向变异，结合缓存编译校验与严格正向提示词组装重建；
+- 发布包烟测无条件依赖校验（R3-P2-002）：移除 smoke test 中对 `jsonschema` 的异常吸收，缺失依赖时显式失败；
+- 确定性序列化保障：UTF-8 字符原生保留（无中文字符 `\uXXXX` 转义）、键字典序排序、紧凑分隔符、无结尾换行符、绝对消除时间戳、内存地址、UUID 或系统临时目录；
+- 架构升级说明：rc7 与 rc8 在相同 seed 下生成的提示词可能存在细微差异（源于 DAG 拓扑执行顺序优化），但在 rc8 内部保持 100% 确定性。
+
+---
+
 ## [v1.1.0-rc7] - 2026-09-02
 
 ### 🌟 终验复审整改与架构重构 (8 项复核修订落地)
