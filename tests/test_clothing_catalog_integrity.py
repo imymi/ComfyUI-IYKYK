@@ -197,6 +197,60 @@ BATCH_1_SPEC = {
     },
 }
 
+# Batch 3: 外套、西服套装与机甲装备 23 款 ID 集合
+BATCH_3_IDS = frozenset({
+    "berserker_armor",
+    "business_suit",
+    "denim_jacket",
+    "down_jacket",
+    "duffel_coat",
+    "firefighter_gear",
+    "knight_armor",
+    "lab_coat",
+    "leather_jacket",
+    "mecha_exoskeleton",
+    "mecha_power_armor",
+    "military_overcoat",
+    "outerwear_coat",
+    "outerwear_jacket",
+    "outerwear_overcoat",
+    "rainwear_coat",
+    "safari_jacket",
+    "soft_shell_jacket",
+    "tactical_vest",
+    "tailcoat",
+    "trench_coat",
+    "windbreaker",
+    "winter_parka",
+})
+
+# Batch 3 规格与能力 SSOT 期望定义
+BATCH_3_SPEC = {
+    "berserker_armor": {"topologies": ["outerwear"], "button": False, "skirt": False, "raw_lines": [242]},
+    "business_suit": {"topologies": ["outerwear"], "button": True, "skirt": False, "raw_lines": [47, 53, 201, 202]},
+    "denim_jacket": {"topologies": ["outerwear"], "button": True, "skirt": False, "raw_lines": [187]},
+    "down_jacket": {"topologies": ["outerwear"], "button": True, "skirt": False, "raw_lines": [192]},
+    "duffel_coat": {"topologies": ["outerwear"], "button": True, "skirt": False, "raw_lines": [196]},
+    "firefighter_gear": {"topologies": ["outerwear"], "button": True, "skirt": False, "raw_lines": [189]},
+    "knight_armor": {"topologies": ["outerwear"], "button": False, "skirt": False, "raw_lines": [109, 240, 241]},
+    "lab_coat": {"topologies": ["outerwear"], "button": True, "skirt": False, "raw_lines": [44, 76, 191]},
+    "leather_jacket": {"topologies": ["outerwear"], "button": True, "skirt": False, "raw_lines": [93, 184]},
+    "mecha_exoskeleton": {"topologies": ["outerwear"], "button": False, "skirt": False, "raw_lines": [130, 136, 139, 140, 221]},
+    "mecha_power_armor": {"topologies": ["outerwear"], "button": False, "skirt": False, "raw_lines": [114]},
+    "military_overcoat": {"topologies": ["outerwear"], "button": True, "skirt": False, "raw_lines": [133]},
+    "outerwear_coat": {"topologies": ["outerwear"], "button": True, "skirt": False, "raw_lines": [110]},
+    "outerwear_jacket": {"topologies": ["outerwear"], "button": True, "skirt": False, "raw_lines": [183, 188]},
+    "outerwear_overcoat": {"topologies": ["outerwear"], "button": True, "skirt": False, "raw_lines": [83, 181, 195]},
+    "rainwear_coat": {"topologies": ["outerwear"], "button": True, "skirt": False, "raw_lines": [103, 220]},
+    "safari_jacket": {"topologies": ["outerwear"], "button": True, "skirt": False, "raw_lines": [185, 234]},
+    "soft_shell_jacket": {"topologies": ["outerwear"], "button": True, "skirt": False, "raw_lines": [128]},
+    "tactical_vest": {"topologies": ["outerwear"], "button": True, "skirt": False, "raw_lines": [94, 193, 194]},
+    "tailcoat": {"topologies": ["outerwear"], "button": True, "skirt": False, "raw_lines": [197]},
+    "trench_coat": {"topologies": ["outerwear"], "button": True, "skirt": False, "raw_lines": [67, 86, 190]},
+    "windbreaker": {"topologies": ["outerwear"], "button": True, "skirt": False, "raw_lines": [66, 115]},
+    "winter_parka": {"topologies": ["outerwear"], "button": True, "skirt": False, "raw_lines": [88]},
+}
+
 
 class TestClothingCatalogIntegrity(unittest.TestCase):
     @classmethod
@@ -207,22 +261,22 @@ class TestClothingCatalogIntegrity(unittest.TestCase):
         cls.cat_by_id = {c["id"]: c for c in cls.categories}
 
     def test_01_id_set_exact_equivalence(self):
-        """严格断言生产 ID 集合精确等于基线 31 款 ∪ Batch 1 16 款 ∪ Batch 2 22 款，共 69 款，多一漏一均直接报错。"""
+        """严格断言生产 ID 集合精确等于基线 31 款 ∪ Batch 1 16 款 ∪ Batch 2 22 款 ∪ Batch 3 23 款，共 92 款，多一漏一均直接报错。"""
         current_ids = set(self.cat_by_id.keys())
-        expected_ids = set(BASE_31_IDS | BATCH_1_IDS | BATCH_2_IDS)
+        expected_ids = set(BASE_31_IDS | BATCH_1_IDS | BATCH_2_IDS | BATCH_3_IDS)
 
         missing = expected_ids - current_ids
         unexpected = current_ids - expected_ids
 
         self.assertEqual(len(missing), 0, f"Missing category IDs in catalog: {missing}")
         self.assertEqual(len(unexpected), 0, f"Unexpected category IDs in catalog: {unexpected}")
-        self.assertEqual(len(current_ids), 69, f"Expected exactly 69 categories, got {len(current_ids)}")
+        self.assertEqual(len(current_ids), 92, f"Expected exactly 92 categories, got {len(current_ids)}")
 
     def test_02_capability_matrix(self):
-        """逐款核验 Batch 1 与 Batch 2 共 38 款形制能力与规格表 100% 吻合 (解扣、掀裙、拉链能力白名单)。"""
+        """逐款核验 Batch 1, Batch 2, Batch 3 共 61 款形制能力与规格表 100% 吻合 (解扣、掀裙、拉链能力白名单)。"""
         tag_id_pattern = re.compile(r"^[a-z][a-z0-9_]{2,95}$")
 
-        combined_specs = {**BATCH_1_SPEC, **BATCH_2_SPEC}
+        combined_specs = {**BATCH_1_SPEC, **BATCH_2_SPEC, **BATCH_3_SPEC}
         for cid, spec in combined_specs.items():
             self.assertIn(cid, self.cat_by_id, f"Category {cid} missing from catalog")
             cat = self.cat_by_id[cid]
@@ -256,10 +310,16 @@ class TestClothingCatalogIntegrity(unittest.TestCase):
             else:
                 self.assertNotIn(cid, ALLOWED_BUTTON_STYLES, f"{cid} has NO button capability in spec but found in ALLOWED_BUTTON_STYLES")
 
-            # 4. 掀裙能力断言 (下装与上装均不属于 NON_SKIRT_ONE_PIECE)
-            self.assertNotIn(cid, NON_SKIRT_ONE_PIECE, f"{cid} must not be in NON_SKIRT_ONE_PIECE")
+            # 4. 掀裙能力断言
+            if spec.get("skirt", False):
+                self.assertNotIn(cid, NON_SKIRT_ONE_PIECE, f"{cid} must not be in NON_SKIRT_ONE_PIECE")
+            else:
+                if cid in ("mecha_power_armor", "mecha_exoskeleton"):
+                    self.assertIn(cid, NON_SKIRT_ONE_PIECE, f"{cid} must be in NON_SKIRT_ONE_PIECE")
+                else:
+                    self.assertNotIn(cid, NON_SKIRT_ONE_PIECE, f"{cid} must not be in NON_SKIRT_ONE_PIECE")
 
-            # 5. 拉链能力断言 (Batch 1 与 Batch 2 均未授权拉链开襟动作)
+            # 5. 拉链能力断言 (Batch 1, 2, 3 均未授权拉链开襟动作)
             self.assertNotIn(cid, ALLOWED_ZIPPER_STYLES, f"{cid} must not be in ALLOWED_ZIPPER_STYLES")
 
     def test_03_discrete_leaf_tags_isolation(self):
@@ -284,18 +344,26 @@ class TestClothingCatalogIntegrity(unittest.TestCase):
         f_tag = next(t for t in mini_cat["tags"] if t["text"] == "flared miniskirt")
         self.assertEqual(t_tag["mutex_group"], f_tag["mutex_group"], "tight and flared miniskirt must share the same silhouette mutex_group")
 
+        # 针对 Batch 3: business_suit 与 tailcoat 严格保持 outerwear 拓扑
+        for b3_cid in ("business_suit", "tailcoat"):
+            b3_cat = self.cat_by_id[b3_cid]
+            for tag in b3_cat["tags"]:
+                self.assertEqual(tag["facts"]["garment_topologies"], ["outerwear"], f"{b3_cid} tag {tag['id']} must have topology ['outerwear']")
+
     def test_04_leaf_tag_count_and_metadata_integrity(self):
-        """严格核验 Batch 1 (51) 与 Batch 2 (67) 共 118 个叶子标签及其元数据完整性 (role, mutex_group, raw_lines, derivation)。"""
+        """严格核验 Batch 1 (51), Batch 2 (67), Batch 3 (75) 共 193 个叶子标签及其元数据完整性 (role, mutex_group, raw_lines, derivation)。"""
         b1_tags = [t for cid in BATCH_1_IDS for t in self.cat_by_id[cid].get("tags", [])]
         b2_tags = [t for cid in BATCH_2_IDS for t in self.cat_by_id[cid].get("tags", [])]
+        b3_tags = [t for cid in BATCH_3_IDS for t in self.cat_by_id[cid].get("tags", [])]
         self.assertEqual(len(b1_tags), 51, f"Expected exactly 51 leaf tags in Batch 1, got {len(b1_tags)}")
         self.assertEqual(len(b2_tags), 67, f"Expected exactly 67 leaf tags in Batch 2, got {len(b2_tags)}")
+        self.assertEqual(len(b3_tags), 75, f"Expected exactly 75 leaf tags in Batch 3, got {len(b3_tags)}")
 
         mg_regex = re.compile(r"^[a-z][a-z0-9_]{2,95}$")
         valid_roles = {"core_base", "variant", "combinable_attribute"}
         valid_derivations = {"verbatim", "derived", "product_extension"}
 
-        for cid in sorted(BATCH_1_IDS | BATCH_2_IDS):
+        for cid in sorted(BATCH_1_IDS | BATCH_2_IDS | BATCH_3_IDS):
             cat = self.cat_by_id[cid]
             tags = cat.get("tags", [])
             has_core = False
@@ -339,7 +407,7 @@ class TestClothingCatalogIntegrity(unittest.TestCase):
         """双向核验原始 TSV 行与词库映射：
         1. 真实读取 TSV 原文，校验行号连续性与 100% 存在；
         2. 校验 verbatim 标签在 TSV 规范化原词中严格有据可查，杜绝凭空新增修饰；
-        3. 台账迁移行 100% 覆盖 (Batch 1: 27 行 + Batch 2: 30 行 = 57 行)，标签引用行真实存在且归口精确，多对一归并依据充分。
+        3. 台账迁移行 100% 覆盖 (Batch 1: 27 行 + Batch 2: 30 行 + Batch 3: 45 行 = 102 行)，标签引用行真实存在且归口精确，多对一归并依据充分。
         """
         self.assertTrue(LEDGER_PATH.exists(), f"Ledger file missing at {LEDGER_PATH}")
         self.assertTrue(RAW_TSV_PATH.exists(), f"TSV file missing at {RAW_TSV_PATH}")
@@ -373,8 +441,8 @@ class TestClothingCatalogIntegrity(unittest.TestCase):
                         forms.add(c.replace("frillded", "frilled"))
             return forms
 
-        # 2. 从迁移台账提取所有分配给 Batch 1 与 Batch 2 的原始行
-        target_ids_scope = set(BATCH_1_IDS | BATCH_2_IDS)
+        # 2. 从迁移台账提取所有分配给 Batch 1, Batch 2, Batch 3 的原始行
+        target_ids_scope = set(BATCH_1_IDS | BATCH_2_IDS | BATCH_3_IDS)
         ledger_text = LEDGER_PATH.read_text(encoding="utf-8")
         active_ledger_rows: dict[int, dict[str, str]] = {}
         for line in ledger_text.splitlines():
@@ -396,7 +464,7 @@ class TestClothingCatalogIntegrity(unittest.TestCase):
                     "reason": cols[12],
                 }
 
-        self.assertEqual(len(active_ledger_rows), 57, f"Expected 57 ledger rows targeting Batch 1 & 2, got {len(active_ledger_rows)}")
+        self.assertEqual(len(active_ledger_rows), 102, f"Expected 102 ledger rows targeting Batch 1, 2 & 3, got {len(active_ledger_rows)}")
 
         # 3. 方向一 (Ledger -> Tags): 台账中分配给 Batch 1 & 2 的每一行在词库中均有对应标签与来源行号标注
         catalog_rows_by_cid: dict[str, set[int]] = {cid: set() for cid in target_ids_scope}

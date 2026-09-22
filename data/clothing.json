@@ -4437,6 +4437,1757 @@
           }
         }
       ]
+    },
+    {
+      "id": "berserker_armor",
+      "name_zh": "狂战士铠甲 (Berserker Armor)",
+      "aliases": [
+        "berserker_gear",
+        "savage_armor"
+      ],
+      "tags": [
+        {
+          "id": "berserker_armor__tag_000",
+          "text": "berserker armor",
+          "role": "core_base",
+          "mutex_group": "berserker_armor_silhouette",
+          "raw_lines": [
+            242
+          ],
+          "derivation": "verbatim",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "outerwear"
+            ],
+            "mutex_groups": [
+              "berserker_armor_silhouette"
+            ]
+          },
+          "derivation_note": "台账第[242]行原文直译建立"
+        },
+        {
+          "id": "berserker_armor__tag_001",
+          "text": "spiked berserker heavy armor",
+          "role": "variant",
+          "mutex_group": "berserker_armor_silhouette",
+          "raw_lines": [
+            242
+          ],
+          "derivation": "derived",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "outerwear"
+            ],
+            "mutex_groups": [
+              "berserker_armor_silhouette"
+            ]
+          },
+          "derivation_note": "berserker_armor 款式 variant 特征细化扩写"
+        },
+        {
+          "id": "berserker_armor__tag_002",
+          "text": "bloodstained armor plates",
+          "role": "combinable_attribute",
+          "mutex_group": "berserker_armor_attr",
+          "raw_lines": [
+            242
+          ],
+          "derivation": "product_extension",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "outerwear"
+            ],
+            "mutex_groups": [
+              "berserker_armor_attr"
+            ]
+          },
+          "derivation_note": "berserker_armor 款式 combinable_attribute 特征细化扩写"
+        }
+      ]
+    },
+    {
+      "id": "business_suit",
+      "name_zh": "职业西装 (Business Suit)",
+      "aliases": [
+        "formal_suit",
+        "office_suit"
+      ],
+      "tags": [
+        {
+          "id": "business_suit__tag_000",
+          "text": "business suit",
+          "role": "core_base",
+          "mutex_group": "business_suit_silhouette",
+          "raw_lines": [
+            47,
+            202
+          ],
+          "derivation": "verbatim",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "outerwear"
+            ],
+            "mutex_groups": [
+              "business_suit_silhouette"
+            ]
+          },
+          "derivation_note": "台账第[47, 202]行原文直译建立"
+        },
+        {
+          "id": "business_suit__tag_001",
+          "text": "black suit",
+          "role": "variant",
+          "mutex_group": "business_suit_silhouette",
+          "raw_lines": [
+            53
+          ],
+          "derivation": "verbatim",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "outerwear"
+            ],
+            "mutex_groups": [
+              "business_suit_silhouette"
+            ]
+          },
+          "derivation_note": "台账第[53]行原文直译建立"
+        },
+        {
+          "id": "business_suit__tag_002",
+          "text": "formal office business suit",
+          "role": "variant",
+          "mutex_group": "business_suit_silhouette",
+          "raw_lines": [
+            201
+          ],
+          "derivation": "derived",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "outerwear"
+            ],
+            "mutex_groups": [
+              "business_suit_silhouette"
+            ]
+          },
+          "derivation_note": "business_suit 款式 variant 特征细化扩写"
+        },
+        {
+          "id": "business_suit__tag_003",
+          "text": "tailored suit jacket with tie",
+          "role": "combinable_attribute",
+          "mutex_group": "business_suit_attr",
+          "raw_lines": [
+            47,
+            202
+          ],
+          "derivation": "product_extension",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "outerwear"
+            ],
+            "mutex_groups": [
+              "business_suit_attr"
+            ]
+          },
+          "derivation_note": "business_suit 款式 combinable_attribute 特征细化扩写"
+        }
+      ]
+    },
+    {
+      "id": "denim_jacket",
+      "name_zh": "牛仔夹克 (Denim Jacket)",
+      "aliases": [
+        "jean_jacket",
+        "denim_coat"
+      ],
+      "tags": [
+        {
+          "id": "denim_jacket__tag_000",
+          "text": "denim jacket",
+          "role": "core_base",
+          "mutex_group": "denim_jacket_silhouette",
+          "raw_lines": [
+            187
+          ],
+          "derivation": "verbatim",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "outerwear"
+            ],
+            "mutex_groups": [
+              "denim_jacket_silhouette"
+            ]
+          },
+          "derivation_note": "台账第[187]行原文直译建立"
+        },
+        {
+          "id": "denim_jacket__tag_001",
+          "text": "distressed blue denim jacket",
+          "role": "variant",
+          "mutex_group": "denim_jacket_silhouette",
+          "raw_lines": [
+            187
+          ],
+          "derivation": "derived",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "outerwear"
+            ],
+            "mutex_groups": [
+              "denim_jacket_silhouette"
+            ]
+          },
+          "derivation_note": "denim_jacket 款式 variant 特征细化扩写"
+        },
+        {
+          "id": "denim_jacket__tag_002",
+          "text": "denim trucker jacket with metal hardware",
+          "role": "combinable_attribute",
+          "mutex_group": "denim_jacket_attr",
+          "raw_lines": [
+            187
+          ],
+          "derivation": "product_extension",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "outerwear"
+            ],
+            "mutex_groups": [
+              "denim_jacket_attr"
+            ]
+          },
+          "derivation_note": "denim_jacket 款式 combinable_attribute 特征细化扩写"
+        }
+      ]
+    },
+    {
+      "id": "down_jacket",
+      "name_zh": "羽绒服 (Down Jacket)",
+      "aliases": [
+        "puffer_jacket",
+        "down_coat"
+      ],
+      "tags": [
+        {
+          "id": "down_jacket__tag_000",
+          "text": "down jackets",
+          "role": "core_base",
+          "mutex_group": "down_jacket_silhouette",
+          "raw_lines": [
+            192
+          ],
+          "derivation": "verbatim",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "outerwear"
+            ],
+            "mutex_groups": [
+              "down_jacket_silhouette"
+            ]
+          },
+          "derivation_note": "台账第[192]行原文直译建立"
+        },
+        {
+          "id": "down_jacket__tag_001",
+          "text": "quilted puffer jacket",
+          "role": "variant",
+          "mutex_group": "down_jacket_silhouette",
+          "raw_lines": [
+            192
+          ],
+          "derivation": "derived",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "outerwear"
+            ],
+            "mutex_groups": [
+              "down_jacket_silhouette"
+            ]
+          },
+          "derivation_note": "down_jacket 款式 variant 特征细化扩写"
+        },
+        {
+          "id": "down_jacket__tag_002",
+          "text": "hooded winter down coat",
+          "role": "combinable_attribute",
+          "mutex_group": "down_jacket_attr",
+          "raw_lines": [
+            192
+          ],
+          "derivation": "product_extension",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "outerwear"
+            ],
+            "mutex_groups": [
+              "down_jacket_attr"
+            ]
+          },
+          "derivation_note": "down_jacket 款式 combinable_attribute 特征细化扩写"
+        }
+      ]
+    },
+    {
+      "id": "duffel_coat",
+      "name_zh": "粗呢大衣 (Duffel Coat)",
+      "aliases": [
+        "toggle_coat",
+        "duffle_coat"
+      ],
+      "tags": [
+        {
+          "id": "duffel_coat__tag_000",
+          "text": "duffel coat",
+          "role": "core_base",
+          "mutex_group": "duffel_coat_silhouette",
+          "raw_lines": [
+            196
+          ],
+          "derivation": "verbatim",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "outerwear"
+            ],
+            "mutex_groups": [
+              "duffel_coat_silhouette"
+            ]
+          },
+          "derivation_note": "台账第[196]行原文直译建立"
+        },
+        {
+          "id": "duffel_coat__tag_001",
+          "text": "toggle closure duffle coat",
+          "role": "variant",
+          "mutex_group": "duffel_coat_silhouette",
+          "raw_lines": [
+            196
+          ],
+          "derivation": "derived",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "outerwear"
+            ],
+            "mutex_groups": [
+              "duffel_coat_silhouette"
+            ]
+          },
+          "derivation_note": "duffel_coat 款式 variant 特征细化扩写"
+        },
+        {
+          "id": "duffel_coat__tag_002",
+          "text": "wool duffel coat with hood",
+          "role": "combinable_attribute",
+          "mutex_group": "duffel_coat_attr",
+          "raw_lines": [
+            196
+          ],
+          "derivation": "product_extension",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "outerwear"
+            ],
+            "mutex_groups": [
+              "duffel_coat_attr"
+            ]
+          },
+          "derivation_note": "duffel_coat 款式 combinable_attribute 特征细化扩写"
+        }
+      ]
+    },
+    {
+      "id": "firefighter_gear",
+      "name_zh": "消防防护服 (Firefighter Gear)",
+      "aliases": [
+        "turnout_gear",
+        "bunker_gear"
+      ],
+      "tags": [
+        {
+          "id": "firefighter_gear__tag_000",
+          "text": "firefighter jacket",
+          "role": "core_base",
+          "mutex_group": "firefighter_gear_silhouette",
+          "raw_lines": [
+            189
+          ],
+          "derivation": "verbatim",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "outerwear"
+            ],
+            "mutex_groups": [
+              "firefighter_gear_silhouette"
+            ]
+          },
+          "derivation_note": "台账第[189]行原文直译建立"
+        },
+        {
+          "id": "firefighter_gear__tag_001",
+          "text": "heavy duty turnout coat",
+          "role": "variant",
+          "mutex_group": "firefighter_gear_silhouette",
+          "raw_lines": [
+            189
+          ],
+          "derivation": "derived",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "outerwear"
+            ],
+            "mutex_groups": [
+              "firefighter_gear_silhouette"
+            ]
+          },
+          "derivation_note": "firefighter_gear 款式 variant 特征细化扩写"
+        },
+        {
+          "id": "firefighter_gear__tag_002",
+          "text": "reflective stripe bunker jacket",
+          "role": "combinable_attribute",
+          "mutex_group": "firefighter_gear_attr",
+          "raw_lines": [
+            189
+          ],
+          "derivation": "product_extension",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "outerwear"
+            ],
+            "mutex_groups": [
+              "firefighter_gear_attr"
+            ]
+          },
+          "derivation_note": "firefighter_gear 款式 combinable_attribute 特征细化扩写"
+        }
+      ]
+    },
+    {
+      "id": "knight_armor",
+      "name_zh": "骑士重铠甲 (Knight Armor)",
+      "aliases": [
+        "plate_armor",
+        "full_plate"
+      ],
+      "tags": [
+        {
+          "id": "knight_armor__tag_000",
+          "text": "armor",
+          "role": "core_base",
+          "mutex_group": "knight_armor_silhouette",
+          "raw_lines": [
+            109,
+            240
+          ],
+          "derivation": "verbatim",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "outerwear"
+            ],
+            "mutex_groups": [
+              "knight_armor_silhouette"
+            ]
+          },
+          "derivation_note": "台账第[109, 240]行原文直译建立"
+        },
+        {
+          "id": "knight_armor__tag_001",
+          "text": "metal armor",
+          "role": "variant",
+          "mutex_group": "knight_armor_silhouette",
+          "raw_lines": [
+            241
+          ],
+          "derivation": "verbatim",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "outerwear"
+            ],
+            "mutex_groups": [
+              "knight_armor_silhouette"
+            ]
+          },
+          "derivation_note": "台账第[241]行原文直译建立"
+        },
+        {
+          "id": "knight_armor__tag_002",
+          "text": "steel plate knight armor",
+          "role": "variant",
+          "mutex_group": "knight_armor_silhouette",
+          "raw_lines": [
+            109,
+            240,
+            241
+          ],
+          "derivation": "derived",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "outerwear"
+            ],
+            "mutex_groups": [
+              "knight_armor_silhouette"
+            ]
+          },
+          "derivation_note": "knight_armor 款式 variant 特征细化扩写"
+        },
+        {
+          "id": "knight_armor__tag_003",
+          "text": "engraved polished steel cuirass",
+          "role": "combinable_attribute",
+          "mutex_group": "knight_armor_attr",
+          "raw_lines": [
+            241
+          ],
+          "derivation": "product_extension",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "outerwear"
+            ],
+            "mutex_groups": [
+              "knight_armor_attr"
+            ]
+          },
+          "derivation_note": "knight_armor 款式 combinable_attribute 特征细化扩写"
+        }
+      ]
+    },
+    {
+      "id": "lab_coat",
+      "name_zh": "实验白大褂 (Lab Coat)",
+      "aliases": [
+        "doctor_coat",
+        "scientist_coat"
+      ],
+      "tags": [
+        {
+          "id": "lab_coat__tag_000",
+          "text": "lab coat",
+          "role": "core_base",
+          "mutex_group": "lab_coat_silhouette",
+          "raw_lines": [
+            44,
+            76,
+            191
+          ],
+          "derivation": "verbatim",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "outerwear"
+            ],
+            "mutex_groups": [
+              "lab_coat_silhouette"
+            ]
+          },
+          "derivation_note": "台账第[44, 76, 191]行原文直译建立"
+        },
+        {
+          "id": "lab_coat__tag_001",
+          "text": "white doctor lab coat",
+          "role": "variant",
+          "mutex_group": "lab_coat_silhouette",
+          "raw_lines": [
+            44,
+            76
+          ],
+          "derivation": "derived",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "outerwear"
+            ],
+            "mutex_groups": [
+              "lab_coat_silhouette"
+            ]
+          },
+          "derivation_note": "lab_coat 款式 variant 特征细化扩写"
+        },
+        {
+          "id": "lab_coat__tag_002",
+          "text": "notched lapel lab coat with pockets",
+          "role": "combinable_attribute",
+          "mutex_group": "lab_coat_attr",
+          "raw_lines": [
+            191
+          ],
+          "derivation": "product_extension",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "outerwear"
+            ],
+            "mutex_groups": [
+              "lab_coat_attr"
+            ]
+          },
+          "derivation_note": "lab_coat 款式 combinable_attribute 特征细化扩写"
+        }
+      ]
+    },
+    {
+      "id": "leather_jacket",
+      "name_zh": "机车皮衣 (Leather Jacket)",
+      "aliases": [
+        "biker_jacket",
+        "moto_jacket"
+      ],
+      "tags": [
+        {
+          "id": "leather_jacket__tag_000",
+          "text": "leather jacket",
+          "role": "core_base",
+          "mutex_group": "leather_jacket_silhouette",
+          "raw_lines": [
+            93,
+            184
+          ],
+          "derivation": "verbatim",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "outerwear"
+            ],
+            "mutex_groups": [
+              "leather_jacket_silhouette"
+            ]
+          },
+          "derivation_note": "台账第[93, 184]行原文直译建立"
+        },
+        {
+          "id": "leather_jacket__tag_001",
+          "text": "black motorcycle leather jacket",
+          "role": "variant",
+          "mutex_group": "leather_jacket_silhouette",
+          "raw_lines": [
+            93,
+            184
+          ],
+          "derivation": "derived",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "outerwear"
+            ],
+            "mutex_groups": [
+              "leather_jacket_silhouette"
+            ]
+          },
+          "derivation_note": "leather_jacket 款式 variant 特征细化扩写"
+        },
+        {
+          "id": "leather_jacket__tag_002",
+          "text": "studded leather biker jacket",
+          "role": "combinable_attribute",
+          "mutex_group": "leather_jacket_attr",
+          "raw_lines": [
+            184
+          ],
+          "derivation": "product_extension",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "outerwear"
+            ],
+            "mutex_groups": [
+              "leather_jacket_attr"
+            ]
+          },
+          "derivation_note": "leather_jacket 款式 combinable_attribute 特征细化扩写"
+        }
+      ]
+    },
+    {
+      "id": "mecha_exoskeleton",
+      "name_zh": "外骨骼机甲 (Mecha Exoskeleton)",
+      "aliases": [
+        "exoskeleton_suit",
+        "mech_frame"
+      ],
+      "tags": [
+        {
+          "id": "mecha_exoskeleton__tag_000",
+          "text": "exoskeleton",
+          "role": "core_base",
+          "mutex_group": "mecha_exoskeleton_silhouette",
+          "raw_lines": [
+            130
+          ],
+          "derivation": "verbatim",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "outerwear"
+            ],
+            "mutex_groups": [
+              "mecha_exoskeleton_silhouette"
+            ]
+          },
+          "derivation_note": "台账第[130]行原文直译建立"
+        },
+        {
+          "id": "mecha_exoskeleton__tag_001",
+          "text": "exoskeleton mecha",
+          "role": "variant",
+          "mutex_group": "mecha_exoskeleton_silhouette",
+          "raw_lines": [
+            136,
+            140
+          ],
+          "derivation": "verbatim",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "outerwear"
+            ],
+            "mutex_groups": [
+              "mecha_exoskeleton_silhouette"
+            ]
+          },
+          "derivation_note": "台账第[136, 140]行原文直译建立"
+        },
+        {
+          "id": "mecha_exoskeleton__tag_002",
+          "text": "mechanical clothes",
+          "role": "variant",
+          "mutex_group": "mecha_exoskeleton_silhouette",
+          "raw_lines": [
+            139
+          ],
+          "derivation": "verbatim",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "outerwear"
+            ],
+            "mutex_groups": [
+              "mecha_exoskeleton_silhouette"
+            ]
+          },
+          "derivation_note": "台账第[139]行原文直译建立"
+        },
+        {
+          "id": "mecha_exoskeleton__tag_003",
+          "text": "mech suit",
+          "role": "variant",
+          "mutex_group": "mecha_exoskeleton_silhouette",
+          "raw_lines": [
+            221
+          ],
+          "derivation": "verbatim",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "outerwear"
+            ],
+            "mutex_groups": [
+              "mecha_exoskeleton_silhouette"
+            ]
+          },
+          "derivation_note": "台账第[221]行原文直译建立"
+        },
+        {
+          "id": "mecha_exoskeleton__tag_004",
+          "text": "hydraulic power actuator joints",
+          "role": "combinable_attribute",
+          "mutex_group": "mecha_exoskeleton_attr",
+          "raw_lines": [
+            136,
+            221
+          ],
+          "derivation": "product_extension",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "outerwear"
+            ],
+            "mutex_groups": [
+              "mecha_exoskeleton_attr"
+            ]
+          },
+          "derivation_note": "mecha_exoskeleton 款式 combinable_attribute 特征细化扩写"
+        }
+      ]
+    },
+    {
+      "id": "mecha_power_armor",
+      "name_zh": "动力装甲 (Power Armor)",
+      "aliases": [
+        "powered_exosuit",
+        "heavy_mech_armor"
+      ],
+      "tags": [
+        {
+          "id": "mecha_power_armor__tag_000",
+          "text": "power armor",
+          "role": "core_base",
+          "mutex_group": "mecha_power_armor_silhouette",
+          "raw_lines": [
+            114
+          ],
+          "derivation": "verbatim",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "outerwear"
+            ],
+            "mutex_groups": [
+              "mecha_power_armor_silhouette"
+            ]
+          },
+          "derivation_note": "台账第[114]行原文直译建立"
+        },
+        {
+          "id": "mecha_power_armor__tag_001",
+          "text": "heavy armored powered suit",
+          "role": "variant",
+          "mutex_group": "mecha_power_armor_silhouette",
+          "raw_lines": [
+            114
+          ],
+          "derivation": "derived",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "outerwear"
+            ],
+            "mutex_groups": [
+              "mecha_power_armor_silhouette"
+            ]
+          },
+          "derivation_note": "mecha_power_armor 款式 variant 特征细化扩写"
+        },
+        {
+          "id": "mecha_power_armor__tag_002",
+          "text": "glowing energy core armor",
+          "role": "combinable_attribute",
+          "mutex_group": "mecha_power_armor_attr",
+          "raw_lines": [
+            114
+          ],
+          "derivation": "product_extension",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "outerwear"
+            ],
+            "mutex_groups": [
+              "mecha_power_armor_attr"
+            ]
+          },
+          "derivation_note": "mecha_power_armor 款式 combinable_attribute 特征细化扩写"
+        }
+      ]
+    },
+    {
+      "id": "military_overcoat",
+      "name_zh": "军大衣 (Military Overcoat)",
+      "aliases": [
+        "greatcoat",
+        "army_greatcoat"
+      ],
+      "tags": [
+        {
+          "id": "military_overcoat__tag_000",
+          "text": "army overcoat",
+          "role": "core_base",
+          "mutex_group": "military_overcoat_silhouette",
+          "raw_lines": [
+            133
+          ],
+          "derivation": "verbatim",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "outerwear"
+            ],
+            "mutex_groups": [
+              "military_overcoat_silhouette"
+            ]
+          },
+          "derivation_note": "台账第[133]行原文直译建立"
+        },
+        {
+          "id": "military_overcoat__tag_001",
+          "text": "double-breasted military greatcoat",
+          "role": "variant",
+          "mutex_group": "military_overcoat_silhouette",
+          "raw_lines": [
+            133
+          ],
+          "derivation": "derived",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "outerwear"
+            ],
+            "mutex_groups": [
+              "military_overcoat_silhouette"
+            ]
+          },
+          "derivation_note": "military_overcoat 款式 variant 特征细化扩写"
+        },
+        {
+          "id": "military_overcoat__tag_002",
+          "text": "epaulet shoulder straps wool overcoat",
+          "role": "combinable_attribute",
+          "mutex_group": "military_overcoat_attr",
+          "raw_lines": [
+            133
+          ],
+          "derivation": "product_extension",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "outerwear"
+            ],
+            "mutex_groups": [
+              "military_overcoat_attr"
+            ]
+          },
+          "derivation_note": "military_overcoat 款式 combinable_attribute 特征细化扩写"
+        }
+      ]
+    },
+    {
+      "id": "outerwear_coat",
+      "name_zh": "通用风衣外套 (Outerwear Coat)",
+      "aliases": [
+        "casual_coat",
+        "mid_length_coat"
+      ],
+      "tags": [
+        {
+          "id": "outerwear_coat__tag_000",
+          "text": "coat",
+          "role": "core_base",
+          "mutex_group": "outerwear_coat_silhouette",
+          "raw_lines": [
+            110
+          ],
+          "derivation": "verbatim",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "outerwear"
+            ],
+            "mutex_groups": [
+              "outerwear_coat_silhouette"
+            ]
+          },
+          "derivation_note": "台账第[110]行原文直译建立"
+        },
+        {
+          "id": "outerwear_coat__tag_001",
+          "text": "casual tailored coat",
+          "role": "variant",
+          "mutex_group": "outerwear_coat_silhouette",
+          "raw_lines": [
+            110
+          ],
+          "derivation": "derived",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "outerwear"
+            ],
+            "mutex_groups": [
+              "outerwear_coat_silhouette"
+            ]
+          },
+          "derivation_note": "outerwear_coat 款式 variant 特征细化扩写"
+        },
+        {
+          "id": "outerwear_coat__tag_002",
+          "text": "wool outerwear coat with wide collar",
+          "role": "combinable_attribute",
+          "mutex_group": "outerwear_coat_attr",
+          "raw_lines": [
+            110
+          ],
+          "derivation": "product_extension",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "outerwear"
+            ],
+            "mutex_groups": [
+              "outerwear_coat_attr"
+            ]
+          },
+          "derivation_note": "outerwear_coat 款式 combinable_attribute 特征细化扩写"
+        }
+      ]
+    },
+    {
+      "id": "outerwear_jacket",
+      "name_zh": "夹克外套 (Outerwear Jacket)",
+      "aliases": [
+        "casual_jacket",
+        "zip_jacket"
+      ],
+      "tags": [
+        {
+          "id": "outerwear_jacket__tag_000",
+          "text": "jacket",
+          "role": "core_base",
+          "mutex_group": "outerwear_jacket_silhouette",
+          "raw_lines": [
+            183
+          ],
+          "derivation": "verbatim",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "outerwear"
+            ],
+            "mutex_groups": [
+              "outerwear_jacket_silhouette"
+            ]
+          },
+          "derivation_note": "台账第[183]行原文直译建立"
+        },
+        {
+          "id": "outerwear_jacket__tag_001",
+          "text": "turtleneck jacket",
+          "role": "variant",
+          "mutex_group": "outerwear_jacket_silhouette",
+          "raw_lines": [
+            188
+          ],
+          "derivation": "verbatim",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "outerwear"
+            ],
+            "mutex_groups": [
+              "outerwear_jacket_silhouette"
+            ]
+          },
+          "derivation_note": "台账第[188]行原文直译建立"
+        },
+        {
+          "id": "outerwear_jacket__tag_002",
+          "text": "casual zip-up bomber jacket",
+          "role": "variant",
+          "mutex_group": "outerwear_jacket_silhouette",
+          "raw_lines": [
+            183
+          ],
+          "derivation": "derived",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "outerwear"
+            ],
+            "mutex_groups": [
+              "outerwear_jacket_silhouette"
+            ]
+          },
+          "derivation_note": "outerwear_jacket 款式 variant 特征细化扩写"
+        },
+        {
+          "id": "outerwear_jacket__tag_003",
+          "text": "ribbed collar and cuffs",
+          "role": "combinable_attribute",
+          "mutex_group": "outerwear_jacket_attr",
+          "raw_lines": [
+            183,
+            188
+          ],
+          "derivation": "product_extension",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "outerwear"
+            ],
+            "mutex_groups": [
+              "outerwear_jacket_attr"
+            ]
+          },
+          "derivation_note": "outerwear_jacket 款式 combinable_attribute 特征细化扩写"
+        }
+      ]
+    },
+    {
+      "id": "outerwear_overcoat",
+      "name_zh": "长款毛呢大衣 (Outerwear Overcoat)",
+      "aliases": [
+        "winter_overcoat",
+        "wool_overcoat"
+      ],
+      "tags": [
+        {
+          "id": "outerwear_overcoat__tag_000",
+          "text": "overcoat",
+          "role": "core_base",
+          "mutex_group": "outerwear_overcoat_silhouette",
+          "raw_lines": [
+            83,
+            195
+          ],
+          "derivation": "verbatim",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "outerwear"
+            ],
+            "mutex_groups": [
+              "outerwear_overcoat_silhouette"
+            ]
+          },
+          "derivation_note": "台账第[83, 195]行原文直译建立"
+        },
+        {
+          "id": "outerwear_overcoat__tag_001",
+          "text": "fur trimmed collar",
+          "role": "combinable_attribute",
+          "mutex_group": "outerwear_overcoat_attr",
+          "raw_lines": [
+            181
+          ],
+          "derivation": "product_extension",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "outerwear"
+            ],
+            "mutex_groups": [
+              "outerwear_overcoat_attr"
+            ]
+          },
+          "derivation_note": "台账第181行毛领纠正拼写(colla->collar)作为大衣装饰配件特征扩写"
+        },
+        {
+          "id": "outerwear_overcoat__tag_002",
+          "text": "long winter wool overcoat",
+          "role": "variant",
+          "mutex_group": "outerwear_overcoat_silhouette",
+          "raw_lines": [
+            83,
+            195
+          ],
+          "derivation": "derived",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "outerwear"
+            ],
+            "mutex_groups": [
+              "outerwear_overcoat_silhouette"
+            ]
+          },
+          "derivation_note": "outerwear_overcoat 款式 variant 特征细化扩写"
+        }
+      ]
+    },
+    {
+      "id": "rainwear_coat",
+      "name_zh": "防雨风衣 (Rainwear Coat)",
+      "aliases": [
+        "waterproof_raincoat",
+        "slicker"
+      ],
+      "tags": [
+        {
+          "id": "rainwear_coat__tag_000",
+          "text": "raincoat",
+          "role": "core_base",
+          "mutex_group": "rainwear_coat_silhouette",
+          "raw_lines": [
+            103,
+            220
+          ],
+          "derivation": "verbatim",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "outerwear"
+            ],
+            "mutex_groups": [
+              "rainwear_coat_silhouette"
+            ]
+          },
+          "derivation_note": "台账第[103, 220]行原文直译建立"
+        },
+        {
+          "id": "rainwear_coat__tag_001",
+          "text": "hooded waterproof raincoat",
+          "role": "variant",
+          "mutex_group": "rainwear_coat_silhouette",
+          "raw_lines": [
+            103,
+            220
+          ],
+          "derivation": "derived",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "outerwear"
+            ],
+            "mutex_groups": [
+              "rainwear_coat_silhouette"
+            ]
+          },
+          "derivation_note": "rainwear_coat 款式 variant 特征细化扩写"
+        },
+        {
+          "id": "rainwear_coat__tag_002",
+          "text": "yellow vinyl long rain coat",
+          "role": "combinable_attribute",
+          "mutex_group": "rainwear_coat_attr",
+          "raw_lines": [
+            103
+          ],
+          "derivation": "product_extension",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "outerwear"
+            ],
+            "mutex_groups": [
+              "rainwear_coat_attr"
+            ]
+          },
+          "derivation_note": "rainwear_coat 款式 combinable_attribute 特征细化扩写"
+        }
+      ]
+    },
+    {
+      "id": "safari_jacket",
+      "name_zh": "探险猎装夹克 (Safari Jacket)",
+      "aliases": [
+        "bush_jacket",
+        "field_jacket"
+      ],
+      "tags": [
+        {
+          "id": "safari_jacket__tag_000",
+          "text": "safari jacket",
+          "role": "core_base",
+          "mutex_group": "safari_jacket_silhouette",
+          "raw_lines": [
+            185
+          ],
+          "derivation": "verbatim",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "outerwear"
+            ],
+            "mutex_groups": [
+              "safari_jacket_silhouette"
+            ]
+          },
+          "derivation_note": "台账第[185]行原文直译建立"
+        },
+        {
+          "id": "safari_jacket__tag_001",
+          "text": "western field jacket",
+          "role": "variant",
+          "mutex_group": "safari_jacket_silhouette",
+          "raw_lines": [
+            234
+          ],
+          "derivation": "derived",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "outerwear"
+            ],
+            "mutex_groups": [
+              "safari_jacket_silhouette"
+            ]
+          },
+          "derivation_note": "safari_jacket 款式 variant 特征细化扩写"
+        },
+        {
+          "id": "safari_jacket__tag_002",
+          "text": "four-pocket belted safari coat",
+          "role": "combinable_attribute",
+          "mutex_group": "safari_jacket_attr",
+          "raw_lines": [
+            185
+          ],
+          "derivation": "product_extension",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "outerwear"
+            ],
+            "mutex_groups": [
+              "safari_jacket_attr"
+            ]
+          },
+          "derivation_note": "safari_jacket 款式 combinable_attribute 特征细化扩写"
+        }
+      ]
+    },
+    {
+      "id": "soft_shell_jacket",
+      "name_zh": "户外软壳外套 (Soft Shell Jacket)",
+      "aliases": [
+        "windproof_softshell",
+        "trekking_jacket"
+      ],
+      "tags": [
+        {
+          "id": "soft_shell_jacket__tag_000",
+          "text": "soft shell coat",
+          "role": "core_base",
+          "mutex_group": "soft_shell_jacket_silhouette",
+          "raw_lines": [
+            128
+          ],
+          "derivation": "verbatim",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "outerwear"
+            ],
+            "mutex_groups": [
+              "soft_shell_jacket_silhouette"
+            ]
+          },
+          "derivation_note": "台账第[128]行原文直译建立"
+        },
+        {
+          "id": "soft_shell_jacket__tag_001",
+          "text": "hooded technical softshell jacket",
+          "role": "variant",
+          "mutex_group": "soft_shell_jacket_silhouette",
+          "raw_lines": [
+            128
+          ],
+          "derivation": "derived",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "outerwear"
+            ],
+            "mutex_groups": [
+              "soft_shell_jacket_silhouette"
+            ]
+          },
+          "derivation_note": "soft_shell_jacket 款式 variant 特征细化扩写"
+        },
+        {
+          "id": "soft_shell_jacket__tag_002",
+          "text": "breathable outdoor windproof shell",
+          "role": "combinable_attribute",
+          "mutex_group": "soft_shell_jacket_attr",
+          "raw_lines": [
+            128
+          ],
+          "derivation": "product_extension",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "outerwear"
+            ],
+            "mutex_groups": [
+              "soft_shell_jacket_attr"
+            ]
+          },
+          "derivation_note": "soft_shell_jacket 款式 combinable_attribute 特征细化扩写"
+        }
+      ]
+    },
+    {
+      "id": "tactical_vest",
+      "name_zh": "战术防弹背心 (Tactical Vest)",
+      "aliases": [
+        "body_armor_vest",
+        "plate_carrier"
+      ],
+      "tags": [
+        {
+          "id": "tactical_vest__tag_000",
+          "text": "bulletproof vest",
+          "role": "core_base",
+          "mutex_group": "tactical_vest_silhouette",
+          "raw_lines": [
+            94
+          ],
+          "derivation": "verbatim",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "outerwear"
+            ],
+            "mutex_groups": [
+              "tactical_vest_silhouette"
+            ]
+          },
+          "derivation_note": "台账第[94]行原文直译建立"
+        },
+        {
+          "id": "tactical_vest__tag_001",
+          "text": "body armor",
+          "role": "variant",
+          "mutex_group": "tactical_vest_silhouette",
+          "raw_lines": [
+            193
+          ],
+          "derivation": "verbatim",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "outerwear"
+            ],
+            "mutex_groups": [
+              "tactical_vest_silhouette"
+            ]
+          },
+          "derivation_note": "台账第[193]行原文直译建立"
+        },
+        {
+          "id": "tactical_vest__tag_002",
+          "text": "flak jacket",
+          "role": "variant",
+          "mutex_group": "tactical_vest_silhouette",
+          "raw_lines": [
+            194
+          ],
+          "derivation": "verbatim",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "outerwear"
+            ],
+            "mutex_groups": [
+              "tactical_vest_silhouette"
+            ]
+          },
+          "derivation_note": "台账第[194]行原文直译建立"
+        },
+        {
+          "id": "tactical_vest__tag_003",
+          "text": "molle load bearing plate carrier",
+          "role": "combinable_attribute",
+          "mutex_group": "tactical_vest_attr",
+          "raw_lines": [
+            94,
+            193
+          ],
+          "derivation": "product_extension",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "outerwear"
+            ],
+            "mutex_groups": [
+              "tactical_vest_attr"
+            ]
+          },
+          "derivation_note": "tactical_vest 款式 combinable_attribute 特征细化扩写"
+        }
+      ]
+    },
+    {
+      "id": "tailcoat",
+      "name_zh": "宫廷燕尾服 (Tailcoat)",
+      "aliases": [
+        "evening_tailcoat",
+        "dress_coat"
+      ],
+      "tags": [
+        {
+          "id": "tailcoat__tag_000",
+          "text": "tailcoat",
+          "role": "core_base",
+          "mutex_group": "tailcoat_silhouette",
+          "raw_lines": [
+            197
+          ],
+          "derivation": "verbatim",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "outerwear"
+            ],
+            "mutex_groups": [
+              "tailcoat_silhouette"
+            ]
+          },
+          "derivation_note": "台账第[197]行原文直译建立"
+        },
+        {
+          "id": "tailcoat__tag_001",
+          "text": "formal black evening tailcoat",
+          "role": "variant",
+          "mutex_group": "tailcoat_silhouette",
+          "raw_lines": [
+            197
+          ],
+          "derivation": "derived",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "outerwear"
+            ],
+            "mutex_groups": [
+              "tailcoat_silhouette"
+            ]
+          },
+          "derivation_note": "tailcoat 款式 variant 特征细化扩写"
+        },
+        {
+          "id": "tailcoat__tag_002",
+          "text": "peaked lapel formal tailcoat",
+          "role": "combinable_attribute",
+          "mutex_group": "tailcoat_attr",
+          "raw_lines": [
+            197
+          ],
+          "derivation": "product_extension",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "outerwear"
+            ],
+            "mutex_groups": [
+              "tailcoat_attr"
+            ]
+          },
+          "derivation_note": "tailcoat 款式 combinable_attribute 特征细化扩写"
+        }
+      ]
+    },
+    {
+      "id": "trench_coat",
+      "name_zh": "战壕风衣 (Trench Coat)",
+      "aliases": [
+        "belted_trench",
+        "duster_coat"
+      ],
+      "tags": [
+        {
+          "id": "trench_coat__tag_000",
+          "text": "trench coat",
+          "role": "core_base",
+          "mutex_group": "trench_coat_silhouette",
+          "raw_lines": [
+            86,
+            190
+          ],
+          "derivation": "verbatim",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "outerwear"
+            ],
+            "mutex_groups": [
+              "trench_coat_silhouette"
+            ]
+          },
+          "derivation_note": "台账第[86, 190]行原文直译建立"
+        },
+        {
+          "id": "trench_coat__tag_001",
+          "text": "wind coat",
+          "role": "variant",
+          "mutex_group": "trench_coat_silhouette",
+          "raw_lines": [
+            67
+          ],
+          "derivation": "verbatim",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "outerwear"
+            ],
+            "mutex_groups": [
+              "trench_coat_silhouette"
+            ]
+          },
+          "derivation_note": "台账第[67]行原文直译建立"
+        },
+        {
+          "id": "trench_coat__tag_002",
+          "text": "double-breasted belted trench coat",
+          "role": "combinable_attribute",
+          "mutex_group": "trench_coat_attr",
+          "raw_lines": [
+            86,
+            190
+          ],
+          "derivation": "product_extension",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "outerwear"
+            ],
+            "mutex_groups": [
+              "trench_coat_attr"
+            ]
+          },
+          "derivation_note": "trench_coat 款式 combinable_attribute 特征细化扩写"
+        }
+      ]
+    },
+    {
+      "id": "windbreaker",
+      "name_zh": "运动防风衣 (Windbreaker)",
+      "aliases": [
+        "lightweight_windbreaker",
+        "running_jacket"
+      ],
+      "tags": [
+        {
+          "id": "windbreaker__tag_000",
+          "text": "white windbreaker",
+          "role": "core_base",
+          "mutex_group": "windbreaker_silhouette",
+          "raw_lines": [
+            66
+          ],
+          "derivation": "verbatim",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "outerwear"
+            ],
+            "mutex_groups": [
+              "windbreaker_silhouette"
+            ]
+          },
+          "derivation_note": "台账第[66]行原文直译建立"
+        },
+        {
+          "id": "windbreaker__tag_001",
+          "text": "standing collar long windbreaker",
+          "role": "variant",
+          "mutex_group": "windbreaker_silhouette",
+          "raw_lines": [
+            115
+          ],
+          "derivation": "verbatim",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "outerwear"
+            ],
+            "mutex_groups": [
+              "windbreaker_silhouette"
+            ]
+          },
+          "derivation_note": "台账第[115]行原文直译建立"
+        },
+        {
+          "id": "windbreaker__tag_002",
+          "text": "zip-up lightweight athletic windbreaker",
+          "role": "combinable_attribute",
+          "mutex_group": "windbreaker_attr",
+          "raw_lines": [
+            66,
+            115
+          ],
+          "derivation": "product_extension",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "outerwear"
+            ],
+            "mutex_groups": [
+              "windbreaker_attr"
+            ]
+          },
+          "derivation_note": "windbreaker 款式 combinable_attribute 特征细化扩写"
+        }
+      ]
+    },
+    {
+      "id": "winter_parka",
+      "name_zh": "防寒派克大衣 (Winter Parka)",
+      "aliases": [
+        "down_parka",
+        "arctic_parka"
+      ],
+      "tags": [
+        {
+          "id": "winter_parka__tag_000",
+          "text": "parka",
+          "role": "core_base",
+          "mutex_group": "winter_parka_silhouette",
+          "raw_lines": [
+            88
+          ],
+          "derivation": "verbatim",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "outerwear"
+            ],
+            "mutex_groups": [
+              "winter_parka_silhouette"
+            ]
+          },
+          "derivation_note": "台账第[88]行原文直译建立"
+        },
+        {
+          "id": "winter_parka__tag_001",
+          "text": "fur-hooded arctic parka",
+          "role": "variant",
+          "mutex_group": "winter_parka_silhouette",
+          "raw_lines": [
+            88
+          ],
+          "derivation": "derived",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "outerwear"
+            ],
+            "mutex_groups": [
+              "winter_parka_silhouette"
+            ]
+          },
+          "derivation_note": "winter_parka 款式 variant 特征细化扩写"
+        },
+        {
+          "id": "winter_parka__tag_002",
+          "text": "heavy duty insulated winter parka",
+          "role": "combinable_attribute",
+          "mutex_group": "winter_parka_attr",
+          "raw_lines": [
+            88
+          ],
+          "derivation": "product_extension",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "outerwear"
+            ],
+            "mutex_groups": [
+              "winter_parka_attr"
+            ]
+          },
+          "derivation_note": "winter_parka 款式 combinable_attribute 特征细化扩写"
+        }
+      ]
     }
   ],
   "clothing_states": [
@@ -4599,6 +6350,70 @@
             ],
             "visible_regions": [
               "lower_body"
+            ],
+            "garment_states": [
+              "opened"
+            ]
+          }
+        },
+        {
+          "id": "unbuttoned__tag_007",
+          "text": "jacket unbuttoned",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "outerwear"
+            ],
+            "visible_regions": [
+              "upper_body"
+            ],
+            "garment_states": [
+              "opened"
+            ]
+          }
+        },
+        {
+          "id": "unbuttoned__tag_008",
+          "text": "coat open",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "outerwear"
+            ],
+            "visible_regions": [
+              "upper_body"
+            ],
+            "garment_states": [
+              "opened"
+            ]
+          }
+        },
+        {
+          "id": "unbuttoned__tag_009",
+          "text": "jacket open",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "outerwear"
+            ],
+            "visible_regions": [
+              "upper_body"
+            ],
+            "garment_states": [
+              "opened"
+            ]
+          }
+        },
+        {
+          "id": "unbuttoned__tag_010",
+          "text": "unbuttoned coat",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "outerwear"
+            ],
+            "visible_regions": [
+              "upper_body"
             ],
             "garment_states": [
               "opened"

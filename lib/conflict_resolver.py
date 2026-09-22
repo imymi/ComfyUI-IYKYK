@@ -113,6 +113,7 @@ ALLOWED_BUTTON_STYLES: Set[str] = {
     "outerwear_overcoat", "outerwear_jacket", "soft_shell_jacket", "rainwear_coat",
     "bathrobe", "combat_tactical", "convenience_store", "frock_smock", "hospital_gown",
     "denim_shorts", "leather_skirt",
+    "leather_jacket", "tactical_vest", "windbreaker", "winter_parka",
 }
 
 NON_SKIRT_ONE_PIECE: Set[str] = {
@@ -130,7 +131,10 @@ ALLOWED_ZIPPER_STYLES: Set[str] = {
 }
 
 RE_DRESS_ACTION = re.compile(r"\b(?:dress)\b", re.IGNORECASE)
-RE_UPPER_BODY_ACTION = re.compile(r"\b(?:shirt|blouse|cleavage|chest|collar|breasts?)\b", re.IGNORECASE)
+RE_SHIRT_ACTION = re.compile(r"\b(?:shirt|blouse)\b", re.IGNORECASE)
+RE_OUTERWEAR_ACTION = re.compile(r"\b(?:jacket|coat|vest|parka|overcoat)\b", re.IGNORECASE)
+RE_CHEST_ACTION = re.compile(r"\b(?:cleavage|chest|collar|breasts?)\b", re.IGNORECASE)
+RE_UPPER_BODY_ACTION = re.compile(r"\b(?:shirt|blouse|cleavage|chest|collar|breasts?|jacket|coat|vest|parka|overcoat)\b", re.IGNORECASE)
 RE_PANTS_ACTION = re.compile(r"\b(?:pants|jeans|shorts)\b", re.IGNORECASE)
 RE_SKIRT_ACTION = re.compile(r"\b(?:skirt)\b", re.IGNORECASE)
 
@@ -205,17 +209,37 @@ def is_garment_compatible_with_state(
                     return False
 
         elif state_id in ("unbuttoned", "opened"):
-            # 2.3 上装/胸部开扣动作 (如 shirt open at chest / buttons undone revealing cleavage / blouse unbuttoned):
-            # 必须具备上身覆盖 (top, outerwear, one_piece, suit)，纯下装 (bottom_pants, bottom_skirt) 绝对禁止承载！
-            if RE_UPPER_BODY_ACTION.search(atom_text):
-                has_upper = any(
-                    a.facts and any(t in a.facts.garment_topologies for t in ("top", "outerwear", "one_piece", "suit"))
+            # 2.3 外套开扣/开襟动作 (如 jacket unbuttoned / coat open / jacket open / unbuttoned coat):
+            # 必须具备外套拓扑 (outerwear)，纯上装衬衫与下装绝对禁止冒充承载！
+            if RE_OUTERWEAR_ACTION.search(atom_text):
+                has_outer = any(
+                    a.facts and "outerwear" in a.facts.garment_topologies
                     for a in entity.member_atoms
                 )
-                if not has_upper:
+                if not has_outer:
                     return False
 
-            # 2.4 裤装动作 (如 pants button undone / jeans unbuttoned):
+            # 2.4 衬衫专属开扣动作 (如 blouse unbuttoned / shirt open at chest):
+            # 必须具备上装/一体衣 (top, one_piece)，纯外套 (outerwear) 与纯下装绝对禁止冒用！
+            if RE_SHIRT_ACTION.search(atom_text):
+                has_shirt = any(
+                    a.facts and any(t in a.facts.garment_topologies for t in ("top", "one_piece"))
+                    for a in entity.member_atoms
+                )
+                if not has_shirt:
+                    return False
+
+            # 2.5 胸部开扣动作 (如 buttons undone revealing cleavage / collar unbuttoned):
+            # 必须具备上身覆盖 (top, one_piece)，纯外套与下装绝对禁止承载！
+            if RE_CHEST_ACTION.search(atom_text):
+                has_chest = any(
+                    a.facts and any(t in a.facts.garment_topologies for t in ("top", "one_piece"))
+                    for a in entity.member_atoms
+                )
+                if not has_chest:
+                    return False
+
+            # 2.6 裤装动作 (如 pants button undone / jeans unbuttoned):
             # 必须为裤装 (bottom_pants, one_piece)，半身裙与纯上装绝对禁止承载！
             if RE_PANTS_ACTION.search(atom_text):
                 has_pants = any(
@@ -225,7 +249,7 @@ def is_garment_compatible_with_state(
                 if not has_pants:
                     return False
 
-            # 2.5 裙装解扣动作 (如 skirt button undone / skirt unbuttoned):
+            # 2.7 裙装解扣动作 (如 skirt button undone / skirt unbuttoned):
             # 必须具备裙形制 (bottom_skirt, 或具备裙装的一体衣 one_piece)，裤装与纯上装绝对禁止承载！
             if RE_SKIRT_ACTION.search(atom_text):
                 has_skirt = any(
