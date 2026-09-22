@@ -1726,40 +1726,80 @@
         {
           "id": "combat_tactical__tag_000",
           "text": "combat suit",
+          "role": "core_base",
+          "mutex_group": "combat_tactical_silhouette",
+          "raw_lines": [
+            74
+          ],
+          "derivation": "verbatim",
+          "derivation_note": "台账第74行战斗服直译与主款式建立",
           "facts": {
             "semantic_role": "selector",
             "garment_topologies": [
               "top"
+            ],
+            "mutex_groups": [
+              "combat_tactical_silhouette"
             ]
           }
         },
         {
           "id": "combat_tactical__tag_001",
           "text": "tactical military jacket",
+          "role": "variant",
+          "mutex_group": "combat_tactical_silhouette",
+          "raw_lines": [
+            74
+          ],
+          "derivation": "derived",
+          "derivation_note": "台账第74行战斗服军规战术夹克廓形变体细化",
           "facts": {
             "semantic_role": "selector",
             "garment_topologies": [
               "top"
+            ],
+            "mutex_groups": [
+              "combat_tactical_silhouette"
             ]
           }
         },
         {
           "id": "combat_tactical__tag_002",
           "text": "swat uniform",
+          "role": "variant",
+          "mutex_group": "combat_tactical_silhouette",
+          "raw_lines": [
+            218
+          ],
+          "derivation": "verbatim",
+          "derivation_note": "台账第218行特警制服合并至战斗服体系",
           "facts": {
             "semantic_role": "selector",
             "garment_topologies": [
               "top"
+            ],
+            "mutex_groups": [
+              "combat_tactical_silhouette"
             ]
           }
         },
         {
           "id": "combat_tactical__tag_003",
           "text": "tactical vest over uniform",
+          "role": "combinable_attribute",
+          "mutex_group": "combat_tactical_vest",
+          "raw_lines": [
+            74
+          ],
+          "derivation": "product_extension",
+          "derivation_note": "战术防弹背心外搭叠穿属性扩写，派生自第74行战术配件需求",
           "facts": {
             "semantic_role": "selector",
             "garment_topologies": [
               "top"
+            ],
+            "mutex_groups": [
+              "combat_tactical_vest"
             ]
           }
         }
@@ -1777,30 +1817,60 @@
         {
           "id": "convenience_store__tag_000",
           "text": "convenience store uniform",
+          "role": "core_base",
+          "mutex_group": "store_uniform_silhouette",
+          "raw_lines": [
+            45
+          ],
+          "derivation": "verbatim",
+          "derivation_note": "台账第45行便利店制服直译与主款式建立",
           "facts": {
             "semantic_role": "selector",
             "garment_topologies": [
               "top"
+            ],
+            "mutex_groups": [
+              "store_uniform_silhouette"
             ]
           }
         },
         {
           "id": "convenience_store__tag_001",
           "text": "retail worker collared shirt",
+          "role": "variant",
+          "mutex_group": "store_uniform_silhouette",
+          "raw_lines": [
+            45
+          ],
+          "derivation": "product_extension",
+          "derivation_note": "便利店店员内搭翻领衬衫变体扩写",
           "facts": {
             "semantic_role": "selector",
             "garment_topologies": [
               "top"
+            ],
+            "mutex_groups": [
+              "store_uniform_silhouette"
             ]
           }
         },
         {
           "id": "convenience_store__tag_002",
           "text": "store staff apron uniform",
+          "role": "combinable_attribute",
+          "mutex_group": "store_uniform_apron",
+          "raw_lines": [
+            45
+          ],
+          "derivation": "product_extension",
+          "derivation_note": "便利店店员围裙工装属性扩写",
           "facts": {
             "semantic_role": "selector",
             "garment_topologies": [
               "top"
+            ],
+            "mutex_groups": [
+              "store_uniform_apron"
             ]
           }
         }
@@ -1818,30 +1888,60 @@
         {
           "id": "crop_top__tag_000",
           "text": "crop top",
+          "role": "core_base",
+          "mutex_group": "crop_top_silhouette",
+          "raw_lines": [
+            40
+          ],
+          "derivation": "verbatim",
+          "derivation_note": "台账第40行露腹短上衣直译与主款式建立",
           "facts": {
             "semantic_role": "selector",
             "garment_topologies": [
               "top"
+            ],
+            "mutex_groups": [
+              "crop_top_silhouette"
             ]
           }
         },
         {
           "id": "crop_top__tag_001",
           "text": "cropped short shirt",
+          "role": "variant",
+          "mutex_group": "crop_top_silhouette",
+          "raw_lines": [
+            40
+          ],
+          "derivation": "derived",
+          "derivation_note": "超短衬衫变体细化",
           "facts": {
             "semantic_role": "selector",
             "garment_topologies": [
               "top"
+            ],
+            "mutex_groups": [
+              "crop_top_silhouette"
             ]
           }
         },
         {
           "id": "crop_top__tag_002",
           "text": "exposed midriff cropped top",
+          "role": "combinable_attribute",
+          "mutex_group": "crop_top_attr",
+          "raw_lines": [
+            40
+          ],
+          "derivation": "product_extension",
+          "derivation_note": "露腰露脐特征属性扩写",
           "facts": {
             "semantic_role": "selector",
             "garment_topologies": [
               "top"
+            ],
+            "mutex_groups": [
+              "crop_top_attr"
             ]
           }
         }
@@ -1859,30 +1959,60 @@
         {
           "id": "fast_food_uniform__tag_000",
           "text": "fast food uniform",
+          "role": "core_base",
+          "mutex_group": "fast_food_silhouette",
+          "raw_lines": [
+            214
+          ],
+          "derivation": "verbatim",
+          "derivation_note": "台账第214行快餐制服直译与主款式建立",
           "facts": {
             "semantic_role": "selector",
             "garment_topologies": [
               "top"
+            ],
+            "mutex_groups": [
+              "fast_food_silhouette"
             ]
           }
         },
         {
           "id": "fast_food_uniform__tag_001",
-          "text": "fast food polo shirt and visor",
+          "text": "short sleeve collared fast food uniform",
+          "role": "variant",
+          "mutex_group": "fast_food_silhouette",
+          "raw_lines": [
+            214
+          ],
+          "derivation": "derived",
+          "derivation_note": "短袖翻领快餐制服变体细化",
           "facts": {
             "semantic_role": "selector",
             "garment_topologies": [
               "top"
+            ],
+            "mutex_groups": [
+              "fast_food_silhouette"
             ]
           }
         },
         {
           "id": "fast_food_uniform__tag_002",
-          "text": "short sleeve collared fast food uniform",
+          "text": "fast food polo shirt and visor",
+          "role": "combinable_attribute",
+          "mutex_group": "fast_food_attr",
+          "raw_lines": [
+            214
+          ],
+          "derivation": "product_extension",
+          "derivation_note": "快餐店Polo与遮阳帽特征属性扩写",
           "facts": {
             "semantic_role": "selector",
             "garment_topologies": [
               "top"
+            ],
+            "mutex_groups": [
+              "fast_food_attr"
             ]
           }
         }
@@ -1900,30 +2030,60 @@
         {
           "id": "fishnet_top__tag_000",
           "text": "fishnet top",
+          "role": "core_base",
+          "mutex_group": "fishnet_silhouette",
+          "raw_lines": [
+            79
+          ],
+          "derivation": "verbatim",
+          "derivation_note": "台账第79行网纹衣直译与主款式建立",
           "facts": {
             "semantic_role": "selector",
             "garment_topologies": [
               "top"
+            ],
+            "mutex_groups": [
+              "fishnet_silhouette"
             ]
           }
         },
         {
           "id": "fishnet_top__tag_001",
           "text": "black mesh fishnet shirt",
+          "role": "variant",
+          "mutex_group": "fishnet_silhouette",
+          "raw_lines": [
+            79
+          ],
+          "derivation": "derived",
+          "derivation_note": "黑色网眼鱼网衬衫经典变体细化",
           "facts": {
             "semantic_role": "selector",
             "garment_topologies": [
               "top"
+            ],
+            "mutex_groups": [
+              "fishnet_silhouette"
             ]
           }
         },
         {
           "id": "fishnet_top__tag_002",
           "text": "sheer net long sleeve top",
+          "role": "combinable_attribute",
+          "mutex_group": "fishnet_attr",
+          "raw_lines": [
+            79
+          ],
+          "derivation": "product_extension",
+          "derivation_note": "透视长袖网眼面料属性扩写",
           "facts": {
             "semantic_role": "selector",
             "garment_topologies": [
               "top"
+            ],
+            "mutex_groups": [
+              "fishnet_attr"
             ]
           }
         }
@@ -1941,30 +2101,61 @@
         {
           "id": "hoodie__tag_000",
           "text": "hoodie",
+          "role": "core_base",
+          "mutex_group": "hoodie_silhouette",
+          "raw_lines": [
+            111,
+            180
+          ],
+          "derivation": "verbatim",
+          "derivation_note": "台账第111行纳入及第180行hoodie同义词合并",
           "facts": {
             "semantic_role": "selector",
             "garment_topologies": [
               "top"
+            ],
+            "mutex_groups": [
+              "hoodie_silhouette"
             ]
           }
         },
         {
           "id": "hoodie__tag_001",
-          "text": "oversized hoodie with hood",
+          "text": "hooded sweatshirt with kangaroo pocket",
+          "role": "variant",
+          "mutex_group": "hoodie_silhouette",
+          "raw_lines": [
+            111
+          ],
+          "derivation": "product_extension",
+          "derivation_note": "袋鼠兜连帽卫衣经典变体扩写",
           "facts": {
             "semantic_role": "selector",
             "garment_topologies": [
               "top"
+            ],
+            "mutex_groups": [
+              "hoodie_silhouette"
             ]
           }
         },
         {
           "id": "hoodie__tag_002",
-          "text": "hooded sweatshirt with kangaroo pocket",
+          "text": "oversized hoodie with hood",
+          "role": "combinable_attribute",
+          "mutex_group": "hoodie_attr",
+          "raw_lines": [
+            186
+          ],
+          "derivation": "derived",
+          "derivation_note": "台账第186行单独hood兜帽词派生扩写为连帽廓形属性",
           "facts": {
             "semantic_role": "selector",
             "garment_topologies": [
               "top"
+            ],
+            "mutex_groups": [
+              "hoodie_attr"
             ]
           }
         }
@@ -1982,30 +2173,60 @@
         {
           "id": "knit_vest__tag_000",
           "text": "v-neck sweater vest",
+          "role": "core_base",
+          "mutex_group": "knit_vest_silhouette",
+          "raw_lines": [
+            125
+          ],
+          "derivation": "verbatim",
+          "derivation_note": "台账第125行V领针织背心直译与主款式建立",
           "facts": {
             "semantic_role": "selector",
             "garment_topologies": [
               "top"
+            ],
+            "mutex_groups": [
+              "knit_vest_silhouette"
             ]
           }
         },
         {
           "id": "knit_vest__tag_001",
           "text": "sleeveless knit vest",
+          "role": "variant",
+          "mutex_group": "knit_vest_silhouette",
+          "raw_lines": [
+            125
+          ],
+          "derivation": "derived",
+          "derivation_note": "无袖针织背心特征细化",
           "facts": {
             "semantic_role": "selector",
             "garment_topologies": [
               "top"
+            ],
+            "mutex_groups": [
+              "knit_vest_silhouette"
             ]
           }
         },
         {
           "id": "knit_vest__tag_002",
           "text": "cable knit sweater vest",
+          "role": "combinable_attribute",
+          "mutex_group": "knit_vest_attr",
+          "raw_lines": [
+            125
+          ],
+          "derivation": "product_extension",
+          "derivation_note": "绞花粗针织材质属性扩写",
           "facts": {
             "semantic_role": "selector",
             "garment_topologies": [
               "top"
+            ],
+            "mutex_groups": [
+              "knit_vest_attr"
             ]
           }
         }
@@ -2023,30 +2244,61 @@
         {
           "id": "military_uniform__tag_000",
           "text": "military uniform",
+          "role": "core_base",
+          "mutex_group": "military_uniform_silhouette",
+          "raw_lines": [
+            60,
+            203
+          ],
+          "derivation": "verbatim",
+          "derivation_note": "台账第60行纳入及第203行military uniform同义词合并",
           "facts": {
             "semantic_role": "selector",
             "garment_topologies": [
               "top"
+            ],
+            "mutex_groups": [
+              "military_uniform_silhouette"
             ]
           }
         },
         {
           "id": "military_uniform__tag_001",
-          "text": "formal military dress uniform",
+          "text": "army service uniform jacket",
+          "role": "variant",
+          "mutex_group": "military_uniform_silhouette",
+          "raw_lines": [
+            60
+          ],
+          "derivation": "derived",
+          "derivation_note": "常服军装夹克变体细化",
           "facts": {
             "semantic_role": "selector",
             "garment_topologies": [
               "top"
+            ],
+            "mutex_groups": [
+              "military_uniform_silhouette"
             ]
           }
         },
         {
           "id": "military_uniform__tag_002",
-          "text": "army service uniform jacket",
+          "text": "formal military dress uniform",
+          "role": "combinable_attribute",
+          "mutex_group": "military_uniform_attr",
+          "raw_lines": [
+            60
+          ],
+          "derivation": "product_extension",
+          "derivation_note": "正式军礼服特征属性扩写",
           "facts": {
             "semantic_role": "selector",
             "garment_topologies": [
               "top"
+            ],
+            "mutex_groups": [
+              "military_uniform_attr"
             ]
           }
         }
@@ -2063,30 +2315,60 @@
         {
           "id": "sailor_shirt__tag_000",
           "text": "sailor shirt",
+          "role": "core_base",
+          "mutex_group": "sailor_shirt_silhouette",
+          "raw_lines": [
+            176
+          ],
+          "derivation": "verbatim",
+          "derivation_note": "台账第176行水手衬衫独立上装直译",
           "facts": {
             "semantic_role": "selector",
             "garment_topologies": [
               "top"
+            ],
+            "mutex_groups": [
+              "sailor_shirt_silhouette"
             ]
           }
         },
         {
           "id": "sailor_shirt__tag_001",
-          "text": "white sailor collar blouse with neckerchief",
+          "text": "short sleeve sailor shirt",
+          "role": "variant",
+          "mutex_group": "sailor_shirt_silhouette",
+          "raw_lines": [
+            176
+          ],
+          "derivation": "derived",
+          "derivation_note": "短袖水手衬衫版型变体细化",
           "facts": {
             "semantic_role": "selector",
             "garment_topologies": [
               "top"
+            ],
+            "mutex_groups": [
+              "sailor_shirt_silhouette"
             ]
           }
         },
         {
           "id": "sailor_shirt__tag_002",
-          "text": "short sleeve sailor shirt",
+          "text": "white sailor collar blouse with neckerchief",
+          "role": "combinable_attribute",
+          "mutex_group": "sailor_shirt_attr",
+          "raw_lines": [
+            176
+          ],
+          "derivation": "product_extension",
+          "derivation_note": "白色水手领配领巾配件属性扩写",
           "facts": {
             "semantic_role": "selector",
             "garment_topologies": [
               "top"
+            ],
+            "mutex_groups": [
+              "sailor_shirt_attr"
             ]
           }
         }
@@ -2106,50 +2388,102 @@
         {
           "id": "shirts_blouses__tag_000",
           "text": "collared shirt",
+          "role": "core_base",
+          "mutex_group": "shirt_silhouette",
+          "raw_lines": [
+            16
+          ],
+          "derivation": "verbatim",
+          "derivation_note": "台账第16行有领衬衫纳入主款",
           "facts": {
             "semantic_role": "selector",
             "garment_topologies": [
               "top"
+            ],
+            "mutex_groups": [
+              "shirt_silhouette"
             ]
           }
         },
         {
           "id": "shirts_blouses__tag_001",
           "text": "white button-down shirt",
+          "role": "variant",
+          "mutex_group": "shirt_silhouette",
+          "raw_lines": [
+            122,
+            175
+          ],
+          "derivation": "verbatim",
+          "derivation_note": "台账第122行白色衣服与第175行白衬衫合并归口",
           "facts": {
             "semantic_role": "selector",
             "garment_topologies": [
               "top"
+            ],
+            "mutex_groups": [
+              "shirt_silhouette"
             ]
           }
         },
         {
           "id": "shirts_blouses__tag_002",
           "text": "taut shirt",
+          "role": "combinable_attribute",
+          "mutex_group": "shirt_fit_attr",
+          "raw_lines": [
+            23
+          ],
+          "derivation": "verbatim",
+          "derivation_note": "台账第23行紧绷衬衫合并为衬衫合身度可组合属性",
           "facts": {
             "semantic_role": "selector",
             "garment_topologies": [
               "top"
+            ],
+            "mutex_groups": [
+              "shirt_fit_attr"
             ]
           }
         },
         {
           "id": "shirts_blouses__tag_003",
           "text": "frilled shirt",
+          "role": "variant",
+          "mutex_group": "shirt_silhouette",
+          "raw_lines": [
+            134,
+            230
+          ],
+          "derivation": "verbatim",
+          "derivation_note": "台账第134行褶边衬衫与第230行褶边合并归口",
           "facts": {
             "semantic_role": "selector",
             "garment_topologies": [
               "top"
+            ],
+            "mutex_groups": [
+              "shirt_silhouette"
             ]
           }
         },
         {
           "id": "shirts_blouses__tag_004",
           "text": "long sleeve collared blouse",
+          "role": "variant",
+          "mutex_group": "shirt_silhouette",
+          "raw_lines": [
+            16
+          ],
+          "derivation": "derived",
+          "derivation_note": "长袖有领女式衬衫变体细化",
           "facts": {
             "semantic_role": "selector",
             "garment_topologies": [
               "top"
+            ],
+            "mutex_groups": [
+              "shirt_silhouette"
             ]
           }
         }
@@ -2167,30 +2501,61 @@
         {
           "id": "sportswear_active__tag_000",
           "text": "sportswear",
+          "role": "core_base",
+          "mutex_group": "sportswear_silhouette",
+          "raw_lines": [
+            10,
+            208
+          ],
+          "derivation": "verbatim",
+          "derivation_note": "台账第10行纳入与第208行sportswear同义词合并",
           "facts": {
             "semantic_role": "selector",
             "garment_topologies": [
               "top"
+            ],
+            "mutex_groups": [
+              "sportswear_silhouette"
             ]
           }
         },
         {
           "id": "sportswear_active__tag_001",
           "text": "athletic sportswear top",
+          "role": "variant",
+          "mutex_group": "sportswear_silhouette",
+          "raw_lines": [
+            10
+          ],
+          "derivation": "derived",
+          "derivation_note": "运动训练上衣版型变体细化",
           "facts": {
             "semantic_role": "selector",
             "garment_topologies": [
               "top"
+            ],
+            "mutex_groups": [
+              "sportswear_silhouette"
             ]
           }
         },
         {
           "id": "sportswear_active__tag_002",
           "text": "breathable athletic shirt",
+          "role": "combinable_attribute",
+          "mutex_group": "sportswear_attr",
+          "raw_lines": [
+            10
+          ],
+          "derivation": "product_extension",
+          "derivation_note": "透气速干运动面料属性扩写",
           "facts": {
             "semantic_role": "selector",
             "garment_topologies": [
               "top"
+            ],
+            "mutex_groups": [
+              "sportswear_attr"
             ]
           }
         }
@@ -2208,30 +2573,60 @@
         {
           "id": "strapless_top__tag_000",
           "text": "strapless tank top",
+          "role": "core_base",
+          "mutex_group": "strapless_silhouette",
+          "raw_lines": [
+            87
+          ],
+          "derivation": "verbatim",
+          "derivation_note": "台账第87行无肩带背心直译与主款建立",
           "facts": {
             "semantic_role": "selector",
             "garment_topologies": [
               "top"
+            ],
+            "mutex_groups": [
+              "strapless_silhouette"
             ]
           }
         },
         {
           "id": "strapless_top__tag_001",
           "text": "strapless tube top",
+          "role": "variant",
+          "mutex_group": "strapless_silhouette",
+          "raw_lines": [
+            87
+          ],
+          "derivation": "derived",
+          "derivation_note": "无肩带抹胸筒顶变体细化",
           "facts": {
             "semantic_role": "selector",
             "garment_topologies": [
               "top"
+            ],
+            "mutex_groups": [
+              "strapless_silhouette"
             ]
           }
         },
         {
           "id": "strapless_top__tag_002",
           "text": "navel cutout strapless top",
+          "role": "combinable_attribute",
+          "mutex_group": "strapless_attr",
+          "raw_lines": [
+            87
+          ],
+          "derivation": "derived",
+          "derivation_note": "第87行navel cutout露脐裁剪拆分为属性",
           "facts": {
             "semantic_role": "selector",
             "garment_topologies": [
               "top"
+            ],
+            "mutex_groups": [
+              "strapless_attr"
             ]
           }
         }
@@ -2249,30 +2644,60 @@
         {
           "id": "sweatshirt__tag_000",
           "text": "sweatshirt",
+          "role": "core_base",
+          "mutex_group": "sweatshirt_silhouette",
+          "raw_lines": [
+            112
+          ],
+          "derivation": "verbatim",
+          "derivation_note": "台账第112行圆领卫衣直译与主款建立",
           "facts": {
             "semantic_role": "selector",
             "garment_topologies": [
               "top"
+            ],
+            "mutex_groups": [
+              "sweatshirt_silhouette"
             ]
           }
         },
         {
           "id": "sweatshirt__tag_001",
           "text": "crewneck sweatshirt",
+          "role": "variant",
+          "mutex_group": "sweatshirt_silhouette",
+          "raw_lines": [
+            112
+          ],
+          "derivation": "derived",
+          "derivation_note": "经典圆领卫衣特征细化",
           "facts": {
             "semantic_role": "selector",
             "garment_topologies": [
               "top"
+            ],
+            "mutex_groups": [
+              "sweatshirt_silhouette"
             ]
           }
         },
         {
           "id": "sweatshirt__tag_002",
           "text": "cotton pullover sweatshirt",
+          "role": "combinable_attribute",
+          "mutex_group": "sweatshirt_attr",
+          "raw_lines": [
+            112
+          ],
+          "derivation": "product_extension",
+          "derivation_note": "套头纯棉材质属性扩写",
           "facts": {
             "semantic_role": "selector",
             "garment_topologies": [
               "top"
+            ],
+            "mutex_groups": [
+              "sweatshirt_attr"
             ]
           }
         }
@@ -2290,30 +2715,60 @@
         {
           "id": "t_shirt__tag_000",
           "text": "t-shirt",
+          "role": "core_base",
+          "mutex_group": "t_shirt_silhouette",
+          "raw_lines": [
+            177
+          ],
+          "derivation": "verbatim",
+          "derivation_note": "台账第177行T恤直译与主款建立",
           "facts": {
             "semantic_role": "selector",
             "garment_topologies": [
               "top"
+            ],
+            "mutex_groups": [
+              "t_shirt_silhouette"
             ]
           }
         },
         {
           "id": "t_shirt__tag_001",
-          "text": "casual cotton t-shirt",
+          "text": "short sleeve crewneck t-shirt",
+          "role": "variant",
+          "mutex_group": "t_shirt_silhouette",
+          "raw_lines": [
+            177
+          ],
+          "derivation": "derived",
+          "derivation_note": "短袖圆领T恤版型细化",
           "facts": {
             "semantic_role": "selector",
             "garment_topologies": [
               "top"
+            ],
+            "mutex_groups": [
+              "t_shirt_silhouette"
             ]
           }
         },
         {
           "id": "t_shirt__tag_002",
-          "text": "short sleeve crewneck t-shirt",
+          "text": "casual cotton t-shirt",
+          "role": "combinable_attribute",
+          "mutex_group": "t_shirt_attr",
+          "raw_lines": [
+            177
+          ],
+          "derivation": "product_extension",
+          "derivation_note": "休闲全棉T恤材质属性扩写",
           "facts": {
             "semantic_role": "selector",
             "garment_topologies": [
               "top"
+            ],
+            "mutex_groups": [
+              "t_shirt_attr"
             ]
           }
         }
@@ -2331,30 +2786,61 @@
         {
           "id": "tops_tanks__tag_000",
           "text": "tank top",
+          "role": "core_base",
+          "mutex_group": "tanks_silhouette",
+          "raw_lines": [
+            27,
+            174
+          ],
+          "derivation": "verbatim",
+          "derivation_note": "台账第27行纳入与第174行tank top同义词合并",
           "facts": {
             "semantic_role": "selector",
             "garment_topologies": [
               "top"
+            ],
+            "mutex_groups": [
+              "tanks_silhouette"
             ]
           }
         },
         {
           "id": "tops_tanks__tag_001",
-          "text": "ribbed tank top",
+          "text": "sleeveless camisole top",
+          "role": "variant",
+          "mutex_group": "tanks_silhouette",
+          "raw_lines": [
+            27
+          ],
+          "derivation": "derived",
+          "derivation_note": "无袖吊带背心变体细化",
           "facts": {
             "semantic_role": "selector",
             "garment_topologies": [
               "top"
+            ],
+            "mutex_groups": [
+              "tanks_silhouette"
             ]
           }
         },
         {
           "id": "tops_tanks__tag_002",
-          "text": "sleeveless camisole top",
+          "text": "ribbed tank top",
+          "role": "combinable_attribute",
+          "mutex_group": "tanks_attr",
+          "raw_lines": [
+            27
+          ],
+          "derivation": "product_extension",
+          "derivation_note": "罗纹面料属性扩写",
           "facts": {
             "semantic_role": "selector",
             "garment_topologies": [
               "top"
+            ],
+            "mutex_groups": [
+              "tanks_attr"
             ]
           }
         }
@@ -2371,30 +2857,60 @@
         {
           "id": "volleyball_uniform__tag_000",
           "text": "volleyball uniform",
+          "role": "core_base",
+          "mutex_group": "volleyball_silhouette",
+          "raw_lines": [
+            11
+          ],
+          "derivation": "verbatim",
+          "derivation_note": "台账第11行排球制服直译与主款建立",
           "facts": {
             "semantic_role": "selector",
             "garment_topologies": [
               "top"
+            ],
+            "mutex_groups": [
+              "volleyball_silhouette"
             ]
           }
         },
         {
           "id": "volleyball_uniform__tag_001",
           "text": "athletic volleyball jersey",
+          "role": "variant",
+          "mutex_group": "volleyball_silhouette",
+          "raw_lines": [
+            11
+          ],
+          "derivation": "derived",
+          "derivation_note": "排球运动球衣变体细化",
           "facts": {
             "semantic_role": "selector",
             "garment_topologies": [
               "top"
+            ],
+            "mutex_groups": [
+              "volleyball_silhouette"
             ]
           }
         },
         {
           "id": "volleyball_uniform__tag_002",
           "text": "numbered sports volleyball top",
+          "role": "combinable_attribute",
+          "mutex_group": "volleyball_attr",
+          "raw_lines": [
+            11
+          ],
+          "derivation": "product_extension",
+          "derivation_note": "印号排球运动上装属性扩写",
           "facts": {
             "semantic_role": "selector",
             "garment_topologies": [
               "top"
+            ],
+            "mutex_groups": [
+              "volleyball_attr"
             ]
           }
         }

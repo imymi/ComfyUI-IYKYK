@@ -27,6 +27,8 @@ from lib.conflict_resolver import (
 
 REPO_DIR = Path(__file__).resolve().parent.parent
 CLOTHING_JSON_PATH = REPO_DIR / "data" / "clothing.json"
+LEDGER_PATH = REPO_DIR / "docs" / "data_migration" / "clothing_lexicon_migration_ledger.md"
+RAW_TSV_PATH = REPO_DIR / "docs" / "data_migration" / "raw_clothing_input.tsv"
 
 # 基线 31 款 ID 集合 (bc0d645)
 BASE_31_IDS = frozenset({
@@ -230,6 +232,127 @@ class TestClothingCatalogIntegrity(unittest.TestCase):
         self.assertIn("combat suit", ct_texts)
         self.assertIn("swat uniform", ct_texts)
 
+    def test_04_batch_1_leaf_tag_count_and_metadata_integrity(self):
+        """严格核验 Batch 1 16 款实际包含 51 个叶子标签及其元数据完整性 (role, mutex_group, raw_lines, derivation)。"""
+        b1_tags = [
+            t
+            for cid in BATCH_1_IDS
+            for t in self.cat_by_id[cid].get("tags", [])
+        ]
+        self.assertEqual(len(b1_tags), 51, f"Expected exactly 51 leaf tags in Batch 1, got {len(b1_tags)}")
+
+        mg_regex = re.compile(r"^[a-z][a-z0-9_]{2,95}$")
+        valid_roles = {"core_base", "variant", "combinable_attribute"}
+        valid_derivations = {"verbatim", "derived", "product_extension"}
+
+        for cid in BATCH_1_IDS:
+            cat = self.cat_by_id[cid]
+            tags = cat.get("tags", [])
+            has_core = False
+            for tag in tags:
+                tid = tag.get("id", "")
+                role = tag.get("role")
+                mg = tag.get("mutex_group")
+                raw_lines = tag.get("raw_lines")
+                derivation = tag.get("derivation")
+                derivation_note = tag.get("derivation_note")
+
+                # 1. 角色合法性
+                self.assertIn(role, valid_roles, f"Tag {tid} in {cid} has invalid role: {role}")
+                if role == "core_base":
+                    has_core = True
+
+                # 2. 互斥组合法性且与 facts.mutex_groups 严格对齐
+                self.assertIsInstance(mg, str, f"Tag {tid} in {cid} missing string mutex_group")
+                self.assertTrue(bool(mg_regex.match(mg)), f"Tag {tid} in {cid} mutex_group '{mg}' invalid")
+                facts_mgs = tag.get("facts", {}).get("mutex_groups", [])
+                self.assertIn(mg, facts_mgs, f"Tag {tid} in {cid} mutex_group '{mg}' missing from facts.mutex_groups {facts_mgs}")
+
+                # 3. 原始行号合法性
+                self.assertIsInstance(raw_lines, list, f"Tag {tid} in {cid} raw_lines must be a list")
+                self.assertTrue(len(raw_lines) > 0, f"Tag {tid} in {cid} raw_lines must not be empty")
+                for r in raw_lines:
+                    self.assertIsInstance(r, int, f"Tag {tid} in {cid} raw_lines item {r} must be int")
+                    self.assertTrue(1 <= r <= 246, f"Tag {tid} in {cid} raw_lines item {r} out of range [1, 246]")
+
+                # 4. 派生类型与扩写依据
+                self.assertIn(derivation, valid_derivations, f"Tag {tid} in {cid} invalid derivation: {derivation}")
+                if derivation in ("derived", "product_extension"):
+                    self.assertTrue(
+                        bool(derivation_note),
+                        f"Tag {tid} in {cid} has derivation '{derivation}' but missing derivation_note"
+                    )
+
+            self.assertTrue(has_core, f"Category {cid} must have at least one 'core_base' tag")
+
+    def test_05_bidirectional_raw_lines_ledger_mapping_and_merge_rationales(self):
+        """双向核验原始 TSV 行与词库映射：台账迁移行 100% 覆盖，标签引用行真实存在且归口精确，多对一归并依据充分。"""
+        self.assertTrue(LEDGER_PATH.exists(), f"Ledger file missing at {LEDGER_PATH}")
+        self.assertTrue(RAW_TSV_PATH.exists(), f"TSV file missing at {RAW_TSV_PATH}")
+
+        # 1. 从迁移台账提取所有分配给 Batch 1 的原始行
+        ledger_text = LEDGER_PATH.read_text(encoding="utf-8")
+        b1_ledger_rows: dict[int, dict[str, str]] = {}
+        for line in ledger_text.splitlines():
+            line = line.strip()
+            if not line.startswith("|") or line.startswith("| 行号") or line.startswith("|:--"):
+                continue
+            cols = [c.strip() for c in line.split("|")[1:-1]]
+            if len(cols) < 13 or not cols[0].isdigit():
+                continue
+            row_no = int(cols[0])
+            target_id = cols[8].strip("`")
+            if target_id in BATCH_1_IDS:
+                b1_ledger_rows[row_no] = {
+                    "row_no": row_no,
+                    "zh": cols[2],
+                    "norm": cols[4].strip("`"),
+                    "status": cols[5],
+                    "target_id": target_id,
+                    "reason": cols[12],
+                }
+
+        self.assertEqual(len(b1_ledger_rows), 27, f"Expected 27 ledger rows targeting Batch 1, got {len(b1_ledger_rows)}")
+
+        # 2. 方向一 (Ledger -> Tags): 台账中分配给 Batch 1 的每一行在词库中均有对应标签与来源行号标注
+        catalog_rows_by_cid: dict[str, set[int]] = {cid: set() for cid in BATCH_1_IDS}
+        for cid in BATCH_1_IDS:
+            for tag in self.cat_by_id[cid].get("tags", []):
+                for r in tag.get("raw_lines", []):
+                    catalog_rows_by_cid[cid].add(r)
+
+        for row_no, rdata in b1_ledger_rows.items():
+            cid = rdata["target_id"]
+            self.assertIn(
+                row_no,
+                catalog_rows_by_cid[cid],
+                f"Ledger row {row_no} ('{rdata['zh']}' -> {cid}) is NOT accounted for in catalog tags of {cid}!"
+            )
+            # 若状态为合并，验证台账记录了明确合并理由
+            if rdata["status"] == "合并":
+                self.assertTrue(
+                    len(rdata["reason"]) >= 5,
+                    f"Merged ledger row {row_no} missing substantial merge rationale: '{rdata['reason']}'"
+                )
+
+        # 3. 方向二 (Tags -> Ledger): 词库标签引用的每一个 raw_lines 行号真实存在且在台账中属于该款式
+        for cid in BATCH_1_IDS:
+            cat = self.cat_by_id[cid]
+            for tag in cat.get("tags", []):
+                for r in tag.get("raw_lines", []):
+                    self.assertIn(
+                        r,
+                        b1_ledger_rows,
+                        f"Tag {tag['id']} in {cid} references row {r}, which is not assigned to Batch 1 in the ledger!"
+                    )
+                    expected_cid = b1_ledger_rows[r]["target_id"]
+                    self.assertEqual(
+                        cid,
+                        expected_cid,
+                        f"Tag {tag['id']} in {cid} references row {r}, but that row belongs to {expected_cid} in the ledger!"
+                    )
+
 
 if __name__ == "__main__":
     unittest.main()
+

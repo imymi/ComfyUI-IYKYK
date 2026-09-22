@@ -302,6 +302,36 @@
           "type": "string",
           "minLength": 1
         },
+        "role": {
+          "type": "string",
+          "enum": [
+            "core_base",
+            "variant",
+            "combinable_attribute"
+          ]
+        },
+        "mutex_group": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_]{2,95}$"
+        },
+        "raw_lines": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "minimum": 1
+          }
+        },
+        "derivation": {
+          "type": "string",
+          "enum": [
+            "verbatim",
+            "derived",
+            "product_extension"
+          ]
+        },
+        "derivation_note": {
+          "type": "string"
+        },
         "facts": {
           "$ref": "#/definitions/semantic_facts"
         }

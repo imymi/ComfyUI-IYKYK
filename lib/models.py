@@ -812,6 +812,8 @@ class SampledTag:
     id: str = ""
     facts: SemanticFacts = field(default_factory=SemanticFacts)
     origin: Optional[SelectionOrigin] = None
+    role: Optional[str] = None
+    raw_lines: Tuple[int, ...] = ()
 
 
 @dataclass(frozen=True)

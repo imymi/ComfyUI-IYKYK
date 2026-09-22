@@ -433,9 +433,11 @@ def validate_all(
                 )
                 return
             actual_keys = set(item.keys())
-            if actual_keys != {"id", "text", "facts"}:
+            required_keys = {"id", "text", "facts"}
+            allowed_optional_keys = {"role", "mutex_group", "raw_lines", "derivation", "derivation_note"}
+            if not required_keys.issubset(actual_keys) or not actual_keys.issubset(required_keys | allowed_optional_keys):
                 result.errors.append(
-                    f"[ERROR] {fname} at {item_path}: invalid leaf tag keys: {sorted(actual_keys)} (expected ['facts', 'id', 'text'])"
+                    f"[ERROR] {fname} at {item_path}: invalid leaf tag keys: {sorted(actual_keys)} (required {sorted(required_keys)}, allowed optional {sorted(allowed_optional_keys)})"
                 )
                 return
             lid = item["id"]

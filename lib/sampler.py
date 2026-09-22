@@ -304,6 +304,76 @@ class DataSampler:
         return rng.choice(items)
 
     @staticmethod
+    def _has_variant_metadata(tags: Sequence[SampledTag]) -> bool:
+        """检查标签序列中是否包含变体角色或互斥组注解。"""
+        return any(
+            t.role is not None
+            or bool(t.facts.mutex_groups)
+            for t in tags
+        )
+
+    @classmethod
+    def _sample_controlled_base_clothing_tags(
+        cls,
+        tags: Sequence[SampledTag],
+        rng: Random,
+    ) -> Tuple[SampledTag, ...]:
+        """对具备变体角色/互斥组的款式执行受控独立采样。
+
+        核心约束：
+        1. 变体互斥保护：同一互斥组（如 silhouette 组）有且仅抽取 1 个；
+        2. 版型优先保底：优先从 role in ('core_base', 'variant') 中抽取 1 个主款版型；
+        3. 可组合属性：从 role == 'combinable_attribute' 且与所选版型不冲突的属性中至多抽取 1 个；
+        4. 防空与可达性：绝不返回空；各变体均有均等机会被抽样。
+        """
+        if not tags:
+            return ()
+
+        silhouette_candidates = [
+            t for t in tags
+            if t.role in ("core_base", "variant")
+        ]
+        attribute_candidates = [
+            t for t in tags
+            if t.role == "combinable_attribute"
+        ]
+
+        if not silhouette_candidates and not attribute_candidates:
+            primary_mg = next((t.facts.mutex_groups[0] for t in tags if t.facts.mutex_groups), None)
+            if primary_mg:
+                silhouette_candidates = [t for t in tags if primary_mg in t.facts.mutex_groups]
+                attribute_candidates = [t for t in tags if primary_mg not in t.facts.mutex_groups]
+            else:
+                picked = cls._pick_one(tags, rng)
+                return (picked,) if picked is not None else ()
+
+        result: List[SampledTag] = []
+        chosen_silhouette: Optional[SampledTag] = None
+
+        if silhouette_candidates:
+            chosen_silhouette = cls._pick_one(silhouette_candidates, rng)
+            if chosen_silhouette is not None:
+                result.append(chosen_silhouette)
+
+        if attribute_candidates:
+            forbidden_mgs = set(chosen_silhouette.facts.mutex_groups) if chosen_silhouette else set()
+            compatible_attrs = [
+                t for t in attribute_candidates
+                if not set(t.facts.mutex_groups).intersection(forbidden_mgs)
+            ]
+            if compatible_attrs:
+                chosen_attr = cls._pick_one(compatible_attrs, rng)
+                if chosen_attr is not None:
+                    result.append(chosen_attr)
+
+        if not result and tags:
+            fallback = cls._pick_one(tags, rng)
+            if fallback is not None:
+                result.append(fallback)
+
+        return tuple(result)
+
+    @staticmethod
     def _flatten_tags(item: Any) -> List[str]:
         if isinstance(item, str):
             return [item.strip()] if item.strip() else []
@@ -402,6 +472,8 @@ class DataSampler:
             if isinstance(item, dict):
                 t_text = item.get("text", "")
                 t_id = item.get("id", f"{parent_id}__tag_{idx:03d}")
+                t_role = item.get("role")
+                t_raw_lines = tuple(item.get("raw_lines", ()))
                 f_dict = dict(item.get("facts", {}))
                 if extra_facts:
                     f_dict.update(extra_facts)
@@ -409,6 +481,8 @@ class DataSampler:
             else:
                 t_text = str(item).strip()
                 t_id = f"{parent_id}__tag_{idx:03d}"
+                t_role = None
+                t_raw_lines = ()
                 facts = SemanticFacts.from_dict(extra_facts or {})
             if not t_text:
                 continue
@@ -426,6 +500,8 @@ class DataSampler:
                     provenance=prov,
                     id=t_id,
                     facts=facts,
+                    role=t_role,
+                    raw_lines=t_raw_lines,
                 )
             )
         return tuple(tags_str), tuple(sampled_tags)
@@ -797,13 +873,18 @@ class DataSampler:
             semantic_ids=(f"clothing:{c_id}", f"nudity:{nudity_level_code}")
         )
         base_tags_tuple = tuple(all_base_sampled)
+        has_variant_metadata = self._has_variant_metadata(base_tags_tuple)
 
         state_mode = get_selection_mode(state)
 
         # 契约 1: 状态为 None -> 仅保留基础款式，不加状态词、不加裸露联动override、不加扩展
         if state_mode == SelectionMode.NONE:
+            if has_variant_metadata:
+                controlled_base = self._sample_controlled_base_clothing_tags(base_tags_tuple, rng)
+            else:
+                controlled_base = base_tags_tuple
             return ClothingSampleResult(
-                base_tags=base_tags_tuple,
+                base_tags=controlled_base,
                 state_tags=(),
                 extension_tags=(),
                 style_id=c_id,
@@ -846,7 +927,13 @@ class DataSampler:
                     "clothing_state",
                     semantic_ids=(f"clothing:{c_id}", f"nudity:{nudity_level_code}", "linkage:general")
                 )
-                chosen_base = self._pick(base_tags_tuple, rng, min(2, len(base_tags_tuple))) if nudity_level_code == "L1" else ()
+                if nudity_level_code == "L1":
+                    if has_variant_metadata:
+                        chosen_base = self._sample_controlled_base_clothing_tags(base_tags_tuple, rng)
+                    else:
+                        chosen_base = self._pick(base_tags_tuple, rng, min(2, len(base_tags_tuple)))
+                else:
+                    chosen_base = ()
                 return ClothingSampleResult(
                     base_tags=tuple(chosen_base),
                     state_tags=tuple(state_tags_list),
@@ -866,7 +953,10 @@ class DataSampler:
                     "clothing_state",
                     semantic_ids=(f"clothing:{c_id}", f"nudity:{nudity_level_code}", "linkage:general")
                 )
-                chosen_base = self._pick(base_tags_tuple, rng, min(2, len(base_tags_tuple)))
+                if has_variant_metadata:
+                    chosen_base = self._sample_controlled_base_clothing_tags(base_tags_tuple, rng)
+                else:
+                    chosen_base = self._pick(base_tags_tuple, rng, min(2, len(base_tags_tuple)))
                 return ClothingSampleResult(
                     base_tags=tuple(chosen_base),
                     state_tags=tuple(state_tags_list),
@@ -895,7 +985,10 @@ class DataSampler:
                         "clothing_state",
                         semantic_ids=(f"clothing:{c_id}", f"nudity:{nudity_level_code}", "linkage:general")
                     )
-                    chosen_base = self._pick(base_tags_tuple, rng, min(2, len(base_tags_tuple)))
+                    if has_variant_metadata:
+                        chosen_base = self._sample_controlled_base_clothing_tags(base_tags_tuple, rng)
+                    else:
+                        chosen_base = self._pick(base_tags_tuple, rng, min(2, len(base_tags_tuple)))
                     base_tags_tuple = tuple(chosen_base)
                 state_id = "auto_linkage"
 
@@ -922,7 +1015,10 @@ class DataSampler:
                 "clothing_state",
                 semantic_ids=(f"clothing:{c_id}", f"state:{state_id}", f"nudity:{nudity_level_code}")
             )
-            chosen_base = self._pick(base_tags_tuple, rng, min(2, len(base_tags_tuple)))
+            if has_variant_metadata:
+                chosen_base = self._sample_controlled_base_clothing_tags(base_tags_tuple, rng)
+            else:
+                chosen_base = self._pick(base_tags_tuple, rng, min(2, len(base_tags_tuple)))
             base_tags_tuple = tuple(chosen_base)
 
         else:
@@ -939,7 +1035,10 @@ class DataSampler:
                 "clothing_state",
                 semantic_ids=(f"clothing:{c_id}", f"state:{state_id}", f"nudity:{nudity_level_code}")
             )
-            chosen_base = self._pick(base_tags_tuple, rng, min(2, len(base_tags_tuple)))
+            if has_variant_metadata:
+                chosen_base = self._sample_controlled_base_clothing_tags(base_tags_tuple, rng)
+            else:
+                chosen_base = self._pick(base_tags_tuple, rng, min(2, len(base_tags_tuple)))
             base_tags_tuple = tuple(chosen_base)
 
         # 契约：Auto, Random, Explicit 在 L2/L3/L4 均通过数据驱动采样扩展库
