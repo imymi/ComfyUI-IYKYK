@@ -452,6 +452,7 @@ class PromptAssembler:
         entry_point: str = "preset_browser",
         preset_raw_value: Optional[str] = None,
         recipe_raw_value: Optional[str] = None,
+        extra_fragments: Sequence[PromptFragment] = (),
     ) -> AssemblyResult:
         """预设模板与风格配方统一装配接口，返回包含 source_atoms 的不可变 AssemblyResult。"""
         if rng is None:
@@ -625,6 +626,7 @@ class PromptAssembler:
             )
             order += 1
 
+        fragments.extend(extra_fragments)
         return assemble_result(fragments, self.data_dir, rng, max_words, resolver=self.resolver)
 
     def assemble_preset_result(

@@ -1,0 +1,247 @@
+line_no	category	name_zh	prompt_raw
+1	综合1	比基尼	bikini
+2	综合1	系绳比基尼	string bikini
+3	综合1	前系带比基尼上装	front-tie bikini top
+4	综合1	侧系带比基尼下装	side-tie bikini bottom
+5	综合1	微小比基尼	micro bikini
+6	综合1	泳装	swimsuit
+7	综合1	连体泳衣	one-piece swimsuit
+8	综合1	学校泳衣	school swimsuit
+9	综合1	竞赛泳衣	competition swimsuit
+10	综合1	运动服	sportswear
+11	综合1	排球服	volleyball uniform
+12	综合1	旗袍	china dress
+13	综合1	水手服	serafuku
+14	综合1	校服	school uniform
+15	综合1	布鲁玛	buruma
+16	综合1	高领衬衫	collared shirt
+17	综合1	紧身衣	leotard
+18	综合1	无肩带紧身衣	strapless leotard
+19	综合1	高叉紧身衣	highleg leotard
+20	综合1	丁字紧身衣	thong leotard
+21	综合1	衣服下紧身衣	leotard under clothes
+22	综合1	紧身衣服	taut clothes
+23	综合1	紧身衬衫	taut shirt
+24	综合1	薄纱连衣裙	sheer tulle dress
+25	综合1	雪纺连衣裙	chiffon dress
+26	综合1	紧身衣裤	bodysuit
+27	综合1	背心	tank top
+28	综合1	连身裙	dress
+29	综合1	露背连身裙	backless dress
+30	综合1	绕颈连身裙	halter dress
+31	综合1	毛衣连身裙	sweater dress
+32	综合1	露背装	backless outfit
+33	综合1	毛衣	sweater
+34	综合1	高领毛衣	turtleneck sweater
+35	综合1	罗纹毛衣	ribbed sweater
+36	综合1	露肩毛衣	off-shoulder sweater
+37	综合1	心型切口	heart cutout
+38	综合1	后背切口	back cutout
+39	综合1	下胸切口	underboob cutout
+40	综合1	小可爱露腹短上衣	crop top
+41	综合1	赛车服(By KimZuo)	racing suit
+42	综合1	护士服(By Yao_men)	nurse
+43	综合1	乳胶紧身衣(By Yao_men)	latex
+44	综合1	白大褂(By Yao_men)	lab_coat
+45	综合1	便利店工作服(By 糯米)	convenience store uniforms
+46	综合1	夏日长裙	summer long skirt
+47	综合1	西装	business suit
+48	综合1	浴衣	yukata
+49	综合1	圣诞装	santa
+50	综合1	哥特洛丽塔风格	gothic_lolita
+51	综合1	马猴烧酒风格	mahou shoujo
+52	综合2	女仆装	Maid dress
+53	综合2	西服(black黑)-by bilibili-跑酷	black suit
+54	综合2	啦啦隊	cheerleading
+55	综合2	迷你比基尼	micro bikini
+56	综合2	頸帶	neck ribbon
+57	综合2	无胸罩	no_bra
+58	综合2	兜帽斗篷	Cape hood
+59	综合2	修女服	nun gown
+60	综合2	军装	military uniform
+61	综合2	汉服	hanfu
+62	综合2	破损的衣物	torn clothes
+63	综合2	婚纱	wedding_dress
+64	综合2	黑色礼服	black skirt dress, flower pattern in dress,black gown
+65	综合2	披风	cloak
+66	综合2	白色风衣	white_windbreaker
+67	综合2	风衣	wind coat
+68	综合2	奶牛比基尼	cow_bikini
+69	综合2	露背毛衣	Open-backed sweater
+70	综合2	曬痕	tan line
+71	综合2	运动制服	gym_uniform
+72	综合2	晚礼服	evening dress
+73	综合2	礼服	full dress
+74	综合2	战斗服	combat suit
+75	综合2	小披风	poncho
+76	综合2	实验袍	lab coat
+77	综合2	学校制服	school_uniform
+78	综合2	甜美可爱的洛丽塔	sweet_lolita
+79	综合2	网纹衣	fishnet top
+80	综合2	魔女风格服	Witch dress
+81	综合2	巫女服	Miko clothing
+82	综合2	无裆内裤	crotchless panties
+83	综合2	大衣	overcoat
+84	综合2	湿润的衣服	wet clothes
+85	综合2	长袍	robe
+86	综合2	战壕风衣	trench_coat
+87	综合2	抹胸	strapless tank top, navel cutout
+88	综合2	派克大衣	parka
+89	综合2	洛丽塔风格	lolita_fashion
+90	综合2	无内衣	no underwear
+91	综合2	水手裙	sailor dress
+92	综合2	紧身连体衣	zentai
+93	综合2	皮衣	leather jacket
+94	综合2	防弹衣	bulletproof_vest,
+95	综合2	蛛网纹路	spider web print
+96	综合2	sweet_lolita,	sweet_lolita
+97	综合2	A	Maid dress
+98	综合2	史莱姆装	slime dress
+99	综合2	撕裂的衣服	torn clothes
+100	综合2	无	less clothes\n
+101	综合3	乳胶衣	latex
+102	综合3	中式死库水（辉木）	Chinese style,One-piece swimsuit，Clothes with gold patterns
+103	综合3	雨衣	Raincoat
+104	综合3	不知火舞	Mai Shiranui
+105	综合3	街头风格服饰	street wear
+106	综合3	修女	loli,one girl,domineering lady, nun
+107	综合3	短款和服	kimono
+108	综合3	浴袍	bathrobe
+109	综合3	铠甲	armor
+110	综合3	外套	coat
+111	综合3	连帽衫(带帽卫衣)	hoodie
+112	综合3	圆领卫衣	sweatshirt
+113	综合3	神父/修生黑袍	Cassock
+114	综合3	动力甲	power armor
+115	综合3	长袖运动服（直译为立领长风衣）	Standing collar long windbreaker
+116	综合3	旗袍（效果好）	cheongsam
+117	综合3	工装	�� dungarees
+118	综合3	中国的衣服裙子	chinese clothes,china dress,
+119	综合3	高叉泳衣	highleg swimsuit
+120	综合3	礼服长裙	revealing dress
+121	综合3	病号服	hospital gown
+122	综合3	白色衣服	White clothes
+123	综合3	希腊服饰	Greek clothes
+124	综合3	紧身连衣裤	leotards
+125	综合3	V领针织毛衣（无袖背心）	V-NECK SWEATER VEST
+126	综合3	南瓜裙	Pumpkin skirt
+127	综合3	万圣节服装	halloween_costume
+128	综合3	软壳外套	soft shell coat
+129	综合3	内衣	underwear
+130	综合3	外骨骼	exoskeleton
+131	综合3	罩衫	frock
+132	综合3	道袍	Taoist robe
+133	综合3	军大衣	Army overcoat
+134	综合3	荷叶边衬衫	frillded shirt
+135	综合3	黑色连衣裙+白色打底T恤搭配(请勿去掉tag括号)	(((black sundress with round neck,white T-shirt bottom)))
+136	综合3	外骨骼机甲	Exoskeleton Mecha
+137	综合3	拼接款	mosaic
+138	综合3	战袍	Battle Robe
+139	综合3	机械服装	mechanical clothes
+140	综合3	机械战甲	[Battle Robe:Exoskeleton Mecha:0.3]
+141	裙子	裙子	skirt
+142	裙子	百褶裙	pleated skirt
+143	裙子	超短裙	miniskirt
+144	裙子	连衣裙	one-piece dress
+145	裙子	花卉图案连衣裙（白）	white skirt dress, flower pattern in dress,white gow
+146	裙子	花卉图案连衣裙（黑）	black skirt dress, flower pattern in dress,black gow
+147	裙子	多層裙子	layered skirt
+148	裙子	分层式半身裙（贵族气质）（by残阳）	layered skirt
+149	裙子	夏日连衣裙	summer dress
+150	裙子	腰围裙	waist apron
+151	裙子	蓬蓬裙	pettiskirt
+152	裙子	芭蕾舞裙	tutu
+153	裙子	格子裙	plaid skirt
+154	裙子	围裙	apron
+155	裙子	铅笔裙	pencil skirt
+156	裙子	迷你裙	miniskirt
+157	裙子	哥特式洛丽塔	lolita gothic
+158	裙子	现代洛丽塔	lolita fasion
+159	裙子	紧身连衣裙	Dirndl
+160	裙子	铠装连衣裙	armored dress
+161	裙子	盔甲裙	armored dress
+162	裙子	长裙	Long skirt
+163	裙子	雨裙	Rainskirt
+164	裙子	中式旗袍死库水	chinese clothes+leotard
+165	裙子	带褶连衣裙	pleated dress
+166	裙子	无肩带礼服	strapless dress
+167	裙子	露肩连衣裙	off-shoulder dress
+168	裙子	婚纱	wedding dress
+169	裙子	汉服	Han Chinese Clothing
+170	裙子	微型短裙	microskirt
+171	裙子	黑百褶裙	black pleated skirt
+172	裙子	吊带裙	suspender skirt
+173	上装	过手袖	sleeves_past_fingers
+174	上装	背心	tank top
+175	上装	白衬衫	white shirt
+176	上装	水手衬衫	sailor shirt
+177	上装	T恤	T-shirt
+178	上装	毛衣	sweater
+179	上装	夏日长裙	summer dress
+180	上装	连帽衫	hoodie
+181	上装	毛领	fur trimmed colla
+182	上装	兜帽斗篷	hooded cloak
+183	上装	夹克	jacket
+184	上装	皮夹克	leather jacket
+185	上装	探险家夹克	safari jacket
+186	上装	兜帽	hood
+187	上装	牛仔夹克	denim jacket
+188	上装	高领夹克	turtleneck jacket
+189	上装	消防员夹克	firefighter jacket
+190	上装	战壕大衣	trench coat
+191	上装	实验室外套	lab coat
+192	上装	羽绒服	Down Jackets
+193	上装	防弹盔甲	body armor
+194	上装	防弹衣	flak jacket
+195	上装	大衣	overcoat
+196	上装	粗呢大衣	duffel coat
+197	服装	燕尾服	tailcoat
+198	服装	女仆装	Victoria black maid dress
+199	服装	水手服	sailor suit
+200	服装	学生服	school uniform
+201	服装	职场制服	bussiness suit
+202	服装	西装	suit
+203	服装	军装	military uniform
+204	服装	礼服	lucency full dress
+205	服装	汉服	hanfu
+206	服装	旗袍	cheongsam
+207	服装	和服	japanses clothes
+208	服装	运动服	sportswear
+209	服装	工装服	dungarees
+210	服装	婚纱	wedding dress
+211	服装	银色连衣裙	silvercleavage dress
+212	服装	长袍	robe
+213	服装	围裙	apron
+214	服装	快餐制服	fast food uniform
+215	服装	JK制服	JK
+216	服装	健身服	gym_uniform
+217	服装	巫女服	miko attire
+218	服装	海军陆战队服	SWAT uniform
+219	服装	无袖连衣裙	sleeveless dress
+220	服装	雨衣	raincoat
+221	服装	机甲衣	mech suit
+222	服装	巫师法袍	wizard robe
+223	下装	牛仔短裤	denim shorts
+224	下装	百褶裙	pleated skirt
+225	下装	热裤	short shorts
+226	下装	铅笔裙	pencil skirt
+227	下装	皮裙	leather skirt
+228	下装	黑色紧身裤	black leggings
+229	下装	和服下的裙子	skirt under kimono
+230	其他服装	褶边	frills
+231	其他服装	花边	lace
+232	其他服装	哥特风格	gothic
+233	其他服装	洛丽塔风格	lolita fashion
+234	其他服装	西部风格	western
+235	其他服装	湿身	wet clothes
+236	其他服装	露单肩	off_shoulder
+237	其他服装	露双肩	bare_shoulders
+238	其他服装	格子花纹	tartan
+239	其他服装	披甲	armored skirt
+240	其他服装	盔甲	armor
+241	其他服装	金属盔甲	metal armor
+242	其他服装	狂战士铠甲	berserker armor
+243	其他服装	腰带	belt
+244	其他服装	围巾	scarf
+245	其他服装	披肩	cape
+246	其他服装	皮草披肩	fur shawl

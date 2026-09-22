@@ -70,6 +70,24 @@ def _extract_ordered_selections(atoms: Sequence[PromptAtom]) -> Tuple[SelectionO
     return tuple(ordered)
 
 
+def _custom_prompt_fragments(text: str, entry_point: str) -> List[PromptFragment]:
+    if not text or not text.strip():
+        return []
+    origin = SelectionOrigin(
+        entry_point=entry_point, mode="custom", selector="custom", raw_value=text,
+    )
+    return [
+        PromptFragment(
+            text=tag,
+            source_slot="custom",
+            order=order,
+            provenance=TagProvenance(kind="user_input", semantic_ids=("slot:custom",)),
+            origin=origin,
+        )
+        for order, tag in enumerate(split_top_level_tags(text.strip()))
+    ]
+
+
 def _make_slot_fragments(
     res: Any,
     slot_name: str,
@@ -398,6 +416,8 @@ def _generate_structured(
     真实微瑕 = inputs.get("真实微瑕", "无 (None)")
     画质等级 = inputs.get("画质等级", "高清写真 (High)")
 
+    custom_fragments = _custom_prompt_fragments(inputs.get("自定义提示词", ""), entry_point)
+
     # 1. 检查是否使用预设模板
     if not _is_none(预设模板):
         rng_preset = derive_substream_rng(effective_seed, "selector:preset_core")
@@ -411,6 +431,7 @@ def _generate_structured(
                 画质等级,
                 rng=rng,
                 entry_point=entry_point,
+                extra_fragments=custom_fragments,
                 preset_raw_value=预设模板,
                 recipe_raw_value=风格配方 if not _is_none(风格配方) else None,
             )
@@ -599,6 +620,9 @@ def _generate_structured(
                                 )
                             )
 
+    if custom_fragments:
+        slots["custom"] = custom_fragments
+
     # 4. 组装、冲突消解与统一 Finalize
     assembly_res = assembler.assemble_slots(slots, rng=rng, context_profile=context_profile)
     negative_prompt = sampler.get_negative_prompt()
@@ -704,6 +728,11 @@ class IYKYKPromptGenerator:
                     "max": 0xFFFFFFFFFFFFFFFF,
                     "control_after_generate": True,
                 }),
+                "自定义提示词": ("STRING", {
+                    "multiline": True,
+                    "default": "",
+                    "tooltip": "追加到正向提示词，支持多行文本、LoRA 和权重语法；留空不追加。",
+                }),
             }
         }
 
@@ -741,6 +770,7 @@ class IYKYKPromptGenerator:
         真实微瑕: str = "无 (None)",
         画质等级: str = "高清写真 (High)",
         prompt_seed: int = -1,
+        自定义提示词: str = "",
         **kwargs: Any,
     ) -> GenerationResult:
         rng, effective_seed = _get_rng(prompt_seed)
@@ -767,6 +797,7 @@ class IYKYKPromptGenerator:
             "角色设定": 角色设定,
             "真实微瑕": 真实微瑕,
             "画质等级": 画质等级,
+            "自定义提示词": 自定义提示词,
         }
         inputs.update(kwargs)
         res = _generate_structured(
@@ -804,6 +835,7 @@ class IYKYKPromptGenerator:
         真实微瑕: str = "无 (None)",
         画质等级: str = "高清写真 (High)",
         prompt_seed: int = -1,
+        自定义提示词: str = "",
         **kwargs: Any,
     ) -> Tuple[str, str, str]:
         res = self.generate_structured(
@@ -830,6 +862,7 @@ class IYKYKPromptGenerator:
             真实微瑕=真实微瑕,
             画质等级=画质等级,
             prompt_seed=prompt_seed,
+            自定义提示词=自定义提示词,
             **kwargs,
         )
         return (res.positive, res.negative, res.description)
@@ -863,6 +896,11 @@ class IYKYKPresetBrowser:
                     "max": 0xFFFFFFFFFFFFFFFF,
                     "control_after_generate": True,
                 }),
+                "自定义提示词": ("STRING", {
+                    "multiline": True,
+                    "default": "",
+                    "tooltip": "追加到正向提示词，支持多行文本、LoRA 和权重语法；留空不追加。",
+                }),
             }
         }
 
@@ -881,6 +919,7 @@ class IYKYKPresetBrowser:
         风格配方: str,
         画质等级: str,
         prompt_seed: int = -1,
+        自定义提示词: str = "",
     ) -> GenerationResult:
         rng, effective_seed = _get_rng(prompt_seed)
         preset = _sampler.get_preset(预设模板, rng)
@@ -902,6 +941,7 @@ class IYKYKPresetBrowser:
             画质等级,
             rng=rng,
             entry_point="preset_browser",
+            extra_fragments=_custom_prompt_fragments(自定义提示词, "preset_browser"),
             preset_raw_value=预设模板,
             recipe_raw_value=风格配方 if not _is_none(风格配方) else None,
         )
@@ -935,8 +975,9 @@ class IYKYKPresetBrowser:
         风格配方: str,
         画质等级: str,
         prompt_seed: int = -1,
+        自定义提示词: str = "",
     ) -> Tuple[str, str, str]:
-        res = self.browse_structured(预设模板, 风格配方, 画质等级, prompt_seed)
+        res = self.browse_structured(预设模板, 风格配方, 画质等级, prompt_seed, 自定义提示词)
         return (res.positive, res.negative, res.description)
 
 
@@ -1083,6 +1124,7 @@ def _serialize_atom_item(a: PromptAtom, is_accepted: bool) -> Dict[str, Any]:
         "source_slot": a.source_slot,
         "span_order": a.span_order,
         "tag_order": a.tag_order,
+        "target_id": a.target_id,
         "text": a.text,
     }
 

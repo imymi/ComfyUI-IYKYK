@@ -27,7 +27,8 @@ const NODE_DEFAULTS = {
         "真实微瑕": "无 (None)",
         "画质等级": "高清写真 (High)",
         "prompt_seed": -1,
-        "control_after_generate": "fixed"
+        "control_after_generate": "fixed",
+        "自定义提示词": ""
     },
 
     // 📋 节点 2: IYKYK 模板浏览器
@@ -36,7 +37,8 @@ const NODE_DEFAULTS = {
         "风格配方": "无 (None)",
         "画质等级": "高清写真 (High)",
         "prompt_seed": -1,
-        "control_after_generate": "fixed"
+        "control_after_generate": "fixed",
+        "自定义提示词": ""
     },
 
     // 🧩 节点 3: IYKYK 自定义槽位拼装器
@@ -85,7 +87,8 @@ const NODE_DEFAULTS = {
         "真实微瑕": "无 (None)",
         "画质等级": "高清写真 (High)",
         "prompt_seed": -1,
-        "control_after_generate": "fixed"
+        "control_after_generate": "fixed",
+        "自定义提示词": ""
     }
 };
 

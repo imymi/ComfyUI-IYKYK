@@ -29,6 +29,13 @@
           "name_zh": {
             "type": "string"
           },
+          "aliases": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
           "tags": {
             "type": "array",
             "items": {

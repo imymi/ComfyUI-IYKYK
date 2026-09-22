@@ -8,9 +8,11 @@ from __future__ import annotations
 
 from collections.abc import Mapping
 import dataclasses
-from dataclasses import replace
+from dataclasses import dataclass, replace
 import hashlib
 import json
+import re
+from enum import Enum
 from pathlib import Path
 from random import Random
 from typing import Any, Dict, List, Optional, Sequence, Set, Tuple
@@ -71,6 +73,380 @@ else:
         parse_rule_document,
     )
     from lib.slot_contract import SLOT_ALIASES, normalize_slot_name
+
+
+# ═══════════════════════════════════════════════════════════════════════════
+# 服装实体聚合与绑定判定 SSOT 生产级实现
+# ═══════════════════════════════════════════════════════════════════════════
+
+class BindingStatus(str, Enum):
+    BOUND = "bound"
+    UNBOUND_NO_CANDIDATE = "unbound_no_candidate"
+    UNBOUND_TARGET_NOT_FOUND = "unbound_target_not_found"
+    UNBOUND_INCOMPATIBLE = "unbound_incompatible"
+    AMBIGUOUS_MULTIPLE_CANDIDATES = "ambiguous_multiple_candidates"
+
+
+@dataclass
+class GarmentCarrierEntity:
+    entity_id: str
+    selector: str
+    selected_id: str
+    member_atoms: List[PromptAtom]
+    is_worn: bool = True
+    is_ambient: bool = False
+    discarded_by: Optional[PromptAtom] = None
+
+
+@dataclass
+class BindingResult:
+    status: BindingStatus
+    target_entity: Optional[GarmentCarrierEntity] = None
+    reason: str = ""
+
+
+ALLOWED_BUTTON_STYLES: Set[str] = {
+    "business_suit", "shirts_blouses", "trench_coat", "lab_coat", "dungarees",
+    "dirndl_dress", "qipao", "fast_food_uniform", "denim_jacket", "down_jacket",
+    "safari_jacket", "duffel_coat", "tailcoat", "firefighter_gear", "blazer_uniform",
+    "clerical_priest", "military_uniform", "military_overcoat", "outerwear_coat",
+    "outerwear_overcoat", "outerwear_jacket", "soft_shell_jacket", "rainwear_coat",
+    "bathrobe", "combat_tactical", "convenience_store", "frock_smock", "hospital_gown",
+}
+
+NON_SKIRT_ONE_PIECE: Set[str] = {
+    "latex_catsuit", "zentai_suit", "leotard_bodysuit", "mecha_power_armor",
+    "mecha_exoskeleton", "racing_suit", "swimsuit_classic", "swimsuit_school",
+    "swimsuit_competition", "swimsuit_creative", "one_piece_swimsuit", "dungarees",
+    "qipao",
+}
+
+# 特定款式的产品业务规则：仅授权数据中明确具备拉链开襟联动事实的款式
+ALLOWED_ZIPPER_STYLES: Set[str] = {
+    "nurse_uniform",      # 护士服拉链开领 (nurse uniform unzipped to waist)
+    "latex_catsuit",      # 乳胶紧身衣拉链 (latex bodysuit unzipped to navel / zipper pulled halfway down)
+    "modern_chinese",     # 新中式改良旗袍拉链 (modern qipao unzipped)
+}
+
+
+def is_garment_compatible_with_state(entity: GarmentCarrierEntity, state_id: str) -> bool:
+    """判定服装实体是否具备承载特定状态原子的物理形制能力（按特定款式的产品业务规则判定）。"""
+    if state_id in ("lifted_up", "lifted", "lifted_skirt"):
+        return any(
+            a.facts and (
+                "bottom_skirt" in a.facts.garment_topologies or 
+                ("one_piece" in a.facts.garment_topologies and entity.selected_id not in NON_SKIRT_ONE_PIECE)
+            )
+            for a in entity.member_atoms
+        )
+    elif state_id in ("unbuttoned", "opened"):
+        return entity.selected_id in ALLOWED_BUTTON_STYLES
+    elif state_id == "unzipped":
+        return entity.selected_id in ALLOWED_ZIPPER_STYLES
+    elif state_id == "pulled_down":
+        return any(
+            a.facts and any(t in a.facts.garment_topologies for t in ("bottom_pants", "bottom_skirt", "underwear", "top", "one_piece"))
+            for a in entity.member_atoms
+        )
+    return True
+
+
+CANONICAL_MODIFIER_STATES: Set[str] = {
+    "unbuttoned", "unzipped", "lifted_up", "pulled_down", "disheveled", "slipping_off",
+    "wet_clinging", "wet_pure", "sweat_soaked",
+    "heart_cutout", "back_cutout", "underboob_cutout", "torn_shredded",
+    "off_shoulder_cut", "bare_shoulders", "taut_tight",
+}
+
+CANONICAL_ABSENCE_STATES: Set[str] = {"braless", "underwearless"}
+
+CANONICAL_LAYERING_STATES: Set[str] = {"skirt_under_kimono", "undergarment_leotard"}
+
+BODY_EXPOSURE_TERMS: Set[str] = {
+    "topless", "bottomless", "bare breasts", "bare chest", "bare skin",
+    "bare back", "bare body", "completely naked", "completely nude",
+    "fully bare body", "fully bare skin", "fully nude", "bare pussy",
+    "bare pussy visible", "bare pussy displayed", "spread legs",
+    "cleavage", "cleavage exposed", "exposed nipples", "bare upper body",
+    "open chest", "fully bare glowing body", "fully bare glowing skin",
+    "fully bare sun-kissed skin", "bare skin glowing", "nude", "naked",
+    "bare breasts exposed", "bare breasts completely exposed",
+    "breasts bare waist covered", "bare breasts over glossy latex pants",
+    "bare breasts bursting from glossy rubber",
+}
+
+RE_ZIPPER_ACTION = re.compile(
+    r"\b(?:unzipped|zipper\s+pulled(?:\s+halfway)?\s+down|zipper\s+down\s+to)\b",
+    re.IGNORECASE,
+)
+RE_BUTTON_ACTION = re.compile(
+    r"\b(?:unbuttoned|buttons?\s+undone|buttons?\s+unbuttoned)\b",
+    re.IGNORECASE,
+)
+RE_PULL_DOWN_ACTION = re.compile(r"\b(?:pulled\s+down|pulled_down)\b", re.IGNORECASE)
+RE_LIFT_ACTION = re.compile(r"\b(?:lifted\s+up|lifted_up|hiked\s+up|lifted\s+skirt|pulled\s+up)\b", re.IGNORECASE)
+RE_SLIPPING_ACTION = re.compile(r"\b(?:slipping\s+off|sliding\s+off)\b", re.IGNORECASE)
+RE_TORN_ACTION = re.compile(r"\b(?:torn|shredded|ripped)\b", re.IGNORECASE)
+RE_DISHEVELED_ACTION = re.compile(r"\b(?:disheveled|untucked|rumpled)\b", re.IGNORECASE)
+RE_PURE_BODY_EXPOSURE = re.compile(
+    r"\b(?:topless|bare\s+breasts|bare\s+skin|completely\s+naked|completely\s+nude|fully\s+bare|bare\s+pussy)\b",
+    re.IGNORECASE,
+)
+
+
+def get_canonical_state_id(atom: PromptAtom) -> str:
+    """提取原子的规范状态 ID，优先结构化事实与规范 ID，集中处理历史文本短语兼容（单源真实源 SSOT）。"""
+    # 1. 优先结构化事实
+    if atom.facts and atom.facts.garment_states:
+        for gs in atom.facts.garment_states:
+            if gs in ("unbuttoned", "opened"):
+                return "unbuttoned"
+            elif gs == "unzipped":
+                return "unzipped"
+            elif gs in ("lifted", "lifted_up", "lifted_skirt"):
+                return "lifted_up"
+            elif gs == "pulled_down":
+                return "pulled_down"
+            elif gs in CANONICAL_MODIFIER_STATES or gs in CANONICAL_ABSENCE_STATES or gs in CANONICAL_LAYERING_STATES or gs == "discarded":
+                return gs
+
+    # 2. 规范 item_id / origin.selected_id
+    raw_id = atom.source_item_id or (atom.origin.selected_id if atom.origin else "")
+    if raw_id in CANONICAL_MODIFIER_STATES or raw_id in CANONICAL_ABSENCE_STATES or raw_id in CANONICAL_LAYERING_STATES or raw_id == "discarded":
+        return raw_id
+
+    # 3. 集中文本动作短语正则回退 (历史文本兼容，杜绝单字误判)
+    clean_text = atom.text.lower().strip()
+    if RE_ZIPPER_ACTION.search(clean_text):
+        return "unzipped"
+    elif RE_BUTTON_ACTION.search(clean_text):
+        return "unbuttoned"
+    elif RE_PULL_DOWN_ACTION.search(clean_text):
+        return "pulled_down"
+    elif RE_LIFT_ACTION.search(clean_text):
+        return "lifted_up"
+    elif RE_SLIPPING_ACTION.search(clean_text):
+        return "slipping_off"
+    elif RE_TORN_ACTION.search(clean_text):
+        return "torn_shredded"
+    elif RE_DISHEVELED_ACTION.search(clean_text):
+        return "disheveled"
+
+    return raw_id or clean_text
+
+
+def is_body_exposure_atom(a: PromptAtom) -> bool:
+    """判定原子是否表达纯人体生理裸露/暴露事实（身体事实绝对免于服装承载物检查）。"""
+    # 1. 显式指定承载目标、或具有服装事实/修饰动作的原子绝非纯身体事实
+    if getattr(a, "target_id", None) is not None:
+        return False
+    if a.facts and (a.facts.garment_states or a.facts.garment_topologies):
+        return False
+    state_id = get_canonical_state_id(a)
+    if state_id in CANONICAL_MODIFIER_STATES:
+        return False
+
+    clean_text = a.text.lower().strip()
+    # 2. 纯身体事实准入
+    if a.source_slot == "nudity" or (a.origin and a.origin.selector == "nudity"):
+        return True
+    if a.facts:
+        nudity_level = getattr(a.facts, "nudity_level", None)
+        if nudity_level and nudity_level not in ("L1", "sfw"):
+            return True
+        if a.facts.visible_regions and any(r in a.facts.visible_regions for r in ("breasts", "genitals", "buttocks", "pubic")):
+            if not a.facts.garment_states and not a.facts.garment_topologies:
+                return True
+    if clean_text in BODY_EXPOSURE_TERMS:
+        return True
+    if RE_PURE_BODY_EXPOSURE.search(clean_text):
+        return True
+    return False
+
+
+def is_garment_modifier_atom(a: PromptAtom) -> bool:
+    """判定原子是否属于需要服装主体承载的衣物动作、湿润、切口或质感修饰。"""
+    if is_body_exposure_atom(a):
+        return False
+
+    slot = (a.source_slot or (a.origin.selector if a.origin else "") or "").lower()
+    kind = ((a.provenance.kind or "") if a.provenance else "").lower()
+    non_garment_domains = {
+        "hairstyle", "hair", "makeup", "accessory", "accessories",
+        "pose", "emotion", "lighting", "shot", "camera", "context",
+        "scene_category", "scene_theme", "theme", "shot_framing", "camera_angle",
+        "film_grain", "liquid", "tattoo", "props", "character", "imperfections",
+        "quality", "preset", "recipe", "nudity", "nudity_level",
+    }
+    if slot in non_garment_domains or kind in non_garment_domains:
+        return False
+
+    state_id = get_canonical_state_id(a)
+    if state_id in CANONICAL_ABSENCE_STATES or state_id in CANONICAL_LAYERING_STATES or state_id == "discarded":
+        return False
+    if state_id in CANONICAL_MODIFIER_STATES:
+        return True
+    if a.facts and a.facts.garment_states:
+        modifier_states = {
+            "unbuttoned", "unzipped", "opened", "lifted", "lifted_up", "pulled_down",
+            "disheveled", "slipping_off", "wet_clinging", "wet_pure",
+            "sweat_soaked", "torn_shredded", "heart_cutout", "back_cutout",
+            "underboob_cutout", "off_shoulder_cut", "taut_tight",
+        }
+        if any(s in modifier_states for s in a.facts.garment_states):
+            return True
+
+    # 若显式指定 target_id 且非主服装实体，判定为修饰
+    if getattr(a, "target_id", None) is not None:
+        if not (a.facts and any(t in a.facts.garment_topologies for t in ("top", "bottom_skirt", "bottom_pants", "one_piece", "outerwear", "suit"))):
+            return True
+
+    return False
+
+
+def build_garment_entity_key(atom: PromptAtom) -> Optional[str]:
+    """区分来源 (Provenance) 与实体身份 (Garment Entity Identity)。"""
+    if (atom.origin and atom.origin.selector == "clothing_state") or (atom.provenance and atom.provenance.kind == "clothing_state"):
+        return None
+
+    slot = atom.origin.selector if atom.origin else (atom.source_slot or "")
+    prov_kind = atom.provenance.kind if atom.provenance else ""
+    item_id = atom.source_item_id or (atom.origin.selected_id if atom.origin else "") or atom.id
+
+    is_carrier = False
+    if slot in ("clothing", "base_clothing") or prov_kind in ("clothing", "base_clothing"):
+        is_carrier = True
+    elif prov_kind == "clothing_extension":
+        if atom.facts and any(t in atom.facts.garment_topologies for t in ("one_piece", "top", "bottom_skirt", "bottom_pants", "outerwear", "underwear", "suit")):
+            is_carrier = True
+    elif slot == "lingerie" or prov_kind in ("lingerie", "lingerie_wardrobe"):
+        is_carrier = True
+    elif slot == "jewelry" or prov_kind in ("jewelry", "headwear_jewelry"):
+        if item_id in ("cloak", "hooded_cloak", "poncho", "fur_shawl"):
+            is_carrier = True
+
+    if not is_carrier:
+        return None
+
+    mode = atom.origin.mode if atom.origin else "explicit"
+    if mode in ("preset", "recipe") and atom.origin and atom.origin.parent_ids:
+        parent_id = atom.origin.parent_ids[0]
+        return f"{mode}:{parent_id}#{slot}#{item_id}"
+
+    return f"garment:{slot}:{item_id}"
+
+
+def extract_garment_entities(active_atoms: Sequence[PromptAtom]) -> Dict[str, GarmentCarrierEntity]:
+    """全域扫描 PromptAtom 序列，按稳定的服装实体键聚合物理服装实体。"""
+    entities_map: Dict[str, GarmentCarrierEntity] = {}
+    for a in active_atoms:
+        ekey = build_garment_entity_key(a)
+        if not ekey:
+            continue
+        slot = a.origin.selector if a.origin else (a.source_slot or "")
+        item_id = a.source_item_id or (a.origin.selected_id if a.origin else "") or a.id
+        if ekey not in entities_map:
+            entities_map[ekey] = GarmentCarrierEntity(
+                entity_id=ekey,
+                selector=slot,
+                selected_id=item_id,
+                member_atoms=[a],
+                is_worn=True,
+                is_ambient=False,
+            )
+        else:
+            entities_map[ekey].member_atoms.append(a)
+    return entities_map
+
+
+
+def find_bound_carrier(
+    state_atom: PromptAtom,
+    entities: Sequence[GarmentCarrierEntity],
+    target_id: Optional[str] = None,
+) -> BindingResult:
+    """四阶确定性绑定决策阶梯：显式目标精确匹配快速失败，无目标形制能力筛选，拒绝盲选 entities[0]。"""
+    active_entities = [e for e in entities if e.is_worn and not e.is_ambient]
+    if not active_entities:
+        return BindingResult(status=BindingStatus.UNBOUND_NO_CANDIDATE, reason="no_active_garments")
+
+    state_id = get_canonical_state_id(state_atom)
+    effective_target_id = target_id if target_id is not None else getattr(state_atom, "target_id", None)
+
+    # 阶梯 1：显式目标匹配（规范 ID 精确匹配，快速失败，绝不回退改绑其他衣物）
+    if effective_target_id is not None:
+        matched = [
+            e for e in active_entities
+            if e.selected_id == effective_target_id or e.entity_id == effective_target_id
+        ]
+        if not matched:
+            return BindingResult(
+                status=BindingStatus.UNBOUND_TARGET_NOT_FOUND,
+                reason=f"explicit_target_not_found: {effective_target_id}",
+            )
+        if len(matched) == 1:
+            target_entity = matched[0]
+            if not is_garment_compatible_with_state(target_entity, state_id):
+                return BindingResult(
+                    status=BindingStatus.UNBOUND_INCOMPATIBLE,
+                    target_entity=target_entity,
+                    reason=f"target_incompatible: entity '{target_entity.selected_id}' cannot accept state '{state_id}'",
+                )
+            return BindingResult(
+                status=BindingStatus.BOUND,
+                target_entity=target_entity,
+                reason="explicit_target_match",
+            )
+        else:
+            compatible_matched = [e for e in matched if is_garment_compatible_with_state(e, state_id)]
+            if len(compatible_matched) == 1:
+                return BindingResult(
+                    status=BindingStatus.BOUND,
+                    target_entity=compatible_matched[0],
+                    reason="explicit_target_match",
+                )
+            elif not compatible_matched:
+                return BindingResult(
+                    status=BindingStatus.UNBOUND_INCOMPATIBLE,
+                    reason=f"explicit_target_incompatible: {effective_target_id}",
+                )
+            else:
+                return BindingResult(
+                    status=BindingStatus.AMBIGUOUS_MULTIPLE_CANDIDATES,
+                    reason=f"multiple_explicit_targets_ambiguous: {effective_target_id}",
+                )
+
+    # 阶梯 2：无显式目标时，按形制能力筛选兼容候选集合
+    compatible_candidates = [
+        e for e in active_entities
+        if is_garment_compatible_with_state(e, state_id)
+    ]
+
+    # 阶梯 3：零候选或单候选确定性裁决（区分“零兼容候选”和“单兼容候选”）
+    if len(compatible_candidates) == 0:
+        return BindingResult(
+            status=BindingStatus.UNBOUND_NO_CANDIDATE,
+            reason=f"no_compatible_candidate_for_state: {state_id}",
+        )
+    elif len(compatible_candidates) == 1:
+        reason = "single_compatible_candidate_match"
+        if state_id == "lifted_up":
+            reason = "skirt_capability_unique_match"
+        elif state_id == "unbuttoned":
+            reason = "button_capability_unique_match"
+        elif state_id == "pulled_down":
+            reason = "pulled_capability_unique_match"
+        return BindingResult(
+            status=BindingStatus.BOUND,
+            target_entity=compatible_candidates[0],
+            reason=reason,
+        )
+
+    # 阶梯 4：多候选歧义拒绝与保全原则（严禁 entities[0] 盲选！）
+    return BindingResult(
+        status=BindingStatus.AMBIGUOUS_MULTIPLE_CANDIDATES,
+        reason=f"ambiguous_carrier_binding: {len(compatible_candidates)} candidates",
+    )
 
 
 # 预编译常量匹配模式 (R2-N09: 零运行时 re.compile 调用)
@@ -718,6 +1094,9 @@ class ConflictResolver:
         if not is_formal_atom(a):
             return
 
+        if a.origin and a.origin.mode == "resolver":
+            return
+
         rule_item = self.registry.get_rule_item(rule_id)
         sc = getattr(rule_item.spec, "semantic_constraints", None)
         if sc:
@@ -995,7 +1374,6 @@ class ConflictResolver:
             if len(ledger.decisions) > dec_count_before:
                 if rule_id not in rules_applied:
                     rules_applied.append(rule_id)
-
 
         # 3. 计算产出哈希与构建决策报告
         current_atoms = index.get_all_active_ordered()
@@ -1700,77 +2078,138 @@ class ConflictResolver:
         one_piece_banned_states = select_fallback_patterns(tf_patterns, role="banned", group_id="one_piece")
         pants_triggers = select_fallback_patterns(tf_patterns, role="trigger", group_id="pants")
         pants_banned_states = select_fallback_patterns(tf_patterns, role="banned", group_id="pants")
-        _op_fact_atoms = index.get_active_by_fact("garment_topologies", "one_piece")
 
-        op_atoms = []
-        clothing_atoms = index.get_active_by_slots("clothing", "clothing_state")
-        for a in clothing_atoms:
-            if not a.can_detect or not index.is_active(a):
-                continue
-            self._validate_formal_atom(a, rule_item.id)
-            if is_formal_atom(a):
-                if a.facts and "one_piece" in a.facts.garment_topologies:
-                    op_atoms.append(a)
-            elif tf.enabled:
-                if any(opt.matches(a.text) for opt in one_piece_triggers):
-                    op_atoms.append(a)
+        active_atoms = index.get_all_active_ordered()
+        entities_map = extract_garment_entities(active_atoms)
 
-        if op_atoms:
-            op_winner = min(op_atoms, key=lambda x: (x.tag_order, x.span_order))
+        # 0. 优先处理 discarded 状态（精准锁定唯一目标实体并注销其在穿承载资格）
+        discarded_atoms = [
+            a for a in active_atoms
+            if index.is_active(a) and (
+                (a.origin and a.origin.selected_id == "discarded")
+                or (a.facts and "discarded" in a.facts.garment_states)
+                or a.source_item_id == "discarded"
+            )
+        ]
+        for da in discarded_atoms:
+            binding = find_bound_carrier(da, list(entities_map.values()))
+            if binding.status == BindingStatus.BOUND and binding.target_entity:
+                target_entity = binding.target_entity
+                target_entity.is_worn = False
+                target_entity.is_ambient = True
+                target_entity.discarded_by = da
+
+        # 获取在穿且非环境物实体
+        worn_entities = [e for e in entities_map.values() if e.is_worn and not e.is_ambient]
+        clothing_atoms = [a for a in active_atoms if a.source_slot in ("clothing", "clothing_state") and index.is_active(a)]
+
+        # 1. 连体衣与解扣/掀裙等结构状态互斥判定
+        op_entities = [
+            e for e in worn_entities
+            if any(ma.facts and "one_piece" in ma.facts.garment_topologies for ma in e.member_atoms)
+        ]
+        op_tf_atoms = []
+        if tf.enabled:
             for a in clothing_atoms:
-                if a in op_atoms or not a.can_detect or not index.is_active(a):
-                    continue
-                is_loser = False
-                is_fallback = False
-                if is_formal_atom(a):
-                    if a.facts and any(s in a.facts.garment_states for s in ("unbuttoned", "lifted_skirt", "opened", "removed")):
-                        is_loser = True
-                elif tf.enabled:
-                    if any(bs.matches(a.text) for bs in one_piece_banned_states):
-                        is_loser = True
-                        is_fallback = True
+                if not is_formal_atom(a) and any(opt.matches(a.text) for opt in one_piece_triggers):
+                    op_tf_atoms.append(a)
 
-                if is_loser:
-                    if not a.can_delete_atom:
-                        continue
-                    if is_fallback:
-                        self.text_fallback_hits += 1
-                    index.drop(a.atom_id)
-                    ledger.record_drop(
-                        rule_item.id,
-                        rule_item.phase,
-                        "one_piece_state_conflict",
-                        (op_winner.atom_id,),
-                        a,
-                    )
-
-        if pants_triggers and pants_banned_states:
-            pants_atoms = []
-            for a in clothing_atoms:
-                if not a.can_detect or not index.is_active(a):
-                    continue
-                self._validate_formal_atom(a, rule_item.id)
-                if is_formal_atom(a):
-                    if a.facts and any(t in a.facts.garment_topologies for t in ("pants", "jeans", "shorts", "trousers")):
-                        pants_atoms.append(a)
-                elif tf.enabled:
-                    if any(pt.matches(a.text) for pt in pants_triggers):
-                        pants_atoms.append(a)
-
-            if pants_atoms:
-                pants_winner = min(pants_atoms, key=lambda x: (x.tag_order, x.span_order))
+        if op_entities or op_tf_atoms:
+            all_op_atoms = [a for e in op_entities for a in e.member_atoms] + op_tf_atoms
+            if all_op_atoms:
+                op_winner = min(all_op_atoms, key=lambda x: (x.tag_order, x.span_order))
                 for a in clothing_atoms:
-                    if a in pants_atoms or not a.can_detect or not index.is_active(a):
+                    if a in all_op_atoms or not a.can_detect or not index.is_active(a):
                         continue
                     is_loser = False
                     is_fallback = False
                     if is_formal_atom(a):
-                        if a.facts and any(s in a.facts.garment_states for s in ("skirt_slit", "pleated_skirt", "skirt_floating", "slit", "lifted_skirt")):
+                        state_id = get_canonical_state_id(a)
+                        if state_id == "unbuttoned":
+                            # 使用四阶绑定阶梯检查解扣目标
+                            binding = find_bound_carrier(a, worn_entities)
+                            if binding.status == BindingStatus.BOUND and binding.target_entity:
+                                # 若绑定的目标实体自身不支持纽扣能力，则判定冲突
+                                if binding.target_entity.selected_id not in ALLOWED_BUTTON_STYLES:
+                                    is_loser = True
+                            elif binding.status in (BindingStatus.UNBOUND_NO_CANDIDATE, BindingStatus.UNBOUND_INCOMPATIBLE, BindingStatus.UNBOUND_TARGET_NOT_FOUND):
+                                if any(oe.selected_id not in ALLOWED_BUTTON_STYLES for oe in op_entities):
+                                    is_loser = True
+                        elif state_id == "unzipped":
+                            # 使用四阶绑定阶梯检查拉链目标
+                            binding = find_bound_carrier(a, worn_entities)
+                            if binding.status == BindingStatus.BOUND and binding.target_entity:
+                                if binding.target_entity.selected_id not in ALLOWED_ZIPPER_STYLES:
+                                    is_loser = True
+                            elif binding.status in (BindingStatus.UNBOUND_NO_CANDIDATE, BindingStatus.UNBOUND_INCOMPATIBLE, BindingStatus.UNBOUND_TARGET_NOT_FOUND):
+                                if any(oe.selected_id not in ALLOWED_ZIPPER_STYLES for oe in op_entities):
+                                    is_loser = True
+                        elif state_id == "lifted_up" or (a.facts and any(s in a.facts.garment_states for s in ("lifted", "lifted_up", "lifted_skirt"))):
+                            binding = find_bound_carrier(a, worn_entities)
+                            if binding.status == BindingStatus.BOUND and binding.target_entity:
+                                if binding.target_entity.selected_id in NON_SKIRT_ONE_PIECE:
+                                    is_loser = True
+                            elif binding.status in (BindingStatus.UNBOUND_NO_CANDIDATE, BindingStatus.UNBOUND_INCOMPATIBLE, BindingStatus.UNBOUND_TARGET_NOT_FOUND):
+                                if any(oe.selected_id in NON_SKIRT_ONE_PIECE for oe in op_entities):
+                                    is_loser = True
+                        elif a.facts and "removed" in a.facts.garment_states:
                             is_loser = True
                     elif tf.enabled:
-                        if any(bs.matches(a.text) for bs in pants_banned_states):
+                        if any(bs.matches(a.text) for bs in one_piece_banned_states):
                             is_loser = True
                             is_fallback = True
+
+                    if is_loser:
+                        if not a.can_delete_atom:
+                            continue
+                        if is_fallback:
+                            self.text_fallback_hits += 1
+                        index.drop(a.atom_id)
+                        ledger.record_drop(
+                            rule_item.id,
+                            rule_item.phase,
+                            "one_piece_state_conflict",
+                            (op_winner.atom_id,),
+                            a,
+                        )
+
+        # 2. 裤装与掀裙状态互斥判定
+        pants_entities = [
+            e for e in worn_entities
+            if any(ma.facts and any(t in ma.facts.garment_topologies for t in ("bottom_pants", "pants", "jeans", "shorts", "trousers")) for ma in e.member_atoms)
+        ]
+        pants_tf_atoms = []
+        if tf.enabled:
+            for a in clothing_atoms:
+                if not is_formal_atom(a) and any(pt.matches(a.text) for pt in pants_triggers):
+                    pants_tf_atoms.append(a)
+
+        if pants_entities or pants_tf_atoms:
+            all_pants_atoms = [a for e in pants_entities for a in e.member_atoms] + pants_tf_atoms
+            if all_pants_atoms:
+                pants_winner = min(all_pants_atoms, key=lambda x: (x.tag_order, x.span_order))
+                has_skirt_entity = any(
+                    any(ma.facts and "bottom_skirt" in ma.facts.garment_topologies for ma in e.member_atoms)
+                    for e in worn_entities
+                )
+                for a in clothing_atoms:
+                    if a in all_pants_atoms or not a.can_detect or not index.is_active(a):
+                        continue
+                    is_loser = False
+                    is_fallback = False
+                    if is_formal_atom(a):
+                        state_id = get_canonical_state_id(a)
+                        if (
+                            state_id in ("lifted_up", "lifted")
+                            or (a.facts and any(s in a.facts.garment_states for s in ("lifted", "lifted_up", "skirt_slit", "pleated_skirt", "skirt_floating", "slit", "lifted_skirt")))
+                        ):
+                            if not has_skirt_entity:
+                                is_loser = True
+                    elif tf.enabled:
+                        if any(bs.matches(a.text) for bs in pants_banned_states):
+                            if not has_skirt_entity:
+                                is_loser = True
+                                is_fallback = True
 
                     if is_loser:
                         if not a.can_delete_atom:
@@ -1785,6 +2224,122 @@ class ConflictResolver:
                             (pants_winner.atom_id,),
                             a,
                         )
+
+        # 3. 叠穿状态检查 (skirt_under_kimono, undergarment_leotard)
+        layering_atoms = [
+            a for a in active_atoms
+            if index.is_active(a) and is_formal_atom(a) and (
+                a.source_item_id in CANONICAL_LAYERING_STATES
+                or (a.origin and a.origin.selected_id in CANONICAL_LAYERING_STATES)
+            )
+        ]
+        for la in layering_atoms:
+            if not index.is_active(la) or not la.can_delete_atom:
+                continue
+            l_id = la.source_item_id or (la.origin.selected_id if la.origin else "")
+            if l_id == "skirt_under_kimono":
+                kimono_entities = [e for e in worn_entities if e.selected_id in ("kimono", "yukata", "furisode", "robe_general", "taoist_robe", "battle_robe")]
+                skirt_entities = [
+                    e for e in worn_entities
+                    if any(ma.facts and "bottom_skirt" in ma.facts.garment_topologies for ma in e.member_atoms)
+                ]
+                has_distinct = any(k.entity_id != s.entity_id for k in kimono_entities for s in skirt_entities)
+                if not has_distinct:
+                    index.drop(la.atom_id)
+                    ledger.record_drop(
+                        rule_item.id,
+                        rule_item.phase,
+                        "layering_mismatch",
+                        (),
+                        la,
+                    )
+            elif l_id == "undergarment_leotard":
+                leotard_entities = [e for e in worn_entities if e.selected_id in ("leotard_bodysuit", "latex_catsuit", "zentai_suit")]
+                outer_entities = [e for e in worn_entities if e.selected_id not in ("leotard_bodysuit", "latex_catsuit", "zentai_suit")]
+                has_distinct = any(leo.entity_id != out.entity_id for leo in leotard_entities for out in outer_entities)
+                if not has_distinct:
+                    index.drop(la.atom_id)
+                    ledger.record_drop(
+                        rule_item.id,
+                        rule_item.phase,
+                        "layering_mismatch",
+                        (),
+                        la,
+                    )
+
+        # 4. 缺席状态检查 (braless, underwearless)
+        absence_atoms = [
+            a for a in active_atoms
+            if index.is_active(a) and is_formal_atom(a) and (
+                a.source_item_id in CANONICAL_ABSENCE_STATES
+                or (a.origin and a.origin.selected_id in CANONICAL_ABSENCE_STATES)
+            )
+        ]
+        for aa in absence_atoms:
+            if not index.is_active(aa) or not aa.can_delete_atom:
+                continue
+            ab_id = aa.source_item_id or (aa.origin.selected_id if aa.origin else "")
+            if ab_id == "braless":
+                bra_entities = [
+                    e for e in worn_entities
+                    if e.selected_id in ("lingerie_lace", "bikini_classic", "bikini_strappy", "bikini_micro")
+                    or any(ma.facts and "underwear" in ma.facts.garment_topologies and "top" in ma.facts.garment_topologies for ma in e.member_atoms)
+                ]
+                if bra_entities:
+                    winner_ids = (bra_entities[0].member_atoms[0].atom_id,)
+                    index.drop(aa.atom_id)
+                    ledger.record_drop(
+                        rule_item.id,
+                        rule_item.phase,
+                        "absence_state_conflict",
+                        winner_ids,
+                        aa,
+                    )
+            elif ab_id == "underwearless":
+                panties_entities = [
+                    e for e in worn_entities
+                    if e.selected_id in ("basic_underwear", "crotchless_panties", "bikini_classic", "bikini_strappy", "bikini_micro")
+                    or any(ma.facts and "underwear" in ma.facts.garment_topologies and ("bottom" in ma.facts.garment_topologies or "bottom_pants" in ma.facts.garment_topologies) for ma in e.member_atoms)
+                ]
+                if panties_entities:
+                    winner_ids = (panties_entities[0].member_atoms[0].atom_id,)
+                    index.drop(aa.atom_id)
+                    ledger.record_drop(
+                        rule_item.id,
+                        rule_item.phase,
+                        "absence_state_conflict",
+                        winner_ids,
+                        aa,
+                    )
+
+        # 5. 承载主体检查 (基于四阶绑定阶梯检查在穿承载物)
+        for a in active_atoms:
+            if not index.is_active(a) or not a.can_detect or not a.can_delete_atom:
+                continue
+
+            if not is_formal_atom(a):
+                continue
+
+            if not is_garment_modifier_atom(a):
+                continue
+
+            binding = find_bound_carrier(a, worn_entities)
+            if binding.status in (
+                BindingStatus.UNBOUND_NO_CANDIDATE,
+                BindingStatus.UNBOUND_TARGET_NOT_FOUND,
+                BindingStatus.UNBOUND_INCOMPATIBLE,
+            ):
+                index.drop(a.atom_id)
+                winner_ids = ()
+                if binding.target_entity:
+                    winner_ids = tuple(m.atom_id for m in binding.target_entity.member_atoms)
+                ledger.record_drop(
+                    rule_item.id,
+                    rule_item.phase,
+                    "state_lacks_carrier",
+                    winner_ids,
+                    a,
+                )
 
         return index.get_all_active_ordered()
 
@@ -1815,12 +2370,14 @@ class ConflictResolver:
                 or (a.provenance and a.provenance.kind == "clothing_extension")
             ):
                 continue
+            if a.provenance and a.provenance.rule_id == rule_item.id:
+                continue
 
             self._validate_formal_atom(a, rule_item.id)
             matched = False
             is_fallback = False
             if is_formal_atom(a):
-                if a.facts and any(s in a.facts.garment_states for s in ("sheer", "see_through", "transparent", "translucent", "wet_clinging")):
+                if a.facts and any(s in a.facts.garment_states for s in ("sheer", "see_through", "transparent", "translucent")):
                     matched = True
                 elif a.source_item_id in ("sheer_chiffon", "sheer_mesh", "semi_translucent"):
                     matched = True
@@ -1833,7 +2390,7 @@ class ConflictResolver:
                 rep_text = rng.choice(replacements)
                 new_facts = None
                 if a.facts:
-                    clean_states = tuple(s for s in a.facts.garment_states if s not in ("sheer", "see_through", "transparent", "translucent", "wet_clinging"))
+                    clean_states = tuple(s for s in a.facts.garment_states if s not in ("sheer", "see_through", "transparent", "translucent"))
                     new_facts = replace(a.facts, garment_states=clean_states)
                 new_a = make_replaced_atom(a, rep_text, rule_item.id, new_facts=new_facts)
                 if is_fallback:
@@ -2648,6 +3205,7 @@ class ConflictResolver:
 
         return index.get_all_active_ordered()
 
+
     # ─── 只读最终硬冲突检测器 (detect_hard_conflicts) ───
 
     def detect_hard_conflicts(self, atoms: Sequence[PromptAtom]) -> Tuple[Tuple[Tuple[str, ...], ...], bool]:
@@ -2828,39 +3386,81 @@ class ConflictResolver:
             if (is_formal_atom(a) and a.facts and "one_piece" in a.facts.garment_topologies)
             or (not is_formal_atom(a) and any(opt.matches(a.text) for opt in r6_op_trig))
         ]
-        op_state_losers = [
-            a for a in detectable
-            if (is_formal_atom(a) and a.facts and any(s in a.facts.garment_states for s in ("unbuttoned", "lifted_skirt", "opened", "removed")))
-            or (not is_formal_atom(a) and any(bs.matches(a.text) for bs in r6_op_ban))
-        ]
-        if op_atoms and op_state_losers:
-            first_op = min(op_atoms, key=lambda x: (x.tag_order, x.span_order))
-            first_loser = min(op_state_losers, key=lambda x: (x.tag_order, x.span_order))
-            if first_op.atom_id != first_loser.atom_id:
-                conflicts.append(("residual_one_piece_state_conflict", "clothing_style_state_coherence", "one_piece_state_conflict", first_op.atom_id, first_loser.atom_id))
-                if _is_loser_protected(first_loser):
-                    protected_losers.append(first_loser)
+        if op_atoms:
+            has_button_carrier = any(
+                (oa.source_item_id or (oa.provenance.item_id if oa.provenance else "") or (oa.origin.selected_id if oa.origin else "")) in ALLOWED_BUTTON_STYLES
+                for oa in op_atoms
+            ) or any(
+                is_formal_atom(a) and (a.source_item_id or (a.provenance.item_id if a.provenance else "") or (a.origin.selected_id if a.origin else "")) in ALLOWED_BUTTON_STYLES
+                for a in detectable
+            )
+            has_skirt_entity = any(
+                is_formal_atom(a) and a.facts and "bottom_skirt" in a.facts.garment_topologies
+                for a in detectable
+            )
+            for a in detectable:
+                if a in op_atoms or a.atom_id in {oa.atom_id for oa in op_atoms}:
+                    continue
+                is_op_conflict = False
+                if is_formal_atom(a):
+                    state_id = a.source_item_id or (a.origin.selected_id if a.origin else "") or a.text
+                    is_unbuttoned = state_id == "unbuttoned" or (a.facts and any(s in a.facts.garment_states for s in ("unbuttoned", "opened")))
+                    is_lifted = state_id in ("lifted_up", "lifted") or (a.facts and any(s in a.facts.garment_states for s in ("lifted", "lifted_up", "lifted_skirt")))
+                    is_removed = a.facts and "removed" in a.facts.garment_states
+
+                    if is_unbuttoned:
+                        if not has_button_carrier:
+                            is_op_conflict = True
+                    elif is_lifted:
+                        is_non_skirt = any(
+                            (oa.source_item_id or (oa.provenance.item_id if oa.provenance else "") or (oa.origin.selected_id if oa.origin else "")) in NON_SKIRT_ONE_PIECE
+                            for oa in op_atoms
+                        )
+                        if is_non_skirt and not has_skirt_entity:
+                            is_op_conflict = True
+                    elif is_removed:
+                        is_op_conflict = True
+                elif any(bs.matches(a.text) for bs in r6_op_ban):
+                    is_op_conflict = True
+
+                if is_op_conflict:
+                    first_op = min(op_atoms, key=lambda x: (x.tag_order, x.span_order))
+                    conflicts.append(("residual_one_piece_state_conflict", "clothing_style_state_coherence", "one_piece_state_conflict", first_op.atom_id, a.atom_id))
+                    if _is_loser_protected(a):
+                        protected_losers.append(a)
 
         r6_pants_trig = select_fallback_patterns(r6_tf, role="trigger", group_id="pants")
         r6_pants_ban = select_fallback_patterns(r6_tf, role="banned", group_id="pants")
         if r6_pants_trig and r6_pants_ban:
             pants_atoms = [
                 a for a in detectable
-                if (is_formal_atom(a) and a.facts and any(t in a.facts.garment_topologies for t in ("pants", "jeans", "shorts", "trousers")))
+                if (is_formal_atom(a) and a.facts and any(t in a.facts.garment_topologies for t in ("pants", "jeans", "shorts", "trousers", "bottom_pants")))
                 or (not is_formal_atom(a) and any(pt.matches(a.text) for pt in r6_pants_trig))
             ]
-            pants_state_losers = [
-                a for a in detectable
-                if (is_formal_atom(a) and a.facts and any(s in a.facts.garment_states for s in ("skirt_slit", "pleated_skirt", "skirt_floating", "slit", "lifted_skirt")))
-                or (not is_formal_atom(a) and any(bs.matches(a.text) for bs in r6_pants_ban))
-            ]
-            if pants_atoms and pants_state_losers:
-                first_pants = min(pants_atoms, key=lambda x: (x.tag_order, x.span_order))
-                first_loser = min(pants_state_losers, key=lambda x: (x.tag_order, x.span_order))
-                if first_pants.atom_id != first_loser.atom_id:
-                    conflicts.append(("residual_pants_state_conflict", "clothing_style_state_coherence", "pants_state_conflict", first_pants.atom_id, first_loser.atom_id))
-                    if _is_loser_protected(first_loser):
-                        protected_losers.append(first_loser)
+            has_skirt_entity = any(
+                is_formal_atom(a) and a.facts and "bottom_skirt" in a.facts.garment_topologies
+                for a in detectable
+            )
+            if pants_atoms and not has_skirt_entity:
+                for a in detectable:
+                    if a in pants_atoms or a.atom_id in {pa.atom_id for pa in pants_atoms}:
+                        continue
+                    is_pants_conflict = False
+                    if is_formal_atom(a):
+                        state_id = a.source_item_id or (a.origin.selected_id if a.origin else "") or a.text
+                        if (
+                            state_id in ("lifted_up", "lifted")
+                            or (a.facts and any(s in a.facts.garment_states for s in ("skirt_slit", "pleated_skirt", "skirt_floating", "slit", "lifted_skirt", "lifted", "lifted_up")))
+                        ):
+                            is_pants_conflict = True
+                    elif any(bs.matches(a.text) for bs in r6_pants_ban):
+                        is_pants_conflict = True
+
+                    if is_pants_conflict:
+                        first_pants = min(pants_atoms, key=lambda x: (x.tag_order, x.span_order))
+                        conflicts.append(("residual_pants_state_conflict", "clothing_style_state_coherence", "pants_state_conflict", first_pants.atom_id, a.atom_id))
+                        if _is_loser_protected(a):
+                            protected_losers.append(a)
 
         # 7. 材质穿透
         r7 = self.registry.get_rule("material_penetration")
@@ -2870,8 +3470,9 @@ class ConflictResolver:
             a for a in detectable
             if not (a.source_slot == "clothing_extension" or (a.provenance and a.provenance.kind == "clothing_extension"))
             and (a.source_slot in getattr(r7, "target_slots", ()) or a.source_slot in ("clothing", "clothing_state"))
+            and not (a.provenance and a.provenance.rule_id == "material_penetration")
             and (
-                (is_formal_atom(a) and a.facts and any(s in a.facts.garment_states for s in ("sheer", "see_through", "transparent", "translucent", "wet_clinging")))
+                (is_formal_atom(a) and a.facts and any(s in a.facts.garment_states for s in ("sheer", "see_through", "transparent", "translucent")))
                 or (is_formal_atom(a) and a.source_item_id in ("sheer_chiffon", "sheer_mesh", "semi_translucent"))
                 or (not is_formal_atom(a) and any(bw.matches(a.text) for bw in r7_banned))
             )

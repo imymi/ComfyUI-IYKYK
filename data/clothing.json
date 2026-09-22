@@ -1611,6 +1611,108 @@
           }
         }
       ]
+    },
+    {
+      "id": "sweater_casual",
+      "name_zh": "休闲毛衣 (Casual Sweater)",
+      "aliases": [
+        "sweater",
+        "turtleneck_sweater",
+        "ribbed_sweater",
+        "off_shoulder_sweater"
+      ],
+      "tags": [
+        {
+          "id": "sweater_casual__tag_000",
+          "text": "casual knit sweater",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "top"
+            ]
+          }
+        },
+        {
+          "id": "sweater_casual__tag_001",
+          "text": "turtleneck sweater",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "top"
+            ]
+          }
+        },
+        {
+          "id": "sweater_casual__tag_002",
+          "text": "ribbed sweater",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "top"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "swimsuit_school",
+      "name_zh": "学校泳衣 (School Swimsuit)",
+      "aliases": [
+        "sukumizu"
+      ],
+      "tags": [
+        {
+          "id": "swimsuit_school__tag_000",
+          "text": "school swimsuit",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "one_piece"
+            ]
+          }
+        },
+        {
+          "id": "swimsuit_school__tag_001",
+          "text": "navy blue one-piece swimsuit",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "one_piece"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "dungarees",
+      "name_zh": "工装背带裤 (Dungarees Overalls)",
+      "aliases": [
+        "overalls"
+      ],
+      "tags": [
+        {
+          "id": "dungarees__tag_000",
+          "text": "denim dungarees overalls",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "one_piece",
+              "bottom_pants"
+            ]
+          }
+        },
+        {
+          "id": "dungarees__tag_001",
+          "text": "workwear overalls with straps",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "one_piece",
+              "bottom_pants"
+            ]
+          }
+        }
+      ]
     }
   ],
   "clothing_states": [
@@ -2127,7 +2229,7 @@
               "upper_body"
             ],
             "garment_states": [
-              "loosened"
+              "discarded"
             ]
           }
         },
@@ -2141,7 +2243,7 @@
               "upper_body"
             ],
             "garment_states": [
-              "loosened"
+              "discarded"
             ]
           }
         },
@@ -2155,7 +2257,7 @@
               "upper_body"
             ],
             "garment_states": [
-              "loosened"
+              "discarded"
             ]
           }
         }

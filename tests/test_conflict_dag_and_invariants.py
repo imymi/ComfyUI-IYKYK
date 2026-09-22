@@ -693,7 +693,7 @@ class TestConflictDAGAndInvariants(unittest.TestCase):
                 make_atom("opened blouse", "clothing", idx=1, origin_mode="preset", facts=SemanticFacts(garment_states=("opened",))),
             ],
             "material_penetration": [
-                make_atom("sheer silk fabric", "clothing", idx=0, origin_mode="preset", facts=SemanticFacts(garment_states=("wet_clinging",), garment_topologies=("top",))),
+                make_atom("sheer silk fabric", "clothing", idx=0, origin_mode="preset", item_id="sheer_chiffon", facts=SemanticFacts(garment_topologies=("top",))),
             ],
             "device_quality_compatibility": [
                 make_atom("cctv camera security footage", "shot_type", idx=0, origin_mode="preset", facts=SemanticFacts(capture_device="cctv", visible_regions=("upper_body",)), item_id="cctv"),
@@ -861,9 +861,9 @@ class TestConflictDAGAndInvariants(unittest.TestCase):
                     make_cascade_atom("unbuttoned blouse", "clothing", 2, facts=SemanticFacts(visible_regions=("upper_body",), garment_topologies=("top",), garment_states=("opened",)), item_id="item_002"),
                 ],
                 "intermediate_ids": ["atom_000", "atom_002"],
-                "final_ids": ["atom_000", "atom_002"],
+                "final_ids": ["atom_000"],
                 "dec_0": {"rule_id": "nudity_clothing_conflicts", "action": "drop", "winner": ("atom_000",), "target": "atom_001", "produced": (), "sequence": 0},
-                "dec_1": None,  # clothing_style has 0 decisions because one_piece was tombstoned
+                "dec_1": {"rule_id": "clothing_style_state_coherence", "action": "drop", "winner": (), "target": "atom_002", "produced": (), "sequence": 1},
                 "pre_dec_later": {"rule_id": "clothing_style_state_coherence", "action": "drop", "winner": ("atom_001",), "target": "atom_002"},
             },
             # 3. framing_lower_body_coherence
@@ -903,9 +903,9 @@ class TestConflictDAGAndInvariants(unittest.TestCase):
                 "earlier_rid": "clothing_style_state_coherence",
                 "later_rid": "material_penetration",
                 "atoms": [
-                    make_cascade_atom("one-piece cheongsam dress", "clothing", 0, facts=SemanticFacts(visible_regions=("upper_body", "lower_body"), garment_topologies=("one_piece",), garment_states=("worn",))),
-                    make_cascade_atom("sheer unbuttoned cardigan", "clothing", 1, facts=SemanticFacts(visible_regions=("upper_body",), garment_topologies=("top",), garment_states=("opened", "wet_clinging"))),
-                    make_cascade_atom("sheer silk blouse", "clothing", 2, facts=SemanticFacts(visible_regions=("upper_body",), garment_topologies=("top",), garment_states=("worn", "wet_clinging"))),
+                    make_cascade_atom("one-piece school swimsuit", "clothing", 0, facts=SemanticFacts(visible_regions=("upper_body", "lower_body"), garment_topologies=("one_piece",), garment_states=("worn",)), item_id="swimsuit_school"),
+                    make_cascade_atom("sheer unbuttoned cardigan", "clothing", 1, facts=SemanticFacts(visible_regions=("upper_body",), garment_topologies=("top",), garment_states=("opened",)), item_id="sheer_mesh"),
+                    make_cascade_atom("sheer silk blouse", "clothing", 2, facts=SemanticFacts(visible_regions=("upper_body",), garment_topologies=("top",), garment_states=("worn",)), item_id="sheer_chiffon"),
                 ],
                 "intermediate_ids": ["atom_000", "atom_002"],
                 "final_ids": ["atom_000", "atom_002__r_material_penetration"],
@@ -1378,7 +1378,7 @@ class TestConflictDAGAndInvariants(unittest.TestCase):
     def test_26_r2_p1_002_independent_rule_rng_substreams(self):
         """反例验证 R2-P1-002: 规则独立 RNG 子流，前序规则命中与否绝不扰动后序规则的随机抽取结果。"""
         tattoo_atom = make_atom("dragon tattoo on back", "tattoo", idx=1, origin_mode="preset")
-        sheer_atom = make_atom("sheer silk fabric", "clothing", idx=0, origin_mode="preset", facts=SemanticFacts(garment_states=("wet_clinging",)))
+        sheer_atom = make_atom("sheer silk fabric", "clothing", idx=0, origin_mode="preset", item_id="sheer_chiffon")
 
         # 运行 1: 仅 tattoo，无前序 material_penetration 命中
         res_solo, app_solo, rep_solo = self.resolver.resolve_atoms_with_full_report([tattoo_atom], Random(1))

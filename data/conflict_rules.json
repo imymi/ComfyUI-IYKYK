@@ -5756,7 +5756,10 @@
       ],
       "reason_codes": [
         "one_piece_state_conflict",
-        "pants_state_conflict"
+        "pants_state_conflict",
+        "state_lacks_carrier",
+        "layering_mismatch",
+        "absence_state_conflict"
       ],
       "semantic_constraints": {
         "domain": "clothing_structure",

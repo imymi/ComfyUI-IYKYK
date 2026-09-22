@@ -1444,7 +1444,13 @@ FROZEN_RULE_SEMANTICS: Dict[str, Dict[str, Any]] = {
         'expected_loser': 'garment_state_action',
         'expected_target_slots': ('clothing',),
         'expected_fact_fields': ('garment_topologies', 'garment_states'),
-        'allowed_reason_codes': ('one_piece_state_conflict', 'pants_state_conflict'),
+        'allowed_reason_codes': (
+            'one_piece_state_conflict',
+            'pants_state_conflict',
+            'state_lacks_carrier',
+            'layering_mismatch',
+            'absence_state_conflict',
+        ),
         'fallback_target_slots': ('clothing',),
         'fallback_patterns': (
             ('one-piece swimsuit', 'phrase'),

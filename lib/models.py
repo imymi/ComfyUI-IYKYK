@@ -371,7 +371,7 @@ CANONICAL_RECIPE_SELECTORS: Tuple[str, ...] = (
 )
 
 CANONICAL_SELECTORS_BY_ENTRY_POINT: Dict[str, Tuple[str, ...]] = {
-    "preset_browser": CANONICAL_PRESET_SELECTORS + CANONICAL_RECIPE_SELECTORS,
+    "preset_browser": CANONICAL_PRESET_SELECTORS + CANONICAL_RECIPE_SELECTORS + ("custom",),
     "generator": CANONICAL_PRESET_SELECTORS + CANONICAL_SLOT_SELECTORS + CANONICAL_RECIPE_SELECTORS,
     "diagnostics": CANONICAL_PRESET_SELECTORS + CANONICAL_SLOT_SELECTORS + CANONICAL_RECIPE_SELECTORS,
     "custom_combiner": CANONICAL_SLOT_SELECTORS + CANONICAL_RECIPE_SELECTORS + ("custom",),
@@ -892,6 +892,7 @@ class PromptFragment:
     id: str = ""
     facts: SemanticFacts = field(default_factory=SemanticFacts)
     origin: Optional[SelectionOrigin] = None
+    target_id: Optional[str] = None
 
 
 @dataclass(frozen=True)
@@ -914,6 +915,7 @@ class PromptAtom:
     facts: SemanticFacts = field(default_factory=SemanticFacts)
     origin: Optional[SelectionOrigin] = None
     id: str = ""
+    target_id: Optional[str] = None
 
     @property
     def can_detect(self) -> bool:

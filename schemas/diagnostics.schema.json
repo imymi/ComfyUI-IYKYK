@@ -69,6 +69,7 @@
         "source_slot",
         "span_order",
         "tag_order",
+        "target_id",
         "text"
       ],
       "properties": {
@@ -107,6 +108,9 @@
         "tag_order": {
           "type": "integer",
           "minimum": 0
+        },
+        "target_id": {
+          "type": ["string", "null"]
         },
         "text": {
           "type": "string"

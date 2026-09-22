@@ -98,6 +98,8 @@ SELECTOR_TO_UI_PARAM: Dict[str, str] = {
 _CATALOG_ITEM_IDS: Optional[Set[str]] = None
 _RUNTIME_ITEM_IDS = {
     "auto_linkage",
+    "linkage_general",
+    "linkage_override",
     "quality_cctv",
     "quality_default",
     "quality_high",
@@ -106,15 +108,17 @@ _RUNTIME_ITEM_IDS = {
     "quality_standard",
 }
 _SEMANTIC_PREFIXES = {
-    "camera_angle", "character", "clothing", "expression", "extension_family",
-    "extension_tier", "film", "hairstyle", "imperfections", "jewelry", "lighting",
+    "angle", "camera_angle", "character", "clothing", "clothing_state", "context",
+    "expression", "extension", "extension_family", "extension_tier", "film",
+    "hairstyle", "imperfection", "imperfections", "jewelry", "lighting", "linkage",
     "liquid", "liquids", "makeup", "nudity", "override", "pose", "prop", "props", "quality",
-    "preset", "recipe", "scene", "shot_type", "slot", "state", "tattoo", "theme",
+    "preset", "recipe", "scene", "shot", "shot_type", "slot", "state", "tattoo", "theme",
 }
 _RUNTIME_SEMANTIC_IDS = {
     "extension_family:cloth_transparency",
     "extension_family:lingerie_wardrobe",
     "extension_family:sfw_exposure",
+    "linkage:general",
     "override:linkage",
 }
 
