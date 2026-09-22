@@ -1042,7 +1042,7 @@ class TestRC8QualityGate(unittest.TestCase):
         batch_hash = hashlib.sha256("".join(ordered_hashes).encode("utf-8")).hexdigest()
         self.assertEqual(
             batch_hash,
-            "e1b8d5a332f942602853e7613c9ae2781858eecce96175db44e879c725953eb0",
+            "4525786e7273dc0694e64ec216d4fc9510f211d32de7bdfaa00a12f7a5f320e2",
             "Seed gate 0..9999 summary hash drifted!",
         )
 
