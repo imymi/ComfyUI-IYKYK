@@ -10,7 +10,7 @@ audit_attribution.py — 全量种子审计差异原子级精确归因引擎
 """
 from __future__ import annotations
 
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List
 
 
 CLOTHING_SLOTS = frozenset({
@@ -42,7 +42,6 @@ def attribute_seed_diff(
     for a in cur_src_atoms:
         cur_src_by_text.setdefault(a["text"], []).append(a)
 
-    rc8_src_by_id = {a["atom_id"]: a for a in rc8_src_atoms if a.get("atom_id")}
     rc8_src_by_text: Dict[str, List[Dict[str, Any]]] = {}
     for a in rc8_src_atoms:
         rc8_src_by_text.setdefault(a["text"], []).append(a)

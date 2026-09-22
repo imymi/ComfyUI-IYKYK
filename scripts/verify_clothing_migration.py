@@ -18,7 +18,7 @@ import json
 import re
 import sys
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Set, Tuple
+from typing import Dict, List, Optional, Tuple
 
 REPO_DIR = Path(__file__).resolve().parent.parent
 if str(REPO_DIR) not in sys.path:
@@ -117,7 +117,7 @@ class VerificationRunner:
         )
 
         content = RAW_TSV_PATH.read_text(encoding="utf-8")
-        lines = [l.strip() for l in content.splitlines() if l.strip()]
+        lines = [line.strip() for line in content.splitlines() if line.strip()]
         self.check(len(lines) == EXPECTED_TOTAL_ROWS + 1, f"TSV 总行数不匹配: 期望 {EXPECTED_TOTAL_ROWS + 1}, 实际 {len(lines)}")
 
         header = lines[0].split("\t")
@@ -143,8 +143,8 @@ class VerificationRunner:
         if self.raw_media_path.exists():
             media_sha = compute_sha256(self.raw_media_path)
             self.check(media_sha == EXPECTED_MEDIA_SHA256, f"原始媒体附件 SHA-256 不匹配: 实际={media_sha}, 期望={EXPECTED_MEDIA_SHA256}")
-            media_lines = [l.strip() for l in self.raw_media_path.read_text(encoding="utf-8").splitlines() if l.strip()]
-            media_data_rows = [l for l in media_lines if l.startswith('|') and not l.startswith('| 分类') and not l.startswith('|---')]
+            media_lines = [line.strip() for line in self.raw_media_path.read_text(encoding="utf-8").splitlines() if line.strip()]
+            media_data_rows = [row for row in media_lines if row.startswith('|') and not row.startswith('| 分类') and not row.startswith('|---')]
             self.check(len(media_data_rows) == EXPECTED_TOTAL_ROWS, f"原始媒体附件表格数据行数不为 {EXPECTED_TOTAL_ROWS}: {len(media_data_rows)}")
 
             # 逐行逐列 3 列绝对一致性对比 (分类, 中文词条, 提示词)
@@ -164,8 +164,8 @@ class VerificationRunner:
         print(f"  ✓ TSV 与媒体附件哈希一致 ({actual_sha[:16]}...)，行号 1~{EXPECTED_TOTAL_ROWS} 逐行三列 100% 绝对一致。")
 
     def load_tsv_rows(self) -> List[Tuple[int, str, str, str]]:
-        lines = [l.strip() for l in RAW_TSV_PATH.read_text(encoding="utf-8").splitlines() if l.strip()]
-        return [(int(p[0]), p[1], p[2], p[3]) for p in [l.split("\t") for l in lines[1:]]]
+        lines = [line.strip() for line in RAW_TSV_PATH.read_text(encoding="utf-8").splitlines() if line.strip()]
+        return [(int(p[0]), p[1], p[2], p[3]) for p in [line.split("\t") for line in lines[1:]]]
 
     def verify_ledger_table(self, tsv_rows: List[Tuple[int, str, str, str]]) -> List[Dict[str, str]]:
         print("\n[Check 2/6] 校验迁移台账 Markdown 与原始 TSV 逐行 1:1 对齐与三层统计...")
@@ -186,7 +186,7 @@ class VerificationRunner:
         self.check(f"{unique_norm} 个" in text, f"第 2 层规范化去重统计计数值未在台账中如实体现 ({unique_norm})")
 
         # 解析台账数据行：精确匹配以 | <数字> | 开头的台账行
-        data_lines = [l.strip() for l in text.splitlines() if re.match(r"^\|\s*\d+\s*\|", l.strip())]
+        data_lines = [line.strip() for line in text.splitlines() if re.match(r"^\|\s*\d+\s*\|", line.strip())]
 
         self.check(len(data_lines) == EXPECTED_TOTAL_ROWS, f"台账数据行数不为 {EXPECTED_TOTAL_ROWS}: 实际 {len(data_lines)}")
 
@@ -298,11 +298,11 @@ class VerificationRunner:
             c_json = json.loads(clothing_json_path.read_text(encoding="utf-8"))
             runtime_stock_states = [s["id"] for s in c_json.get("clothing_states", [])]
             self.check(len(runtime_stock_states) == 12, f"运行库存量状态条数不为 12: {len(runtime_stock_states)}")
-            
+
             # 严格断言：差集报告中记录的存量状态集合完全等价于运行库存量状态真实 ID
             for s in runtime_stock_states:
                 self.check(f"`{s}`" in diff_text, f"差集报告存量状态清单遗漏真实 ID: {s}")
-            
+
             # 严禁将消解内部枚举 (opened, lifted, lowered, loosened, wet) 误列为存量 ID
             sec5_pos = diff_text.find("## 五、服装状态")
             sec6_pos = diff_text.find("## 六、", sec5_pos)
@@ -360,12 +360,12 @@ class VerificationRunner:
         sec4_pos = diff_text.find("## 四、109 款新增服装款式全量工程规格台账")
         sec5_pos = diff_text.find("## 五、", sec4_pos)
         sec4_text = diff_text[sec4_pos:sec5_pos] if (sec4_pos != -1 and sec5_pos != -1) else (diff_text[sec4_pos:] if sec4_pos != -1 else "")
-        sec4_lines = [l.strip() for l in sec4_text.splitlines() if re.match(r"^\|\s*\d+\s*\|", l.strip())]
+        sec4_lines = [line.strip() for line in sec4_text.splitlines() if re.match(r"^\|\s*\d+\s*\|", line.strip())]
         self.check(len(sec4_lines) == 109, f"规格台账数据行不为 109 行: {len(sec4_lines)}")
 
         spec_map = {}
-        for l in sec4_lines:
-            cols = [c.strip() for c in l.split("|")[1:-1]]
+        for line in sec4_lines:
+            cols = [c.strip() for c in line.split("|")[1:-1]]
             cid = cols[1].strip("`")
             topo = cols[3].strip("`")
             btn = cols[4]
@@ -392,7 +392,7 @@ class VerificationRunner:
             self.check(spec_map["sweater_casual"]["button"] == "禁止", f"sweater_casual 解扣应为禁止: {spec_map['sweater_casual']['button']}")
             self.check(spec_map["sweater_casual"]["skirt"] == "不适用", f"sweater_casual 掀裙应为不适用: {spec_map['sweater_casual']['skirt']}")
 
-        print(f"  ✓ 差集报告与台账提取清单 100% 集合等价 (81-0+28=109 守恒闭合，拓扑严格遵循 models.py 合法枚举，跨文档属性 100% 一致)。")
+        print("  ✓ 差集报告与台账提取清单 100% 集合等价 (81-0+28=109 守恒闭合，拓扑严格遵循 models.py 合法枚举，跨文档属性 100% 一致)。")
 
     def verify_zero_dangling_targets(self, ledger_rows: List[Dict[str, str]]) -> None:
         print("\n[Check 4/6] 校验目标 Catalog 规范 ID 零悬空 (合并目标的有效归口)...")
@@ -403,7 +403,7 @@ class VerificationRunner:
 
         existing_categories = {c["id"] for c in clothing_data.get("categories", [])}
         existing_states = {s["id"] for s in clothing_data.get("clothing_states", [])}
-        existing_lingerie = {l["id"] for l in clothing_data.get("lingerie_wardrobe", [])}
+        existing_lingerie = {item["id"] for item in clothing_data.get("lingerie_wardrobe", [])}
         existing_jewelry = {j["id"] for j in accessories_data.get("headwear_jewelry", [])}
         existing_imperfections = {i["id"] for i in imperfections_data.get("categories", [])}
 
@@ -445,7 +445,7 @@ class VerificationRunner:
                     dangling_targets.append((r["row_id"], r["name_zh"], target, cat_type))
 
         self.check(len(dangling_targets) == 0, f"发现悬空目标 ID: {dangling_targets}")
-        print(f"  ✓ 全量 246 行台账目标 ID 零悬空，所有合并目标均落在明确的存量或新增规范归口中。")
+        print("  ✓ 全量 246 行台账目标 ID 零悬空，所有合并目标均落在明确的存量或新增规范归口中。")
 
     def verify_carrier_spec(self) -> None:
         print("\n[Check 5/6] 校验状态三元分类规约与承载绑定规范...")
@@ -454,7 +454,7 @@ class VerificationRunner:
             return
 
         spec_text = CARRIER_SPEC_PATH.read_text(encoding="utf-8")
-        
+
         # 1. 状态三元模型
         self.check("修饰状态" in spec_text or "Modifiers" in spec_text, "承载规约中缺少修饰状态 (Modifiers) 定义")
         self.check("缺席/真空状态" in spec_text or "Absence" in spec_text, "承载规约中缺少缺席/真空状态 (Absence) 定义")
@@ -500,7 +500,6 @@ class VerificationRunner:
                 BindingStatus,
                 extract_garment_entities,
                 find_bound_carrier,
-                is_garment_compatible_with_state,
                 make_test_atom,
                 get_all_level_a_fixtures,
                 get_all_level_b_fixtures,
@@ -562,7 +561,7 @@ class VerificationRunner:
                 self.check(b.enforce_single_drop, f"Level B 用例 {b.case_id} 未开启 enforce_single_drop 黑盒契约")
                 self.check(b.enforce_ledger_conservation, f"Level B 用例 {b.case_id} 未开启 enforce_ledger_conservation 守恒契约")
 
-            print(f"  ✓ 测试夹具 Level A (7用例含A-5和服多原子叠穿反例、A-6同一预设两件衣物独立实体反例、A-7换序不变性契约) 与 Level B (2用例) 及反例断言契约 100% 合规。")
+            print("  ✓ 测试夹具 Level A (7用例含A-5和服多原子叠穿反例、A-6同一预设两件衣物独立实体反例、A-7换序不变性契约) 与 Level B (2用例) 及反例断言契约 100% 合规。")
         except Exception as e:
             self.check(False, f"测试夹具加载或校验异常: {e}")
 

@@ -5,9 +5,8 @@ build_data_migration_ledger.py — 生成 246 行完整、无截断、可追溯�
 from __future__ import annotations
 
 import hashlib
-import json
 from pathlib import Path
-from typing import Any, Dict, List, Tuple
+from typing import Dict, Tuple
 
 REPO_DIR = Path(__file__).resolve().parent.parent
 TSV_PATH = REPO_DIR / "docs" / "data_migration" / "raw_clothing_input.tsv"
@@ -28,7 +27,7 @@ def normalize_prompt(p: str) -> str:
 
 def build_ledger() -> None:
     raw_sha = compute_sha256(TSV_PATH)
-    lines = [l.strip().split("\t") for l in TSV_PATH.read_text(encoding="utf-8").splitlines() if l.strip()][1:]
+    lines = [line.strip().split("\t") for line in TSV_PATH.read_text(encoding="utf-8").splitlines() if line.strip()][1:]
 
     # 预设详细映射规则字典 (按原始行号 1~246)
     # 格式: line_no: (status, target_slot, target_catalog, target_id, ops, button_cap, skirt_cap, reason)
@@ -287,15 +286,15 @@ def build_ledger() -> None:
     for r in rules.values():
         status_counts[r[0]] += 1
 
-    unique_raw = len({l[3] for l in lines})
-    unique_norm = len({normalize_prompt(l[3]) for l in lines})
+    unique_raw = len({row[3] for row in lines})
+    unique_norm = len({normalize_prompt(row[3]) for row in lines})
 
     # 生成 Markdown
     md = [
         "# 服装提示词全量数据迁移台账 (Line-by-Line Migration Ledger)",
         "",
         "> **源文件基线信息**：",
-        f"> - 原始文件路径：`docs/data_migration/raw_clothing_input.tsv`",
+        "> - 原始文件路径：`docs/data_migration/raw_clothing_input.tsv`",
         f"> - 原始文件 SHA-256：`{raw_sha}`",
         f"> - 原始总记录数：**{total_rows} 行** (行号 1~246 连续闭合，无任何截断或省略)",
         "",

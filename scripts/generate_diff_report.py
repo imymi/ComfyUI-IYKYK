@@ -11,11 +11,11 @@ LEDGER_PATH = REPO_DIR / "docs" / "data_migration" / "clothing_lexicon_migration
 DIFF_REPORT_PATH = REPO_DIR / "docs" / "data_migration" / "catalog_diff_report.md"
 
 ledger_text = LEDGER_PATH.read_text(encoding="utf-8")
-data_lines = [l.strip() for l in ledger_text.splitlines() if re.match(r"^\|\s*\d+\s*\|", l.strip())]
+data_lines = [line.strip() for line in ledger_text.splitlines() if re.match(r"^\|\s*\d+\s*\|", line.strip())]
 
 ledger_map = {}
-for l in data_lines:
-    cols = [c.strip() for c in l.split("|")[1:-1]]
+for line in data_lines:
+    cols = [c.strip() for c in line.split("|")[1:-1]]
     if cols[5] == "纳入" and "categories" in cols[7] and "clothing.json" in cols[7]:
         cid = cols[8].strip("`")
         if cid not in ledger_map:
@@ -53,12 +53,18 @@ tops = {
 
 assigned_topos = {}
 for cid in sorted(ledger_map.keys()):
-    if cid in skirts: assigned_topos[cid] = "bottom_skirt"
-    elif cid in pants: assigned_topos[cid] = "bottom_pants"
-    elif cid in underwear: assigned_topos[cid] = "underwear"
-    elif cid in outerwear: assigned_topos[cid] = "outerwear"
-    elif cid in tops: assigned_topos[cid] = "top"
-    else: assigned_topos[cid] = "one_piece"
+    if cid in skirts:
+        assigned_topos[cid] = "bottom_skirt"
+    elif cid in pants:
+        assigned_topos[cid] = "bottom_pants"
+    elif cid in underwear:
+        assigned_topos[cid] = "underwear"
+    elif cid in outerwear:
+        assigned_topos[cid] = "outerwear"
+    elif cid in tops:
+        assigned_topos[cid] = "top"
+    else:
+        assigned_topos[cid] = "one_piece"
 
 old_81_str = """
     "taoist_robe", "greek_toga", "battle_robe", "bikini_classic", "bikini_strappy",

@@ -134,7 +134,7 @@ def is_garment_compatible_with_state(entity: GarmentCarrierEntity, state_id: str
     if state_id in ("lifted_up", "lifted", "lifted_skirt"):
         return any(
             a.facts and (
-                "bottom_skirt" in a.facts.garment_topologies or 
+                "bottom_skirt" in a.facts.garment_topologies or
                 ("one_piece" in a.facts.garment_topologies and entity.selected_id not in NON_SKIRT_ONE_PIECE)
             )
             for a in entity.member_atoms
@@ -2377,7 +2377,7 @@ class ConflictResolver:
             matched = False
             is_fallback = False
             if is_formal_atom(a):
-                if a.facts and any(s in a.facts.garment_states for s in ("sheer", "see_through", "transparent", "translucent")):
+                if a.facts and any(s in a.facts.garment_states for s in ("sheer", "see_through", "transparent", "translucent", "wet_clinging")):
                     matched = True
                 elif a.source_item_id in ("sheer_chiffon", "sheer_mesh", "semi_translucent"):
                     matched = True
@@ -3472,7 +3472,7 @@ class ConflictResolver:
             and (a.source_slot in getattr(r7, "target_slots", ()) or a.source_slot in ("clothing", "clothing_state"))
             and not (a.provenance and a.provenance.rule_id == "material_penetration")
             and (
-                (is_formal_atom(a) and a.facts and any(s in a.facts.garment_states for s in ("sheer", "see_through", "transparent", "translucent")))
+                (is_formal_atom(a) and a.facts and any(s in a.facts.garment_states for s in ("sheer", "see_through", "transparent", "translucent", "wet_clinging")))
                 or (is_formal_atom(a) and a.source_item_id in ("sheer_chiffon", "sheer_mesh", "semi_translucent"))
                 or (not is_formal_atom(a) and any(bw.matches(a.text) for bw in r7_banned))
             )
