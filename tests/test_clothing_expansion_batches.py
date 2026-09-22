@@ -151,18 +151,25 @@ class TestClothingExpansionBatches(unittest.TestCase):
                 self.assertLessEqual(len(words), 15, f"Tag in {cid} too long: '{tag.text}'")
 
     def test_04_button_capability_positive_and_negative_matrix(self):
-        """
-        形制能力契约核验 (解扣状态 unbuttoned):
-        严格验证具体动作词条 (buttons undone revealing cleavage / shirt open at chest) 真实生成或精准剔除：
-        - 正例：具备纽扣能力的款式 (Batch 1: 5 款, Batch 2: denim_shorts, leather_skirt 共 7 款)：
-          动作词条 100% 保留在 positive prompt 中，且决策报告中无相应动作的 Drop；
+        """形制能力契约核验 (解扣状态 unbuttoned):
+        严格验证具体动作词条 (按服装形制拓扑区分动作) 真实生成或精准剔除：
+        - 正例：具备纽扣能力的款式 (Batch 1: 5 款上装, Batch 2: denim_shorts 牛仔短裤, leather_skirt 皮裙 共 7 款)：
+          * 上装正例：buttons undone revealing cleavage / shirt open at chest 保留在 positive prompt 中；
+          * 裤装正例 (denim_shorts)：pants button undone / jeans unbuttoned 保留在 positive prompt 中，胸前/衬衫动作严禁存在；
+          * 裙装正例 (leather_skirt)：skirt button undone / skirt unbuttoned 保留在 positive prompt 中，胸前/衬衫动作严禁存在；
+          * 正例动作无相应 Drop 决策。
         - 反例：无纽扣能力的款式 (Batch 1: 11 款, Batch 2: 20 款 共 31 款)：
           动作词条绝对不出现在 positive prompt 中，且决策报告中必须明确记录 action == "drop" 且 reason_code == "state_lacks_carrier"。
         """
-        btn_terms = ("buttons undone revealing cleavage", "shirt open at chest")
-        all_items = [(i[0], i[3]) for i in BATCH_1_ITEMS] + [(i[0], i[3]) for i in BATCH_2_ITEMS]
+        all_items = [(i[0], i[3], ["top"]) for i in BATCH_1_ITEMS] + [(i[0], i[3], i[5]) for i in BATCH_2_ITEMS]
 
-        for cid, button_allowed in all_items:
+        ALL_BUTTON_ACTIONS = (
+            "blouse unbuttoned", "buttons undone revealing cleavage", "shirt open at chest",
+            "pants button undone", "jeans unbuttoned",
+            "skirt button undone", "skirt unbuttoned",
+        )
+
+        for cid, button_allowed, topos in all_items:
             gen_res = self.generator.generate_structured(
                 场景预设="日常街道",
                 服装款式=cid,
@@ -173,14 +180,24 @@ class TestClothingExpansionBatches(unittest.TestCase):
             report = gen_res.resolution_report
             self.assertIsNotNone(report)
 
+            if "bottom_pants" in topos:
+                expected_target_actions = ("pants button undone", "jeans unbuttoned")
+                forbidden_cross_actions = ("buttons undone revealing cleavage", "shirt open at chest", "skirt button undone", "skirt unbuttoned")
+            elif "bottom_skirt" in topos:
+                expected_target_actions = ("skirt button undone", "skirt unbuttoned")
+                forbidden_cross_actions = ("buttons undone revealing cleavage", "shirt open at chest", "pants button undone", "jeans unbuttoned")
+            else:
+                expected_target_actions = ("buttons undone revealing cleavage", "shirt open at chest")
+                forbidden_cross_actions = ("pants button undone", "jeans unbuttoned", "skirt button undone", "skirt unbuttoned")
+
             dropped_btn_decisions = {
                 d.before_text: d
                 for d in report.decisions
-                if d.action == "drop" and d.before_text in btn_terms
+                if d.action == "drop" and d.before_text in expected_target_actions
             }
 
             if button_allowed:
-                for bt in btn_terms:
+                for bt in expected_target_actions:
                     self.assertIn(
                         bt,
                         gen_res.positive,
@@ -191,35 +208,47 @@ class TestClothingExpansionBatches(unittest.TestCase):
                         dropped_btn_decisions,
                         f"Style {cid} has button capability, but action '{bt}' was unexpectedly dropped!",
                     )
+                for f_bt in forbidden_cross_actions:
+                    self.assertNotIn(
+                        f_bt,
+                        gen_res.positive,
+                        f"Style {cid} must NOT carry incompatible cross-body action '{f_bt}'!",
+                    )
             else:
-                for bt in btn_terms:
+                for bt in ALL_BUTTON_ACTIONS:
                     self.assertNotIn(
                         bt,
                         gen_res.positive,
                         f"Style {cid} lacks button capability, but action '{bt}' leaked into positive prompt!",
                     )
-                    self.assertIn(
-                        bt,
-                        dropped_btn_decisions,
-                        f"Style {cid} lacks button capability, but action '{bt}' was not dropped!",
-                    )
+                dropped_all_btn = {
+                    d.before_text: d
+                    for d in report.decisions
+                    if d.action == "drop" and d.before_text in ALL_BUTTON_ACTIONS
+                }
+                self.assertGreater(
+                    len(dropped_all_btn),
+                    0,
+                    f"Style {cid} lacks button capability, but no button action was dropped!",
+                )
+                for bt, d in dropped_all_btn.items():
                     self.assertEqual(
-                        dropped_btn_decisions[bt].reason_code,
+                        d.reason_code,
                         "state_lacks_carrier",
-                        f"Style {cid} dropped '{bt}' with unexpected reason {dropped_btn_decisions[bt].reason_code}",
+                        f"Style {cid} dropped '{bt}' with unexpected reason {d.reason_code}",
                     )
 
     def test_05_skirt_capability_positive_and_negative_matrix(self):
-        """
-        形制能力契约核验 (掀裙状态 lifted_up):
-        严格验证具体动作词条 (skirt pulled up revealing panties / dress hitched up) 真实生成或精准剔除：
+        """形制能力契约核验 (掀裙状态 lifted_up):
+        严格验证具体动作词条 (skirt pulled up revealing panties / skirt hiked up to waist) 真实生成或精准剔除：
         - 正例：具备裙装能力的款式 (Batch 2 的 16 款半身裙)：
-          动作词条 100% 保留在 positive prompt 中，且决策报告中无相应动作的 Drop；
+          * 半身裙动作 (skirt pulled up revealing panties, skirt hiked up to waist) 100% 保留在 positive prompt 中；
+          * 连衣裙动作 (dress hitched up) 绝对禁止借用/泄漏到半身裙中；
+          * 决策报告中无裙装动作的 Drop；
         - 反例：无裙装能力的款式 (Batch 1 的 16 款上装、Batch 2 的 3 款裤装及 3 款比基尼内衣 共 22 款)：
           动作词条绝对不出现在 positive prompt 中，且决策报告中必须明确记录 action == "drop"；
           其中裤装冲突原因严格为 pants_state_conflict，上装/内衣冲突原因严格为 state_lacks_carrier。
         """
-        skirt_terms = ("skirt pulled up revealing panties", "dress hitched up")
         all_items = [(i[0], False, ["top"]) for i in BATCH_1_ITEMS] + [(i[0], i[4], i[5]) for i in BATCH_2_ITEMS]
 
         for cid, skirt_allowed, topos in all_items:
@@ -233,44 +262,162 @@ class TestClothingExpansionBatches(unittest.TestCase):
             report = gen_res.resolution_report
             self.assertIsNotNone(report)
 
-            dropped_skirt_decisions = {
-                d.before_text: d
-                for d in report.decisions
-                if d.action == "drop" and d.before_text in skirt_terms
-            }
-
             if skirt_allowed:
-                for st in skirt_terms:
-                    self.assertIn(
-                        st,
-                        gen_res.positive,
-                        f"Skirt style {cid} has skirt capability, but action '{st}' is missing from positive prompt!",
-                    )
-                    self.assertNotIn(
-                        st,
-                        dropped_skirt_decisions,
-                        f"Skirt style {cid} has skirt capability, but action '{st}' was unexpectedly dropped!",
+                expected_skirt_actions = ("skirt pulled up revealing panties", "skirt hiked up to waist")
+                dropped_skirt_decisions = {
+                    d.before_text: d
+                    for d in report.decisions
+                    if d.action == "drop" and d.before_text in expected_skirt_actions
+                }
+                # 具备裙装能力：采到的裙装动作必须保留在 positive prompt 中
+                has_skirt_action = any(st in gen_res.positive for st in expected_skirt_actions)
+                self.assertTrue(
+                    has_skirt_action,
+                    f"Skirt style {cid} has skirt capability, but no skirt action was retained in positive prompt!",
+                )
+                self.assertEqual(
+                    len(dropped_skirt_decisions),
+                    0,
+                    f"Skirt style {cid} has skirt capability, but skirt action was unexpectedly dropped: {list(dropped_skirt_decisions.keys())}!",
+                )
+                # 核心验收契约：半身裙绝对不能冒用连衣裙词条 dress hitched up
+                self.assertNotIn(
+                    "dress hitched up",
+                    gen_res.positive,
+                    f"Half-skirt style {cid} must NOT carry dress action 'dress hitched up'!",
+                )
+                # 若采到了 dress hitched up，其必须以 state_lacks_carrier 记录 drop
+                dropped_dress_decisions = {
+                    d.before_text: d
+                    for d in report.decisions
+                    if d.action == "drop" and d.before_text == "dress hitched up"
+                }
+                for dt, d in dropped_dress_decisions.items():
+                    self.assertEqual(
+                        d.reason_code,
+                        "state_lacks_carrier",
+                        f"Half-skirt style {cid} dropped '{dt}' with unexpected reason {d.reason_code}",
                     )
             else:
                 expected_reason = (
                     "pants_state_conflict" if "bottom_pants" in topos else "state_lacks_carrier"
                 )
-                for st in skirt_terms:
+                test_terms = ("skirt pulled up revealing panties", "skirt hiked up to waist", "dress hitched up")
+                dropped_skirt_decisions = {
+                    d.before_text: d
+                    for d in report.decisions
+                    if d.action == "drop" and d.before_text in test_terms
+                }
+                for st in test_terms:
                     self.assertNotIn(
                         st,
                         gen_res.positive,
                         f"Non-skirt style {cid} lacks skirt capability, but action '{st}' leaked into positive prompt!",
                     )
-                    self.assertIn(
-                        st,
-                        dropped_skirt_decisions,
-                        f"Non-skirt style {cid} lacks skirt capability, but action '{st}' was not dropped!",
-                    )
+                self.assertTrue(
+                    len(dropped_skirt_decisions) >= 1,
+                    f"Non-skirt style {cid} expected dropped skirt actions, but none found",
+                )
+                for st, dec in dropped_skirt_decisions.items():
                     self.assertEqual(
-                        dropped_skirt_decisions[st].reason_code,
+                        dec.reason_code,
                         expected_reason,
-                        f"Non-skirt style {cid} dropped '{st}' with unexpected reason {dropped_skirt_decisions[st].reason_code}, expected {expected_reason}",
+                        f"Non-skirt style {cid} dropped '{st}' with unexpected reason {dec.reason_code}, expected {expected_reason}",
                     )
+
+    def test_05b_carrier_action_type_binding_isolation(self):
+        """专项核验验收阻断项：下装禁止承载上装/连衣裙动作，且外来错误动作必须以 state_lacks_carrier 被 drop。
+
+        测试场景 (固定 prompt_seed=42)：
+        1. denim_shorts + 解扣：保留短裤解扣 (jeans unbuttoned / pants button undone)，
+           绝无 buttons undone revealing cleavage / shirt open at chest；
+           若将 buttons undone 注入消解器，必须以 state_lacks_carrier 被精准剔除；
+        2. leather_skirt + 解扣：保留裙装解扣 (skirt button undone / skirt unbuttoned)，
+           绝无 buttons undone revealing cleavage / shirt open at chest；
+           若将 buttons undone 注入消解器，必须以 state_lacks_carrier 被精准剔除；
+        3. miniskirt + 掀裙：保留半身裙掀起动作 (skirt pulled up revealing panties / skirt hiked up to waist)，
+           绝无 dress hitched up；
+           若将 dress hitched up 注入消解器，必须以 state_lacks_carrier 被精准剔除。
+        """
+        from tests.fixtures.conflict_rule_fixtures import make_test_atom
+
+        # 1. denim_shorts + 解扣
+        res_denim = self.generator.generate_structured(
+            场景预设="日常街道",
+            服装款式="denim_shorts",
+            服装状态="解开纽扣 (Unbuttoned)",
+            裸露等级="L2 差分微露 (Partially Exposed)",
+            prompt_seed=42,
+        )
+        self.assertIn("pants button undone", res_denim.positive)
+        self.assertIn("jeans unbuttoned", res_denim.positive)
+        self.assertNotIn("buttons undone revealing cleavage", res_denim.positive)
+        self.assertNotIn("shirt open at chest", res_denim.positive)
+
+        # 独立消解器核验：上装开扣动作与 denim_shorts 强行组合时必须以 state_lacks_carrier drop
+        atoms_denim = [
+            make_test_atom("denim shorts", source_slot="clothing", item_id="denim_shorts", garment_topologies=["bottom_pants"], tag_order=0),
+            make_test_atom("buttons undone revealing cleavage", source_slot="clothing_state", item_id="unbuttoned", garment_topologies=["top", "one_piece"], garment_states=["opened"], tag_order=1),
+            make_test_atom("shirt open at chest", source_slot="clothing_state", item_id="unbuttoned", garment_topologies=["top", "one_piece"], garment_states=["opened"], tag_order=2),
+        ]
+        _, _, report_denim = self.resolver.resolve_atoms_with_full_report(atoms_denim)
+        dropped_denim = {d.before_text: d.reason_code for d in report_denim.decisions if d.action == "drop"}
+        self.assertEqual(dropped_denim.get("buttons undone revealing cleavage"), "state_lacks_carrier")
+        self.assertEqual(dropped_denim.get("shirt open at chest"), "state_lacks_carrier")
+
+        # 2. leather_skirt + 解扣
+        res_leather = self.generator.generate_structured(
+            场景预设="日常街道",
+            服装款式="leather_skirt",
+            服装状态="解开纽扣 (Unbuttoned)",
+            裸露等级="L2 差分微露 (Partially Exposed)",
+            prompt_seed=42,
+        )
+        self.assertIn("skirt button undone", res_leather.positive)
+        self.assertIn("skirt unbuttoned", res_leather.positive)
+        self.assertNotIn("buttons undone revealing cleavage", res_leather.positive)
+        self.assertNotIn("shirt open at chest", res_leather.positive)
+
+        # 独立消解器核验：上装开扣动作与 leather_skirt 强行组合时必须以 state_lacks_carrier drop
+        atoms_leather = [
+            make_test_atom("leather skirt", source_slot="clothing", item_id="leather_skirt", garment_topologies=["bottom_skirt"], tag_order=0),
+            make_test_atom("buttons undone revealing cleavage", source_slot="clothing_state", item_id="unbuttoned", garment_topologies=["top", "one_piece"], garment_states=["opened"], tag_order=1),
+            make_test_atom("shirt open at chest", source_slot="clothing_state", item_id="unbuttoned", garment_topologies=["top", "one_piece"], garment_states=["opened"], tag_order=2),
+        ]
+        _, _, report_leather = self.resolver.resolve_atoms_with_full_report(atoms_leather)
+        dropped_leather = {d.before_text: d.reason_code for d in report_leather.decisions if d.action == "drop"}
+        self.assertEqual(dropped_leather.get("buttons undone revealing cleavage"), "state_lacks_carrier")
+        self.assertEqual(dropped_leather.get("shirt open at chest"), "state_lacks_carrier")
+
+        # 3. miniskirt + 掀裙
+        res_mini = self.generator.generate_structured(
+            场景预设="日常街道",
+            服装款式="miniskirt",
+            服装状态="裙摆掀起 (Skirt Lifted Up)",
+            裸露等级="L2 差分微露 (Partially Exposed)",
+            prompt_seed=42,
+        )
+        self.assertIn("skirt pulled up revealing panties", res_mini.positive)
+        self.assertNotIn("dress hitched up", res_mini.positive)
+        dropped_mini_decisions = {
+            d.before_text: d.reason_code
+            for d in res_mini.resolution_report.decisions
+            if d.action == "drop"
+        }
+        self.assertEqual(
+            dropped_mini_decisions.get("dress hitched up"),
+            "state_lacks_carrier",
+            "miniskirt must drop sampled 'dress hitched up' with state_lacks_carrier",
+        )
+
+        # 独立消解器核验：连衣裙掀起动作与 miniskirt 强行组合时必须以 state_lacks_carrier drop
+        atoms_mini = [
+            make_test_atom("miniskirt", source_slot="clothing", item_id="miniskirt", garment_topologies=["bottom_skirt"], tag_order=0),
+            make_test_atom("dress hitched up", source_slot="clothing_state", item_id="lifted_up", garment_topologies=["one_piece"], garment_states=["lifted"], tag_order=1),
+        ]
+        _, _, report_mini = self.resolver.resolve_atoms_with_full_report(atoms_mini)
+        dropped_mini = {d.before_text: d.reason_code for d in report_mini.decisions if d.action == "drop"}
+        self.assertEqual(dropped_mini.get("dress hitched up"), "state_lacks_carrier")
 
     def test_06_end_to_end_generation_and_dag_provenance(self):
         """端到端验证 Batch 1 (16 款) 与 Batch 2 (22 款) 共 38 款新增款式在真实节点生成下的 Provenance DAG 完整性与零未消解冲突。"""

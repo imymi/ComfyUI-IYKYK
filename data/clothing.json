@@ -4492,6 +4492,10 @@
           "text": "blouse unbuttoned",
           "facts": {
             "semantic_role": "selector",
+            "garment_topologies": [
+              "top",
+              "one_piece"
+            ],
             "visible_regions": [
               "lower_body",
               "upper_body"
@@ -4506,6 +4510,10 @@
           "text": "buttons undone revealing cleavage",
           "facts": {
             "semantic_role": "selector",
+            "garment_topologies": [
+              "top",
+              "one_piece"
+            ],
             "visible_regions": [
               "lower_body",
               "upper_body"
@@ -4520,9 +4528,77 @@
           "text": "shirt open at chest",
           "facts": {
             "semantic_role": "selector",
+            "garment_topologies": [
+              "top",
+              "one_piece"
+            ],
             "visible_regions": [
               "lower_body",
               "upper_body"
+            ],
+            "garment_states": [
+              "opened"
+            ]
+          }
+        },
+        {
+          "id": "unbuttoned__tag_003",
+          "text": "pants button undone",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "bottom_pants"
+            ],
+            "visible_regions": [
+              "lower_body"
+            ],
+            "garment_states": [
+              "opened"
+            ]
+          }
+        },
+        {
+          "id": "unbuttoned__tag_004",
+          "text": "jeans unbuttoned",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "bottom_pants"
+            ],
+            "visible_regions": [
+              "lower_body"
+            ],
+            "garment_states": [
+              "opened"
+            ]
+          }
+        },
+        {
+          "id": "unbuttoned__tag_005",
+          "text": "skirt button undone",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "bottom_skirt"
+            ],
+            "visible_regions": [
+              "lower_body"
+            ],
+            "garment_states": [
+              "opened"
+            ]
+          }
+        },
+        {
+          "id": "unbuttoned__tag_006",
+          "text": "skirt unbuttoned",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "bottom_skirt"
+            ],
+            "visible_regions": [
+              "lower_body"
             ],
             "garment_states": [
               "opened"

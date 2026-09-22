@@ -129,26 +129,115 @@ ALLOWED_ZIPPER_STYLES: Set[str] = {
     "modern_chinese",     # 新中式改良旗袍拉链 (modern qipao unzipped)
 }
 
+RE_DRESS_ACTION = re.compile(r"\b(?:dress)\b", re.IGNORECASE)
+RE_UPPER_BODY_ACTION = re.compile(r"\b(?:shirt|blouse|cleavage|chest|collar|breasts?)\b", re.IGNORECASE)
+RE_PANTS_ACTION = re.compile(r"\b(?:pants|jeans|shorts)\b", re.IGNORECASE)
+RE_SKIRT_ACTION = re.compile(r"\b(?:skirt)\b", re.IGNORECASE)
 
-def is_garment_compatible_with_state(entity: GarmentCarrierEntity, state_id: str) -> bool:
+
+def is_garment_compatible_with_state(
+    entity: GarmentCarrierEntity,
+    state_id: str,
+    state_atom: Optional[PromptAtom] = None,
+) -> bool:
     """判定服装实体是否具备承载特定状态原子的物理形制能力（按特定款式的产品业务规则判定）。"""
     if state_id in ("lifted_up", "lifted", "lifted_skirt"):
-        return any(
+        is_skirt_compatible = any(
             a.facts and (
                 "bottom_skirt" in a.facts.garment_topologies or
                 ("one_piece" in a.facts.garment_topologies and entity.selected_id not in NON_SKIRT_ONE_PIECE)
             )
             for a in entity.member_atoms
         )
+        if not is_skirt_compatible:
+            return False
     elif state_id in ("unbuttoned", "opened"):
-        return entity.selected_id in ALLOWED_BUTTON_STYLES
+        if entity.selected_id not in ALLOWED_BUTTON_STYLES:
+            return False
     elif state_id == "unzipped":
-        return entity.selected_id in ALLOWED_ZIPPER_STYLES
+        if entity.selected_id not in ALLOWED_ZIPPER_STYLES:
+            return False
     elif state_id == "pulled_down":
-        return any(
+        is_pulled_compatible = any(
             a.facts and any(t in a.facts.garment_topologies for t in ("bottom_pants", "bottom_skirt", "underwear", "top", "one_piece"))
             for a in entity.member_atoms
         )
+        if not is_pulled_compatible:
+            return False
+
+    if state_atom is not None:
+        entity_topologies: Set[str] = set()
+        for a in entity.member_atoms:
+            if a.facts and a.facts.garment_topologies:
+                entity_topologies.update(a.facts.garment_topologies)
+
+        # 1. 结构化事实匹配：若动作原子声明了所需服装拓扑，实体拓扑必须相交
+        if state_atom.facts and state_atom.facts.garment_topologies:
+            atom_topos = set(state_atom.facts.garment_topologies)
+            if entity_topologies and not (entity_topologies & atom_topos):
+                return False
+
+        # 2. 动作短语语义正则核验 (单源真实源，覆盖跨形制细化)
+        atom_text = state_atom.text.lower().strip() if state_atom.text else ""
+
+        if state_id in ("lifted_up", "lifted", "lifted_skirt"):
+            # 2.1 连衣裙动作 (如 dress hitched up / dress sliding down):
+            # 必须为真实连衣裙 (one_piece 且不在 NON_SKIRT_ONE_PIECE 中)，下装半身裙 (bottom_skirt) 绝对禁止冒充承载！
+            if RE_DRESS_ACTION.search(atom_text):
+                is_dress = any(
+                    a.facts and "one_piece" in a.facts.garment_topologies and entity.selected_id not in NON_SKIRT_ONE_PIECE
+                    for a in entity.member_atoms
+                )
+                if not is_dress:
+                    return False
+
+            # 2.2 裙装动作 (如 skirt pulled up / skirt hiked up):
+            # 必须具备裙形制 (bottom_skirt, 或具备裙装的一体衣 one_piece)，裤装与纯上装绝对禁止承载！
+            if RE_SKIRT_ACTION.search(atom_text):
+                has_skirt = any(
+                    a.facts and (
+                        "bottom_skirt" in a.facts.garment_topologies or
+                        ("one_piece" in a.facts.garment_topologies and entity.selected_id not in NON_SKIRT_ONE_PIECE)
+                    )
+                    for a in entity.member_atoms
+                )
+                if not has_skirt:
+                    return False
+
+        elif state_id in ("unbuttoned", "opened"):
+            # 2.3 上装/胸部开扣动作 (如 shirt open at chest / buttons undone revealing cleavage / blouse unbuttoned):
+            # 必须具备上身覆盖 (top, outerwear, one_piece, suit)，纯下装 (bottom_pants, bottom_skirt) 绝对禁止承载！
+            if RE_UPPER_BODY_ACTION.search(atom_text):
+                has_upper = any(
+                    a.facts and any(t in a.facts.garment_topologies for t in ("top", "outerwear", "one_piece", "suit"))
+                    for a in entity.member_atoms
+                )
+                if not has_upper:
+                    return False
+
+            # 2.4 裤装动作 (如 pants button undone / jeans unbuttoned):
+            # 必须为裤装 (bottom_pants, one_piece)，半身裙与纯上装绝对禁止承载！
+            if RE_PANTS_ACTION.search(atom_text):
+                has_pants = any(
+                    a.facts and any(t in a.facts.garment_topologies for t in ("bottom_pants", "one_piece"))
+                    for a in entity.member_atoms
+                )
+                if not has_pants:
+                    return False
+
+            # 2.5 裙装解扣动作 (如 skirt button undone / skirt unbuttoned):
+            # 必须具备裙形制 (bottom_skirt, 或具备裙装的一体衣 one_piece)，裤装与纯上装绝对禁止承载！
+            if RE_SKIRT_ACTION.search(atom_text):
+                has_skirt = any(
+                    a.facts and (
+                        "bottom_skirt" in a.facts.garment_topologies or
+                        ("one_piece" in a.facts.garment_topologies and entity.selected_id not in NON_SKIRT_ONE_PIECE)
+                    )
+                    for a in entity.member_atoms
+                )
+                if not has_skirt:
+                    return False
+
     return True
 
 
@@ -387,7 +476,7 @@ def find_bound_carrier(
             )
         if len(matched) == 1:
             target_entity = matched[0]
-            if not is_garment_compatible_with_state(target_entity, state_id):
+            if not is_garment_compatible_with_state(target_entity, state_id, state_atom):
                 return BindingResult(
                     status=BindingStatus.UNBOUND_INCOMPATIBLE,
                     target_entity=target_entity,
@@ -399,7 +488,7 @@ def find_bound_carrier(
                 reason="explicit_target_match",
             )
         else:
-            compatible_matched = [e for e in matched if is_garment_compatible_with_state(e, state_id)]
+            compatible_matched = [e for e in matched if is_garment_compatible_with_state(e, state_id, state_atom)]
             if len(compatible_matched) == 1:
                 return BindingResult(
                     status=BindingStatus.BOUND,
@@ -420,7 +509,7 @@ def find_bound_carrier(
     # 阶梯 2：无显式目标时，按形制能力筛选兼容候选集合
     compatible_candidates = [
         e for e in active_entities
-        if is_garment_compatible_with_state(e, state_id)
+        if is_garment_compatible_with_state(e, state_id, state_atom)
     ]
 
     # 阶梯 3：零候选或单候选确定性裁决（区分“零兼容候选”和“单兼容候选”）

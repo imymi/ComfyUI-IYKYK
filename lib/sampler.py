@@ -16,7 +16,7 @@ import json
 import re
 from pathlib import Path
 from random import Random
-from typing import Any, Dict, List, Optional, Sequence, Tuple
+from typing import Any, Dict, List, Optional, Sequence, Set, Tuple
 
 if __package__:
     from .context_affinity import (
@@ -372,6 +372,52 @@ class DataSampler:
                 result.append(fallback)
 
         return tuple(result)
+
+    @classmethod
+    def _pick_state_tags(
+        cls,
+        raw_state_tags: List[Any],
+        state_id: str,
+        chosen_style: Dict[str, Any],
+        has_variant_metadata: bool,
+        rng: Random,
+    ) -> List[Any]:
+        """受控状态标签采样：
+        1. 存量 31 款 (not has_variant_metadata)：严格保持向后兼容性与随机数调用序列保真，
+           若 state_id == 'unbuttoned'，仅从前 3 个存量标签中采样；其余状态使用全量 tags。
+        2. 新增款式 (has_variant_metadata)：按款式的服装形制拓扑 (garment_topologies)
+           从状态候选标签中过滤出相符拓扑的标签（例如短裤/牛仔裤解扣仅取下装解扣标签，半身裙掀裙仅取裙装标签且不取连衣裙标签）。
+           若无匹配项，则回退全量状态标签候选池交由 ConflictResolver 消解。
+        """
+        if not has_variant_metadata:
+            if state_id == "unbuttoned":
+                legacy_tags = [
+                    t for t in raw_state_tags
+                    if isinstance(t, dict) and t.get("id") in ("unbuttoned__tag_000", "unbuttoned__tag_001", "unbuttoned__tag_002")
+                ]
+                if not legacy_tags:
+                    legacy_tags = raw_state_tags[:3]
+                return cls._pick(legacy_tags, rng, min(2, len(legacy_tags)))
+            return cls._pick(raw_state_tags, rng, min(2, len(raw_state_tags)))
+
+        # 新增款式：提取当前款式的形制拓扑
+        style_topos: Set[str] = set()
+        for tag_item in chosen_style.get("tags", []):
+            facts = tag_item.get("facts") if isinstance(tag_item, dict) else None
+            if isinstance(facts, dict) and facts.get("garment_topologies"):
+                style_topos.update(facts["garment_topologies"])
+
+        # 检查是否有显式拓扑匹配的状态标签候选
+        matching_tags = []
+        for st in raw_state_tags:
+            if isinstance(st, dict):
+                st_facts = st.get("facts", {})
+                st_topos = set(st_facts.get("garment_topologies", []))
+                if st_topos and (st_topos & style_topos):
+                    matching_tags.append(st)
+
+        pool = matching_tags if matching_tags else raw_state_tags
+        return cls._pick(pool, rng, min(2, len(pool)))
 
     @staticmethod
     def _flatten_tags(item: Any) -> List[str]:
@@ -1008,7 +1054,9 @@ class DataSampler:
             chosen_state = self._pick_one(pool if pool else states, rng)
             state_id = chosen_state.get("id", "")
             raw_state_tags = chosen_state.get("tags", [])
-            picked_state_tags = self._pick(raw_state_tags, rng, min(2, len(raw_state_tags)))
+            picked_state_tags = self._pick_state_tags(
+                raw_state_tags, state_id, chosen_style, has_variant_metadata, rng
+            )
             _, state_tags_list = self._to_sampled_tags(
                 picked_state_tags,
                 state_id,
@@ -1028,7 +1076,9 @@ class DataSampler:
                 raise DataSelectionError(f"Unknown clothing state: {state!r}")
             state_id = chosen_state.get("id", "")
             raw_state_tags = chosen_state.get("tags", [])
-            picked_state_tags = self._pick(raw_state_tags, rng, min(2, len(raw_state_tags)))
+            picked_state_tags = self._pick_state_tags(
+                raw_state_tags, state_id, chosen_style, has_variant_metadata, rng
+            )
             _, state_tags_list = self._to_sampled_tags(
                 picked_state_tags,
                 state_id,
