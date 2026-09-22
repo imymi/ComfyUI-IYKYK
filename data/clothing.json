@@ -2915,6 +2915,1528 @@
           }
         }
       ]
+    },
+    {
+      "id": "black_leggings",
+      "name_zh": "黑色紧身裤 (Black Leggings)",
+      "aliases": [
+        "leggings",
+        "tights"
+      ],
+      "tags": [
+        {
+          "id": "black_leggings__tag_000",
+          "text": "black leggings",
+          "role": "core_base",
+          "mutex_group": "black_leggings_silhouette",
+          "raw_lines": [
+            228
+          ],
+          "derivation": "verbatim",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "bottom_pants"
+            ],
+            "mutex_groups": [
+              "black_leggings_silhouette"
+            ]
+          }
+        },
+        {
+          "id": "black_leggings__tag_001",
+          "text": "high-waisted black leggings",
+          "role": "variant",
+          "mutex_group": "black_leggings_silhouette",
+          "raw_lines": [
+            228
+          ],
+          "derivation": "derived",
+          "derivation_note": "派生自第228行黑色打底裤，细化为高腰修身紧身裤版型",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "bottom_pants"
+            ],
+            "mutex_groups": [
+              "black_leggings_silhouette"
+            ]
+          }
+        },
+        {
+          "id": "black_leggings__tag_002",
+          "text": "stretch tight leggings",
+          "role": "combinable_attribute",
+          "mutex_group": "black_leggings_attr",
+          "raw_lines": [
+            228
+          ],
+          "derivation": "derived",
+          "derivation_note": "派生自第228行高弹修身质地属性",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "bottom_pants"
+            ],
+            "mutex_groups": [
+              "black_leggings_attr"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "denim_shorts",
+      "name_zh": "牛仔短裤 (Denim Shorts)",
+      "aliases": [
+        "jean_shorts",
+        "cutoffs"
+      ],
+      "tags": [
+        {
+          "id": "denim_shorts__tag_000",
+          "text": "denim shorts",
+          "role": "core_base",
+          "mutex_group": "denim_shorts_silhouette",
+          "raw_lines": [
+            223
+          ],
+          "derivation": "verbatim",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "bottom_pants"
+            ],
+            "mutex_groups": [
+              "denim_shorts_silhouette"
+            ]
+          }
+        },
+        {
+          "id": "denim_shorts__tag_001",
+          "text": "ripped denim shorts",
+          "role": "variant",
+          "mutex_group": "denim_shorts_silhouette",
+          "raw_lines": [
+            223
+          ],
+          "derivation": "derived",
+          "derivation_note": "派生自第223行牛仔短裤，细化为水洗破洞毛边牛仔短裤版型",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "bottom_pants"
+            ],
+            "mutex_groups": [
+              "denim_shorts_silhouette"
+            ]
+          }
+        },
+        {
+          "id": "denim_shorts__tag_002",
+          "text": "frayed hem denim shorts",
+          "role": "combinable_attribute",
+          "mutex_group": "denim_shorts_attr",
+          "raw_lines": [
+            223
+          ],
+          "derivation": "derived",
+          "derivation_note": "派生自第223行毛边裤腿细节属性",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "bottom_pants"
+            ],
+            "mutex_groups": [
+              "denim_shorts_attr"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "hot_pants",
+      "name_zh": "热裤 (Hot Pants)",
+      "aliases": [
+        "booty_shorts"
+      ],
+      "tags": [
+        {
+          "id": "hot_pants__tag_000",
+          "text": "short shorts",
+          "role": "core_base",
+          "mutex_group": "hot_pants_silhouette",
+          "raw_lines": [
+            225
+          ],
+          "derivation": "verbatim",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "bottom_pants"
+            ],
+            "mutex_groups": [
+              "hot_pants_silhouette"
+            ]
+          }
+        },
+        {
+          "id": "hot_pants__tag_001",
+          "text": "tight hot pants",
+          "role": "variant",
+          "mutex_group": "hot_pants_silhouette",
+          "raw_lines": [
+            225
+          ],
+          "derivation": "derived",
+          "derivation_note": "派生自第225行热裤中文归口，细化为紧身热裤版型",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "bottom_pants"
+            ],
+            "mutex_groups": [
+              "hot_pants_silhouette"
+            ]
+          }
+        },
+        {
+          "id": "hot_pants__tag_002",
+          "text": "cheeky low rise short shorts",
+          "role": "combinable_attribute",
+          "mutex_group": "hot_pants_attr",
+          "raw_lines": [
+            225
+          ],
+          "derivation": "derived",
+          "derivation_note": "派生自第225行超短低腰贴身剪裁细节",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "bottom_pants"
+            ],
+            "mutex_groups": [
+              "hot_pants_attr"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "armored_skirt",
+      "name_zh": "披甲战裙 (Armored Skirt)",
+      "aliases": [
+        "tassets",
+        "fauld"
+      ],
+      "tags": [
+        {
+          "id": "armored_skirt__tag_000",
+          "text": "armored skirt",
+          "role": "core_base",
+          "mutex_group": "armored_skirt_silhouette",
+          "raw_lines": [
+            239
+          ],
+          "derivation": "verbatim",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "bottom_skirt"
+            ],
+            "mutex_groups": [
+              "armored_skirt_silhouette"
+            ]
+          }
+        },
+        {
+          "id": "armored_skirt__tag_001",
+          "text": "metal plate armored skirt",
+          "role": "variant",
+          "mutex_group": "armored_skirt_silhouette",
+          "raw_lines": [
+            239
+          ],
+          "derivation": "derived",
+          "derivation_note": "派生自第239行披甲战裙，细化为金属挂片护腿铠甲短裙版型",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "bottom_skirt"
+            ],
+            "mutex_groups": [
+              "armored_skirt_silhouette"
+            ]
+          }
+        },
+        {
+          "id": "armored_skirt__tag_002",
+          "text": "leather tassets over skirt",
+          "role": "combinable_attribute",
+          "mutex_group": "armored_skirt_attr",
+          "raw_lines": [
+            239
+          ],
+          "derivation": "product_extension",
+          "derivation_note": "产品扩写铠甲裙护腿皮带与甲片叠穿细节",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "bottom_skirt"
+            ],
+            "mutex_groups": [
+              "armored_skirt_attr"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "layered_skirt",
+      "name_zh": "多层蛋糕裙 (Layered Skirt)",
+      "aliases": [
+        "tiered_skirt"
+      ],
+      "tags": [
+        {
+          "id": "layered_skirt__tag_000",
+          "text": "layered skirt",
+          "role": "core_base",
+          "mutex_group": "layered_skirt_silhouette",
+          "raw_lines": [
+            147,
+            148
+          ],
+          "derivation": "verbatim",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "bottom_skirt"
+            ],
+            "mutex_groups": [
+              "layered_skirt_silhouette"
+            ]
+          }
+        },
+        {
+          "id": "layered_skirt__tag_001",
+          "text": "tiered ruffle skirt",
+          "role": "variant",
+          "mutex_group": "layered_skirt_silhouette",
+          "raw_lines": [
+            147
+          ],
+          "derivation": "derived",
+          "derivation_note": "派生自第147行多层蛋糕裙，细化为荷叶边分层裙版型",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "bottom_skirt"
+            ],
+            "mutex_groups": [
+              "layered_skirt_silhouette"
+            ]
+          }
+        },
+        {
+          "id": "layered_skirt__tag_002",
+          "text": "flowing tiered layered skirt",
+          "role": "combinable_attribute",
+          "mutex_group": "layered_skirt_attr",
+          "raw_lines": [
+            148
+          ],
+          "derivation": "derived",
+          "derivation_note": "派生自第148行分层贵族气质下摆细节",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "bottom_skirt"
+            ],
+            "mutex_groups": [
+              "layered_skirt_attr"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "leather_skirt",
+      "name_zh": "皮裙 (Leather Skirt)",
+      "aliases": [
+        "leather_miniskirt"
+      ],
+      "tags": [
+        {
+          "id": "leather_skirt__tag_000",
+          "text": "leather skirt",
+          "role": "core_base",
+          "mutex_group": "leather_skirt_silhouette",
+          "raw_lines": [
+            227
+          ],
+          "derivation": "verbatim",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "bottom_skirt"
+            ],
+            "mutex_groups": [
+              "leather_skirt_silhouette"
+            ]
+          }
+        },
+        {
+          "id": "leather_skirt__tag_001",
+          "text": "black leather miniskirt",
+          "role": "variant",
+          "mutex_group": "leather_skirt_silhouette",
+          "raw_lines": [
+            227
+          ],
+          "derivation": "derived",
+          "derivation_note": "派生自第227行皮裙，细化为机车黑色皮质超短裙版型",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "bottom_skirt"
+            ],
+            "mutex_groups": [
+              "leather_skirt_silhouette"
+            ]
+          }
+        },
+        {
+          "id": "leather_skirt__tag_002",
+          "text": "zippered leather skirt",
+          "role": "combinable_attribute",
+          "mutex_group": "leather_skirt_attr",
+          "raw_lines": [
+            227
+          ],
+          "derivation": "derived",
+          "derivation_note": "派生自第227行机车风金属拉链与纽扣装饰属性",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "bottom_skirt"
+            ],
+            "mutex_groups": [
+              "leather_skirt_attr"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "long_skirt",
+      "name_zh": "长裙 (Long Skirt)",
+      "aliases": [
+        "maxi_skirt"
+      ],
+      "tags": [
+        {
+          "id": "long_skirt__tag_000",
+          "text": "long skirt",
+          "role": "core_base",
+          "mutex_group": "long_skirt_silhouette",
+          "raw_lines": [
+            162
+          ],
+          "derivation": "verbatim",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "bottom_skirt"
+            ],
+            "mutex_groups": [
+              "long_skirt_silhouette"
+            ]
+          }
+        },
+        {
+          "id": "long_skirt__tag_001",
+          "text": "flowing maxi skirt",
+          "role": "variant",
+          "mutex_group": "long_skirt_silhouette",
+          "raw_lines": [
+            162
+          ],
+          "derivation": "derived",
+          "derivation_note": "派生自第162行长裙，细化为飘逸及踝半身长裙版型",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "bottom_skirt"
+            ],
+            "mutex_groups": [
+              "long_skirt_silhouette"
+            ]
+          }
+        },
+        {
+          "id": "long_skirt__tag_002",
+          "text": "ankle length skirt",
+          "role": "combinable_attribute",
+          "mutex_group": "long_skirt_attr",
+          "raw_lines": [
+            162
+          ],
+          "derivation": "derived",
+          "derivation_note": "派生自第162行及踝长度剪裁特征",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "bottom_skirt"
+            ],
+            "mutex_groups": [
+              "long_skirt_attr"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "microskirt",
+      "name_zh": "微型超短裙 (Microskirt)",
+      "aliases": [
+        "micro_skirt"
+      ],
+      "tags": [
+        {
+          "id": "microskirt__tag_000",
+          "text": "microskirt",
+          "role": "core_base",
+          "mutex_group": "microskirt_silhouette",
+          "raw_lines": [
+            170
+          ],
+          "derivation": "verbatim",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "bottom_skirt"
+            ],
+            "mutex_groups": [
+              "microskirt_silhouette"
+            ]
+          }
+        },
+        {
+          "id": "microskirt__tag_001",
+          "text": "ultra short microskirt",
+          "role": "variant",
+          "mutex_group": "microskirt_silhouette",
+          "raw_lines": [
+            170
+          ],
+          "derivation": "derived",
+          "derivation_note": "派生自第170行微型短裙，细化为齐臀极限超短裙版型",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "bottom_skirt"
+            ],
+            "mutex_groups": [
+              "microskirt_silhouette"
+            ]
+          }
+        },
+        {
+          "id": "microskirt__tag_002",
+          "text": "pelvic waistband microskirt",
+          "role": "combinable_attribute",
+          "mutex_group": "microskirt_attr",
+          "raw_lines": [
+            170
+          ],
+          "derivation": "derived",
+          "derivation_note": "派生自第170行超低腰紧窄腰围属性",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "bottom_skirt"
+            ],
+            "mutex_groups": [
+              "microskirt_attr"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "miniskirt",
+      "name_zh": "迷你超短裙 (Miniskirt)",
+      "aliases": [
+        "mini_skirt",
+        "short_skirt"
+      ],
+      "tags": [
+        {
+          "id": "miniskirt__tag_000",
+          "text": "miniskirt",
+          "role": "core_base",
+          "mutex_group": "miniskirt_silhouette",
+          "raw_lines": [
+            143,
+            156
+          ],
+          "derivation": "verbatim",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "bottom_skirt"
+            ],
+            "mutex_groups": [
+              "miniskirt_silhouette"
+            ]
+          }
+        },
+        {
+          "id": "miniskirt__tag_001",
+          "text": "tight fitted miniskirt",
+          "role": "variant",
+          "mutex_group": "miniskirt_silhouette",
+          "raw_lines": [
+            143
+          ],
+          "derivation": "derived",
+          "derivation_note": "派生自第143行超短裙，细化为修身包臀超短裙版型",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "bottom_skirt"
+            ],
+            "mutex_groups": [
+              "miniskirt_silhouette"
+            ]
+          }
+        },
+        {
+          "id": "miniskirt__tag_002",
+          "text": "flared miniskirt",
+          "role": "variant",
+          "mutex_group": "miniskirt_silhouette",
+          "raw_lines": [
+            156
+          ],
+          "derivation": "derived",
+          "derivation_note": "派生自第156行迷你裙，细化为A字微散裙摆版型，与紧身款互斥同组",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "bottom_skirt"
+            ],
+            "mutex_groups": [
+              "miniskirt_silhouette"
+            ]
+          }
+        },
+        {
+          "id": "miniskirt__tag_003",
+          "text": "high-waisted miniskirt",
+          "role": "combinable_attribute",
+          "mutex_group": "miniskirt_attr",
+          "raw_lines": [
+            143
+          ],
+          "derivation": "derived",
+          "derivation_note": "派生自第143行高腰显腿长通用结构属性，与紧身和微散版型均完全兼容",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "bottom_skirt"
+            ],
+            "mutex_groups": [
+              "miniskirt_attr"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "pencil_skirt",
+      "name_zh": "铅笔包臀裙 (Pencil Skirt)",
+      "aliases": [
+        "tight_skirt"
+      ],
+      "tags": [
+        {
+          "id": "pencil_skirt__tag_000",
+          "text": "pencil skirt",
+          "role": "core_base",
+          "mutex_group": "pencil_skirt_silhouette",
+          "raw_lines": [
+            155,
+            226
+          ],
+          "derivation": "verbatim",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "bottom_skirt"
+            ],
+            "mutex_groups": [
+              "pencil_skirt_silhouette"
+            ]
+          }
+        },
+        {
+          "id": "pencil_skirt__tag_001",
+          "text": "tight high-waisted pencil skirt",
+          "role": "variant",
+          "mutex_group": "pencil_skirt_silhouette",
+          "raw_lines": [
+            155
+          ],
+          "derivation": "derived",
+          "derivation_note": "派生自第155行铅笔裙，细化为高腰紧身包臀铅笔裙版型",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "bottom_skirt"
+            ],
+            "mutex_groups": [
+              "pencil_skirt_silhouette"
+            ]
+          }
+        },
+        {
+          "id": "pencil_skirt__tag_002",
+          "text": "formal knee-length pencil skirt",
+          "role": "combinable_attribute",
+          "mutex_group": "pencil_skirt_attr",
+          "raw_lines": [
+            226
+          ],
+          "derivation": "derived",
+          "derivation_note": "派生自第226行及膝正装职场包身属性",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "bottom_skirt"
+            ],
+            "mutex_groups": [
+              "pencil_skirt_attr"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "pettiskirt",
+      "name_zh": "蓬蓬衬裙 (Pettiskirt)",
+      "aliases": [
+        "crinoline"
+      ],
+      "tags": [
+        {
+          "id": "pettiskirt__tag_000",
+          "text": "pettiskirt",
+          "role": "core_base",
+          "mutex_group": "pettiskirt_silhouette",
+          "raw_lines": [
+            151
+          ],
+          "derivation": "verbatim",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "bottom_skirt"
+            ],
+            "mutex_groups": [
+              "pettiskirt_silhouette"
+            ]
+          }
+        },
+        {
+          "id": "pettiskirt__tag_001",
+          "text": "fluffy chiffon pettiskirt",
+          "role": "variant",
+          "mutex_group": "pettiskirt_silhouette",
+          "raw_lines": [
+            151
+          ],
+          "derivation": "derived",
+          "derivation_note": "派生自第151行蓬蓬裙，细化为蓬松雪纺网纱衬裙版型",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "bottom_skirt"
+            ],
+            "mutex_groups": [
+              "pettiskirt_silhouette"
+            ]
+          }
+        },
+        {
+          "id": "pettiskirt__tag_002",
+          "text": "ruffled voluminous pettiskirt",
+          "role": "combinable_attribute",
+          "mutex_group": "pettiskirt_attr",
+          "raw_lines": [
+            151
+          ],
+          "derivation": "derived",
+          "derivation_note": "派生自第151行荷叶边大体积支撑属性",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "bottom_skirt"
+            ],
+            "mutex_groups": [
+              "pettiskirt_attr"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "plaid_skirt",
+      "name_zh": "格子百褶裙 (Plaid Skirt)",
+      "aliases": [
+        "tartan_skirt"
+      ],
+      "tags": [
+        {
+          "id": "plaid_skirt__tag_000",
+          "text": "plaid skirt",
+          "role": "core_base",
+          "mutex_group": "plaid_skirt_silhouette",
+          "raw_lines": [
+            153
+          ],
+          "derivation": "verbatim",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "bottom_skirt"
+            ],
+            "mutex_groups": [
+              "plaid_skirt_silhouette"
+            ]
+          }
+        },
+        {
+          "id": "plaid_skirt__tag_001",
+          "text": "tartan pleated skirt",
+          "role": "variant",
+          "mutex_group": "plaid_skirt_silhouette",
+          "raw_lines": [
+            153,
+            238
+          ],
+          "derivation": "derived",
+          "derivation_note": "派生自第153行格子裙与第238行苏格兰格纹合并，细化为英伦学院风格子褶裙版型",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "bottom_skirt"
+            ],
+            "mutex_groups": [
+              "plaid_skirt_silhouette"
+            ]
+          }
+        },
+        {
+          "id": "plaid_skirt__tag_002",
+          "text": "tartan",
+          "role": "combinable_attribute",
+          "mutex_group": "plaid_skirt_attr",
+          "raw_lines": [
+            238
+          ],
+          "derivation": "verbatim",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "bottom_skirt"
+            ],
+            "mutex_groups": [
+              "plaid_skirt_attr"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "pleated_skirt",
+      "name_zh": "经典百褶裙 (Pleated Skirt)",
+      "aliases": [
+        "tennis_skirt",
+        "school_skirt"
+      ],
+      "tags": [
+        {
+          "id": "pleated_skirt__tag_000",
+          "text": "pleated skirt",
+          "role": "core_base",
+          "mutex_group": "pleated_skirt_silhouette",
+          "raw_lines": [
+            142,
+            224
+          ],
+          "derivation": "verbatim",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "bottom_skirt"
+            ],
+            "mutex_groups": [
+              "pleated_skirt_silhouette"
+            ]
+          }
+        },
+        {
+          "id": "pleated_skirt__tag_001",
+          "text": "black pleated skirt",
+          "role": "variant",
+          "mutex_group": "pleated_skirt_silhouette",
+          "raw_lines": [
+            171
+          ],
+          "derivation": "verbatim",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "bottom_skirt"
+            ],
+            "mutex_groups": [
+              "pleated_skirt_silhouette"
+            ]
+          }
+        },
+        {
+          "id": "pleated_skirt__tag_002",
+          "text": "school uniform pleated skirt",
+          "role": "combinable_attribute",
+          "mutex_group": "pleated_skirt_attr",
+          "raw_lines": [
+            142
+          ],
+          "derivation": "derived",
+          "derivation_note": "派生自第142行百褶裙，细化为学生制服规整压褶细节",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "bottom_skirt"
+            ],
+            "mutex_groups": [
+              "pleated_skirt_attr"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "pumpkin_skirt",
+      "name_zh": "南瓜裙 (Pumpkin Skirt)",
+      "aliases": [
+        "balloon_skirt"
+      ],
+      "tags": [
+        {
+          "id": "pumpkin_skirt__tag_000",
+          "text": "pumpkin skirt",
+          "role": "core_base",
+          "mutex_group": "pumpkin_skirt_silhouette",
+          "raw_lines": [
+            126
+          ],
+          "derivation": "verbatim",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "bottom_skirt"
+            ],
+            "mutex_groups": [
+              "pumpkin_skirt_silhouette"
+            ]
+          }
+        },
+        {
+          "id": "pumpkin_skirt__tag_001",
+          "text": "puffy balloon pumpkin skirt",
+          "role": "variant",
+          "mutex_group": "pumpkin_skirt_silhouette",
+          "raw_lines": [
+            126
+          ],
+          "derivation": "derived",
+          "derivation_note": "派生自第126行南瓜裙，细化为气球下摆膨胀南瓜短裙版型",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "bottom_skirt"
+            ],
+            "mutex_groups": [
+              "pumpkin_skirt_silhouette"
+            ]
+          }
+        },
+        {
+          "id": "pumpkin_skirt__tag_002",
+          "text": "gathered hem pumpkin skirt",
+          "role": "combinable_attribute",
+          "mutex_group": "pumpkin_skirt_attr",
+          "raw_lines": [
+            126
+          ],
+          "derivation": "derived",
+          "derivation_note": "派生自第126行下摆抽褶束口特征属性",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "bottom_skirt"
+            ],
+            "mutex_groups": [
+              "pumpkin_skirt_attr"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "rain_skirt",
+      "name_zh": "分体雨裙 (Rain Skirt)",
+      "aliases": [
+        "rainskirt"
+      ],
+      "tags": [
+        {
+          "id": "rain_skirt__tag_000",
+          "text": "rainskirt",
+          "role": "core_base",
+          "mutex_group": "rain_skirt_silhouette",
+          "raw_lines": [
+            163
+          ],
+          "derivation": "verbatim",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "bottom_skirt"
+            ],
+            "mutex_groups": [
+              "rain_skirt_silhouette"
+            ]
+          }
+        },
+        {
+          "id": "rain_skirt__tag_001",
+          "text": "waterproof wrap rain skirt",
+          "role": "variant",
+          "mutex_group": "rain_skirt_silhouette",
+          "raw_lines": [
+            163
+          ],
+          "derivation": "derived",
+          "derivation_note": "派生自第163行雨裙，细化为户外防水裹身雨裙版型",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "bottom_skirt"
+            ],
+            "mutex_groups": [
+              "rain_skirt_silhouette"
+            ]
+          }
+        },
+        {
+          "id": "rain_skirt__tag_002",
+          "text": "silnylon ultralight rain skirt",
+          "role": "combinable_attribute",
+          "mutex_group": "rain_skirt_attr",
+          "raw_lines": [
+            163
+          ],
+          "derivation": "product_extension",
+          "derivation_note": "产品扩写超轻硅胶尼龙防雨面料特征",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "bottom_skirt"
+            ],
+            "mutex_groups": [
+              "rain_skirt_attr"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "skirts_general",
+      "name_zh": "通用半身裙 (Skirts)",
+      "aliases": [
+        "casual_skirt"
+      ],
+      "tags": [
+        {
+          "id": "skirts_general__tag_000",
+          "text": "skirt",
+          "role": "core_base",
+          "mutex_group": "skirts_general_silhouette",
+          "raw_lines": [
+            141
+          ],
+          "derivation": "verbatim",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "bottom_skirt"
+            ],
+            "mutex_groups": [
+              "skirts_general_silhouette"
+            ]
+          }
+        },
+        {
+          "id": "skirts_general__tag_001",
+          "text": "casual everyday skirt",
+          "role": "variant",
+          "mutex_group": "skirts_general_silhouette",
+          "raw_lines": [
+            141
+          ],
+          "derivation": "derived",
+          "derivation_note": "派生自第141行裙子，细化为日常休闲通用单品半身裙版型",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "bottom_skirt"
+            ],
+            "mutex_groups": [
+              "skirts_general_silhouette"
+            ]
+          }
+        },
+        {
+          "id": "skirts_general__tag_002",
+          "text": "knee-length regular skirt",
+          "role": "combinable_attribute",
+          "mutex_group": "skirts_general_attr",
+          "raw_lines": [
+            141
+          ],
+          "derivation": "derived",
+          "derivation_note": "派生自第141行及膝常规裙摆属性",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "bottom_skirt"
+            ],
+            "mutex_groups": [
+              "skirts_general_attr"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "suspender_skirt",
+      "name_zh": "吊带裙 (Suspender Skirt)",
+      "aliases": [
+        "pinafore_skirt"
+      ],
+      "tags": [
+        {
+          "id": "suspender_skirt__tag_000",
+          "text": "suspender skirt",
+          "role": "core_base",
+          "mutex_group": "suspender_skirt_silhouette",
+          "raw_lines": [
+            172
+          ],
+          "derivation": "verbatim",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "bottom_skirt"
+            ],
+            "mutex_groups": [
+              "suspender_skirt_silhouette"
+            ]
+          }
+        },
+        {
+          "id": "suspender_skirt__tag_001",
+          "text": "high-waisted pinafore suspender skirt",
+          "role": "variant",
+          "mutex_group": "suspender_skirt_silhouette",
+          "raw_lines": [
+            172
+          ],
+          "derivation": "derived",
+          "derivation_note": "派生自第172行吊带裙，细化为高腰带肩带背带伞裙版型",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "bottom_skirt"
+            ],
+            "mutex_groups": [
+              "suspender_skirt_silhouette"
+            ]
+          }
+        },
+        {
+          "id": "suspender_skirt__tag_002",
+          "text": "shoulder strap suspender skirt",
+          "role": "combinable_attribute",
+          "mutex_group": "suspender_skirt_attr",
+          "raw_lines": [
+            172
+          ],
+          "derivation": "derived",
+          "derivation_note": "派生自第172行肩带与背带结构细节",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "bottom_skirt"
+            ],
+            "mutex_groups": [
+              "suspender_skirt_attr"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "tutu_skirt",
+      "name_zh": "芭蕾舞短裙 (Tutu Skirt)",
+      "aliases": [
+        "ballet_tutu"
+      ],
+      "tags": [
+        {
+          "id": "tutu_skirt__tag_000",
+          "text": "tutu",
+          "role": "core_base",
+          "mutex_group": "tutu_skirt_silhouette",
+          "raw_lines": [
+            152
+          ],
+          "derivation": "verbatim",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "bottom_skirt"
+            ],
+            "mutex_groups": [
+              "tutu_skirt_silhouette"
+            ]
+          }
+        },
+        {
+          "id": "tutu_skirt__tag_001",
+          "text": "tutu skirt",
+          "role": "variant",
+          "mutex_group": "tutu_skirt_silhouette",
+          "raw_lines": [
+            152
+          ],
+          "derivation": "derived",
+          "derivation_note": "派生自第152行芭蕾舞裙，细化为硬纱芭蕾短裙版型",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "bottom_skirt"
+            ],
+            "mutex_groups": [
+              "tutu_skirt_silhouette"
+            ]
+          }
+        },
+        {
+          "id": "tutu_skirt__tag_002",
+          "text": "ballerina tulle tutu",
+          "role": "combinable_attribute",
+          "mutex_group": "tutu_skirt_attr",
+          "raw_lines": [
+            152
+          ],
+          "derivation": "derived",
+          "derivation_note": "派生自第152行芭蕾硬网纱蓬起质感",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "bottom_skirt"
+            ],
+            "mutex_groups": [
+              "tutu_skirt_attr"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "waist_apron",
+      "name_zh": "半身腰围裙 (Waist Apron)",
+      "aliases": [
+        "half_apron"
+      ],
+      "tags": [
+        {
+          "id": "waist_apron__tag_000",
+          "text": "waist apron",
+          "role": "core_base",
+          "mutex_group": "waist_apron_silhouette",
+          "raw_lines": [
+            150
+          ],
+          "derivation": "verbatim",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "bottom_skirt"
+            ],
+            "mutex_groups": [
+              "waist_apron_silhouette"
+            ]
+          }
+        },
+        {
+          "id": "waist_apron__tag_001",
+          "text": "half apron tied at waist",
+          "role": "variant",
+          "mutex_group": "waist_apron_silhouette",
+          "raw_lines": [
+            150
+          ],
+          "derivation": "derived",
+          "derivation_note": "派生自第150行腰围裙，细化为系腰半截围裙版型",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "bottom_skirt"
+            ],
+            "mutex_groups": [
+              "waist_apron_silhouette"
+            ]
+          }
+        },
+        {
+          "id": "waist_apron__tag_002",
+          "text": "kitchen waist apron with pocket",
+          "role": "combinable_attribute",
+          "mutex_group": "waist_apron_attr",
+          "raw_lines": [
+            150
+          ],
+          "derivation": "derived",
+          "derivation_note": "派生自第150行服务员/厨房半身口袋属性",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "bottom_skirt"
+            ],
+            "mutex_groups": [
+              "waist_apron_attr"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "bikini_classic",
+      "name_zh": "经典比基尼 (Classic Bikini)",
+      "aliases": [
+        "two_piece_swimsuit"
+      ],
+      "tags": [
+        {
+          "id": "bikini_classic__tag_000",
+          "text": "bikini",
+          "role": "core_base",
+          "mutex_group": "bikini_classic_silhouette",
+          "raw_lines": [
+            1
+          ],
+          "derivation": "verbatim",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "underwear"
+            ],
+            "mutex_groups": [
+              "bikini_classic_silhouette"
+            ]
+          }
+        },
+        {
+          "id": "bikini_classic__tag_001",
+          "text": "two-piece bikini swimsuit",
+          "role": "variant",
+          "mutex_group": "bikini_classic_silhouette",
+          "raw_lines": [
+            1
+          ],
+          "derivation": "derived",
+          "derivation_note": "派生自第1行比基尼，细化为分体双件套传统比基尼版型",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "underwear"
+            ],
+            "mutex_groups": [
+              "bikini_classic_silhouette"
+            ]
+          }
+        },
+        {
+          "id": "bikini_classic__tag_002",
+          "text": "triangle bikini top and briefs",
+          "role": "combinable_attribute",
+          "mutex_group": "bikini_classic_attr",
+          "raw_lines": [
+            1
+          ],
+          "derivation": "derived",
+          "derivation_note": "派生自第1行三角罩杯与泳裤组合属性",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "underwear"
+            ],
+            "mutex_groups": [
+              "bikini_classic_attr"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "bikini_creative",
+      "name_zh": "创意奶牛比基尼 (Creative Cow Bikini)",
+      "aliases": [
+        "cow_print_bikini"
+      ],
+      "tags": [
+        {
+          "id": "bikini_creative__tag_000",
+          "text": "cow bikini",
+          "role": "core_base",
+          "mutex_group": "bikini_creative_silhouette",
+          "raw_lines": [
+            68
+          ],
+          "derivation": "verbatim",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "underwear"
+            ],
+            "mutex_groups": [
+              "bikini_creative_silhouette"
+            ]
+          }
+        },
+        {
+          "id": "bikini_creative__tag_001",
+          "text": "cow print bikini swimsuit",
+          "role": "variant",
+          "mutex_group": "bikini_creative_silhouette",
+          "raw_lines": [
+            68
+          ],
+          "derivation": "derived",
+          "derivation_note": "派生自第68行奶牛比基尼，细化为黑白奶牛斑纹创意分体泳装版型",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "underwear"
+            ],
+            "mutex_groups": [
+              "bikini_creative_silhouette"
+            ]
+          }
+        },
+        {
+          "id": "bikini_creative__tag_002",
+          "text": "bovine patterned bikini",
+          "role": "combinable_attribute",
+          "mutex_group": "bikini_creative_attr",
+          "raw_lines": [
+            68
+          ],
+          "derivation": "derived",
+          "derivation_note": "派生自第68行奶牛斑纹纹理细节",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "underwear"
+            ],
+            "mutex_groups": [
+              "bikini_creative_attr"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "bikini_strappy",
+      "name_zh": "绑带系绳比基尼 (Strappy String Bikini)",
+      "aliases": [
+        "string_bikini"
+      ],
+      "tags": [
+        {
+          "id": "bikini_strappy__tag_000",
+          "text": "string bikini",
+          "role": "core_base",
+          "mutex_group": "bikini_strappy_silhouette",
+          "raw_lines": [
+            2
+          ],
+          "derivation": "verbatim",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "underwear"
+            ],
+            "mutex_groups": [
+              "bikini_strappy_silhouette"
+            ]
+          }
+        },
+        {
+          "id": "bikini_strappy__tag_001",
+          "text": "front-tie bikini top",
+          "role": "variant",
+          "mutex_group": "bikini_strappy_silhouette",
+          "raw_lines": [
+            3
+          ],
+          "derivation": "verbatim",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "underwear"
+            ],
+            "mutex_groups": [
+              "bikini_strappy_silhouette"
+            ]
+          }
+        },
+        {
+          "id": "bikini_strappy__tag_002",
+          "text": "side-tie bikini bottom",
+          "role": "combinable_attribute",
+          "mutex_group": "bikini_strappy_attr",
+          "raw_lines": [
+            4
+          ],
+          "derivation": "verbatim",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "underwear"
+            ],
+            "mutex_groups": [
+              "bikini_strappy_attr"
+            ]
+          }
+        }
+      ]
     }
   ],
   "clothing_states": [

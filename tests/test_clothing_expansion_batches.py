@@ -2,14 +2,15 @@
 test_clothing_expansion_batches.py — 生产服装词库分批迁移行为、采样可达性与消解冲突门禁测试
 
 覆盖验证：
-1. Batch 1 (16 款上装) 逐款采样可达性：按 ID、按中文显示名、按别名精确命中；
-2. 随机采样全可达性：在随机模式下，万种子空间内 16 款新增款式均可被真实抽样命中；
+1. Batch 1 (16 款上装) 与 Batch 2 (22 款下装与内衣) 逐款采样可达性：按 ID、按中文显示名、按别名精确命中；
+2. 随机采样全可达性：在随机模式下，万种子空间内 38 款新增款式均可被真实抽样命中；
 3. 离散叶子标签独立性：多变体款式返回离散原子，绝无暴力拼接；
 4. 形制契约正反例：
-   - 正例：具备纽扣能力的款式 (shirts_blouses, combat_tactical 等) + unbuttoned 零 state_lacks_carrier 剔除；
-   - 反例：无纽扣能力的款式 (t_shirt, hoodie 等) + unbuttoned 被精准剔除并标记 state_lacks_carrier；
-   - 反例：上装 + lifted_up (掀裙) 均被精准剔除并标记 state_lacks_carrier；
-5. 真实节点端到端生成与 Provenance DAG 完整性。
+   - 纽扣能力：正例 (7 款) 验证具体动作词条留在 positive 且零 drop；反例 (31 款) 验证动作词条不漏出且 drop 标记 state_lacks_carrier；
+   - 裙装能力：正例 (16 款半身裙) 验证掀裙动作留在 positive 且零 drop；反例 (22 款上装/裤装/内衣) 验证动作词条不漏出且裤装标记 pants_state_conflict、其他标记 state_lacks_carrier；
+5. 真实节点端到端生成与 Provenance DAG 完整性；
+6. 四状态模式受控采样与叶子标签 100% 全覆盖 (Batch 1: 51 标签, Batch 2: 67 标签, 共 118 标签)；
+7. 存量 31 款兼容性与 596f43e 基线 930 用例全量黄金哈希保真。
 """
 from __future__ import annotations
 
@@ -45,6 +46,31 @@ BATCH_1_ITEMS = [
     ("volleyball_uniform", "排球服 (Volleyball Uniform)", ["volleyball_jersey"], False),
 ]
 
+BATCH_2_ITEMS = [
+    ("armored_skirt", "披甲战裙 (Armored Skirt)", ["tassets", "fauld"], False, True, ["bottom_skirt"]),
+    ("bikini_classic", "经典比基尼 (Classic Bikini)", ["two_piece_swimsuit"], False, False, ["underwear"]),
+    ("bikini_creative", "创意奶牛比基尼 (Creative Cow Bikini)", ["cow_print_bikini"], False, False, ["underwear"]),
+    ("bikini_strappy", "绑带系绳比基尼 (Strappy String Bikini)", ["string_bikini"], False, False, ["underwear"]),
+    ("black_leggings", "黑色紧身裤 (Black Leggings)", ["leggings", "tights"], False, False, ["bottom_pants"]),
+    ("denim_shorts", "牛仔短裤 (Denim Shorts)", ["jean_shorts", "cutoffs"], True, False, ["bottom_pants"]),
+    ("hot_pants", "热裤 (Hot Pants)", ["booty_shorts"], False, False, ["bottom_pants"]),
+    ("layered_skirt", "多层蛋糕裙 (Layered Skirt)", ["tiered_skirt"], False, True, ["bottom_skirt"]),
+    ("leather_skirt", "皮裙 (Leather Skirt)", ["leather_miniskirt"], True, True, ["bottom_skirt"]),
+    ("long_skirt", "长裙 (Long Skirt)", ["maxi_skirt"], False, True, ["bottom_skirt"]),
+    ("microskirt", "微型超短裙 (Microskirt)", ["micro_skirt"], False, True, ["bottom_skirt"]),
+    ("miniskirt", "迷你超短裙 (Miniskirt)", ["mini_skirt", "short_skirt"], False, True, ["bottom_skirt"]),
+    ("pencil_skirt", "铅笔包臀裙 (Pencil Skirt)", ["tight_skirt"], False, True, ["bottom_skirt"]),
+    ("pettiskirt", "蓬蓬衬裙 (Pettiskirt)", ["crinoline"], False, True, ["bottom_skirt"]),
+    ("plaid_skirt", "格子百褶裙 (Plaid Skirt)", ["tartan_skirt"], False, True, ["bottom_skirt"]),
+    ("pleated_skirt", "经典百褶裙 (Pleated Skirt)", ["tennis_skirt", "school_skirt"], False, True, ["bottom_skirt"]),
+    ("pumpkin_skirt", "南瓜裙 (Pumpkin Skirt)", ["balloon_skirt"], False, True, ["bottom_skirt"]),
+    ("rain_skirt", "分体雨裙 (Rain Skirt)", ["rainskirt"], False, True, ["bottom_skirt"]),
+    ("skirts_general", "通用半身裙 (Skirts)", ["casual_skirt"], False, True, ["bottom_skirt"]),
+    ("suspender_skirt", "吊带裙 (Suspender Skirt)", ["pinafore_skirt"], False, True, ["bottom_skirt"]),
+    ("tutu_skirt", "芭蕾舞短裙 (Tutu Skirt)", ["ballet_tutu"], False, True, ["bottom_skirt"]),
+    ("waist_apron", "半身腰围裙 (Waist Apron)", ["half_apron"], False, True, ["bottom_skirt"]),
+]
+
 
 class TestClothingExpansionBatches(unittest.TestCase):
     @classmethod
@@ -53,8 +79,8 @@ class TestClothingExpansionBatches(unittest.TestCase):
         cls.resolver = ConflictResolver(DATA_DIR)
         cls.generator = nodes.IYKYKPromptGenerator()
 
-    def test_01_batch_1_sampling_accessibility(self):
-        """逐款验证 Batch 1 16 款上装按规范 ID、中文显示名和别名均可精确采样。"""
+    def test_01_batch_1_and_2_sampling_accessibility(self):
+        """逐款验证 Batch 1 (16 款上装) 与 Batch 2 (22 款下装与内衣) 按规范 ID、中文显示名和别名均可精确采样。"""
         rng = Random(42)
         for cid, name_zh, aliases, _ in BATCH_1_ITEMS:
             # 1. 按规范 ID 采样
@@ -76,24 +102,48 @@ class TestClothingExpansionBatches(unittest.TestCase):
                 res_alias = self.sampler.sample_clothing_result(alias, "无 (None)", "L1", rng)
                 self.assertEqual(res_alias.style_id, cid)
 
-    def test_02_batch_1_random_reachability(self):
-        """验证 Batch 1 16 款上装在随机模式 (随机 (Random)) 下均可真实被抽中。"""
+        for cid, name_zh, aliases, _, _, topos in BATCH_2_ITEMS:
+            # 1. 按规范 ID 采样
+            res_id = self.sampler.sample_clothing_result(cid, "无 (None)", "L1", rng)
+            self.assertEqual(res_id.style_id, cid)
+            self.assertIn(len(res_id.base_tags), (1, 2))
+            for tag in res_id.base_tags:
+                self.assertEqual(tag.provenance.item_id, cid)
+                self.assertEqual(tag.provenance.kind, "base_clothing")
+                self.assertTrue(
+                    any(t in tag.facts.garment_topologies for t in topos),
+                    f"{cid} tag {tag.text} topologies {tag.facts.garment_topologies} disjoint from {topos}"
+                )
+
+            # 2. 按中文名称采样
+            res_name = self.sampler.sample_clothing_result(name_zh, "无 (None)", "L1", rng)
+            self.assertEqual(res_name.style_id, cid)
+            self.assertIn(len(res_name.base_tags), (1, 2))
+
+            # 3. 按别名采样
+            for alias in aliases:
+                res_alias = self.sampler.sample_clothing_result(alias, "无 (None)", "L1", rng)
+                self.assertEqual(res_alias.style_id, cid)
+
+    def test_02_batches_random_reachability(self):
+        """验证 Batch 1 (16 款) 与 Batch 2 (22 款) 共 38 款新增款式在随机模式 (随机 (Random)) 下均可真实被抽中。"""
         sampled_styles = set()
         rng = Random(2026)
-        # 47 款均匀抽取，抽样 2000 次，期望每款约 42 次，所有 16 款必须 100% 被覆盖
-        for _ in range(2000):
+        # 69 款均匀抽取，抽样 3000 次，期望每款约 43 次，所有 38 款必须 100% 被覆盖
+        for _ in range(3000):
             res = self.sampler.sample_clothing_result("随机 (Random)", "无 (None)", "L1", rng)
             if res.style_id:
                 sampled_styles.add(res.style_id)
 
-        target_b1_ids = {item[0] for item in BATCH_1_ITEMS}
-        unreached = target_b1_ids - sampled_styles
-        self.assertEqual(len(unreached), 0, f"Batch 1 styles never reached in random sampling: {unreached}")
+        target_ids = {item[0] for item in BATCH_1_ITEMS} | {item[0] for item in BATCH_2_ITEMS}
+        unreached = target_ids - sampled_styles
+        self.assertEqual(len(unreached), 0, f"Styles never reached in random sampling: {unreached}")
 
     def test_03_discrete_tag_syntax_and_word_count(self):
-        """验证 Batch 1 款式返回离散叶子标签，零语法破坏且词数处于合理受控范围。"""
+        """验证 Batch 1 与 Batch 2 共 38 款款式返回离散叶子标签，零语法破坏且词数处于合理受控范围。"""
         rng = Random(1234)
-        for cid, name_zh, _, _ in BATCH_1_ITEMS:
+        all_items = [(i[0], i[1]) for i in BATCH_1_ITEMS] + [(i[0], i[1]) for i in BATCH_2_ITEMS]
+        for cid, name_zh in all_items:
             res = self.sampler.sample_clothing_result(cid, "无 (None)", "L1", rng)
             for tag in res.base_tags:
                 validate_prompt_syntax(tag.text)
@@ -103,10 +153,16 @@ class TestClothingExpansionBatches(unittest.TestCase):
     def test_04_button_capability_positive_and_negative_matrix(self):
         """
         形制能力契约核验 (解扣状态 unbuttoned):
-        - 允许解扣的 5 款 (combat_tactical, convenience_store, fast_food_uniform, military_uniform, shirts_blouses): 零 state_lacks_carrier 剔除
-        - 禁止解扣的 11 款 (crop_top, fishnet_top, hoodie, knit_vest, sailor_shirt, sportswear_active, strapless_top, sweatshirt, t_shirt, tops_tanks, volleyball_uniform): unbuttoned 100% 被 Drop 并记录 state_lacks_carrier
+        严格验证具体动作词条 (buttons undone revealing cleavage / shirt open at chest) 真实生成或精准剔除：
+        - 正例：具备纽扣能力的款式 (Batch 1: 5 款, Batch 2: denim_shorts, leather_skirt 共 7 款)：
+          动作词条 100% 保留在 positive prompt 中，且决策报告中无相应动作的 Drop；
+        - 反例：无纽扣能力的款式 (Batch 1: 11 款, Batch 2: 20 款 共 31 款)：
+          动作词条绝对不出现在 positive prompt 中，且决策报告中必须明确记录 action == "drop" 且 reason_code == "state_lacks_carrier"。
         """
-        for cid, name_zh, _, button_allowed in BATCH_1_ITEMS:
+        btn_terms = ("buttons undone revealing cleavage", "shirt open at chest")
+        all_items = [(i[0], i[3]) for i in BATCH_1_ITEMS] + [(i[0], i[3]) for i in BATCH_2_ITEMS]
+
+        for cid, button_allowed in all_items:
             gen_res = self.generator.generate_structured(
                 场景预设="日常街道",
                 服装款式=cid,
@@ -117,26 +173,56 @@ class TestClothingExpansionBatches(unittest.TestCase):
             report = gen_res.resolution_report
             self.assertIsNotNone(report)
 
-            dropped_unbuttoned = any(
-                d.action == "drop"
-                and d.reason_code == "state_lacks_carrier"
+            dropped_btn_decisions = {
+                d.before_text: d
                 for d in report.decisions
-            )
+                if d.action == "drop" and d.before_text in btn_terms
+            }
 
             if button_allowed:
-                self.assertFalse(
-                    dropped_unbuttoned,
-                    f"Style {cid} has button capability, but unbuttoned was unexpectedly dropped with state_lacks_carrier!",
-                )
+                for bt in btn_terms:
+                    self.assertIn(
+                        bt,
+                        gen_res.positive,
+                        f"Style {cid} has button capability, but action '{bt}' is missing from positive prompt!",
+                    )
+                    self.assertNotIn(
+                        bt,
+                        dropped_btn_decisions,
+                        f"Style {cid} has button capability, but action '{bt}' was unexpectedly dropped!",
+                    )
             else:
-                self.assertTrue(
-                    dropped_unbuttoned,
-                    f"Style {cid} lacks button capability, but unbuttoned was NOT dropped with state_lacks_carrier!",
-                )
+                for bt in btn_terms:
+                    self.assertNotIn(
+                        bt,
+                        gen_res.positive,
+                        f"Style {cid} lacks button capability, but action '{bt}' leaked into positive prompt!",
+                    )
+                    self.assertIn(
+                        bt,
+                        dropped_btn_decisions,
+                        f"Style {cid} lacks button capability, but action '{bt}' was not dropped!",
+                    )
+                    self.assertEqual(
+                        dropped_btn_decisions[bt].reason_code,
+                        "state_lacks_carrier",
+                        f"Style {cid} dropped '{bt}' with unexpected reason {dropped_btn_decisions[bt].reason_code}",
+                    )
 
-    def test_05_skirt_capability_negative_all_tops_drop_lifted_skirt(self):
-        """形制能力契约核验 (掀裙状态 lifted_up): Batch 1 全部 16 款均为上装 (top)，与掀裙均互斥，lifted_up 必须 100% 被 Drop。"""
-        for cid, name_zh, _, _ in BATCH_1_ITEMS:
+    def test_05_skirt_capability_positive_and_negative_matrix(self):
+        """
+        形制能力契约核验 (掀裙状态 lifted_up):
+        严格验证具体动作词条 (skirt pulled up revealing panties / dress hitched up) 真实生成或精准剔除：
+        - 正例：具备裙装能力的款式 (Batch 2 的 16 款半身裙)：
+          动作词条 100% 保留在 positive prompt 中，且决策报告中无相应动作的 Drop；
+        - 反例：无裙装能力的款式 (Batch 1 的 16 款上装、Batch 2 的 3 款裤装及 3 款比基尼内衣 共 22 款)：
+          动作词条绝对不出现在 positive prompt 中，且决策报告中必须明确记录 action == "drop"；
+          其中裤装冲突原因严格为 pants_state_conflict，上装/内衣冲突原因严格为 state_lacks_carrier。
+        """
+        skirt_terms = ("skirt pulled up revealing panties", "dress hitched up")
+        all_items = [(i[0], False, ["top"]) for i in BATCH_1_ITEMS] + [(i[0], i[4], i[5]) for i in BATCH_2_ITEMS]
+
+        for cid, skirt_allowed, topos in all_items:
             gen_res = self.generator.generate_structured(
                 场景预设="日常街道",
                 服装款式=cid,
@@ -147,21 +233,51 @@ class TestClothingExpansionBatches(unittest.TestCase):
             report = gen_res.resolution_report
             self.assertIsNotNone(report)
 
-            dropped_lifted = any(
-                d.action == "drop"
-                and d.reason_code == "state_lacks_carrier"
+            dropped_skirt_decisions = {
+                d.before_text: d
                 for d in report.decisions
-            )
-            self.assertTrue(
-                dropped_lifted,
-                f"Top garment {cid} has no skirt, but lifted_up was not dropped with state_lacks_carrier!",
-            )
+                if d.action == "drop" and d.before_text in skirt_terms
+            }
+
+            if skirt_allowed:
+                for st in skirt_terms:
+                    self.assertIn(
+                        st,
+                        gen_res.positive,
+                        f"Skirt style {cid} has skirt capability, but action '{st}' is missing from positive prompt!",
+                    )
+                    self.assertNotIn(
+                        st,
+                        dropped_skirt_decisions,
+                        f"Skirt style {cid} has skirt capability, but action '{st}' was unexpectedly dropped!",
+                    )
+            else:
+                expected_reason = (
+                    "pants_state_conflict" if "bottom_pants" in topos else "state_lacks_carrier"
+                )
+                for st in skirt_terms:
+                    self.assertNotIn(
+                        st,
+                        gen_res.positive,
+                        f"Non-skirt style {cid} lacks skirt capability, but action '{st}' leaked into positive prompt!",
+                    )
+                    self.assertIn(
+                        st,
+                        dropped_skirt_decisions,
+                        f"Non-skirt style {cid} lacks skirt capability, but action '{st}' was not dropped!",
+                    )
+                    self.assertEqual(
+                        dropped_skirt_decisions[st].reason_code,
+                        expected_reason,
+                        f"Non-skirt style {cid} dropped '{st}' with unexpected reason {dropped_skirt_decisions[st].reason_code}, expected {expected_reason}",
+                    )
 
     def test_06_end_to_end_generation_and_dag_provenance(self):
-        """端到端验证 Batch 1 16 款上装在真实节点生成下的 Provenance DAG 完整性与零未消解冲突。"""
+        """端到端验证 Batch 1 (16 款) 与 Batch 2 (22 款) 共 38 款新增款式在真实节点生成下的 Provenance DAG 完整性与零未消解冲突。"""
         from tests.test_rc8_quality_gate import _verify_provenance_dag
 
-        for cid, name_zh, _, _ in BATCH_1_ITEMS:
+        all_items = [(i[0], i[1]) for i in BATCH_1_ITEMS] + [(i[0], i[1]) for i in BATCH_2_ITEMS]
+        for cid, name_zh in all_items:
             res = self.generator.generate_structured(
                 场景预设="日常街道",
                 剧情主题="随机 (Random)",
@@ -183,7 +299,8 @@ class TestClothingExpansionBatches(unittest.TestCase):
         2. 基础服装防空保留：在所有应保留基础服装的模式下，len(res.base_tags) >= 1；
         3. 版型与属性约束：恰有 1 个主款/变体 (core_base/variant)，至多 1 个可组合属性 (combinable_attribute)；
         4. 同组互斥严格为 1：res.base_tags 中绝不允许存在共享相同非空 mutex_group 的两个标签；
-        5. 全变体可达性 (Reachability)：对 16 款逐款多种子抽样，词库定义的每一个变体与属性均被真实采到，全批 51 个叶子变体 100% 可达。
+        5. 全变体可达性 (Reachability)：对 Batch 1 (16 款) 与 Batch 2 (22 款) 逐款多种子抽样，
+           词库定义的每一个变体与属性均被真实采到，Batch 1 51 个叶子标签与 Batch 2 67 个叶子标签 (共 118 个) 100% 可达。
         """
         with open(DATA_DIR / "clothing.json", "r", encoding="utf-8") as f:
             cdata = json.load(f)
@@ -202,67 +319,75 @@ class TestClothingExpansionBatches(unittest.TestCase):
             ("EXPLICIT_L4", "正常穿着 (Normal)", "L4"),
         ]
 
-        all_seen_tags = set()
-        for cid, _, _, _ in BATCH_1_ITEMS:
-            expected_tags = catalog_tags_by_id[cid]
-            seen_tags = set()
+        def run_batch_checks(batch_items, expected_batch_tag_count, batch_name):
+            all_seen_tags = set()
+            for item in batch_items:
+                cid = item[0]
+                expected_tags = catalog_tags_by_id[cid]
+                seen_tags = set()
 
-            for mode_name, state_opt, nudity_code in modes:
-                for seed in range(25):
-                    rng = Random(seed * 100 + 7)
-                    res = self.sampler.sample_clothing_result(cid, state_opt, nudity_code, rng)
+                for mode_name, state_opt, nudity_code in modes:
+                    for seed in range(25):
+                        rng = Random(seed * 100 + 7)
+                        res = self.sampler.sample_clothing_result(cid, state_opt, nudity_code, rng)
 
-                    # 1. 基础服装防空保留：必须存在基础款式标签
-                    self.assertGreaterEqual(
-                        len(res.base_tags),
-                        1,
-                        f"Category {cid} produced empty base_tags under mode {mode_name} with seed {seed}"
-                    )
-
-                    # 2. 恰有 1 个版型主款/变体 (role in core_base, variant)
-                    silhouettes = [t for t in res.base_tags if getattr(t, "role", None) in ("core_base", "variant")]
-                    self.assertEqual(
-                        len(silhouettes),
-                        1,
-                        f"Category {cid} expected exactly 1 silhouette variant, got {[t.text for t in silhouettes]} under {mode_name} seed {seed}"
-                    )
-
-                    # 3. 至多 1 个可组合属性 (role == combinable_attribute)
-                    attributes = [t for t in res.base_tags if getattr(t, "role", None) == "combinable_attribute"]
-                    self.assertLessEqual(
-                        len(attributes),
-                        1,
-                        f"Category {cid} expected at most 1 combinable attribute, got {[t.text for t in attributes]} under {mode_name} seed {seed}"
-                    )
-
-                    # 4. 强互斥不共存：同一互斥组至多 1 个
-                    used_mg_counts: dict[str, int] = {}
-                    for tag in res.base_tags:
-                        seen_tags.add(tag.text)
-                        all_seen_tags.add(tag.text)
-                        for mg in tag.facts.mutex_groups:
-                            used_mg_counts[mg] = used_mg_counts.get(mg, 0) + 1
-                    for mg, count in used_mg_counts.items():
-                        self.assertEqual(
-                            count,
+                        # 1. 基础服装防空保留：必须存在基础款式标签
+                        self.assertGreaterEqual(
+                            len(res.base_tags),
                             1,
-                            f"Category {cid} co-sampled {count} tags in same mutex_group '{mg}': {[t.text for t in res.base_tags]} under {mode_name} seed {seed}"
+                            f"Category {cid} produced empty base_tags under mode {mode_name} with seed {seed}"
                         )
 
-            # 5. 款内可达性验证：该款词库声明的每一个标签在不同种子下均能被实际采到
-            unreached = expected_tags - seen_tags
-            self.assertEqual(
-                len(unreached),
-                0,
-                f"Category {cid} has unreachable tags in controlled sampling: {unreached}"
-            )
+                        # 2. 恰有 1 个版型主款/变体 (role in core_base, variant)
+                        silhouettes = [t for t in res.base_tags if getattr(t, "role", None) in ("core_base", "variant")]
+                        self.assertEqual(
+                            len(silhouettes),
+                            1,
+                            f"Category {cid} expected exactly 1 silhouette variant, got {[t.text for t in silhouettes]} under {mode_name} seed {seed}"
+                        )
 
-        # 6. 全批可达性验证：Batch 1 声明的全部 51 个叶子标签必须全部被采到
-        self.assertEqual(
-            len(all_seen_tags),
-            51,
-            f"Expected all 51 leaf tags across Batch 1 to be reached, got {len(all_seen_tags)}"
-        )
+                        # 3. 至多 1 个可组合属性 (role == combinable_attribute)
+                        attributes = [t for t in res.base_tags if getattr(t, "role", None) == "combinable_attribute"]
+                        self.assertLessEqual(
+                            len(attributes),
+                            1,
+                            f"Category {cid} expected at most 1 combinable attribute, got {[t.text for t in attributes]} under {mode_name} seed {seed}"
+                        )
+
+                        # 4. 强互斥不共存：同一互斥组至多 1 个
+                        used_mg_counts: dict[str, int] = {}
+                        for tag in res.base_tags:
+                            seen_tags.add(tag.text)
+                            all_seen_tags.add(tag.text)
+                            for mg in tag.facts.mutex_groups:
+                                used_mg_counts[mg] = used_mg_counts.get(mg, 0) + 1
+                        for mg, count in used_mg_counts.items():
+                            self.assertEqual(
+                                count,
+                                1,
+                                f"Category {cid} co-sampled {count} tags in same mutex_group '{mg}': {[t.text for t in res.base_tags]} under {mode_name} seed {seed}"
+                            )
+
+                # 5. 款内可达性验证：该款词库声明的每一个标签在不同种子下均能被实际采到
+                unreached = expected_tags - seen_tags
+                self.assertEqual(
+                    len(unreached),
+                    0,
+                    f"Category {cid} in {batch_name} has unreachable tags in controlled sampling: {unreached}"
+                )
+
+            # 6. 全批可达性验证：该批声明的全部叶子标签必须全部被采到
+            self.assertEqual(
+                len(all_seen_tags),
+                expected_batch_tag_count,
+                f"Expected all {expected_batch_tag_count} leaf tags across {batch_name} to be reached, got {len(all_seen_tags)}"
+            )
+            return all_seen_tags
+
+        b1_seen = run_batch_checks(BATCH_1_ITEMS, 51, "Batch 1")
+        b2_seen = run_batch_checks(BATCH_2_ITEMS, 67, "Batch 2")
+        self.assertEqual(len(b1_seen | b2_seen), 118, "Combined Batch 1 + 2 reached leaf tags must be exactly 118")
+
 
     def test_08_legacy_31_styles_compatibility_and_rng_order(self):
         """

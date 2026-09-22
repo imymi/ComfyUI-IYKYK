@@ -112,6 +112,7 @@ ALLOWED_BUTTON_STYLES: Set[str] = {
     "clerical_priest", "military_uniform", "military_overcoat", "outerwear_coat",
     "outerwear_overcoat", "outerwear_jacket", "soft_shell_jacket", "rainwear_coat",
     "bathrobe", "combat_tactical", "convenience_store", "frock_smock", "hospital_gown",
+    "denim_shorts", "leather_skirt",
 }
 
 NON_SKIRT_ONE_PIECE: Set[str] = {
