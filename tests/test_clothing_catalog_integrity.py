@@ -251,6 +251,60 @@ BATCH_3_SPEC = {
     "winter_parka": {"topologies": ["outerwear"], "button": True, "skirt": False, "raw_lines": [88]},
 }
 
+# Batch 4: 连衣裙、连体衣与特定主题制服 23 款 ID 集合
+BATCH_4_IDS = frozenset({
+    "anime_cosplay",
+    "apron_dress",
+    "armored_dress",
+    "bathrobe",
+    "battle_robe",
+    "clerical_nun",
+    "clerical_priest",
+    "festive_costume",
+    "frock_smock",
+    "greek_toga",
+    "hospital_gown",
+    "leotard_bodysuit",
+    "racing_suit",
+    "robe_general",
+    "shinto_miko",
+    "slime_dress",
+    "swimsuit_classic",
+    "swimsuit_competition",
+    "swimsuit_creative",
+    "taoist_robe",
+    "witch_robe",
+    "wizard_robe",
+    "zentai_suit",
+})
+
+# Batch 4 规格与能力 SSOT 期望定义
+BATCH_4_SPEC = {
+    "anime_cosplay": {"topologies": ["one_piece"], "button": False, "skirt": False, "raw_lines": [104]},
+    "apron_dress": {"topologies": ["one_piece"], "button": False, "skirt": True, "raw_lines": [154, 213]},
+    "armored_dress": {"topologies": ["one_piece"], "button": False, "skirt": True, "raw_lines": [160, 161]},
+    "bathrobe": {"topologies": ["one_piece"], "button": True, "skirt": True, "raw_lines": [108]},
+    "battle_robe": {"topologies": ["one_piece"], "button": False, "skirt": True, "raw_lines": [138]},
+    "clerical_nun": {"topologies": ["one_piece"], "button": False, "skirt": True, "raw_lines": [59, 106]},
+    "clerical_priest": {"topologies": ["one_piece"], "button": True, "skirt": True, "raw_lines": [113]},
+    "festive_costume": {"topologies": ["one_piece"], "button": True, "skirt": True, "raw_lines": [49, 127]},
+    "frock_smock": {"topologies": ["one_piece"], "button": True, "skirt": True, "raw_lines": [131]},
+    "greek_toga": {"topologies": ["one_piece"], "button": False, "skirt": True, "raw_lines": [123]},
+    "hospital_gown": {"topologies": ["one_piece"], "button": True, "skirt": True, "raw_lines": [121]},
+    "leotard_bodysuit": {"topologies": ["one_piece"], "button": False, "skirt": False, "raw_lines": [17, 18, 19, 20, 26, 124]},
+    "racing_suit": {"topologies": ["one_piece"], "button": True, "skirt": False, "raw_lines": [41]},
+    "robe_general": {"topologies": ["one_piece"], "button": True, "skirt": True, "raw_lines": [85, 212]},
+    "shinto_miko": {"topologies": ["one_piece"], "button": False, "skirt": True, "raw_lines": [81, 217]},
+    "slime_dress": {"topologies": ["one_piece"], "button": False, "skirt": True, "raw_lines": [98]},
+    "swimsuit_classic": {"topologies": ["one_piece"], "button": False, "skirt": False, "raw_lines": [6]},
+    "swimsuit_competition": {"topologies": ["one_piece"], "button": False, "skirt": False, "raw_lines": [9]},
+    "swimsuit_creative": {"topologies": ["one_piece"], "button": False, "skirt": False, "raw_lines": [102, 164]},
+    "taoist_robe": {"topologies": ["one_piece"], "button": False, "skirt": True, "raw_lines": [132]},
+    "witch_robe": {"topologies": ["one_piece"], "button": False, "skirt": True, "raw_lines": [80]},
+    "wizard_robe": {"topologies": ["one_piece"], "button": False, "skirt": True, "raw_lines": [222]},
+    "zentai_suit": {"topologies": ["one_piece"], "button": False, "skirt": False, "raw_lines": [92]},
+}
+
 
 class TestClothingCatalogIntegrity(unittest.TestCase):
     @classmethod
@@ -261,22 +315,22 @@ class TestClothingCatalogIntegrity(unittest.TestCase):
         cls.cat_by_id = {c["id"]: c for c in cls.categories}
 
     def test_01_id_set_exact_equivalence(self):
-        """严格断言生产 ID 集合精确等于基线 31 款 ∪ Batch 1 16 款 ∪ Batch 2 22 款 ∪ Batch 3 23 款，共 92 款，多一漏一均直接报错。"""
+        """严格断言生产 ID 集合精确等于基线 31 款 ∪ Batch 1 16 款 ∪ Batch 2 22 款 ∪ Batch 3 23 款 ∪ Batch 4 23 款，共 115 款，多一漏一均直接报错。"""
         current_ids = set(self.cat_by_id.keys())
-        expected_ids = set(BASE_31_IDS | BATCH_1_IDS | BATCH_2_IDS | BATCH_3_IDS)
+        expected_ids = set(BASE_31_IDS | BATCH_1_IDS | BATCH_2_IDS | BATCH_3_IDS | BATCH_4_IDS)
 
         missing = expected_ids - current_ids
         unexpected = current_ids - expected_ids
 
         self.assertEqual(len(missing), 0, f"Missing category IDs in catalog: {missing}")
         self.assertEqual(len(unexpected), 0, f"Unexpected category IDs in catalog: {unexpected}")
-        self.assertEqual(len(current_ids), 92, f"Expected exactly 92 categories, got {len(current_ids)}")
+        self.assertEqual(len(current_ids), 115, f"Expected exactly 115 categories, got {len(current_ids)}")
 
     def test_02_capability_matrix(self):
-        """逐款核验 Batch 1, Batch 2, Batch 3 共 61 款形制能力与规格表 100% 吻合 (解扣、掀裙、拉链能力白名单)。"""
+        """逐款核验 Batch 1..4 共 84 款形制能力与规格表 100% 吻合 (解扣、掀裙、拉链能力白名单)。"""
         tag_id_pattern = re.compile(r"^[a-z][a-z0-9_]{2,95}$")
 
-        combined_specs = {**BATCH_1_SPEC, **BATCH_2_SPEC, **BATCH_3_SPEC}
+        combined_specs = {**BATCH_1_SPEC, **BATCH_2_SPEC, **BATCH_3_SPEC, **BATCH_4_SPEC}
         for cid, spec in combined_specs.items():
             self.assertIn(cid, self.cat_by_id, f"Category {cid} missing from catalog")
             cat = self.cat_by_id[cid]
@@ -314,12 +368,12 @@ class TestClothingCatalogIntegrity(unittest.TestCase):
             if spec.get("skirt", False):
                 self.assertNotIn(cid, NON_SKIRT_ONE_PIECE, f"{cid} must not be in NON_SKIRT_ONE_PIECE")
             else:
-                if cid in ("mecha_power_armor", "mecha_exoskeleton"):
+                if cid in ("mecha_power_armor", "mecha_exoskeleton") or "one_piece" in spec["topologies"]:
                     self.assertIn(cid, NON_SKIRT_ONE_PIECE, f"{cid} must be in NON_SKIRT_ONE_PIECE")
                 else:
                     self.assertNotIn(cid, NON_SKIRT_ONE_PIECE, f"{cid} must not be in NON_SKIRT_ONE_PIECE")
 
-            # 5. 拉链能力断言 (Batch 1, 2, 3 均未授权拉链开襟动作)
+            # 5. 拉链能力断言 (Batch 1, 2, 3, 4 均未授权拉链开襟动作)
             self.assertNotIn(cid, ALLOWED_ZIPPER_STYLES, f"{cid} must not be in ALLOWED_ZIPPER_STYLES")
 
     def test_03_discrete_leaf_tags_isolation(self):
@@ -351,19 +405,21 @@ class TestClothingCatalogIntegrity(unittest.TestCase):
                 self.assertEqual(tag["facts"]["garment_topologies"], ["outerwear"], f"{b3_cid} tag {tag['id']} must have topology ['outerwear']")
 
     def test_04_leaf_tag_count_and_metadata_integrity(self):
-        """严格核验 Batch 1 (51), Batch 2 (67), Batch 3 (75) 共 193 个叶子标签及其元数据完整性 (role, mutex_group, raw_lines, derivation)。"""
+        """严格核验 Batch 1 (51), Batch 2 (67), Batch 3 (75), Batch 4 (76) 四个新增批次累计269个叶子标签及其元数据完整性 (role, mutex_group, raw_lines, derivation)。"""
         b1_tags = [t for cid in BATCH_1_IDS for t in self.cat_by_id[cid].get("tags", [])]
         b2_tags = [t for cid in BATCH_2_IDS for t in self.cat_by_id[cid].get("tags", [])]
         b3_tags = [t for cid in BATCH_3_IDS for t in self.cat_by_id[cid].get("tags", [])]
+        b4_tags = [t for cid in BATCH_4_IDS for t in self.cat_by_id[cid].get("tags", [])]
         self.assertEqual(len(b1_tags), 51, f"Expected exactly 51 leaf tags in Batch 1, got {len(b1_tags)}")
         self.assertEqual(len(b2_tags), 67, f"Expected exactly 67 leaf tags in Batch 2, got {len(b2_tags)}")
         self.assertEqual(len(b3_tags), 75, f"Expected exactly 75 leaf tags in Batch 3, got {len(b3_tags)}")
+        self.assertEqual(len(b4_tags), 76, f"Expected exactly 76 leaf tags in Batch 4, got {len(b4_tags)}")
 
         mg_regex = re.compile(r"^[a-z][a-z0-9_]{2,95}$")
         valid_roles = {"core_base", "variant", "combinable_attribute"}
         valid_derivations = {"verbatim", "derived", "product_extension"}
 
-        for cid in sorted(BATCH_1_IDS | BATCH_2_IDS | BATCH_3_IDS):
+        for cid in sorted(BATCH_1_IDS | BATCH_2_IDS | BATCH_3_IDS | BATCH_4_IDS):
             cat = self.cat_by_id[cid]
             tags = cat.get("tags", [])
             has_core = False
@@ -407,7 +463,7 @@ class TestClothingCatalogIntegrity(unittest.TestCase):
         """双向核验原始 TSV 行与词库映射：
         1. 真实读取 TSV 原文，校验行号连续性与 100% 存在；
         2. 校验 verbatim 标签在 TSV 规范化原词中严格有据可查，杜绝凭空新增修饰；
-        3. 台账迁移行 100% 覆盖 (Batch 1: 27 行 + Batch 2: 30 行 + Batch 3: 45 行 = 102 行)，标签引用行真实存在且归口精确，多对一归并依据充分。
+        3. 台账迁移行 100% 覆盖 (Batch 1: 27 行 + Batch 2: 30 行 + Batch 3: 45 行 + Batch 4: 35 行 = 137 行)，标签引用行真实存在且归口精确，多对一归并依据充分。
         """
         self.assertTrue(LEDGER_PATH.exists(), f"Ledger file missing at {LEDGER_PATH}")
         self.assertTrue(RAW_TSV_PATH.exists(), f"TSV file missing at {RAW_TSV_PATH}")
@@ -441,8 +497,8 @@ class TestClothingCatalogIntegrity(unittest.TestCase):
                         forms.add(c.replace("frillded", "frilled"))
             return forms
 
-        # 2. 从迁移台账提取所有分配给 Batch 1, Batch 2, Batch 3 的原始行
-        target_ids_scope = set(BATCH_1_IDS | BATCH_2_IDS | BATCH_3_IDS)
+        # 2. 从迁移台账提取所有分配给 Batch 1, Batch 2, Batch 3, Batch 4 的原始行
+        target_ids_scope = set(BATCH_1_IDS | BATCH_2_IDS | BATCH_3_IDS | BATCH_4_IDS)
         ledger_text = LEDGER_PATH.read_text(encoding="utf-8")
         active_ledger_rows: dict[int, dict[str, str]] = {}
         for line in ledger_text.splitlines():
@@ -464,9 +520,9 @@ class TestClothingCatalogIntegrity(unittest.TestCase):
                     "reason": cols[12],
                 }
 
-        self.assertEqual(len(active_ledger_rows), 102, f"Expected 102 ledger rows targeting Batch 1, 2 & 3, got {len(active_ledger_rows)}")
+        self.assertEqual(len(active_ledger_rows), 137, f"Expected 137 ledger rows targeting Batch 1, 2, 3 & 4, got {len(active_ledger_rows)}")
 
-        # 3. 方向一 (Ledger -> Tags): 台账中分配给 Batch 1 & 2 的每一行在词库中均有对应标签与来源行号标注
+        # 3. 方向一 (Ledger -> Tags): 台账中分配给 Batch 1..4 的每一行在词库中均有对应标签与来源行号标注
         catalog_rows_by_cid: dict[str, set[int]] = {cid: set() for cid in target_ids_scope}
         for cid in target_ids_scope:
             for tag in self.cat_by_id[cid].get("tags", []):

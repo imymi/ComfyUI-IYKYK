@@ -6188,6 +6188,1775 @@
           "derivation_note": "winter_parka 款式 combinable_attribute 特征细化扩写"
         }
       ]
+    },
+    {
+      "id": "anime_cosplay",
+      "name_zh": "不知火舞 (Mai Shiranui Cosplay)",
+      "aliases": [
+        "mai_shiranui",
+        "shiranui_mai_costume"
+      ],
+      "tags": [
+        {
+          "id": "anime_cosplay__tag_000",
+          "text": "mai shiranui",
+          "role": "core_base",
+          "mutex_group": "anime_cosplay_silhouette",
+          "raw_lines": [
+            104
+          ],
+          "derivation": "verbatim",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "one_piece"
+            ],
+            "mutex_groups": [
+              "anime_cosplay_silhouette"
+            ]
+          },
+          "derivation_note": "台账第[104]行原文直译建立"
+        },
+        {
+          "id": "anime_cosplay__tag_001",
+          "text": "mai shiranui ninja outfit",
+          "role": "variant",
+          "mutex_group": "anime_cosplay_silhouette",
+          "raw_lines": [
+            104
+          ],
+          "derivation": "derived",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "one_piece"
+            ],
+            "mutex_groups": [
+              "anime_cosplay_silhouette"
+            ]
+          },
+          "derivation_note": "anime_cosplay 款式 variant 特征细化扩写"
+        },
+        {
+          "id": "anime_cosplay__tag_002",
+          "text": "red sleeveless ninja kimono dress",
+          "role": "combinable_attribute",
+          "mutex_group": "anime_cosplay_attr",
+          "raw_lines": [
+            104
+          ],
+          "derivation": "product_extension",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "one_piece"
+            ],
+            "mutex_groups": [
+              "anime_cosplay_attr"
+            ]
+          },
+          "derivation_note": "anime_cosplay 款式 combinable_attribute 特征细化扩写"
+        }
+      ]
+    },
+    {
+      "id": "apron_dress",
+      "name_zh": "全身围裙 (Apron Dress)",
+      "aliases": [
+        "pinafore_dress",
+        "full_apron"
+      ],
+      "tags": [
+        {
+          "id": "apron_dress__tag_000",
+          "text": "apron",
+          "role": "core_base",
+          "mutex_group": "apron_dress_silhouette",
+          "raw_lines": [
+            154,
+            213
+          ],
+          "derivation": "verbatim",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "one_piece"
+            ],
+            "mutex_groups": [
+              "apron_dress_silhouette"
+            ]
+          },
+          "derivation_note": "台账第[154, 213]行原文直译建立"
+        },
+        {
+          "id": "apron_dress__tag_001",
+          "text": "white apron dress",
+          "role": "variant",
+          "mutex_group": "apron_dress_silhouette",
+          "raw_lines": [
+            154,
+            213
+          ],
+          "derivation": "derived",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "one_piece"
+            ],
+            "mutex_groups": [
+              "apron_dress_silhouette"
+            ]
+          },
+          "derivation_note": "apron_dress 款式 variant 特征细化扩写"
+        },
+        {
+          "id": "apron_dress__tag_002",
+          "text": "frilled pinafore apron with back tie",
+          "role": "combinable_attribute",
+          "mutex_group": "apron_dress_attr",
+          "raw_lines": [
+            154,
+            213
+          ],
+          "derivation": "product_extension",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "one_piece"
+            ],
+            "mutex_groups": [
+              "apron_dress_attr"
+            ]
+          },
+          "derivation_note": "apron_dress 款式 combinable_attribute 特征细化扩写"
+        }
+      ]
+    },
+    {
+      "id": "armored_dress",
+      "name_zh": "铠装连衣裙 (Armored Dress)",
+      "aliases": [
+        "battle_dress_armor",
+        "armored_gown"
+      ],
+      "tags": [
+        {
+          "id": "armored_dress__tag_000",
+          "text": "armored dress",
+          "role": "core_base",
+          "mutex_group": "armored_dress_silhouette",
+          "raw_lines": [
+            160,
+            161
+          ],
+          "derivation": "verbatim",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "one_piece"
+            ],
+            "mutex_groups": [
+              "armored_dress_silhouette"
+            ]
+          },
+          "derivation_note": "台账第[160, 161]行原文直译建立"
+        },
+        {
+          "id": "armored_dress__tag_001",
+          "text": "knight armored battle dress",
+          "role": "variant",
+          "mutex_group": "armored_dress_silhouette",
+          "raw_lines": [
+            160,
+            161
+          ],
+          "derivation": "derived",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "one_piece"
+            ],
+            "mutex_groups": [
+              "armored_dress_silhouette"
+            ]
+          },
+          "derivation_note": "armored_dress 款式 variant 特征细化扩写"
+        },
+        {
+          "id": "armored_dress__tag_002",
+          "text": "steel pauldrons and armored skirt plates",
+          "role": "combinable_attribute",
+          "mutex_group": "armored_dress_attr",
+          "raw_lines": [
+            160,
+            161
+          ],
+          "derivation": "product_extension",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "one_piece"
+            ],
+            "mutex_groups": [
+              "armored_dress_attr"
+            ]
+          },
+          "derivation_note": "armored_dress 款式 combinable_attribute 特征细化扩写"
+        }
+      ]
+    },
+    {
+      "id": "bathrobe",
+      "name_zh": "浴袍 (Bathrobe)",
+      "aliases": [
+        "spa_robe",
+        "terrycloth_robe"
+      ],
+      "tags": [
+        {
+          "id": "bathrobe__tag_000",
+          "text": "bathrobe",
+          "role": "core_base",
+          "mutex_group": "bathrobe_silhouette",
+          "raw_lines": [
+            108
+          ],
+          "derivation": "verbatim",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "one_piece"
+            ],
+            "mutex_groups": [
+              "bathrobe_silhouette"
+            ]
+          },
+          "derivation_note": "台账第[108]行原文直译建立"
+        },
+        {
+          "id": "bathrobe__tag_001",
+          "text": "terrycloth bathrobe",
+          "role": "variant",
+          "mutex_group": "bathrobe_silhouette",
+          "raw_lines": [
+            108
+          ],
+          "derivation": "derived",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "one_piece"
+            ],
+            "mutex_groups": [
+              "bathrobe_silhouette"
+            ]
+          },
+          "derivation_note": "bathrobe 款式 variant 特征细化扩写"
+        },
+        {
+          "id": "bathrobe__tag_002",
+          "text": "belted waist sash bathrobe",
+          "role": "combinable_attribute",
+          "mutex_group": "bathrobe_attr",
+          "raw_lines": [
+            108
+          ],
+          "derivation": "product_extension",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "one_piece"
+            ],
+            "mutex_groups": [
+              "bathrobe_attr"
+            ]
+          },
+          "derivation_note": "bathrobe 款式 combinable_attribute 特征细化扩写"
+        }
+      ]
+    },
+    {
+      "id": "battle_robe",
+      "name_zh": "战袍 (Battle Robe)",
+      "aliases": [
+        "combat_robe",
+        "warrior_robe"
+      ],
+      "tags": [
+        {
+          "id": "battle_robe__tag_000",
+          "text": "battle robe",
+          "role": "core_base",
+          "mutex_group": "battle_robe_silhouette",
+          "raw_lines": [
+            138
+          ],
+          "derivation": "verbatim",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "one_piece"
+            ],
+            "mutex_groups": [
+              "battle_robe_silhouette"
+            ]
+          },
+          "derivation_note": "台账第[138]行原文直译建立"
+        },
+        {
+          "id": "battle_robe__tag_001",
+          "text": "flowing combat battle robe",
+          "role": "variant",
+          "mutex_group": "battle_robe_silhouette",
+          "raw_lines": [
+            138
+          ],
+          "derivation": "derived",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "one_piece"
+            ],
+            "mutex_groups": [
+              "battle_robe_silhouette"
+            ]
+          },
+          "derivation_note": "battle_robe 款式 variant 特征细化扩写"
+        },
+        {
+          "id": "battle_robe__tag_002",
+          "text": "reinforced hem split warrior robe",
+          "role": "combinable_attribute",
+          "mutex_group": "battle_robe_attr",
+          "raw_lines": [
+            138
+          ],
+          "derivation": "product_extension",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "one_piece"
+            ],
+            "mutex_groups": [
+              "battle_robe_attr"
+            ]
+          },
+          "derivation_note": "battle_robe 款式 combinable_attribute 特征细化扩写"
+        }
+      ]
+    },
+    {
+      "id": "clerical_nun",
+      "name_zh": "修女服 (Nun Habit)",
+      "aliases": [
+        "nun_habit",
+        "convent_habit"
+      ],
+      "tags": [
+        {
+          "id": "clerical_nun__tag_000",
+          "text": "nun gown",
+          "role": "core_base",
+          "mutex_group": "clerical_nun_silhouette",
+          "raw_lines": [
+            59
+          ],
+          "derivation": "verbatim",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "one_piece"
+            ],
+            "mutex_groups": [
+              "clerical_nun_silhouette"
+            ]
+          },
+          "derivation_note": "台账第[59]行原文直译建立"
+        },
+        {
+          "id": "clerical_nun__tag_001",
+          "text": "nun",
+          "role": "variant",
+          "mutex_group": "clerical_nun_silhouette",
+          "raw_lines": [
+            106
+          ],
+          "derivation": "verbatim",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "one_piece"
+            ],
+            "mutex_groups": [
+              "clerical_nun_silhouette"
+            ]
+          },
+          "derivation_note": "台账第[106]行原文直译建立"
+        },
+        {
+          "id": "clerical_nun__tag_002",
+          "text": "traditional Catholic nun habit",
+          "role": "variant",
+          "mutex_group": "clerical_nun_silhouette",
+          "raw_lines": [
+            59,
+            106
+          ],
+          "derivation": "derived",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "one_piece"
+            ],
+            "mutex_groups": [
+              "clerical_nun_silhouette"
+            ]
+          },
+          "derivation_note": "clerical_nun 款式 variant 特征细化扩写"
+        },
+        {
+          "id": "clerical_nun__tag_003",
+          "text": "white wimple veil and cross pendant",
+          "role": "combinable_attribute",
+          "mutex_group": "clerical_nun_attr",
+          "raw_lines": [
+            59,
+            106
+          ],
+          "derivation": "product_extension",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "one_piece"
+            ],
+            "mutex_groups": [
+              "clerical_nun_attr"
+            ]
+          },
+          "derivation_note": "clerical_nun 款式 combinable_attribute 特征细化扩写"
+        }
+      ]
+    },
+    {
+      "id": "clerical_priest",
+      "name_zh": "神父修生黑袍 (Priest Cassock)",
+      "aliases": [
+        "cassock",
+        "priest_robe"
+      ],
+      "tags": [
+        {
+          "id": "clerical_priest__tag_000",
+          "text": "cassock",
+          "role": "core_base",
+          "mutex_group": "clerical_priest_silhouette",
+          "raw_lines": [
+            113
+          ],
+          "derivation": "verbatim",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "one_piece"
+            ],
+            "mutex_groups": [
+              "clerical_priest_silhouette"
+            ]
+          },
+          "derivation_note": "台账第[113]行原文直译建立"
+        },
+        {
+          "id": "clerical_priest__tag_001",
+          "text": "black clerical cassock robe",
+          "role": "variant",
+          "mutex_group": "clerical_priest_silhouette",
+          "raw_lines": [
+            113
+          ],
+          "derivation": "derived",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "one_piece"
+            ],
+            "mutex_groups": [
+              "clerical_priest_silhouette"
+            ]
+          },
+          "derivation_note": "clerical_priest 款式 variant 特征细化扩写"
+        },
+        {
+          "id": "clerical_priest__tag_002",
+          "text": "single-breasted clerical collar cassock",
+          "role": "combinable_attribute",
+          "mutex_group": "clerical_priest_attr",
+          "raw_lines": [
+            113
+          ],
+          "derivation": "product_extension",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "one_piece"
+            ],
+            "mutex_groups": [
+              "clerical_priest_attr"
+            ]
+          },
+          "derivation_note": "clerical_priest 款式 combinable_attribute 特征细化扩写"
+        }
+      ]
+    },
+    {
+      "id": "festive_costume",
+      "name_zh": "节日圣诞装 (Festive Santa Costume)",
+      "aliases": [
+        "santa_costume",
+        "christmas_outfit"
+      ],
+      "tags": [
+        {
+          "id": "festive_costume__tag_000",
+          "text": "santa",
+          "role": "core_base",
+          "mutex_group": "festive_costume_silhouette",
+          "raw_lines": [
+            49
+          ],
+          "derivation": "verbatim",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "one_piece"
+            ],
+            "mutex_groups": [
+              "festive_costume_silhouette"
+            ]
+          },
+          "derivation_note": "台账第[49]行原文直译建立"
+        },
+        {
+          "id": "festive_costume__tag_001",
+          "text": "halloween costume",
+          "role": "variant",
+          "mutex_group": "festive_costume_silhouette",
+          "raw_lines": [
+            127
+          ],
+          "derivation": "verbatim",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "one_piece"
+            ],
+            "mutex_groups": [
+              "festive_costume_silhouette"
+            ]
+          },
+          "derivation_note": "台账第[127]行原文直译建立"
+        },
+        {
+          "id": "festive_costume__tag_002",
+          "text": "festive holiday costume",
+          "role": "variant",
+          "mutex_group": "festive_costume_silhouette",
+          "raw_lines": [
+            49,
+            127
+          ],
+          "derivation": "derived",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "one_piece"
+            ],
+            "mutex_groups": [
+              "festive_costume_silhouette"
+            ]
+          },
+          "derivation_note": "festive_costume 款式 variant 特征细化扩写"
+        },
+        {
+          "id": "festive_costume__tag_003",
+          "text": "festive party accents with decorative ribbon trim",
+          "role": "combinable_attribute",
+          "mutex_group": "festive_costume_attr",
+          "raw_lines": [
+            49,
+            127
+          ],
+          "derivation": "product_extension",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "one_piece"
+            ],
+            "mutex_groups": [
+              "festive_costume_attr"
+            ]
+          },
+          "derivation_note": "festive_costume 款式 combinable_attribute 特征细化扩写"
+        }
+      ]
+    },
+    {
+      "id": "frock_smock",
+      "name_zh": "工装罩衫 (Frock / Smock)",
+      "aliases": [
+        "artist_smock",
+        "work_frock"
+      ],
+      "tags": [
+        {
+          "id": "frock_smock__tag_000",
+          "text": "frock",
+          "role": "core_base",
+          "mutex_group": "frock_smock_silhouette",
+          "raw_lines": [
+            131
+          ],
+          "derivation": "verbatim",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "one_piece"
+            ],
+            "mutex_groups": [
+              "frock_smock_silhouette"
+            ]
+          },
+          "derivation_note": "台账第[131]行原文直译建立"
+        },
+        {
+          "id": "frock_smock__tag_001",
+          "text": "loose artist smock frock",
+          "role": "variant",
+          "mutex_group": "frock_smock_silhouette",
+          "raw_lines": [
+            131
+          ],
+          "derivation": "derived",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "one_piece"
+            ],
+            "mutex_groups": [
+              "frock_smock_silhouette"
+            ]
+          },
+          "derivation_note": "frock_smock 款式 variant 特征细化扩写"
+        },
+        {
+          "id": "frock_smock__tag_002",
+          "text": "linen painter smock with button placket",
+          "role": "combinable_attribute",
+          "mutex_group": "frock_smock_attr",
+          "raw_lines": [
+            131
+          ],
+          "derivation": "product_extension",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "one_piece"
+            ],
+            "mutex_groups": [
+              "frock_smock_attr"
+            ]
+          },
+          "derivation_note": "frock_smock 款式 combinable_attribute 特征细化扩写"
+        }
+      ]
+    },
+    {
+      "id": "greek_toga",
+      "name_zh": "古希腊托加/佩普洛斯 (Greek Toga / Peplos)",
+      "aliases": [
+        "peplos",
+        "chiton"
+      ],
+      "tags": [
+        {
+          "id": "greek_toga__tag_000",
+          "text": "greek clothes",
+          "role": "core_base",
+          "mutex_group": "greek_toga_silhouette",
+          "raw_lines": [
+            123
+          ],
+          "derivation": "verbatim",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "one_piece"
+            ],
+            "mutex_groups": [
+              "greek_toga_silhouette"
+            ]
+          },
+          "derivation_note": "台账第[123]行原文直译建立"
+        },
+        {
+          "id": "greek_toga__tag_001",
+          "text": "ancient greek toga",
+          "role": "variant",
+          "mutex_group": "greek_toga_silhouette",
+          "raw_lines": [
+            123
+          ],
+          "derivation": "derived",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "one_piece"
+            ],
+            "mutex_groups": [
+              "greek_toga_silhouette"
+            ]
+          },
+          "derivation_note": "greek_toga 款式 variant 特征细化扩写"
+        },
+        {
+          "id": "greek_toga__tag_002",
+          "text": "draped white chiton with gold trim",
+          "role": "combinable_attribute",
+          "mutex_group": "greek_toga_attr",
+          "raw_lines": [
+            123
+          ],
+          "derivation": "product_extension",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "one_piece"
+            ],
+            "mutex_groups": [
+              "greek_toga_attr"
+            ]
+          },
+          "derivation_note": "greek_toga 款式 combinable_attribute 特征细化扩写"
+        }
+      ]
+    },
+    {
+      "id": "hospital_gown",
+      "name_zh": "病号服 (Hospital Gown)",
+      "aliases": [
+        "patient_gown",
+        "medical_gown"
+      ],
+      "tags": [
+        {
+          "id": "hospital_gown__tag_000",
+          "text": "hospital gown",
+          "role": "core_base",
+          "mutex_group": "hospital_gown_silhouette",
+          "raw_lines": [
+            121
+          ],
+          "derivation": "verbatim",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "one_piece"
+            ],
+            "mutex_groups": [
+              "hospital_gown_silhouette"
+            ]
+          },
+          "derivation_note": "台账第[121]行原文直译建立"
+        },
+        {
+          "id": "hospital_gown__tag_001",
+          "text": "light blue patient hospital gown",
+          "role": "variant",
+          "mutex_group": "hospital_gown_silhouette",
+          "raw_lines": [
+            121
+          ],
+          "derivation": "derived",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "one_piece"
+            ],
+            "mutex_groups": [
+              "hospital_gown_silhouette"
+            ]
+          },
+          "derivation_note": "hospital_gown 款式 variant 特征细化扩写"
+        },
+        {
+          "id": "hospital_gown__tag_002",
+          "text": "back-tie loose cotton hospital gown",
+          "role": "combinable_attribute",
+          "mutex_group": "hospital_gown_attr",
+          "raw_lines": [
+            121
+          ],
+          "derivation": "product_extension",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "one_piece"
+            ],
+            "mutex_groups": [
+              "hospital_gown_attr"
+            ]
+          },
+          "derivation_note": "hospital_gown 款式 combinable_attribute 特征细化扩写"
+        }
+      ]
+    },
+    {
+      "id": "leotard_bodysuit",
+      "name_zh": "连体紧身衣 (Leotard Bodysuit)",
+      "aliases": [
+        "dance_leotard",
+        "gymnastics_bodysuit"
+      ],
+      "tags": [
+        {
+          "id": "leotard_bodysuit__tag_000",
+          "text": "leotard",
+          "role": "core_base",
+          "mutex_group": "leotard_bodysuit_silhouette",
+          "raw_lines": [
+            17,
+            124
+          ],
+          "derivation": "verbatim",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "one_piece"
+            ],
+            "mutex_groups": [
+              "leotard_bodysuit_silhouette"
+            ]
+          },
+          "derivation_note": "台账第[17, 124]行原文直译建立"
+        },
+        {
+          "id": "leotard_bodysuit__tag_001",
+          "text": "strapless leotard",
+          "role": "variant",
+          "mutex_group": "leotard_bodysuit_silhouette",
+          "raw_lines": [
+            18
+          ],
+          "derivation": "verbatim",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "one_piece"
+            ],
+            "mutex_groups": [
+              "leotard_bodysuit_silhouette"
+            ]
+          },
+          "derivation_note": "台账第[18]行原文直译建立"
+        },
+        {
+          "id": "leotard_bodysuit__tag_002",
+          "text": "highleg leotard",
+          "role": "variant",
+          "mutex_group": "leotard_bodysuit_silhouette",
+          "raw_lines": [
+            19
+          ],
+          "derivation": "verbatim",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "one_piece"
+            ],
+            "mutex_groups": [
+              "leotard_bodysuit_silhouette"
+            ]
+          },
+          "derivation_note": "台账第[19]行原文直译建立"
+        },
+        {
+          "id": "leotard_bodysuit__tag_003",
+          "text": "thong leotard",
+          "role": "variant",
+          "mutex_group": "leotard_bodysuit_silhouette",
+          "raw_lines": [
+            20
+          ],
+          "derivation": "verbatim",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "one_piece"
+            ],
+            "mutex_groups": [
+              "leotard_bodysuit_silhouette"
+            ]
+          },
+          "derivation_note": "台账第[20]行原文直译建立"
+        },
+        {
+          "id": "leotard_bodysuit__tag_004",
+          "text": "bodysuit",
+          "role": "variant",
+          "mutex_group": "leotard_bodysuit_silhouette",
+          "raw_lines": [
+            26
+          ],
+          "derivation": "verbatim",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "one_piece"
+            ],
+            "mutex_groups": [
+              "leotard_bodysuit_silhouette"
+            ]
+          },
+          "derivation_note": "台账第[26]行原文直译建立"
+        },
+        {
+          "id": "leotard_bodysuit__tag_005",
+          "text": "sleeveless athletic gymnastics leotard",
+          "role": "variant",
+          "mutex_group": "leotard_bodysuit_silhouette",
+          "raw_lines": [
+            17,
+            124
+          ],
+          "derivation": "derived",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "one_piece"
+            ],
+            "mutex_groups": [
+              "leotard_bodysuit_silhouette"
+            ]
+          },
+          "derivation_note": "leotard_bodysuit 款式 variant 特征细化扩写"
+        },
+        {
+          "id": "leotard_bodysuit__tag_006",
+          "text": "stretchy spandex fitted leotard",
+          "role": "combinable_attribute",
+          "mutex_group": "leotard_bodysuit_attr",
+          "raw_lines": [
+            17,
+            26
+          ],
+          "derivation": "product_extension",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "one_piece"
+            ],
+            "mutex_groups": [
+              "leotard_bodysuit_attr"
+            ]
+          },
+          "derivation_note": "leotard_bodysuit 款式 combinable_attribute 特征细化扩写"
+        }
+      ]
+    },
+    {
+      "id": "racing_suit",
+      "name_zh": "赛车连体服 (Racing Suit)",
+      "aliases": [
+        "motorsport_suit",
+        "driver_overalls"
+      ],
+      "tags": [
+        {
+          "id": "racing_suit__tag_000",
+          "text": "racing suit",
+          "role": "core_base",
+          "mutex_group": "racing_suit_silhouette",
+          "raw_lines": [
+            41
+          ],
+          "derivation": "verbatim",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "one_piece"
+            ],
+            "mutex_groups": [
+              "racing_suit_silhouette"
+            ]
+          },
+          "derivation_note": "台账第[41]行原文直译建立"
+        },
+        {
+          "id": "racing_suit__tag_001",
+          "text": "leather motorsport racing suit",
+          "role": "variant",
+          "mutex_group": "racing_suit_silhouette",
+          "raw_lines": [
+            41
+          ],
+          "derivation": "derived",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "one_piece"
+            ],
+            "mutex_groups": [
+              "racing_suit_silhouette"
+            ]
+          },
+          "derivation_note": "racing_suit 款式 variant 特征细化扩写"
+        },
+        {
+          "id": "racing_suit__tag_002",
+          "text": "sponsor patches and padded racing collar",
+          "role": "combinable_attribute",
+          "mutex_group": "racing_suit_attr",
+          "raw_lines": [
+            41
+          ],
+          "derivation": "product_extension",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "one_piece"
+            ],
+            "mutex_groups": [
+              "racing_suit_attr"
+            ]
+          },
+          "derivation_note": "racing_suit 款式 combinable_attribute 特征细化扩写"
+        }
+      ]
+    },
+    {
+      "id": "robe_general",
+      "name_zh": "休闲长袍 (Casual Robe)",
+      "aliases": [
+        "lounge_robe",
+        "housecoat"
+      ],
+      "tags": [
+        {
+          "id": "robe_general__tag_000",
+          "text": "robe",
+          "role": "core_base",
+          "mutex_group": "robe_general_silhouette",
+          "raw_lines": [
+            85,
+            212
+          ],
+          "derivation": "verbatim",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "one_piece"
+            ],
+            "mutex_groups": [
+              "robe_general_silhouette"
+            ]
+          },
+          "derivation_note": "台账第[85, 212]行原文直译建立"
+        },
+        {
+          "id": "robe_general__tag_001",
+          "text": "long flowing lounging robe",
+          "role": "variant",
+          "mutex_group": "robe_general_silhouette",
+          "raw_lines": [
+            85,
+            212
+          ],
+          "derivation": "derived",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "one_piece"
+            ],
+            "mutex_groups": [
+              "robe_general_silhouette"
+            ]
+          },
+          "derivation_note": "robe_general 款式 variant 特征细化扩写"
+        },
+        {
+          "id": "robe_general__tag_002",
+          "text": "wide-sleeved belted housecoat robe",
+          "role": "combinable_attribute",
+          "mutex_group": "robe_general_attr",
+          "raw_lines": [
+            85,
+            212
+          ],
+          "derivation": "product_extension",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "one_piece"
+            ],
+            "mutex_groups": [
+              "robe_general_attr"
+            ]
+          },
+          "derivation_note": "robe_general 款式 combinable_attribute 特征细化扩写"
+        }
+      ]
+    },
+    {
+      "id": "shinto_miko",
+      "name_zh": "神道巫女服 (Shinto Miko Attire)",
+      "aliases": [
+        "miko_attire",
+        "shrine_maiden_costume"
+      ],
+      "tags": [
+        {
+          "id": "shinto_miko__tag_000",
+          "text": "miko clothing",
+          "role": "core_base",
+          "mutex_group": "shinto_miko_silhouette",
+          "raw_lines": [
+            81
+          ],
+          "derivation": "verbatim",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "one_piece"
+            ],
+            "mutex_groups": [
+              "shinto_miko_silhouette"
+            ]
+          },
+          "derivation_note": "台账第[81]行原文直译建立"
+        },
+        {
+          "id": "shinto_miko__tag_001",
+          "text": "miko attire",
+          "role": "variant",
+          "mutex_group": "shinto_miko_silhouette",
+          "raw_lines": [
+            217
+          ],
+          "derivation": "verbatim",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "one_piece"
+            ],
+            "mutex_groups": [
+              "shinto_miko_silhouette"
+            ]
+          },
+          "derivation_note": "台账第[217]行原文直译建立"
+        },
+        {
+          "id": "shinto_miko__tag_002",
+          "text": "traditional shrine maiden robe",
+          "role": "variant",
+          "mutex_group": "shinto_miko_silhouette",
+          "raw_lines": [
+            81,
+            217
+          ],
+          "derivation": "derived",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "one_piece"
+            ],
+            "mutex_groups": [
+              "shinto_miko_silhouette"
+            ]
+          },
+          "derivation_note": "shinto_miko 款式 variant 特征细化扩写"
+        },
+        {
+          "id": "shinto_miko__tag_003",
+          "text": "white kosode robe and red scarlet hakama skirt",
+          "role": "combinable_attribute",
+          "mutex_group": "shinto_miko_attr",
+          "raw_lines": [
+            81,
+            217
+          ],
+          "derivation": "product_extension",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "one_piece"
+            ],
+            "mutex_groups": [
+              "shinto_miko_attr"
+            ]
+          },
+          "derivation_note": "shinto_miko 款式 combinable_attribute 特征细化扩写"
+        }
+      ]
+    },
+    {
+      "id": "slime_dress",
+      "name_zh": "史莱姆凝胶装 (Slime Dress)",
+      "aliases": [
+        "gel_dress",
+        "translucent_slime_outfit"
+      ],
+      "tags": [
+        {
+          "id": "slime_dress__tag_000",
+          "text": "slime dress",
+          "role": "core_base",
+          "mutex_group": "slime_dress_silhouette",
+          "raw_lines": [
+            98
+          ],
+          "derivation": "verbatim",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "one_piece"
+            ],
+            "mutex_groups": [
+              "slime_dress_silhouette"
+            ]
+          },
+          "derivation_note": "台账第[98]行原文直译建立"
+        },
+        {
+          "id": "slime_dress__tag_001",
+          "text": "translucent gelatinous slime dress",
+          "role": "variant",
+          "mutex_group": "slime_dress_silhouette",
+          "raw_lines": [
+            98
+          ],
+          "derivation": "derived",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "one_piece"
+            ],
+            "mutex_groups": [
+              "slime_dress_silhouette"
+            ]
+          },
+          "derivation_note": "slime_dress 款式 variant 特征细化扩写"
+        },
+        {
+          "id": "slime_dress__tag_002",
+          "text": "dripping glossy translucent slime hem",
+          "role": "combinable_attribute",
+          "mutex_group": "slime_dress_attr",
+          "raw_lines": [
+            98
+          ],
+          "derivation": "product_extension",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "one_piece"
+            ],
+            "mutex_groups": [
+              "slime_dress_attr"
+            ]
+          },
+          "derivation_note": "slime_dress 款式 combinable_attribute 特征细化扩写"
+        }
+      ]
+    },
+    {
+      "id": "swimsuit_classic",
+      "name_zh": "经典连体泳装 (Classic One-Piece Swimsuit)",
+      "aliases": [
+        "classic_one_piece",
+        "maillot"
+      ],
+      "tags": [
+        {
+          "id": "swimsuit_classic__tag_000",
+          "text": "swimsuit",
+          "role": "core_base",
+          "mutex_group": "swimsuit_classic_silhouette",
+          "raw_lines": [
+            6
+          ],
+          "derivation": "verbatim",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "one_piece"
+            ],
+            "mutex_groups": [
+              "swimsuit_classic_silhouette"
+            ]
+          },
+          "derivation_note": "台账第[6]行原文直译建立"
+        },
+        {
+          "id": "swimsuit_classic__tag_001",
+          "text": "classic one-piece swimsuit",
+          "role": "variant",
+          "mutex_group": "swimsuit_classic_silhouette",
+          "raw_lines": [
+            6
+          ],
+          "derivation": "derived",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "one_piece"
+            ],
+            "mutex_groups": [
+              "swimsuit_classic_silhouette"
+            ]
+          },
+          "derivation_note": "swimsuit_classic 款式 variant 特征细化扩写"
+        },
+        {
+          "id": "swimsuit_classic__tag_002",
+          "text": "scoop neck fitted maillot swimsuit",
+          "role": "combinable_attribute",
+          "mutex_group": "swimsuit_classic_attr",
+          "raw_lines": [
+            6
+          ],
+          "derivation": "product_extension",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "one_piece"
+            ],
+            "mutex_groups": [
+              "swimsuit_classic_attr"
+            ]
+          },
+          "derivation_note": "swimsuit_classic 款式 combinable_attribute 特征细化扩写"
+        }
+      ]
+    },
+    {
+      "id": "swimsuit_competition",
+      "name_zh": "竞赛专业泳衣 (Competition Swimsuit)",
+      "aliases": [
+        "racing_swimsuit",
+        "fastskin_suit"
+      ],
+      "tags": [
+        {
+          "id": "swimsuit_competition__tag_000",
+          "text": "competition swimsuit",
+          "role": "core_base",
+          "mutex_group": "swimsuit_competition_silhouette",
+          "raw_lines": [
+            9
+          ],
+          "derivation": "verbatim",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "one_piece"
+            ],
+            "mutex_groups": [
+              "swimsuit_competition_silhouette"
+            ]
+          },
+          "derivation_note": "台账第[9]行原文直译建立"
+        },
+        {
+          "id": "swimsuit_competition__tag_001",
+          "text": "professional racing competition swimsuit",
+          "role": "variant",
+          "mutex_group": "swimsuit_competition_silhouette",
+          "raw_lines": [
+            9
+          ],
+          "derivation": "derived",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "one_piece"
+            ],
+            "mutex_groups": [
+              "swimsuit_competition_silhouette"
+            ]
+          },
+          "derivation_note": "swimsuit_competition 款式 variant 特征细化扩写"
+        },
+        {
+          "id": "swimsuit_competition__tag_002",
+          "text": "racerback aerodynamic hydrodynamic swimsuit",
+          "role": "combinable_attribute",
+          "mutex_group": "swimsuit_competition_attr",
+          "raw_lines": [
+            9
+          ],
+          "derivation": "product_extension",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "one_piece"
+            ],
+            "mutex_groups": [
+              "swimsuit_competition_attr"
+            ]
+          },
+          "derivation_note": "swimsuit_competition 款式 combinable_attribute 特征细化扩写"
+        }
+      ]
+    },
+    {
+      "id": "swimsuit_creative",
+      "name_zh": "中式改良死库水 (Chinese Style Sukumizu)",
+      "aliases": [
+        "chinese_sukumizu",
+        "qipao_swimsuit"
+      ],
+      "tags": [
+        {
+          "id": "swimsuit_creative__tag_000",
+          "text": "chinese clothes+leotard",
+          "role": "core_base",
+          "mutex_group": "swimsuit_creative_silhouette",
+          "raw_lines": [
+            164
+          ],
+          "derivation": "verbatim",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "one_piece"
+            ],
+            "mutex_groups": [
+              "swimsuit_creative_silhouette"
+            ]
+          },
+          "derivation_note": "台账第[164]行原文直译建立"
+        },
+        {
+          "id": "swimsuit_creative__tag_001",
+          "text": "chinese style one-piece swimsuit with gold patterns",
+          "role": "variant",
+          "mutex_group": "swimsuit_creative_silhouette",
+          "raw_lines": [
+            102
+          ],
+          "derivation": "derived",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "one_piece"
+            ],
+            "mutex_groups": [
+              "swimsuit_creative_silhouette"
+            ]
+          },
+          "derivation_note": "swimsuit_creative 款式 variant 特征细化扩写"
+        },
+        {
+          "id": "swimsuit_creative__tag_002",
+          "text": "mandarin collar keyhole cutout sukumizu",
+          "role": "combinable_attribute",
+          "mutex_group": "swimsuit_creative_attr",
+          "raw_lines": [
+            102,
+            164
+          ],
+          "derivation": "product_extension",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "one_piece"
+            ],
+            "mutex_groups": [
+              "swimsuit_creative_attr"
+            ]
+          },
+          "derivation_note": "swimsuit_creative 款式 combinable_attribute 特征细化扩写"
+        }
+      ]
+    },
+    {
+      "id": "taoist_robe",
+      "name_zh": "传统道袍 (Taoist Robe / Daopao)",
+      "aliases": [
+        "daopao",
+        "taoist_vestment"
+      ],
+      "tags": [
+        {
+          "id": "taoist_robe__tag_000",
+          "text": "taoist robe",
+          "role": "core_base",
+          "mutex_group": "taoist_robe_silhouette",
+          "raw_lines": [
+            132
+          ],
+          "derivation": "verbatim",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "one_piece"
+            ],
+            "mutex_groups": [
+              "taoist_robe_silhouette"
+            ]
+          },
+          "derivation_note": "台账第[132]行原文直译建立"
+        },
+        {
+          "id": "taoist_robe__tag_001",
+          "text": "ceremonial blue taoist daopao",
+          "role": "variant",
+          "mutex_group": "taoist_robe_silhouette",
+          "raw_lines": [
+            132
+          ],
+          "derivation": "derived",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "one_piece"
+            ],
+            "mutex_groups": [
+              "taoist_robe_silhouette"
+            ]
+          },
+          "derivation_note": "taoist_robe 款式 variant 特征细化扩写"
+        },
+        {
+          "id": "taoist_robe__tag_002",
+          "text": "bagua yin-yang embroidery on flowing robe",
+          "role": "combinable_attribute",
+          "mutex_group": "taoist_robe_attr",
+          "raw_lines": [
+            132
+          ],
+          "derivation": "product_extension",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "one_piece"
+            ],
+            "mutex_groups": [
+              "taoist_robe_attr"
+            ]
+          },
+          "derivation_note": "taoist_robe 款式 combinable_attribute 特征细化扩写"
+        }
+      ]
+    },
+    {
+      "id": "witch_robe",
+      "name_zh": "魔女法袍 (Witch Robe / Dress)",
+      "aliases": [
+        "sorceress_robe",
+        "witch_gown"
+      ],
+      "tags": [
+        {
+          "id": "witch_robe__tag_000",
+          "text": "witch dress",
+          "role": "core_base",
+          "mutex_group": "witch_robe_silhouette",
+          "raw_lines": [
+            80
+          ],
+          "derivation": "verbatim",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "one_piece"
+            ],
+            "mutex_groups": [
+              "witch_robe_silhouette"
+            ]
+          },
+          "derivation_note": "台账第[80]行原文直译建立"
+        },
+        {
+          "id": "witch_robe__tag_001",
+          "text": "dark fantasy witch robe",
+          "role": "variant",
+          "mutex_group": "witch_robe_silhouette",
+          "raw_lines": [
+            80
+          ],
+          "derivation": "derived",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "one_piece"
+            ],
+            "mutex_groups": [
+              "witch_robe_silhouette"
+            ]
+          },
+          "derivation_note": "witch_robe 款式 variant 特征细化扩写"
+        },
+        {
+          "id": "witch_robe__tag_002",
+          "text": "flared pointed bell sleeves and mystical hem",
+          "role": "combinable_attribute",
+          "mutex_group": "witch_robe_attr",
+          "raw_lines": [
+            80
+          ],
+          "derivation": "product_extension",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "one_piece"
+            ],
+            "mutex_groups": [
+              "witch_robe_attr"
+            ]
+          },
+          "derivation_note": "witch_robe 款式 combinable_attribute 特征细化扩写"
+        }
+      ]
+    },
+    {
+      "id": "wizard_robe",
+      "name_zh": "巫师贤者法袍 (Wizard Archmage Robe)",
+      "aliases": [
+        "mage_robe",
+        "archmage_vestment"
+      ],
+      "tags": [
+        {
+          "id": "wizard_robe__tag_000",
+          "text": "wizard robe",
+          "role": "core_base",
+          "mutex_group": "wizard_robe_silhouette",
+          "raw_lines": [
+            222
+          ],
+          "derivation": "verbatim",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "one_piece"
+            ],
+            "mutex_groups": [
+              "wizard_robe_silhouette"
+            ]
+          },
+          "derivation_note": "台账第[222]行原文直译建立"
+        },
+        {
+          "id": "wizard_robe__tag_001",
+          "text": "hooded mystical wizard robe",
+          "role": "variant",
+          "mutex_group": "wizard_robe_silhouette",
+          "raw_lines": [
+            222
+          ],
+          "derivation": "derived",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "one_piece"
+            ],
+            "mutex_groups": [
+              "wizard_robe_silhouette"
+            ]
+          },
+          "derivation_note": "wizard_robe 款式 variant 特征细化扩写"
+        },
+        {
+          "id": "wizard_robe__tag_002",
+          "text": "gold runic embroidered trim and mantle",
+          "role": "combinable_attribute",
+          "mutex_group": "wizard_robe_attr",
+          "raw_lines": [
+            222
+          ],
+          "derivation": "product_extension",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "one_piece"
+            ],
+            "mutex_groups": [
+              "wizard_robe_attr"
+            ]
+          },
+          "derivation_note": "wizard_robe 款式 combinable_attribute 特征细化扩写"
+        }
+      ]
+    },
+    {
+      "id": "zentai_suit",
+      "name_zh": "全身紧身连体衣 (Zentai Suit)",
+      "aliases": [
+        "full_body_tights",
+        "catsuit_zentai"
+      ],
+      "tags": [
+        {
+          "id": "zentai_suit__tag_000",
+          "text": "zentai",
+          "role": "core_base",
+          "mutex_group": "zentai_suit_silhouette",
+          "raw_lines": [
+            92
+          ],
+          "derivation": "verbatim",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "one_piece"
+            ],
+            "mutex_groups": [
+              "zentai_suit_silhouette"
+            ]
+          },
+          "derivation_note": "台账第[92]行原文直译建立"
+        },
+        {
+          "id": "zentai_suit__tag_001",
+          "text": "skin-tight spandex zentai suit",
+          "role": "variant",
+          "mutex_group": "zentai_suit_silhouette",
+          "raw_lines": [
+            92
+          ],
+          "derivation": "derived",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "one_piece"
+            ],
+            "mutex_groups": [
+              "zentai_suit_silhouette"
+            ]
+          },
+          "derivation_note": "zentai_suit 款式 variant 特征细化扩写"
+        },
+        {
+          "id": "zentai_suit__tag_002",
+          "text": "seamless matte full-body covering suit",
+          "role": "combinable_attribute",
+          "mutex_group": "zentai_suit_attr",
+          "raw_lines": [
+            92
+          ],
+          "derivation": "product_extension",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "one_piece"
+            ],
+            "mutex_groups": [
+              "zentai_suit_attr"
+            ]
+          },
+          "derivation_note": "zentai_suit 款式 combinable_attribute 特征细化扩写"
+        }
+      ]
     }
   ],
   "clothing_states": [
@@ -6244,8 +8013,7 @@
           "facts": {
             "semantic_role": "selector",
             "garment_topologies": [
-              "top",
-              "one_piece"
+              "top"
             ],
             "visible_regions": [
               "lower_body",
@@ -6280,8 +8048,7 @@
           "facts": {
             "semantic_role": "selector",
             "garment_topologies": [
-              "top",
-              "one_piece"
+              "top"
             ],
             "visible_regions": [
               "lower_body",
@@ -6410,6 +8177,91 @@
           "facts": {
             "semantic_role": "selector",
             "garment_topologies": [
+              "outerwear"
+            ],
+            "visible_regions": [
+              "upper_body"
+            ],
+            "garment_states": [
+              "opened"
+            ]
+          }
+        },
+        {
+          "id": "unbuttoned__tag_011",
+          "text": "robe open at chest",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "one_piece"
+            ],
+            "visible_regions": [
+              "upper_body"
+            ],
+            "garment_states": [
+              "opened"
+            ]
+          }
+        },
+        {
+          "id": "unbuttoned__tag_012",
+          "text": "robe unfastened",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "one_piece"
+            ],
+            "visible_regions": [
+              "lower_body",
+              "upper_body"
+            ],
+            "garment_states": [
+              "opened"
+            ]
+          }
+        },
+        {
+          "id": "unbuttoned__tag_013",
+          "text": "suit unbuttoned at chest",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "one_piece"
+            ],
+            "visible_regions": [
+              "upper_body"
+            ],
+            "garment_states": [
+              "opened"
+            ]
+          }
+        },
+        {
+          "id": "unbuttoned__tag_014",
+          "text": "collar unbuttoned",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "top",
+              "one_piece",
+              "outerwear"
+            ],
+            "visible_regions": [
+              "upper_body"
+            ],
+            "garment_states": [
+              "opened"
+            ]
+          }
+        },
+        {
+          "id": "unbuttoned__tag_015",
+          "text": "front unbuttoned",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "top",
+              "one_piece",
               "outerwear"
             ],
             "visible_regions": [

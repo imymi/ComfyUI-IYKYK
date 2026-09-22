@@ -20,8 +20,10 @@ from random import Random
 import unittest
 
 from lib.conflict_resolver import (
+    BindingStatus,
     ConflictResolver,
     GarmentCarrierEntity,
+    find_bound_carrier,
     is_garment_compatible_with_state,
 )
 from lib.lexer import validate_prompt_syntax
@@ -101,6 +103,32 @@ BATCH_3_ITEMS = [
     ("winter_parka", "防寒派克大衣 (Winter Parka)", ["down_parka", "arctic_parka"], True, False, ["outerwear"]),
 ]
 
+BATCH_4_ITEMS = [
+    ("anime_cosplay", "不知火舞 (Mai Shiranui Cosplay)", ["mai_shiranui", "shiranui_mai_costume"], False, False, ["one_piece"]),
+    ("apron_dress", "全身围裙 (Apron Dress)", ["pinafore_dress", "full_apron"], False, True, ["one_piece"]),
+    ("armored_dress", "铠装连衣裙 (Armored Dress)", ["battle_dress_armor", "armored_gown"], False, True, ["one_piece"]),
+    ("bathrobe", "浴袍 (Bathrobe)", ["spa_robe", "terrycloth_robe"], True, True, ["one_piece"]),
+    ("battle_robe", "战袍 (Battle Robe)", ["combat_robe", "warrior_robe"], False, True, ["one_piece"]),
+    ("clerical_nun", "修女服 (Nun Habit)", ["nun_habit", "convent_habit"], False, True, ["one_piece"]),
+    ("clerical_priest", "神父修生黑袍 (Priest Cassock)", ["cassock", "priest_robe"], True, True, ["one_piece"]),
+    ("festive_costume", "节日圣诞装 (Festive Santa Costume)", ["santa_costume", "christmas_outfit"], True, True, ["one_piece"]),
+    ("frock_smock", "工装罩衫 (Frock / Smock)", ["artist_smock", "work_frock"], True, True, ["one_piece"]),
+    ("greek_toga", "古希腊托加/佩普洛斯 (Greek Toga / Peplos)", ["peplos", "chiton"], False, True, ["one_piece"]),
+    ("hospital_gown", "病号服 (Hospital Gown)", ["patient_gown", "medical_gown"], True, True, ["one_piece"]),
+    ("leotard_bodysuit", "连体紧身衣 (Leotard Bodysuit)", ["dance_leotard", "gymnastics_bodysuit"], False, False, ["one_piece"]),
+    ("racing_suit", "赛车连体服 (Racing Suit)", ["motorsport_suit", "driver_overalls"], True, False, ["one_piece"]),
+    ("robe_general", "休闲长袍 (Casual Robe)", ["lounge_robe", "housecoat"], True, True, ["one_piece"]),
+    ("shinto_miko", "神道巫女服 (Shinto Miko Attire)", ["miko_attire", "shrine_maiden_costume"], False, True, ["one_piece"]),
+    ("slime_dress", "史莱姆凝胶装 (Slime Dress)", ["gel_dress", "translucent_slime_outfit"], False, True, ["one_piece"]),
+    ("swimsuit_classic", "经典连体泳装 (Classic One-Piece Swimsuit)", ["classic_one_piece", "maillot"], False, False, ["one_piece"]),
+    ("swimsuit_competition", "竞赛专业泳衣 (Competition Swimsuit)", ["racing_swimsuit", "fastskin_suit"], False, False, ["one_piece"]),
+    ("swimsuit_creative", "中式改良死库水 (Chinese Style Sukumizu)", ["chinese_sukumizu", "qipao_swimsuit"], False, False, ["one_piece"]),
+    ("taoist_robe", "传统道袍 (Taoist Robe / Daopao)", ["daopao", "taoist_vestment"], False, True, ["one_piece"]),
+    ("witch_robe", "魔女法袍 (Witch Robe / Dress)", ["sorceress_robe", "witch_gown"], False, True, ["one_piece"]),
+    ("wizard_robe", "巫师贤者法袍 (Wizard Archmage Robe)", ["mage_robe", "archmage_vestment"], False, True, ["one_piece"]),
+    ("zentai_suit", "全身紧身连体衣 (Zentai Suit)", ["full_body_tights", "catsuit_zentai"], False, False, ["one_piece"]),
+]
+
 
 class TestClothingExpansionBatches(unittest.TestCase):
     @classmethod
@@ -109,8 +137,8 @@ class TestClothingExpansionBatches(unittest.TestCase):
         cls.resolver = ConflictResolver(DATA_DIR)
         cls.generator = nodes.IYKYKPromptGenerator()
 
-    def test_01_batch_1_2_3_sampling_accessibility(self):
-        """逐款验证 Batch 1 (16 款上装), Batch 2 (22 款下装与内衣), Batch 3 (23 款外套机甲) 按规范 ID、中文显示名和别名均可精确采样。"""
+    def test_01_batch_1_2_3_4_sampling_accessibility(self):
+        """逐款验证 Batch 1 (16 款上装), Batch 2 (22 款下装与内衣), Batch 3 (23 款外套机甲), Batch 4 (23 款连衣裙/连体衣/制服) 按规范 ID、中文显示名和别名均可精确采样。"""
         rng = Random(42)
         for cid, name_zh, aliases, _ in BATCH_1_ITEMS:
             # 1. 按规范 ID 采样
@@ -178,24 +206,52 @@ class TestClothingExpansionBatches(unittest.TestCase):
                 res_alias = self.sampler.sample_clothing_result(alias, "无 (None)", "L1", rng)
                 self.assertEqual(res_alias.style_id, cid)
 
+        for cid, name_zh, aliases, _, _, topos in BATCH_4_ITEMS:
+            # 1. 按规范 ID 采样
+            res_id = self.sampler.sample_clothing_result(cid, "无 (None)", "L1", rng)
+            self.assertEqual(res_id.style_id, cid)
+            self.assertIn(len(res_id.base_tags), (1, 2))
+            for tag in res_id.base_tags:
+                self.assertEqual(tag.provenance.item_id, cid)
+                self.assertEqual(tag.provenance.kind, "base_clothing")
+                self.assertTrue(
+                    any(t in tag.facts.garment_topologies for t in topos),
+                    f"{cid} tag {tag.text} topologies {tag.facts.garment_topologies} disjoint from {topos}"
+                )
+
+            # 2. 按中文名称采样
+            res_name = self.sampler.sample_clothing_result(name_zh, "无 (None)", "L1", rng)
+            self.assertEqual(res_name.style_id, cid)
+            self.assertIn(len(res_name.base_tags), (1, 2))
+
+            # 3. 按别名采样
+            for alias in aliases:
+                res_alias = self.sampler.sample_clothing_result(alias, "无 (None)", "L1", rng)
+                self.assertEqual(res_alias.style_id, cid)
+
     def test_02_batches_random_reachability(self):
-        """验证 Batch 1 (16 款), Batch 2 (22 款), Batch 3 (23 款) 共 61 款新增款式在随机模式 (随机 (Random)) 下均可真实被抽中。"""
+        """验证 Batch 1 (16 款), Batch 2 (22 款), Batch 3 (23 款), Batch 4 (23 款) 共 84 款新增款式在随机模式 (随机 (Random)) 下均可真实被抽中。"""
         sampled_styles = set()
         rng = Random(2026)
-        # 92 款均匀抽取，抽样 3000 次，所有 61 款新增款式必须 100% 被覆盖
-        for _ in range(3000):
+        # 115 款均匀抽取，抽样 4000 次，所有 84 款新增款式必须 100% 被覆盖
+        for _ in range(4000):
             res = self.sampler.sample_clothing_result("随机 (Random)", "无 (None)", "L1", rng)
             if res.style_id:
                 sampled_styles.add(res.style_id)
 
-        target_ids = {item[0] for item in BATCH_1_ITEMS} | {item[0] for item in BATCH_2_ITEMS} | {item[0] for item in BATCH_3_ITEMS}
+        target_ids = {item[0] for item in BATCH_1_ITEMS} | {item[0] for item in BATCH_2_ITEMS} | {item[0] for item in BATCH_3_ITEMS} | {item[0] for item in BATCH_4_ITEMS}
         unreached = target_ids - sampled_styles
         self.assertEqual(len(unreached), 0, f"Styles never reached in random sampling: {unreached}")
 
     def test_03_discrete_tag_syntax_and_word_count(self):
-        """验证 Batch 1, 2, 3 共 61 款款式返回离散叶子标签，零语法破坏且词数处于合理受控范围。"""
+        """验证 Batch 1, 2, 3, 4 共 84 款款式返回离散叶子标签，零语法破坏且词数处于合理受控范围。"""
         rng = Random(1234)
-        all_items = [(i[0], i[1]) for i in BATCH_1_ITEMS] + [(i[0], i[1]) for i in BATCH_2_ITEMS] + [(i[0], i[1]) for i in BATCH_3_ITEMS]
+        all_items = (
+            [(i[0], i[1]) for i in BATCH_1_ITEMS]
+            + [(i[0], i[1]) for i in BATCH_2_ITEMS]
+            + [(i[0], i[1]) for i in BATCH_3_ITEMS]
+            + [(i[0], i[1]) for i in BATCH_4_ITEMS]
+        )
         for cid, name_zh in all_items:
             res = self.sampler.sample_clothing_result(cid, "无 (None)", "L1", rng)
             for tag in res.base_tags:
@@ -206,19 +262,21 @@ class TestClothingExpansionBatches(unittest.TestCase):
     def test_04_button_capability_positive_and_negative_matrix(self):
         """形制能力契约核验 (解扣状态 unbuttoned):
         严格验证具体动作词条 (按服装形制拓扑区分动作) 真实生成或精准剔除：
-        - 正例：具备纽扣能力的款式 (Batch 1: 5 款上装, Batch 2: denim_shorts, leather_skirt 2 款, Batch 3: 19 款外套 共 26 款)：
-          * 上装正例：buttons undone revealing cleavage / shirt open at chest 保留在 positive prompt 中；
-          * 裤装正例 (denim_shorts)：pants button undone / jeans unbuttoned 保留在 positive prompt 中，胸前/衬衫/外套动作严禁存在；
-          * 裙装正例 (leather_skirt)：skirt button undone / skirt unbuttoned 保留在 positive prompt 中，胸前/衬衫/外套动作严禁存在；
-          * 外套正例 (Batch 3 19 款)：unbuttoned coat / jacket open 保留在 positive prompt 中，衬衫/裤装/裙装动作严禁存在；
+        - 正例：具备纽扣能力的款式 (Batch 1: 5 款上装, Batch 2: denim_shorts, leather_skirt 2 款, Batch 3: 19 款外套, Batch 4: 7 款连体/长袍/套装 共 33 款)：
+          * 上装正例：collar unbuttoned / front unbuttoned 保留在 positive prompt 中；
+          * 裤装正例 (denim_shorts)：pants button undone / jeans unbuttoned 保留在 positive prompt 中，胸前/衬衫/外套/长袍动作严禁存在；
+          * 裙装正例 (leather_skirt)：skirt button undone / skirt unbuttoned 保留在 positive prompt 中，胸前/衬衫/外套/长袍动作严禁存在；
+          * 外套正例 (Batch 3 19 款)：unbuttoned coat / collar unbuttoned 保留在 positive prompt 中，衬衫/裤装/裙装/长袍动作严禁存在；
+          * 连体正例 (Batch 4 7 款)：racing_suit 保留 suit unbuttoned at chest 与 collar unbuttoned；bathrobe 等长袍/工装保留 collar unbuttoned 且 suit 动作以 state_lacks_carrier drop；
           * 正例动作无相应 Drop 决策。
-        - 反例：无纽扣能力的款式 (Batch 1: 11 款, Batch 2: 20 款, Batch 3: 4 款机甲重铠 共 35 款)：
-          动作词条绝对不出现在 positive prompt 中，且决策报告中必须明确记录 action == "drop" 且 reason_code == "state_lacks_carrier"。
+        - 反例：无纽扣能力的款式 (Batch 1: 11 款, Batch 2: 20 款, Batch 3: 4 款机甲重铠, Batch 4: 16 款非纽扣连体衣 共 51 款)：
+          动作词条绝对不出现在 positive prompt 中，且决策报告中必须明确记录 action == "drop"。
         """
         all_items = (
             [(i[0], i[3], ["top"]) for i in BATCH_1_ITEMS]
             + [(i[0], i[3], i[5]) for i in BATCH_2_ITEMS]
             + [(i[0], i[3], i[5]) for i in BATCH_3_ITEMS]
+            + [(i[0], i[3], i[5]) for i in BATCH_4_ITEMS]
         )
 
         ALL_BUTTON_ACTIONS = (
@@ -226,6 +284,8 @@ class TestClothingExpansionBatches(unittest.TestCase):
             "pants button undone", "jeans unbuttoned",
             "skirt button undone", "skirt unbuttoned",
             "jacket unbuttoned", "coat open", "jacket open", "unbuttoned coat",
+            "robe open at chest", "robe unfastened", "suit unbuttoned at chest",
+            "collar unbuttoned", "front unbuttoned",
         )
 
         for cid, button_allowed, topos in all_items:
@@ -241,16 +301,49 @@ class TestClothingExpansionBatches(unittest.TestCase):
 
             if "bottom_pants" in topos:
                 expected_target_actions = ("pants button undone", "jeans unbuttoned")
-                forbidden_cross_actions = ("buttons undone revealing cleavage", "shirt open at chest", "skirt button undone", "skirt unbuttoned", "unbuttoned coat", "jacket open")
+                forbidden_cross_actions = (
+                    "buttons undone revealing cleavage", "shirt open at chest", "blouse unbuttoned",
+                    "skirt button undone", "skirt unbuttoned", "unbuttoned coat", "jacket open",
+                    "jacket unbuttoned", "robe open at chest", "suit unbuttoned at chest",
+                    "collar unbuttoned", "front unbuttoned"
+                )
             elif "bottom_skirt" in topos:
                 expected_target_actions = ("skirt button undone", "skirt unbuttoned")
-                forbidden_cross_actions = ("buttons undone revealing cleavage", "shirt open at chest", "pants button undone", "jeans unbuttoned", "unbuttoned coat", "jacket open")
+                forbidden_cross_actions = (
+                    "buttons undone revealing cleavage", "shirt open at chest", "blouse unbuttoned",
+                    "pants button undone", "jeans unbuttoned", "unbuttoned coat", "jacket open",
+                    "jacket unbuttoned", "robe open at chest", "suit unbuttoned at chest",
+                    "collar unbuttoned", "front unbuttoned"
+                )
             elif "outerwear" in topos:
-                expected_target_actions = ("unbuttoned coat", "jacket open")
-                forbidden_cross_actions = ("buttons undone revealing cleavage", "shirt open at chest", "blouse unbuttoned", "pants button undone", "jeans unbuttoned", "skirt button undone", "skirt unbuttoned")
+                expected_target_actions = ("unbuttoned coat", "collar unbuttoned")
+                forbidden_cross_actions = (
+                    "buttons undone revealing cleavage", "shirt open at chest", "blouse unbuttoned",
+                    "pants button undone", "jeans unbuttoned", "skirt button undone", "skirt unbuttoned",
+                    "robe open at chest", "suit unbuttoned at chest"
+                )
+            elif "one_piece" in topos:
+                if cid == "racing_suit":
+                    expected_target_actions = ("suit unbuttoned at chest", "collar unbuttoned")
+                    forbidden_cross_actions = (
+                        "blouse unbuttoned", "shirt open at chest", "pants button undone",
+                        "jeans unbuttoned", "skirt button undone", "skirt unbuttoned",
+                        "unbuttoned coat", "jacket open"
+                    )
+                else:
+                    expected_target_actions = ("collar unbuttoned",)
+                    forbidden_cross_actions = (
+                        "blouse unbuttoned", "shirt open at chest", "suit unbuttoned at chest",
+                        "pants button undone", "jeans unbuttoned", "skirt button undone",
+                        "skirt unbuttoned", "unbuttoned coat", "jacket open"
+                    )
             else:
-                expected_target_actions = ("buttons undone revealing cleavage", "shirt open at chest")
-                forbidden_cross_actions = ("pants button undone", "jeans unbuttoned", "skirt button undone", "skirt unbuttoned", "unbuttoned coat", "jacket open")
+                expected_target_actions = ("collar unbuttoned", "front unbuttoned")
+                forbidden_cross_actions = (
+                    "pants button undone", "jeans unbuttoned", "skirt button undone",
+                    "skirt unbuttoned", "unbuttoned coat", "jacket open", "jacket unbuttoned",
+                    "robe open at chest", "suit unbuttoned at chest"
+                )
 
             dropped_btn_decisions = {
                 d.before_text: d
@@ -276,6 +369,21 @@ class TestClothingExpansionBatches(unittest.TestCase):
                         gen_res.positive,
                         f"Style {cid} must NOT carry incompatible cross-body action '{f_bt}'!",
                     )
+                if "one_piece" in topos and cid != "racing_suit":
+                    dropped_suit = [
+                        d for d in report.decisions
+                        if d.action == "drop" and d.before_text == "suit unbuttoned at chest"
+                    ]
+                    self.assertGreater(
+                        len(dropped_suit),
+                        0,
+                        f"Non-suit one-piece style {cid} expected 'suit unbuttoned at chest' to be dropped",
+                    )
+                    self.assertEqual(
+                        dropped_suit[0].reason_code,
+                        "state_lacks_carrier",
+                        f"Style {cid} dropped suit action with unexpected reason {dropped_suit[0].reason_code}",
+                    )
             else:
                 for bt in ALL_BUTTON_ACTIONS:
                     self.assertNotIn(
@@ -293,28 +401,33 @@ class TestClothingExpansionBatches(unittest.TestCase):
                     0,
                     f"Style {cid} lacks button capability, but no button action was dropped!",
                 )
+                expected_drop_reason = (
+                    "one_piece_state_conflict" if "one_piece" in topos else "state_lacks_carrier"
+                )
                 for bt, d in dropped_all_btn.items():
                     self.assertEqual(
                         d.reason_code,
-                        "state_lacks_carrier",
-                        f"Style {cid} dropped '{bt}' with unexpected reason {d.reason_code}",
+                        expected_drop_reason,
+                        f"Style {cid} dropped '{bt}' with unexpected reason {d.reason_code}, expected {expected_drop_reason}",
                     )
 
     def test_05_skirt_capability_positive_and_negative_matrix(self):
         """形制能力契约核验 (掀裙状态 lifted_up):
         严格验证具体动作词条 (skirt pulled up revealing panties / skirt hiked up to waist) 真实生成或精准剔除：
-        - 正例：具备裙装能力的款式 (Batch 2 的 16 款半身裙)：
+        - 正例：具备裙装能力的款式 (Batch 2 的 16 款半身裙, Batch 4 的 16 款裙装/长袍 共 32 款)：
           * 半身裙动作 (skirt pulled up revealing panties, skirt hiked up to waist) 100% 保留在 positive prompt 中；
-          * 连衣裙动作 (dress hitched up) 绝对禁止借用/泄漏到半身裙中；
-          * 决策报告中无裙装动作的 Drop；
-        - 反例：无裙装能力的款式 (Batch 1 的 16 款上装、Batch 2 的 3 款裤装及 3 款比基尼内衣、Batch 3 的 23 款外套机甲 共 45 款)：
+          * 半身裙绝对禁止冒用/泄漏连衣裙动作 (dress hitched up)；
+          * 连衣裙/长袍正例具备完整裙装掀起能力；
+          * 决策报告中无合法裙装动作的 Drop；
+        - 反例：无裙装能力的款式 (Batch 1 的 16 款上装、Batch 2 的 3 款裤装及 3 款比基尼内衣、Batch 3 的 23 款外套机甲、Batch 4 的 7 款非裙装连体衣 共 52 款)：
           动作词条绝对不出现在 positive prompt 中，且决策报告中必须明确记录 action == "drop"；
-          其中裤装冲突原因严格为 pants_state_conflict，上装/内衣/外套冲突原因严格为 state_lacks_carrier。
+          其中裤装冲突原因严格为 pants_state_conflict，非裙装连体衣冲突原因严格为 one_piece_state_conflict，其他标记 state_lacks_carrier。
         """
         all_items = (
             [(i[0], False, ["top"]) for i in BATCH_1_ITEMS]
             + [(i[0], i[4], i[5]) for i in BATCH_2_ITEMS]
             + [(i[0], i[4], i[5]) for i in BATCH_3_ITEMS]
+            + [(i[0], i[4], i[5]) for i in BATCH_4_ITEMS]
         )
 
         for cid, skirt_allowed, topos in all_items:
@@ -346,27 +459,30 @@ class TestClothingExpansionBatches(unittest.TestCase):
                     0,
                     f"Skirt style {cid} has skirt capability, but skirt action was unexpectedly dropped: {list(dropped_skirt_decisions.keys())}!",
                 )
-                # 核心验收契约：半身裙绝对不能冒用连衣裙词条 dress hitched up
-                self.assertNotIn(
-                    "dress hitched up",
-                    gen_res.positive,
-                    f"Half-skirt style {cid} must NOT carry dress action 'dress hitched up'!",
-                )
-                # 若采到了 dress hitched up，其必须以 state_lacks_carrier 记录 drop
-                dropped_dress_decisions = {
-                    d.before_text: d
-                    for d in report.decisions
-                    if d.action == "drop" and d.before_text == "dress hitched up"
-                }
-                for dt, d in dropped_dress_decisions.items():
-                    self.assertEqual(
-                        d.reason_code,
-                        "state_lacks_carrier",
-                        f"Half-skirt style {cid} dropped '{dt}' with unexpected reason {d.reason_code}",
+                if "bottom_skirt" in topos:
+                    # 核心验收契约：半身裙绝对不能冒用连衣裙词条 dress hitched up
+                    self.assertNotIn(
+                        "dress hitched up",
+                        gen_res.positive,
+                        f"Half-skirt style {cid} must NOT carry dress action 'dress hitched up'!",
                     )
+                    # 若采到了 dress hitched up，其必须以 state_lacks_carrier 记录 drop
+                    dropped_dress_decisions = {
+                        d.before_text: d
+                        for d in report.decisions
+                        if d.action == "drop" and d.before_text == "dress hitched up"
+                    }
+                    for dt, d in dropped_dress_decisions.items():
+                        self.assertEqual(
+                            d.reason_code,
+                            "state_lacks_carrier",
+                            f"Half-skirt style {cid} dropped '{dt}' with unexpected reason {d.reason_code}",
+                        )
             else:
                 expected_reason = (
-                    "pants_state_conflict" if "bottom_pants" in topos else "state_lacks_carrier"
+                    "pants_state_conflict" if "bottom_pants" in topos else (
+                        "one_piece_state_conflict" if "one_piece" in topos else "state_lacks_carrier"
+                    )
                 )
                 test_terms = ("skirt pulled up revealing panties", "skirt hiked up to waist", "dress hitched up")
                 dropped_skirt_decisions = {
@@ -489,12 +605,16 @@ class TestClothingExpansionBatches(unittest.TestCase):
         """专项核验 Batch 3 外套解扣动作适配与语义承载物隔离 (解决原有 top/one_piece 拓扑无法承载外套解扣问题)：
 
         测试场景：
-        1. lab_coat + 解扣：保留外套专属解扣动作 (unbuttoned coat / jacket open)，
+        1. lab_coat + 解扣：保留外套专属解扣动作 (unbuttoned coat / collar unbuttoned)，
            绝无 shirt open at chest / blouse unbuttoned；
         2. 独立消解器核验：当向 lab_coat (仅 outerwear 拓扑) 强行注入 shirt open at chest / blouse unbuttoned 时，
            必须精准被标记为 action == 'drop' 且 reason_code == 'state_lacks_carrier'，绝不冒用；
         3. 独立消解器核验：当向 lab_coat 强行注入 dress hitched up 时，必须以 state_lacks_carrier 被 drop；
-        4. 显式目标绑定测试：当显式将衬衫动作绑定到纯外套时，判定为不兼容，不发生错误承载。
+        4. 显式目标与多承载物隔离长期回归测试：
+           当同时存在外套 (lab_coat) 和合法衬衫 (shirts_blouses) 时，
+           将衬衫解扣动作 (shirt open at chest) 的 target_id 显式指向外套 (lab_coat)，
+           find_bound_carrier 必须返回 UNBOUND_INCOMPATIBLE，绝不回退改绑到衬衫；
+           且在全量消解器中，该动作必须以 state_lacks_carrier 记录 drop。
         """
         from tests.fixtures.conflict_rule_fixtures import make_test_atom
 
@@ -507,7 +627,7 @@ class TestClothingExpansionBatches(unittest.TestCase):
             prompt_seed=42,
         )
         self.assertIn("unbuttoned coat", res_lab.positive)
-        self.assertIn("jacket open", res_lab.positive)
+        self.assertIn("collar unbuttoned", res_lab.positive)
         self.assertNotIn("shirt open at chest", res_lab.positive)
         self.assertNotIn("blouse unbuttoned", res_lab.positive)
         self.assertNotIn("buttons undone revealing cleavage", res_lab.positive)
@@ -516,8 +636,8 @@ class TestClothingExpansionBatches(unittest.TestCase):
         atoms_lab = [
             make_test_atom("lab coat", source_slot="clothing", item_id="lab_coat", garment_topologies=["outerwear"], tag_order=0),
             make_test_atom("jacket unbuttoned", source_slot="clothing_state", item_id="unbuttoned", garment_topologies=["outerwear"], garment_states=["opened"], tag_order=1),
-            make_test_atom("shirt open at chest", source_slot="clothing_state", item_id="unbuttoned", garment_topologies=["top", "one_piece"], garment_states=["opened"], tag_order=2),
-            make_test_atom("blouse unbuttoned", source_slot="clothing_state", item_id="unbuttoned", garment_topologies=["top", "one_piece"], garment_states=["opened"], tag_order=3),
+            make_test_atom("shirt open at chest", source_slot="clothing_state", item_id="unbuttoned", garment_topologies=["top"], garment_states=["opened"], tag_order=2),
+            make_test_atom("blouse unbuttoned", source_slot="clothing_state", item_id="unbuttoned", garment_topologies=["top"], garment_states=["opened"], tag_order=3),
             make_test_atom("dress hitched up", source_slot="clothing_state", item_id="lifted_up", garment_topologies=["one_piece"], garment_states=["lifted"], tag_order=4),
         ]
         _, _, report_lab = self.resolver.resolve_atoms_with_full_report(atoms_lab)
@@ -540,11 +660,148 @@ class TestClothingExpansionBatches(unittest.TestCase):
         compat_outer_action = is_garment_compatible_with_state(carrier_outer, "unbuttoned", atoms_lab[1])
         self.assertTrue(compat_outer_action, "lab_coat carrier must be compatible with jacket unbuttoned atom")
 
+        # 4. 多承载物长期回归：同时存在外套与合法衬衫，显式指定外套为目标绝不回退改绑
+        atom_shirt_carrier = make_test_atom("white collared shirt", source_slot="clothing", item_id="shirts_blouses", garment_topologies=["top"], tag_order=5)
+        carrier_shirt = GarmentCarrierEntity(
+            entity_id="carrier_shirt",
+            selector="clothing",
+            selected_id="shirts_blouses",
+            member_atoms=[atom_shirt_carrier],
+        )
+        atom_shirt_action_targeted_to_outer = make_test_atom(
+            "shirt open at chest",
+            source_slot="clothing_state",
+            item_id="unbuttoned",
+            garment_topologies=["top"],
+            garment_states=["opened"],
+            target_id="lab_coat",
+            tag_order=6,
+        )
+        binding_multi = find_bound_carrier(atom_shirt_action_targeted_to_outer, [carrier_outer, carrier_shirt])
+        self.assertEqual(
+            binding_multi.status,
+            BindingStatus.UNBOUND_INCOMPATIBLE,
+            "Targeting shirt action to outerwear must return UNBOUND_INCOMPATIBLE even when a compatible shirt carrier exists",
+        )
+        self.assertNotEqual(
+            binding_multi.target_entity,
+            carrier_shirt,
+            "Must NOT fallback rebind to compatible shirt when explicit target_id was specified",
+        )
+
+        multi_atoms = [atoms_lab[0], atom_shirt_carrier, atom_shirt_action_targeted_to_outer]
+        _, _, report_multi = self.resolver.resolve_atoms_with_full_report(multi_atoms)
+        dropped_multi = {d.before_text: d.reason_code for d in report_multi.decisions if d.action == "drop"}
+        self.assertEqual(
+            dropped_multi.get("shirt open at chest"),
+            "state_lacks_carrier",
+            "Explicitly mis-targeted shirt action must be dropped with state_lacks_carrier without fallback",
+        )
+
+    def test_05d_one_piece_action_binding_isolation(self):
+        """专项核验 Batch 4 连体衣/长袍/制服动作语义约束与隔离 (one_piece 不能自动等同于衬衫)：
+
+        测试场景：
+        1. 浴袍 (bathrobe)：正例承载 collar unbuttoned / robe open at chest，
+           绝不承载 shirt open at chest / blouse unbuttoned / suit unbuttoned at chest；
+        2. 赛车连体服 (racing_suit)：正例承载 suit unbuttoned at chest / collar unbuttoned，
+           绝不承载 shirt open at chest / robe open at chest；
+        3. 显式目标与多承载物隔离长期回归测试：
+           当同时存在连体长袍 (bathrobe) 和合法衬衫 (shirts_blouses) 时，
+           将衬衫解扣动作 (shirt open at chest) 的 target_id 显式指向 bathrobe，
+           find_bound_carrier 必须返回 UNBOUND_INCOMPATIBLE，绝不回退改绑到衬衫；
+           且在全量消解器中，该动作必须以 state_lacks_carrier 记录 drop。
+        """
+        from tests.fixtures.conflict_rule_fixtures import make_test_atom
+
+        # 1. bathrobe 独立消解器核验
+        atom_bathrobe = make_test_atom("bathrobe", source_slot="clothing", item_id="bathrobe", garment_topologies=["one_piece"], tag_order=0)
+        atoms_bathrobe = [
+            atom_bathrobe,
+            make_test_atom("robe open at chest", source_slot="clothing_state", item_id="unbuttoned", garment_topologies=["one_piece"], garment_states=["opened"], tag_order=1),
+            make_test_atom("collar unbuttoned", source_slot="clothing_state", item_id="unbuttoned", garment_topologies=["top", "one_piece", "outerwear"], garment_states=["opened"], tag_order=2),
+            make_test_atom("shirt open at chest", source_slot="clothing_state", item_id="unbuttoned", garment_topologies=["top"], garment_states=["opened"], tag_order=3),
+            make_test_atom("blouse unbuttoned", source_slot="clothing_state", item_id="unbuttoned", garment_topologies=["top"], garment_states=["opened"], tag_order=4),
+            make_test_atom("suit unbuttoned at chest", source_slot="clothing_state", item_id="unbuttoned", garment_topologies=["one_piece"], garment_states=["opened"], tag_order=5),
+        ]
+        _, _, rep_bathrobe = self.resolver.resolve_atoms_with_full_report(atoms_bathrobe)
+        dropped_bathrobe = {d.before_text: d.reason_code for d in rep_bathrobe.decisions if d.action == "drop"}
+        self.assertNotIn("robe open at chest", dropped_bathrobe)
+        self.assertNotIn("collar unbuttoned", dropped_bathrobe)
+        self.assertEqual(dropped_bathrobe.get("shirt open at chest"), "state_lacks_carrier")
+        self.assertEqual(dropped_bathrobe.get("blouse unbuttoned"), "state_lacks_carrier")
+        self.assertEqual(dropped_bathrobe.get("suit unbuttoned at chest"), "state_lacks_carrier")
+
+        # 2. racing_suit 独立消解器核验
+        atom_racing = make_test_atom("racing suit", source_slot="clothing", item_id="racing_suit", garment_topologies=["one_piece"], tag_order=0)
+        atoms_racing = [
+            atom_racing,
+            make_test_atom("suit unbuttoned at chest", source_slot="clothing_state", item_id="unbuttoned", garment_topologies=["one_piece"], garment_states=["opened"], tag_order=1),
+            make_test_atom("collar unbuttoned", source_slot="clothing_state", item_id="unbuttoned", garment_topologies=["top", "one_piece", "outerwear"], garment_states=["opened"], tag_order=2),
+            make_test_atom("shirt open at chest", source_slot="clothing_state", item_id="unbuttoned", garment_topologies=["top"], garment_states=["opened"], tag_order=3),
+            make_test_atom("robe open at chest", source_slot="clothing_state", item_id="unbuttoned", garment_topologies=["one_piece"], garment_states=["opened"], tag_order=4),
+        ]
+        _, _, rep_racing = self.resolver.resolve_atoms_with_full_report(atoms_racing)
+        dropped_racing = {d.before_text: d.reason_code for d in rep_racing.decisions if d.action == "drop"}
+        self.assertNotIn("suit unbuttoned at chest", dropped_racing)
+        self.assertNotIn("collar unbuttoned", dropped_racing)
+        self.assertEqual(dropped_racing.get("shirt open at chest"), "state_lacks_carrier")
+        self.assertEqual(dropped_racing.get("robe open at chest"), "state_lacks_carrier")
+
+        # 3. 多承载物长期回归：同时存在浴袍与合法衬衫，显式指定浴袍为目标绝不回退改绑
+        carrier_bathrobe = GarmentCarrierEntity(
+            entity_id="carrier_bathrobe",
+            selector="clothing",
+            selected_id="bathrobe",
+            member_atoms=[atom_bathrobe],
+        )
+        atom_shirt_carrier2 = make_test_atom("white collared shirt", source_slot="clothing", item_id="shirts_blouses", garment_topologies=["top"], tag_order=5)
+        carrier_shirt2 = GarmentCarrierEntity(
+            entity_id="carrier_shirt",
+            selector="clothing",
+            selected_id="shirts_blouses",
+            member_atoms=[atom_shirt_carrier2],
+        )
+        atom_shirt_action_targeted_to_robe = make_test_atom(
+            "shirt open at chest",
+            source_slot="clothing_state",
+            item_id="unbuttoned",
+            garment_topologies=["top"],
+            garment_states=["opened"],
+            target_id="bathrobe",
+            tag_order=6,
+        )
+        binding_robe_multi = find_bound_carrier(atom_shirt_action_targeted_to_robe, [carrier_bathrobe, carrier_shirt2])
+        self.assertEqual(
+            binding_robe_multi.status,
+            BindingStatus.UNBOUND_INCOMPATIBLE,
+            "Targeting shirt action to bathrobe must return UNBOUND_INCOMPATIBLE even when a compatible shirt carrier exists",
+        )
+        self.assertNotEqual(
+            binding_robe_multi.target_entity,
+            carrier_shirt2,
+            "Must NOT fallback rebind to compatible shirt when explicit target_id was specified",
+        )
+
+        multi_atoms_robe = [atom_bathrobe, atom_shirt_carrier2, atom_shirt_action_targeted_to_robe]
+        _, _, report_robe_multi = self.resolver.resolve_atoms_with_full_report(multi_atoms_robe)
+        dropped_robe_multi = {d.before_text: d.reason_code for d in report_robe_multi.decisions if d.action == "drop"}
+        self.assertEqual(
+            dropped_robe_multi.get("shirt open at chest"),
+            "state_lacks_carrier",
+            "Explicitly mis-targeted shirt action must be dropped with state_lacks_carrier without fallback",
+        )
+
     def test_06_end_to_end_generation_and_dag_provenance(self):
-        """端到端验证 Batch 1 (16 款), Batch 2 (22 款), Batch 3 (23 款) 共 61 款新增款式在真实节点生成下的 Provenance DAG 完整性与零未消解冲突。"""
+        """端到端验证 Batch 1 (16 款), Batch 2 (22 款), Batch 3 (23 款), Batch 4 (23 款) 共 84 款新增款式在真实节点生成下的 Provenance DAG 完整性与零未消解冲突。"""
         from tests.test_rc8_quality_gate import _verify_provenance_dag
 
-        all_items = [(i[0], i[1]) for i in BATCH_1_ITEMS] + [(i[0], i[1]) for i in BATCH_2_ITEMS] + [(i[0], i[1]) for i in BATCH_3_ITEMS]
+        all_items = (
+            [(i[0], i[1]) for i in BATCH_1_ITEMS]
+            + [(i[0], i[1]) for i in BATCH_2_ITEMS]
+            + [(i[0], i[1]) for i in BATCH_3_ITEMS]
+            + [(i[0], i[1]) for i in BATCH_4_ITEMS]
+        )
         for cid, name_zh in all_items:
             res = self.generator.generate_structured(
                 场景预设="日常街道",
@@ -567,8 +824,8 @@ class TestClothingExpansionBatches(unittest.TestCase):
         2. 基础服装防空保留：在所有应保留基础服装的模式下，len(res.base_tags) >= 1；
         3. 版型与属性约束：恰有 1 个主款/变体 (core_base/variant)，至多 1 个可组合属性 (combinable_attribute)；
         4. 同组互斥严格为 1：res.base_tags 中绝不允许存在共享相同非空 mutex_group 的两个标签；
-        5. 全变体可达性 (Reachability)：对 Batch 1 (16 款), Batch 2 (22 款), Batch 3 (23 款) 逐款多种子抽样，
-           词库定义的每一个变体与属性均被真实采到，Batch 1 51 个叶子标签、Batch 2 67 个叶子标签、Batch 3 75 个叶子标签 (共 193 个) 100% 可达。
+        5. 全变体可达性 (Reachability)：对 Batch 1 (16 款), Batch 2 (22 款), Batch 3 (23 款), Batch 4 (23 款) 逐款多种子抽样，
+           词库定义的每一个变体与属性均被真实采到，四个新增批次累计269个叶子标签 100% 可达。
         """
         with open(DATA_DIR / "clothing.json", "r", encoding="utf-8") as f:
             cdata = json.load(f)
@@ -655,7 +912,12 @@ class TestClothingExpansionBatches(unittest.TestCase):
         b1_seen = run_batch_checks(BATCH_1_ITEMS, 51, "Batch 1")
         b2_seen = run_batch_checks(BATCH_2_ITEMS, 67, "Batch 2")
         b3_seen = run_batch_checks(BATCH_3_ITEMS, 75, "Batch 3")
-        self.assertEqual(len(b1_seen | b2_seen | b3_seen), 193, "Combined Batch 1 + 2 + 3 reached leaf tags must be exactly 193")
+        b4_seen = run_batch_checks(BATCH_4_ITEMS, 76, "Batch 4")
+        self.assertEqual(
+            len(b1_seen | b2_seen | b3_seen | b4_seen),
+            269,
+            "四个新增批次累计269个叶子标签 must be exactly 269",
+        )
 
 
     def test_08_legacy_31_styles_compatibility_and_rng_order(self):
