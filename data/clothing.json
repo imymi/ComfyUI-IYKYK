@@ -2414,8 +2414,8 @@
             122,
             175
           ],
-          "derivation": "verbatim",
-          "derivation_note": "台账第122行白色衣服与第175行白衬衫合并归口",
+          "derivation": "derived",
+          "derivation_note": "派生自第122行白色衣服与第175行白衬衫合并归口，细化为有领纽扣白衬衫版型",
           "facts": {
             "semantic_role": "selector",
             "garment_topologies": [

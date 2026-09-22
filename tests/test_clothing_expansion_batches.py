@@ -179,9 +179,11 @@ class TestClothingExpansionBatches(unittest.TestCase):
     def test_07_four_state_modes_mutual_exclusion_and_variant_reachability(self):
         """
         覆盖四种状态模式 (NONE, AUTO, RANDOM, EXPLICIT) 的受控独立采样契约：
-        1. 同组互斥严格为 1：res.base_tags 中绝不允许存在共享相同非空 mutex_group 的两个标签；
-        2. 基础服装防空保留：在所有应保留基础服装的模式下，len(res.base_tags) >= 1，且必包含主款或变体；
-        3. 全变体可达性 (Reachability)：对 16 款逐款多种子抽样，词库定义的每一个变体与可组合属性均能被真实抽中。
+        1. 规范等级代码 (L2-L4) 覆盖 AUTO, RANDOM, EXPLICIT 的真实分支，同时保留 NONE；
+        2. 基础服装防空保留：在所有应保留基础服装的模式下，len(res.base_tags) >= 1；
+        3. 版型与属性约束：恰有 1 个主款/变体 (core_base/variant)，至多 1 个可组合属性 (combinable_attribute)；
+        4. 同组互斥严格为 1：res.base_tags 中绝不允许存在共享相同非空 mutex_group 的两个标签；
+        5. 全变体可达性 (Reachability)：对 16 款逐款多种子抽样，词库定义的每一个变体与属性均被真实采到，全批 51 个叶子变体 100% 可达。
         """
         with open(DATA_DIR / "clothing.json", "r", encoding="utf-8") as f:
             cdata = json.load(f)
@@ -189,11 +191,18 @@ class TestClothingExpansionBatches(unittest.TestCase):
 
         modes = [
             ("NONE", "无 (None)", "L1"),
-            ("AUTO", "自动联动裸露等级 (Auto Link Nudity)", "L2 差分微露 (Partially Exposed)"),
-            ("RANDOM", "随机 (Random)", "L1"),
-            ("EXPLICIT", "正常穿着 (Normal)", "L1"),
+            ("AUTO_L2", "自动联动裸露等级 (Auto Link Nudity)", "L2"),
+            ("AUTO_L3", "自动联动裸露等级 (Auto Link Nudity)", "L3"),
+            ("AUTO_L4", "自动联动裸露等级 (Auto Link Nudity)", "L4"),
+            ("RANDOM_L2", "随机 (Random)", "L2"),
+            ("RANDOM_L3", "随机 (Random)", "L3"),
+            ("RANDOM_L4", "随机 (Random)", "L4"),
+            ("EXPLICIT_L2", "正常穿着 (Normal)", "L2"),
+            ("EXPLICIT_L3", "正常穿着 (Normal)", "L3"),
+            ("EXPLICIT_L4", "正常穿着 (Normal)", "L4"),
         ]
 
+        all_seen_tags = set()
         for cid, _, _, _ in BATCH_1_ITEMS:
             expected_tags = catalog_tags_by_id[cid]
             seen_tags = set()
@@ -210,7 +219,7 @@ class TestClothingExpansionBatches(unittest.TestCase):
                         f"Category {cid} produced empty base_tags under mode {mode_name} with seed {seed}"
                     )
 
-                    # 2. 必须且仅有 1 个版型主款/变体 (role in core_base, variant)
+                    # 2. 恰有 1 个版型主款/变体 (role in core_base, variant)
                     silhouettes = [t for t in res.base_tags if getattr(t, "role", None) in ("core_base", "variant")]
                     self.assertEqual(
                         len(silhouettes),
@@ -218,10 +227,19 @@ class TestClothingExpansionBatches(unittest.TestCase):
                         f"Category {cid} expected exactly 1 silhouette variant, got {[t.text for t in silhouettes]} under {mode_name} seed {seed}"
                     )
 
-                    # 3. 强互斥不共存：同一互斥组至多 1 个
+                    # 3. 至多 1 个可组合属性 (role == combinable_attribute)
+                    attributes = [t for t in res.base_tags if getattr(t, "role", None) == "combinable_attribute"]
+                    self.assertLessEqual(
+                        len(attributes),
+                        1,
+                        f"Category {cid} expected at most 1 combinable attribute, got {[t.text for t in attributes]} under {mode_name} seed {seed}"
+                    )
+
+                    # 4. 强互斥不共存：同一互斥组至多 1 个
                     used_mg_counts: dict[str, int] = {}
                     for tag in res.base_tags:
                         seen_tags.add(tag.text)
+                        all_seen_tags.add(tag.text)
                         for mg in tag.facts.mutex_groups:
                             used_mg_counts[mg] = used_mg_counts.get(mg, 0) + 1
                     for mg, count in used_mg_counts.items():
@@ -231,7 +249,7 @@ class TestClothingExpansionBatches(unittest.TestCase):
                             f"Category {cid} co-sampled {count} tags in same mutex_group '{mg}': {[t.text for t in res.base_tags]} under {mode_name} seed {seed}"
                         )
 
-            # 4. 全变体可达性验证：该款词库声明的每一个标签在不同种子下均能被实际采到
+            # 5. 款内可达性验证：该款词库声明的每一个标签在不同种子下均能被实际采到
             unreached = expected_tags - seen_tags
             self.assertEqual(
                 len(unreached),
@@ -239,17 +257,39 @@ class TestClothingExpansionBatches(unittest.TestCase):
                 f"Category {cid} has unreachable tags in controlled sampling: {unreached}"
             )
 
+        # 6. 全批可达性验证：Batch 1 声明的全部 51 个叶子标签必须全部被采到
+        self.assertEqual(
+            len(all_seen_tags),
+            51,
+            f"Expected all 51 leaf tags across Batch 1 to be reached, got {len(all_seen_tags)}"
+        )
+
     def test_08_legacy_31_styles_compatibility_and_rng_order(self):
         """
         验证存量 31 款向后兼容与随机数调用顺序严格保真：
         1. 存量款式在 SelectionMode.NONE 下保持原分支，返回全部基础标签且不消耗 RNG 调用；
         2. 在 L5/L6 等原本不输出基础服装的路径继续输出空 base_tags，保持原行为；
-        3. 对比固定种子下显式调用的输出一致性。
+        3. 对比 596f43e 基线的固定多场景/多种子全量输出 (930 组用例) 与 RNG 状态序列，严格断言哈希一致。
         """
+        import hashlib
         from tests.test_clothing_catalog_integrity import BASE_31_IDS
 
+        test_scenarios = [
+            ("无 (None)", "L1"),
+            ("无 (None)", "L2"),
+            ("无 (None)", "L5"),
+            ("自动联动裸露等级 (Auto Link Nudity)", "L1"),
+            ("自动联动裸露等级 (Auto Link Nudity)", "L2"),
+            ("自动联动裸露等级 (Auto Link Nudity)", "L3"),
+            ("随机 (Random)", "L1"),
+            ("随机 (Random)", "L2"),
+            ("正常穿着 (Normal)", "L1"),
+            ("正常穿着 (Normal)", "L2"),
+        ]
+
+        records = []
         for cid in sorted(BASE_31_IDS):
-            # 1. NONE 模式：存量款式无元数据，必须返回全部基础标签
+            # 1. NONE 模式：存量款式无元数据，必须返回全部基础标签且 0 次 RNG 消费
             rng_a = Random(42)
             state_before = rng_a.getstate()
             res_none = self.sampler.sample_clothing_result(cid, "无 (None)", "L1", rng_a)
@@ -267,6 +307,33 @@ class TestClothingExpansionBatches(unittest.TestCase):
             self.assertEqual(len(res_l5.base_tags), 0, f"Legacy style {cid} under L5 must have empty base_tags")
             res_l6 = self.sampler.sample_clothing_result(cid, "正常穿着 (Normal)", "L6", Random(42))
             self.assertEqual(len(res_l6.base_tags), 0, f"Legacy style {cid} under L6 must have empty base_tags")
+
+            # 3. 收集 930 组输出与 post-call RNG 状态以核验 596f43e 基线保真度
+            for state_opt, nudity_code in test_scenarios:
+                for seed in (42, 100, 2024):
+                    rng = Random(seed)
+                    res = self.sampler.sample_clothing_result(cid, state_opt, nudity_code, rng)
+                    records.append({
+                        "cid": cid,
+                        "state_opt": state_opt,
+                        "nudity": nudity_code,
+                        "seed": seed,
+                        "base": [t.text for t in res.base_tags],
+                        "state": [t.text for t in res.state_tags],
+                        "ext": [t.text for t in res.extension_tags],
+                        "state_id": res.state_id,
+                        "rng_next": rng.random(),
+                    })
+
+        self.assertEqual(len(records), 930)
+        serialized = json.dumps(records, sort_keys=True, ensure_ascii=False)
+        digest = hashlib.sha256(serialized.encode("utf-8")).hexdigest()
+        golden_digest_596f43e = "2d00175f39f7c8fd2492f212e8867efd0feb5c1a697d0591829fdf5c1c3da4c4"
+        self.assertEqual(
+            digest,
+            golden_digest_596f43e,
+            f"Legacy 31 styles sampling output or RNG sequence drifted from 596f43e baseline! Got {digest}"
+        )
 
 
 if __name__ == "__main__":

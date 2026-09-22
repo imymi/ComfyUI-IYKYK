@@ -286,11 +286,51 @@ class TestClothingCatalogIntegrity(unittest.TestCase):
             self.assertTrue(has_core, f"Category {cid} must have at least one 'core_base' tag")
 
     def test_05_bidirectional_raw_lines_ledger_mapping_and_merge_rationales(self):
-        """双向核验原始 TSV 行与词库映射：台账迁移行 100% 覆盖，标签引用行真实存在且归口精确，多对一归并依据充分。"""
+        """双向核验原始 TSV 行与词库映射：
+        1. 真实读取 TSV 原文，校验行号连续性与 100% 存在；
+        2. 校验 verbatim 标签在 TSV 规范化原词中严格有据可查，杜绝凭空新增修饰；
+        3. 台账迁移行 100% 覆盖，标签引用行真实存在且归口精确，多对一归并依据充分。
+        """
         self.assertTrue(LEDGER_PATH.exists(), f"Ledger file missing at {LEDGER_PATH}")
         self.assertTrue(RAW_TSV_PATH.exists(), f"TSV file missing at {RAW_TSV_PATH}")
 
-        # 1. 从迁移台账提取所有分配给 Batch 1 的原始行
+        # 1. 真实读取并解析原始 TSV 输入文件
+        tsv_lines = RAW_TSV_PATH.read_text(encoding="utf-8").splitlines()
+        self.assertGreater(len(tsv_lines), 1, "TSV file is empty")
+        tsv_raw_by_line: dict[int, dict[str, str]] = {}
+        for line in tsv_lines[1:]:
+            parts = line.split("\t")
+            if len(parts) >= 4 and parts[0].isdigit():
+                lno = int(parts[0])
+                tsv_raw_by_line[lno] = {
+                    "cat": parts[1].strip(),
+                    "zh": parts[2].strip(),
+                    "en": parts[3].strip(),
+                }
+        self.assertEqual(len(tsv_raw_by_line), 246, f"Expected 246 TSV rows, got {len(tsv_raw_by_line)}")
+
+        # 定义严格允许的 verbatim 文本规范化规则：
+        # - 大小写归一 (casefold / lower)；
+        # - 下划线转空格；
+        # - 末尾标点逗号/分号清除；
+        # - 按逗号分词取独立原子短语；
+        # - 英文常规单复数归一 (如 uniforms -> uniform)；
+        # - 已知原始笔误纠偏 (如 frillded -> frilled)。
+        def get_allowed_verbatim_forms(raw_text: str) -> set[str]:
+            forms = set()
+            base = raw_text.strip().lower().replace("_", " ").rstrip(",;").strip()
+            forms.add(base)
+            for chunk in re.split(r"[,;]+", raw_text):
+                c = chunk.strip().lower().replace("_", " ").rstrip(",;").strip()
+                if c:
+                    forms.add(c)
+                    if c.endswith("s") and not c.endswith("ss"):
+                        forms.add(c[:-1])
+                    if "frillded" in c:
+                        forms.add(c.replace("frillded", "frilled"))
+            return forms
+
+        # 2. 从迁移台账提取所有分配给 Batch 1 的原始行
         ledger_text = LEDGER_PATH.read_text(encoding="utf-8")
         b1_ledger_rows: dict[int, dict[str, str]] = {}
         for line in ledger_text.splitlines():
@@ -314,7 +354,7 @@ class TestClothingCatalogIntegrity(unittest.TestCase):
 
         self.assertEqual(len(b1_ledger_rows), 27, f"Expected 27 ledger rows targeting Batch 1, got {len(b1_ledger_rows)}")
 
-        # 2. 方向一 (Ledger -> Tags): 台账中分配给 Batch 1 的每一行在词库中均有对应标签与来源行号标注
+        # 3. 方向一 (Ledger -> Tags): 台账中分配给 Batch 1 的每一行在词库中均有对应标签与来源行号标注
         catalog_rows_by_cid: dict[str, set[int]] = {cid: set() for cid in BATCH_1_IDS}
         for cid in BATCH_1_IDS:
             for tag in self.cat_by_id[cid].get("tags", []):
@@ -335,21 +375,45 @@ class TestClothingCatalogIntegrity(unittest.TestCase):
                     f"Merged ledger row {row_no} missing substantial merge rationale: '{rdata['reason']}'"
                 )
 
-        # 3. 方向二 (Tags -> Ledger): 词库标签引用的每一个 raw_lines 行号真实存在且在台账中属于该款式
+        # 4. 方向二 (Tags -> Ledger & TSV): 词库标签引用的每一个 raw_lines 行号真实存在且在台账中属于该款式
         for cid in BATCH_1_IDS:
             cat = self.cat_by_id[cid]
             for tag in cat.get("tags", []):
-                for r in tag.get("raw_lines", []):
+                tid = tag["id"]
+                tag_text = tag["text"].strip().lower()
+                deriv = tag.get("derivation")
+                raw_lines = tag.get("raw_lines", [])
+
+                for r in raw_lines:
+                    self.assertIn(r, tsv_raw_by_line, f"Tag {tid} in {cid} references nonexistent TSV row {r}!")
                     self.assertIn(
                         r,
                         b1_ledger_rows,
-                        f"Tag {tag['id']} in {cid} references row {r}, which is not assigned to Batch 1 in the ledger!"
+                        f"Tag {tid} in {cid} references row {r}, which is not assigned to Batch 1 in the ledger!"
                     )
                     expected_cid = b1_ledger_rows[r]["target_id"]
                     self.assertEqual(
                         cid,
                         expected_cid,
-                        f"Tag {tag['id']} in {cid} references row {r}, but that row belongs to {expected_cid} in the ledger!"
+                        f"Tag {tid} in {cid} references row {r}, but that row belongs to {expected_cid} in the ledger!"
+                    )
+
+                # 5. 原文真伪校验：若标注为 verbatim，必须在引用行的规范化原文中严格匹配
+                if deriv == "verbatim":
+                    allowed_forms = set()
+                    for r in raw_lines:
+                        allowed_forms.update(get_allowed_verbatim_forms(tsv_raw_by_line[r]["en"]))
+                    self.assertIn(
+                        tag_text,
+                        allowed_forms,
+                        f"Tag {tid} ('{tag['text']}') in {cid} is marked verbatim but not found in allowed forms "
+                        f"{allowed_forms} of raw lines {raw_lines}! If it includes derived details, mark as 'derived' or 'product_extension'."
+                    )
+                else:
+                    # derived 或 product_extension 必须给出具体扩写说明
+                    self.assertTrue(
+                        bool(tag.get("derivation_note")),
+                        f"Tag {tid} in {cid} is '{deriv}' but missing derivation_note"
                     )
 
 
