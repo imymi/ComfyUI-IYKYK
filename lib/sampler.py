@@ -820,22 +820,41 @@ class DataSampler:
         state_id: Optional[str] = None
 
         # L1, L5, L6: 强力应用 style_overrides 保证纯净性与防泄漏
-        if nudity_level_code in ("L1", "L5", "L6") and c_id in style_overrides:
-            override_tags = list(style_overrides[c_id])
-            _, state_tags_list = self._to_sampled_tags(
-                override_tags,
-                c_id,
-                "clothing_state",
-                semantic_ids=(f"clothing:{c_id}", f"nudity:{nudity_level_code}", "override:linkage")
-            )
-            return ClothingSampleResult(
-                base_tags=(),
-                state_tags=tuple(state_tags_list),
-                extension_tags=(),
-                style_id=c_id,
-                state_id="linkage_override",
-                nudity_level=nudity_level_code
-            )
+        if nudity_level_code in ("L1", "L5", "L6"):
+            if c_id in style_overrides:
+                override_tags = list(style_overrides[c_id])
+                _, state_tags_list = self._to_sampled_tags(
+                    override_tags,
+                    c_id,
+                    "clothing_state",
+                    semantic_ids=(f"clothing:{c_id}", f"nudity:{nudity_level_code}", "override:linkage")
+                )
+                return ClothingSampleResult(
+                    base_tags=(),
+                    state_tags=tuple(state_tags_list),
+                    extension_tags=(),
+                    style_id=c_id,
+                    state_id="linkage_override",
+                    nudity_level=nudity_level_code
+                )
+            else:
+                gen_tags = linkage_data.get("general_tags", [])
+                chosen_gen = self._pick(gen_tags, rng, min(2, len(gen_tags)))
+                _, state_tags_list = self._to_sampled_tags(
+                    chosen_gen,
+                    "linkage_general",
+                    "clothing_state",
+                    semantic_ids=(f"clothing:{c_id}", f"nudity:{nudity_level_code}", "linkage:general")
+                )
+                chosen_base = self._pick(base_tags_tuple, rng, min(2, len(base_tags_tuple))) if nudity_level_code == "L1" else ()
+                return ClothingSampleResult(
+                    base_tags=tuple(chosen_base),
+                    state_tags=tuple(state_tags_list),
+                    extension_tags=(),
+                    style_id=c_id,
+                    state_id="linkage_general",
+                    nudity_level=nudity_level_code
+                )
 
         if state_mode == SelectionMode.AUTO:
             if nudity_level_code in ("L1", "L5", "L6"):

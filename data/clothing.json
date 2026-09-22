@@ -1713,6 +1713,692 @@
           }
         }
       ]
+    },
+    {
+      "id": "combat_tactical",
+      "name_zh": "战斗服 (Combat Tactical Suit)",
+      "aliases": [
+        "combat_suit",
+        "swat_uniform",
+        "tactical_uniform"
+      ],
+      "tags": [
+        {
+          "id": "combat_tactical__tag_000",
+          "text": "combat suit",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "top"
+            ]
+          }
+        },
+        {
+          "id": "combat_tactical__tag_001",
+          "text": "tactical military jacket",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "top"
+            ]
+          }
+        },
+        {
+          "id": "combat_tactical__tag_002",
+          "text": "swat uniform",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "top"
+            ]
+          }
+        },
+        {
+          "id": "combat_tactical__tag_003",
+          "text": "tactical vest over uniform",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "top"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "convenience_store",
+      "name_zh": "便利店工作服 (Convenience Store Uniform)",
+      "aliases": [
+        "convenience_store_uniform",
+        "clerk_uniform",
+        "convenience_store_worker"
+      ],
+      "tags": [
+        {
+          "id": "convenience_store__tag_000",
+          "text": "convenience store uniform",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "top"
+            ]
+          }
+        },
+        {
+          "id": "convenience_store__tag_001",
+          "text": "retail worker collared shirt",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "top"
+            ]
+          }
+        },
+        {
+          "id": "convenience_store__tag_002",
+          "text": "store staff apron uniform",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "top"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "crop_top",
+      "name_zh": "小可爱露腹短上衣 (Crop Top)",
+      "aliases": [
+        "crop_top",
+        "belly_top",
+        "short_top"
+      ],
+      "tags": [
+        {
+          "id": "crop_top__tag_000",
+          "text": "crop top",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "top"
+            ]
+          }
+        },
+        {
+          "id": "crop_top__tag_001",
+          "text": "cropped short shirt",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "top"
+            ]
+          }
+        },
+        {
+          "id": "crop_top__tag_002",
+          "text": "exposed midriff cropped top",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "top"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "fast_food_uniform",
+      "name_zh": "快餐制服 (Fast Food Uniform)",
+      "aliases": [
+        "fast_food_worker",
+        "restaurant_uniform",
+        "fast_food_staff"
+      ],
+      "tags": [
+        {
+          "id": "fast_food_uniform__tag_000",
+          "text": "fast food uniform",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "top"
+            ]
+          }
+        },
+        {
+          "id": "fast_food_uniform__tag_001",
+          "text": "fast food polo shirt and visor",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "top"
+            ]
+          }
+        },
+        {
+          "id": "fast_food_uniform__tag_002",
+          "text": "short sleeve collared fast food uniform",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "top"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "fishnet_top",
+      "name_zh": "网纹衣 (Fishnet Top)",
+      "aliases": [
+        "fishnet_shirt",
+        "mesh_top",
+        "netted_shirt"
+      ],
+      "tags": [
+        {
+          "id": "fishnet_top__tag_000",
+          "text": "fishnet top",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "top"
+            ]
+          }
+        },
+        {
+          "id": "fishnet_top__tag_001",
+          "text": "black mesh fishnet shirt",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "top"
+            ]
+          }
+        },
+        {
+          "id": "fishnet_top__tag_002",
+          "text": "sheer net long sleeve top",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "top"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "hoodie",
+      "name_zh": "连帽衫 (Hoodie)",
+      "aliases": [
+        "hooded_sweatshirt",
+        "hooded_sweater",
+        "oversized_hoodie"
+      ],
+      "tags": [
+        {
+          "id": "hoodie__tag_000",
+          "text": "hoodie",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "top"
+            ]
+          }
+        },
+        {
+          "id": "hoodie__tag_001",
+          "text": "oversized hoodie with hood",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "top"
+            ]
+          }
+        },
+        {
+          "id": "hoodie__tag_002",
+          "text": "hooded sweatshirt with kangaroo pocket",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "top"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "knit_vest",
+      "name_zh": "V领针织背心 (Knit Vest)",
+      "aliases": [
+        "sweater_vest",
+        "v_neck_vest",
+        "sleeveless_sweater"
+      ],
+      "tags": [
+        {
+          "id": "knit_vest__tag_000",
+          "text": "v-neck sweater vest",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "top"
+            ]
+          }
+        },
+        {
+          "id": "knit_vest__tag_001",
+          "text": "sleeveless knit vest",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "top"
+            ]
+          }
+        },
+        {
+          "id": "knit_vest__tag_002",
+          "text": "cable knit sweater vest",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "top"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "military_uniform",
+      "name_zh": "军装 (Military Uniform)",
+      "aliases": [
+        "army_uniform",
+        "military_jacket",
+        "officer_uniform"
+      ],
+      "tags": [
+        {
+          "id": "military_uniform__tag_000",
+          "text": "military uniform",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "top"
+            ]
+          }
+        },
+        {
+          "id": "military_uniform__tag_001",
+          "text": "formal military dress uniform",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "top"
+            ]
+          }
+        },
+        {
+          "id": "military_uniform__tag_002",
+          "text": "army service uniform jacket",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "top"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "sailor_shirt",
+      "name_zh": "水手衬衫 (Sailor Shirt)",
+      "aliases": [
+        "sailor_collar_shirt",
+        "sailor_blouse"
+      ],
+      "tags": [
+        {
+          "id": "sailor_shirt__tag_000",
+          "text": "sailor shirt",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "top"
+            ]
+          }
+        },
+        {
+          "id": "sailor_shirt__tag_001",
+          "text": "white sailor collar blouse with neckerchief",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "top"
+            ]
+          }
+        },
+        {
+          "id": "sailor_shirt__tag_002",
+          "text": "short sleeve sailor shirt",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "top"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "shirts_blouses",
+      "name_zh": "高领衬衫 (Shirts & Blouses)",
+      "aliases": [
+        "collared_shirt",
+        "white_shirt",
+        "button_down_shirt",
+        "frilled_shirt",
+        "taut_shirt"
+      ],
+      "tags": [
+        {
+          "id": "shirts_blouses__tag_000",
+          "text": "collared shirt",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "top"
+            ]
+          }
+        },
+        {
+          "id": "shirts_blouses__tag_001",
+          "text": "white button-down shirt",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "top"
+            ]
+          }
+        },
+        {
+          "id": "shirts_blouses__tag_002",
+          "text": "taut shirt",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "top"
+            ]
+          }
+        },
+        {
+          "id": "shirts_blouses__tag_003",
+          "text": "frilled shirt",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "top"
+            ]
+          }
+        },
+        {
+          "id": "shirts_blouses__tag_004",
+          "text": "long sleeve collared blouse",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "top"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "sportswear_active",
+      "name_zh": "运动服 (Active Sportswear)",
+      "aliases": [
+        "activewear",
+        "athletic_wear",
+        "tracksuit_top"
+      ],
+      "tags": [
+        {
+          "id": "sportswear_active__tag_000",
+          "text": "sportswear",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "top"
+            ]
+          }
+        },
+        {
+          "id": "sportswear_active__tag_001",
+          "text": "athletic sportswear top",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "top"
+            ]
+          }
+        },
+        {
+          "id": "sportswear_active__tag_002",
+          "text": "breathable athletic shirt",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "top"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "strapless_top",
+      "name_zh": "抹胸 (Strapless Top)",
+      "aliases": [
+        "tube_top",
+        "strapless_tank_top",
+        "bandeau"
+      ],
+      "tags": [
+        {
+          "id": "strapless_top__tag_000",
+          "text": "strapless tank top",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "top"
+            ]
+          }
+        },
+        {
+          "id": "strapless_top__tag_001",
+          "text": "strapless tube top",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "top"
+            ]
+          }
+        },
+        {
+          "id": "strapless_top__tag_002",
+          "text": "navel cutout strapless top",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "top"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "sweatshirt",
+      "name_zh": "圆领卫衣 (Sweatshirt)",
+      "aliases": [
+        "crewneck_sweatshirt",
+        "crew_neck_sweater",
+        "pullover_sweatshirt"
+      ],
+      "tags": [
+        {
+          "id": "sweatshirt__tag_000",
+          "text": "sweatshirt",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "top"
+            ]
+          }
+        },
+        {
+          "id": "sweatshirt__tag_001",
+          "text": "crewneck sweatshirt",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "top"
+            ]
+          }
+        },
+        {
+          "id": "sweatshirt__tag_002",
+          "text": "cotton pullover sweatshirt",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "top"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "t_shirt",
+      "name_zh": "T恤 (T-Shirt)",
+      "aliases": [
+        "tee",
+        "casual_t_shirt",
+        "short_sleeve_tee"
+      ],
+      "tags": [
+        {
+          "id": "t_shirt__tag_000",
+          "text": "t-shirt",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "top"
+            ]
+          }
+        },
+        {
+          "id": "t_shirt__tag_001",
+          "text": "casual cotton t-shirt",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "top"
+            ]
+          }
+        },
+        {
+          "id": "t_shirt__tag_002",
+          "text": "short sleeve crewneck t-shirt",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "top"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "tops_tanks",
+      "name_zh": "背心 (Tanks & Camisoles)",
+      "aliases": [
+        "tank_top",
+        "camisole",
+        "sleeveless_undershirt"
+      ],
+      "tags": [
+        {
+          "id": "tops_tanks__tag_000",
+          "text": "tank top",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "top"
+            ]
+          }
+        },
+        {
+          "id": "tops_tanks__tag_001",
+          "text": "ribbed tank top",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "top"
+            ]
+          }
+        },
+        {
+          "id": "tops_tanks__tag_002",
+          "text": "sleeveless camisole top",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "top"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "volleyball_uniform",
+      "name_zh": "排球服 (Volleyball Uniform)",
+      "aliases": [
+        "volleyball_jersey",
+        "volleyball_kit"
+      ],
+      "tags": [
+        {
+          "id": "volleyball_uniform__tag_000",
+          "text": "volleyball uniform",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "top"
+            ]
+          }
+        },
+        {
+          "id": "volleyball_uniform__tag_001",
+          "text": "athletic volleyball jersey",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "top"
+            ]
+          }
+        },
+        {
+          "id": "volleyball_uniform__tag_002",
+          "text": "numbered sports volleyball top",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "top"
+            ]
+          }
+        }
+      ]
     }
   ],
   "clothing_states": [
@@ -1724,6 +2410,10 @@
     {
       "id": "normal",
       "name_zh": "整齐穿着 (Normal Wearing)",
+      "aliases": [
+        "正常穿着 (Normal)",
+        "正常穿着"
+      ],
       "tags": [
         {
           "id": "normal__tag_000",

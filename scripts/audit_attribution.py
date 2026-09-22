@@ -10,7 +10,7 @@ audit_attribution.py — 全量种子审计差异原子级精确归因引擎
 """
 from __future__ import annotations
 
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 
 
 CLOTHING_SLOTS = frozenset({
@@ -24,17 +24,32 @@ CLOTHING_SLOTS = frozenset({
 
 def attribute_seed_diff(
     s: int,
-    rc8_clothing_id: str,
-    cur_clothing_id: str,
-    rc8_src_atoms: List[Dict[str, Any]],
-    rc8_final_atoms: List[Dict[str, Any]],
-    rc8_decisions: List[Dict[str, Any]],
-    cur_src_atoms: List[Dict[str, Any]],
-    cur_final_atoms: List[Dict[str, Any]],
-    cur_decisions: List[Dict[str, Any]],
+    rc8_clothing_id: Optional[str] = None,
+    cur_clothing_id: str = "",
+    rc8_src_atoms: Optional[List[Dict[str, Any]]] = None,
+    rc8_final_atoms: Optional[List[Dict[str, Any]]] = None,
+    rc8_decisions: Optional[List[Dict[str, Any]]] = None,
+    cur_src_atoms: Optional[List[Dict[str, Any]]] = None,
+    cur_final_atoms: Optional[List[Dict[str, Any]]] = None,
+    cur_decisions: Optional[List[Dict[str, Any]]] = None,
+    *,
+    base_clothing_id: Optional[str] = None,
+    base_src_atoms: Optional[List[Dict[str, Any]]] = None,
+    base_final_atoms: Optional[List[Dict[str, Any]]] = None,
+    base_decisions: Optional[List[Dict[str, Any]]] = None,
+    base_catalog_size: Optional[int] = None,
+    cur_catalog_size: Optional[int] = None,
 ) -> Dict[str, Any]:
     """以原子及来源身份建立差异映射，通过 target_atom_id / produced_atom_ids 对应决策，绝无裸逗号拆分和子串认领。"""
-    sampling_delta = (rc8_clothing_id != cur_clothing_id)
+    effective_base_clothing_id = base_clothing_id if base_clothing_id is not None else (rc8_clothing_id or "")
+    effective_base_src_atoms = base_src_atoms if base_src_atoms is not None else (rc8_src_atoms or [])
+    effective_base_final_atoms = base_final_atoms if base_final_atoms is not None else (rc8_final_atoms or [])
+    effective_base_decisions = base_decisions if base_decisions is not None else (rc8_decisions or [])
+    cur_src_atoms = cur_src_atoms or []
+    cur_final_atoms = cur_final_atoms or []
+    cur_decisions = cur_decisions or []
+
+    sampling_delta = (effective_base_clothing_id != cur_clothing_id)
 
     # 源原子按 ID 与文本索引
     cur_src_by_id = {a["atom_id"]: a for a in cur_src_atoms if a.get("atom_id")}
@@ -42,9 +57,9 @@ def attribute_seed_diff(
     for a in cur_src_atoms:
         cur_src_by_text.setdefault(a["text"], []).append(a)
 
-    rc8_src_by_text: Dict[str, List[Dict[str, Any]]] = {}
-    for a in rc8_src_atoms:
-        rc8_src_by_text.setdefault(a["text"], []).append(a)
+    base_src_by_text: Dict[str, List[Dict[str, Any]]] = {}
+    for a in effective_base_src_atoms:
+        base_src_by_text.setdefault(a["text"], []).append(a)
 
     # 决议索引：精确按 target_atom_id 与 produced_atom_ids 索引
     cur_decs_by_target = {d["target_atom_id"]: d for d in cur_decisions if d.get("target_atom_id")}
@@ -55,7 +70,7 @@ def attribute_seed_diff(
             cur_produced_ids.add(pid)
             cur_produced_dec[pid] = d
 
-    rc8_decs_by_target = {d["target_atom_id"]: d for d in rc8_decisions if d.get("target_atom_id")}
+    base_decs_by_target = {d["target_atom_id"]: d for d in effective_base_decisions if d.get("target_atom_id")}
 
     # ─── 阶段 1: Current 完整最终原子集合的版本内来源身份独立核验 ───
     # 必须在跨版本比较之前执行：保留原子必须严格匹配源原子的 ID 与内容；新生成原子必须匹配对应生成决策。
@@ -82,11 +97,19 @@ def attribute_seed_diff(
 
     # ─── 阶段 2: 跨版本差异计算与归因 ───
     cur_final_texts = {a["text"] for a in cur_final_atoms}
-    rc8_final_texts = {a["text"] for a in rc8_final_atoms}
+    base_final_texts = {a["text"] for a in effective_base_final_atoms}
 
     # 原子级比较：从最终产出原子中找出差异（杜绝按逗号拆分字符串破坏复合词条）
-    removed_atoms = [a for a in rc8_final_atoms if a["text"] not in cur_final_texts]
-    added_atoms = [b for b in cur_final_atoms if b["text"] not in rc8_final_texts]
+    removed_atoms = [a for a in effective_base_final_atoms if a["text"] not in cur_final_texts]
+    added_atoms = [b for b in cur_final_atoms if b["text"] not in base_final_texts]
+
+    # 文本与文案参数格式化
+    if base_catalog_size is not None and cur_catalog_size is not None:
+        expansion_text = f"due to {base_catalog_size} -> {cur_catalog_size} styles in catalog"
+        intra_text = f"PRNG draw on {cur_catalog_size} styles shifted intra-slot tag sampling"
+    else:
+        expansion_text = "due to clothing catalog expansion"
+        intra_text = "PRNG draw on expanded catalog shifted intra-slot tag sampling"
 
     removed_attributions = []
     for ra in removed_atoms:
@@ -132,9 +155,10 @@ def attribute_seed_diff(
                     "category": "clothing_pool_expansion_category_shift",
                     "slot": slot,
                     "item_id": ra.get("item_id", ""),
-                    "rc8_clothing_id": rc8_clothing_id,
+                    "base_clothing_id": effective_base_clothing_id,
+                    "rc8_clothing_id": effective_base_clothing_id,
                     "cur_clothing_id": cur_clothing_id,
-                    "rationale": f"Sampled clothing shifted '{rc8_clothing_id}' -> '{cur_clothing_id}' due to 28 -> 31 styles in catalog",
+                    "rationale": f"Sampled clothing shifted '{effective_base_clothing_id}' -> '{cur_clothing_id}' {expansion_text}",
                 })
             else:
                 removed_attributions.append({
@@ -142,9 +166,10 @@ def attribute_seed_diff(
                     "category": "clothing_pool_expansion_intra_slot_shift",
                     "slot": slot,
                     "item_id": ra.get("item_id", ""),
-                    "rc8_clothing_id": rc8_clothing_id,
+                    "base_clothing_id": effective_base_clothing_id,
+                    "rc8_clothing_id": effective_base_clothing_id,
                     "cur_clothing_id": cur_clothing_id,
-                    "rationale": f"Same clothing '{cur_clothing_id}', PRNG draw on 31 styles shifted intra-slot tag sampling",
+                    "rationale": f"Same clothing '{cur_clothing_id}', {intra_text}",
                 })
 
     added_attributions = list(unsourced_atoms)
@@ -183,19 +208,20 @@ def attribute_seed_diff(
                 })
                 continue
 
-            # 3. 检查 RC8 是否采样过
-            rc8_matches = rc8_src_by_text.get(text, [])
-            if not rc8_matches:
-                # RC8 未采样：属于 Current 新采样的原子
+            # 3. 检查 Base 是否采样过
+            base_matches = base_src_by_text.get(text, [])
+            if not base_matches:
+                # Base 未采样：属于 Current 新采样的原子
                 if sampling_delta:
                     added_attributions.append({
                         "text": text,
                         "category": "clothing_pool_expansion_category_shift",
                         "slot": slot,
                         "item_id": aa.get("item_id", ""),
-                        "rc8_clothing_id": rc8_clothing_id,
+                        "base_clothing_id": effective_base_clothing_id,
+                        "rc8_clothing_id": effective_base_clothing_id,
                         "cur_clothing_id": cur_clothing_id,
-                        "rationale": f"Newly sampled in Current due to clothing shift '{rc8_clothing_id}' -> '{cur_clothing_id}'",
+                        "rationale": f"Newly sampled in Current due to clothing shift '{effective_base_clothing_id}' -> '{cur_clothing_id}'",
                     })
                 else:
                     added_attributions.append({
@@ -203,30 +229,35 @@ def attribute_seed_diff(
                         "category": "clothing_pool_expansion_intra_slot_shift",
                         "slot": slot,
                         "item_id": aa.get("item_id", ""),
-                        "rc8_clothing_id": rc8_clothing_id,
+                        "base_clothing_id": effective_base_clothing_id,
+                        "rc8_clothing_id": effective_base_clothing_id,
                         "cur_clothing_id": cur_clothing_id,
                         "rationale": f"Newly sampled in Current due to intra-slot PRNG shift on '{cur_clothing_id}'",
                     })
             else:
-                # RC8 采样过该原子，核查是否在 RC8 中被删除决策剔除而在 Current 中得以幸存
-                rc8_atom = rc8_matches[0]
-                rc8_atom_id = rc8_atom["atom_id"]
-                rc8_drop = rc8_decs_by_target.get(rc8_atom_id)
-                if rc8_drop and rc8_drop.get("before_text") == text:
+                # Base 采样过该原子，核查是否在 Base 中被删除决策剔除而在 Current 中得以幸存
+                base_atom = base_matches[0]
+                base_atom_id = base_atom["atom_id"]
+                base_drop = base_decs_by_target.get(base_atom_id)
+                if base_drop and base_drop.get("before_text") == text:
                     added_attributions.append({
                         "text": text,
                         "category": "rc8_decision_dropped_now_survived",
+                        "base_category": "base_decision_dropped_now_survived",
                         "slot": slot,
                         "item_id": aa.get("item_id", ""),
-                        "rc8_rule_id": rc8_drop["rule_id"],
-                        "rc8_reason_code": rc8_drop["reason_code"],
-                        "rc8_target_atom_id": rc8_atom_id,
+                        "base_rule_id": base_drop["rule_id"],
+                        "rc8_rule_id": base_drop["rule_id"],
+                        "base_reason_code": base_drop["reason_code"],
+                        "rc8_reason_code": base_drop["reason_code"],
+                        "base_target_atom_id": base_atom_id,
+                        "rc8_target_atom_id": base_atom_id,
                     })
                 else:
                     added_attributions.append({
                         "text": text,
                         "category": "UNEXPLAINED_RC8_SILENT_DROP",
-                        "error": f"Atom '{text}' was in RC8 source as {rc8_atom_id} but absent in RC8 final without drop decision",
+                        "error": f"Atom '{text}' was in base source as {base_atom_id} but absent in base final without drop decision",
                     })
 
     unexplained_rem = [a for a in removed_attributions if a["category"].startswith("UNEXPLAINED")]
@@ -244,17 +275,18 @@ def attribute_seed_diff(
         summary = f"UNEXPLAINED: {len(unexplained_rem)} removed, {len(unexplained_add)} added unexplained"
     elif sampling_delta:
         primary_category = "clothing_pool_expansion_category_shift"
-        summary = f"clothing_pool_expansion_category_shift: sampled clothing shifted '{rc8_clothing_id}' -> '{cur_clothing_id}' due to 28 -> 31 styles in catalog"
+        summary = f"clothing_pool_expansion_category_shift: sampled clothing shifted '{effective_base_clothing_id}' -> '{cur_clothing_id}' {expansion_text}"
     elif coherence_decisions:
         primary_category = coherence_decisions[0]["reason_code"]
         summary = f"{primary_category}: same clothing '{cur_clothing_id}', dangling/incompatible modifiers pruned per carrier coherence"
     else:
         primary_category = "clothing_pool_expansion_intra_slot_shift"
-        summary = f"clothing_pool_expansion_intra_slot_shift: same clothing '{cur_clothing_id}', PRNG draw on 31 styles shifted intra-slot tag sampling"
+        summary = f"clothing_pool_expansion_intra_slot_shift: same clothing '{cur_clothing_id}', {intra_text}"
 
     return {
         "seed": s,
-        "rc8_clothing_id": rc8_clothing_id,
+        "base_clothing_id": effective_base_clothing_id,
+        "rc8_clothing_id": effective_base_clothing_id,
         "cur_clothing_id": cur_clothing_id,
         "sampling_delta": sampling_delta,
         "removed_atoms": [a["text"] for a in removed_atoms],
