@@ -19,6 +19,7 @@ from random import Random
 from typing import Any, Dict, List, Optional, Sequence, Set, Tuple
 
 if __package__:
+    from .conflict_resolver import GarmentCarrierEntity, is_garment_compatible_with_state
     from .context_affinity import (
         ContextAffinityRegistry,
         compute_context_profile,
@@ -29,13 +30,16 @@ if __package__:
     from .models import (
         ClothingSampleResult,
         ContextProfile,
+        PromptAtom,
         SampleResult,
         SampledTag,
         SemanticFacts,
+        SpanType,
         TagProvenance,
         ThemeSampleResult,
     )
 else:
+    from lib.conflict_resolver import GarmentCarrierEntity, is_garment_compatible_with_state
     from lib.context_affinity import (
         ContextAffinityRegistry,
         compute_context_profile,
@@ -46,9 +50,11 @@ else:
     from lib.models import (
         ClothingSampleResult,
         ContextProfile,
+        PromptAtom,
         SampleResult,
         SampledTag,
         SemanticFacts,
+        SpanType,
         TagProvenance,
         ThemeSampleResult,
     )
@@ -402,12 +408,90 @@ class DataSampler:
 
         # 新增款式：提取当前款式的形制拓扑
         style_topos: Set[str] = set()
-        for tag_item in chosen_style.get("tags", []):
+        for tag_item in chosen_style.get("tags", []) if isinstance(chosen_style, dict) else []:
             facts = tag_item.get("facts") if isinstance(tag_item, dict) else None
             if isinstance(facts, dict) and facts.get("garment_topologies"):
                 style_topos.update(facts["garment_topologies"])
 
-        # 检查是否有显式拓扑匹配的状态标签候选
+        if state_id in ("unbuttoned", "opened"):
+            # 解扣状态：按服装实体具体动作形制兼容性 (is_garment_compatible_with_state) 精确筛选候选，
+            # 杜绝由于细化形制（如长袍、赛车服、西服专属解扣）不兼容导致整组动作被消解器全部剔除
+            style_id = chosen_style.get("id", "") if isinstance(chosen_style, dict) else ""
+            member_atoms = []
+            for tag_item in chosen_style.get("tags", []) if isinstance(chosen_style, dict) else []:
+                if isinstance(tag_item, dict):
+                    facts = tag_item.get("facts")
+                    sem_facts = (
+                        SemanticFacts(
+                            garment_topologies=tuple(facts.get("garment_topologies", ())),
+                        )
+                        if isinstance(facts, dict)
+                        else SemanticFacts()
+                    )
+                    member_atoms.append(
+                        PromptAtom(
+                            text=tag_item.get("text", ""),
+                            span_type=SpanType.PLAIN,
+                            source_slot="clothing",
+                            source_item_id=style_id,
+                            facts=sem_facts,
+                            id=tag_item.get("id", ""),
+                        )
+                    )
+                elif isinstance(tag_item, str):
+                    member_atoms.append(
+                        PromptAtom(
+                            text=tag_item,
+                            span_type=SpanType.PLAIN,
+                            source_slot="clothing",
+                            source_item_id=style_id,
+                            id=tag_item,
+                        )
+                    )
+
+            carrier = GarmentCarrierEntity(
+                entity_id=f"garment:clothing:{style_id}",
+                selector="clothing",
+                selected_id=style_id,
+                member_atoms=member_atoms,
+                is_worn=True,
+                is_ambient=False,
+            )
+
+            matching_tags = []
+            for st in raw_state_tags:
+                if isinstance(st, dict):
+                    st_facts = st.get("facts")
+                    st_atom = PromptAtom(
+                        text=st.get("text", ""),
+                        span_type=SpanType.PLAIN,
+                        source_slot="clothing_state",
+                        source_item_id=state_id,
+                        facts=(
+                            SemanticFacts(
+                                garment_topologies=tuple(st_facts.get("garment_topologies", ())),
+                            )
+                            if isinstance(st_facts, dict)
+                            else SemanticFacts()
+                        ),
+                        id=st.get("id", ""),
+                    )
+                    if is_garment_compatible_with_state(carrier, state_id, st_atom):
+                        matching_tags.append(st)
+
+            if matching_tags:
+                pool = matching_tags
+            else:
+                # 负例款式（未授权解扣的款式被指定了 unbuttoned，如泳衣、铠甲）：
+                # 回退到拓扑相交候选或全量候选，交由 ConflictResolver 消解并记录冲突
+                topo_matching = [
+                    st for st in raw_state_tags
+                    if isinstance(st, dict) and (set(st.get("facts", {}).get("garment_topologies", [])) & style_topos)
+                ]
+                pool = topo_matching if topo_matching else raw_state_tags
+            return cls._pick(pool, rng, min(2, len(pool)))
+
+        # 其余状态：按形制拓扑相交筛选候选
         matching_tags = []
         for st in raw_state_tags:
             if isinstance(st, dict):

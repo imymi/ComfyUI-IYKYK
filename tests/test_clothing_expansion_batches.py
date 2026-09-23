@@ -323,8 +323,8 @@ class TestClothingExpansionBatches(unittest.TestCase):
                     "robe open at chest", "suit unbuttoned at chest"
                 )
             elif "one_piece" in topos:
+                expected_target_actions = ("collar unbuttoned",)
                 if cid == "racing_suit":
-                    expected_target_actions = ("suit unbuttoned at chest", "collar unbuttoned")
                     forbidden_cross_actions = (
                         "blouse unbuttoned", "shirt open at chest", "pants button undone",
                         "jeans unbuttoned", "skirt button undone", "skirt unbuttoned",
@@ -370,19 +370,18 @@ class TestClothingExpansionBatches(unittest.TestCase):
                         f"Style {cid} must NOT carry incompatible cross-body action '{f_bt}'!",
                     )
                 if "one_piece" in topos and cid != "racing_suit":
-                    dropped_suit = [
-                        d for d in report.decisions
-                        if d.action == "drop" and d.before_text == "suit unbuttoned at chest"
+                    # 独立消解器核验：若非赛车服连体衣被强行注入赛车服专属解扣动作，消解器必须以 state_lacks_carrier 剔除
+                    from tests.fixtures.conflict_rule_fixtures import make_test_atom
+                    atoms_suit_test = [
+                        make_test_atom(cid, source_slot="clothing", item_id=cid, garment_topologies=["one_piece"], tag_order=0),
+                        make_test_atom("suit unbuttoned at chest", source_slot="clothing_state", item_id="unbuttoned", garment_topologies=["one_piece"], garment_states=["opened"], tag_order=1),
                     ]
-                    self.assertGreater(
-                        len(dropped_suit),
-                        0,
-                        f"Non-suit one-piece style {cid} expected 'suit unbuttoned at chest' to be dropped",
-                    )
+                    _, _, rep_suit = self.resolver.resolve_atoms_with_full_report(atoms_suit_test)
+                    drop_suit = {d.before_text: d.reason_code for d in rep_suit.decisions if d.action == "drop"}
                     self.assertEqual(
-                        dropped_suit[0].reason_code,
+                        drop_suit.get("suit unbuttoned at chest"),
                         "state_lacks_carrier",
-                        f"Style {cid} dropped suit action with unexpected reason {dropped_suit[0].reason_code}",
+                        f"Style {cid} expected 'suit unbuttoned at chest' to be dropped by resolver with state_lacks_carrier",
                     )
             else:
                 for bt in ALL_BUTTON_ACTIONS:
@@ -410,6 +409,105 @@ class TestClothingExpansionBatches(unittest.TestCase):
                         expected_drop_reason,
                         f"Style {cid} dropped '{bt}' with unexpected reason {d.reason_code}, expected {expected_drop_reason}",
                     )
+
+    def test_04b_button_candidate_resolution_consistency_and_seed_4_regression(self):
+        """核验 P2 阻断项修复：采样候选形制兼容性与消解器完全一致，Random(4) 严禁丢光解扣动作。
+
+        验收要求：
+        1. 采样候选应使用与消解器一致的具体动作兼容判定，不能仅比较拓扑；
+        2. 对七款授权解扣款式 (festive_costume, frock_smock, racing_suit, bathrobe, clerical_priest, hospital_gown, robe_general)，
+           在没有镜头等其他排他因素时，保证至少能抽中并保留一个合法解扣动作，且不得出现“只有错误动作、被消解器全数剔除导致正向提示词缺少解扣表达”；
+        3. 严禁款式冒用不匹配的细化动作（如 festive_costume / frock_smock 抽到 robe 动作，或普通长袍抽到 suit 动作）；
+        4. 覆盖 Random(4) 精确复现种子与 0..20 种子多轮扫描。
+        """
+        target_styles = [
+            ("festive_costume", "节日圣诞装 (Festive Santa Costume)"),
+            ("frock_smock", "工装罩衫 (Frock / Smock)"),
+            ("racing_suit", "赛车连体服 (Racing Suit)"),
+            ("bathrobe", "浴袍 (Bathrobe)"),
+            ("clerical_priest", "神父修生黑袍 (Priest Cassock)"),
+            ("hospital_gown", "病号服 (Hospital Gown)"),
+            ("robe_general", "休闲长袍 (Casual Robe)"),
+        ]
+
+        # 1. 直接核验采样器候选与绑定结果 (精准复现 Random(4) 场景)
+        for cid, name_zh in target_styles:
+            rng = Random(4)
+            sample_res = self.sampler.sample_clothing_result(
+                style=cid,
+                state="解开纽扣 (Unbuttoned)",
+                nudity_level_code="L2",
+                rng=rng,
+            )
+            state_texts = [t.text for t in sample_res.state_tags]
+            self.assertGreater(
+                len(state_texts),
+                0,
+                f"Style {cid} must sample at least 1 state tag under Random(4)",
+            )
+            if cid in ("festive_costume", "frock_smock", "racing_suit"):
+                for t in state_texts:
+                    self.assertNotIn(
+                        "robe",
+                        t.lower(),
+                        f"Style {cid} must NOT sample robe-specific action '{t}' under Random(4)!",
+                    )
+            if cid != "racing_suit":
+                for t in state_texts:
+                    self.assertNotIn(
+                        "suit unbuttoned",
+                        t.lower(),
+                        f"Style {cid} must NOT sample suit-specific action '{t}' under Random(4)!",
+                    )
+
+        # 2. 端到端生成节点核验：Random(4) 保证正向提示词具备解扣动作
+        for cid, name_zh in target_styles:
+            gen_res = self.generator.generate_structured(
+                场景预设="日常街道",
+                剧情主题="随机 (Random)",
+                服装款式=name_zh,
+                服装状态="解开纽扣 (Unbuttoned)",
+                裸露等级="L2 差分微露 (Partially Exposed)",
+                画质等级="高清写真 (High)",
+                prompt_seed=4,
+            )
+            pos = gen_res.positive
+            has_btn = any(w in pos.lower() for w in ("unbutton", "open at chest", "unfastened"))
+            self.assertTrue(
+                has_btn,
+                f"Style {cid} must retain at least one unbuttoned action under seed=4! Positive prompt: {pos}",
+            )
+            if cid in ("festive_costume", "frock_smock", "racing_suit"):
+                self.assertNotIn(
+                    "robe",
+                    pos.lower(),
+                    f"Style {cid} must NOT output robe action under seed=4! Positive: {pos}",
+                )
+            if cid != "racing_suit":
+                self.assertNotIn(
+                    "suit unbuttoned",
+                    pos.lower(),
+                    f"Style {cid} must NOT output suit action under seed=4! Positive: {pos}",
+                )
+
+        # 3. 0..20 多种子扫描：保证 100% 具备解扣动作且无不兼容细化动作泄漏
+        for s in range(21):
+            for cid, name_zh in target_styles:
+                gen_res = self.generator.generate_structured(
+                    场景预设="日常街道",
+                    剧情主题="随机 (Random)",
+                    服装款式=name_zh,
+                    服装状态="解开纽扣 (Unbuttoned)",
+                    裸露等级="L2 差分微露 (Partially Exposed)",
+                    画质等级="高清写真 (High)",
+                    prompt_seed=s,
+                )
+                pos = gen_res.positive
+                has_btn = any(w in pos.lower() for w in ("unbutton", "open at chest", "unfastened"))
+                self.assertTrue(
+                    has_btn,
+                    f"Style {cid} lost button action under seed={s}! Positive: {pos}",
+                )
 
     def test_05_skirt_capability_positive_and_negative_matrix(self):
         """形制能力契约核验 (掀裙状态 lifted_up):
