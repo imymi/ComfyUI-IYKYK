@@ -1049,12 +1049,18 @@ class TestRC8QualityGate(unittest.TestCase):
         self.assertEqual(count, 10000)
 
     def test_03b_seed_gate_golden_hash(self):
-        """固定汇总哈希稳定性门禁：验证 137 款全量目录 Seeds 0..9999 汇总哈希严格等于黄金哈希。"""
+        """固定汇总哈希稳定性门禁：验证 Seeds 0..9999 汇总哈希严格等于第 2 步基线哈希 (保留 dba5861 原始基线哈希)。"""
+        # 1. dba5861 原始基线哈希 (137 款全量迁移终验基线):
+        #    a39a823d09b3b817107ba6a6ebdd5fdb261f4f71bd8148bd7856533fdf21c218
+        # 2. 第 2 步基线哈希 (11 条服装状态落地 + 修复全景构图内衣误判后基线，非 rc9 最终版本基线):
+        #    3e1291ae60af887ebde1869a8fb60f7937424198c1db6a4856bb90aa954725fc
+        baseline_dba5861_hash = "a39a823d09b3b817107ba6a6ebdd5fdb261f4f71bd8148bd7856533fdf21c218"
+        step2_expected_hash = "3e1291ae60af887ebde1869a8fb60f7937424198c1db6a4856bb90aa954725fc"
         _, _, batch_hash = self._run_seed_gate_10k()
         self.assertEqual(
             batch_hash,
-            "a39a823d09b3b817107ba6a6ebdd5fdb261f4f71bd8148bd7856533fdf21c218",
-            "Seed gate 0..9999 summary hash drifted!",
+            step2_expected_hash,
+            f"Seed gate 0..9999 summary hash drifted! Expected Step 2: {step2_expected_hash}, baseline dba5861 was: {baseline_dba5861_hash}",
         )
 
     def test_03c_dual_version_divergence_audit(self):
@@ -1062,6 +1068,7 @@ class TestRC8QualityGate(unittest.TestCase):
         import tempfile
         from scripts.audit_bc0d645_divergence import EXPECTED_BASELINE_HASH, run_divergence_audit
 
+        step2_expected_hash = "3e1291ae60af887ebde1869a8fb60f7937424198c1db6a4856bb90aa954725fc"
         audit_seeds = int(os.environ.get("IYKYK_AUDIT_SEEDS", "10000"))
         # 测试产物严格隔离写入临时目录，避免污染或改写受版本管理的正式报告文件
         with tempfile.TemporaryDirectory(prefix="iykyk_audit_test_") as tmp_dir:
@@ -1076,7 +1083,7 @@ class TestRC8QualityGate(unittest.TestCase):
             self.assertEqual(report["unexplained_seeds_count"], 0, f"Unexplained diffs detected: {report['unexplained_seeds']}")
             if audit_seeds == 10000:
                 self.assertEqual(report["baseline_batch_hash"], EXPECTED_BASELINE_HASH)
-                self.assertEqual(report["current_batch_hash"], "a39a823d09b3b817107ba6a6ebdd5fdb261f4f71bd8148bd7856533fdf21c218")
+                self.assertEqual(report["current_batch_hash"], step2_expected_hash)
 
 
 if __name__ == "__main__":

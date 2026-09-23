@@ -10280,6 +10280,558 @@
           }
         }
       ]
+    },
+    {
+      "id": "taut_tight",
+      "name_zh": "紧绷勾勒 (Taut & Tight)",
+      "aliases": [
+        "紧身衣服",
+        "taut clothes",
+        "tight clothes"
+      ],
+      "tags": [
+        {
+          "id": "taut_tight__tag_000",
+          "text": "taut clothes",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "lower_body",
+              "upper_body"
+            ],
+            "garment_states": [
+              "worn"
+            ]
+          }
+        },
+        {
+          "id": "taut_tight__tag_001",
+          "text": "taut fabric clinging to body",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "lower_body",
+              "upper_body"
+            ],
+            "garment_states": [
+              "worn"
+            ]
+          }
+        },
+        {
+          "id": "taut_tight__tag_002",
+          "text": "tight fitting fabric",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "lower_body",
+              "upper_body"
+            ],
+            "garment_states": [
+              "worn"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "wet_pure",
+      "name_zh": "纯净湿身 (Pure Wet)",
+      "aliases": [
+        "湿润的衣服",
+        "湿身",
+        "wet clothes"
+      ],
+      "tags": [
+        {
+          "id": "wet_pure__tag_000",
+          "text": "wet clothes",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "lower_body",
+              "upper_body"
+            ],
+            "garment_states": [
+              "worn"
+            ]
+          }
+        },
+        {
+          "id": "wet_pure__tag_001",
+          "text": "soaked clothing",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "lower_body",
+              "upper_body"
+            ],
+            "garment_states": [
+              "worn"
+            ]
+          }
+        },
+        {
+          "id": "wet_pure__tag_002",
+          "text": "drenched fabric",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "lower_body",
+              "upper_body"
+            ],
+            "garment_states": [
+              "worn"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "heart_cutout",
+      "name_zh": "心形镂空 (Heart Cutout)",
+      "aliases": [
+        "心型切口",
+        "heart cutout"
+      ],
+      "tags": [
+        {
+          "id": "heart_cutout__tag_000",
+          "text": "heart cutout",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "top",
+              "one_piece"
+            ],
+            "visible_regions": [
+              "upper_body"
+            ],
+            "garment_states": [
+              "worn"
+            ]
+          }
+        },
+        {
+          "id": "heart_cutout__tag_001",
+          "text": "heart-shaped chest cutout",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "top",
+              "one_piece"
+            ],
+            "visible_regions": [
+              "upper_body"
+            ],
+            "garment_states": [
+              "worn"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "back_cutout",
+      "name_zh": "露背镂空 (Back Cutout)",
+      "aliases": [
+        "后背切口",
+        "back cutout"
+      ],
+      "tags": [
+        {
+          "id": "back_cutout__tag_000",
+          "text": "back cutout",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "top",
+              "one_piece"
+            ],
+            "visible_regions": [
+              "upper_body"
+            ],
+            "garment_states": [
+              "worn"
+            ]
+          }
+        },
+        {
+          "id": "back_cutout__tag_001",
+          "text": "backless cutout",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "top",
+              "one_piece"
+            ],
+            "visible_regions": [
+              "upper_body"
+            ],
+            "garment_states": [
+              "worn"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "underboob_cutout",
+      "name_zh": "下胸镂空 (Underboob Cutout)",
+      "aliases": [
+        "下胸切口",
+        "underboob cutout"
+      ],
+      "tags": [
+        {
+          "id": "underboob_cutout__tag_000",
+          "text": "underboob cutout",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "top",
+              "one_piece"
+            ],
+            "visible_regions": [
+              "upper_body"
+            ],
+            "garment_states": [
+              "worn"
+            ]
+          }
+        },
+        {
+          "id": "underboob_cutout__tag_001",
+          "text": "exposed underboob slit",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "top",
+              "one_piece"
+            ],
+            "visible_regions": [
+              "upper_body"
+            ],
+            "garment_states": [
+              "worn"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "off_shoulder_cut",
+      "name_zh": "露单肩 (Off-Shoulder Cut)",
+      "aliases": [
+        "露单肩",
+        "off shoulder",
+        "single bare shoulder"
+      ],
+      "tags": [
+        {
+          "id": "off_shoulder_cut__tag_000",
+          "text": "off-shoulder cut",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "top",
+              "one_piece"
+            ],
+            "visible_regions": [
+              "upper_body"
+            ],
+            "garment_states": [
+              "worn"
+            ]
+          }
+        },
+        {
+          "id": "off_shoulder_cut__tag_001",
+          "text": "single bare shoulder",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "top",
+              "one_piece"
+            ],
+            "visible_regions": [
+              "upper_body"
+            ],
+            "garment_states": [
+              "worn"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "bare_shoulders",
+      "name_zh": "露双肩 (Bare Shoulders)",
+      "aliases": [
+        "露双肩",
+        "bare shoulders",
+        "exposed shoulders"
+      ],
+      "tags": [
+        {
+          "id": "bare_shoulders__tag_000",
+          "text": "bare shoulders",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "top",
+              "one_piece"
+            ],
+            "visible_regions": [
+              "upper_body"
+            ],
+            "garment_states": [
+              "worn"
+            ]
+          }
+        },
+        {
+          "id": "bare_shoulders__tag_001",
+          "text": "off-the-shoulder neckline",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "top",
+              "one_piece"
+            ],
+            "visible_regions": [
+              "upper_body"
+            ],
+            "garment_states": [
+              "worn"
+            ]
+          }
+        },
+        {
+          "id": "bare_shoulders__tag_002",
+          "text": "exposed shoulders",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "top",
+              "one_piece"
+            ],
+            "visible_regions": [
+              "upper_body"
+            ],
+            "garment_states": [
+              "worn"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "braless",
+      "name_zh": "真空无胸罩 (Braless)",
+      "aliases": [
+        "无胸罩",
+        "no_bra",
+        "braless"
+      ],
+      "tags": [
+        {
+          "id": "braless__tag_000",
+          "text": "braless",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "underwear"
+            ],
+            "visible_regions": [
+              "upper_body"
+            ],
+            "garment_states": [
+              "removed"
+            ]
+          }
+        },
+        {
+          "id": "braless__tag_001",
+          "text": "no bra",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "underwear"
+            ],
+            "visible_regions": [
+              "upper_body"
+            ],
+            "garment_states": [
+              "removed"
+            ]
+          }
+        },
+        {
+          "id": "braless__tag_002",
+          "text": "unconstrained breasts beneath clothing",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "underwear"
+            ],
+            "visible_regions": [
+              "upper_body"
+            ],
+            "garment_states": [
+              "removed"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "underwearless",
+      "name_zh": "真空无内裤 (Underwearless)",
+      "aliases": [
+        "无内衣",
+        "no underwear",
+        "underwearless",
+        "commando"
+      ],
+      "tags": [
+        {
+          "id": "underwearless__tag_000",
+          "text": "no underwear",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "underwear"
+            ],
+            "visible_regions": [
+              "lower_body"
+            ],
+            "garment_states": [
+              "removed"
+            ]
+          }
+        },
+        {
+          "id": "underwearless__tag_001",
+          "text": "wearing no panties",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "underwear"
+            ],
+            "visible_regions": [
+              "lower_body"
+            ],
+            "garment_states": [
+              "removed"
+            ]
+          }
+        },
+        {
+          "id": "underwearless__tag_002",
+          "text": "underwearless",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "underwear"
+            ],
+            "visible_regions": [
+              "lower_body"
+            ],
+            "garment_states": [
+              "removed"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "undergarment_leotard",
+      "name_zh": "内穿连体紧身衣 (Leotard Under Clothes)",
+      "aliases": [
+        "衣服下紧身衣",
+        "leotard under clothes"
+      ],
+      "tags": [
+        {
+          "id": "undergarment_leotard__tag_000",
+          "text": "leotard under clothes",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "one_piece",
+              "underwear"
+            ],
+            "visible_regions": [
+              "lower_body",
+              "upper_body"
+            ],
+            "garment_states": [
+              "worn"
+            ]
+          }
+        },
+        {
+          "id": "undergarment_leotard__tag_001",
+          "text": "visible leotard beneath outfit",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "one_piece",
+              "underwear"
+            ],
+            "visible_regions": [
+              "lower_body",
+              "upper_body"
+            ],
+            "garment_states": [
+              "worn"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "skirt_under_kimono",
+      "name_zh": "和服叠穿裙装 (Skirt Under Kimono)",
+      "aliases": [
+        "和服下的裙子",
+        "skirt under kimono"
+      ],
+      "tags": [
+        {
+          "id": "skirt_under_kimono__tag_000",
+          "text": "skirt under kimono",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "bottom_skirt"
+            ],
+            "visible_regions": [
+              "lower_body"
+            ],
+            "garment_states": [
+              "worn"
+            ]
+          }
+        },
+        {
+          "id": "skirt_under_kimono__tag_001",
+          "text": "layered skirt beneath robe",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "bottom_skirt"
+            ],
+            "visible_regions": [
+              "lower_body"
+            ],
+            "garment_states": [
+              "worn"
+            ]
+          }
+        }
+      ]
     }
   ],
   "clothing_nudity_linkage": {

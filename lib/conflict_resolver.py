@@ -426,7 +426,7 @@ def is_garment_modifier_atom(a: PromptAtom) -> bool:
             "unbuttoned", "unzipped", "opened", "lifted", "lifted_up", "pulled_down",
             "disheveled", "slipping_off", "wet_clinging", "wet_pure",
             "sweat_soaked", "torn_shredded", "heart_cutout", "back_cutout",
-            "underboob_cutout", "off_shoulder_cut", "taut_tight",
+            "underboob_cutout", "off_shoulder_cut", "bare_shoulders", "taut_tight",
         }
         if any(s in modifier_states for s in a.facts.garment_states):
             return True
@@ -441,7 +441,7 @@ def is_garment_modifier_atom(a: PromptAtom) -> bool:
 
 def build_garment_entity_key(atom: PromptAtom) -> Optional[str]:
     """区分来源 (Provenance) 与实体身份 (Garment Entity Identity)。"""
-    if (atom.origin and atom.origin.selector == "clothing_state") or (atom.provenance and atom.provenance.kind == "clothing_state"):
+    if atom.source_slot == "clothing_state" or (atom.origin and atom.origin.selector == "clothing_state") or (atom.provenance and atom.provenance.kind == "clothing_state"):
         return None
 
     slot = atom.origin.selector if atom.origin else (atom.source_slot or "")
@@ -1954,7 +1954,8 @@ class ConflictResolver:
                     if not a.can_detect or not index.is_active(a):
                         continue
                     if is_formal_atom(a):
-                        if a.facts and any(r in a.facts.visible_regions for r in ("crotch", "breasts", "buttocks", "pubic", "full_body")):
+                        is_nude_slot = a.source_slot == "nudity" or (a.origin and a.origin.selector == "nudity") or (a.provenance and a.provenance.kind == "nudity")
+                        if a.facts and (any(r in a.facts.visible_regions for r in ("crotch", "breasts", "buttocks", "pubic")) or ("full_body" in a.facts.visible_regions and is_nude_slot)):
                             trig_atoms.append(a)
                     elif tf.enabled:
                         if any(t.matches(a.text) for t in triggers):
@@ -2288,7 +2289,13 @@ class ConflictResolver:
                                 if any(oe.selected_id in NON_SKIRT_ONE_PIECE for oe in op_entities):
                                     is_loser = True
                         elif a.facts and "removed" in a.facts.garment_states:
-                            is_loser = True
+                            # 缺席状态 (braless, underwearless) 属于内衣层缺席声明，由后续 step 4 缺席状态专用互斥逻辑裁决，不得在此被误判为连体外装冲突
+                            if not (
+                                a.source_item_id in CANONICAL_ABSENCE_STATES
+                                or (a.origin and a.origin.selected_id in CANONICAL_ABSENCE_STATES)
+                                or (a.facts and "underwear" in a.facts.garment_topologies)
+                            ):
+                                is_loser = True
                     elif tf.enabled:
                         if any(bs.matches(a.text) for bs in one_piece_banned_states):
                             is_loser = True
@@ -2373,7 +2380,7 @@ class ConflictResolver:
                 continue
             l_id = la.source_item_id or (la.origin.selected_id if la.origin else "")
             if l_id == "skirt_under_kimono":
-                kimono_entities = [e for e in worn_entities if e.selected_id in ("kimono", "yukata", "furisode", "robe_general", "taoist_robe", "battle_robe")]
+                kimono_entities = [e for e in worn_entities if e.selected_id in ("kimono", "yukata", "furisode", "robe_general", "taoist_robe", "battle_robe", "bathrobe", "witch_robe", "wizard_robe")]
                 skirt_entities = [
                     e for e in worn_entities
                     if any(ma.facts and "bottom_skirt" in ma.facts.garment_topologies for ma in e.member_atoms)
@@ -3421,7 +3428,14 @@ class ConflictResolver:
             c_ban = select_fallback_patterns(r2_tf, role="banned", group_id=gid)
             trig_atoms = [
                 a for a in detectable
-                if (is_formal_atom(a) and a.facts and any(r in a.facts.visible_regions for r in ("crotch", "breasts", "buttocks", "pubic", "full_body")))
+                if (
+                    is_formal_atom(a)
+                    and a.facts
+                    and (
+                        any(r in a.facts.visible_regions for r in ("crotch", "breasts", "buttocks", "pubic"))
+                        or ("full_body" in a.facts.visible_regions and (a.source_slot == "nudity" or (a.origin and a.origin.selector == "nudity") or (a.provenance and a.provenance.kind == "nudity")))
+                    )
+                )
                 or (not is_formal_atom(a) and any(t.matches(a.text) for t in c_trig))
             ]
             ban_atoms = [
@@ -3541,7 +3555,15 @@ class ConflictResolver:
                     state_id = a.source_item_id or (a.origin.selected_id if a.origin else "") or a.text
                     is_unbuttoned = state_id == "unbuttoned" or (a.facts and any(s in a.facts.garment_states for s in ("unbuttoned", "opened")))
                     is_lifted = state_id in ("lifted_up", "lifted") or (a.facts and any(s in a.facts.garment_states for s in ("lifted", "lifted_up", "lifted_skirt")))
-                    is_removed = a.facts and "removed" in a.facts.garment_states
+                    is_removed = (
+                        a.facts
+                        and "removed" in a.facts.garment_states
+                        and not (
+                            a.source_item_id in CANONICAL_ABSENCE_STATES
+                            or (a.origin and a.origin.selected_id in CANONICAL_ABSENCE_STATES)
+                            or ("underwear" in a.facts.garment_topologies)
+                        )
+                    )
 
                     if is_unbuttoned:
                         if not has_button_carrier:

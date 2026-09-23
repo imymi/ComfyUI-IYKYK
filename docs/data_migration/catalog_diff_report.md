@@ -10,21 +10,21 @@
 
 | 数据集 / 槽位 (Catalog & Slot) | 对应数据文件 | 存量有效项数 | 台账提取新增项数 | 迁移后总量 | 规模增幅 | 兼容性保障机制 |
 |---|---|---|---|---|---|---|
-| **服装款式** (`clothing`) | `data/clothing.json -> categories` | 28 项 | **+109 项** | 137 项 | +389.3% | 存量 28 项保真，恢复 sweater_casual 独立建模，原生通过 combo |
+| **服装款式** (`clothing`) | `data/clothing.json -> categories` | 31 款 (基线 bc0d645) | **+106 款** | 137 款 | +341.9% | 存量 31 款严格保真，Batch 1~5 新增 106 款全量入库并已完成闭环验收 |
 | **服装状态** (`clothing`) | `data/clothing.json -> clothing_states` | 12 条 (含1联动) | **+11 条** | 23 条 | +91.7% | 状态三元分类消解，防自我承载与防悬空误删 |
-| **头饰配饰** (`jewelry`) | `data/accessories.json -> headwear_jewelry` | 34 项 | **+7 项** | 41 项 | +20.6% | 槽位与数据键解耦，外穿斗篷/披肩纳入承载白名单 |
+| **头饰配饰** (`jewelry`) | `data/accessories.json -> headwear_jewelry` | 12 项 | **+7 项** | 19 项 | +58.3% | 槽位与数据键解耦，外穿斗篷/披肩纳入承载白名单 |
 | **情趣内衣** (`lingerie`) | `data/clothing.json -> lingerie_wardrobe` | 10 项 | **+2 项** | 12 项 | +20.0% | 纳入全域承载主体白名单，开裆内裤独立建模 |
-| **身体微瑕** (`imperfections`) | `data/imperfections.json -> categories` | 11 项 | **+1 项** | 12 项 | +9.1% | `tan_lines` 泳装日晒痕迹归入身体微瑕主槽位 |
+| **身体微瑕** (`imperfections`) | `data/imperfections.json -> categories` | 7 项 | **+1 项** | 8 项 | +14.3% | `tan_lines` 泳装日晒痕迹归入身体微瑕主槽位 |
 
 ---
 
 ## 二、服装款式 (`clothing.json -> categories`) 详细差集清单
 
-### 1. 存量保留清单 (28 项，严格 100% 保真)
-以下 28 项为 ComfyUI-IYKYK 运行库原生存在的款式 ID，本次迁移**绝不修改、绝不废弃、绝不移出**：
-`qipao`, `hanfu`, `modern_chinese`, `kimono`, `yukata`, `furisode`, `jk_seifuku`, `blazer_uniform`, `gym_uniform`, `hanbok`, `korean_school`, `ol_suit`, `nurse_uniform`, `maid_dress`, `waitress_uniform`, `lingerie_lace`, `silk_robe`, `camisole_slip`, `bikini_micro`, `one_piece_swimsuit`, `latex_catsuit`, `leather_corset`, `bunny_suit`, `cheerleader`, `evening_dress`, `street_casual`, `party_club`, `knit_sweater`。
+### 1. 存量保留清单 (31 款，严格 100% 保真)
+以下 31 款为 ComfyUI-IYKYK bc0d645 基线中存在的款式 ID，本次迁移**绝不修改、绝不废弃、绝不移出**：
+`qipao`, `hanfu`, `modern_chinese`, `kimono`, `yukata`, `furisode`, `jk_seifuku`, `blazer_uniform`, `gym_uniform`, `hanbok`, `korean_school`, `ol_suit`, `nurse_uniform`, `maid_dress`, `waitress_uniform`, `lingerie_lace`, `silk_robe`, `camisole_slip`, `bikini_micro`, `one_piece_swimsuit`, `latex_catsuit`, `leather_corset`, `bunny_suit`, `cheerleader`, `evening_dress`, `street_casual`, `party_club`, `knit_sweater`, `sweater_casual`, `swimsuit_school`, `dungarees`。
 
-### 2. 台账提取确定新增款式清单 (109 项 JSON 集合)
+### 2. 台账提取确定新增款式清单 (106 款 JSON 集合)
 ```json
 [
   "anime_cosplay",
@@ -53,7 +53,6 @@
   "dress_backless",
   "dress_casual",
   "duffel_coat",
-  "dungarees",
   "fast_food_uniform",
   "festive_costume",
   "firefighter_gear",
@@ -113,13 +112,11 @@
   "summer_sundress",
   "sundress_layered",
   "suspender_skirt",
-  "sweater_casual",
   "sweater_dress",
   "sweatshirt",
   "swimsuit_classic",
   "swimsuit_competition",
   "swimsuit_creative",
-  "swimsuit_school",
   "t_shirt",
   "tactical_vest",
   "tailcoat",
@@ -213,8 +210,9 @@
 
 ---
 
-## 四、109 款新增服装款式全量工程规格台账
+## 四、新增服装款式全量工程规格台账 (Batch 1~5 独立新增 106 款，与基线 31 款共同构成 137 款全量目录)
 
+> **说明**：原台账中第 117 行 `dungarees`、第 33 行 `sweater` (`sweater_casual`)、第 8 行 `school swimsuit` (`swimsuit_school`) 在基线 `bc0d645` 中已原生存在（归入 31 款保留清单）；Batch 1~5 实际独立新增 106 款，共同达成 137 款全量目录闭环。
 > **拓扑枚举严格约束**：所有形制拓扑字段 (`topologies`) 必须且只能取值自 `models.py` 权威枚举：`one_piece`, `top`, `bottom_pants`, `bottom_skirt`, `underwear`, `outerwear`, `none`。坚决杜绝任何非规范复合字符串。
 
 | 序号 | 款式规范 ID | 中文名称 | 形制拓扑 (`topologies`) | 解扣能力 (`button`) | 掀裙能力 (`skirt`) | 原始行号 | 规范化提示词 |
@@ -371,8 +369,8 @@
 
 ### 1. 配饰 (`accessories.json -> headwear_jewelry`，运行时槽位 `jewelry`) 新增清单 (+7 项)
 1. `neck_ribbon` (丝带颈带, Row 56, `neck ribbon`)
-2. `hooded_cloak` (连帽防风斗篷, Row 58, `hooded cloak`，纳入承载白名单)
-3. `cloak` (无帽长披风, Row 65, `cloak`，纳入承载白名单)
+2. `hooded_cloak` (连帽防风斗篷, Rows 58, 182, `Cape hood` / `hooded cloak`，合并去重，纳入承载白名单)
+3. `cloak` (无帽长披风, Rows 65, 245, `cloak` / `cape`，合并去重，纳入承载白名单)
 4. `poncho` (套头小披风, Row 75, `poncho`，纳入承载白名单)
 5. `waist_belt` (基础皮革腰带, Row 243, `belt`)
 6. `winter_scarf` (针织保暖围巾, Row 244, `scarf`)
@@ -380,7 +378,7 @@
 
 ### 2. 情趣内衣 (`clothing.json -> lingerie_wardrobe`，运行时槽位 `lingerie`) 新增清单 (+2 项)
 1. `crotchless_panties` (开裆无底内裤, Row 82, `crotchless panties`，独立建模)
-2. `basic_underwear` (基础日常内衣, Row 114, `underwear`，新增独立规范条目)
+2. `basic_underwear` (基础日常内衣, Row 129, `underwear`，新增独立规范条目；注：原误注 Row 114 实为 power armor)
 
 ### 3. 身体微瑕 (`imperfections.json -> categories`，运行时槽位 `imperfections`) 新增清单 (+1 项)
 1. `tan_lines` (日晒泳装痕迹, Row 70, `tan lines`，身体唯一主归属，彻底剥离衣柜)

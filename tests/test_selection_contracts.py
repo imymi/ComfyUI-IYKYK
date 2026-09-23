@@ -230,7 +230,7 @@ class TestSelectionContracts(unittest.TestCase):
                 except Exception as e:
                     self.fail(f"Real call failed for UI option '{opt}' in slot '{slot_name}': {e}")
 
-        self.assertEqual(called_count, 566, f"Expected exactly 566 explicit UI options, called {called_count}")
+        self.assertEqual(called_count, 577, f"Expected exactly 577 explicit UI options (566 + 11 new states), called {called_count}")
 
     def test_strict_negative_selectors_fail_fast(self):
         """

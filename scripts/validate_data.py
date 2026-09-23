@@ -566,6 +566,7 @@ def validate_all(
 def main() -> int:
     parser = argparse.ArgumentParser(description="Validate ComfyUI-IYKYK JSON datasets against Draft-7 schemas.")
     parser.add_argument("--strict", action="store_true", help="Fail with non-zero exit code if any error occurs")
+    parser.add_argument("--zero-warnings", "--fail-on-warnings", dest="zero_warnings", action="store_true", help="Fail with non-zero exit code if any warning occurs")
     parser.add_argument("--data-dir", type=Path, default=DATA_DIR, help="Path to data directory")
     parser.add_argument("--schemas-dir", type=Path, default=SCHEMAS_DIR, help="Path to schemas directory")
     args = parser.parse_args()
@@ -584,6 +585,9 @@ def main() -> int:
 
     if not res.is_valid:
         print(f"\n❌ Validation FAILED with {len(res.errors)} errors ({len(res.warnings)} warnings).")
+        return 1
+    elif args.zero_warnings and len(res.warnings) > 0:
+        print(f"\n❌ Validation FAILED due to --zero-warnings gate: 0 errors ({len(res.warnings)} warnings).")
         return 1
     else:
         print(f"\n✅ Validation PASSED with 0 errors ({len(res.warnings)} warnings).")
