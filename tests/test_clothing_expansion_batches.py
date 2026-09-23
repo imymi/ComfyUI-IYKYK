@@ -129,6 +129,31 @@ BATCH_4_ITEMS = [
     ("zentai_suit", "全身紧身连体衣 (Zentai Suit)", ["full_body_tights", "catsuit_zentai"], False, False, ["one_piece"]),
 ]
 
+BATCH_5_ITEMS = [
+    ("chiffon_dress", "雪纺连衣裙 (Chiffon Dress)", ["sheer_chiffon_dress"], False, True, ["one_piece"]),
+    ("cocktail_dress", "鸡尾酒礼服裙 (Cocktail Dress)", ["party_dress", "evening_cocktail_dress"], False, True, ["one_piece"]),
+    ("dirndl_dress", "德式紧身胸衣连衣裙 (Dirndl Dress)", ["bavarian_dirndl", "alpine_dirndl"], True, True, ["one_piece"]),
+    ("dress_backless", "大露背连身裙 (Backless Dress)", ["open_back_dress"], False, True, ["one_piece"]),
+    ("dress_casual", "休闲日常连身裙 (Casual Day Dress)", ["daily_dress", "casual_one_piece"], False, True, ["one_piece"]),
+    ("floral_dress_black", "黑色碎花连衣裙 (Black Floral Dress)", ["dark_floral_dress"], False, True, ["one_piece"]),
+    ("floral_dress_white", "白色碎花连衣裙 (White Floral Dress)", ["light_floral_dress"], False, True, ["one_piece"]),
+    ("formal_gown", "高定正式长礼服 (Formal Evening Gown)", ["ball_gown", "formal_evening_gown"], False, True, ["one_piece"]),
+    ("halter_dress", "挂脖连身裙 (Halter Dress)", ["halter_neck_dress"], False, True, ["one_piece"]),
+    ("lolita_fashion", "经典古典洛丽塔洋装 (Classic Lolita Dress)", ["classic_lolita", "lolita_dress"], True, True, ["one_piece"]),
+    ("lolita_gothic", "哥特洛丽塔洋装 (Gothic Lolita Dress)", ["kuro_lolita", "gothic_lolita_dress"], True, True, ["one_piece"]),
+    ("lolita_sweet", "甜美洛丽塔洋装 (Sweet Lolita Dress)", ["ama_lolita", "sweet_lolita_dress"], True, True, ["one_piece"]),
+    ("mahou_shoujo", "魔法少女战装 (Magical Girl Costume)", ["magical_girl_dress", "anime_magical_girl"], False, True, ["one_piece"]),
+    ("off_shoulder_dress", "一字领露肩连衣裙 (Off-Shoulder Dress)", ["bardot_dress", "shoulderless_dress"], False, True, ["one_piece"]),
+    ("pleated_dress", "细褶风琴连衣裙 (Pleated Dress)", ["accordion_pleat_dress"], False, True, ["one_piece"]),
+    ("sleeveless_dress", "轻盈无袖连衣裙 (Sleeveless Dress)", ["tank_dress"], False, True, ["one_piece"]),
+    ("strapless_dress", "抹胸无肩带礼服裙 (Strapless Dress)", ["tube_dress", "bandeau_dress"], False, True, ["one_piece"]),
+    ("summer_sundress", "清凉夏日吊带裙 (Summer Sundress)", ["summer_dress", "sundress"], False, True, ["one_piece"]),
+    ("sundress_layered", "黑吊带裙内搭白T恤叠穿 (Layered Sundress with T-Shirt)", ["layered_sundress", "pinafore_over_tshirt"], False, True, ["one_piece"]),
+    ("sweater_dress", "软糯针织毛衣裙 (Sweater Dress)", ["knit_sweater_dress", "jumper_dress"], False, True, ["one_piece"]),
+    ("tulle_dress", "仙气薄纱蓬蓬裙 (Tulle Dress)", ["fairy_tulle_dress", "mesh_dress"], False, True, ["one_piece"]),
+    ("wedding_dress", "纯白新娘婚纱 (White Bridal Wedding Dress)", ["bridal_gown", "wedding_gown"], False, True, ["one_piece"]),
+]
+
 
 class TestClothingExpansionBatches(unittest.TestCase):
     @classmethod
@@ -137,8 +162,8 @@ class TestClothingExpansionBatches(unittest.TestCase):
         cls.resolver = ConflictResolver(DATA_DIR)
         cls.generator = nodes.IYKYKPromptGenerator()
 
-    def test_01_batch_1_2_3_4_sampling_accessibility(self):
-        """逐款验证 Batch 1 (16 款上装), Batch 2 (22 款下装与内衣), Batch 3 (23 款外套机甲), Batch 4 (23 款连衣裙/连体衣/制服) 按规范 ID、中文显示名和别名均可精确采样。"""
+    def test_01_batch_1_2_3_4_5_sampling_accessibility(self):
+        """逐款验证 Batch 1 (16 款上装), Batch 2 (22 款下装与内衣), Batch 3 (23 款外套机甲), Batch 4 (23 款连体衣/制服), Batch 5 (22 款连衣裙礼服) 按规范 ID、中文显示名和别名均可精确采样。"""
         rng = Random(42)
         for cid, name_zh, aliases, _ in BATCH_1_ITEMS:
             # 1. 按规范 ID 采样
@@ -229,28 +254,58 @@ class TestClothingExpansionBatches(unittest.TestCase):
                 res_alias = self.sampler.sample_clothing_result(alias, "无 (None)", "L1", rng)
                 self.assertEqual(res_alias.style_id, cid)
 
+        for cid, name_zh, aliases, _, _, topos in BATCH_5_ITEMS:
+            # 1. 按规范 ID 采样
+            res_id = self.sampler.sample_clothing_result(cid, "无 (None)", "L1", rng)
+            self.assertEqual(res_id.style_id, cid)
+            self.assertIn(len(res_id.base_tags), (1, 2))
+            for tag in res_id.base_tags:
+                self.assertEqual(tag.provenance.item_id, cid)
+                self.assertEqual(tag.provenance.kind, "base_clothing")
+                self.assertTrue(
+                    any(t in tag.facts.garment_topologies for t in topos),
+                    f"{cid} tag {tag.text} topologies {tag.facts.garment_topologies} disjoint from {topos}"
+                )
+
+            # 2. 按中文名称采样
+            res_name = self.sampler.sample_clothing_result(name_zh, "无 (None)", "L1", rng)
+            self.assertEqual(res_name.style_id, cid)
+            self.assertIn(len(res_name.base_tags), (1, 2))
+
+            # 3. 按别名采样
+            for alias in aliases:
+                res_alias = self.sampler.sample_clothing_result(alias, "无 (None)", "L1", rng)
+                self.assertEqual(res_alias.style_id, cid)
+
     def test_02_batches_random_reachability(self):
-        """验证 Batch 1 (16 款), Batch 2 (22 款), Batch 3 (23 款), Batch 4 (23 款) 共 84 款新增款式在随机模式 (随机 (Random)) 下均可真实被抽中。"""
+        """验证 Batch 1 (16 款), Batch 2 (22 款), Batch 3 (23 款), Batch 4 (23 款), Batch 5 (22 款) 共 106 款新增款式在随机模式 (随机 (Random)) 下均可真实被抽中。"""
         sampled_styles = set()
         rng = Random(2026)
-        # 115 款均匀抽取，抽样 4000 次，所有 84 款新增款式必须 100% 被覆盖
-        for _ in range(4000):
+        # 137 款均匀抽取，抽样 6000 次，所有 106 款新增款式必须 100% 被覆盖
+        for _ in range(6000):
             res = self.sampler.sample_clothing_result("随机 (Random)", "无 (None)", "L1", rng)
             if res.style_id:
                 sampled_styles.add(res.style_id)
 
-        target_ids = {item[0] for item in BATCH_1_ITEMS} | {item[0] for item in BATCH_2_ITEMS} | {item[0] for item in BATCH_3_ITEMS} | {item[0] for item in BATCH_4_ITEMS}
+        target_ids = (
+            {item[0] for item in BATCH_1_ITEMS}
+            | {item[0] for item in BATCH_2_ITEMS}
+            | {item[0] for item in BATCH_3_ITEMS}
+            | {item[0] for item in BATCH_4_ITEMS}
+            | {item[0] for item in BATCH_5_ITEMS}
+        )
         unreached = target_ids - sampled_styles
         self.assertEqual(len(unreached), 0, f"Styles never reached in random sampling: {unreached}")
 
     def test_03_discrete_tag_syntax_and_word_count(self):
-        """验证 Batch 1, 2, 3, 4 共 84 款款式返回离散叶子标签，零语法破坏且词数处于合理受控范围。"""
+        """验证 Batch 1, 2, 3, 4, 5 共 106 款款式返回离散叶子标签，零语法破坏且词数处于合理受控范围。"""
         rng = Random(1234)
         all_items = (
             [(i[0], i[1]) for i in BATCH_1_ITEMS]
             + [(i[0], i[1]) for i in BATCH_2_ITEMS]
             + [(i[0], i[1]) for i in BATCH_3_ITEMS]
             + [(i[0], i[1]) for i in BATCH_4_ITEMS]
+            + [(i[0], i[1]) for i in BATCH_5_ITEMS]
         )
         for cid, name_zh in all_items:
             res = self.sampler.sample_clothing_result(cid, "无 (None)", "L1", rng)
@@ -262,14 +317,14 @@ class TestClothingExpansionBatches(unittest.TestCase):
     def test_04_button_capability_positive_and_negative_matrix(self):
         """形制能力契约核验 (解扣状态 unbuttoned):
         严格验证具体动作词条 (按服装形制拓扑区分动作) 真实生成或精准剔除：
-        - 正例：具备纽扣能力的款式 (Batch 1: 5 款上装, Batch 2: denim_shorts, leather_skirt 2 款, Batch 3: 19 款外套, Batch 4: 7 款连体/长袍/套装 共 33 款)：
+        - 正例：具备纽扣能力的款式 (Batch 1: 5 款, Batch 2: 2 款, Batch 3: 19 款, Batch 4: 7 款, Batch 5: 4 款 共 37 款)：
           * 上装正例：collar unbuttoned / front unbuttoned 保留在 positive prompt 中；
-          * 裤装正例 (denim_shorts)：pants button undone / jeans unbuttoned 保留在 positive prompt 中，胸前/衬衫/外套/长袍动作严禁存在；
-          * 裙装正例 (leather_skirt)：skirt button undone / skirt unbuttoned 保留在 positive prompt 中，胸前/衬衫/外套/长袍动作严禁存在；
-          * 外套正例 (Batch 3 19 款)：unbuttoned coat / collar unbuttoned 保留在 positive prompt 中，衬衫/裤装/裙装/长袍动作严禁存在；
-          * 连体正例 (Batch 4 7 款)：racing_suit 保留 suit unbuttoned at chest 与 collar unbuttoned；bathrobe 等长袍/工装保留 collar unbuttoned 且 suit 动作以 state_lacks_carrier drop；
+          * 裤装正例 (denim_shorts)：pants button undone / jeans unbuttoned 保留在 positive prompt 中；
+          * 裙装正例 (leather_skirt)：skirt button undone / skirt unbuttoned 保留在 positive prompt 中；
+          * 外套正例 (Batch 3 19 款)：unbuttoned coat / collar unbuttoned 保留在 positive prompt 中；
+          * 连体正例 (Batch 4 7 款, Batch 5 4 款)：racing_suit 保留 suit unbuttoned at chest；其余长袍/洛丽塔洋装保留 collar unbuttoned；
           * 正例动作无相应 Drop 决策。
-        - 反例：无纽扣能力的款式 (Batch 1: 11 款, Batch 2: 20 款, Batch 3: 4 款机甲重铠, Batch 4: 16 款非纽扣连体衣 共 51 款)：
+        - 反例：无纽扣能力的款式 (Batch 1: 11 款, Batch 2: 20 款, Batch 3: 4 款, Batch 4: 16 款, Batch 5: 18 款 共 69 款)：
           动作词条绝对不出现在 positive prompt 中，且决策报告中必须明确记录 action == "drop"。
         """
         all_items = (
@@ -277,6 +332,7 @@ class TestClothingExpansionBatches(unittest.TestCase):
             + [(i[0], i[3], i[5]) for i in BATCH_2_ITEMS]
             + [(i[0], i[3], i[5]) for i in BATCH_3_ITEMS]
             + [(i[0], i[3], i[5]) for i in BATCH_4_ITEMS]
+            + [(i[0], i[3], i[5]) for i in BATCH_5_ITEMS]
         )
 
         ALL_BUTTON_ACTIONS = (
@@ -512,7 +568,7 @@ class TestClothingExpansionBatches(unittest.TestCase):
     def test_05_skirt_capability_positive_and_negative_matrix(self):
         """形制能力契约核验 (掀裙状态 lifted_up):
         严格验证具体动作词条 (skirt pulled up revealing panties / skirt hiked up to waist) 真实生成或精准剔除：
-        - 正例：具备裙装能力的款式 (Batch 2 的 16 款半身裙, Batch 4 的 16 款裙装/长袍 共 32 款)：
+        - 正例：具备裙装能力的款式 (Batch 2 的 16 款半身裙, Batch 4 的 16 款裙装/长袍, Batch 5 的 22 款连衣裙/礼服 共 54 款)：
           * 半身裙动作 (skirt pulled up revealing panties, skirt hiked up to waist) 100% 保留在 positive prompt 中；
           * 半身裙绝对禁止冒用/泄漏连衣裙动作 (dress hitched up)；
           * 连衣裙/长袍正例具备完整裙装掀起能力；
@@ -526,6 +582,7 @@ class TestClothingExpansionBatches(unittest.TestCase):
             + [(i[0], i[4], i[5]) for i in BATCH_2_ITEMS]
             + [(i[0], i[4], i[5]) for i in BATCH_3_ITEMS]
             + [(i[0], i[4], i[5]) for i in BATCH_4_ITEMS]
+            + [(i[0], i[4], i[5]) for i in BATCH_5_ITEMS]
         )
 
         for cid, skirt_allowed, topos in all_items:
@@ -890,8 +947,35 @@ class TestClothingExpansionBatches(unittest.TestCase):
             "Explicitly mis-targeted shirt action must be dropped with state_lacks_carrier without fallback",
         )
 
+    def test_05e_sundress_layered_pipeline_syntax_preservation(self):
+        """专项核验终验阻断项：第 135 行复合强调语法贯穿端到端生成链路。
+
+        验证流程：
+        1. 显式选择 sundress_layered，采样得到 (((black sundress with round neck,white t-shirt bottom)))；
+        2. 经过 PromptAssembler 组装、PromptAtom 原子化、ConflictResolver 消解与 PromptFormatter 格式化；
+        3. 最终产出的正向提示词中必须完整字面保留三重括号与内部逗号：
+           '(((black sundress with round neck,white t-shirt bottom)))'；
+        4. 全文本语法校验 validate_prompt_syntax 严格通过，且顶层分词器 split_top_level_tags 绝不割裂内部逗号。
+        """
+        from lib.lexer import split_top_level_tags, validate_prompt_syntax
+
+        expected_tag = "(((black sundress with round neck,white t-shirt bottom)))"
+        # 使用固定种子验证端到端生成
+        res = self.generator.generate_structured(
+            场景预设="日常街道",
+            服装款式="sundress_layered",
+            服装状态="正常穿着 (Normal)",
+            裸露等级="L1 包裹暗示 (Fully Clothed / Suggestive)",
+            画质等级="高清写真 (High)",
+            prompt_seed=0,
+        )
+        self.assertIn(expected_tag, res.positive, f"Compound tag '{expected_tag}' not preserved in generation: {res.positive}")
+        validate_prompt_syntax(res.positive)
+        tags = split_top_level_tags(res.positive)
+        self.assertIn(expected_tag, tags, f"Compound tag with internal comma was corrupted or split into {tags}")
+
     def test_06_end_to_end_generation_and_dag_provenance(self):
-        """端到端验证 Batch 1 (16 款), Batch 2 (22 款), Batch 3 (23 款), Batch 4 (23 款) 共 84 款新增款式在真实节点生成下的 Provenance DAG 完整性与零未消解冲突。"""
+        """端到端验证 Batch 1 (16 款), Batch 2 (22 款), Batch 3 (23 款), Batch 4 (23 款), Batch 5 (22 款) 共 106 款新增款式在真实节点生成下的 Provenance DAG 完整性与零未消解冲突。"""
         from tests.test_rc8_quality_gate import _verify_provenance_dag
 
         all_items = (
@@ -899,6 +983,7 @@ class TestClothingExpansionBatches(unittest.TestCase):
             + [(i[0], i[1]) for i in BATCH_2_ITEMS]
             + [(i[0], i[1]) for i in BATCH_3_ITEMS]
             + [(i[0], i[1]) for i in BATCH_4_ITEMS]
+            + [(i[0], i[1]) for i in BATCH_5_ITEMS]
         )
         for cid, name_zh in all_items:
             res = self.generator.generate_structured(
@@ -922,8 +1007,8 @@ class TestClothingExpansionBatches(unittest.TestCase):
         2. 基础服装防空保留：在所有应保留基础服装的模式下，len(res.base_tags) >= 1；
         3. 版型与属性约束：恰有 1 个主款/变体 (core_base/variant)，至多 1 个可组合属性 (combinable_attribute)；
         4. 同组互斥严格为 1：res.base_tags 中绝不允许存在共享相同非空 mutex_group 的两个标签；
-        5. 全变体可达性 (Reachability)：对 Batch 1 (16 款), Batch 2 (22 款), Batch 3 (23 款), Batch 4 (23 款) 逐款多种子抽样，
-           词库定义的每一个变体与属性均被真实采到，四个新增批次累计269个叶子标签 100% 可达。
+        5. 全变体可达性 (Reachability)：对 Batch 1..5 共 106 款逐款多种子抽样，
+           词库定义的每一个变体与属性均被真实采到，五个新增批次累计335个叶子标签 100% 可达。
         """
         with open(DATA_DIR / "clothing.json", "r", encoding="utf-8") as f:
             cdata = json.load(f)
@@ -1011,10 +1096,11 @@ class TestClothingExpansionBatches(unittest.TestCase):
         b2_seen = run_batch_checks(BATCH_2_ITEMS, 67, "Batch 2")
         b3_seen = run_batch_checks(BATCH_3_ITEMS, 75, "Batch 3")
         b4_seen = run_batch_checks(BATCH_4_ITEMS, 76, "Batch 4")
+        b5_seen = run_batch_checks(BATCH_5_ITEMS, 66, "Batch 5")
         self.assertEqual(
-            len(b1_seen | b2_seen | b3_seen | b4_seen),
-            269,
-            "四个新增批次累计269个叶子标签 must be exactly 269",
+            len(b1_seen | b2_seen | b3_seen | b4_seen | b5_seen),
+            335,
+            "五个新增批次累计335个叶子标签 must be exactly 335",
         )
 
 

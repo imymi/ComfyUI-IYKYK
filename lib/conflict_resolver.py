@@ -115,6 +115,7 @@ ALLOWED_BUTTON_STYLES: Set[str] = {
     "denim_shorts", "leather_skirt",
     "leather_jacket", "tactical_vest", "windbreaker", "winter_parka",
     "festive_costume", "racing_suit", "robe_general",
+    "lolita_fashion", "lolita_gothic", "lolita_sweet",
 }
 
 NON_SKIRT_ONE_PIECE: Set[str] = {

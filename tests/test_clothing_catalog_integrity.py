@@ -305,6 +305,58 @@ BATCH_4_SPEC = {
     "zentai_suit": {"topologies": ["one_piece"], "button": False, "skirt": False, "raw_lines": [92]},
 }
 
+# Batch 5: 连衣裙、礼服与洛丽塔服饰 22 款 ID 集合
+BATCH_5_IDS = frozenset({
+    "chiffon_dress",
+    "cocktail_dress",
+    "dirndl_dress",
+    "dress_backless",
+    "dress_casual",
+    "floral_dress_black",
+    "floral_dress_white",
+    "formal_gown",
+    "halter_dress",
+    "lolita_fashion",
+    "lolita_gothic",
+    "lolita_sweet",
+    "mahou_shoujo",
+    "off_shoulder_dress",
+    "pleated_dress",
+    "sleeveless_dress",
+    "strapless_dress",
+    "summer_sundress",
+    "sundress_layered",
+    "sweater_dress",
+    "tulle_dress",
+    "wedding_dress",
+})
+
+# Batch 5 规格与能力 SSOT 期望定义
+BATCH_5_SPEC = {
+    "chiffon_dress": {"topologies": ["one_piece"], "button": False, "skirt": True, "raw_lines": [25]},
+    "cocktail_dress": {"topologies": ["one_piece"], "button": False, "skirt": True, "raw_lines": [211]},
+    "dirndl_dress": {"topologies": ["one_piece"], "button": True, "skirt": True, "raw_lines": [159]},
+    "dress_backless": {"topologies": ["one_piece"], "button": False, "skirt": True, "raw_lines": [29, 32]},
+    "dress_casual": {"topologies": ["one_piece"], "button": False, "skirt": True, "raw_lines": [28, 137, 144]},
+    "floral_dress_black": {"topologies": ["one_piece"], "button": False, "skirt": True, "raw_lines": [146]},
+    "floral_dress_white": {"topologies": ["one_piece"], "button": False, "skirt": True, "raw_lines": [145]},
+    "formal_gown": {"topologies": ["one_piece"], "button": False, "skirt": True, "raw_lines": [73, 204]},
+    "halter_dress": {"topologies": ["one_piece"], "button": False, "skirt": True, "raw_lines": [30]},
+    "lolita_fashion": {"topologies": ["one_piece"], "button": True, "skirt": True, "raw_lines": [89, 158, 233]},
+    "lolita_gothic": {"topologies": ["one_piece"], "button": True, "skirt": True, "raw_lines": [50, 95, 157, 232]},
+    "lolita_sweet": {"topologies": ["one_piece"], "button": True, "skirt": True, "raw_lines": [78, 96]},
+    "mahou_shoujo": {"topologies": ["one_piece"], "button": False, "skirt": True, "raw_lines": [51]},
+    "off_shoulder_dress": {"topologies": ["one_piece"], "button": False, "skirt": True, "raw_lines": [167]},
+    "pleated_dress": {"topologies": ["one_piece"], "button": False, "skirt": True, "raw_lines": [165]},
+    "sleeveless_dress": {"topologies": ["one_piece"], "button": False, "skirt": True, "raw_lines": [219]},
+    "strapless_dress": {"topologies": ["one_piece"], "button": False, "skirt": True, "raw_lines": [166]},
+    "summer_sundress": {"topologies": ["one_piece"], "button": False, "skirt": True, "raw_lines": [46, 149, 179]},
+    "sundress_layered": {"topologies": ["one_piece"], "button": False, "skirt": True, "raw_lines": [135]},
+    "sweater_dress": {"topologies": ["one_piece"], "button": False, "skirt": True, "raw_lines": [31]},
+    "tulle_dress": {"topologies": ["one_piece"], "button": False, "skirt": True, "raw_lines": [24]},
+    "wedding_dress": {"topologies": ["one_piece"], "button": False, "skirt": True, "raw_lines": [63, 168, 210]},
+}
+
 
 class TestClothingCatalogIntegrity(unittest.TestCase):
     @classmethod
@@ -315,22 +367,22 @@ class TestClothingCatalogIntegrity(unittest.TestCase):
         cls.cat_by_id = {c["id"]: c for c in cls.categories}
 
     def test_01_id_set_exact_equivalence(self):
-        """严格断言生产 ID 集合精确等于基线 31 款 ∪ Batch 1 16 款 ∪ Batch 2 22 款 ∪ Batch 3 23 款 ∪ Batch 4 23 款，共 115 款，多一漏一均直接报错。"""
+        """严格断言生产 ID 集合精确等于基线 31 款 ∪ Batch 1 16 款 ∪ Batch 2 22 款 ∪ Batch 3 23 款 ∪ Batch 4 23 款 ∪ Batch 5 22 款，共 137 款，多一漏一均直接报错。"""
         current_ids = set(self.cat_by_id.keys())
-        expected_ids = set(BASE_31_IDS | BATCH_1_IDS | BATCH_2_IDS | BATCH_3_IDS | BATCH_4_IDS)
+        expected_ids = set(BASE_31_IDS | BATCH_1_IDS | BATCH_2_IDS | BATCH_3_IDS | BATCH_4_IDS | BATCH_5_IDS)
 
         missing = expected_ids - current_ids
         unexpected = current_ids - expected_ids
 
         self.assertEqual(len(missing), 0, f"Missing category IDs in catalog: {missing}")
         self.assertEqual(len(unexpected), 0, f"Unexpected category IDs in catalog: {unexpected}")
-        self.assertEqual(len(current_ids), 115, f"Expected exactly 115 categories, got {len(current_ids)}")
+        self.assertEqual(len(current_ids), 137, f"Expected exactly 137 categories, got {len(current_ids)}")
 
     def test_02_capability_matrix(self):
-        """逐款核验 Batch 1..4 共 84 款形制能力与规格表 100% 吻合 (解扣、掀裙、拉链能力白名单)。"""
+        """逐款核验 Batch 1..5 共 106 款形制能力与规格表 100% 吻合 (解扣、掀裙、拉链能力白名单)。"""
         tag_id_pattern = re.compile(r"^[a-z][a-z0-9_]{2,95}$")
 
-        combined_specs = {**BATCH_1_SPEC, **BATCH_2_SPEC, **BATCH_3_SPEC, **BATCH_4_SPEC}
+        combined_specs = {**BATCH_1_SPEC, **BATCH_2_SPEC, **BATCH_3_SPEC, **BATCH_4_SPEC, **BATCH_5_SPEC}
         for cid, spec in combined_specs.items():
             self.assertIn(cid, self.cat_by_id, f"Category {cid} missing from catalog")
             cat = self.cat_by_id[cid]
@@ -405,21 +457,25 @@ class TestClothingCatalogIntegrity(unittest.TestCase):
                 self.assertEqual(tag["facts"]["garment_topologies"], ["outerwear"], f"{b3_cid} tag {tag['id']} must have topology ['outerwear']")
 
     def test_04_leaf_tag_count_and_metadata_integrity(self):
-        """严格核验 Batch 1 (51), Batch 2 (67), Batch 3 (75), Batch 4 (76) 四个新增批次累计269个叶子标签及其元数据完整性 (role, mutex_group, raw_lines, derivation)。"""
+        """严格核验 Batch 1 (51), Batch 2 (67), Batch 3 (75), Batch 4 (76), Batch 5 (66) 五个新增批次累计335个叶子标签及其元数据完整性 (role, mutex_group, raw_lines, derivation)。"""
         b1_tags = [t for cid in BATCH_1_IDS for t in self.cat_by_id[cid].get("tags", [])]
         b2_tags = [t for cid in BATCH_2_IDS for t in self.cat_by_id[cid].get("tags", [])]
         b3_tags = [t for cid in BATCH_3_IDS for t in self.cat_by_id[cid].get("tags", [])]
         b4_tags = [t for cid in BATCH_4_IDS for t in self.cat_by_id[cid].get("tags", [])]
+        b5_tags = [t for cid in BATCH_5_IDS for t in self.cat_by_id[cid].get("tags", [])]
         self.assertEqual(len(b1_tags), 51, f"Expected exactly 51 leaf tags in Batch 1, got {len(b1_tags)}")
         self.assertEqual(len(b2_tags), 67, f"Expected exactly 67 leaf tags in Batch 2, got {len(b2_tags)}")
         self.assertEqual(len(b3_tags), 75, f"Expected exactly 75 leaf tags in Batch 3, got {len(b3_tags)}")
         self.assertEqual(len(b4_tags), 76, f"Expected exactly 76 leaf tags in Batch 4, got {len(b4_tags)}")
+        self.assertEqual(len(b5_tags), 66, f"Expected exactly 66 leaf tags in Batch 5, got {len(b5_tags)}")
+        total_expanded = len(b1_tags) + len(b2_tags) + len(b3_tags) + len(b4_tags) + len(b5_tags)
+        self.assertEqual(total_expanded, 335, f"Expected exactly 335 cumulative leaf tags across Batch 1..5, got {total_expanded}")
 
         mg_regex = re.compile(r"^[a-z][a-z0-9_]{2,95}$")
         valid_roles = {"core_base", "variant", "combinable_attribute"}
         valid_derivations = {"verbatim", "derived", "product_extension"}
 
-        for cid in sorted(BATCH_1_IDS | BATCH_2_IDS | BATCH_3_IDS | BATCH_4_IDS):
+        for cid in sorted(BATCH_1_IDS | BATCH_2_IDS | BATCH_3_IDS | BATCH_4_IDS | BATCH_5_IDS):
             cat = self.cat_by_id[cid]
             tags = cat.get("tags", [])
             has_core = False
@@ -463,7 +519,7 @@ class TestClothingCatalogIntegrity(unittest.TestCase):
         """双向核验原始 TSV 行与词库映射：
         1. 真实读取 TSV 原文，校验行号连续性与 100% 存在；
         2. 校验 verbatim 标签在 TSV 规范化原词中严格有据可查，杜绝凭空新增修饰；
-        3. 台账迁移行 100% 覆盖 (Batch 1: 27 行 + Batch 2: 30 行 + Batch 3: 45 行 + Batch 4: 35 行 = 137 行)，标签引用行真实存在且归口精确，多对一归并依据充分。
+        3. 台账迁移行 100% 覆盖 (Batch 1: 27 行 + Batch 2: 30 行 + Batch 3: 45 行 + Batch 4: 35 行 + Batch 5: 36 行 = 173 行)，标签引用行真实存在且归口精确，多对一归并依据充分。
         """
         self.assertTrue(LEDGER_PATH.exists(), f"Ledger file missing at {LEDGER_PATH}")
         self.assertTrue(RAW_TSV_PATH.exists(), f"TSV file missing at {RAW_TSV_PATH}")
@@ -497,8 +553,8 @@ class TestClothingCatalogIntegrity(unittest.TestCase):
                         forms.add(c.replace("frillded", "frilled"))
             return forms
 
-        # 2. 从迁移台账提取所有分配给 Batch 1, Batch 2, Batch 3, Batch 4 的原始行
-        target_ids_scope = set(BATCH_1_IDS | BATCH_2_IDS | BATCH_3_IDS | BATCH_4_IDS)
+        # 2. 从迁移台账提取所有分配给 Batch 1, Batch 2, Batch 3, Batch 4, Batch 5 的原始行
+        target_ids_scope = set(BATCH_1_IDS | BATCH_2_IDS | BATCH_3_IDS | BATCH_4_IDS | BATCH_5_IDS)
         ledger_text = LEDGER_PATH.read_text(encoding="utf-8")
         active_ledger_rows: dict[int, dict[str, str]] = {}
         for line in ledger_text.splitlines():
@@ -520,9 +576,9 @@ class TestClothingCatalogIntegrity(unittest.TestCase):
                     "reason": cols[12],
                 }
 
-        self.assertEqual(len(active_ledger_rows), 137, f"Expected 137 ledger rows targeting Batch 1, 2, 3 & 4, got {len(active_ledger_rows)}")
+        self.assertEqual(len(active_ledger_rows), 173, f"Expected 173 ledger rows targeting Batch 1..5, got {len(active_ledger_rows)}")
 
-        # 3. 方向一 (Ledger -> Tags): 台账中分配给 Batch 1..4 的每一行在词库中均有对应标签与来源行号标注
+        # 3. 方向一 (Ledger -> Tags): 台账中分配给 Batch 1..5 的每一行在词库中均有对应标签与来源行号标注
         catalog_rows_by_cid: dict[str, set[int]] = {cid: set() for cid in target_ids_scope}
         for cid in target_ids_scope:
             for tag in self.cat_by_id[cid].get("tags", []):
@@ -556,7 +612,7 @@ class TestClothingCatalogIntegrity(unittest.TestCase):
                     self.assertIn(
                         r,
                         active_ledger_rows,
-                        f"Tag {tid} in {cid} references row {r}, which is not assigned to Batch 1 or 2 in the ledger!"
+                        f"Tag {tid} in {cid} references row {r}, which is not assigned to Batch 1..5 in the ledger!"
                     )
                     expected_cid = active_ledger_rows[r]["target_id"]
                     self.assertEqual(
@@ -581,6 +637,32 @@ class TestClothingCatalogIntegrity(unittest.TestCase):
                         bool(tag.get("derivation_note")),
                         f"Tag {tid} in {cid} is '{deriv}' but missing derivation_note"
                     )
+
+    def test_06_sundress_layered_compound_syntax_preservation(self):
+        """严格核验第 135 行复合强调语法 (((black sundress with round neck,white t-shirt bottom)))：
+        1. 词库字面与角色属性完整性；
+        2. 词法解析器保留为单个受保护 SpanType.PAREN，顶层切分不破坏内部逗号；
+        3. 提示词语法校验器通过。
+        """
+        from lib.lexer import split_top_level_tags, tokenize_prompt_spans, validate_prompt_syntax, SpanType
+
+        cat = self.cat_by_id["sundress_layered"]
+        core_tag = next(t for t in cat["tags"] if t["role"] == "core_base")
+        expected_text = "(((black sundress with round neck,white t-shirt bottom)))"
+        self.assertEqual(core_tag["text"], expected_text)
+        self.assertEqual(core_tag["derivation"], "verbatim")
+        self.assertEqual(core_tag["raw_lines"], [135])
+
+        # 语法与词法校验
+        validate_prompt_syntax(expected_text)
+        test_prompt = f"1girl, solo, {expected_text}, outdoors"
+        validate_prompt_syntax(test_prompt)
+
+        tags = split_top_level_tags(test_prompt)
+        self.assertIn(expected_text, tags, f"Compound tag with internal comma was corrupted or split: {tags}")
+
+        spans = tokenize_prompt_spans(expected_text)
+        self.assertTrue(any(s.span_type == SpanType.PAREN for s in spans), f"Expected PAREN span in {spans}")
 
 
 if __name__ == "__main__":

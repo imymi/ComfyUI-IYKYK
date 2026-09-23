@@ -7957,6 +7957,1553 @@
           "derivation_note": "zentai_suit 款式 combinable_attribute 特征细化扩写"
         }
       ]
+    },
+    {
+      "id": "chiffon_dress",
+      "name_zh": "雪纺连衣裙 (Chiffon Dress)",
+      "aliases": [
+        "sheer_chiffon_dress"
+      ],
+      "tags": [
+        {
+          "id": "chiffon_dress__tag_000",
+          "text": "chiffon dress",
+          "role": "core_base",
+          "mutex_group": "chiffon_dress_silhouette",
+          "raw_lines": [
+            25
+          ],
+          "derivation": "verbatim",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "one_piece"
+            ],
+            "mutex_groups": [
+              "chiffon_dress_silhouette"
+            ]
+          },
+          "derivation_note": "台账第[25]行原文直译建立"
+        },
+        {
+          "id": "chiffon_dress__tag_001",
+          "text": "tiered ruffle chiffon dress",
+          "role": "variant",
+          "mutex_group": "chiffon_dress_silhouette",
+          "raw_lines": [
+            25
+          ],
+          "derivation": "derived",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "one_piece"
+            ],
+            "mutex_groups": [
+              "chiffon_dress_silhouette"
+            ]
+          },
+          "derivation_note": "chiffon_dress 款式 variant 荷叶边多层雪纺裙细化扩写"
+        },
+        {
+          "id": "chiffon_dress__tag_002",
+          "text": "flowing sheer chiffon hem",
+          "role": "combinable_attribute",
+          "mutex_group": "chiffon_dress_attr",
+          "raw_lines": [
+            25
+          ],
+          "derivation": "product_extension",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "one_piece"
+            ],
+            "mutex_groups": [
+              "chiffon_dress_attr"
+            ]
+          },
+          "derivation_note": "chiffon_dress 款式 combinable_attribute 飘逸半透裙摆细节增补"
+        }
+      ]
+    },
+    {
+      "id": "cocktail_dress",
+      "name_zh": "鸡尾酒礼服裙 (Cocktail Dress)",
+      "aliases": [
+        "party_dress",
+        "evening_cocktail_dress"
+      ],
+      "tags": [
+        {
+          "id": "cocktail_dress__tag_000",
+          "text": "silvercleavage dress",
+          "role": "core_base",
+          "mutex_group": "cocktail_dress_silhouette",
+          "raw_lines": [
+            211
+          ],
+          "derivation": "verbatim",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "one_piece"
+            ],
+            "mutex_groups": [
+              "cocktail_dress_silhouette"
+            ]
+          },
+          "derivation_note": "台账第[211]行原文直译建立"
+        },
+        {
+          "id": "cocktail_dress__tag_001",
+          "text": "metallic shimmer cocktail dress",
+          "role": "variant",
+          "mutex_group": "cocktail_dress_silhouette",
+          "raw_lines": [
+            211
+          ],
+          "derivation": "derived",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "one_piece"
+            ],
+            "mutex_groups": [
+              "cocktail_dress_silhouette"
+            ]
+          },
+          "derivation_note": "cocktail_dress 款式 variant 金属光泽鸡尾酒裙细化扩写"
+        },
+        {
+          "id": "cocktail_dress__tag_002",
+          "text": "sculpted sweetheart neckline",
+          "role": "combinable_attribute",
+          "mutex_group": "cocktail_dress_attr",
+          "raw_lines": [
+            211
+          ],
+          "derivation": "product_extension",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "one_piece"
+            ],
+            "mutex_groups": [
+              "cocktail_dress_attr"
+            ]
+          },
+          "derivation_note": "cocktail_dress 款式 combinable_attribute 桃心领结构细节增补"
+        }
+      ]
+    },
+    {
+      "id": "dirndl_dress",
+      "name_zh": "德式紧身胸衣连衣裙 (Dirndl Dress)",
+      "aliases": [
+        "bavarian_dirndl",
+        "alpine_dirndl"
+      ],
+      "tags": [
+        {
+          "id": "dirndl_dress__tag_000",
+          "text": "dirndl",
+          "role": "core_base",
+          "mutex_group": "dirndl_dress_silhouette",
+          "raw_lines": [
+            159
+          ],
+          "derivation": "verbatim",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "one_piece"
+            ],
+            "mutex_groups": [
+              "dirndl_dress_silhouette"
+            ]
+          },
+          "derivation_note": "台账第[159]行原文直译建立"
+        },
+        {
+          "id": "dirndl_dress__tag_001",
+          "text": "traditional dirndl dress",
+          "role": "variant",
+          "mutex_group": "dirndl_dress_silhouette",
+          "raw_lines": [
+            159
+          ],
+          "derivation": "derived",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "one_piece"
+            ],
+            "mutex_groups": [
+              "dirndl_dress_silhouette"
+            ]
+          },
+          "derivation_note": "dirndl_dress 款式 variant 传统德式刺绣紧身胸衣连衣裙细化扩写"
+        },
+        {
+          "id": "dirndl_dress__tag_002",
+          "text": "contrasting silk apron",
+          "role": "combinable_attribute",
+          "mutex_group": "dirndl_dress_attr",
+          "raw_lines": [
+            159
+          ],
+          "derivation": "product_extension",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "one_piece"
+            ],
+            "mutex_groups": [
+              "dirndl_dress_attr"
+            ]
+          },
+          "derivation_note": "dirndl_dress 款式 combinable_attribute 丝绸围裙细节增补"
+        }
+      ]
+    },
+    {
+      "id": "dress_backless",
+      "name_zh": "大露背连身裙 (Backless Dress)",
+      "aliases": [
+        "open_back_dress"
+      ],
+      "tags": [
+        {
+          "id": "dress_backless__tag_000",
+          "text": "backless dress",
+          "role": "core_base",
+          "mutex_group": "dress_backless_silhouette",
+          "raw_lines": [
+            29
+          ],
+          "derivation": "verbatim",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "one_piece"
+            ],
+            "mutex_groups": [
+              "dress_backless_silhouette"
+            ]
+          },
+          "derivation_note": "台账第[29]行原文直译建立"
+        },
+        {
+          "id": "dress_backless__tag_001",
+          "text": "crisscross strap backless dress",
+          "role": "variant",
+          "mutex_group": "dress_backless_silhouette",
+          "raw_lines": [
+            32
+          ],
+          "derivation": "derived",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "one_piece"
+            ],
+            "mutex_groups": [
+              "dress_backless_silhouette"
+            ]
+          },
+          "derivation_note": "台账第[32]行 backless outfit 细化为交叉绑带大露背连衣裙"
+        },
+        {
+          "id": "dress_backless__tag_002",
+          "text": "draped cowl back line",
+          "role": "combinable_attribute",
+          "mutex_group": "dress_backless_attr",
+          "raw_lines": [
+            29,
+            32
+          ],
+          "derivation": "product_extension",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "one_piece"
+            ],
+            "mutex_groups": [
+              "dress_backless_attr"
+            ]
+          },
+          "derivation_note": "dress_backless 款式 combinable_attribute 垂坠后背线条细节增补"
+        }
+      ]
+    },
+    {
+      "id": "dress_casual",
+      "name_zh": "休闲日常连身裙 (Casual Day Dress)",
+      "aliases": [
+        "daily_dress",
+        "casual_one_piece"
+      ],
+      "tags": [
+        {
+          "id": "dress_casual__tag_000",
+          "text": "dress",
+          "role": "core_base",
+          "mutex_group": "dress_casual_silhouette",
+          "raw_lines": [
+            28
+          ],
+          "derivation": "verbatim",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "one_piece"
+            ],
+            "mutex_groups": [
+              "dress_casual_silhouette"
+            ]
+          },
+          "derivation_note": "台账第[28]行原文直译建立"
+        },
+        {
+          "id": "dress_casual__tag_001",
+          "text": "colorblock mosaic dress",
+          "role": "variant",
+          "mutex_group": "dress_casual_silhouette",
+          "raw_lines": [
+            137,
+            144
+          ],
+          "derivation": "derived",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "one_piece"
+            ],
+            "mutex_groups": [
+              "dress_casual_silhouette"
+            ]
+          },
+          "derivation_note": "台账第[137, 144]行 mosaic + one-piece dress 语义融合细化为拼接日常裙"
+        },
+        {
+          "id": "dress_casual__tag_002",
+          "text": "relaxed fit soft jersey cotton",
+          "role": "combinable_attribute",
+          "mutex_group": "dress_casual_attr",
+          "raw_lines": [
+            28,
+            144
+          ],
+          "derivation": "product_extension",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "one_piece"
+            ],
+            "mutex_groups": [
+              "dress_casual_attr"
+            ]
+          },
+          "derivation_note": "dress_casual 款式 combinable_attribute 休闲柔软棉质细节增补"
+        }
+      ]
+    },
+    {
+      "id": "floral_dress_black",
+      "name_zh": "黑色碎花连衣裙 (Black Floral Dress)",
+      "aliases": [
+        "dark_floral_dress"
+      ],
+      "tags": [
+        {
+          "id": "floral_dress_black__tag_000",
+          "text": "black skirt dress",
+          "role": "core_base",
+          "mutex_group": "floral_dress_black_silhouette",
+          "raw_lines": [
+            146
+          ],
+          "derivation": "verbatim",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "one_piece"
+            ],
+            "mutex_groups": [
+              "floral_dress_black_silhouette"
+            ]
+          },
+          "derivation_note": "台账第[146]行原文直译建立"
+        },
+        {
+          "id": "floral_dress_black__tag_001",
+          "text": "vintage dark rose floral dress",
+          "role": "variant",
+          "mutex_group": "floral_dress_black_silhouette",
+          "raw_lines": [
+            146
+          ],
+          "derivation": "derived",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "one_piece"
+            ],
+            "mutex_groups": [
+              "floral_dress_black_silhouette"
+            ]
+          },
+          "derivation_note": "floral_dress_black 款式 variant 复古深色玫瑰碎花细化扩写"
+        },
+        {
+          "id": "floral_dress_black__tag_002",
+          "text": "gothic dark botanical pattern",
+          "role": "combinable_attribute",
+          "mutex_group": "floral_dress_black_attr",
+          "raw_lines": [
+            146
+          ],
+          "derivation": "product_extension",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "one_piece"
+            ],
+            "mutex_groups": [
+              "floral_dress_black_attr"
+            ]
+          },
+          "derivation_note": "floral_dress_black 款式 combinable_attribute 暗黑植物印花细节增补"
+        }
+      ]
+    },
+    {
+      "id": "floral_dress_white",
+      "name_zh": "白色碎花连衣裙 (White Floral Dress)",
+      "aliases": [
+        "light_floral_dress"
+      ],
+      "tags": [
+        {
+          "id": "floral_dress_white__tag_000",
+          "text": "white skirt dress",
+          "role": "core_base",
+          "mutex_group": "floral_dress_white_silhouette",
+          "raw_lines": [
+            145
+          ],
+          "derivation": "verbatim",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "one_piece"
+            ],
+            "mutex_groups": [
+              "floral_dress_white_silhouette"
+            ]
+          },
+          "derivation_note": "台账第[145]行原文直译建立"
+        },
+        {
+          "id": "floral_dress_white__tag_001",
+          "text": "pastel flower white sundress",
+          "role": "variant",
+          "mutex_group": "floral_dress_white_silhouette",
+          "raw_lines": [
+            145
+          ],
+          "derivation": "derived",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "one_piece"
+            ],
+            "mutex_groups": [
+              "floral_dress_white_silhouette"
+            ]
+          },
+          "derivation_note": "floral_dress_white 款式 variant 浅色粉彩花卉白色吊带裙细化扩写"
+        },
+        {
+          "id": "floral_dress_white__tag_002",
+          "text": "airy botanical floral embroidery",
+          "role": "combinable_attribute",
+          "mutex_group": "floral_dress_white_attr",
+          "raw_lines": [
+            145
+          ],
+          "derivation": "product_extension",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "one_piece"
+            ],
+            "mutex_groups": [
+              "floral_dress_white_attr"
+            ]
+          },
+          "derivation_note": "floral_dress_white 款式 combinable_attribute 清透花卉刺绣细节增补"
+        }
+      ]
+    },
+    {
+      "id": "formal_gown",
+      "name_zh": "高定正式长礼服 (Formal Evening Gown)",
+      "aliases": [
+        "ball_gown",
+        "formal_evening_gown"
+      ],
+      "tags": [
+        {
+          "id": "formal_gown__tag_000",
+          "text": "full dress",
+          "role": "core_base",
+          "mutex_group": "formal_gown_silhouette",
+          "raw_lines": [
+            73
+          ],
+          "derivation": "verbatim",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "one_piece"
+            ],
+            "mutex_groups": [
+              "formal_gown_silhouette"
+            ]
+          },
+          "derivation_note": "台账第[73]行原文直译建立"
+        },
+        {
+          "id": "formal_gown__tag_001",
+          "text": "lucency full dress",
+          "role": "variant",
+          "mutex_group": "formal_gown_silhouette",
+          "raw_lines": [
+            204
+          ],
+          "derivation": "verbatim",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "one_piece"
+            ],
+            "mutex_groups": [
+              "formal_gown_silhouette"
+            ]
+          },
+          "derivation_note": "台账第[204]行原文直译建立"
+        },
+        {
+          "id": "formal_gown__tag_002",
+          "text": "delicate trailing floor train",
+          "role": "combinable_attribute",
+          "mutex_group": "formal_gown_attr",
+          "raw_lines": [
+            73,
+            204
+          ],
+          "derivation": "product_extension",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "one_piece"
+            ],
+            "mutex_groups": [
+              "formal_gown_attr"
+            ]
+          },
+          "derivation_note": "formal_gown 款式 combinable_attribute 拖地长裙摆细节增补"
+        }
+      ]
+    },
+    {
+      "id": "halter_dress",
+      "name_zh": "挂脖连身裙 (Halter Dress)",
+      "aliases": [
+        "halter_neck_dress"
+      ],
+      "tags": [
+        {
+          "id": "halter_dress__tag_000",
+          "text": "halter dress",
+          "role": "core_base",
+          "mutex_group": "halter_dress_silhouette",
+          "raw_lines": [
+            30
+          ],
+          "derivation": "verbatim",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "one_piece"
+            ],
+            "mutex_groups": [
+              "halter_dress_silhouette"
+            ]
+          },
+          "derivation_note": "台账第[30]行原文直译建立"
+        },
+        {
+          "id": "halter_dress__tag_001",
+          "text": "backless halter flare dress",
+          "role": "variant",
+          "mutex_group": "halter_dress_silhouette",
+          "raw_lines": [
+            30
+          ],
+          "derivation": "derived",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "one_piece"
+            ],
+            "mutex_groups": [
+              "halter_dress_silhouette"
+            ]
+          },
+          "derivation_note": "halter_dress 款式 variant 露背挂脖伞状裙细化扩写"
+        },
+        {
+          "id": "halter_dress__tag_002",
+          "text": "collarbone framing halter neckline",
+          "role": "combinable_attribute",
+          "mutex_group": "halter_dress_attr",
+          "raw_lines": [
+            30
+          ],
+          "derivation": "product_extension",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "one_piece"
+            ],
+            "mutex_groups": [
+              "halter_dress_attr"
+            ]
+          },
+          "derivation_note": "halter_dress 款式 combinable_attribute 锁骨挂脖领口细节增补"
+        }
+      ]
+    },
+    {
+      "id": "lolita_fashion",
+      "name_zh": "经典古典洛丽塔洋装 (Classic Lolita Dress)",
+      "aliases": [
+        "classic_lolita",
+        "lolita_dress"
+      ],
+      "tags": [
+        {
+          "id": "lolita_fashion__tag_000",
+          "text": "lolita fashion",
+          "role": "core_base",
+          "mutex_group": "lolita_fashion_silhouette",
+          "raw_lines": [
+            89,
+            233
+          ],
+          "derivation": "verbatim",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "one_piece"
+            ],
+            "mutex_groups": [
+              "lolita_fashion_silhouette"
+            ]
+          },
+          "derivation_note": "台账第[89, 233]行原文直译建立"
+        },
+        {
+          "id": "lolita_fashion__tag_001",
+          "text": "victorian lace classic lolita",
+          "role": "variant",
+          "mutex_group": "lolita_fashion_silhouette",
+          "raw_lines": [
+            158
+          ],
+          "derivation": "derived",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "one_piece"
+            ],
+            "mutex_groups": [
+              "lolita_fashion_silhouette"
+            ]
+          },
+          "derivation_note": "台账第[158]行 lolita fasion 细化为维多利亚蕾丝古典洛丽塔洋装"
+        },
+        {
+          "id": "lolita_fashion__tag_002",
+          "text": "voluminous bell-shaped petticoat support",
+          "role": "combinable_attribute",
+          "mutex_group": "lolita_fashion_attr",
+          "raw_lines": [
+            89,
+            233
+          ],
+          "derivation": "product_extension",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "one_piece"
+            ],
+            "mutex_groups": [
+              "lolita_fashion_attr"
+            ]
+          },
+          "derivation_note": "lolita_fashion 款式 combinable_attribute 钟形撑裙骨架细节增补"
+        }
+      ]
+    },
+    {
+      "id": "lolita_gothic",
+      "name_zh": "哥特洛丽塔洋装 (Gothic Lolita Dress)",
+      "aliases": [
+        "kuro_lolita",
+        "gothic_lolita_dress"
+      ],
+      "tags": [
+        {
+          "id": "lolita_gothic__tag_000",
+          "text": "gothic lolita",
+          "role": "core_base",
+          "mutex_group": "lolita_gothic_silhouette",
+          "raw_lines": [
+            50
+          ],
+          "derivation": "verbatim",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "one_piece"
+            ],
+            "mutex_groups": [
+              "lolita_gothic_silhouette"
+            ]
+          },
+          "derivation_note": "台账第[50]行原文直译建立"
+        },
+        {
+          "id": "lolita_gothic__tag_001",
+          "text": "spider web print gothic lolita",
+          "role": "variant",
+          "mutex_group": "lolita_gothic_silhouette",
+          "raw_lines": [
+            95,
+            157
+          ],
+          "derivation": "derived",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "one_piece"
+            ],
+            "mutex_groups": [
+              "lolita_gothic_silhouette"
+            ]
+          },
+          "derivation_note": "台账第[95, 157]行蛛网纹与哥特风格融入哥特洛丽塔细化扩写"
+        },
+        {
+          "id": "lolita_gothic__tag_002",
+          "text": "dark tiered ruffles and cross accents",
+          "role": "combinable_attribute",
+          "mutex_group": "lolita_gothic_attr",
+          "raw_lines": [
+            50,
+            232
+          ],
+          "derivation": "product_extension",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "one_piece"
+            ],
+            "mutex_groups": [
+              "lolita_gothic_attr"
+            ]
+          },
+          "derivation_note": "lolita_gothic 款式 combinable_attribute 暗黑多层荷叶边与十字饰件细节增补"
+        }
+      ]
+    },
+    {
+      "id": "lolita_sweet",
+      "name_zh": "甜美洛丽塔洋装 (Sweet Lolita Dress)",
+      "aliases": [
+        "ama_lolita",
+        "sweet_lolita_dress"
+      ],
+      "tags": [
+        {
+          "id": "lolita_sweet__tag_000",
+          "text": "sweet lolita",
+          "role": "core_base",
+          "mutex_group": "lolita_sweet_silhouette",
+          "raw_lines": [
+            78,
+            96
+          ],
+          "derivation": "verbatim",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "one_piece"
+            ],
+            "mutex_groups": [
+              "lolita_sweet_silhouette"
+            ]
+          },
+          "derivation_note": "台账第[78, 96]行原文直译建立"
+        },
+        {
+          "id": "lolita_sweet__tag_001",
+          "text": "pastel pink frilled sweet lolita",
+          "role": "variant",
+          "mutex_group": "lolita_sweet_silhouette",
+          "raw_lines": [
+            78
+          ],
+          "derivation": "derived",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "one_piece"
+            ],
+            "mutex_groups": [
+              "lolita_sweet_silhouette"
+            ]
+          },
+          "derivation_note": "lolita_sweet 款式 variant 粉彩荷叶边甜美洛丽塔细化扩写"
+        },
+        {
+          "id": "lolita_sweet__tag_002",
+          "text": "decorative candy and lace trimmings",
+          "role": "combinable_attribute",
+          "mutex_group": "lolita_sweet_attr",
+          "raw_lines": [
+            96
+          ],
+          "derivation": "product_extension",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "one_piece"
+            ],
+            "mutex_groups": [
+              "lolita_sweet_attr"
+            ]
+          },
+          "derivation_note": "lolita_sweet 款式 combinable_attribute 糖果饰件与蕾丝饰边细节增补"
+        }
+      ]
+    },
+    {
+      "id": "mahou_shoujo",
+      "name_zh": "魔法少女战装 (Magical Girl Costume)",
+      "aliases": [
+        "magical_girl_dress",
+        "anime_magical_girl"
+      ],
+      "tags": [
+        {
+          "id": "mahou_shoujo__tag_000",
+          "text": "mahou shoujo",
+          "role": "core_base",
+          "mutex_group": "mahou_shoujo_silhouette",
+          "raw_lines": [
+            51
+          ],
+          "derivation": "verbatim",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "one_piece"
+            ],
+            "mutex_groups": [
+              "mahou_shoujo_silhouette"
+            ]
+          },
+          "derivation_note": "台账第[51]行原文直译建立"
+        },
+        {
+          "id": "mahou_shoujo__tag_001",
+          "text": "magical girl costume",
+          "role": "variant",
+          "mutex_group": "mahou_shoujo_silhouette",
+          "raw_lines": [
+            51
+          ],
+          "derivation": "derived",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "one_piece"
+            ],
+            "mutex_groups": [
+              "mahou_shoujo_silhouette"
+            ]
+          },
+          "derivation_note": "台账第[51]行 mahou shoujo 意译为 magical girl costume 细化变体"
+        },
+        {
+          "id": "mahou_shoujo__tag_002",
+          "text": "oversized chest ribbon and magical gem brooch",
+          "role": "combinable_attribute",
+          "mutex_group": "mahou_shoujo_attr",
+          "raw_lines": [
+            51
+          ],
+          "derivation": "product_extension",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "one_piece"
+            ],
+            "mutex_groups": [
+              "mahou_shoujo_attr"
+            ]
+          },
+          "derivation_note": "mahou_shoujo 款式 combinable_attribute 大蝴蝶结与魔宝石胸针细节增补"
+        }
+      ]
+    },
+    {
+      "id": "off_shoulder_dress",
+      "name_zh": "一字领露肩连衣裙 (Off-Shoulder Dress)",
+      "aliases": [
+        "bardot_dress",
+        "shoulderless_dress"
+      ],
+      "tags": [
+        {
+          "id": "off_shoulder_dress__tag_000",
+          "text": "off-shoulder dress",
+          "role": "core_base",
+          "mutex_group": "off_shoulder_dress_silhouette",
+          "raw_lines": [
+            167
+          ],
+          "derivation": "verbatim",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "one_piece"
+            ],
+            "mutex_groups": [
+              "off_shoulder_dress_silhouette"
+            ]
+          },
+          "derivation_note": "台账第[167]行原文直译建立"
+        },
+        {
+          "id": "off_shoulder_dress__tag_001",
+          "text": "ruffled off-shoulder bodycon dress",
+          "role": "variant",
+          "mutex_group": "off_shoulder_dress_silhouette",
+          "raw_lines": [
+            167
+          ],
+          "derivation": "derived",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "one_piece"
+            ],
+            "mutex_groups": [
+              "off_shoulder_dress_silhouette"
+            ]
+          },
+          "derivation_note": "off_shoulder_dress 款式 variant 荷叶边紧身一字领连衣裙细化扩写"
+        },
+        {
+          "id": "off_shoulder_dress__tag_002",
+          "text": "draped shoulder-baring neckline",
+          "role": "combinable_attribute",
+          "mutex_group": "off_shoulder_dress_attr",
+          "raw_lines": [
+            167
+          ],
+          "derivation": "product_extension",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "one_piece"
+            ],
+            "mutex_groups": [
+              "off_shoulder_dress_attr"
+            ]
+          },
+          "derivation_note": "off_shoulder_dress 款式 combinable_attribute 露肩垂坠领口细节增补"
+        }
+      ]
+    },
+    {
+      "id": "pleated_dress",
+      "name_zh": "细褶风琴连衣裙 (Pleated Dress)",
+      "aliases": [
+        "accordion_pleat_dress"
+      ],
+      "tags": [
+        {
+          "id": "pleated_dress__tag_000",
+          "text": "pleated dress",
+          "role": "core_base",
+          "mutex_group": "pleated_dress_silhouette",
+          "raw_lines": [
+            165
+          ],
+          "derivation": "verbatim",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "one_piece"
+            ],
+            "mutex_groups": [
+              "pleated_dress_silhouette"
+            ]
+          },
+          "derivation_note": "台账第[165]行原文直译建立"
+        },
+        {
+          "id": "pleated_dress__tag_001",
+          "text": "accordion pleated midi dress",
+          "role": "variant",
+          "mutex_group": "pleated_dress_silhouette",
+          "raw_lines": [
+            165
+          ],
+          "derivation": "derived",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "one_piece"
+            ],
+            "mutex_groups": [
+              "pleated_dress_silhouette"
+            ]
+          },
+          "derivation_note": "pleated_dress 款式 variant 手风琴百褶中长连衣裙细化扩写"
+        },
+        {
+          "id": "pleated_dress__tag_002",
+          "text": "fine sharp pleating structure",
+          "role": "combinable_attribute",
+          "mutex_group": "pleated_dress_attr",
+          "raw_lines": [
+            165
+          ],
+          "derivation": "product_extension",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "one_piece"
+            ],
+            "mutex_groups": [
+              "pleated_dress_attr"
+            ]
+          },
+          "derivation_note": "pleated_dress 款式 combinable_attribute 锐利风琴细褶细节增补"
+        }
+      ]
+    },
+    {
+      "id": "sleeveless_dress",
+      "name_zh": "轻盈无袖连衣裙 (Sleeveless Dress)",
+      "aliases": [
+        "tank_dress"
+      ],
+      "tags": [
+        {
+          "id": "sleeveless_dress__tag_000",
+          "text": "sleeveless dress",
+          "role": "core_base",
+          "mutex_group": "sleeveless_dress_silhouette",
+          "raw_lines": [
+            219
+          ],
+          "derivation": "verbatim",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "one_piece"
+            ],
+            "mutex_groups": [
+              "sleeveless_dress_silhouette"
+            ]
+          },
+          "derivation_note": "台账第[219]行原文直译建立"
+        },
+        {
+          "id": "sleeveless_dress__tag_001",
+          "text": "fit and flare sleeveless dress",
+          "role": "variant",
+          "mutex_group": "sleeveless_dress_silhouette",
+          "raw_lines": [
+            219
+          ],
+          "derivation": "derived",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "one_piece"
+            ],
+            "mutex_groups": [
+              "sleeveless_dress_silhouette"
+            ]
+          },
+          "derivation_note": "sleeveless_dress 款式 variant 伞状无袖裙细化扩写"
+        },
+        {
+          "id": "sleeveless_dress__tag_002",
+          "text": "clean armhole tailored cut",
+          "role": "combinable_attribute",
+          "mutex_group": "sleeveless_dress_attr",
+          "raw_lines": [
+            219
+          ],
+          "derivation": "product_extension",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "one_piece"
+            ],
+            "mutex_groups": [
+              "sleeveless_dress_attr"
+            ]
+          },
+          "derivation_note": "sleeveless_dress 款式 combinable_attribute 利落袖窿剪裁细节增补"
+        }
+      ]
+    },
+    {
+      "id": "strapless_dress",
+      "name_zh": "抹胸无肩带礼服裙 (Strapless Dress)",
+      "aliases": [
+        "tube_dress",
+        "bandeau_dress"
+      ],
+      "tags": [
+        {
+          "id": "strapless_dress__tag_000",
+          "text": "strapless dress",
+          "role": "core_base",
+          "mutex_group": "strapless_dress_silhouette",
+          "raw_lines": [
+            166
+          ],
+          "derivation": "verbatim",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "one_piece"
+            ],
+            "mutex_groups": [
+              "strapless_dress_silhouette"
+            ]
+          },
+          "derivation_note": "台账第[166]行原文直译建立"
+        },
+        {
+          "id": "strapless_dress__tag_001",
+          "text": "boned sweetheart strapless dress",
+          "role": "variant",
+          "mutex_group": "strapless_dress_silhouette",
+          "raw_lines": [
+            166
+          ],
+          "derivation": "derived",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "one_piece"
+            ],
+            "mutex_groups": [
+              "strapless_dress_silhouette"
+            ]
+          },
+          "derivation_note": "strapless_dress 款式 variant 鱼骨桃心领抹胸裙细化扩写"
+        },
+        {
+          "id": "strapless_dress__tag_002",
+          "text": "fitted stay-up bustier bodice",
+          "role": "combinable_attribute",
+          "mutex_group": "strapless_dress_attr",
+          "raw_lines": [
+            166
+          ],
+          "derivation": "product_extension",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "one_piece"
+            ],
+            "mutex_groups": [
+              "strapless_dress_attr"
+            ]
+          },
+          "derivation_note": "strapless_dress 款式 combinable_attribute 贴身胸衣结构细节增补"
+        }
+      ]
+    },
+    {
+      "id": "summer_sundress",
+      "name_zh": "清凉夏日吊带裙 (Summer Sundress)",
+      "aliases": [
+        "summer_dress",
+        "sundress"
+      ],
+      "tags": [
+        {
+          "id": "summer_sundress__tag_000",
+          "text": "summer dress",
+          "role": "core_base",
+          "mutex_group": "summer_sundress_silhouette",
+          "raw_lines": [
+            149,
+            179
+          ],
+          "derivation": "verbatim",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "one_piece"
+            ],
+            "mutex_groups": [
+              "summer_sundress_silhouette"
+            ]
+          },
+          "derivation_note": "台账第[149, 179]行原文直译建立"
+        },
+        {
+          "id": "summer_sundress__tag_001",
+          "text": "spaghetti strap summer sundress",
+          "role": "variant",
+          "mutex_group": "summer_sundress_silhouette",
+          "raw_lines": [
+            46
+          ],
+          "derivation": "derived",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "one_piece"
+            ],
+            "mutex_groups": [
+              "summer_sundress_silhouette"
+            ]
+          },
+          "derivation_note": "台账第[46]行夏日长裙 summer long skirt 细化为细吊带夏日裙"
+        },
+        {
+          "id": "summer_sundress__tag_002",
+          "text": "airy lightweight cotton weave",
+          "role": "combinable_attribute",
+          "mutex_group": "summer_sundress_attr",
+          "raw_lines": [
+            46,
+            149
+          ],
+          "derivation": "product_extension",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "one_piece"
+            ],
+            "mutex_groups": [
+              "summer_sundress_attr"
+            ]
+          },
+          "derivation_note": "summer_sundress 款式 combinable_attribute 轻盈透气纯棉细节增补"
+        }
+      ]
+    },
+    {
+      "id": "sundress_layered",
+      "name_zh": "黑吊带裙内搭白T恤叠穿 (Layered Sundress with T-Shirt)",
+      "aliases": [
+        "layered_sundress",
+        "pinafore_over_tshirt"
+      ],
+      "tags": [
+        {
+          "id": "sundress_layered__tag_000",
+          "text": "(((black sundress with round neck,white t-shirt bottom)))",
+          "role": "core_base",
+          "mutex_group": "sundress_layered_silhouette",
+          "raw_lines": [
+            135
+          ],
+          "derivation": "verbatim",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "one_piece"
+            ],
+            "mutex_groups": [
+              "sundress_layered_silhouette"
+            ]
+          },
+          "derivation_note": "台账第[135]行原文保留三重括号与内部逗号复合强调语法建立"
+        },
+        {
+          "id": "sundress_layered__tag_001",
+          "text": "round-neck white tee under black pinafore sundress",
+          "role": "variant",
+          "mutex_group": "sundress_layered_silhouette",
+          "raw_lines": [
+            135
+          ],
+          "derivation": "derived",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "one_piece"
+            ],
+            "mutex_groups": [
+              "sundress_layered_silhouette"
+            ]
+          },
+          "derivation_note": "sundress_layered 款式 variant 圆领白T恤与黑色背心裙叠穿细化扩写"
+        },
+        {
+          "id": "sundress_layered__tag_002",
+          "text": "distinct contrast layer neckline",
+          "role": "combinable_attribute",
+          "mutex_group": "sundress_layered_attr",
+          "raw_lines": [
+            135
+          ],
+          "derivation": "product_extension",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "one_piece"
+            ],
+            "mutex_groups": [
+              "sundress_layered_attr"
+            ]
+          },
+          "derivation_note": "sundress_layered 款式 combinable_attribute 鲜明黑白叠穿领口细节增补"
+        }
+      ]
+    },
+    {
+      "id": "sweater_dress",
+      "name_zh": "软糯针织毛衣裙 (Sweater Dress)",
+      "aliases": [
+        "knit_sweater_dress",
+        "jumper_dress"
+      ],
+      "tags": [
+        {
+          "id": "sweater_dress__tag_000",
+          "text": "sweater dress",
+          "role": "core_base",
+          "mutex_group": "sweater_dress_silhouette",
+          "raw_lines": [
+            31
+          ],
+          "derivation": "verbatim",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "one_piece"
+            ],
+            "mutex_groups": [
+              "sweater_dress_silhouette"
+            ]
+          },
+          "derivation_note": "台账第[31]行原文直译建立"
+        },
+        {
+          "id": "sweater_dress__tag_001",
+          "text": "oversized chunky knit sweater dress",
+          "role": "variant",
+          "mutex_group": "sweater_dress_silhouette",
+          "raw_lines": [
+            31
+          ],
+          "derivation": "derived",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "one_piece"
+            ],
+            "mutex_groups": [
+              "sweater_dress_silhouette"
+            ]
+          },
+          "derivation_note": "sweater_dress 款式 variant 宽松粗针织毛衣连衣裙细化扩写"
+        },
+        {
+          "id": "sweater_dress__tag_002",
+          "text": "textured cable-knit yarn stitch",
+          "role": "combinable_attribute",
+          "mutex_group": "sweater_dress_attr",
+          "raw_lines": [
+            31
+          ],
+          "derivation": "product_extension",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "one_piece"
+            ],
+            "mutex_groups": [
+              "sweater_dress_attr"
+            ]
+          },
+          "derivation_note": "sweater_dress 款式 combinable_attribute 麻花绞花针脚细节增补"
+        }
+      ]
+    },
+    {
+      "id": "tulle_dress",
+      "name_zh": "仙气薄纱蓬蓬裙 (Tulle Dress)",
+      "aliases": [
+        "fairy_tulle_dress",
+        "mesh_dress"
+      ],
+      "tags": [
+        {
+          "id": "tulle_dress__tag_000",
+          "text": "sheer tulle dress",
+          "role": "core_base",
+          "mutex_group": "tulle_dress_silhouette",
+          "raw_lines": [
+            24
+          ],
+          "derivation": "verbatim",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "one_piece"
+            ],
+            "mutex_groups": [
+              "tulle_dress_silhouette"
+            ]
+          },
+          "derivation_note": "台账第[24]行原文直译建立"
+        },
+        {
+          "id": "tulle_dress__tag_001",
+          "text": "multi-layered puff tulle dress",
+          "role": "variant",
+          "mutex_group": "tulle_dress_silhouette",
+          "raw_lines": [
+            24
+          ],
+          "derivation": "derived",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "one_piece"
+            ],
+            "mutex_groups": [
+              "tulle_dress_silhouette"
+            ]
+          },
+          "derivation_note": "tulle_dress 款式 variant 多层蓬蓬薄纱裙细化扩写"
+        },
+        {
+          "id": "tulle_dress__tag_002",
+          "text": "translucent floating airy mesh tiers",
+          "role": "combinable_attribute",
+          "mutex_group": "tulle_dress_attr",
+          "raw_lines": [
+            24
+          ],
+          "derivation": "product_extension",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "one_piece"
+            ],
+            "mutex_groups": [
+              "tulle_dress_attr"
+            ]
+          },
+          "derivation_note": "tulle_dress 款式 combinable_attribute 半透明空气感网纱细节增补"
+        }
+      ]
+    },
+    {
+      "id": "wedding_dress",
+      "name_zh": "纯白新娘婚纱 (White Bridal Wedding Dress)",
+      "aliases": [
+        "bridal_gown",
+        "wedding_gown"
+      ],
+      "tags": [
+        {
+          "id": "wedding_dress__tag_000",
+          "text": "wedding dress",
+          "role": "core_base",
+          "mutex_group": "wedding_dress_silhouette",
+          "raw_lines": [
+            168,
+            210
+          ],
+          "derivation": "verbatim",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "one_piece"
+            ],
+            "mutex_groups": [
+              "wedding_dress_silhouette"
+            ]
+          },
+          "derivation_note": "台账第[168, 210]行原文直译建立"
+        },
+        {
+          "id": "wedding_dress__tag_001",
+          "text": "white bridal wedding dress",
+          "role": "variant",
+          "mutex_group": "wedding_dress_silhouette",
+          "raw_lines": [
+            63
+          ],
+          "derivation": "derived",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "one_piece"
+            ],
+            "mutex_groups": [
+              "wedding_dress_silhouette"
+            ]
+          },
+          "derivation_note": "台账第[63]行 wedding_dress 扩写为标准纯白新娘婚纱"
+        },
+        {
+          "id": "wedding_dress__tag_002",
+          "text": "cathedral train lace veil",
+          "role": "combinable_attribute",
+          "mutex_group": "wedding_dress_attr",
+          "raw_lines": [
+            63,
+            168,
+            210
+          ],
+          "derivation": "product_extension",
+          "facts": {
+            "semantic_role": "selector",
+            "garment_topologies": [
+              "one_piece"
+            ],
+            "mutex_groups": [
+              "wedding_dress_attr"
+            ]
+          },
+          "derivation_note": "wedding_dress 款式 combinable_attribute 大教堂拖尾蕾丝头纱细节增补"
+        }
+      ]
     }
   ],
   "clothing_states": [

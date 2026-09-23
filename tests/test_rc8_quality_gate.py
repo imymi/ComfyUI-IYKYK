@@ -26,8 +26,9 @@ from tests.audit_oracle import validate_audit_json_oracle
 
 from lib.conflict_resolver import build_canonical_catalog_facts
 
-DATA_DIR = Path(__file__).parent.parent / "data"
-SCHEMAS_DIR = Path(__file__).parent.parent / "schemas"
+REPO_DIR = Path(__file__).resolve().parent.parent
+DATA_DIR = REPO_DIR / "data"
+SCHEMAS_DIR = REPO_DIR / "schemas"
 FIXTURES_DIR = Path(__file__).parent / "fixtures"
 DIAGNOSTICS_SCHEMA_DOC = json.loads((SCHEMAS_DIR / "diagnostics.schema.json").read_text(encoding="utf-8"))
 EXPECTED_BASELINE_CONTENT_SHA256 = "779aca4d52238cabd9eaa8d4f5411654a8b01bb19f3519cff60eff7cc9541783"
@@ -1048,15 +1049,29 @@ class TestRC8QualityGate(unittest.TestCase):
         self.assertEqual(count, 10000)
 
     def test_03b_seed_gate_golden_hash(self):
-        """固定汇总哈希稳定性门禁 (待最终验收)：验证 Seeds 0..9999 汇总哈希与基线严格一致。"""
-        if os.environ.get("IYKYK_ENFORCE_GOLDEN_HASH") != "1":
-            self.skipTest("待最终验收: Golden batch hash check is deferred to final full-catalog acceptance (Step 5)")
+        """固定汇总哈希稳定性门禁：验证 137 款全量目录 Seeds 0..9999 汇总哈希严格等于黄金哈希。"""
         _, _, batch_hash = self._run_seed_gate_10k()
         self.assertEqual(
             batch_hash,
-            "4525786e7273dc0694e64ec216d4fc9510f211d32de7bdfaa00a12f7a5f320e2",
+            "a39a823d09b3b817107ba6a6ebdd5fdb261f4f71bd8148bd7856533fdf21c218",
             "Seed gate 0..9999 summary hash drifted!",
         )
+
+    def test_03c_dual_version_divergence_audit(self):
+        """真正的双版本差异审计入口：对照 bc0d645 (31 款基线) 逐原子归因校验，未解释差异必须绝对为 0。"""
+        from scripts.audit_bc0d645_divergence import EXPECTED_BASELINE_HASH, run_divergence_audit
+
+        audit_seeds = int(os.environ.get("IYKYK_AUDIT_SEEDS", "10000"))
+        report = run_divergence_audit(
+            total_seeds=audit_seeds,
+            baseline_commit="bc0d645",
+            output_json=REPO_DIR / "docs" / "data_migration" / "bc0d645_to_137_divergence_audit.json",
+            output_md=REPO_DIR / "docs" / "data_migration" / "bc0d645_to_137_divergence_audit.md",
+        )
+        self.assertEqual(report["unexplained_seeds_count"], 0, f"Unexplained diffs detected: {report['unexplained_seeds']}")
+        if audit_seeds == 10000:
+            self.assertEqual(report["baseline_batch_hash"], EXPECTED_BASELINE_HASH)
+            self.assertEqual(report["current_batch_hash"], "a39a823d09b3b817107ba6a6ebdd5fdb261f4f71bd8148bd7856533fdf21c218")
 
 
 if __name__ == "__main__":
