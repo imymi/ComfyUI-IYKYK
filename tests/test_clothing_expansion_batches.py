@@ -969,6 +969,16 @@ class TestClothingExpansionBatches(unittest.TestCase):
             画质等级="高清写真 (High)",
             prompt_seed=0,
         )
+        # 1. 验证在 source_atoms 中成功原子化并保留完整字面与结构
+        src_atom = next((a for a in res.source_atoms if a.text == expected_tag), None)
+        self.assertIsNotNone(src_atom, f"Compound tag '{expected_tag}' not found in source_atoms: {[a.text for a in res.source_atoms]}")
+        self.assertEqual(src_atom.source_item_id, "sundress_layered")
+
+        # 2. 验证经 ConflictResolver 消解后未被误删或割裂，完整保留在 accepted atoms 中
+        final_atom = next((a for a in res.atoms if a.text == expected_tag), None)
+        self.assertIsNotNone(final_atom, f"Compound tag '{expected_tag}' not found in resolved final atoms: {[a.text for a in res.atoms]}")
+
+        # 3. 验证格式化后保留在正向提示词中且顶层分词器不拆分内部逗号
         self.assertIn(expected_tag, res.positive, f"Compound tag '{expected_tag}' not preserved in generation: {res.positive}")
         validate_prompt_syntax(res.positive)
         tags = split_top_level_tags(res.positive)
