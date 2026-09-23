@@ -1049,41 +1049,117 @@ class TestRC8QualityGate(unittest.TestCase):
         self.assertEqual(count, 10000)
 
     def test_03b_seed_gate_golden_hash(self):
-        """固定汇总哈希稳定性门禁：验证 Seeds 0..9999 汇总哈希严格等于第 2 步基线哈希 (保留 dba5861 原始基线哈希)。"""
+        """固定汇总哈希稳定性门禁：验证 Seeds 0..9999 汇总哈希严格等于第 3 步基线哈希 (保留 dba5861 原始基线哈希与第 2 步基线哈希)。"""
         # 1. dba5861 原始基线哈希 (137 款全量迁移终验基线):
         #    a39a823d09b3b817107ba6a6ebdd5fdb261f4f71bd8148bd7856533fdf21c218
-        # 2. 第 2 步基线哈希 (11 条服装状态落地 + 修复全景构图内衣误判后基线，非 rc9 最终版本基线):
+        # 2. 第 2 步基线哈希 (11 条服装状态落地 + 修复全景构图内衣误判后基线):
         #    3e1291ae60af887ebde1869a8fb60f7937424198c1db6a4856bb90aa954725fc
+        # 3. 第 3 步基线哈希 (跨词库 10 项条目落地后基线，非 rc9 最终版本基线):
+        #    ab5a633cfb3fde70d9a6c629ee65a540955d87ee143e66570d780743246cab89
         baseline_dba5861_hash = "a39a823d09b3b817107ba6a6ebdd5fdb261f4f71bd8148bd7856533fdf21c218"
-        step2_expected_hash = "3e1291ae60af887ebde1869a8fb60f7937424198c1db6a4856bb90aa954725fc"
+        step2_baseline_hash = "3e1291ae60af887ebde1869a8fb60f7937424198c1db6a4856bb90aa954725fc"
+        step3_expected_hash = "ab5a633cfb3fde70d9a6c629ee65a540955d87ee143e66570d780743246cab89"
         _, _, batch_hash = self._run_seed_gate_10k()
         self.assertEqual(
             batch_hash,
-            step2_expected_hash,
-            f"Seed gate 0..9999 summary hash drifted! Expected Step 2: {step2_expected_hash}, baseline dba5861 was: {baseline_dba5861_hash}",
+            step3_expected_hash,
+            f"Seed gate 0..9999 summary hash drifted! Expected Step 3: {step3_expected_hash}, Step 2 was: {step2_baseline_hash}, baseline dba5861 was: {baseline_dba5861_hash}",
         )
 
     def test_03c_dual_version_divergence_audit(self):
-        """真正的双版本差异审计入口：对照 bc0d645 (31 款基线) 逐原子归因校验，未解释差异必须绝对为 0。"""
+        """双版本分阶段差异审计门禁：全量核验历史演进链证据，并对第 3 步增量变更执行自动化因果归因全量核验。"""
         import tempfile
-        from scripts.audit_bc0d645_divergence import EXPECTED_BASELINE_HASH, run_divergence_audit
+        from scratch.audit_step3_cross_catalog import run_audit
 
-        step2_expected_hash = "3e1291ae60af887ebde1869a8fb60f7937424198c1db6a4856bb90aa954725fc"
+        stage1_baseline_commit = "bc0d645"
+        stage1_baseline_hash = "4525786e7273dc0694e64ec216d4fc9510f211d32de7bdfaa00a12f7a5f320e2"
+        stage1_target_hash = "a39a823d09b3b817107ba6a6ebdd5fdb261f4f71bd8148bd7856533fdf21c218"
+
+        stage2_baseline_commit = "dba5861"
+        stage2_target_hash = "3e1291ae60af887ebde1869a8fb60f7937424198c1db6a4856bb90aa954725fc"
+
+        step3_expected_hash = "ab5a633cfb3fde70d9a6c629ee65a540955d87ee143e66570d780743246cab89"
+
+        # 1. 阶段 1 历史证据核验 (bc0d645 31 款 -> dba5861 137 款全量迁移)
+        stage1_report_file = REPO_DIR / "docs" / "data_migration" / "bc0d645_to_137_divergence_audit.json"
+        self.assertTrue(stage1_report_file.exists(), f"Missing Stage 1 audit report: {stage1_report_file}")
+        stage1_doc = json.loads(stage1_report_file.read_text(encoding="utf-8"))
+        self.assertEqual(stage1_doc.get("total_seeds"), 10000, "Stage 1 report must cover exactly 10,000 seeds")
+        self.assertEqual(
+            stage1_doc.get("metadata", {}).get("baseline_commit"),
+            stage1_baseline_commit,
+            f"Stage 1 baseline commit mismatch, expected {stage1_baseline_commit}",
+        )
+        self.assertEqual(
+            stage1_doc.get("baseline_batch_hash"),
+            stage1_baseline_hash,
+            f"Stage 1 baseline hash mismatch, expected {stage1_baseline_hash}",
+        )
+        self.assertEqual(
+            stage1_doc.get("current_batch_hash"),
+            stage1_target_hash,
+            f"Stage 1 target hash mismatch, expected {stage1_target_hash}",
+        )
+        self.assertEqual(
+            stage1_doc.get("unexplained_seeds_count"),
+            0,
+            f"Stage 1 has unexplained diffs: {stage1_doc.get('unexplained_seeds_count')}",
+        )
+
+        # 2. 阶段 2 历史证据核验 (dba5861 -> 2df289a 服装状态落地与全景构图误判修复)
+        stage2_report_file = REPO_DIR / "scratch" / "dba5861_to_current_audit.json"
+        self.assertTrue(stage2_report_file.exists(), f"Missing Stage 2 audit report: {stage2_report_file}")
+        stage2_doc = json.loads(stage2_report_file.read_text(encoding="utf-8"))
+        self.assertEqual(stage2_doc.get("seeds_count"), 10000, "Stage 2 report must cover exactly 10,000 seeds")
+        self.assertEqual(
+            stage2_doc.get("baseline_commit"),
+            stage2_baseline_commit,
+            f"Stage 2 baseline commit mismatch, expected {stage2_baseline_commit}",
+        )
+        # 验证首尾衔接：阶段 2 的基线哈希严格等于阶段 1 的目标哈希
+        self.assertEqual(
+            stage2_doc.get("baseline_batch_hash"),
+            stage1_target_hash,
+            f"Stage 2 baseline hash must chain-link to Stage 1 target hash {stage1_target_hash}",
+        )
+        self.assertEqual(
+            stage2_doc.get("current_batch_hash"),
+            stage2_target_hash,
+            f"Stage 2 target hash mismatch, expected {stage2_target_hash}",
+        )
+        self.assertEqual(
+            stage2_doc.get("unexplained_seeds_count"),
+            0,
+            f"Stage 2 has unexplained diffs: {stage2_doc.get('unexplained_seeds_count')}",
+        )
+
+        # 3. 阶段 3 实时重跑因果归因审计 (2df289a -> HEAD 跨词库 10 项条目落地)
         audit_seeds = int(os.environ.get("IYKYK_AUDIT_SEEDS", "10000"))
-        # 测试产物严格隔离写入临时目录，避免污染或改写受版本管理的正式报告文件
         with tempfile.TemporaryDirectory(prefix="iykyk_audit_test_") as tmp_dir:
             tmp_path = Path(tmp_dir)
-            report = run_divergence_audit(
+            report = run_audit(
                 total_seeds=audit_seeds,
-                baseline_commit="bc0d645",
                 scratch_dir=tmp_path / "scratch",
-                output_json=tmp_path / "audit.json",
-                output_md=tmp_path / "audit.md",
+                output_archive=tmp_path / "archive.json.gz",
+                output_report_md=tmp_path / "report.md",
             )
-            self.assertEqual(report["unexplained_seeds_count"], 0, f"Unexplained diffs detected: {report['unexplained_seeds']}")
+            self.assertEqual(
+                report["unexplained_count"],
+                0,
+                f"Stage 3 has unexplained diffs: {report.get('unexplained_seeds')}",
+            )
             if audit_seeds == 10000:
-                self.assertEqual(report["baseline_batch_hash"], EXPECTED_BASELINE_HASH)
-                self.assertEqual(report["current_batch_hash"], step2_expected_hash)
+                # 验证首尾衔接：阶段 3 的基线哈希严格等于阶段 2 的目标哈希
+                self.assertEqual(
+                    report["baseline_hash"],
+                    stage2_target_hash,
+                    f"Stage 3 baseline hash must chain-link to Stage 2 target hash {stage2_target_hash}",
+                )
+                self.assertEqual(
+                    report["current_hash"],
+                    step3_expected_hash,
+                    f"Stage 3 current hash mismatch! Expected {step3_expected_hash}, got {report['current_hash']}",
+                )
 
 
 if __name__ == "__main__":

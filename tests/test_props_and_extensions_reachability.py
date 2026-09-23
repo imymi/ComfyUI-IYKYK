@@ -38,7 +38,7 @@ class TestPropsAndExtensionsReachability(unittest.TestCase):
         cls.expected_transparency_ids = {item["id"] for item in clothing_doc.get("cloth_transparency_tiers", [])}
         cls.expected_wardrobe_ids = {item["id"] for item in clothing_doc.get("lingerie_wardrobe", [])}
         cls.expected_all_24_tier_ids = cls.expected_exposure_ids | cls.expected_transparency_ids | cls.expected_wardrobe_ids
-        assert len(cls.expected_all_24_tier_ids) == 24, f"Expected 24 distinct tier IDs, got {len(cls.expected_all_24_tier_ids)}"
+        assert len(cls.expected_all_24_tier_ids) == 26, f"Expected 26 distinct tier IDs, got {len(cls.expected_all_24_tier_ids)}"
 
     def test_all_15_props_return_non_empty_tags(self):
         """测试全部 15 个道具分类（包含 4 个二级 items 嵌套分类）单项选择均输出非空结果"""
@@ -99,9 +99,9 @@ class TestPropsAndExtensionsReachability(unittest.TestCase):
             self.assertTrue(len(tags) > 0, f"Transparency tier [{t}] returned empty tags")
 
     def test_lingerie_wardrobe_reachability(self):
-        """测试 10 大类情趣内衣衣柜分类均可达且非空"""
+        """测试 12 大类情趣内衣衣柜分类均可达且非空"""
         wardrobe = self.sampler.list_lingerie_wardrobe()
-        self.assertEqual(len(wardrobe), 10, f"Expected 10 lingerie wardrobe items, got {len(wardrobe)}")
+        self.assertEqual(len(wardrobe), 12, f"Expected 12 lingerie wardrobe items, got {len(wardrobe)}")
         for w in wardrobe:
             tags = self.sampler.sample_lingerie_wardrobe(w, Random(42))
             self.assertTrue(len(tags) > 0, f"Lingerie wardrobe category [{w}] returned empty tags")

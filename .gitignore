@@ -10,3 +10,7 @@ build/
 *.egg-info/
 .DS_Store
 *.zip
+
+# Large divergence audit archives (>100MB blocked by GitHub)
+scratch/*.gz
+

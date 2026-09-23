@@ -2424,7 +2424,7 @@ class ConflictResolver:
             if ab_id == "braless":
                 bra_entities = [
                     e for e in worn_entities
-                    if e.selected_id in ("lingerie_lace", "bikini_classic", "bikini_strappy", "bikini_micro")
+                    if e.selected_id in ("basic_underwear", "lingerie_lace", "bikini_classic", "bikini_strappy", "bikini_micro")
                     or any(ma.facts and "underwear" in ma.facts.garment_topologies and "top" in ma.facts.garment_topologies for ma in e.member_atoms)
                 ]
                 if bra_entities:

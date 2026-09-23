@@ -210,6 +210,34 @@
           }
         }
       ]
+    },
+    {
+      "id": "tan_lines",
+      "name_zh": "☀️ 日晒比基尼泳痕 (Bikini Tan Lines)",
+      "tags": [
+        {
+          "id": "tan_lines__tag_000",
+          "text": "distinct bikini tan lines",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "lower_body",
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "tan_lines__tag_001",
+          "text": "two-tone sun tanned skin with pale contrast marks",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "lower_body",
+              "upper_body"
+            ]
+          }
+        }
+      ]
     }
   ]
 }

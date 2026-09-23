@@ -16036,6 +16036,72 @@
           }
         }
       ]
+    },
+    {
+      "id": "crotchless_panties",
+      "name_zh": "开裆无底内裤 (Crotchless Panties)",
+      "tags": [
+        {
+          "id": "crotchless_panties__tag_000",
+          "text": "crotchless panties",
+          "facts": {
+            "garment_topologies": [
+              "underwear"
+            ],
+            "semantic_role": "selector",
+            "visible_regions": [
+              "lower_body"
+            ]
+          }
+        },
+        {
+          "id": "crotchless_panties__tag_001",
+          "text": "open gusset panties",
+          "facts": {
+            "garment_topologies": [
+              "underwear"
+            ],
+            "semantic_role": "selector",
+            "visible_regions": [
+              "lower_body"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "basic_underwear",
+      "name_zh": "基础日常内衣 (Basic Underwear Set)",
+      "tags": [
+        {
+          "id": "basic_underwear__tag_000",
+          "text": "cotton bra and panties set",
+          "facts": {
+            "garment_topologies": [
+              "underwear"
+            ],
+            "semantic_role": "selector",
+            "visible_regions": [
+              "lower_body",
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "basic_underwear__tag_001",
+          "text": "basic comfortable underwear",
+          "facts": {
+            "garment_topologies": [
+              "underwear"
+            ],
+            "semantic_role": "selector",
+            "visible_regions": [
+              "lower_body",
+              "upper_body"
+            ]
+          }
+        }
+      ]
     }
   ],
   "extension_policy": {
@@ -16087,7 +16153,9 @@
         "corset_cincher",
         "cosplay_maid_bunny",
         "oriental_cheongsam",
-        "leather_latex"
+        "leather_latex",
+        "crotchless_panties",
+        "basic_underwear"
       ]
     }
   }

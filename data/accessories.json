@@ -859,6 +859,232 @@
           }
         }
       ]
+    },
+    {
+      "id": "neck_ribbon",
+      "name_zh": "丝带颈带 (Silk Neck Ribbon)",
+      "tags": [
+        {
+          "id": "neck_ribbon__tag_000",
+          "text": "neck ribbon",
+          "facts": {
+            "semantic_role": "selector",
+            "prop_usage": "worn",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "neck_ribbon__tag_001",
+          "text": "tied silk neck ribbon",
+          "facts": {
+            "semantic_role": "selector",
+            "prop_usage": "worn",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "hooded_cloak",
+      "name_zh": "连帽防风斗篷 (Hooded Cloak)",
+      "tags": [
+        {
+          "id": "hooded_cloak__tag_000",
+          "text": "hooded cloak",
+          "facts": {
+            "garment_topologies": [
+              "outerwear"
+            ],
+            "prop_usage": "worn",
+            "semantic_role": "selector",
+            "visible_regions": [
+              "lower_body",
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "hooded_cloak__tag_001",
+          "text": "cape hood draped over shoulders",
+          "facts": {
+            "garment_topologies": [
+              "outerwear"
+            ],
+            "prop_usage": "worn",
+            "semantic_role": "selector",
+            "visible_regions": [
+              "lower_body",
+              "upper_body"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "cloak",
+      "name_zh": "无帽长披风 (Long Cloak / Cape)",
+      "tags": [
+        {
+          "id": "cloak__tag_000",
+          "text": "cloak",
+          "facts": {
+            "garment_topologies": [
+              "outerwear"
+            ],
+            "prop_usage": "worn",
+            "semantic_role": "selector",
+            "visible_regions": [
+              "lower_body",
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "cloak__tag_001",
+          "text": "long flowing cape",
+          "facts": {
+            "garment_topologies": [
+              "outerwear"
+            ],
+            "prop_usage": "worn",
+            "semantic_role": "selector",
+            "visible_regions": [
+              "lower_body",
+              "upper_body"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "poncho",
+      "name_zh": "套头小披风 (Poncho)",
+      "tags": [
+        {
+          "id": "poncho__tag_000",
+          "text": "poncho",
+          "facts": {
+            "garment_topologies": [
+              "outerwear"
+            ],
+            "prop_usage": "worn",
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "poncho__tag_001",
+          "text": "warm knitted poncho",
+          "facts": {
+            "garment_topologies": [
+              "outerwear"
+            ],
+            "prop_usage": "worn",
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "waist_belt",
+      "name_zh": "基础皮革腰带 (Leather Waist Belt)",
+      "tags": [
+        {
+          "id": "waist_belt__tag_000",
+          "text": "leather waist belt",
+          "facts": {
+            "prop_usage": "worn",
+            "semantic_role": "selector",
+            "visible_regions": [
+              "lower_body",
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "waist_belt__tag_001",
+          "text": "belt around waist",
+          "facts": {
+            "prop_usage": "worn",
+            "semantic_role": "selector",
+            "visible_regions": [
+              "lower_body",
+              "upper_body"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "winter_scarf",
+      "name_zh": "针织保暖围巾 (Winter Scarf)",
+      "tags": [
+        {
+          "id": "winter_scarf__tag_000",
+          "text": "winter scarf",
+          "facts": {
+            "prop_usage": "worn",
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "winter_scarf__tag_001",
+          "text": "knitted warm scarf wrapped around neck",
+          "facts": {
+            "prop_usage": "worn",
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "fur_shawl",
+      "name_zh": "保暖皮草披肩 (Fur Shawl)",
+      "tags": [
+        {
+          "id": "fur_shawl__tag_000",
+          "text": "fur shawl",
+          "facts": {
+            "garment_topologies": [
+              "outerwear"
+            ],
+            "prop_usage": "worn",
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "fur_shawl__tag_001",
+          "text": "luxurious fur shoulder wrap",
+          "facts": {
+            "garment_topologies": [
+              "outerwear"
+            ],
+            "prop_usage": "worn",
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        }
+      ]
     }
   ]
 }

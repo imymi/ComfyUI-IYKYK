@@ -1,0 +1,38 @@
+{
+  "manifest_version": "1.0",
+  "tested_component": "v1.1.0-rc9 Step 3 Cross-Catalog Expansion",
+  "tested_commit_target": "HEAD",
+  "runtime_environment": {
+    "python_version": "3.9.6",
+    "platform": "Darwin (macOS)",
+    "workers": 8
+  },
+  "archive_storage_strategy": "local_archive_and_on_demand_reconstruction",
+  "storage_policy_notes": "Due to GitHub 100 MiB file limits and absence of Git LFS, the 135.6 MiB divergence evidence archive is preserved locally in scratch/ and ignored via .gitignore. The repository maintains this authoritative manifest, checksums, and deterministic replay specifications.",
+  "original_archive": {
+    "filename": "audit_step3_evidence.json.gz",
+    "relative_path": "scratch/audit_step3_evidence.json.gz",
+    "size_bytes": 142222803,
+    "size_human": "135.6 MiB",
+    "sha256": "3f06db3894828270604683862c6261f7f62a98ee4117f1302f33684582660b81",
+    "checksum_note": "This SHA-256 reflects the original archive generated during Step 3 acceptance. Subsequent re-runs produce identical underlying JSON data and batch hashes, but gzip compressed stream SHA-256 may vary due to timestamp headers."
+  },
+  "audit_results": {
+    "baseline_commit": "2df289a",
+    "baseline_hash": "3e1291ae60af887ebde1869a8fb60f7937424198c1db6a4856bb90aa954725fc",
+    "current_hash": "ab5a633cfb3fde70d9a6c629ee65a540955d87ee143e66570d780743246cab89",
+    "total_seeds": 10000,
+    "identical_seeds": 647,
+    "divergent_seeds": 9353,
+    "unexplained_seeds_count": 0,
+    "gate_status": "PASS"
+  },
+  "reproduction": {
+    "command": "python scratch/audit_step3_cross_catalog.py --seeds 10000 --output-archive scratch/audit_step3_evidence.json.gz --output-report scratch/audit_step3_report.md",
+    "deterministic_assertions": [
+      "Baseline 10k hash == 3e1291ae60af887ebde1869a8fb60f7937424198c1db6a4856bb90aa954725fc",
+      "Current 10k hash == ab5a633cfb3fde70d9a6c629ee65a540955d87ee143e66570d780743246cab89",
+      "unexplained_seeds_count == 0"
+    ]
+  }
+}

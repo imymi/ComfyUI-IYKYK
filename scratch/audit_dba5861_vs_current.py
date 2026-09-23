@@ -21,7 +21,7 @@ import subprocess
 import sys
 import tempfile
 import time
-from typing import Any, Dict, List, Optional, Set, Tuple
+from typing import Any, Dict, List, Set, Tuple
 
 REPO_DIR = Path(__file__).resolve().parent.parent
 DBA_COMMIT = "dba5861"
@@ -97,7 +97,7 @@ def dec_dict(d):
 res = []
 for s in range(start_seed, start_seed + count):
     r = g.generate_structured(**inputs, prompt_seed=s)
-    
+
     # 提取在穿实体与状态绑定证据
     entities = extract_garment_entities(r.atoms)
     worn = [e for e in entities.values() if e.is_worn and not e.is_ambient]
@@ -190,7 +190,7 @@ def attribute_atom_divergence(
 ) -> Dict[str, Any]:
     """
     对单个种子的跨版本输出执行逐原子结构化因果归因。
-    
+
     严禁使用裸逗号 split(",")，严格核验来源一致性、删除原因一致性、载体绑定证据链与相对顺序保序。
     """
     seed = item_dba["seed"]
