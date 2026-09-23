@@ -27,15 +27,11 @@ CLOTHING_SLOTS = frozenset({
 
 
 def _collect_tag_slices(text: str) -> Set[str]:
-    """提取标签全文及其逗号分隔切片和词法 span，确保原子化切分后的词条均可被因果证据检索。"""
+    """通过生产原子化规则构建因果证据，严禁裸逗号拆分破坏复合语法结构。"""
     res: Set[str] = set()
     if not text:
         return res
     res.add(text)
-    for part in text.split(","):
-        p = part.strip()
-        if p:
-            res.add(p)
     try:
         from lib.lexer import parse_prompt
         parsed = parse_prompt(text)
@@ -133,7 +129,7 @@ class CatalogLexiconEvidence:
                     txt = t.get("text", "") if isinstance(t, dict) else str(t).strip()
                     slices = _collect_tag_slices(txt)
                     s.update(slices)
-                    state_tags.update(slices)
+                    # 严禁将款式专属联动 (style_overrides) 泄漏至全局 state_tags 白名单
 
         return cls(category_tags=cat_tags, state_tags=state_tags, extension_tags=ext_tags, known_extra_tags=known_extra_tags)
 

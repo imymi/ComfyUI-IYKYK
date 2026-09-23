@@ -997,7 +997,50 @@ class TestM3SliceResolution(unittest.TestCase):
         self.assertEqual(diff_shift_fake["primary_category"], "unexplained")
         self.assertEqual(diff_shift_fake["unexplained_added"][0]["category"], "UNEXPLAINED_BASELESS_CLOTHING_TAG")
 
+    def test_audit_attribution_cross_clothing_style_override_leak_rejected(self):
+        """[P2 验收] 验证专属联动词条 (style_overrides) 绝不可泄漏到全局白名单，跨款式替换必须触发硬阻断。"""
+        from scripts.audit_attribution import attribute_seed_diff
+
+        # 反例: 同款式 (qipao -> qipao)，但被替换为女仆装专属联动词条 "maid dress pulled down"
+        diff_leak = attribute_seed_diff(
+            s=3001,
+            base_clothing_id="qipao",
+            cur_clothing_id="qipao",
+            base_src_atoms=[{"atom_id": "b1", "text": "silk qipao", "slot": "clothing", "item_id": "qipao"}],
+            base_final_atoms=[{"atom_id": "b1", "text": "silk qipao", "slot": "clothing", "item_id": "qipao"}],
+            base_decisions=[],
+            cur_src_atoms=[{"atom_id": "c1", "text": "maid dress pulled down", "slot": "clothing", "item_id": "qipao"}],
+            cur_final_atoms=[{"atom_id": "c1", "text": "maid dress pulled down", "slot": "clothing", "item_id": "qipao"}],
+            cur_decisions=[],
+        )
+        self.assertTrue(diff_leak["is_unexplained"], "Cross-clothing style override leak must trigger is_unexplained=True")
+        self.assertEqual(diff_leak["primary_category"], "unexplained")
+        self.assertEqual(len(diff_leak["unexplained_added"]), 1)
+        self.assertEqual(diff_leak["unexplained_added"][0]["category"], "UNEXPLAINED_BASELESS_CLOTHING_TAG")
+
+    def test_audit_attribution_truncated_compound_tag_rejected(self):
+        """[P2 验收] 验证复合词条被裸逗号截断破坏后绝不可被放行，必须严格按生产词法器判定并触发硬阻断。"""
+        from scripts.audit_attribution import attribute_seed_diff
+
+        # 反例: sundress_layered 复合强调词条被截断为前缀片段 "(((black sundress with round neck"
+        diff_trunc = attribute_seed_diff(
+            s=3002,
+            base_clothing_id="sundress_layered",
+            cur_clothing_id="sundress_layered",
+            base_src_atoms=[{"atom_id": "b1", "text": "(((black sundress with round neck,white t-shirt bottom)))", "slot": "clothing", "item_id": "sundress_layered"}],
+            base_final_atoms=[{"atom_id": "b1", "text": "(((black sundress with round neck,white t-shirt bottom)))", "slot": "clothing", "item_id": "sundress_layered"}],
+            base_decisions=[],
+            cur_src_atoms=[{"atom_id": "c1", "text": "(((black sundress with round neck", "slot": "clothing", "item_id": "sundress_layered"}],
+            cur_final_atoms=[{"atom_id": "c1", "text": "(((black sundress with round neck", "slot": "clothing", "item_id": "sundress_layered"}],
+            cur_decisions=[],
+        )
+        self.assertTrue(diff_trunc["is_unexplained"], "Truncated compound tag must trigger is_unexplained=True")
+        self.assertEqual(diff_trunc["primary_category"], "unexplained")
+        self.assertEqual(len(diff_trunc["unexplained_added"]), 1)
+        self.assertEqual(diff_trunc["unexplained_added"][0]["category"], "UNEXPLAINED_BASELESS_CLOTHING_TAG")
+
 
 if __name__ == "__main__":
     unittest.main()
+
 
