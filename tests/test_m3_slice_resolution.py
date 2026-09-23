@@ -924,6 +924,79 @@ class TestM3SliceResolution(unittest.TestCase):
         self.assertEqual(diff_res["unexplained_added"][0]["category"], "UNEXPLAINED_UNSOURCED_ATOM")
         self.assertEqual(diff_res["unexplained_added"][0]["atom_id"], "phantom_2")
 
+    def test_audit_attribution_baseless_clothing_replacement_rejected(self):
+        """[P2 验收] 验证同款式下任意伪造文本或未经词库授权的词条替换必须触发 UNEXPLAINED 硬阻断。"""
+        from scripts.audit_attribution import attribute_seed_diff
+
+        # 反例 1: 同款式 (qipao -> qipao)，但 Current 伪造任意文本 "arbitrary fake description"
+        diff_fake = attribute_seed_diff(
+            s=1001,
+            base_clothing_id="qipao",
+            cur_clothing_id="qipao",
+            base_src_atoms=[{"atom_id": "b1", "text": "silk qipao", "slot": "clothing", "item_id": "qipao"}],
+            base_final_atoms=[{"atom_id": "b1", "text": "silk qipao", "slot": "clothing", "item_id": "qipao"}],
+            base_decisions=[],
+            cur_src_atoms=[{"atom_id": "c1", "text": "arbitrary fake description", "slot": "clothing", "item_id": "qipao"}],
+            cur_final_atoms=[{"atom_id": "c1", "text": "arbitrary fake description", "slot": "clothing", "item_id": "qipao"}],
+            cur_decisions=[],
+        )
+        self.assertTrue(diff_fake["is_unexplained"], "Baseless fake description must trigger is_unexplained=True")
+        self.assertEqual(diff_fake["primary_category"], "unexplained")
+        self.assertEqual(len(diff_fake["unexplained_added"]), 1)
+        self.assertEqual(diff_fake["unexplained_added"][0]["category"], "UNEXPLAINED_BASELESS_CLOTHING_TAG")
+
+        # 反例 2: 同款式 (qipao -> qipao)，但被替换为其他不相干款式的标签 (tactical military jacket)
+        diff_unrelated = attribute_seed_diff(
+            s=1002,
+            base_clothing_id="qipao",
+            cur_clothing_id="qipao",
+            base_src_atoms=[{"atom_id": "b1", "text": "silk qipao", "slot": "clothing", "item_id": "qipao"}],
+            base_final_atoms=[{"atom_id": "b1", "text": "silk qipao", "slot": "clothing", "item_id": "qipao"}],
+            base_decisions=[],
+            cur_src_atoms=[{"atom_id": "c1", "text": "tactical military jacket", "slot": "clothing", "item_id": "qipao"}],
+            cur_final_atoms=[{"atom_id": "c1", "text": "tactical military jacket", "slot": "clothing", "item_id": "qipao"}],
+            cur_decisions=[],
+        )
+        self.assertTrue(diff_unrelated["is_unexplained"], "Unrelated category tag must trigger is_unexplained=True")
+        self.assertEqual(diff_unrelated["primary_category"], "unexplained")
+        self.assertEqual(len(diff_unrelated["unexplained_added"]), 1)
+        self.assertEqual(diff_unrelated["unexplained_added"][0]["category"], "UNEXPLAINED_BASELESS_CLOTHING_TAG")
+
+        # 正例: 同款式 (qipao -> qipao)，变体采样命中合法词条 (silk qipao -> high slit cheongsam)
+        diff_legit = attribute_seed_diff(
+            s=1003,
+            base_clothing_id="qipao",
+            cur_clothing_id="qipao",
+            base_src_atoms=[{"atom_id": "b1", "text": "silk qipao", "slot": "clothing", "item_id": "qipao"}],
+            base_final_atoms=[{"atom_id": "b1", "text": "silk qipao", "slot": "clothing", "item_id": "qipao"}],
+            base_decisions=[],
+            cur_src_atoms=[{"atom_id": "c1", "text": "high slit cheongsam", "slot": "clothing", "item_id": "qipao"}],
+            cur_final_atoms=[{"atom_id": "c1", "text": "high slit cheongsam", "slot": "clothing", "item_id": "qipao"}],
+            cur_decisions=[],
+        )
+        self.assertFalse(diff_legit["is_unexplained"], "Legitimate variant tag must pass attribution")
+        self.assertEqual(diff_legit["primary_category"], "clothing_pool_expansion_intra_slot_shift")
+
+    def test_audit_attribution_baseless_category_shift_tag_rejected(self):
+        """[P2 验收] 验证跨款式位移中，新增原子如果不属于目标款式的合法词库，必须触发 UNEXPLAINED 硬阻断。"""
+        from scripts.audit_attribution import attribute_seed_diff
+
+        # 款式位移 (bikini_micro -> qipao)，但 Current 伪造非旗袍词条 "hallucinated space suit"
+        diff_shift_fake = attribute_seed_diff(
+            s=2001,
+            base_clothing_id="bikini_micro",
+            cur_clothing_id="qipao",
+            base_src_atoms=[{"atom_id": "b1", "text": "micro triangle bikini top", "slot": "clothing", "item_id": "bikini_micro"}],
+            base_final_atoms=[{"atom_id": "b1", "text": "micro triangle bikini top", "slot": "clothing", "item_id": "bikini_micro"}],
+            base_decisions=[],
+            cur_src_atoms=[{"atom_id": "c1", "text": "hallucinated space suit", "slot": "clothing", "item_id": "qipao"}],
+            cur_final_atoms=[{"atom_id": "c1", "text": "hallucinated space suit", "slot": "clothing", "item_id": "qipao"}],
+            cur_decisions=[],
+        )
+        self.assertTrue(diff_shift_fake["is_unexplained"])
+        self.assertEqual(diff_shift_fake["primary_category"], "unexplained")
+        self.assertEqual(diff_shift_fake["unexplained_added"][0]["category"], "UNEXPLAINED_BASELESS_CLOTHING_TAG")
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -1059,19 +1059,24 @@ class TestRC8QualityGate(unittest.TestCase):
 
     def test_03c_dual_version_divergence_audit(self):
         """真正的双版本差异审计入口：对照 bc0d645 (31 款基线) 逐原子归因校验，未解释差异必须绝对为 0。"""
+        import tempfile
         from scripts.audit_bc0d645_divergence import EXPECTED_BASELINE_HASH, run_divergence_audit
 
         audit_seeds = int(os.environ.get("IYKYK_AUDIT_SEEDS", "10000"))
-        report = run_divergence_audit(
-            total_seeds=audit_seeds,
-            baseline_commit="bc0d645",
-            output_json=REPO_DIR / "docs" / "data_migration" / "bc0d645_to_137_divergence_audit.json",
-            output_md=REPO_DIR / "docs" / "data_migration" / "bc0d645_to_137_divergence_audit.md",
-        )
-        self.assertEqual(report["unexplained_seeds_count"], 0, f"Unexplained diffs detected: {report['unexplained_seeds']}")
-        if audit_seeds == 10000:
-            self.assertEqual(report["baseline_batch_hash"], EXPECTED_BASELINE_HASH)
-            self.assertEqual(report["current_batch_hash"], "a39a823d09b3b817107ba6a6ebdd5fdb261f4f71bd8148bd7856533fdf21c218")
+        # 测试产物严格隔离写入临时目录，避免污染或改写受版本管理的正式报告文件
+        with tempfile.TemporaryDirectory(prefix="iykyk_audit_test_") as tmp_dir:
+            tmp_path = Path(tmp_dir)
+            report = run_divergence_audit(
+                total_seeds=audit_seeds,
+                baseline_commit="bc0d645",
+                scratch_dir=tmp_path / "scratch",
+                output_json=tmp_path / "audit.json",
+                output_md=tmp_path / "audit.md",
+            )
+            self.assertEqual(report["unexplained_seeds_count"], 0, f"Unexplained diffs detected: {report['unexplained_seeds']}")
+            if audit_seeds == 10000:
+                self.assertEqual(report["baseline_batch_hash"], EXPECTED_BASELINE_HASH)
+                self.assertEqual(report["current_batch_hash"], "a39a823d09b3b817107ba6a6ebdd5fdb261f4f71bd8148bd7856533fdf21c218")
 
 
 if __name__ == "__main__":

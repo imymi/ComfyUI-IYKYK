@@ -7,25 +7,35 @@ audit_bc0d645_divergence.py — 全量双版本 (bc0d645 -> Current 137 款) 逐
 2. 真实运行 Current (137 款) 10,000 种子生成，计算 Current 汇总哈希；
 3. 逐种子比对输出，对所有产生文本差异的种子调用 attribute_seed_diff 执行逐原子级精确归因；
 4. 阻断门禁：任何未解释差异 (UNEXPLAINED) 数量 > 0 则立即报错并阻断更新哈希；
-5. 输出标准化 JSON 审计档案与 Markdown 审查报告。
+5. 完整归档：完整保存全部 4,682 组差异及对应原子、决策与采样依据（采用 .json.gz 压缩存储以控制体积），并输出可读 Markdown 与摘要 JSON；
+6. 环境可移植：使用系统/环境临时目录，支持在干净检出和 CI 环境中无污染运行。
 """
 from __future__ import annotations
 
 import argparse
 import concurrent.futures
+import datetime
+import gzip
 import hashlib
 import json
 import os
 from pathlib import Path
 import subprocess
 import sys
+import tempfile
 import time
 from typing import Any, Dict, List
 
 REPO_DIR = Path(__file__).resolve().parent.parent
-DEFAULT_SCRATCH_DIR = Path("/Users/jacobyang/.gemini/antigravity/brain/4dfc2f79-2452-47f9-bc8f-de7cd3d990cc/scratch")
 BASELINE_COMMIT = "bc0d645"
 EXPECTED_BASELINE_HASH = "4525786e7273dc0694e64ec216d4fc9510f211d32de7bdfaa00a12f7a5f320e2"
+
+
+def get_default_scratch_dir() -> Path:
+    env_dir = os.environ.get("IYKYK_AUDIT_SCRATCH_DIR")
+    if env_dir:
+        return Path(env_dir)
+    return Path(tempfile.gettempdir()) / "iykyk_audit_scratch"
 
 
 WORKER_SCRIPT = """
@@ -123,9 +133,18 @@ def ensure_baseline_repo(scratch_dir: Path, baseline_commit: str = BASELINE_COMM
     baseline_dir = scratch_dir / f"baseline_{baseline_commit}"
     if not (baseline_dir / "nodes.py").exists():
         baseline_dir.mkdir(parents=True, exist_ok=True)
-        # 导出基线代码
-        cmd = f"git archive {baseline_commit} | tar -x -C {baseline_dir}"
-        subprocess.run(cmd, shell=True, check=True, cwd=str(REPO_DIR))
+        # 1. 尝试直接从本地导出基线代码
+        cmd = ["git", "archive", baseline_commit]
+        res = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, cwd=str(REPO_DIR))
+        if res.returncode != 0:
+            # 本地未包含该 commit (如 CI 浅克隆)，尝试从远程拉取
+            print(f"[i] Baseline commit {baseline_commit} not found locally, attempting fetch from origin...")
+            subprocess.run(["git", "fetch", "--depth=1", "origin", baseline_commit], cwd=str(REPO_DIR), check=True)
+            res = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, cwd=str(REPO_DIR), check=True)
+
+        # 解压到 baseline_dir
+        tar_cmd = ["tar", "-x", "-C", str(baseline_dir)]
+        subprocess.run(tar_cmd, input=res.stdout, check=True)
     return baseline_dir
 
 
@@ -199,9 +218,22 @@ def run_divergence_audit(
     output_md: Path | None = None,
     python_bin: str | None = None,
 ) -> Dict[str, Any]:
-    scratch_dir = scratch_dir or DEFAULT_SCRATCH_DIR
+    scratch_dir = scratch_dir or get_default_scratch_dir()
     scratch_dir.mkdir(parents=True, exist_ok=True)
     python_bin = python_bin or sys.executable
+
+    # 获取 Git commit
+    res_commit = subprocess.run(["git", "rev-parse", "HEAD"], capture_output=True, text=True, cwd=str(REPO_DIR))
+    cur_commit = res_commit.stdout.strip() if res_commit.returncode == 0 else "unknown"
+
+    # 获取当前版本
+    version_str = "v1.1.0-rc8"
+    pyproject_file = REPO_DIR / "pyproject.toml"
+    if pyproject_file.exists():
+        for line in pyproject_file.read_text(encoding="utf-8").splitlines():
+            if line.strip().startswith("version"):
+                version_str = "v" + line.split("=")[1].strip().strip('"').strip("'")
+                break
 
     # 1. 准备基线仓库
     t0 = time.time()
@@ -254,7 +286,11 @@ def run_divergence_audit(
     print(f"[+] Current {total_seeds} seeds batch hash: {cur_batch_hash}")
 
     # 4. 执行逐种子逐原子差异归因比对
-    from scripts.audit_attribution import attribute_seed_diff
+    from scripts.audit_attribution import CatalogLexiconEvidence, attribute_seed_diff
+
+    # 构建双方词库因果证据白名单
+    base_lexicon = CatalogLexiconEvidence.from_clothing_json(baseline_dir / "data" / "clothing.json", known_extra_tags={"back"})
+    cur_lexicon = CatalogLexiconEvidence.from_clothing_json(REPO_DIR / "data" / "clothing.json", known_extra_tags={"back"})
 
     print(f"[*] Auditing divergence between baseline and current across {total_seeds} seeds...")
     identical_count = 0
@@ -284,6 +320,8 @@ def run_divergence_audit(
             cur_decisions=c["decisions"],
             base_catalog_size=31,
             cur_catalog_size=137,
+            base_catalog_evidence=base_lexicon,
+            cur_catalog_evidence=cur_lexicon,
         )
 
         cat = attr["primary_category"]
@@ -297,6 +335,9 @@ def run_divergence_audit(
             "summary": attr["attribution_summary"],
             "removed_atoms": attr["removed_atoms"],
             "added_atoms": attr["added_atoms"],
+            "removed_attributions": attr["removed_attributions"],
+            "added_attributions": attr["added_attributions"],
+            "coherence_decisions": attr.get("coherence_decisions", []),
             "unexplained_removed": attr["unexplained_removed"],
             "unexplained_added": attr["unexplained_added"],
         })
@@ -313,8 +354,13 @@ def run_divergence_audit(
     total_time = time.time() - t0
 
     # 5. 构建审计总结报告
-    report = {
+    metadata = {
         "baseline_commit": baseline_commit,
+        "current_commit": cur_commit,
+        "package_version": version_str,
+        "generated_at": datetime.datetime.now(datetime.timezone.utc).isoformat(),
+    }
+    summary_stats = {
         "baseline_catalog_size": 31,
         "current_catalog_size": 137,
         "total_seeds": total_seeds,
@@ -324,18 +370,40 @@ def run_divergence_audit(
         "baseline_batch_hash": base_batch_hash,
         "current_batch_hash": cur_batch_hash,
         "attribution_categories": category_counts,
-        "unexplained_seeds": unexplained_seeds,
         "audit_duration_seconds": round(total_time, 2),
     }
 
-    # 6. 保存报告文件
+    report = {
+        **metadata,
+        **summary_stats,
+        "unexplained_seeds": unexplained_seeds,
+    }
+
+    # 6. 保存报告文件与完整压缩归档
+    archive_gz_path = None
     if output_json:
         output_json.parent.mkdir(parents=True, exist_ok=True)
-        # 为控制 JSON 体积，完整审计档案保存前 1000 组差异明细与全量未解释项
-        full_json_doc = dict(report)
-        full_json_doc["sample_diffs_limit_1000"] = audited_diffs[:1000]
-        output_json.write_text(json.dumps(full_json_doc, indent=2, ensure_ascii=False), encoding="utf-8")
-        print(f"[+] Divergence audit JSON saved to: {output_json}")
+        # 完整全量差异与逐原子依据归档文件 (.json.gz)，包含全部 diff_count 组差异
+        gz_target = output_json.with_suffix(".json.gz") if not str(output_json).endswith(".gz") else output_json
+        full_archive_doc = {
+            "metadata": metadata,
+            "summary": summary_stats,
+            "all_divergent_seeds": audited_diffs,
+            "unexplained_seeds": unexplained_seeds,
+        }
+        with gzip.open(gz_target, "wt", encoding="utf-8") as gf:
+            json.dump(full_archive_doc, gf, ensure_ascii=False)
+        archive_gz_path = str(gz_target.name)
+        print(f"[+] Full divergence archive ({diff_count} diffs) saved to: {gz_target}")
+
+        # 保存摘要 JSON（包含全景统计、分类分布与前 50 组样本差异）
+        summary_doc = dict(summary_stats)
+        summary_doc["metadata"] = metadata
+        summary_doc["archive_file"] = archive_gz_path
+        summary_doc["unexplained_seeds"] = unexplained_seeds
+        summary_doc["sample_diffs_preview_50"] = audited_diffs[:50]
+        output_json.write_text(json.dumps(summary_doc, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+        print(f"[+] Divergence audit summary JSON saved to: {output_json}")
 
     if output_md:
         output_md.parent.mkdir(parents=True, exist_ok=True)
@@ -343,11 +411,12 @@ def run_divergence_audit(
             "# 双版本全量种子差异归因审查报告",
             "",
             f"- **基线提交**: `{baseline_commit}` (31 款)",
-            "- **当前版本**: HEAD (137 款完整目录)",
+            f"- **受测版本**: `{version_str}` (HEAD: `{cur_commit[:10]}`) (137 款完整目录)",
             f"- **测试种子范围**: Seeds `0..{total_seeds - 1}` (共 {total_seeds:,} 种子)",
             f"- **基线汇总哈希**: `{base_batch_hash}` (与冻结基线 100% 吻合)",
             f"- **当前汇总哈希**: `{cur_batch_hash}`",
             f"- **未解释差异项 (UNEXPLAINED)**: **`{len(unexplained_seeds)}`** (硬失败门禁要求 == 0)",
+            f"- **完整归档依据**: `{archive_gz_path or 'N/A'}` (包含全部 {diff_count} 组差异逐原子归因依据)",
             "",
             "## 差异分布全景统计",
             "",
@@ -385,7 +454,7 @@ def run_divergence_audit(
                     f"`{u['removed']}` | `{u['added']}` |"
                 )
 
-        output_md.write_text("\n".join(md_lines), encoding="utf-8")
+        output_md.write_text("\n".join(md_lines) + "\n", encoding="utf-8")
         print(f"[+] Divergence audit Markdown saved to: {output_md}")
 
     # 7. 门禁阻断检查
@@ -413,7 +482,7 @@ def main() -> None:
     parser.add_argument("--count", type=int, default=10000, help="Number of seeds to audit (0..count-1)")
     parser.add_argument("--chunk-size", type=int, default=1000, help="Seeds per worker batch chunk")
     parser.add_argument("--workers", type=int, default=min(8, os.cpu_count() or 4), help="Parallel worker threads")
-    parser.add_argument("--scratch-dir", type=Path, default=DEFAULT_SCRATCH_DIR, help="Scratch directory for baseline work")
+    parser.add_argument("--scratch-dir", type=Path, default=None, help="Scratch directory for baseline work")
     parser.add_argument(
         "--output-json",
         type=Path,
@@ -428,12 +497,14 @@ def main() -> None:
     )
     args = parser.parse_args()
 
+    scratch_dir = args.scratch_dir or get_default_scratch_dir()
+
     run_divergence_audit(
         total_seeds=args.count,
         chunk_size=args.chunk_size,
         workers=args.workers,
         baseline_commit=args.baseline_commit,
-        scratch_dir=args.scratch_dir,
+        scratch_dir=scratch_dir,
         output_json=args.output_json,
         output_md=args.output_md,
     )
