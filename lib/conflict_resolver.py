@@ -1216,7 +1216,7 @@ class RuleRegistry:
 
 
 class ConflictResolver:
-    """ComfyUI-IYKYK v1.1.0-rc8 冲突消解引擎权威执行器。"""
+    """ComfyUI-IYKYK 冲突消解引擎权威执行器。"""
     def __init__(self, data_dir: Path):
         self.data_dir = data_dir
         self.registry = RuleRegistry(data_dir)

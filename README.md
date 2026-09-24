@@ -7,7 +7,7 @@
 
 ComfyUI-IYKYK 是一套面向东亚人像与剧情场景的提示词生成节点。它把场景、人物、服装、构图、光线等选择组织成结构化语义，再通过冲突规则生成更自洽的正向提示词、负向提示词和中文说明。
 
-当前版本：**v1.1.0-rc8**。本版本新增多信号情境亲和矩阵、17 规则 DAG 冲突引擎和可重放的诊断 JSON。
+当前版本：**v1.1.0-rc9**。本版本完成服装词库扩充、服装状态与跨词库条目迁移，并加强承载绑定和冲突消解。
 
 > 本项目包含仅适合成年人的 SFW/NSFW 词库。请先阅读[内容与授权](#内容与授权)。
 
@@ -17,7 +17,7 @@ ComfyUI-IYKYK 是一套面向东亚人像与剧情场景的提示词生成节点
 - 77 个预设、8 个风格配方、14 类情境和 20 份运行时数据目录。
 - Random/Auto 使用情境亲和采样；显式选择保持优先，但仍接受物理与语义冲突检查。
 - 17 条稳定规则按阶段、优先级和依赖 DAG 执行，不依赖文档编号或隐式代码顺序。
-- 固定 `prompt_seed` 可在 rc8 内确定性复现；不同版本之间不承诺提示词逐字一致。
+- 固定 `prompt_seed` 可在同一版本内确定性复现；不同版本之间不承诺提示词逐字一致。
 - LoRA、加权括号、引号和转义逗号等受保护 Span 保持字节不变。
 - 诊断节点输出可按 Draft-7 Schema 验证的确定性 JSON，记录选择来源、规则决策和 Atom 生命周期。
 - 最终提示词按完整 Tag 控制在 250 词以内，不截断受保护语法。
@@ -26,7 +26,7 @@ ComfyUI-IYKYK 是一套面向东亚人像与剧情场景的提示词生成节点
 
 ### Release ZIP（推荐）
 
-1. 从 [GitHub Releases](https://github.com/imymi/ComfyUI-IYKYK/releases) 下载 `ComfyUI-IYKYK-v1.1.0-rc8.zip`。
+1. 从 [GitHub Releases](https://github.com/imymi/ComfyUI-IYKYK/releases) 下载 `ComfyUI-IYKYK-v1.1.0-rc9.zip`。
 2. 解压到 `ComfyUI/custom_nodes/ComfyUI-IYKYK`。
 3. 重启 ComfyUI，在节点搜索中输入 `IYKYK`。
 
@@ -41,7 +41,7 @@ git clone https://github.com/imymi/ComfyUI-IYKYK.git
 
 ```bash
 cd ComfyUI-IYKYK
-git checkout v1.1.0-rc8
+git checkout v1.1.0-rc9
 ```
 
 ### ComfyUI Manager
@@ -177,10 +177,10 @@ counts
 
 ## 确定性与兼容性
 
-- `prompt_seed >= 0`：同一 rc8 版本、相同输入得到相同输出与诊断 JSON。
+- `prompt_seed >= 0`：同一 rc9 版本、相同输入得到相同输出与诊断 JSON。
 - `prompt_seed = -1`：按 ComfyUI 的生成周期更新结果。
-- rc7 与 rc8 的同 seed 输出允许变化；rc8 改用了独立 RNG 子流和 DAG 规则调度。
-- 既有三个节点的输出数量与类型保持不变；rc8 只新增了诊断节点。
+- rc8 与 rc9 扩充了采样目录，同一个 seed 的输出可能变化；升级后应在 rc9 内重新固定并验证预期结果。
+- 四个节点的输出数量与类型保持不变；旧工作流中的服装选项 ID 继续保留。
 - 输出是普通字符串，可接入常见 ComfyUI 文本编码流程；最终模型效果仍取决于 checkpoint、文本编码器、采样参数和工作流。
 
 ## 开发与验证
@@ -203,7 +203,13 @@ python -m unittest discover -s tests -q
 python scripts/build_release.py --mode verify
 ```
 
-rc8 发布审核记录包括：
+rc9 发布前的本地审核记录包括：
+
+- 137 款服装、23 条服装状态、19 项头饰配饰、12 项内衣和 8 项微瑕进入目录。
+- 10,000 种子分阶段差异审计未解释项为 0；本地全量 413 项测试通过。
+- 发布构建、GitHub Actions 与下载包验收以该版本标签对应的实际结果为准。
+
+rc8 历史发布审核记录包括：
 
 - Python 3.9、3.10、3.11、3.12 各 321 项测试通过。
 - 20 个运行时 JSON 严格校验通过，规则 Schema 零漂移。
@@ -212,7 +218,7 @@ rc8 发布审核记录包括：
 - 24-Atom 本机夹具 p95 约 2.12 ms；该数字用于本机回归，不作为跨机器性能承诺。
 - 固定构建时间的双构建产物逐字节一致；发布包包含 42 个运行时文件。
 
-实现规格见 [`docs/v1.1.0-rc8-conflict-affinity-implementation-spec.md`](docs/v1.1.0-rc8-conflict-affinity-implementation-spec.md)，版本变化见 [`CHANGELOG.md`](CHANGELOG.md)。
+rc8 的冲突引擎实现规格见 [`docs/v1.1.0-rc8-conflict-affinity-implementation-spec.md`](docs/v1.1.0-rc8-conflict-affinity-implementation-spec.md)；rc9 的词库迁移记录见 [`docs/data_migration/catalog_diff_report.md`](docs/data_migration/catalog_diff_report.md)，版本变化见 [`CHANGELOG.md`](CHANGELOG.md)。
 
 ## 常见问题
 
@@ -230,7 +236,7 @@ rc8 发布审核记录包括：
 
 ### 为什么升级后同一个 seed 变了
 
-确定性边界是版本内，而不是跨版本。rc8 的亲和分布、RNG 子流和规则执行顺序均与 rc7 不同。
+确定性边界是版本内，而不是跨版本。rc9 扩充了候选目录，可能改变同一 seed 的抽样结果。
 
 ## 内容与授权
 
