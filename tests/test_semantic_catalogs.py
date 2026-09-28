@@ -150,7 +150,7 @@ class TestSemanticCatalogs(unittest.TestCase):
                 self.assertEqual(origin["selected_id"], rid)
 
     def test_generator_node_full_chain_provenance(self):
-        """验证 15 槽位生成器输出全量携带不可变 SemanticFacts 与 SelectionOrigin"""
+        """验证提示词生成器输出全量携带不可变 SemanticFacts 与 SelectionOrigin"""
         gen = IYKYKPromptGenerator()
         res = gen.generate_structured(
             "无 (None)",
@@ -367,7 +367,7 @@ class TestSemanticCatalogs(unittest.TestCase):
             facts.visible_regions = ("new",)
 
     def test_prompt_seed_0_rich_rule_facts(self):
-        """验证固定 seed=0 且全开 15 槽位时，所有 source atoms 均携带真实规则事实"""
+        """验证固定 seed=0 且全开槽位时，所有 source atoms 均携带真实规则事实"""
         gen = IYKYKPromptGenerator()
         res = gen.generate_structured(
             预设模板="无 (None)",
@@ -631,7 +631,7 @@ class TestSemanticCatalogs(unittest.TestCase):
                 self.assertIn(st.id, all_leaf_ids, f"Sampled leaf ID {st.id} not found in clothing.json")
 
     def test_zero_text_fallback_in_formal_catalogs(self):
-        """验证正式目录全量 15 槽位 source atoms 具有 100% 真实叶子 ID 与有效规则事实，fallback 为零"""
+        """验证正式目录全量槽位 source atoms 具有 100% 真实叶子 ID 与有效规则事实，fallback 为零"""
         gen = IYKYKPromptGenerator()
         res = gen.generate_structured(
             预设模板="无 (None)",

@@ -2,6 +2,8 @@
 
 本项目遵循 [Semantic Versioning](https://semver.org/lang/zh-CN/) 规范。
 
+本日志也保留开发阶段的历史记录；版本标题本身不代表存在同名 Git tag 或 GitHub Release，公开发布记录以 [GitHub Releases](https://github.com/imymi/ComfyUI-IYKYK/releases) 为准。
+
 ---
 
 ## [v1.1.0-rc9] - 2026-09-24
@@ -56,7 +58,7 @@
 
 ---
 
-## [v1.1.0-rc7] - 2026-09-02
+## [v1.1.0-rc7] - 2026-09-03
 
 ### 🌟 终验复审整改与架构重构 (8 项复核修订落地)
 
@@ -325,7 +327,9 @@
 
 ---
 
-## [v1.1.0] - 2026-09-01
+## 开发里程碑（非发布条目） - 2026-09-01
+
+> 本节保留 1.1.0 开发阶段的历史变更，原误标为 `v1.1.0`，不表示正式版已发布。未来正式 `v1.1.0` 应另建条目并使用实际发布日期。
 
 ### 🚀 P1 & P2 架构级重构与工程化加固 (Architecture & Engineering Upgrade)
 

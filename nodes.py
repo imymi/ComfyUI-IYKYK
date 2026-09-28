@@ -1,10 +1,11 @@
 """
 nodes.py — ComfyUI 原生自定义节点定义与注册
 
-包含 3 个核心节点：
-1. IYKYKPromptGenerator (🎴 IYKYK 15槽位提示词生成器) — 全维度 15 槽位独立控制与情境自洽采样
+包含 4 个原生节点：
+1. IYKYKPromptGenerator (🎴 IYKYK 提示词生成器) — 全维度槽位独立控制与情境自洽采样
 2. IYKYKPresetBrowser (📋 IYKYK 模板浏览器) — 77 套手写预设模板与 8 大风格配方叠加
 3. IYKYKCustomSlotCombiner (🧩 IYKYK 自定义槽位拼装器) — 自由输入多槽位文本与冲突消解
+4. IYKYKPromptDiagnostics (🔎 IYKYK 提示词诊断) — 复用完整生成器输入并输出提示词与审计轨迹
 
 特性：
 - 完整支持 prompt_seed（-1 为动态随机抽卡，非负整数为 100% 确定性复现）
@@ -457,7 +458,7 @@ def _generate_structured(
                 budget_filter_records=assembly_res.budget_filter_records,
             )
 
-    # 2. 采样 15 槽位
+    # 2. 采样各槽位
     # 槽位 1: 场景 + 主题
     rng_scene = derive_substream_rng(effective_seed, "selector:scene_theme")
     scene_res = sampler.sample_scene_result(场景大类, rng_scene)
@@ -666,11 +667,11 @@ def _generate_structured(
 
 
 # ═══════════════════════════════════════════════════════════════════════════
-# 节点 1: 🎴 IYKYK 15槽位提示词生成器
+# 节点 1: 🎴 IYKYK 提示词生成器
 # ═══════════════════════════════════════════════════════════════════════════
 
 class IYKYKPromptGenerator:
-    """15 槽位提示词生成器"""
+    """提示词生成器"""
 
     @classmethod
     def INPUT_TYPES(cls):
@@ -1451,7 +1452,7 @@ NODE_CLASS_MAPPINGS = {
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
-    "IYKYKPromptGenerator": "🎴 IYKYK 15槽位提示词生成器",
+    "IYKYKPromptGenerator": "🎴 IYKYK 提示词生成器",
     "IYKYKPresetBrowser": "📋 IYKYK 模板浏览器",
     "IYKYKCustomSlotCombiner": "🧩 IYKYK 自定义槽位拼装器",
     "IYKYKPromptDiagnostics": "🔎 IYKYK 提示词诊断",

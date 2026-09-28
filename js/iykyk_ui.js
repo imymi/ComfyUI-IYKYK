@@ -2,7 +2,7 @@ import { app } from "../../scripts/app.js";
 import { EXTENSION_VERSION } from "./version.js";
 
 const NODE_DEFAULTS = {
-    // 🎴 节点 1: IYKYK 15槽位提示词生成器
+    // 🎴 节点 1: IYKYK 提示词生成器
     "IYKYKPromptGenerator": {
         "预设模板": "无 (None)",
         "风格配方": "无 (None)",

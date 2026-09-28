@@ -1,5 +1,5 @@
 """
-test_conflict_engine_matrix.py — 17 大冲突消解规则与 15 槽位全量交叉消解矩阵测试套件
+test_conflict_engine_matrix.py — 17 大冲突消解规则与多槽位交叉消解矩阵测试套件
 """
 from __future__ import annotations
 
@@ -136,7 +136,7 @@ class TestConflictEngineMatrix(unittest.TestCase):
 
     # ─── 综合多规则交叉级联消解测试 ───
     def test_cross_slot_full_cascade_15_slots(self):
-        """测试 15 槽位极端冲突下，17 大规则流水线级联消解的终极稳定性"""
+        """测试多槽位极端冲突下，17 大规则流水线级联消解的终极稳定性"""
         frags = [
             # 1. 景别特写 (Rule 13 触发)
             PromptFragment(text="extreme close-up, focused on facial expression", source_slot="shot_type", order=1),
