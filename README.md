@@ -242,7 +242,7 @@ rc8 的冲突引擎实现规格见 [`docs/v1.1.0-rc8-conflict-affinity-implement
 
 - 本项目仅面向成年人。不得用于涉及未成年人、无同意行为、真实人物侵害或其他违法内容的生成与传播。
 - 用户须自行遵守所在地区法律、模型许可证、平台政策和所使用素材的授权条件。
-- 项目词库与早期结构参考了 [`ShuaiHui/nsfw-prompt-templates-asian`](https://github.com/ShuaiHui/nsfw-prompt-templates-asian)。
+- 项目词库与早期结构参考了 [`ShuaiHui/nsfw-prompt-templates-asian`](https://github.com/ShuaiHui/nsfw-prompt-templates-asian)；来源范围、上游授权线索与待确认事项见 [THIRD_PARTY.md](THIRD_PARTY.md)。
 - **当前仓库未包含 `LICENSE` 文件。** 不应仅凭历史 README 的 Apache-2.0 表述推定本仓库或上游素材已经获得该许可证授权；复制、再分发或制作衍生版本前，请向仓库维护者核实适用条款及上游授权。
 
 问题与缺陷请提交到 [GitHub Issues](https://github.com/imymi/ComfyUI-IYKYK/issues)。
