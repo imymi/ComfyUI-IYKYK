@@ -18,33 +18,62 @@ jobs:
       with:
         fetch-depth: 0
 
+    - name: Detect docs-only changes
+      id: changes
+      env:
+        BASE_SHA: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || github.event.before }}
+      run: |
+        docs_only=false
+        if [[ "$BASE_SHA" =~ ^[0-9a-f]{40}$ ]] &&
+           [[ ! "$BASE_SHA" =~ ^0{40}$ ]] &&
+           git cat-file -e "$BASE_SHA^{commit}" 2>/dev/null &&
+           git diff --no-renames --name-only -z "$BASE_SHA" HEAD -- > "$RUNNER_TEMP/ci-changed-paths"; then
+          if [[ -s "$RUNNER_TEMP/ci-changed-paths" ]]; then
+            docs_only=true
+            while IFS= read -r -d '' path; do
+              case "$path" in
+                README.md|CHANGELOG.md|THIRD_PARTY.md|docs/*.md|source_md/*.md) ;;
+                *) docs_only=false; break ;;
+              esac
+            done < "$RUNNER_TEMP/ci-changed-paths"
+          fi
+        fi
+        echo "docs_only=$docs_only" >> "$GITHUB_OUTPUT"
+
     - name: Set up Python ${{ matrix.python-version }}
+      if: steps.changes.outputs.docs_only != 'true' || matrix.python-version == '3.11'
       uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.python-version }}
 
     - name: Install Development Dependencies
+      if: steps.changes.outputs.docs_only != 'true' || matrix.python-version == '3.11'
       run: |
         python -m pip install --upgrade pip
         python -m pip install -e ".[dev]"
 
     - name: Run Ruff Lint
+      if: steps.changes.outputs.docs_only != 'true'
       run: |
         ruff check .
 
     - name: Check Rule Schema Drift (Read-only)
+      if: steps.changes.outputs.docs_only != 'true'
       run: |
         python scripts/generate_rule_schemas.py --check
 
     - name: Validate Datasets & Schema
+      if: steps.changes.outputs.docs_only != 'true'
       run: |
         python scripts/validate_data.py --strict
 
     - name: Run Full Test Suite
+      if: steps.changes.outputs.docs_only != 'true'
       run: |
         python -m unittest discover -s tests -v
 
     - name: Double Build & Compare SHA256
+      if: steps.changes.outputs.docs_only != 'true'
       run: |
         mkdir -p /tmp/build_a /tmp/build_b
         python scripts/build_release.py --mode verify --output-dir /tmp/build_a
@@ -62,3 +91,11 @@ jobs:
         test -f "/tmp/build_a/$GEN_A/MANIFEST.json"
         test -f "/tmp/build_a/$GEN_A/SHA256SUMS.txt"
         echo "✅ Deterministic build verified: bit-for-bit identical across independent runs."
+
+    - name: Check documentation contracts
+      if: steps.changes.outputs.docs_only == 'true' && matrix.python-version == '3.11'
+      run: python -m unittest tests.test_doc_contracts -v
+
+    - name: Verify documentation release package
+      if: steps.changes.outputs.docs_only == 'true' && matrix.python-version == '3.11'
+      run: python scripts/build_release.py --mode verify --output-dir /tmp/build_docs
