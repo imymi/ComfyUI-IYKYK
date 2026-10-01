@@ -665,55 +665,107 @@ class TestM1AuditNegativeVerification(unittest.TestCase):
     def test_audit_replay_purely_from_archive(self):
         """
         反例与自洽闭环：验证归档证据包含全部必要输入（atoms, decisions, bindings, dedup/budget 等），
-        且“仅从归档重放”全部检查能够得到严格相同结果，0 unexplained diffs。
+        且传入独立重放预言机全量覆盖全部 4799 条差异记录，断言 0 unexplained diffs。
+        缺失归档必须阻断门禁断言失败（严禁 skipTest）。
         """
-        from scratch.audit_m1_wildcards_slice import attribute_m1_seed_diff
+        from scratch.audit_m1_wildcards_slice import (
+            attribute_m1_seed_diff,
+            DeterministicReplayOracle,
+        )
         archive_path = REPO_DIR / "scratch" / "audit_m1_evidence.json.gz"
         if not archive_path.exists():
-            self.skipTest(f"Archive {archive_path} not found")
+            self.fail(f"Audit archive missing: {archive_path}. Gate requires full archive to be generated and verified.")
 
         with gzip.open(archive_path, "rt", encoding="utf-8") as f:
             doc = json.load(f)
 
         diffs = doc.get("diffs", [])
-        self.assertGreater(len(diffs), 0, "Archive diffs must not be empty")
+        self.assertEqual(len(diffs), 4799, f"Archive must contain exactly 4799 divergent records, got {len(diffs)}")
 
-        # 抽样前 100 组差异记录，验证仅靠归档输入能完整重放
-        for rec in diffs[:100]:
+        # 独立重放预言机（非数据自比，使用独立确定性重放预言机）
+        replay_oracle = DeterministicReplayOracle()
+
+        for rec in diffs:
             s = rec["seed"]
-            # 兼容：如果记录中已有完整的 base_item 和 cur_item，则直接使用
-            base_item = rec.get("base_item")
-            cur_item = rec.get("cur_item")
-            if base_item is None or cur_item is None:
-                # 兼容旧格式
-                base_item = {
-                    "seed": s,
-                    "source_atoms": rec["base_source_atoms"],
-                    "final_atoms": rec["base_final_atoms"],
-                    "decisions": [],
-                    "carrier_bindings": {},
-                    "dedup_records": [],
-                    "budget_records": [],
-                    "positive": "",
-                    "hash": "",
-                }
-                cur_item = {
-                    "seed": s,
-                    "source_atoms": rec["cur_source_atoms"],
-                    "final_atoms": rec["cur_final_atoms"],
-                    "decisions": rec.get("decisions", []),
-                    "carrier_bindings": rec.get("carrier_bindings", {}),
-                    "dedup_records": rec.get("dedup_records", []),
-                    "budget_records": rec.get("budget_records", []),
-                    "positive": "",
-                    "hash": "",
-                }
-            res = attribute_m1_seed_diff(s, base_item, cur_item, self.catalog_lookup, self.valid_rules)
+            base_item = rec["base_item"]
+            cur_item = rec["cur_item"]
+            res = attribute_m1_seed_diff(
+                s,
+                base_item,
+                cur_item,
+                self.catalog_lookup,
+                self.valid_rules,
+                replay_oracle=replay_oracle,
+            )
             self.assertTrue(
                 res["is_explained"],
-                f"Replay from archive failed for seed {s}: {res['unexplained_reasons']}"
+                f"Replay from archive failed for seed {s}: {res['unexplained_reasons']}",
             )
             self.assertEqual(res["unexplained_reasons"], [])
+
+    def test_negative_arbitrary_catalog_hair_replacement_blocked(self):
+        """
+        反例 5 (针对用户审核发现 1)：
+        使用真实目录中的合法词条 long_straight_black ('long straight black hair')
+        任意替换当前版本真实采出的 big_wavy_curls ('big loose waves')。
+        通过真实审计入口并传入独立重放预言机 DeterministicReplayOracle。
+        断言审计器绝不能将其误归因为 PRNG_CANDIDATE_SHIFT，必须拦截报错并断言 is_explained == False。
+        """
+        from scratch.audit_m1_wildcards_slice import (
+            attribute_m1_seed_diff,
+            DeterministicReplayOracle,
+        )
+        import copy
+
+        test_seed = 11
+        archive_path = REPO_DIR / "scratch" / "audit_m1_evidence.json.gz"
+        if not archive_path.exists():
+            self.fail(f"Audit archive missing: {archive_path}")
+
+        with gzip.open(archive_path, "rt", encoding="utf-8") as f:
+            doc = json.load(f)
+
+        rec = next((r for r in doc["diffs"] if r["seed"] == test_seed), None)
+        self.assertIsNotNone(rec, f"Seed {test_seed} must be in archive diffs")
+
+        base = rec["base_item"]
+        cur = copy.deepcopy(rec["cur_item"])
+
+        # 确认当前版本原始抽样确实存在 big loose waves
+        self.assertTrue(any(a["text"] == "big loose waves" for a in cur["source_atoms"]))
+
+        # 篡改：用真实词库合法词条 long straight black hair 任意替换
+        for a in cur["source_atoms"]:
+            if a["text"] == "big loose waves":
+                a["text"] = "long straight black hair"
+                a["source_item_id"] = "long_straight_black"
+                a["id"] = "long_straight_black__tag_000"
+        for a in cur["final_atoms"]:
+            if a["text"] == "big loose waves":
+                a["text"] = "long straight black hair"
+                a["source_item_id"] = "long_straight_black"
+                a["id"] = "long_straight_black__tag_000"
+
+        # 真实审计入口调用并传入独立重放预言机
+        replay_oracle = DeterministicReplayOracle()
+        res = attribute_m1_seed_diff(
+            test_seed,
+            base,
+            cur,
+            self.catalog_lookup,
+            self.valid_rules,
+            replay_oracle=replay_oracle,
+        )
+
+        self.assertFalse(res["is_explained"], "Arbitrary catalog hair replacement must NOT be explained!")
+        self.assertTrue(
+            any("UNEXPLAINED_SOURCE_ATOM_MUTATION(hairstyle)" in r for r in res["unexplained_reasons"]),
+            f"Expected UNEXPLAINED_SOURCE_ATOM_MUTATION(hairstyle), got: {res['unexplained_reasons']}",
+        )
+        self.assertTrue(
+            any("UNEXPLAINED_REMOVED_ATOM" in r for r in res["unexplained_reasons"]),
+            f"Expected UNEXPLAINED_REMOVED_ATOM, got: {res['unexplained_reasons']}",
+        )
 
 
 if __name__ == "__main__":

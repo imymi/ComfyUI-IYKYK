@@ -65,6 +65,55 @@ NEW_PROP_LEAF_IDS = frozenset({
 })
 ALL_M1_ITEM_IDS = NEW_HAIRSTYLE_IDS | NEW_LIGHTING_IDS | NEW_PROP_IDS
 
+EXPECTED_AUDITED_DATA_HASHES = {
+    "accessories.json": "b7cc189be606288bcfd4efb463770cb63c3d764bf26164f524316468d04e87ad",
+    "lighting.json": "bdfe81d6846c9e50a0f607414561275ec868d09c592476bf15ca814c65191766",
+    "props.json": "e0496d2ca8866a755ebe6f4bfc3f9304a17189ab893808bf5cc6d612f05845be",
+}
+
+
+def atom_to_dict(a: Any) -> Dict[str, Any]:
+    if isinstance(a, dict):
+        return a
+    return {
+        "atom_id": getattr(a, "atom_id", ""),
+        "text": getattr(a, "text", ""),
+        "source_slot": getattr(a, "source_slot", ""),
+        "source_item_id": getattr(a, "source_item_id", ""),
+        "span_order": getattr(a, "span_order", 0),
+        "tag_order": getattr(a, "tag_order", 0),
+        "id": getattr(a, "id", ""),
+        "facts": getattr(a, "facts", {}).to_dict() if hasattr(getattr(a, "facts", None), "to_dict") else (getattr(a, "facts", {}) or {}),
+        "provenance": getattr(a, "provenance", {}).to_dict() if hasattr(getattr(a, "provenance", None), "to_dict") else {},
+    }
+
+
+def setup_controlled_reference_env(scratch_dir: Path) -> Path:
+    """
+    构建受控对照基线环境 (Controlled Reference Environment)：
+    1. 基于固定基线代码 c74084d 导出代码树；
+    2. 仅打入 6 款已审核 M1 样本数据增量，并断言数据散列绝对匹配；
+    3. 杜绝任何未审核逻辑或数据污染，充当因果审计的独立预言机。
+    """
+    controlled_dir = scratch_dir / f"controlled_ref_{BASELINE_COMMIT}_m1"
+    export_commit(BASELINE_COMMIT, controlled_dir)
+    controlled_data_dir = controlled_dir / "data"
+
+    for fname, exp_hash in EXPECTED_AUDITED_DATA_HASHES.items():
+        src_path = REPO_DIR / "data" / fname
+        if not src_path.exists():
+            raise FileNotFoundError(f"Audited data file missing: {src_path}")
+        src_hash = hashlib.sha256(src_path.read_bytes()).hexdigest()
+        if src_hash != exp_hash:
+            raise RuntimeError(f"Audited data hash mismatch for {fname}: expected {exp_hash}, got {src_hash}")
+        dst_path = controlled_data_dir / fname
+        dst_path.write_bytes(src_path.read_bytes())
+        dst_hash = hashlib.sha256(dst_path.read_bytes()).hexdigest()
+        if dst_hash != exp_hash:
+            raise RuntimeError(f"Controlled reference data hash mismatch for {fname}: expected {exp_hash}, got {dst_hash}")
+
+    return controlled_dir
+
 
 def load_authoritative_catalog_lookup(data_dir: Path) -> Dict[Tuple[str, str], Set[str]]:
     """
@@ -251,26 +300,36 @@ DEFAULT_GATE_INPUTS = {
 class DeterministicReplayOracle:
     """
     确定性候选重放预言机：
-    用于对指定种子和槽位执行受控重放，验证当前版本的源原子抽样结果与 PRNG 数学选择完全一致。
-    支持从预计算批次初始化，或在需要时直接调用 generator 动态重放。
+    用于对指定种子和槽位执行受控重放，验证被测版本的源原子抽样结果与 PRNG 数学选择完全一致。
+    支持从受控基线对照环境生成的 reference_data 初始化，或在需要时直接调用受控 generator 动态重放。
+    安全铁律：绝不接受待审核 candidate/cur 数据作为预期！
     """
 
-    def __init__(self, precomputed_data: Optional[Dict[int, Dict[str, Any]]] = None):
-        self._precomputed = precomputed_data or {}
+    def __init__(
+        self,
+        reference_data: Optional[Dict[int, Dict[str, Any]]] = None,
+        reference_dir: Optional[Path] = None,
+    ):
+        self._reference_data = reference_data or {}
+        self._reference_dir = reference_dir
         self._generator = None
         self._cache: Dict[int, Dict[str, List[Tuple[str, str, str, int]]]] = {}
 
-        if self._precomputed:
-            for s, item in self._precomputed.items():
+        if self._reference_data:
+            for s, item in self._reference_data.items():
                 by_slot = collections.defaultdict(list)
                 for a in item.get("source_atoms", []):
-                    slot = normalize_slot_name(a["source_slot"])
-                    by_slot[slot].append(slot_atom_signature(a))
+                    slot = normalize_slot_name(a.get("source_slot", "") if isinstance(a, dict) else a.source_slot)
+                    by_slot[slot].append(slot_atom_signature(atom_to_dict(a)))
                 self._cache[s] = dict(by_slot)
 
     @property
     def generator(self):
         if self._generator is None:
+            if self._reference_dir is not None:
+                ref_str = str(self._reference_dir)
+                if ref_str not in sys.path:
+                    sys.path.insert(0, ref_str)
             import nodes
             self._generator = nodes.IYKYKPromptGenerator()
         return self._generator
@@ -281,7 +340,7 @@ class DeterministicReplayOracle:
             by_slot = collections.defaultdict(list)
             for a in res.source_atoms:
                 s_name = normalize_slot_name(a.source_slot)
-                by_slot[s_name].append(slot_atom_signature(a))
+                by_slot[s_name].append(slot_atom_signature(atom_to_dict(a)))
             self._cache[seed] = dict(by_slot)
 
         slot_map = self._cache[seed]
@@ -395,8 +454,21 @@ def attribute_m1_seed_diff(
                     f"UNEXPLAINED_SOURCE_ATOM_MUTATION({slot}): Source atoms in expanded slot '{slot}' "
                     f"vanished without replacement in current version! base={b_sigs} vs cur=[]"
                 )
-            # B. 若配置了确定性重放预言机，断言当前源原子签名必须与确定性 PRNG 选择重放完全一致
-            if replay_oracle is not None:
+            # B. 任何源原子漂移必须有独立确定性重放预言机证明
+            if b_sigs != c_sigs:
+                if replay_oracle is None:
+                    unexplained_reasons.append(
+                        f"MISSING_REPLAY_ORACLE({slot}): Cannot verify PRNG candidate shift for slot '{slot}' "
+                        f"without independent deterministic replay oracle! base={b_sigs} vs cur={c_sigs}"
+                    )
+                else:
+                    expected_sigs = replay_oracle.get_source_atoms(seed, slot)
+                    if c_sigs != expected_sigs:
+                        unexplained_reasons.append(
+                            f"UNEXPLAINED_SOURCE_ATOM_MUTATION({slot}): Source atoms in expanded slot '{slot}' "
+                            f"deviated from deterministic PRNG selection replay! cur={c_sigs} vs expected={expected_sigs}"
+                        )
+            elif replay_oracle is not None:
                 expected_sigs = replay_oracle.get_source_atoms(seed, slot)
                 if c_sigs != expected_sigs:
                     unexplained_reasons.append(
@@ -532,9 +604,17 @@ def attribute_m1_seed_diff(
             is_proven = True
             explained_attributions.append({"atom_id": aid, "text": a["text"], "category": f"PRODUCED_BY_DECISION({prod_dec['rule_id']})"})
         elif slot in M1_EXPANDED_SLOTS and sem_key(a) in cur_src_keys:
-            # 扩充槽位在源头发生了合法的抽样偏移
-            is_proven = True
-            explained_attributions.append({"atom_id": aid, "text": a["text"], "category": f"PRNG_CANDIDATE_SHIFT({slot})"})
+            # 扩充槽位在源头发生了合法的抽样偏移：必须经独立预言机证实其实际被选中
+            if replay_oracle is not None:
+                expected_sigs = replay_oracle.get_source_atoms(seed, slot)
+                c_slot_sigs = [slot_atom_signature(x) for x in c_src_by_slot.get(slot, [])]
+                if c_slot_sigs == expected_sigs and slot_atom_signature(a) in expected_sigs:
+                    is_proven = True
+                    explained_attributions.append({"atom_id": aid, "text": a["text"], "category": f"PRNG_CANDIDATE_SHIFT({slot})"})
+                else:
+                    is_proven = False
+            else:
+                is_proven = False
         elif sem_key(a) in base_src_keys and sem_key(a) in cur_src_keys:
             # 在双版本源头均存在，但基线中被规则删除了、当前未被删除（规则消解上下文改变）
             is_proven = True
@@ -569,13 +649,15 @@ def attribute_m1_seed_diff(
             if not c_slot_atoms:
                 # 当前源头根本没有为该槽位采出任何候选，属于非法静默删除，绝不能认定为 PRNG 替换！
                 is_proven = False
+            elif replay_oracle is None:
+                is_proven = False
             else:
                 c_sigs = [slot_atom_signature(a) for a in c_slot_atoms]
                 b_sigs = [slot_atom_signature(a) for a in b_src_by_slot.get(slot, [])]
                 if c_sigs == b_sigs:
                     # 源原子完全相同，终态却消失且无消解决策
                     is_proven = False
-                elif replay_oracle is not None and c_sigs != replay_oracle.get_source_atoms(seed, slot):
+                elif c_sigs != replay_oracle.get_source_atoms(seed, slot):
                     # 当前采出与确定性重放预言机不符
                     is_proven = False
                 else:
@@ -615,7 +697,11 @@ def run_m1_audit(
     scratch_dir.mkdir(parents=True, exist_ok=True)
 
     baseline_dir = scratch_dir / f"baseline_{BASELINE_COMMIT}"
+    print(f"[*] Exporting git baseline {BASELINE_COMMIT} to {baseline_dir}...")
     export_commit(BASELINE_COMMIT, baseline_dir)
+
+    print("[*] Setting up controlled reference environment (c74084d + 6 audited M1 samples)...")
+    controlled_ref_dir = setup_controlled_reference_env(scratch_dir)
 
     # 获取源码树元数据与 HEAD 提交
     meta = get_source_tree_metadata(REPO_DIR)
@@ -632,14 +718,20 @@ def run_m1_audit(
     if total_seeds == 10000 and base_hash != EXPECTED_BASELINE_HASH:
         raise RuntimeError(f"Baseline hash mismatch: expected {EXPECTED_BASELINE_HASH}, got {base_hash}")
 
+    print(f"[*] Running controlled reference generation for {total_seeds} seeds...")
+    ref_data, ref_hash = run_batch_parallel(controlled_ref_dir, total_seeds)
+    print(f"    Controlled ref batch hash: {ref_hash}")
+    if total_seeds == 10000 and ref_hash != EXPECTED_M1_HASH:
+        raise RuntimeError(f"Controlled reference hash mismatch: expected {EXPECTED_M1_HASH}, got {ref_hash}")
+
     print(f"[*] Running current working tree ({git_head[:7]}) generation for {total_seeds} seeds...")
     cur_data, cur_hash = run_batch_parallel(REPO_DIR, total_seeds)
     print(f"    Current batch hash:  {cur_hash}")
     if total_seeds == 10000 and cur_hash != EXPECTED_M1_HASH:
         raise RuntimeError(f"Current hash mismatch: expected {EXPECTED_M1_HASH}, got {cur_hash}")
 
-    print("[*] Auditing seed divergences with atomic causal verification & deterministic selection replay...")
-    replay_oracle = DeterministicReplayOracle(cur_data)
+    print("[*] Auditing seed divergences with atomic causal verification & independent controlled reference replay...")
+    replay_oracle = DeterministicReplayOracle(reference_data=ref_data, reference_dir=controlled_ref_dir)
     identical_count = 0
     divergent_count = 0
     unexplained_seeds: Dict[int, List[str]] = {}
