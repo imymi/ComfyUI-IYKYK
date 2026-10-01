@@ -1,15 +1,15 @@
 {
   "manifest_version": "1.0",
   "tested_component": "M1 Wildcard Vertical Slice (6 samples)",
-  "tested_commit_target": "56e05d5221411c217cf6692acee50c58f5662538",
-  "tree_hash": "22212655c422989d3a5db09e8164d956d212fa6f",
+  "tested_commit_target": "2fd867b4d5afda058aa6d7582eb312e3c3e71e0d",
+  "tree_hash": "90d31f44e146bb58f8f5b77d358579e4dc15a67a",
   "is_dirty": false,
   "source_tree": {
-    "git_commit": "56e05d5221411c217cf6692acee50c58f5662538",
-    "git_tree": "22212655c422989d3a5db09e8164d956d212fa6f",
+    "git_commit": "2fd867b4d5afda058aa6d7582eb312e3c3e71e0d",
+    "git_tree": "90d31f44e146bb58f8f5b77d358579e4dc15a67a",
     "is_dirty": false,
     "uncommitted_changes": [],
-    "audit_script_hash": "24f5060f49c89bdc080efeeff0a88e287a3be6bee457e740ed520a87d3f46113",
+    "audit_script_hash": "496fdaa211eef00517a6d8fd4cf6ff2872f7eebf27afddc027805a95ce680190",
     "data_hashes": {
       "accessories.json": "b7cc189be606288bcfd4efb463770cb63c3d764bf26164f524316468d04e87ad",
       "lighting.json": "bdfe81d6846c9e50a0f607414561275ec868d09c592476bf15ca814c65191766",
@@ -18,7 +18,7 @@
   },
   "original_archive": {
     "filename": "audit_m1_evidence.json.gz",
-    "sha256": "1be9bb59df95803e9800749f7f5ea803510b17b8a73d5e803b47319c83d9ffb4",
+    "sha256": "1e25ccf7e44d1218c8d3af94ef63dd9238f5d2f9fd8cb0d0a8bae88796e764be",
     "records_count": 4799
   },
   "audit_results": {

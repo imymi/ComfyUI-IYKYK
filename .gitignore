@@ -14,4 +14,5 @@ build/
 # Large divergence audit archives (>100MB blocked by GitHub)
 scratch/*.gz
 scratch/baseline_*
+scratch/controlled_ref_*
 
