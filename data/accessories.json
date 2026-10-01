@@ -599,6 +599,38 @@
           }
         }
       ]
+    },
+    {
+      "id": "ext_aw_hair_bob_blunt_cut",
+      "name_zh": "齐发尾短波波头 (Blunt-cut Short Bob)",
+      "tags": [
+        {
+          "id": "ext_aw_hair_bob_blunt_cut__tag_000",
+          "text": "sleek blunt-cut short bob",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "face"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "ext_aw_hair_long_parted_behind_ears",
+      "name_zh": "中分长发挂耳 (Long Hair Tucked Behind Ears)",
+      "tags": [
+        {
+          "id": "ext_aw_hair_long_parted_behind_ears__tag_000",
+          "text": "long hair, parted down the middle and tucked behind the ears",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "face"
+            ]
+          }
+        }
+      ]
     }
   ],
   "headwear_jewelry": [

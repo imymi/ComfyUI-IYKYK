@@ -2241,6 +2241,23 @@
       ],
       "erotic_tags": [],
       "id": "professional_lighting_16"
+    },
+    {
+      "id": "ext_aw_light_direct_flash",
+      "name": "机顶直闪光 / 闪光灯摄影 (Direct Flash Photography)",
+      "tags": [
+        {
+          "id": "ext_aw_light_direct_flash__tag_000",
+          "text": "direct flash photography",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": null,
+            "light_sources": [],
+            "color_modes": []
+          }
+        }
+      ],
+      "erotic_tags": []
     }
   ],
   "cinematic_lighting": [
@@ -2784,6 +2801,28 @@
         }
       ],
       "id": "cinematic_lighting_03",
+      "erotic_tags": []
+    },
+    {
+      "id": "ext_aw_light_warm_golden_hour",
+      "name": "暖金黄昏夕阳光 (Warm Golden Hour Lighting)",
+      "tags": [
+        {
+          "id": "ext_aw_light_warm_golden_hour__tag_000",
+          "text": "warm golden hour lighting during sunset outdoors",
+          "facts": {
+            "semantic_role": "selector",
+            "time_of_day": "dusk",
+            "light_sources": [
+              "daylight"
+            ],
+            "color_modes": [
+              "color"
+            ],
+            "space_kind": "outdoor"
+          }
+        }
+      ],
       "erotic_tags": []
     }
   ],

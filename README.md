@@ -243,6 +243,10 @@ rc8 的冲突引擎实现规格见 [`docs/v1.1.0-rc8-conflict-affinity-implement
 - 本项目仅面向成年人。不得用于涉及未成年人、无同意行为、真实人物侵害或其他违法内容的生成与传播。
 - 用户须自行遵守所在地区法律、模型许可证、平台政策和所使用素材的授权条件。
 - 项目词库与早期结构参考了 [`ShuaiHui/nsfw-prompt-templates-asian`](https://github.com/ShuaiHui/nsfw-prompt-templates-asian)；来源范围、上游授权线索与待确认事项见 [THIRD_PARTY.md](THIRD_PARTY.md)。
+- **词库扩充来源与开源许可归属 (M1 增补)**：
+  - **BKWILDCARDS**：作者 `bkidderz`（[bkidderz/BKWILDCARDS](https://github.com/bkidderz/BKWILDCARDS)），词库内容遵循 [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/) 许可协议。入选条目包括发型 `sleek blunt-cut short bob` 与 `long hair, parted down the middle and tucked behind the ears`，衍生使用保持该协议归属。
+  - **mattjaybe**：作者 `mattjaybe`（[mattjaybe/sd-wildcards](https://github.com/mattjaybe/sd-wildcards)），声明遵循 [CC0 1.0 Universal 公共领域贡献](https://creativecommons.org/publicdomain/zero/1.0/)。入选条目包括直闪光 `direct flash photography`、黄昏夕阳光（改编限定版 `warm golden hour lighting during sunset outdoors`）、手拿包 `elegant clutch bag held in hand`、腋下包 `baguette bag worn over shoulder under arm`。
+  - 其他上游来源（如 BooruPromptGallery 采用 GNU AGPL v3）因适用范围待核实，未纳入本版本核心发行包。详细溯源见 `docs/data_migration/ai_wildcards_provenance_ledger.tsv`。
 - **当前仓库未包含 `LICENSE` 文件。** 不应仅凭历史 README 的 Apache-2.0 表述推定本仓库或上游素材已经获得该许可证授权；复制、再分发或制作衍生版本前，请向仓库维护者核实适用条款及上游授权。
 
 问题与缺陷请提交到 [GitHub Issues](https://github.com/imymi/ComfyUI-IYKYK/issues)。
