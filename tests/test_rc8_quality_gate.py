@@ -1163,32 +1163,37 @@ class TestRC8QualityGate(unittest.TestCase):
             f"Stage 3 has unexplained diffs: {stage3_res.get('unexplained_seeds_count')}",
         )
 
-        # 4. 阶段 4 差异归因审计核验 (c74084d -> M1 Working Tree，词库扩充垂直切片 6 款词条)
-        stage4_manifest_file = REPO_DIR / "scratch" / "audit_m1_manifest.json"
-        self.assertTrue(stage4_manifest_file.exists(), f"Missing Stage 4 M1 manifest: {stage4_manifest_file}")
-        stage4_doc = json.loads(stage4_manifest_file.read_text(encoding="utf-8"))
-        stage4_res = stage4_doc.get("audit_results", {})
-        self.assertEqual(stage4_res.get("total_seeds"), 10000, "Stage 4 report must cover exactly 10,000 seeds")
-        self.assertEqual(
-            stage4_res.get("baseline_commit"),
-            stage4_baseline_commit,
-            f"Stage 4 baseline commit mismatch, expected {stage4_baseline_commit}",
-        )
-        self.assertEqual(
-            stage4_res.get("baseline_hash"),
-            stage3_target_hash,
-            f"Stage 4 baseline hash must chain-link to Stage 3 target hash {stage3_target_hash}",
-        )
-        self.assertEqual(
-            stage4_res.get("current_hash"),
-            stage4_target_hash,
-            f"Stage 4 target hash mismatch, expected {stage4_target_hash}",
-        )
-        self.assertEqual(
-            stage4_res.get("unexplained_seeds_count"),
-            0,
-            f"Stage 4 M1 has unexplained diffs: {stage4_res.get('unexplained_seeds_count')}",
-        )
+        # 4. 阶段 4 实时重跑因果归因审计 (c74084d -> HEAD M1 词库扩充垂直切片 6 款词条)
+        import tempfile
+        from scratch.audit_m1_wildcards_slice import run_m1_audit
+
+        audit_seeds = int(os.environ.get("IYKYK_AUDIT_SEEDS", "10000"))
+        with tempfile.TemporaryDirectory(prefix="iykyk_m1_audit_") as tmp_dir:
+            tmp_path = Path(tmp_dir)
+            report = run_m1_audit(
+                total_seeds=audit_seeds,
+                scratch_dir=tmp_path / "scratch",
+                output_archive=tmp_path / "archive.json.gz",
+                output_report_md=tmp_path / "report.md",
+                output_manifest=tmp_path / "manifest.json",
+            )
+            self.assertEqual(
+                report["unexplained_count"],
+                0,
+                f"Stage 4 M1 has unexplained diffs: {report.get('unexplained_seeds')}",
+            )
+            if audit_seeds == 10000:
+                # 验证首尾衔接：阶段 4 的基线哈希严格等于阶段 3 的目标哈希
+                self.assertEqual(
+                    report["baseline_hash"],
+                    stage3_target_hash,
+                    f"Stage 4 baseline hash must chain-link to Stage 3 target hash {stage3_target_hash}",
+                )
+                self.assertEqual(
+                    report["current_hash"],
+                    stage4_target_hash,
+                    f"Stage 4 target hash mismatch! Expected {stage4_target_hash}, got {report['current_hash']}",
+                )
 
 
 if __name__ == "__main__":

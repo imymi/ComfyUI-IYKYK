@@ -1,7 +1,7 @@
 {
   "manifest_version": "1.0",
   "tested_component": "M1 Wildcard Vertical Slice (6 samples)",
-  "tested_commit_target": "HEAD",
+  "tested_commit_target": "10cc7856b40f6df1db0ba620653fb6c8164f692a",
   "audit_results": {
     "baseline_commit": "c74084d",
     "baseline_hash": "ab5a633cfb3fde70d9a6c629ee65a540955d87ee143e66570d780743246cab89",
@@ -13,10 +13,10 @@
     "gate_status": "PASS"
   },
   "category_breakdown": {
-    "PRNG_CANDIDATE_REPLACED": 3822,
+    "PRNG_CANDIDATE_REPLACED": 3749,
     "PRNG_CANDIDATE_SHIFT": 3498,
     "NEW_PROP_SAMPLED": 162,
-    "NEW_HAIRSTYLE_SAMPLED": 182,
-    "RESOLVED_BY_RULE": 11
+    "RESOLVED_BY_RULE": 93,
+    "NEW_HAIRSTYLE_SAMPLED": 182
   }
 }

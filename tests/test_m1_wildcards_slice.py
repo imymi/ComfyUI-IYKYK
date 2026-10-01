@@ -422,5 +422,128 @@ class TestM1SamplesPipelineAndRules(unittest.TestCase):
         )
 
 
+class TestM1AuditNegativeVerification(unittest.TestCase):
+    """
+    针对 M1 差异归因审计器的负向反例测试 (Negative Anti-Regression Tests)：
+    验证审计器在面对人为篡改、意外丢失、未授权词条时必须 100% 敏锐拦截并判为 UNEXPLAINED，
+    绝对禁止按槽位白名单盲目放行！
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        from scratch.audit_m1_wildcards_slice import (
+            load_authoritative_catalog_lookup,
+            load_authoritative_resolver_rules,
+        )
+        cls.catalog_lookup = load_authoritative_catalog_lookup(DATA_DIR)
+        cls.valid_rules = load_authoritative_resolver_rules(DATA_DIR)
+
+    def _create_clean_fixture(self):
+        """构造一个合法、结构闭环的 baseline 与 current 种子基线"""
+        atom_pose = {
+            "atom_id": "atom_pose_01",
+            "text": "sitting on floor",
+            "source_slot": "pose",
+            "source_item_id": "sitting",
+            "tag_order": 1,
+            "span_order": 0,
+        }
+        atom_hair = {
+            "atom_id": "atom_hair_01",
+            "text": "high ponytail",
+            "source_slot": "hairstyle",
+            "source_item_id": "high_ponytail",
+            "tag_order": 2,
+            "span_order": 0,
+        }
+        import copy
+        item = {
+            "seed": 42,
+            "positive": "sitting on floor, high ponytail",
+            "hash": "hash42",
+            "source_atoms": [copy.deepcopy(atom_pose), copy.deepcopy(atom_hair)],
+            "final_atoms": [copy.deepcopy(atom_pose), copy.deepcopy(atom_hair)],
+            "decisions": [],
+            "carrier_bindings": {},
+            "dedup_records": [],
+            "budget_records": [],
+        }
+        return copy.deepcopy(item), copy.deepcopy(item)
+
+    def test_negative_counterfactual_pose_dropped_without_evidence(self):
+        """
+        反例 1 (核心审查发现)：基线中存在姿态原子，当前版本将其从 source_atoms 和 final_atoms 均删除，
+        无消解决策、无 RNG 证据。断言审计器严苛拦截，禁止误判为 PRNG 替换！
+        """
+        from scratch.audit_m1_wildcards_slice import attribute_m1_seed_diff
+
+        base, cur = self._create_clean_fixture()
+        # 人为删除姿态原子
+        cur["source_atoms"] = [a for a in cur["source_atoms"] if a["source_slot"] != "pose"]
+        cur["final_atoms"] = [a for a in cur["final_atoms"] if a["source_slot"] != "pose"]
+        cur["positive"] = "high ponytail"
+        cur["hash"] = "hash_mutated"
+
+        res = attribute_m1_seed_diff(42, base, cur, self.catalog_lookup, self.valid_rules)
+        self.assertFalse(res["is_explained"], "Audit must NOT explain silently deleted pose atoms!")
+        self.assertTrue(
+            any("UNEXPLAINED_SOURCE_ATOM_MUTATION(pose)" in r for r in res["unexplained_reasons"]),
+            f"Expected UNEXPLAINED_SOURCE_ATOM_MUTATION(pose), got: {res['unexplained_reasons']}",
+        )
+
+    def test_negative_unauthorized_leaf_tag_tampering(self):
+        """反例 2：当前版本被注入未授权词条文本，断言审计器必须拦截。"""
+        from scratch.audit_m1_wildcards_slice import attribute_m1_seed_diff
+
+        base, cur = self._create_clean_fixture()
+        # 篡改发型文本为未授权词条
+        for a in cur["source_atoms"]:
+            if a["source_slot"] == "hairstyle":
+                a["text"] = "unauthorized_hacked_hair_tag"
+        for a in cur["final_atoms"]:
+            if a["source_slot"] == "hairstyle":
+                a["text"] = "unauthorized_hacked_hair_tag"
+
+        res = attribute_m1_seed_diff(42, base, cur, self.catalog_lookup, self.valid_rules)
+        self.assertFalse(res["is_explained"])
+        self.assertTrue(
+            any("UNEXPLAINED_UNKNOWN_LEAF_TAG(hairstyle" in r for r in res["unexplained_reasons"]),
+            f"Expected UNEXPLAINED_UNKNOWN_LEAF_TAG, got: {res['unexplained_reasons']}",
+        )
+
+    def test_negative_silent_atom_drop_without_decision(self):
+        """反例 3：源原子存在但终态消失，且无任何消解决策记录。断言必须拦截。"""
+        from scratch.audit_m1_wildcards_slice import attribute_m1_seed_diff
+
+        base, cur = self._create_clean_fixture()
+        # 从终态移除发型，但不提供任何 decision
+        cur["final_atoms"] = [a for a in cur["final_atoms"] if a["source_slot"] != "hairstyle"]
+        cur["positive"] = "sitting on floor"
+
+        res = attribute_m1_seed_diff(42, base, cur, self.catalog_lookup, self.valid_rules)
+        self.assertFalse(res["is_explained"])
+        self.assertTrue(
+            any("UNEXPLAINED_SILENT_ATOM_DROP" in r for r in res["unexplained_reasons"]),
+            f"Expected UNEXPLAINED_SILENT_ATOM_DROP, got: {res['unexplained_reasons']}",
+        )
+
+    def test_negative_identical_text_with_structural_tampering(self):
+        """
+        反例 4：虽然正向提示词与哈希完全相同，但原子 ID 被篡改导致来源签名断裂。
+        断言即使 is_identical == True，依然判定为 is_explained == False。
+        """
+        from scratch.audit_m1_wildcards_slice import attribute_m1_seed_diff
+
+        base, cur = self._create_clean_fixture()
+        # 篡改终态原子的 atom_id
+        cur["final_atoms"][0]["atom_id"] = "hacked_atom_id"
+
+        res = attribute_m1_seed_diff(42, base, cur, self.catalog_lookup, self.valid_rules)
+        self.assertTrue(res["is_identical"])
+        self.assertFalse(res["is_explained"], "Even identical text must fail if internal structure is tampered!")
+        self.assertTrue(len(res["unexplained_reasons"]) > 0)
+
+
 if __name__ == "__main__":
     unittest.main()
+
