@@ -2,14 +2,13 @@
 tests/test_m1_wildcards_slice.py — M1 垂直切片 6 条样本全链路自动化验收测试
 
 覆盖内容：
-1. 台账 TSV 复合键唯一性与字段规范校验
-2. 6 条样本显式选中（无冲突正向生成）测试
-3. 样本 3：黑白胶片下直闪光不被误删测试（负向回归测试）
-4. 样本 4：规则单测（合成 fixture）与管线集成测试（夜间场景消解黄昏光）
-5. 样本 5：双手占用姿态下仅触发 pose_hand_occupation 移除手拿包
-6. 样本 5 补充：双手可用下输入 2 个手持物触发 handheld_props_single_holder
-7. 样本 6 对照：双手占用姿态下腋下包（worn, hands_required=0）不误删
-8. ExactCatalogIndex 碰撞与命名隔离测试
+1. 台账 TSV 复合键唯一性、目标映射与 JSON 实体双向一致性校验
+2. 6 条样本在真实生成器与目录数据下的端到端生成测试
+3. 样本 3：真实黑白胶片下直闪光不被误删测试（负向回归测试）
+4. 样本 4：解决默认配置与多种子下生成失败问题，并验证夜景下的消解规则
+5. 样本 5 & 6：真实目录数据加载核验、双手占用下真实生成器对抗测试（手拿包移除 vs 腋下包保留）
+6. 样本 5 补充：真实目录双持物触发 handheld_props_single_holder
+7. ExactCatalogIndex 碰撞与命名隔离测试
 """
 from __future__ import annotations
 
@@ -19,19 +18,13 @@ import random
 import unittest
 from pathlib import Path
 
-from lib.assembler import PromptAssembler
-from lib.conflict_resolver import ConflictResolver, OneTimeIndex, DecisionLedger
+from lib.conflict_resolver import ConflictResolver
 from lib.models import (
-    GenerationResult,
     PromptAtom,
-    PromptFragment,
-    PromptSpan,
     SelectionOrigin,
     SemanticFacts,
     SpanType,
-    TagProvenance,
 )
-from lib.rule_contract import FROZEN_DAG_METADATA
 from lib.sampler import DataSampler, ExactCatalogIndex
 import nodes
 
@@ -41,7 +34,7 @@ DOCS_DIR = REPO_DIR / "docs" / "data_migration"
 
 
 class TestM1WildcardsProvenanceLedger(unittest.TestCase):
-    """测试 M1 准入台账数据规范与复合主键约束。"""
+    """测试 M1 准入台账数据规范、复合主键约束及目标文件实体映射。"""
 
     def setUp(self):
         self.tsv_path = DOCS_DIR / "ai_wildcards_provenance_ledger.tsv"
@@ -93,13 +86,58 @@ class TestM1WildcardsProvenanceLedger(unittest.TestCase):
                 )
                 seen_primary_ids.add(cid)
 
-            # 校验许可依据非空
+            # 校验许可依据与评级
             self.assertTrue(row["license"].strip(), f"Empty license for {cid}")
             self.assertTrue(row["license_evidence"].strip(), f"Empty license_evidence for {cid}")
             self.assertEqual(row["rating"], "SFW", f"M1 sample {cid} must be SFW")
+            self.assertEqual(row["source_license_status"], "verified")
+            self.assertEqual(row["semantics_review_status"], "verified")
+            self.assertEqual(row["pipeline_test_status"], "verified")
+            self.assertEqual(row["overall_status"], "verified")
 
         self.assertEqual(found_ids, expected_ids, "Ledger canonical IDs mismatch expected M1 set")
         self.assertEqual(seen_primary_ids, expected_ids, "Not all canonical IDs have a primary record")
+
+    def test_ledger_target_mapping_and_json_consistency(self):
+        """校验台账中的 target_file, target_parent_id, target_leaf_id 真实存在于 JSON 且文本匹配。"""
+        with open(self.tsv_path, "r", encoding="utf-8") as f:
+            rows = list(csv.DictReader(f, delimiter="\t"))
+
+        for r in rows:
+            f_path = REPO_DIR / r["target_file"]
+            self.assertTrue(f_path.is_file(), f"Target file does not exist: {f_path}")
+            data = json.loads(f_path.read_text(encoding="utf-8"))
+
+            p_id = r["target_parent_id"]
+            l_id = r["target_leaf_id"]
+
+            found_parent = False
+            found_leaf = False
+            leaf_text = ""
+
+            def search(obj):
+                nonlocal found_parent, found_leaf, leaf_text
+                if isinstance(obj, dict):
+                    if obj.get("id") == p_id:
+                        found_parent = True
+                    if obj.get("id") == l_id:
+                        found_leaf = True
+                        leaf_text = obj.get("text", "")
+                    for v in obj.values():
+                        search(v)
+                elif isinstance(obj, list):
+                    for it in obj:
+                        search(it)
+
+            search(data)
+            self.assertTrue(found_parent, f"Parent ID {p_id} not found in {f_path}")
+            self.assertTrue(found_leaf, f"Leaf ID {l_id} not found in {f_path}")
+            expected_text = r["canonical_text"]
+            self.assertEqual(
+                leaf_text,
+                expected_text,
+                f"Canonical text mismatch for {l_id}: actual={leaf_text!r}, expected={expected_text!r}",
+            )
 
 
 class TestM1ExactCatalogCollision(unittest.TestCase):
@@ -138,14 +176,15 @@ class TestM1ExactCatalogCollision(unittest.TestCase):
 
 
 class TestM1SamplesPipelineAndRules(unittest.TestCase):
-    """测试 6 条样本的无冲突生成、单测及三态规则消解。"""
+    """测试 6 条样本的真实目录数据加载、全管线端到端生成及冲突消解。"""
 
     def setUp(self):
         self.generator = nodes.IYKYKPromptGenerator()
+        self.sampler = DataSampler(DATA_DIR)
         self.resolver = ConflictResolver(DATA_DIR)
 
     def test_sample_1_blunt_cut_bob_clean_generation(self):
-        """样本 1：齐发尾短波波头显式选择，正常输出且不触发冲突。"""
+        """样本 1：齐发尾短波波头显式选择，真实生成器端到端输出且不触发冲突。"""
         pos, neg, desc = self.generator.generate(
             发型发色="齐发尾短波波头 (Blunt-cut Short Bob)",
             裸露等级="L1 包裹暗示 (Fully Clothed / Suggestive)",
@@ -155,7 +194,7 @@ class TestM1SamplesPipelineAndRules(unittest.TestCase):
         self.assertIn("发型: 齐发尾短波波头", desc)
 
     def test_sample_2_long_hair_tucked_ears_clean_generation(self):
-        """样本 2：中分长发挂耳显式选择，正常输出。"""
+        """样本 2：中分长发挂耳显式选择，真实生成器端到端输出。"""
         pos, neg, desc = self.generator.generate(
             发型发色="中分长发挂耳 (Long Hair Tucked Behind Ears)",
             裸露等级="L1 包裹暗示 (Fully Clothed / Suggestive)",
@@ -173,9 +212,7 @@ class TestM1SamplesPipelineAndRules(unittest.TestCase):
         self.assertIn("direct flash photography", pos)
 
         # B. 黑白负向回归：选择胶片风格包含 monochrome，验证直闪光不被 drop
-        # 在 IYKYK 中胶片风格有黑白选项
-        sampler = DataSampler(DATA_DIR)
-        film_stocks = sampler.list_film_stocks()
+        film_stocks = self.sampler.list_film_stocks()
         mono_stock = next((f for f in film_stocks if "黑白" in f or "Monochrome" in f or "Tri-X" in f), None)
         self.assertIsNotNone(mono_stock, "Could not find a monochrome film stock in data/film_stocks.json")
 
@@ -184,76 +221,55 @@ class TestM1SamplesPipelineAndRules(unittest.TestCase):
             胶片风格=mono_stock,
             prompt_seed=42,
         )
-        # 直闪光无 color 属性，必须完整保留！
         self.assertIn("direct flash photography", pos_mono)
 
-    def test_sample_4_warm_golden_hour_clean_and_night_resolution(self):
-        """样本 4：黄昏夕阳光正向输出，且在夜间场景下被 environmental_lighting_coherence 消解。"""
-        # A. 正向输出（显式搭配户外日间场景 山林/露营，验证自洽输出）
-        pos, _, _ = self.generator.generate(
-            场景大类="山林/露营",
+    def test_sample_4_warm_golden_hour_default_config_and_multi_seed(self):
+        """样本 4 回归门禁：验证在默认配置与多种子下生成成功，不抛出室内外冲突异常。"""
+        # A. 用户复现用例：默认参数 + prompt_seed=42
+        pos, neg, desc = self.generator.generate(
             光影预设="暖金黄昏夕阳光 (Warm Golden Hour Lighting)",
             prompt_seed=42,
         )
-        self.assertIn("warm golden hour lighting during sunset outdoors", pos)
+        self.assertTrue(pos, "Prompt must not be empty")
+        self.assertIn("warm golden hour lighting during sunset", pos)
 
-        # B. 规则单测：使用合成夜间 Anchor Fixture，验证精准触发 environmental_lighting_coherence
-        origin_scene = SelectionOrigin(entry_point="generator", mode="explicit", selector="scene")
-        origin_light = SelectionOrigin(entry_point="generator", mode="explicit", selector="lighting")
-        anchor_atom = PromptAtom(
-            atom_id="fixture_anchor_night",
-            text="park at night",
-            source_slot="scene_theme",
-            span_type=SpanType.PLAIN,
-            origin=origin_scene,
-            facts=SemanticFacts(
-                semantic_role="scene_anchor",
-                time_of_day="night",
-                space_kind="outdoor",
-            ),
-        )
-        golden_hour_atom = PromptAtom(
-            atom_id="test_golden_hour",
-            text="warm golden hour lighting during sunset outdoors",
-            source_slot="lighting",
-            span_type=SpanType.PLAIN,
-            origin=origin_light,
-            facts=SemanticFacts(
-                semantic_role="selector",
-                time_of_day="dusk",
-                light_sources=("daylight",),
-                color_modes=("color",),
-                space_kind="outdoor",
-            ),
-        )
+        # B. 跨 50 个随机种子全管线运行无任何未消解冲突异常
+        for s in range(50):
+            p, _, _ = self.generator.generate(
+                光影预设="暖金黄昏夕阳光 (Warm Golden Hour Lighting)",
+                prompt_seed=s,
+            )
+            self.assertTrue(p, f"Empty prompt at seed {s}")
 
-        res_atoms, rules_applied, report = self.resolver.resolve_atoms_with_full_report(
-            [anchor_atom, golden_hour_atom],
-            rng=random.Random(42),
-        )
-        remaining_ids = [a.atom_id for a in res_atoms]
-        self.assertNotIn("test_golden_hour", remaining_ids, "Golden hour light should be dropped in night scene")
-        self.assertIn("environmental_lighting_coherence", rules_applied)
-        self.assertTrue(
-            any(
-                d.rule_id == "environmental_lighting_coherence" and d.target_atom_id == "test_golden_hour"
-                for d in report.decisions
-            ),
-            "Expected environmental_lighting_coherence drop record for golden hour light",
-        )
-
-        # C. 管线集成测试：使用真实夜间场景 scene_rooftop_at_night (对应子类 都市露出)
-        pos_night, _, _ = self.generator.generate(
+    def test_sample_4_warm_golden_hour_night_scene_drop(self):
+        """样本 4 规则消解：使用真实夜间场景 (都市露出 / scene_rooftop_at_night) 验证夕阳光被精准消解。"""
+        res_night = self.generator.generate_structured(
             场景大类="都市露出",
             剧情主题="无 (None)",
             光影预设="暖金黄昏夕阳光 (Warm Golden Hour Lighting)",
             prompt_seed=42,
         )
-        self.assertNotIn("warm golden hour lighting during sunset outdoors", pos_night)
+        self.assertNotIn("warm golden hour lighting during sunset", res_night.positive)
+        rules_applied = [d.rule_id for d in res_night.resolution_report.decisions]
+        self.assertIn("environmental_lighting_coherence", rules_applied)
 
-    def test_sample_5_clutch_bag_hand_occupation(self):
-        """样本 5：双手占用时，手拿包被 pose_hand_occupation 移除。"""
-        # A. 常规单手可用，正常输出
+    def test_sample_5_and_6_props_catalog_data_integrity(self):
+        """样本 5 与 6 真实目录加载核验：断言 DataSampler 从 props.json 加载的 facts 严格符合契约。"""
+        res_clutch = self.sampler.sample_prop_result("👛 精致手拿包 (Clutch Bag)", random.Random(42))
+        self.assertIsNotNone(res_clutch)
+        self.assertEqual(res_clutch.sampled_tags[0].text, "elegant clutch bag held in hand")
+        self.assertEqual(res_clutch.sampled_tags[0].facts.prop_usage, "handheld")
+        self.assertEqual(res_clutch.sampled_tags[0].facts.hands_required, 1)
+
+        res_baguette = self.sampler.sample_prop_result("👜 复古腋下包 (Baguette Bag)", random.Random(42))
+        self.assertIsNotNone(res_baguette)
+        self.assertEqual(res_baguette.sampled_tags[0].text, "baguette bag worn over shoulder under arm")
+        self.assertEqual(res_baguette.sampled_tags[0].facts.prop_usage, "worn")
+        self.assertEqual(res_baguette.sampled_tags[0].facts.hands_required, 0)
+
+    def test_sample_5_clutch_bag_clean_and_busy_pose_drop(self):
+        """样本 5 端到端测试：双手可用正常生成；真实双手忙姿势触发 pose_hand_occupation 移除手拿包。"""
+        # A. 真实单手可用站姿：手拿包正常输出
         pos_free, _, _ = self.generator.generate(
             道具物件="👛 精致手拿包 (Clutch Bag)",
             姿势动作="🧍 站姿系列",
@@ -261,145 +277,81 @@ class TestM1SamplesPipelineAndRules(unittest.TestCase):
         )
         self.assertIn("elegant clutch bag held in hand", pos_free)
 
-        # B. 规则单测：双手忙姿态（both_busy）触发 pose_hand_occupation
-        origin_pose = SelectionOrigin(entry_point="generator", mode="explicit", selector="pose")
-        origin_prop = SelectionOrigin(entry_point="generator", mode="explicit", selector="props")
-        busy_pose_atom = PromptAtom(
-            atom_id="test_busy_pose",
-            text="hands clasped behind head",
-            source_slot="poses",
-            span_type=SpanType.PLAIN,
-            origin=origin_pose,
-            facts=SemanticFacts(
-                semantic_role="selector",
-                hand_state="both_busy",
-            ),
+        # B. 真实双手忙姿态（姿势动作="💋 挑逗姿态", seed=21 采样 both hands wrapped around shaft, hands_required=2）
+        res_busy = self.generator.generate_structured(
+            姿势动作="💋 挑逗姿态",
+            道具物件="👛 精致手拿包 (Clutch Bag)",
+            prompt_seed=21,
         )
-        clutch_atom = PromptAtom(
-            atom_id="test_clutch_bag",
-            text="elegant clutch bag held in hand",
-            source_slot="props",
-            span_type=SpanType.PLAIN,
-            origin=origin_prop,
-            facts=SemanticFacts(
-                semantic_role="selector",
-                prop_usage="handheld",
-                hands_required=1,
-            ),
-        )
+        self.assertNotIn("elegant clutch bag held in hand", res_busy.positive)
+        hand_drops = [
+            d for d in res_busy.resolution_report.decisions
+            if d.rule_id == "pose_hand_occupation" and d.action == "drop"
+        ]
+        self.assertEqual(len(hand_drops), 1, "Expected pose_hand_occupation drop record for clutch bag")
+        self.assertEqual(hand_drops[0].before_text, "elegant clutch bag held in hand")
 
-        res_atoms, rules_applied, report = self.resolver.resolve_atoms_with_full_report(
-            [busy_pose_atom, clutch_atom],
-            rng=random.Random(42),
+    def test_sample_6_baguette_bag_busy_pose_retention(self):
+        """样本 6 对照组端到端测试：在完全相同的双手忙姿态下，腋下包 (worn, hands_required=0) 100% 保留。"""
+        res_baguette = self.generator.generate_structured(
+            姿势动作="💋 挑逗姿态",
+            道具物件="👜 复古腋下包 (Baguette Bag)",
+            prompt_seed=21,
         )
-        remaining_ids = [a.atom_id for a in res_atoms]
-        self.assertNotIn("test_clutch_bag", remaining_ids)
-        self.assertIn("pose_hand_occupation", rules_applied)
-        self.assertTrue(
-            any(
-                d.rule_id == "pose_hand_occupation" and d.target_atom_id == "test_clutch_bag"
-                for d in report.decisions
-            ),
-            "Expected pose_hand_occupation record for clutch bag",
-        )
+        self.assertIn("baguette bag worn over shoulder under arm", res_baguette.positive)
+        # 断言未被 pose_hand_occupation 规则作为目标删除
+        pose_drops = [
+            d for d in res_baguette.resolution_report.decisions
+            if d.rule_id == "pose_hand_occupation" and d.before_text == "baguette bag worn over shoulder under arm"
+        ]
+        self.assertEqual(len(pose_drops), 0, "Baguette bag must NOT be dropped by pose_hand_occupation")
 
     def test_sample_5_supplement_multiple_holders_rule(self):
-        """样本 5 补充：双手可用时，2 个手持物触发 handheld_props_single_holder 胜者保留。"""
-        origin_pose = SelectionOrigin(entry_point="generator", mode="explicit", selector="pose")
-        origin_prop = SelectionOrigin(entry_point="generator", mode="explicit", selector="props")
-        free_pose_atom = PromptAtom(
-            atom_id="test_free_pose",
-            text="standing naturally",
-            source_slot="poses",
-            span_type=SpanType.PLAIN,
-            origin=origin_pose,
-            facts=SemanticFacts(
-                semantic_role="selector",
-                hand_state="free",
-            ),
-        )
-        clutch_atom_1 = PromptAtom(
-            atom_id="test_clutch_bag_1",
-            text="elegant clutch bag held in hand",
+        """样本 5 补充：使用 data/props.json 真实条目测试 2 个手持物触发 handheld_props_single_holder。"""
+        props_doc = json.loads((DATA_DIR / "props.json").read_text(encoding="utf-8"))
+        clutch_cat = next(c for c in props_doc["categories"] if c["id"] == "fashion_clutch_bag")
+        clutch_tag = clutch_cat["tags"][0]
+
+        wine_cat = next(c for c in props_doc["categories"] if c["id"] == "wine_glass_bottle")
+        wine_tag = next(t for t in wine_cat["tags"] if t["id"] == "wine_glass_bottle__tag_001")
+
+        origin = SelectionOrigin(entry_point="custom_combiner", mode="explicit", selector="props")
+
+        atom_clutch = PromptAtom(
+            atom_id="atom_clutch_1",
+            text=clutch_tag["text"],
             source_slot="props",
-            span_type=SpanType.PLAIN,
             tag_order=1,
             span_order=0,
-            origin=origin_prop,
-            facts=SemanticFacts(
-                semantic_role="selector",
-                prop_usage="handheld",
-                hands_required=1,
-            ),
-        )
-        fan_atom_2 = PromptAtom(
-            atom_id="test_folding_fan_2",
-            text="silk folding fan held in hand",
-            source_slot="props",
             span_type=SpanType.PLAIN,
+            origin=origin,
+            facts=SemanticFacts.from_dict(clutch_tag["facts"]),
+        )
+
+        atom_wine = PromptAtom(
+            atom_id="atom_wine_2",
+            text=wine_tag["text"],
+            source_slot="props",
             tag_order=2,
             span_order=0,
-            origin=origin_prop,
-            facts=SemanticFacts(
-                semantic_role="selector",
-                prop_usage="handheld",
-                hands_required=1,
-            ),
+            span_type=SpanType.PLAIN,
+            origin=origin,
+            facts=SemanticFacts.from_dict(wine_tag["facts"]),
         )
 
-        res_atoms, rules_applied, report = self.resolver.resolve_atoms_with_full_report(
-            [free_pose_atom, clutch_atom_1, fan_atom_2],
-            rng=random.Random(42),
-        )
-        remaining_ids = [a.atom_id for a in res_atoms]
-        self.assertIn("test_clutch_bag_1", remaining_ids, "Winner handheld prop should remain")
-        self.assertNotIn("test_folding_fan_2", remaining_ids, "Loser handheld prop should be dropped")
-        self.assertIn("handheld_props_single_holder", rules_applied)
+        resolved, rules, rep = self.resolver.resolve_atoms_with_full_report([atom_clutch, atom_wine])
+        resolved_texts = [a.text for a in resolved]
+
+        self.assertIn("elegant clutch bag held in hand", resolved_texts)
+        self.assertNotIn("stemware with red wine", resolved_texts)
+        self.assertIn("handheld_props_single_holder", rules)
         self.assertTrue(
             any(
-                d.rule_id == "handheld_props_single_holder" and d.target_atom_id == "test_folding_fan_2"
-                for d in report.decisions
-            ),
-            "Expected handheld_props_single_holder record for second handheld prop",
-        )
-
-    def test_sample_6_baguette_bag_worn_not_dropped_in_busy_pose(self):
-        """样本 6 对照组：双手忙姿势下，腋下包因 prop_usage=worn 且 hands_required=0 保持保留。"""
-        origin_pose = SelectionOrigin(entry_point="generator", mode="explicit", selector="pose")
-        origin_prop = SelectionOrigin(entry_point="generator", mode="explicit", selector="props")
-        busy_pose_atom = PromptAtom(
-            atom_id="test_busy_pose",
-            text="hands clasped behind head",
-            source_slot="poses",
-            span_type=SpanType.PLAIN,
-            origin=origin_pose,
-            facts=SemanticFacts(
-                semantic_role="selector",
-                hand_state="both_busy",
-            ),
-        )
-        baguette_atom = PromptAtom(
-            atom_id="test_baguette_bag",
-            text="baguette bag worn over shoulder under arm",
-            source_slot="props",
-            span_type=SpanType.PLAIN,
-            origin=origin_prop,
-            facts=SemanticFacts(
-                semantic_role="selector",
-                prop_usage="worn",
-                hands_required=0,
-            ),
-        )
-
-        res_atoms, _, _ = self.resolver.resolve_atoms_with_full_report(
-            [busy_pose_atom, baguette_atom],
-            rng=random.Random(42),
-        )
-        remaining_ids = [a.atom_id for a in res_atoms]
-        self.assertIn(
-            "test_baguette_bag",
-            remaining_ids,
-            "Baguette bag (worn, hands_required=0) must NOT be dropped by pose_hand_occupation",
+                d.rule_id == "handheld_props_single_holder"
+                and d.target_atom_id == "atom_wine_2"
+                and d.reason_code == "single_handheld_prop_limit"
+                for d in rep.decisions
+            )
         )
 
 

@@ -2809,17 +2809,14 @@
       "tags": [
         {
           "id": "ext_aw_light_warm_golden_hour__tag_000",
-          "text": "warm golden hour lighting during sunset outdoors",
+          "text": "warm golden hour lighting during sunset",
           "facts": {
             "semantic_role": "selector",
             "time_of_day": "dusk",
             "light_sources": [
               "daylight"
             ],
-            "color_modes": [
-              "color"
-            ],
-            "space_kind": "outdoor"
+            "color_modes": []
           }
         }
       ],
