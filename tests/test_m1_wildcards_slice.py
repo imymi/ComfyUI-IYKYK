@@ -98,8 +98,13 @@ class TestM1WildcardsProvenanceLedger(unittest.TestCase):
         self.assertEqual(found_ids, expected_ids, "Ledger canonical IDs mismatch expected M1 set")
         self.assertEqual(seen_primary_ids, expected_ids, "Not all canonical IDs have a primary record")
 
-    def test_ledger_target_mapping_and_json_consistency(self):
-        """校验台账中的 target_file, target_parent_id, target_leaf_id 真实存在于 JSON 且文本匹配。"""
+    def test_ledger_target_mapping_and_parent_child_hierarchy(self):
+        """
+        校验台账中的父子关系、唯一性与文本严格一致：
+        1. target_file, target_parent_id, target_leaf_id 存在且在对应文件中全局唯一；
+        2. target_leaf_id 必须真实属于 target_parent_id 的 tags 列表中 (严格父子关系)；
+        3. 叶子 text 与台账 canonical_text 严格一致。
+        """
         with open(self.tsv_path, "r", encoding="utf-8") as f:
             rows = list(csv.DictReader(f, delimiter="\t"))
 
@@ -111,33 +116,95 @@ class TestM1WildcardsProvenanceLedger(unittest.TestCase):
             p_id = r["target_parent_id"]
             l_id = r["target_leaf_id"]
 
-            found_parent = False
-            found_leaf = False
-            leaf_text = ""
+            matching_parents = []
+            matching_leaves = []
 
-            def search(obj):
-                nonlocal found_parent, found_leaf, leaf_text
+            def walk_parents(obj):
                 if isinstance(obj, dict):
                     if obj.get("id") == p_id:
-                        found_parent = True
-                    if obj.get("id") == l_id:
-                        found_leaf = True
-                        leaf_text = obj.get("text", "")
+                        matching_parents.append(obj)
                     for v in obj.values():
-                        search(v)
+                        walk_parents(v)
                 elif isinstance(obj, list):
                     for it in obj:
-                        search(it)
+                        walk_parents(it)
 
-            search(data)
-            self.assertTrue(found_parent, f"Parent ID {p_id} not found in {f_path}")
-            self.assertTrue(found_leaf, f"Leaf ID {l_id} not found in {f_path}")
+            def walk_leaves(obj):
+                if isinstance(obj, dict):
+                    if obj.get("id") == l_id:
+                        matching_leaves.append(obj)
+                    for v in obj.values():
+                        walk_leaves(v)
+                elif isinstance(obj, list):
+                    for it in obj:
+                        walk_leaves(it)
+
+            walk_parents(data)
+            walk_leaves(data)
+
+            # 1. 全局唯一性
+            self.assertEqual(len(matching_parents), 1, f"Parent ID {p_id} must appear exactly once in {f_path}, found {len(matching_parents)}")
+            self.assertEqual(len(matching_leaves), 1, f"Leaf ID {l_id} must appear exactly once in {f_path}, found {len(matching_leaves)}")
+
+            parent_obj = matching_parents[0]
+            leaf_obj = matching_leaves[0]
+
+            # 2. 确认叶子属于指定父项
+            parent_tags = parent_obj.get("tags", [])
+            tag_ids_in_parent = [t.get("id") for t in parent_tags if isinstance(t, dict)]
+            self.assertIn(
+                l_id,
+                tag_ids_in_parent,
+                f"Leaf ID {l_id} does not belong to parent {p_id} tags list in {f_path} (parent tags: {tag_ids_in_parent})",
+            )
+
+            # 3. 规范文本严格一致
             expected_text = r["canonical_text"]
             self.assertEqual(
-                leaf_text,
+                leaf_obj.get("text", ""),
                 expected_text,
-                f"Canonical text mismatch for {l_id}: actual={leaf_text!r}, expected={expected_text!r}",
+                f"Canonical text mismatch for {l_id}: actual={leaf_obj.get('text')!r}, expected={expected_text!r}",
             )
+
+    def test_ledger_bidirectional_exact_leaf_coverage(self):
+        """
+        反向闭环核验：全量扫描 20 份运行时 JSON，所有以 'ext_aw_' 开头的叶子 ID
+        必须与台账中登记的 target_leaf_id 集合 100% 严格恒等 (双向闭包，无未登记新增项，无虚报条目)。
+        """
+        with open(self.tsv_path, "r", encoding="utf-8") as f:
+            rows = list(csv.DictReader(f, delimiter="\t"))
+        ledger_leaf_ids = {r["target_leaf_id"] for r in rows}
+
+        actual_catalog_ext_aw_leaves = set()
+        for json_path in DATA_DIR.glob("*.json"):
+            try:
+                data = json.loads(json_path.read_text(encoding="utf-8"))
+            except Exception:
+                continue
+
+            def scan_ext_leaves(obj):
+                if isinstance(obj, dict):
+                    oid = obj.get("id", "")
+                    if (
+                        isinstance(oid, str)
+                        and oid.startswith("ext_aw_")
+                        and "text" in obj
+                        and ("facts" in obj or "semantic_role" in obj.get("facts", {}))
+                    ):
+                        actual_catalog_ext_aw_leaves.add(oid)
+                    for v in obj.values():
+                        scan_ext_leaves(v)
+                elif isinstance(obj, list):
+                    for it in obj:
+                        scan_ext_leaves(it)
+
+            scan_ext_leaves(data)
+
+        self.assertEqual(
+            actual_catalog_ext_aw_leaves,
+            ledger_leaf_ids,
+            f"Bidirectional M1 leaf ID coverage mismatch! In catalog: {actual_catalog_ext_aw_leaves}, in ledger: {ledger_leaf_ids}",
+        )
 
 
 class TestM1ExactCatalogCollision(unittest.TestCase):
@@ -306,8 +373,8 @@ class TestM1SamplesPipelineAndRules(unittest.TestCase):
         ]
         self.assertEqual(len(pose_drops), 0, "Baguette bag must NOT be dropped by pose_hand_occupation")
 
-    def test_sample_5_supplement_multiple_holders_rule(self):
-        """样本 5 补充：使用 data/props.json 真实条目测试 2 个手持物触发 handheld_props_single_holder。"""
+    def test_sample_5_real_facts_rule_resolution_for_multiple_holders(self):
+        """样本 5 规则消解：使用 data/props.json 真实条目文本与 facts 构造 atom，验证规则 handheld_props_single_holder 消解。"""
         props_doc = json.loads((DATA_DIR / "props.json").read_text(encoding="utf-8"))
         clutch_cat = next(c for c in props_doc["categories"] if c["id"] == "fashion_clutch_bag")
         clutch_tag = clutch_cat["tags"][0]
