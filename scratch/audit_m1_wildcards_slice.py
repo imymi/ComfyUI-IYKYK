@@ -17,12 +17,13 @@ from __future__ import annotations
 import argparse
 import collections
 import gzip
+import hashlib
 import json
 from pathlib import Path
 import subprocess
 import sys
 import time
-from typing import Any, Dict, List, Set, Tuple
+from typing import Any, Dict, List, Optional, Set, Tuple
 
 REPO_DIR = Path(__file__).resolve().parent.parent
 DATA_DIR = REPO_DIR / "data"
@@ -221,12 +222,117 @@ def load_authoritative_catalog_lookup(data_dir: Path) -> Dict[Tuple[str, str], S
     return lookup
 
 
+DEFAULT_GATE_INPUTS = {
+    "预设模板": "无 (None)",
+    "风格配方": "无 (None)",
+    "场景大类": "随机 (Random)",
+    "剧情主题": "随机 (Random)",
+    "景别构图": "自动 (Auto)",
+    "拍摄视角": "自动 (Auto)",
+    "裸露等级": "随机 (Random)",
+    "服装款式": "随机 (Random)",
+    "服装状态": "自动联动裸露等级 (Auto Link Nudity)",
+    "发型发色": "随机 (Random)",
+    "饰品头饰": "随机 (Random)",
+    "妆容细节": "随机 (Random)",
+    "姿势动作": "随机 (Random)",
+    "情绪表情": "随机 (Random)",
+    "光影预设": "自动 (Auto)",
+    "胶片风格": "随机 (Random)",
+    "液体效果": "随机 (Random)",
+    "纹身标记": "随机 (Random)",
+    "道具物件": "随机 (Random)",
+    "角色设定": "随机 (Random)",
+    "真实微瑕": "随机 (Random)",
+    "画质等级": "高清写真 (High)",
+}
+
+
+class DeterministicReplayOracle:
+    """
+    确定性候选重放预言机：
+    用于对指定种子和槽位执行受控重放，验证当前版本的源原子抽样结果与 PRNG 数学选择完全一致。
+    支持从预计算批次初始化，或在需要时直接调用 generator 动态重放。
+    """
+
+    def __init__(self, precomputed_data: Optional[Dict[int, Dict[str, Any]]] = None):
+        self._precomputed = precomputed_data or {}
+        self._generator = None
+        self._cache: Dict[int, Dict[str, List[Tuple[str, str, str, int]]]] = {}
+
+        if self._precomputed:
+            for s, item in self._precomputed.items():
+                by_slot = collections.defaultdict(list)
+                for a in item.get("source_atoms", []):
+                    slot = normalize_slot_name(a["source_slot"])
+                    by_slot[slot].append(slot_atom_signature(a))
+                self._cache[s] = dict(by_slot)
+
+    @property
+    def generator(self):
+        if self._generator is None:
+            import nodes
+            self._generator = nodes.IYKYKPromptGenerator()
+        return self._generator
+
+    def get_source_atoms(self, seed: int, slot: Optional[str] = None) -> List[Tuple[str, str, str, int]]:
+        if seed not in self._cache:
+            res = self.generator.generate_structured(**DEFAULT_GATE_INPUTS, prompt_seed=seed)
+            by_slot = collections.defaultdict(list)
+            for a in res.source_atoms:
+                s_name = normalize_slot_name(a.source_slot)
+                by_slot[s_name].append(slot_atom_signature(a))
+            self._cache[seed] = dict(by_slot)
+
+        slot_map = self._cache[seed]
+        if slot is not None:
+            return slot_map.get(normalize_slot_name(slot), [])
+        return slot_map
+
+
+def get_source_tree_metadata(repo_dir: Path) -> Dict[str, Any]:
+    """提取当前源码树摘要、Git 提交与 Dirty 状态以准确绑定审计证据。"""
+    try:
+        git_head = subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=str(repo_dir), text=True).strip()
+    except Exception:
+        git_head = "unknown"
+    try:
+        git_tree = subprocess.check_output(["git", "rev-parse", "HEAD^{tree}"], cwd=str(repo_dir), text=True).strip()
+    except Exception:
+        git_tree = "unknown"
+    try:
+        status_out = subprocess.check_output(["git", "status", "--porcelain", "-uno"], cwd=str(repo_dir), text=True).strip()
+        is_dirty = bool(status_out)
+    except Exception:
+        status_out = ""
+        is_dirty = False
+
+    script_path = repo_dir / "scratch" / "audit_m1_wildcards_slice.py"
+    script_hash = hashlib.sha256(script_path.read_bytes()).hexdigest() if script_path.exists() else ""
+    data_files = ["accessories.json", "lighting.json", "props.json"]
+    data_hashes = {}
+    for df in data_files:
+        p = repo_dir / "data" / df
+        if p.exists():
+            data_hashes[df] = hashlib.sha256(p.read_bytes()).hexdigest()
+
+    return {
+        "git_commit": git_head,
+        "git_tree": git_tree,
+        "is_dirty": is_dirty,
+        "uncommitted_changes": status_out.splitlines() if is_dirty else [],
+        "audit_script_hash": script_hash,
+        "data_hashes": data_hashes,
+    }
+
+
 def attribute_m1_seed_diff(
     seed: int,
     base_item: Dict[str, Any],
     cur_item: Dict[str, Any],
-    catalog_lookup: Dict[Tuple[str, Set[str]], Set[str]],
+    catalog_lookup: Dict[Tuple[str, str], Set[str]],
     valid_rules: Set[str] | None = None,
+    replay_oracle: Optional[Any] = None,
 ) -> Dict[str, Any]:
     """对单个种子执行严格结构化逐原子跨版本差异因果归因。"""
     if valid_rules is None:
@@ -260,7 +366,7 @@ def attribute_m1_seed_diff(
             )
 
     # ─────────────────────────────────────────────────────────────
-    # 2. 核心因果定理：非扩充槽位源原子绝对恒等定理 (Zero Drift in Unchanged Slots)
+    # 2. 核心因果定理：非扩充槽位源原子绝对恒等定理 + 扩充槽位确定性重放验证
     # ─────────────────────────────────────────────────────────────
     b_src_by_slot: Dict[str, List[Dict[str, Any]]] = collections.defaultdict(list)
     for a in base_src:
@@ -272,14 +378,31 @@ def attribute_m1_seed_diff(
 
     all_src_slots = set(b_src_by_slot.keys()) | set(c_src_by_slot.keys())
     for slot in all_src_slots:
+        b_sigs = [slot_atom_signature(a) for a in b_src_by_slot[slot]]
+        c_sigs = [slot_atom_signature(a) for a in c_src_by_slot[slot]]
+
         if slot not in M1_EXPANDED_SLOTS:
-            b_sigs = [slot_atom_signature(a) for a in b_src_by_slot[slot]]
-            c_sigs = [slot_atom_signature(a) for a in c_src_by_slot[slot]]
             if b_sigs != c_sigs:
                 unexplained_reasons.append(
                     f"UNEXPLAINED_SOURCE_ATOM_MUTATION({slot}): Source atoms drifted in unchanged slot! "
                     f"base={b_sigs} vs cur={c_sigs}"
                 )
+        else:
+            # 扩充槽位因果校验：
+            # A. 任何在基线中存在的扩充槽位，禁止在当前源头中无 replacement 静默消失
+            if b_sigs and not c_sigs:
+                unexplained_reasons.append(
+                    f"UNEXPLAINED_SOURCE_ATOM_MUTATION({slot}): Source atoms in expanded slot '{slot}' "
+                    f"vanished without replacement in current version! base={b_sigs} vs cur=[]"
+                )
+            # B. 若配置了确定性重放预言机，断言当前源原子签名必须与确定性 PRNG 选择重放完全一致
+            if replay_oracle is not None:
+                expected_sigs = replay_oracle.get_source_atoms(seed, slot)
+                if c_sigs != expected_sigs:
+                    unexplained_reasons.append(
+                        f"UNEXPLAINED_SOURCE_ATOM_MUTATION({slot}): Source atoms in expanded slot '{slot}' "
+                        f"deviated from deterministic PRNG selection replay! cur={c_sigs} vs expected={expected_sigs}"
+                    )
 
     # ─────────────────────────────────────────────────────────────
     # 3. 权威词库核验：当前版本采出的每一个源原子必须严格属于权威词库
@@ -442,8 +565,22 @@ def attribute_m1_seed_diff(
             explained_attributions.append({"atom_id": aid, "text": b["text"], "category": f"RESOLVED_BY_RULE({dec.get('rule_id')})"})
         # 情况 2: 属于扩充槽位，在当前版本源头因抽样池扩大而被合法替换
         elif slot in M1_EXPANDED_SLOTS and b_key not in cur_src_keys:
-            is_proven = True
-            explained_attributions.append({"atom_id": aid, "text": b["text"], "category": f"PRNG_CANDIDATE_REPLACED({slot})"})
+            c_slot_atoms = c_src_by_slot.get(slot, [])
+            if not c_slot_atoms:
+                # 当前源头根本没有为该槽位采出任何候选，属于非法静默删除，绝不能认定为 PRNG 替换！
+                is_proven = False
+            else:
+                c_sigs = [slot_atom_signature(a) for a in c_slot_atoms]
+                b_sigs = [slot_atom_signature(a) for a in b_src_by_slot.get(slot, [])]
+                if c_sigs == b_sigs:
+                    # 源原子完全相同，终态却消失且无消解决策
+                    is_proven = False
+                elif replay_oracle is not None and c_sigs != replay_oracle.get_source_atoms(seed, slot):
+                    # 当前采出与确定性重放预言机不符
+                    is_proven = False
+                else:
+                    is_proven = True
+                    explained_attributions.append({"atom_id": aid, "text": b["text"], "category": f"PRNG_CANDIDATE_REPLACED({slot})"})
 
         if not is_proven:
             unexplained_reasons.append(
@@ -480,8 +617,9 @@ def run_m1_audit(
     baseline_dir = scratch_dir / f"baseline_{BASELINE_COMMIT}"
     export_commit(BASELINE_COMMIT, baseline_dir)
 
-    # 获取当前工作区 Git HEAD 提交哈希
-    git_head = subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=str(REPO_DIR), text=True).strip()
+    # 获取源码树元数据与 HEAD 提交
+    meta = get_source_tree_metadata(REPO_DIR)
+    git_head = meta["git_commit"]
 
     print(f"[*] Loaded authoritative resolver rules from {REPO_DIR / 'data'}...")
     valid_rules = load_authoritative_resolver_rules(REPO_DIR / "data")
@@ -500,7 +638,8 @@ def run_m1_audit(
     if total_seeds == 10000 and cur_hash != EXPECTED_M1_HASH:
         raise RuntimeError(f"Current hash mismatch: expected {EXPECTED_M1_HASH}, got {cur_hash}")
 
-    print("[*] Auditing seed divergences with atomic causal verification...")
+    print("[*] Auditing seed divergences with atomic causal verification & deterministic selection replay...")
+    replay_oracle = DeterministicReplayOracle(cur_data)
     identical_count = 0
     divergent_count = 0
     unexplained_seeds: Dict[int, List[str]] = {}
@@ -508,7 +647,7 @@ def run_m1_audit(
     audited_diffs: List[Dict[str, Any]] = []
 
     for s in range(total_seeds):
-        res = attribute_m1_seed_diff(s, base_data[s], cur_data[s], catalog_lookup, valid_rules)
+        res = attribute_m1_seed_diff(s, base_data[s], cur_data[s], catalog_lookup, valid_rules, replay_oracle=replay_oracle)
 
         # 核心：无遗漏收集所有未解释种子（无论文本是否相同）
         if not res["is_explained"]:
@@ -517,13 +656,11 @@ def run_m1_audit(
             audited_diffs.append({
                 "seed": s,
                 "is_identical": res["is_identical"],
+                "is_explained": False,
                 "unexplained_reasons": res["unexplained_reasons"],
                 "attributions": res["attributions"],
-                "base_source_atoms": base_data[s]["source_atoms"],
-                "cur_source_atoms": cur_data[s]["source_atoms"],
-                "base_final_atoms": base_data[s]["final_atoms"],
-                "cur_final_atoms": cur_data[s]["final_atoms"],
-                "decisions": cur_data[s]["decisions"],
+                "base_item": base_data[s],
+                "cur_item": cur_data[s],
             })
         elif res["is_identical"]:
             identical_count += 1
@@ -535,12 +672,10 @@ def run_m1_audit(
             audited_diffs.append({
                 "seed": s,
                 "is_identical": False,
+                "is_explained": True,
                 "attributions": res["attributions"],
-                "base_source_atoms": base_data[s]["source_atoms"],
-                "cur_source_atoms": cur_data[s]["source_atoms"],
-                "base_final_atoms": base_data[s]["final_atoms"],
-                "cur_final_atoms": cur_data[s]["final_atoms"],
-                "decisions": cur_data[s]["decisions"],
+                "base_item": base_data[s],
+                "cur_item": cur_data[s],
             })
 
     elapsed = time.time() - start_time
@@ -553,7 +688,7 @@ def run_m1_audit(
     for cat, cnt in category_counts.most_common():
         print(f"      - {cat}: {cnt} ({cnt / divergent_count * 100:.2f}%)")
 
-    # 1. 保存完整归档 (包含全部差异种子的双版本完整原子、决策及逐原子证明链)
+    # 1. 保存完整归档 (包含全部差异种子的双版本完整输入原子、决策、绑定及逐原子证明链)
     archive_path = output_archive or (scratch_dir / "audit_m1_evidence.json.gz")
     archive_path.parent.mkdir(parents=True, exist_ok=True)
     with gzip.open(archive_path, "wt", encoding="utf-8") as f:
@@ -563,17 +698,21 @@ def run_m1_audit(
                 "baseline_hash": base_hash,
                 "current_target": git_head,
                 "current_hash": cur_hash,
+                "tree_hash": meta["git_tree"],
+                "is_dirty": meta["is_dirty"],
                 "total_seeds": total_seeds,
                 "identical_seeds": identical_count,
                 "divergent_seeds": divergent_count,
                 "unexplained_count": len(unexplained_seeds),
                 "elapsed_seconds": elapsed,
+                "source_tree": meta,
             },
             "category_breakdown": dict(category_counts),
             "unexplained_seeds": unexplained_seeds,
             "diffs": audited_diffs,
         }, f, ensure_ascii=False)
-    print(f"[+] Full audit archive saved to: {archive_path}")
+    archive_sha256 = hashlib.sha256(archive_path.read_bytes()).hexdigest()
+    print(f"[+] Full audit archive saved to: {archive_path} (SHA-256: {archive_sha256})")
 
     # 2. 保存 Markdown 报告
     report_path = output_report_md or (scratch_dir / "audit_m1_report.md")
@@ -583,11 +722,12 @@ def run_m1_audit(
         "",
         f"- **Baseline Commit**: `{BASELINE_COMMIT}` (`{base_hash}`)",
         f"- **Current Target**: `{git_head}` (`{cur_hash}`)",
+        f"- **Tree Hash**: `{meta['git_tree']}` (Dirty: {meta['is_dirty']})",
         f"- **Total Seeds**: {total_seeds:,}",
         f"- **Identical Seeds**: {identical_count:,} ({identical_count / total_seeds * 100:.2f}%)",
         f"- **Divergent Seeds**: {divergent_count:,} ({divergent_count / total_seeds * 100:.2f}%)",
         f"- **Unexplained Seeds**: **{len(unexplained_seeds)}** (Gate: == 0)",
-        f"- **Evidence Archive**: `{archive_path.name}` ({len(audited_diffs):,} divergent records with full atoms and decisions)",
+        f"- **Evidence Archive**: `{archive_path.name}` ({len(audited_diffs):,} divergent records with full items and decisions)",
         "",
         "## Category Breakdown",
         "",
@@ -606,6 +746,14 @@ def run_m1_audit(
         "manifest_version": "1.0",
         "tested_component": "M1 Wildcard Vertical Slice (6 samples)",
         "tested_commit_target": git_head,
+        "tree_hash": meta["git_tree"],
+        "is_dirty": meta["is_dirty"],
+        "source_tree": meta,
+        "original_archive": {
+            "filename": archive_path.name,
+            "sha256": archive_sha256,
+            "records_count": len(audited_diffs),
+        },
         "audit_results": {
             "baseline_commit": BASELINE_COMMIT,
             "baseline_hash": base_hash,

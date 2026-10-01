@@ -13,6 +13,7 @@ tests/test_m1_wildcards_slice.py — M1 垂直切片 6 条样本全链路自动�
 from __future__ import annotations
 
 import csv
+import gzip
 import json
 import random
 import unittest
@@ -439,7 +440,7 @@ class TestM1AuditNegativeVerification(unittest.TestCase):
         cls.valid_rules = load_authoritative_resolver_rules(DATA_DIR)
 
     def _create_clean_fixture(self):
-        """构造一个合法、结构闭环的 baseline 与 current 种子基线"""
+        """构造一个合法、结构闭环的 baseline 与 current 种子基线，包含 pose、hairstyle、props、lighting 全部四大关键槽位"""
         atom_pose = {
             "atom_id": "atom_pose_01",
             "text": "sitting on floor",
@@ -456,13 +457,30 @@ class TestM1AuditNegativeVerification(unittest.TestCase):
             "tag_order": 2,
             "span_order": 0,
         }
+        atom_prop = {
+            "atom_id": "atom_prop_01",
+            "text": "leather briefcase",
+            "source_slot": "props",
+            "source_item_id": "briefcase",
+            "tag_order": 3,
+            "span_order": 0,
+        }
+        atom_light = {
+            "atom_id": "atom_light_01",
+            "text": "studio softbox lighting",
+            "source_slot": "lighting",
+            "source_item_id": "studio_softbox",
+            "tag_order": 4,
+            "span_order": 0,
+        }
         import copy
+        atoms = [copy.deepcopy(atom_pose), copy.deepcopy(atom_hair), copy.deepcopy(atom_prop), copy.deepcopy(atom_light)]
         item = {
             "seed": 42,
-            "positive": "sitting on floor, high ponytail",
+            "positive": "sitting on floor, high ponytail, leather briefcase, studio softbox lighting",
             "hash": "hash42",
-            "source_atoms": [copy.deepcopy(atom_pose), copy.deepcopy(atom_hair)],
-            "final_atoms": [copy.deepcopy(atom_pose), copy.deepcopy(atom_hair)],
+            "source_atoms": copy.deepcopy(atoms),
+            "final_atoms": copy.deepcopy(atoms),
             "decisions": [],
             "carrier_bindings": {},
             "dedup_records": [],
@@ -478,10 +496,9 @@ class TestM1AuditNegativeVerification(unittest.TestCase):
         from scratch.audit_m1_wildcards_slice import attribute_m1_seed_diff
 
         base, cur = self._create_clean_fixture()
-        # 人为删除姿态原子
         cur["source_atoms"] = [a for a in cur["source_atoms"] if a["source_slot"] != "pose"]
         cur["final_atoms"] = [a for a in cur["final_atoms"] if a["source_slot"] != "pose"]
-        cur["positive"] = "high ponytail"
+        cur["positive"] = "high ponytail, leather briefcase, studio softbox lighting"
         cur["hash"] = "hash_mutated"
 
         res = attribute_m1_seed_diff(42, base, cur, self.catalog_lookup, self.valid_rules)
@@ -489,6 +506,108 @@ class TestM1AuditNegativeVerification(unittest.TestCase):
         self.assertTrue(
             any("UNEXPLAINED_SOURCE_ATOM_MUTATION(pose)" in r for r in res["unexplained_reasons"]),
             f"Expected UNEXPLAINED_SOURCE_ATOM_MUTATION(pose), got: {res['unexplained_reasons']}",
+        )
+
+    def test_negative_counterfactual_hairstyle_dropped_without_evidence(self):
+        """
+        反例 1b (审查阻断项)：基线存在发型原子，当前版本将其从 source_atoms 和 final_atoms 均删除，
+        无消解决策、无 replacement 证据。断言审计器严苛拦截，禁止误判为 PRNG_CANDIDATE_REPLACED！
+        """
+        from scratch.audit_m1_wildcards_slice import attribute_m1_seed_diff
+
+        base, cur = self._create_clean_fixture()
+        cur["source_atoms"] = [a for a in cur["source_atoms"] if a["source_slot"] != "hairstyle"]
+        cur["final_atoms"] = [a for a in cur["final_atoms"] if a["source_slot"] != "hairstyle"]
+        cur["positive"] = "sitting on floor, leather briefcase, studio softbox lighting"
+        cur["hash"] = "hash_mutated_hair"
+
+        res = attribute_m1_seed_diff(42, base, cur, self.catalog_lookup, self.valid_rules)
+        self.assertFalse(res["is_explained"], "Audit must NOT explain silently deleted hairstyle atoms!")
+        self.assertTrue(
+            any("UNEXPLAINED_SOURCE_ATOM_MUTATION(hairstyle)" in r for r in res["unexplained_reasons"]),
+            f"Expected UNEXPLAINED_SOURCE_ATOM_MUTATION(hairstyle), got: {res['unexplained_reasons']}",
+        )
+        self.assertTrue(
+            any("UNEXPLAINED_REMOVED_ATOM" in r for r in res["unexplained_reasons"]),
+            f"Expected UNEXPLAINED_REMOVED_ATOM, got: {res['unexplained_reasons']}",
+        )
+
+    def test_negative_counterfactual_props_dropped_without_evidence(self):
+        """
+        反例 1c (审查阻断项)：基线存在道具原子，当前版本将其从 source_atoms 和 final_atoms 均删除，
+        无消解决策、无 replacement 证据。断言审计器严苛拦截，禁止误判为 PRNG_CANDIDATE_REPLACED！
+        """
+        from scratch.audit_m1_wildcards_slice import attribute_m1_seed_diff
+
+        base, cur = self._create_clean_fixture()
+        cur["source_atoms"] = [a for a in cur["source_atoms"] if a["source_slot"] != "props"]
+        cur["final_atoms"] = [a for a in cur["final_atoms"] if a["source_slot"] != "props"]
+        cur["positive"] = "sitting on floor, high ponytail, studio softbox lighting"
+        cur["hash"] = "hash_mutated_props"
+
+        res = attribute_m1_seed_diff(42, base, cur, self.catalog_lookup, self.valid_rules)
+        self.assertFalse(res["is_explained"], "Audit must NOT explain silently deleted props atoms!")
+        self.assertTrue(
+            any("UNEXPLAINED_SOURCE_ATOM_MUTATION(props)" in r for r in res["unexplained_reasons"]),
+            f"Expected UNEXPLAINED_SOURCE_ATOM_MUTATION(props), got: {res['unexplained_reasons']}",
+        )
+        self.assertTrue(
+            any("UNEXPLAINED_REMOVED_ATOM" in r for r in res["unexplained_reasons"]),
+            f"Expected UNEXPLAINED_REMOVED_ATOM, got: {res['unexplained_reasons']}",
+        )
+
+    def test_negative_counterfactual_lighting_dropped_without_evidence(self):
+        """
+        反例 1d (审查阻断项)：基线存在光影原子，当前版本将其从 source_atoms 和 final_atoms 均删除，
+        无消解决策、无 replacement 证据。断言审计器严苛拦截，禁止误判为 PRNG_CANDIDATE_REPLACED！
+        """
+        from scratch.audit_m1_wildcards_slice import attribute_m1_seed_diff
+
+        base, cur = self._create_clean_fixture()
+        cur["source_atoms"] = [a for a in cur["source_atoms"] if a["source_slot"] != "lighting"]
+        cur["final_atoms"] = [a for a in cur["final_atoms"] if a["source_slot"] != "lighting"]
+        cur["positive"] = "sitting on floor, high ponytail, leather briefcase"
+        cur["hash"] = "hash_mutated_lighting"
+
+        res = attribute_m1_seed_diff(42, base, cur, self.catalog_lookup, self.valid_rules)
+        self.assertFalse(res["is_explained"], "Audit must NOT explain silently deleted lighting atoms!")
+        self.assertTrue(
+            any("UNEXPLAINED_SOURCE_ATOM_MUTATION(lighting)" in r for r in res["unexplained_reasons"]),
+            f"Expected UNEXPLAINED_SOURCE_ATOM_MUTATION(lighting), got: {res['unexplained_reasons']}",
+        )
+        self.assertTrue(
+            any("UNEXPLAINED_REMOVED_ATOM" in r for r in res["unexplained_reasons"]),
+            f"Expected UNEXPLAINED_REMOVED_ATOM, got: {res['unexplained_reasons']}",
+        )
+
+    def test_negative_expanded_slot_arbitrary_candidate_mutation_without_replay(self):
+        """
+        反例 1e：在扩充槽位中虽然采出了有效词条，但并未经过确定性重放预言机确认（人为篡改候选）。
+        断言预言机模式下必须严格拦截并定性为重放偏差。
+        """
+        from scratch.audit_m1_wildcards_slice import attribute_m1_seed_diff
+
+        class MockOracle:
+            def get_source_atoms(self, seed: int, slot: str | None = None):
+                expected = [("hairstyle", "high_ponytail", "high ponytail", 0)]
+                return expected if (slot is None or slot == "hairstyle") else []
+
+        base, cur = self._create_clean_fixture()
+        # 将发型篡改为另一个合法词条，但与预言机期望不符
+        for a in cur["source_atoms"]:
+            if a["source_slot"] == "hairstyle":
+                a["text"] = "short bob"
+                a["source_item_id"] = "short_bob"
+        for a in cur["final_atoms"]:
+            if a["source_slot"] == "hairstyle":
+                a["text"] = "short bob"
+                a["source_item_id"] = "short_bob"
+
+        res = attribute_m1_seed_diff(42, base, cur, self.catalog_lookup, self.valid_rules, replay_oracle=MockOracle())
+        self.assertFalse(res["is_explained"])
+        self.assertTrue(
+            any("UNEXPLAINED_SOURCE_ATOM_MUTATION(hairstyle)" in r for r in res["unexplained_reasons"]),
+            f"Expected UNEXPLAINED_SOURCE_ATOM_MUTATION(hairstyle), got: {res['unexplained_reasons']}",
         )
 
     def test_negative_unauthorized_leaf_tag_tampering(self):
@@ -518,7 +637,7 @@ class TestM1AuditNegativeVerification(unittest.TestCase):
         base, cur = self._create_clean_fixture()
         # 从终态移除发型，但不提供任何 decision
         cur["final_atoms"] = [a for a in cur["final_atoms"] if a["source_slot"] != "hairstyle"]
-        cur["positive"] = "sitting on floor"
+        cur["positive"] = "sitting on floor, leather briefcase, studio softbox lighting"
 
         res = attribute_m1_seed_diff(42, base, cur, self.catalog_lookup, self.valid_rules)
         self.assertFalse(res["is_explained"])
@@ -542,6 +661,59 @@ class TestM1AuditNegativeVerification(unittest.TestCase):
         self.assertTrue(res["is_identical"])
         self.assertFalse(res["is_explained"], "Even identical text must fail if internal structure is tampered!")
         self.assertTrue(len(res["unexplained_reasons"]) > 0)
+
+    def test_audit_replay_purely_from_archive(self):
+        """
+        反例与自洽闭环：验证归档证据包含全部必要输入（atoms, decisions, bindings, dedup/budget 等），
+        且“仅从归档重放”全部检查能够得到严格相同结果，0 unexplained diffs。
+        """
+        from scratch.audit_m1_wildcards_slice import attribute_m1_seed_diff
+        archive_path = REPO_DIR / "scratch" / "audit_m1_evidence.json.gz"
+        if not archive_path.exists():
+            self.skipTest(f"Archive {archive_path} not found")
+
+        with gzip.open(archive_path, "rt", encoding="utf-8") as f:
+            doc = json.load(f)
+
+        diffs = doc.get("diffs", [])
+        self.assertGreater(len(diffs), 0, "Archive diffs must not be empty")
+
+        # 抽样前 100 组差异记录，验证仅靠归档输入能完整重放
+        for rec in diffs[:100]:
+            s = rec["seed"]
+            # 兼容：如果记录中已有完整的 base_item 和 cur_item，则直接使用
+            base_item = rec.get("base_item")
+            cur_item = rec.get("cur_item")
+            if base_item is None or cur_item is None:
+                # 兼容旧格式
+                base_item = {
+                    "seed": s,
+                    "source_atoms": rec["base_source_atoms"],
+                    "final_atoms": rec["base_final_atoms"],
+                    "decisions": [],
+                    "carrier_bindings": {},
+                    "dedup_records": [],
+                    "budget_records": [],
+                    "positive": "",
+                    "hash": "",
+                }
+                cur_item = {
+                    "seed": s,
+                    "source_atoms": rec["cur_source_atoms"],
+                    "final_atoms": rec["cur_final_atoms"],
+                    "decisions": rec.get("decisions", []),
+                    "carrier_bindings": rec.get("carrier_bindings", {}),
+                    "dedup_records": rec.get("dedup_records", []),
+                    "budget_records": rec.get("budget_records", []),
+                    "positive": "",
+                    "hash": "",
+                }
+            res = attribute_m1_seed_diff(s, base_item, cur_item, self.catalog_lookup, self.valid_rules)
+            self.assertTrue(
+                res["is_explained"],
+                f"Replay from archive failed for seed {s}: {res['unexplained_reasons']}"
+            )
+            self.assertEqual(res["unexplained_reasons"], [])
 
 
 if __name__ == "__main__":
