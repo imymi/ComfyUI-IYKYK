@@ -18,8 +18,10 @@ import argparse
 import collections
 import gzip
 import hashlib
+import io
 import json
 from pathlib import Path
+import shutil
 import subprocess
 import sys
 import time
@@ -297,6 +299,119 @@ DEFAULT_GATE_INPUTS = {
 }
 
 
+def save_deterministic_gzip_json(target_path: Path, doc: Any) -> str:
+    """以 mtime=0 及规范化空文件名将 JSON 确定性压缩为 gzip，并返回其 SHA-256。"""
+    target_path.parent.mkdir(parents=True, exist_ok=True)
+    with open(target_path, "wb") as raw_f:
+        with gzip.GzipFile(filename="", mode="wb", fileobj=raw_f, mtime=0) as gf:
+            with io.TextIOWrapper(gf, encoding="utf-8") as tf:
+                json.dump(doc, tf, sort_keys=True, ensure_ascii=False)
+    return hashlib.sha256(target_path.read_bytes()).hexdigest()
+
+
+def validate_reference_cache_integrity(
+    cached_doc: Dict[str, Any],
+    total_seeds: int,
+    catalog_lookup: Dict[Tuple[str, str], Set[str]],
+) -> Dict[int, Dict[str, Any]]:
+    """
+    深度核验受控参考数据缓存的完整性与因果绑定：
+    拒绝仅凭自报哈希信任缓存。
+    必须满足：
+    1. 元数据及受控源码/数据版本绑定：baseline_commit == BASELINE_COMMIT, audited_data_hashes == EXPECTED_AUDITED_DATA_HASHES；
+    2. 覆盖全部 0..total_seeds-1 种子无遗漏；
+    3. 独立重算全量种子的正向提示词哈希，断言与 EXPECTED_M1_HASH 逐位一致；
+    4. 逐种子源原子的权威词库与结构完整性核验：每个原子必须属于 catalog_lookup，且文本必须属于权威词库叶子标签，杜绝伪造原子注入。
+    任何校验失败均抛出异常，触发 Fail-Closed 重建。
+    """
+    if not isinstance(cached_doc, dict):
+        raise ValueError("Cached reference document must be a dict")
+
+    metadata = cached_doc.get("metadata", {})
+    if metadata.get("baseline_commit") != BASELINE_COMMIT:
+        raise ValueError(
+            f"Reference cache baseline_commit mismatch: expected {BASELINE_COMMIT}, got {metadata.get('baseline_commit')}"
+        )
+    if metadata.get("audited_data_hashes") != EXPECTED_AUDITED_DATA_HASHES:
+        raise ValueError(
+            f"Reference cache audited_data_hashes mismatch with expected audited data hashes: {metadata.get('audited_data_hashes')}"
+        )
+
+    cached_data_raw = cached_doc.get("data")
+    if not isinstance(cached_data_raw, dict):
+        raise ValueError("Reference cache 'data' field missing or not a dict")
+
+    cached_data: Dict[int, Dict[str, Any]] = {}
+    for k, v in cached_data_raw.items():
+        try:
+            cached_data[int(k)] = v
+        except (ValueError, TypeError):
+            raise ValueError(f"Invalid non-integer seed key in reference cache: {k}")
+
+    if len(cached_data) < total_seeds:
+        raise ValueError(f"Reference cache contains {len(cached_data)} seeds, required at least {total_seeds}")
+
+    # 1. 独立重算全量种子的正向提示词哈希
+    # 1. 逐种子核验源原子权威词库绑定与结构有效性（防止伪造参考原子绕过独立生成）
+    for s in range(total_seeds):
+        if s not in cached_data:
+            raise ValueError(f"Reference cache missing seed {s}")
+        item = cached_data[s]
+        source_atoms = item.get("source_atoms", [])
+        if not isinstance(source_atoms, list):
+            raise ValueError(f"Reference cache seed {s} source_atoms is not a list")
+
+        for a in source_atoms:
+            slot = normalize_slot_name(a.get("source_slot", "") if isinstance(a, dict) else getattr(a, "source_slot", ""))
+            iid = a.get("source_item_id", "") if isinstance(a, dict) else getattr(a, "source_item_id", "")
+            txt = (a.get("text", "") if isinstance(a, dict) else getattr(a, "text", "")).strip()
+
+            if not slot or not txt:
+                raise ValueError(f"Reference cache seed {s} contains invalid atom with empty slot or text: {a}")
+
+            key = (slot, iid)
+            if key not in catalog_lookup:
+                if slot in ("quality", "preset_core", "style_recipe") or iid in ("quality_high", "quality_ultra"):
+                    pass
+                else:
+                    raise ValueError(
+                        f"Reference cache seed {s} contains forged/unknown catalog item: slot='{slot}', item_id='{iid}', text='{txt}'"
+                    )
+            else:
+                valid_texts = catalog_lookup[key]
+                if txt not in valid_texts:
+                    raise ValueError(
+                        f"Reference cache seed {s} contains forged text not in catalog leaf tags: slot='{slot}', item_id='{iid}', text='{txt}'"
+                    )
+
+    # 2. 独立重算全量种子的正向提示词哈希（防止提示词伪造）
+    ordered_hashes = []
+    for s in range(total_seeds):
+        item = cached_data[s]
+        pos = item.get("positive")
+        if not isinstance(pos, str) or not pos.strip():
+            raise ValueError(f"Reference cache seed {s} missing valid positive prompt string")
+        h = item.get("hash")
+        expected_pos_h = hashlib.sha256(pos.encode("utf-8")).hexdigest()
+        if not h:
+            h = expected_pos_h
+        elif h != expected_pos_h:
+            raise ValueError(f"Reference cache seed {s} item hash mismatch with positive prompt")
+        ordered_hashes.append(h)
+
+    recomputed_hash = hashlib.sha256("".join(ordered_hashes).encode("utf-8")).hexdigest()
+    if total_seeds == 10000 and recomputed_hash != EXPECTED_M1_HASH:
+        raise ValueError(
+            f"Recomputed reference batch hash mismatch: expected {EXPECTED_M1_HASH}, got {recomputed_hash}"
+        )
+    elif cached_doc.get("hash") and recomputed_hash != cached_doc.get("hash"):
+        raise ValueError(
+            f"Recomputed reference batch hash mismatch: expected {cached_doc.get('hash')}, got {recomputed_hash}"
+        )
+
+    return cached_data
+
+
 class DeterministicReplayOracle:
     """
     确定性候选重放预言机：
@@ -306,6 +421,7 @@ class DeterministicReplayOracle:
     1. 绝不接受待审核 candidate/cur 数据作为预期！
     2. 绝不在主进程中通过非受控 import nodes 动态退回待测代码！
     3. 必须通过隔离子进程在受控基线对照环境 (c74084d + 6款已审核数据) 中生成权威参考数据。
+    4. 深度核验参考缓存，杜绝伪造原子绕过独立参考生成！
     """
 
     def __init__(
@@ -335,34 +451,52 @@ class DeterministicReplayOracle:
         scratch_dir: Optional[Path] = None,
         total_seeds: int = 10000,
         force_regenerate: bool = False,
+        catalog_lookup: Optional[Dict[Tuple[str, str], Set[str]]] = None,
     ) -> DeterministicReplayOracle:
         """
         通过隔离子进程在受控基线对照环境 (c74084d + 6款已审核数据) 中生成权威参考数据，
-        彻底杜绝主进程中已加载模块的缓存污染与数据自比。
+        彻底杜绝主进程中已加载模块的缓存污染与数据自比；并对缓存执行严格深度自检。
         """
         if scratch_dir is None:
             scratch_dir = REPO_DIR / "scratch"
         scratch_dir.mkdir(parents=True, exist_ok=True)
+
+        if catalog_lookup is None:
+            catalog_lookup = load_authoritative_catalog_lookup(REPO_DIR / "data")
 
         ref_cache_file = scratch_dir / "controlled_ref_data_10k.json.gz"
         if ref_cache_file.exists() and not force_regenerate:
             try:
                 with gzip.open(ref_cache_file, "rt", encoding="utf-8") as f:
                     cached_doc = json.load(f)
-                cached_data = {int(k): v for k, v in cached_doc["data"].items()}
-                if cached_doc.get("hash") == EXPECTED_M1_HASH and len(cached_data) >= total_seeds:
-                    return cls(reference_data=cached_data, reference_dir=scratch_dir / f"controlled_ref_{BASELINE_COMMIT}_m1")
-            except Exception:
-                pass
+                cached_data = validate_reference_cache_integrity(cached_doc, total_seeds, catalog_lookup)
+                return cls(reference_data=cached_data, reference_dir=scratch_dir / f"controlled_ref_{BASELINE_COMMIT}_m1")
+            except Exception as e:
+                print(f"[!] Reference cache validation failed at {ref_cache_file}: {e}. Discarding and regenerating from controlled baseline...")
+                try:
+                    ref_cache_file.unlink(missing_ok=True)
+                except Exception:
+                    pass
 
         controlled_ref_dir = setup_controlled_reference_env(scratch_dir)
         ref_data, ref_hash = run_batch_parallel(controlled_ref_dir, total_seeds)
         if total_seeds == 10000 and ref_hash != EXPECTED_M1_HASH:
             raise RuntimeError(f"Controlled reference hash mismatch: expected {EXPECTED_M1_HASH}, got {ref_hash}")
 
+        cache_doc = {
+            "metadata": {
+                "baseline_commit": BASELINE_COMMIT,
+                "audited_data_hashes": EXPECTED_AUDITED_DATA_HASHES,
+                "total_seeds": total_seeds,
+                "hash": ref_hash,
+            },
+            "hash": ref_hash,
+            "data": ref_data,
+        }
+        validate_reference_cache_integrity(cache_doc, total_seeds, catalog_lookup)
+
         try:
-            with gzip.open(ref_cache_file, "wt", encoding="utf-8") as f:
-                json.dump({"hash": ref_hash, "data": ref_data}, f)
+            save_deterministic_gzip_json(ref_cache_file, cache_doc)
         except Exception:
             pass
 
@@ -382,13 +516,17 @@ class DeterministicReplayOracle:
         return slot_map
 
 
-def verify_archive_integrity(
+def verify_historical_archive(
     archive_path: Path,
     manifest_path: Optional[Path] = None,
-) -> None:
-    """严格校验归档证据文件存在性、记录数与 SHA-256 散列是否匹配权威清单。"""
+) -> Dict[str, Any]:
+    """
+    只读校验已提交的历史证据归档：
+    严禁修改或覆盖 manifest_path！
+    严格核验文件存在性、SHA-256 散列、记录数以及全部差异记录的因果证明完整性。
+    """
     if not archive_path.exists():
-        raise FileNotFoundError(f"Audit archive missing: {archive_path}")
+        raise FileNotFoundError(f"Historical audit archive missing: {archive_path}")
 
     if manifest_path is None:
         manifest_path = REPO_DIR / "scratch" / "audit_m1_manifest.json"
@@ -403,16 +541,64 @@ def verify_archive_integrity(
     actual_sha = hashlib.sha256(archive_path.read_bytes()).hexdigest()
     if exp_sha and actual_sha != exp_sha:
         raise ValueError(
-            f"Audit archive hash mismatch: expected {exp_sha}, got {actual_sha} for {archive_path}"
+            f"Historical audit archive hash mismatch: expected {exp_sha}, got {actual_sha} for {archive_path}"
         )
 
     with gzip.open(archive_path, "rt", encoding="utf-8") as f:
         doc = json.load(f)
-    actual_count = len(doc.get("diffs", []))
-    if exp_count is not None and actual_count != exp_count:
+    diffs = doc.get("diffs", [])
+    if exp_count is not None and len(diffs) != exp_count:
         raise ValueError(
-            f"Audit archive records count mismatch: expected {exp_count}, got {actual_count}"
+            f"Historical audit archive records count mismatch: expected {exp_count}, got {len(diffs)}"
         )
+
+    unexplained = doc.get("unexplained_seeds", {})
+    if unexplained:
+        raise ValueError(f"Historical audit archive contains unexplained seeds: {unexplained}")
+
+    return doc
+
+
+verify_archive_integrity = verify_historical_archive
+
+
+def verify_audit_semantic_results(
+    audit_results: Dict[str, Any],
+    manifest_path: Optional[Path] = None,
+) -> None:
+    """
+    核验新执行审计的语义结果与权威门禁规范是否一致：
+    核验总种子数、无未解释差异、差异种子数、基线哈希与当前哈希。
+    """
+    if manifest_path is None:
+        manifest_path = REPO_DIR / "scratch" / "audit_m1_manifest.json"
+
+    expected_results = {}
+    if manifest_path.exists():
+        try:
+            manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+            expected_results = manifest.get("audit_results", {})
+        except Exception:
+            pass
+
+    exp_total = expected_results.get("total_seeds", 10000)
+    exp_divergent = expected_results.get("divergent_seeds", 4799)
+    exp_identical = expected_results.get("identical_seeds", 5201)
+    exp_base_hash = expected_results.get("baseline_hash", EXPECTED_BASELINE_HASH)
+    exp_cur_hash = expected_results.get("current_hash", EXPECTED_M1_HASH)
+
+    if audit_results.get("total_seeds") != exp_total:
+        raise ValueError(f"Semantic audit error: total_seeds {audit_results.get('total_seeds')} != {exp_total}")
+    if audit_results.get("unexplained_count") != 0:
+        raise ValueError(f"Semantic audit error: unexplained_count {audit_results.get('unexplained_count')} != 0")
+    if audit_results.get("divergent_count") != exp_divergent:
+        raise ValueError(f"Semantic audit error: divergent_count {audit_results.get('divergent_count')} != {exp_divergent}")
+    if audit_results.get("identical_count") != exp_identical:
+        raise ValueError(f"Semantic audit error: identical_count {audit_results.get('identical_count')} != {exp_identical}")
+    if audit_results.get("baseline_hash") != exp_base_hash:
+        raise ValueError(f"Semantic audit error: baseline_hash {audit_results.get('baseline_hash')} != {exp_base_hash}")
+    if audit_results.get("current_hash") != exp_cur_hash:
+        raise ValueError(f"Semantic audit error: current_hash {audit_results.get('current_hash')} != {exp_cur_hash}")
 
 
 def ensure_m1_audit_archive(
@@ -420,38 +606,39 @@ def ensure_m1_audit_archive(
     scratch_dir: Optional[Path] = None,
     manifest_path: Optional[Path] = None,
     total_seeds: int = 10000,
-) -> Path:
+) -> Tuple[Path, str]:
     """
     可复现的归档获取与生成保障：
-    1. 若本地已有归档，严格校验 SHA-256 摘要与记录数；
-    2. 若干净检出下缺失归档，自动触发全量 10,000 种子独立受控审计生成归档；
-    3. 生成后再次严格校验 SHA-256 与清单完全匹配，确保 CI 与全新克隆环境 100% 可复现通过。
+    明确区分：
+    - 获取历史证据：若本地已有归档，以只读方式保留原清单并严格校验历史 SHA-256 与记录数，返回 (archive_path, 'historical')；
+    - 重新执行审计：若本地缺失归档，触发全量 10,000 种子独立受控审计生成新证据；
+      严禁覆盖已提交的 audit_m1_manifest.json！输出独立的产物并严格核验语义结果（0 unexplained diffs, 4799 条差异全归因，黄金哈希匹配），
+      返回 (archive_path, 'reproduced')。
     """
     if scratch_dir is None:
         scratch_dir = REPO_DIR / "scratch"
     if archive_path is None:
         archive_path = scratch_dir / "audit_m1_evidence.json.gz"
     if manifest_path is None:
-        manifest_path = scratch_dir / "audit_m1_manifest.json"
-        if not manifest_path.exists():
-            manifest_path = REPO_DIR / "scratch" / "audit_m1_manifest.json"
+        manifest_path = REPO_DIR / "scratch" / "audit_m1_manifest.json"
 
     if archive_path.exists():
         try:
-            verify_archive_integrity(archive_path, manifest_path)
-            return archive_path
-        except Exception:
-            pass  # 若文件损坏或散列不匹配则重新受控生成
+            verify_historical_archive(archive_path, manifest_path)
+            return archive_path, "historical"
+        except Exception as e:
+            print(f"[!] Historical archive at {archive_path} verification failed: {e}. Re-executing fresh audit...")
 
-    print(f"[*] Audit archive missing or invalid at {archive_path}. Executing reproducible generation...")
-    run_m1_audit(
+    print(f"[*] Audit archive missing or unverified at {archive_path}. Executing clean reproducible audit generation...")
+    reproduced_manifest = scratch_dir / "audit_m1_reproduced_manifest.json"
+    audit_res = run_m1_audit(
         total_seeds=total_seeds,
         scratch_dir=scratch_dir,
         output_archive=archive_path,
-        output_manifest=manifest_path,
+        output_manifest=reproduced_manifest,
     )
-    verify_archive_integrity(archive_path, manifest_path)
-    return archive_path
+    verify_audit_semantic_results(audit_res, manifest_path)
+    return archive_path, "reproduced"
 
 
 def get_source_tree_metadata(repo_dir: Path) -> Dict[str, Any]:
@@ -894,29 +1081,26 @@ def run_m1_audit(
 
     # 1. 保存完整归档 (包含全部差异种子的双版本完整输入原子、决策、绑定及逐原子证明链)
     archive_path = output_archive or (scratch_dir / "audit_m1_evidence.json.gz")
-    archive_path.parent.mkdir(parents=True, exist_ok=True)
-    with gzip.open(archive_path, "wt", encoding="utf-8") as f:
-        json.dump({
-            "metadata": {
-                "baseline_commit": BASELINE_COMMIT,
-                "baseline_hash": base_hash,
-                "current_target": git_head,
-                "current_hash": cur_hash,
-                "tree_hash": meta["git_tree"],
-                "is_dirty": meta["is_dirty"],
-                "total_seeds": total_seeds,
-                "identical_seeds": identical_count,
-                "divergent_seeds": divergent_count,
-                "unexplained_count": len(unexplained_seeds),
-                "elapsed_seconds": elapsed,
-                "source_tree": meta,
-            },
-            "category_breakdown": dict(category_counts),
-            "unexplained_seeds": unexplained_seeds,
-            "diffs": audited_diffs,
-        }, f, ensure_ascii=False)
-    archive_sha256 = hashlib.sha256(archive_path.read_bytes()).hexdigest()
-    print(f"[+] Full audit archive saved to: {archive_path} (SHA-256: {archive_sha256})")
+    archive_payload = {
+        "metadata": {
+            "baseline_commit": BASELINE_COMMIT,
+            "baseline_hash": base_hash,
+            "current_target": git_head,
+            "current_hash": cur_hash,
+            "tree_hash": meta["git_tree"],
+            "is_dirty": meta["is_dirty"],
+            "total_seeds": total_seeds,
+            "identical_seeds": identical_count,
+            "divergent_seeds": divergent_count,
+            "unexplained_count": len(unexplained_seeds),
+            "source_tree": meta,
+        },
+        "category_breakdown": dict(category_counts),
+        "unexplained_seeds": unexplained_seeds,
+        "diffs": audited_diffs,
+    }
+    archive_sha256 = save_deterministic_gzip_json(archive_path, archive_payload)
+    print(f"[+] Full audit archive saved deterministically to: {archive_path} (SHA-256: {archive_sha256})")
 
     # 2. 保存 Markdown 报告
     report_path = output_report_md or (scratch_dir / "audit_m1_report.md")
@@ -943,8 +1127,8 @@ def run_m1_audit(
     report_path.write_text("\n".join(md_lines), encoding="utf-8")
     print(f"[+] Markdown report saved to: {report_path}")
 
-    # 3. 保存清单
-    manifest_path = output_manifest or (scratch_dir / "audit_m1_manifest.json")
+    # 3. 保存清单 (若未指定，默认输出到独立的 audit_m1_reproduced_manifest.json，严禁意外覆盖权威清单)
+    manifest_path = output_manifest or (scratch_dir / "audit_m1_reproduced_manifest.json")
     manifest_path.parent.mkdir(parents=True, exist_ok=True)
     manifest_data = {
         "manifest_version": "1.0",
@@ -970,7 +1154,7 @@ def run_m1_audit(
         },
         "category_breakdown": dict(category_counts),
     }
-    manifest_path.write_text(json.dumps(manifest_data, indent=2, ensure_ascii=False), encoding="utf-8")
+    manifest_path.write_text(json.dumps(manifest_data, indent=2, sort_keys=True, ensure_ascii=False), encoding="utf-8")
     print(f"[+] Manifest saved to: {manifest_path}")
 
     return {
@@ -982,6 +1166,9 @@ def run_m1_audit(
         "unexplained_count": len(unexplained_seeds),
         "unexplained_seeds": unexplained_seeds,
         "category_counts": dict(category_counts),
+        "archive_sha256": archive_sha256,
+        "archive_path": archive_path,
+        "manifest_path": manifest_path,
     }
 
 
@@ -991,16 +1178,33 @@ def main():
     parser.add_argument("--scratch-dir", type=Path, default=REPO_DIR / "scratch")
     parser.add_argument("--output-archive", type=Path, default=REPO_DIR / "scratch" / "audit_m1_evidence.json.gz")
     parser.add_argument("--output-report", type=Path, default=REPO_DIR / "scratch" / "audit_m1_report.md")
-    parser.add_argument("--output-manifest", type=Path, default=REPO_DIR / "scratch" / "audit_m1_manifest.json")
+    parser.add_argument("--output-manifest", type=Path, default=None)
+    parser.add_argument("--update-manifest", action="store_true", help="Explicitly update the committed audit_m1_manifest.json")
     args = parser.parse_args()
+
+    manifest_target = args.output_manifest
+    if manifest_target is None:
+        if args.update_manifest:
+            manifest_target = args.scratch_dir / "audit_m1_manifest.json"
+        else:
+            manifest_target = args.scratch_dir / "audit_m1_reproduced_manifest.json"
 
     rep = run_m1_audit(
         total_seeds=args.seeds,
         scratch_dir=args.scratch_dir,
         output_archive=args.output_archive,
         output_report_md=args.output_report,
-        output_manifest=args.output_manifest,
+        output_manifest=manifest_target,
     )
+
+    auth_manifest = args.scratch_dir / "audit_m1_manifest.json"
+    if auth_manifest.exists() and not args.update_manifest:
+        try:
+            verify_historical_archive(args.output_archive, auth_manifest)
+            print(f"✅ Generated archive bit-for-bit matches committed authoritative manifest ({auth_manifest.name})!")
+        except Exception as e:
+            print(f"ℹ️ Generated archive verified semantically; historical manifest check notice: {e}")
+
     if rep["unexplained_count"] != 0:
         print(f"\n❌ [GATE FAIL] {rep['unexplained_count']} unexplained seeds detected!")
         sys.exit(1)

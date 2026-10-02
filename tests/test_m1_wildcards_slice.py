@@ -672,11 +672,13 @@ class TestM1AuditNegativeVerification(unittest.TestCase):
             attribute_m1_seed_diff,
             DeterministicReplayOracle,
             ensure_m1_audit_archive,
-            verify_archive_integrity,
+            verify_historical_archive,
         )
         archive_path = REPO_DIR / "scratch" / "audit_m1_evidence.json.gz"
-        ensure_m1_audit_archive(archive_path)
-        verify_archive_integrity(archive_path)
+        manifest_path = REPO_DIR / "scratch" / "audit_m1_manifest.json"
+        archive_path, mode = ensure_m1_audit_archive(archive_path, manifest_path=manifest_path)
+        if mode == "historical":
+            verify_historical_archive(archive_path, manifest_path)
 
         with gzip.open(archive_path, "rt", encoding="utf-8") as f:
             doc = json.load(f)
@@ -717,14 +719,16 @@ class TestM1AuditNegativeVerification(unittest.TestCase):
             attribute_m1_seed_diff,
             DeterministicReplayOracle,
             ensure_m1_audit_archive,
-            verify_archive_integrity,
+            verify_historical_archive,
         )
         import copy
 
         test_seed = 11
         archive_path = REPO_DIR / "scratch" / "audit_m1_evidence.json.gz"
-        ensure_m1_audit_archive(archive_path)
-        verify_archive_integrity(archive_path)
+        manifest_path = REPO_DIR / "scratch" / "audit_m1_manifest.json"
+        archive_path, mode = ensure_m1_audit_archive(archive_path, manifest_path=manifest_path)
+        if mode == "historical":
+            verify_historical_archive(archive_path, manifest_path)
 
         with gzip.open(archive_path, "rt", encoding="utf-8") as f:
             doc = json.load(f)
@@ -770,6 +774,63 @@ class TestM1AuditNegativeVerification(unittest.TestCase):
             any("UNEXPLAINED_REMOVED_ATOM" in r for r in res["unexplained_reasons"]),
             f"Expected UNEXPLAINED_REMOVED_ATOM, got: {res['unexplained_reasons']}",
         )
+
+    def test_negative_forged_reference_cache_rejected(self):
+        """
+        反例 6 (针对用户审核发现 1):
+        模拟带有合法哈希标签但包含伪造参考原子的缓存文件。
+        断言 validate_reference_cache_integrity 绝不因自报哈希而放行，必须抛出校验异常；
+        且断言 DeterministicReplayOracle.from_controlled_reference 拒绝接受该伪造。
+        """
+        from scratch.audit_m1_wildcards_slice import (
+            validate_reference_cache_integrity,
+            DeterministicReplayOracle,
+            EXPECTED_M1_HASH,
+            BASELINE_COMMIT,
+            EXPECTED_AUDITED_DATA_HASHES,
+        )
+
+        forged_doc = {
+            "metadata": {
+                "baseline_commit": BASELINE_COMMIT,
+                "audited_data_hashes": EXPECTED_AUDITED_DATA_HASHES,
+                "total_seeds": 1,
+                "hash": EXPECTED_M1_HASH,
+            },
+            "hash": EXPECTED_M1_HASH,
+            "data": {
+                0: {
+                    "positive": "best quality, 1girl",
+                    "source_atoms": [
+                        {
+                            "atom_id": "forged_atom_0",
+                            "source_slot": "hairstyle",
+                            "source_item_id": "not_selected",
+                            "text": "fabricated reference",
+                            "span_order": 0,
+                        }
+                    ],
+                }
+            },
+        }
+
+        with self.assertRaises(ValueError) as cm:
+            validate_reference_cache_integrity(forged_doc, total_seeds=1, catalog_lookup=self.catalog_lookup)
+        self.assertIn("forged", str(cm.exception).lower())
+
+        # 进一步断言：从磁盘加载包含该伪造的缓存时，预言机坚决淘汰并重新生成，杜绝伪造原子被接受
+        import tempfile
+        import io
+        with tempfile.TemporaryDirectory() as td:
+            tpath = Path(td)
+            cache_file = tpath / "controlled_ref_data_10k.json.gz"
+            with open(cache_file, "wb") as rf:
+                with gzip.GzipFile(filename="", mode="wb", fileobj=rf, mtime=0) as gf:
+                    with io.TextIOWrapper(gf, encoding="utf-8") as tf:
+                        json.dump(forged_doc, tf)
+            oracle = DeterministicReplayOracle.from_controlled_reference(tpath, total_seeds=1)
+            cached_atoms = oracle.get_source_atoms(0, "hairstyle")
+            self.assertFalse(any("fabricated reference" in sig[2] for sig in cached_atoms))
 
 
 if __name__ == "__main__":
