@@ -622,12 +622,22 @@ def ensure_m1_audit_archive(
     if manifest_path is None:
         manifest_path = REPO_DIR / "scratch" / "audit_m1_manifest.json"
 
+    reproduced_manifest = scratch_dir / "audit_m1_reproduced_manifest.json"
+
     if archive_path.exists():
-        try:
-            verify_historical_archive(archive_path, manifest_path)
-            return archive_path, "historical"
-        except Exception as e:
-            print(f"[!] Historical archive at {archive_path} verification failed: {e}. Re-executing fresh audit...")
+        if manifest_path.exists():
+            try:
+                verify_historical_archive(archive_path, manifest_path)
+                return archive_path, "historical"
+            except Exception:
+                pass
+        if reproduced_manifest.exists():
+            try:
+                verify_historical_archive(archive_path, reproduced_manifest)
+                return archive_path, "reproduced"
+            except Exception:
+                pass
+        print(f"[!] Historical archive at {archive_path} unverified against historical/reproduced manifests. Re-executing fresh audit...")
 
     print(f"[*] Audit archive missing or unverified at {archive_path}. Executing clean reproducible audit generation...")
     reproduced_manifest = scratch_dir / "audit_m1_reproduced_manifest.json"
