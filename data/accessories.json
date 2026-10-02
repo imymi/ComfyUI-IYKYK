@@ -631,6 +631,102 @@
           }
         }
       ]
+    },
+    {
+      "id": "ext_aw_hair_pixie_textured_crop",
+      "name_zh": "碎发质感精灵短发 (Textured Pixie Crop)",
+      "tags": [
+        {
+          "id": "ext_aw_hair_pixie_textured_crop__tag_000",
+          "text": "textured pixie crop, piecey and short",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "face"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "ext_aw_hair_crown_braid_updo",
+      "name_zh": "盘头花冠编发 (Crown Braid Updo)",
+      "tags": [
+        {
+          "id": "ext_aw_hair_crown_braid_updo__tag_000",
+          "text": "crown braid wrapped around the head",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "face"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "ext_aw_hair_single_back_braid",
+      "name_zh": "后背单条垂长辫 (Single Long Back Braid)",
+      "tags": [
+        {
+          "id": "ext_aw_hair_single_back_braid__tag_000",
+          "text": "single long braid down the back",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "face"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "ext_aw_hair_half_up_half_down",
+      "name_zh": "半扎半披公主发 (Half-Up Half-Down)",
+      "tags": [
+        {
+          "id": "ext_aw_hair_half_up_half_down__tag_000",
+          "text": "half-up hair, top pulled back with loose lengths",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "face"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "ext_aw_hair_vintage_finger_waves",
+      "name_zh": "复古手推波浪卷发 (Vintage Finger Waves)",
+      "tags": [
+        {
+          "id": "ext_aw_hair_vintage_finger_waves__tag_000",
+          "text": "vintage finger waves close to head in structured ridges",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "face"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "ext_aw_hair_low_nape_chignon",
+      "name_zh": "颈后低发髻盘发 (Low Nape Chignon)",
+      "tags": [
+        {
+          "id": "ext_aw_hair_low_nape_chignon__tag_000",
+          "text": "smooth elegant chignon bun gathered at the nape",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "face"
+            ]
+          }
+        }
+      ]
     }
   ],
   "headwear_jewelry": [
@@ -1113,6 +1209,54 @@
             "semantic_role": "selector",
             "visible_regions": [
               "upper_body"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "ext_aw_jewelry_pearl_drop_earrings",
+      "name_zh": "优雅水滴珍珠耳坠 (Pearl Drop Earrings)",
+      "tags": [
+        {
+          "id": "ext_aw_jewelry_pearl_drop_earrings__tag_000",
+          "text": "elegant pearl drop earrings",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "face"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "ext_aw_jewelry_silver_hoop_earrings",
+      "name_zh": "极简纯银圈形耳环 (Silver Hoop Earrings)",
+      "tags": [
+        {
+          "id": "ext_aw_jewelry_silver_hoop_earrings__tag_000",
+          "text": "minimalist silver hoop earrings",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "face"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "ext_aw_headwear_silk_scrunchie",
+      "name_zh": "法式真丝大肠发圈 (Silk Scrunchie)",
+      "tags": [
+        {
+          "id": "ext_aw_headwear_silk_scrunchie__tag_000",
+          "text": "silk fabric scrunchie holding hair",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "face"
             ]
           }
         }

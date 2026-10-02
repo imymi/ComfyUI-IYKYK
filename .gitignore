@@ -15,4 +15,6 @@ build/
 scratch/*.gz
 scratch/baseline_*
 scratch/controlled_ref_*
+scratch/target_*
+scratch/*reproduced_manifest.json
 

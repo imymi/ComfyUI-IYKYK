@@ -46,11 +46,6 @@ class TestM1WildcardsProvenanceLedger(unittest.TestCase):
             reader = csv.DictReader(f, delimiter="\t")
             rows = list(reader)
 
-        self.assertEqual(len(rows), 6, f"Expected 6 rows in M1 slice ledger, got {len(rows)}")
-
-        seen_composite_keys = set()
-        seen_primary_ids = set()
-
         expected_ids = {
             "ext_aw_hair_bob_blunt_cut",
             "ext_aw_hair_long_parted_behind_ears",
@@ -59,6 +54,12 @@ class TestM1WildcardsProvenanceLedger(unittest.TestCase):
             "ext_aw_prop_clutch_bag",
             "ext_aw_prop_baguette_bag",
         }
+
+        m1_rows = [r for r in rows if r["canonical_id"] in expected_ids]
+        self.assertEqual(len(m1_rows), 6, f"Expected 6 rows for M1 slice in ledger, got {len(m1_rows)}")
+
+        seen_composite_keys = set()
+        seen_primary_ids = set()
 
         found_ids = set()
 
@@ -96,8 +97,9 @@ class TestM1WildcardsProvenanceLedger(unittest.TestCase):
             self.assertEqual(row["pipeline_test_status"], "verified")
             self.assertEqual(row["overall_status"], "verified")
 
-        self.assertEqual(found_ids, expected_ids, "Ledger canonical IDs mismatch expected M1 set")
-        self.assertEqual(seen_primary_ids, expected_ids, "Not all canonical IDs have a primary record")
+        found_m1_ids = {r["canonical_id"] for r in m1_rows}
+        self.assertEqual(found_m1_ids, expected_ids, "Ledger canonical IDs mismatch expected M1 set")
+        self.assertTrue(expected_ids.issubset(seen_primary_ids), "Not all canonical IDs have a primary record")
 
     def test_ledger_target_mapping_and_parent_child_hierarchy(self):
         """

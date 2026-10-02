@@ -72,6 +72,11 @@ jobs:
       run: |
         python scratch/audit_m1_wildcards_slice.py --seeds 10000
 
+    - name: Generate M2 Divergence Audit Evidence & Verify Manifest
+      if: steps.changes.outputs.docs_only != 'true'
+      run: |
+        python scratch/audit_m2_wildcards_batch.py --seeds 10000
+
     - name: Run Full Test Suite
       if: steps.changes.outputs.docs_only != 'true'
       run: |

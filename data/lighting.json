@@ -2258,6 +2258,26 @@
         }
       ],
       "erotic_tags": []
+    },
+    {
+      "id": "ext_aw_light_soft_bounced",
+      "name": "反光板柔和跳灯补光 (Soft Bounced Fill Light)",
+      "tags": [
+        {
+          "id": "ext_aw_light_soft_bounced__tag_000",
+          "text": "soft bounced fill light from neutral reflector",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "time_of_day": null,
+            "light_sources": [
+              "studio"
+            ],
+            "color_modes": []
+          }
+        }
+      ],
+      "erotic_tags": []
     }
   ],
   "cinematic_lighting": [
@@ -2815,6 +2835,46 @@
             "time_of_day": "dusk",
             "light_sources": [
               "daylight"
+            ],
+            "color_modes": []
+          }
+        }
+      ],
+      "erotic_tags": []
+    },
+    {
+      "id": "ext_aw_light_candlelight",
+      "name": "暖调摇曳烛光 (Warm Flickering Candlelight)",
+      "tags": [
+        {
+          "id": "ext_aw_light_candlelight__tag_000",
+          "text": "warm flickering candlelight illuminating face and shadows",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "time_of_day": null,
+            "light_sources": [
+              "candle"
+            ],
+            "color_modes": []
+          }
+        }
+      ],
+      "erotic_tags": []
+    },
+    {
+      "id": "ext_aw_light_bioluminescent",
+      "name": "生物荧光暗部微光 (Bioluminescent Ambient Glow)",
+      "tags": [
+        {
+          "id": "ext_aw_light_bioluminescent__tag_000",
+          "text": "faint bioluminescent glow casting subtle ambient light",
+          "facts": {
+            "semantic_role": "selector",
+            "space_kind": null,
+            "time_of_day": "night",
+            "light_sources": [
+              "artificial_cool"
             ],
             "color_modes": []
           }

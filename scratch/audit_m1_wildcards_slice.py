@@ -42,6 +42,7 @@ from lib.lexer import parse_prompt  # noqa: E402
 from lib.conflict_resolver import normalize_slot_name  # noqa: E402
 
 BASELINE_COMMIT = "c74084d"
+M1_TARGET_COMMIT = "6da94cb"
 EXPECTED_BASELINE_HASH = "ab5a633cfb3fde70d9a6c629ee65a540955d87ee143e66570d780743246cab89"
 EXPECTED_M1_HASH = "aa7581bc2304f6f75530d95ab4e1b75e7e1101720b1dfaf14c2a1c328fcd1139"
 EXPECTED_M1_SOURCE_ATOMS_DIGEST = "b79fdee3ea57dba2b0280771873523126cbe1965497c921690eec7371a98466f"
@@ -90,19 +91,27 @@ def atom_to_dict(a: Any) -> Dict[str, Any]:
     }
 
 
+def setup_m1_target_env(scratch_dir: Path) -> Path:
+    """导出固定 M1 终态提交 (6da94cb) 作为可重复验证的历史快照环境。"""
+    target_dir = scratch_dir / f"target_{M1_TARGET_COMMIT}_m1"
+    export_commit(M1_TARGET_COMMIT, target_dir)
+    return target_dir
+
+
 def setup_controlled_reference_env(scratch_dir: Path) -> Path:
     """
     构建受控对照基线环境 (Controlled Reference Environment)：
     1. 基于固定基线代码 c74084d 导出代码树；
-    2. 仅打入 6 款已审核 M1 样本数据增量，并断言数据散列绝对匹配；
-    3. 杜绝任何未审核逻辑或数据污染，充当因果审计的独立预言机。
+    2. 基于固定 M1 终态快照 (6da94cb) 提取 6 款已审核 M1 样本数据增量，并断言数据散列绝对匹配；
+    3. 杜绝任何后续 M2/M3 未审核逻辑或工作区当前文件污染，充当因果审计的独立预言机。
     """
     controlled_dir = scratch_dir / f"controlled_ref_{BASELINE_COMMIT}_m1"
     export_commit(BASELINE_COMMIT, controlled_dir)
     controlled_data_dir = controlled_dir / "data"
 
+    target_dir = setup_m1_target_env(scratch_dir)
     for fname, exp_hash in EXPECTED_AUDITED_DATA_HASHES.items():
-        src_path = REPO_DIR / "data" / fname
+        src_path = target_dir / "data" / fname
         if not src_path.exists():
             raise FileNotFoundError(f"Audited data file missing: {src_path}")
         src_hash = hashlib.sha256(src_path.read_bytes()).hexdigest()
@@ -513,7 +522,8 @@ class DeterministicReplayOracle:
         scratch_dir.mkdir(parents=True, exist_ok=True)
 
         if catalog_lookup is None:
-            catalog_lookup = load_authoritative_catalog_lookup(REPO_DIR / "data")
+            target_dir = setup_m1_target_env(scratch_dir)
+            catalog_lookup = load_authoritative_catalog_lookup(target_dir / "data")
 
         ref_cache_file = scratch_dir / "controlled_ref_data_10k.json.gz"
         if ref_cache_file.exists() and not force_regenerate:
@@ -749,7 +759,8 @@ def attribute_m1_seed_diff(
 ) -> Dict[str, Any]:
     """对单个种子执行严格结构化逐原子跨版本差异因果归因。"""
     if valid_rules is None:
-        valid_rules = load_authoritative_resolver_rules(REPO_DIR / "data")
+        target_dir = setup_m1_target_env(REPO_DIR / "scratch")
+        valid_rules = load_authoritative_resolver_rules(target_dir / "data")
 
     base_src = base_item["source_atoms"]
     cur_src = cur_item["source_atoms"]
@@ -1057,14 +1068,15 @@ def run_m1_audit(
     print("[*] Setting up controlled reference environment (c74084d + 6 audited M1 samples)...")
     controlled_ref_dir = setup_controlled_reference_env(scratch_dir)
 
-    # 获取源码树元数据与 HEAD 提交
-    meta = get_source_tree_metadata(REPO_DIR)
+    # 导出固定 M1 终态快照环境并获取元数据
+    target_dir = setup_m1_target_env(scratch_dir)
+    meta = get_source_tree_metadata(target_dir)
     git_head = meta["git_commit"]
 
-    print(f"[*] Loaded authoritative resolver rules from {REPO_DIR / 'data'}...")
-    valid_rules = load_authoritative_resolver_rules(REPO_DIR / "data")
-    print(f"[*] Loaded universal catalog lookup from {REPO_DIR / 'data'}...")
-    catalog_lookup = load_authoritative_catalog_lookup(REPO_DIR / "data")
+    print(f"[*] Loaded authoritative resolver rules from {target_dir / 'data'}...")
+    valid_rules = load_authoritative_resolver_rules(target_dir / "data")
+    print(f"[*] Loaded universal catalog lookup from {target_dir / 'data'}...")
+    catalog_lookup = load_authoritative_catalog_lookup(target_dir / "data")
 
     print(f"[*] Running baseline ({BASELINE_COMMIT}) generation for {total_seeds} seeds...")
     base_data, base_hash = run_batch_parallel(baseline_dir, total_seeds)
@@ -1096,9 +1108,9 @@ def run_m1_audit(
     save_deterministic_gzip_json(ref_cache_file, ref_cache_doc)
     print(f"[+] Controlled reference cache saved: {ref_cache_file}")
 
-    print(f"[*] Running current working tree ({git_head[:7]}) generation for {total_seeds} seeds...")
-    cur_data, cur_hash = run_batch_parallel(REPO_DIR, total_seeds)
-    print(f"    Current batch hash:  {cur_hash}")
+    print(f"[*] Running fixed M1 target snapshot ({git_head[:7]}) generation for {total_seeds} seeds...")
+    cur_data, cur_hash = run_batch_parallel(target_dir, total_seeds)
+    print(f"    Target batch hash:   {cur_hash}")
     if total_seeds == 10000 and cur_hash != EXPECTED_M1_HASH:
         raise RuntimeError(f"Current hash mismatch: expected {EXPECTED_M1_HASH}, got {cur_hash}")
 
