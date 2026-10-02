@@ -1027,9 +1027,18 @@ def run_m1_audit(
         raise RuntimeError(f"Controlled reference hash mismatch: expected {EXPECTED_M1_HASH}, got {ref_hash}")
 
     ref_cache_file = scratch_dir / "controlled_ref_data_10k.json.gz"
+    ref_cache_doc = {
+        "metadata": {
+            "baseline_commit": BASELINE_COMMIT,
+            "audited_data_hashes": EXPECTED_AUDITED_DATA_HASHES,
+            "total_seeds": total_seeds,
+            "hash": ref_hash,
+        },
+        "hash": ref_hash,
+        "data": ref_data,
+    }
     try:
-        with gzip.open(ref_cache_file, "wt", encoding="utf-8") as f:
-            json.dump({"hash": ref_hash, "data": ref_data}, f)
+        save_deterministic_gzip_json(ref_cache_file, ref_cache_doc)
     except Exception:
         pass
 
