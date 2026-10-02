@@ -21,7 +21,6 @@ import hashlib
 import io
 import json
 from pathlib import Path
-import shutil
 import subprocess
 import sys
 import time
@@ -550,10 +549,8 @@ class DeterministicReplayOracle:
         }
         validate_reference_cache_integrity(cache_doc, total_seeds, catalog_lookup)
 
-        try:
-            save_deterministic_gzip_json(ref_cache_file, cache_doc)
-        except Exception:
-            pass
+        save_deterministic_gzip_json(ref_cache_file, cache_doc)
+        print(f"[+] Controlled reference cache saved: {ref_cache_file}")
 
         return cls(reference_data=ref_data, reference_dir=controlled_ref_dir)
 
@@ -1094,10 +1091,10 @@ def run_m1_audit(
         "source_atoms_digest": atoms_digest,
         "data": ref_data,
     }
-    try:
-        save_deterministic_gzip_json(ref_cache_file, ref_cache_doc)
-    except Exception:
-        pass
+    validate_reference_cache_integrity(ref_cache_doc, total_seeds, catalog_lookup)
+    ref_cache_file = scratch_dir / "controlled_ref_data_10k.json.gz"
+    save_deterministic_gzip_json(ref_cache_file, ref_cache_doc)
+    print(f"[+] Controlled reference cache saved: {ref_cache_file}")
 
     print(f"[*] Running current working tree ({git_head[:7]}) generation for {total_seeds} seeds...")
     cur_data, cur_hash = run_batch_parallel(REPO_DIR, total_seeds)

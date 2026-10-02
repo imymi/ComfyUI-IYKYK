@@ -852,6 +852,8 @@ class TestM1AuditNegativeVerification(unittest.TestCase):
         import io
 
         ref_cache_path = REPO_DIR / "scratch" / "controlled_ref_data_10k.json.gz"
+        if not ref_cache_path.exists():
+            DeterministicReplayOracle.from_controlled_reference(REPO_DIR / "scratch")
         self.assertTrue(ref_cache_path.exists(), "Controlled ref cache must exist for counterfactual test")
 
         with gzip.open(ref_cache_path, "rt", encoding="utf-8") as f:
