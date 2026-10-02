@@ -45,6 +45,7 @@ from lib.conflict_resolver import normalize_slot_name  # noqa: E402
 BASELINE_COMMIT = "c74084d"
 EXPECTED_BASELINE_HASH = "ab5a633cfb3fde70d9a6c629ee65a540955d87ee143e66570d780743246cab89"
 EXPECTED_M1_HASH = "aa7581bc2304f6f75530d95ab4e1b75e7e1101720b1dfaf14c2a1c328fcd1139"
+EXPECTED_M1_SOURCE_ATOMS_DIGEST = "b79fdee3ea57dba2b0280771873523126cbe1965497c921690eec7371a98466f"
 
 # M1 实际增补词库的目标槽位（仅有这 3 个槽位允许源原子抽样发生差异）
 M1_EXPANDED_SLOTS = frozenset({"hairstyle", "props", "lighting"})
@@ -309,6 +310,18 @@ def save_deterministic_gzip_json(target_path: Path, doc: Any) -> str:
     return hashlib.sha256(target_path.read_bytes()).hexdigest()
 
 
+def compute_source_atoms_digest(data: Dict[int, Dict[str, Any]], count: int) -> str:
+    """计算全量种子源原子槽位签名的确定性 SHA-256 摘要。"""
+    hasher = hashlib.sha256()
+    for s in range(count):
+        item = data[s]
+        atoms = item.get("source_atoms", [])
+        for a in atoms:
+            sig = slot_atom_signature(atom_to_dict(a))
+            hasher.update(f"{s}:{sig[0]}:{sig[1]}:{sig[2]}:{sig[3]}\n".encode("utf-8"))
+    return hasher.hexdigest()
+
+
 def validate_reference_cache_integrity(
     cached_doc: Dict[str, Any],
     total_seeds: int,
@@ -320,8 +333,10 @@ def validate_reference_cache_integrity(
     必须满足：
     1. 元数据及受控源码/数据版本绑定：baseline_commit == BASELINE_COMMIT, audited_data_hashes == EXPECTED_AUDITED_DATA_HASHES；
     2. 覆盖全部 0..total_seeds-1 种子无遗漏；
-    3. 独立重算全量种子的正向提示词哈希，断言与 EXPECTED_M1_HASH 逐位一致；
-    4. 逐种子源原子的权威词库与结构完整性核验：每个原子必须属于 catalog_lookup，且文本必须属于权威词库叶子标签，杜绝伪造原子注入。
+    3. 逐种子源原子的权威词库有效性核验：每个原子必须属于 catalog_lookup，且文本必须属于权威词库叶子标签；
+    4. 逐种子源原子与消解决策及终态提示词的因果闭环绑定：未被规则消耗的源原子必须严格呈现在终态提示词中，杜绝词条置换；
+    5. 独立重算全量种子的正向提示词哈希，断言与 EXPECTED_M1_HASH 逐位一致；
+    6. 独立重算全量种子的源原子槽位签名权威摘要，断言与 EXPECTED_M1_SOURCE_ATOMS_DIGEST 逐位一致。
     任何校验失败均抛出异常，触发 Fail-Closed 重建。
     """
     if not isinstance(cached_doc, dict):
@@ -351,8 +366,7 @@ def validate_reference_cache_integrity(
     if len(cached_data) < total_seeds:
         raise ValueError(f"Reference cache contains {len(cached_data)} seeds, required at least {total_seeds}")
 
-    # 1. 独立重算全量种子的正向提示词哈希
-    # 1. 逐种子核验源原子权威词库绑定与结构有效性（防止伪造参考原子绕过独立生成）
+    # 1. 逐种子核验源原子权威词库绑定与结构有效性（防止伪造未知词条注入）
     for s in range(total_seeds):
         if s not in cached_data:
             raise ValueError(f"Reference cache missing seed {s}")
@@ -384,7 +398,34 @@ def validate_reference_cache_integrity(
                         f"Reference cache seed {s} contains forged text not in catalog leaf tags: slot='{slot}', item_id='{iid}', text='{txt}'"
                     )
 
-    # 2. 独立重算全量种子的正向提示词哈希（防止提示词伪造）
+    # 2. 种子级源原子与消解决策及终态提示词的因果闭环绑定（杜绝将源原子偷换为另一合法词条）
+    for s in range(total_seeds):
+        item = cached_data[s]
+        pos = item.get("positive", "")
+        consumed_atom_ids = {
+            d.get("target_atom_id")
+            for d in item.get("decisions", [])
+            if d.get("action") in ("drop", "replace")
+        }
+        for rec in item.get("dedup_records", []):
+            consumed_atom_ids.add(rec.get("atom_id"))
+        for rec in item.get("budget_records", []):
+            consumed_atom_ids.add(rec.get("atom_id"))
+
+        for a in item.get("source_atoms", []):
+            aid = a.get("atom_id") if isinstance(a, dict) else getattr(a, "atom_id", "")
+            txt = (a.get("text") if isinstance(a, dict) else getattr(a, "text", "")).strip()
+            slot = normalize_slot_name(a.get("source_slot", "") if isinstance(a, dict) else getattr(a, "source_slot", ""))
+            iid = a.get("source_item_id", "") if isinstance(a, dict) else getattr(a, "source_item_id", "")
+
+            # 若该源原子未被消解决策或过滤器剔除，它必须作为终态标签完整呈现在 positive 提示词中
+            if aid not in consumed_atom_ids and txt not in pos:
+                raise ValueError(
+                    f"Reference cache seed {s}: atom '{aid}' ('{txt}', slot={slot}, id={iid}) is unconsumed by resolver decisions "
+                    f"but missing from positive prompt! Forged/mutated reference source atom detected."
+                )
+
+    # 3. 独立重算全量种子的正向提示词哈希（防止提示词伪造）
     ordered_hashes = []
     for s in range(total_seeds):
         item = cached_data[s]
@@ -407,6 +448,17 @@ def validate_reference_cache_integrity(
     elif cached_doc.get("hash") and recomputed_hash != cached_doc.get("hash"):
         raise ValueError(
             f"Recomputed reference batch hash mismatch: expected {cached_doc.get('hash')}, got {recomputed_hash}"
+        )
+
+    # 4. 独立重算全量源原子槽位签名的权威可信摘要（确保原子级完全一致，杜绝任何词条置换）
+    recomputed_atoms_digest = compute_source_atoms_digest(cached_data, total_seeds)
+    if total_seeds == 10000 and recomputed_atoms_digest != EXPECTED_M1_SOURCE_ATOMS_DIGEST:
+        raise ValueError(
+            f"Recomputed reference source atoms digest mismatch: expected {EXPECTED_M1_SOURCE_ATOMS_DIGEST}, got {recomputed_atoms_digest}"
+        )
+    elif metadata.get("source_atoms_digest") and recomputed_atoms_digest != metadata.get("source_atoms_digest"):
+        raise ValueError(
+            f"Recomputed reference source atoms digest mismatch: expected {metadata.get('source_atoms_digest')}, got {recomputed_atoms_digest}"
         )
 
     return cached_data
@@ -483,14 +535,17 @@ class DeterministicReplayOracle:
         if total_seeds == 10000 and ref_hash != EXPECTED_M1_HASH:
             raise RuntimeError(f"Controlled reference hash mismatch: expected {EXPECTED_M1_HASH}, got {ref_hash}")
 
+        atoms_digest = compute_source_atoms_digest(ref_data, total_seeds)
         cache_doc = {
             "metadata": {
                 "baseline_commit": BASELINE_COMMIT,
                 "audited_data_hashes": EXPECTED_AUDITED_DATA_HASHES,
                 "total_seeds": total_seeds,
                 "hash": ref_hash,
+                "source_atoms_digest": atoms_digest,
             },
             "hash": ref_hash,
+            "source_atoms_digest": atoms_digest,
             "data": ref_data,
         }
         validate_reference_cache_integrity(cache_doc, total_seeds, catalog_lookup)
@@ -1026,15 +1081,17 @@ def run_m1_audit(
     if total_seeds == 10000 and ref_hash != EXPECTED_M1_HASH:
         raise RuntimeError(f"Controlled reference hash mismatch: expected {EXPECTED_M1_HASH}, got {ref_hash}")
 
-    ref_cache_file = scratch_dir / "controlled_ref_data_10k.json.gz"
+    atoms_digest = compute_source_atoms_digest(ref_data, total_seeds)
     ref_cache_doc = {
         "metadata": {
             "baseline_commit": BASELINE_COMMIT,
             "audited_data_hashes": EXPECTED_AUDITED_DATA_HASHES,
             "total_seeds": total_seeds,
             "hash": ref_hash,
+            "source_atoms_digest": atoms_digest,
         },
         "hash": ref_hash,
+        "source_atoms_digest": atoms_digest,
         "data": ref_data,
     }
     try:

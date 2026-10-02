@@ -832,6 +832,65 @@ class TestM1AuditNegativeVerification(unittest.TestCase):
             cached_atoms = oracle.get_source_atoms(0, "hairstyle")
             self.assertFalse(any("fabricated reference" in sig[2] for sig in cached_atoms))
 
+    def test_negative_legitimate_catalog_hair_replacement_in_cache_rejected(self):
+        """
+        反例 7 (针对用户审核发现 1):
+        模拟将真实 10,000 种子缓存中的 seed 0 的 high_ponytail / high ponytail
+        替换为另一合法词库条目 long_straight_black / long straight black hair，
+        保持原始提示词、哈希及版本元数据完全不变。
+        断言 validate_reference_cache_integrity 绝不放行，必须拦截：
+        既因未被消解决策消耗的源原子缺失于 positive 终态提示词而报错，
+        也因源原子槽位签名权威摘要 (source_atoms_digest) 不匹配而报错；
+        且断言 DeterministicReplayOracle.from_controlled_reference 拒绝接受该篡改，自动淘汰并重新受控生成。
+        """
+        from scratch.audit_m1_wildcards_slice import (
+            validate_reference_cache_integrity,
+            DeterministicReplayOracle,
+        )
+        import copy
+        import tempfile
+        import io
+
+        ref_cache_path = REPO_DIR / "scratch" / "controlled_ref_data_10k.json.gz"
+        self.assertTrue(ref_cache_path.exists(), "Controlled ref cache must exist for counterfactual test")
+
+        with gzip.open(ref_cache_path, "rt", encoding="utf-8") as f:
+            genuine_doc = json.load(f)
+
+        tampered_doc = copy.deepcopy(genuine_doc)
+        seed_0 = tampered_doc["data"]["0"]
+        # 找到原始 high ponytail 原子并替换为另一合法词库条目 long straight black hair
+        hair_atom = next(a for a in seed_0["source_atoms"] if a.get("source_slot") == "hairstyle")
+        self.assertEqual(hair_atom["text"], "high ponytail")
+        hair_atom["text"] = "long straight black hair"
+        hair_atom["source_item_id"] = "long_straight_black"
+        hair_atom["id"] = "long_straight_black__tag_000"
+
+        # 1. 验证因果闭环与摘要校验双重拦截
+        with self.assertRaises(ValueError) as cm:
+            validate_reference_cache_integrity(tampered_doc, total_seeds=10000, catalog_lookup=self.catalog_lookup)
+        err_msg = str(cm.exception)
+        self.assertTrue(
+            "unconsumed by resolver decisions but missing from positive prompt" in err_msg
+            or "source atoms digest mismatch" in err_msg,
+            f"Expected causal binding or digest mismatch, got: {err_msg}",
+        )
+
+        # 2. 验证磁盘加载该被替换合法词条的缓存时，预言机坚决淘汰重建，绝不把篡改原子作为参考答案
+        with tempfile.TemporaryDirectory() as td:
+            tpath = Path(td)
+            cache_file = tpath / "controlled_ref_data_10k.json.gz"
+            with open(cache_file, "wb") as rf:
+                with gzip.GzipFile(filename="", mode="wb", fileobj=rf, mtime=0) as gf:
+                    with io.TextIOWrapper(gf, encoding="utf-8") as tf:
+                        json.dump(tampered_doc, tf)
+            # from_controlled_reference 拦截该伪造并自动淘汰该缓存文件，受控生成真实参考
+            oracle = DeterministicReplayOracle.from_controlled_reference(tpath, total_seeds=1)
+            cached_atoms = oracle.get_source_atoms(0, "hairstyle")
+            # 确认替换后的 long straight black hair 绝未被接受为 seed 0 的参考答案
+            self.assertFalse(any("long straight black hair" in sig[2] for sig in cached_atoms))
+            self.assertTrue(any("high ponytail" in sig[2] for sig in cached_atoms))
+
 
 if __name__ == "__main__":
     unittest.main()
