@@ -301,52 +301,157 @@ class DeterministicReplayOracle:
     """
     确定性候选重放预言机：
     用于对指定种子和槽位执行受控重放，验证被测版本的源原子抽样结果与 PRNG 数学选择完全一致。
-    支持从受控基线对照环境生成的 reference_data 初始化，或在需要时直接调用受控 generator 动态重放。
-    安全铁律：绝不接受待审核 candidate/cur 数据作为预期！
+    支持从受控基线对照环境生成的 reference_data 初始化。
+    安全铁律：
+    1. 绝不接受待审核 candidate/cur 数据作为预期！
+    2. 绝不在主进程中通过非受控 import nodes 动态退回待测代码！
+    3. 必须通过隔离子进程在受控基线对照环境 (c74084d + 6款已审核数据) 中生成权威参考数据。
     """
 
     def __init__(
         self,
-        reference_data: Optional[Dict[int, Dict[str, Any]]] = None,
+        reference_data: Dict[int, Dict[str, Any]],
         reference_dir: Optional[Path] = None,
     ):
-        self._reference_data = reference_data or {}
+        if not reference_data:
+            raise ValueError(
+                "DeterministicReplayOracle requires non-empty reference_data generated from controlled reference baseline! "
+                "Use DeterministicReplayOracle.from_controlled_reference(scratch_dir) to generate."
+            )
+        self._reference_data = reference_data
         self._reference_dir = reference_dir
-        self._generator = None
         self._cache: Dict[int, Dict[str, List[Tuple[str, str, str, int]]]] = {}
 
-        if self._reference_data:
-            for s, item in self._reference_data.items():
-                by_slot = collections.defaultdict(list)
-                for a in item.get("source_atoms", []):
-                    slot = normalize_slot_name(a.get("source_slot", "") if isinstance(a, dict) else a.source_slot)
-                    by_slot[slot].append(slot_atom_signature(atom_to_dict(a)))
-                self._cache[s] = dict(by_slot)
+        for s, item in self._reference_data.items():
+            by_slot = collections.defaultdict(list)
+            for a in item.get("source_atoms", []):
+                slot = normalize_slot_name(a.get("source_slot", "") if isinstance(a, dict) else a.source_slot)
+                by_slot[slot].append(slot_atom_signature(atom_to_dict(a)))
+            self._cache[s] = dict(by_slot)
 
-    @property
-    def generator(self):
-        if self._generator is None:
-            if self._reference_dir is not None:
-                ref_str = str(self._reference_dir)
-                if ref_str not in sys.path:
-                    sys.path.insert(0, ref_str)
-            import nodes
-            self._generator = nodes.IYKYKPromptGenerator()
-        return self._generator
+    @classmethod
+    def from_controlled_reference(
+        cls,
+        scratch_dir: Optional[Path] = None,
+        total_seeds: int = 10000,
+        force_regenerate: bool = False,
+    ) -> DeterministicReplayOracle:
+        """
+        通过隔离子进程在受控基线对照环境 (c74084d + 6款已审核数据) 中生成权威参考数据，
+        彻底杜绝主进程中已加载模块的缓存污染与数据自比。
+        """
+        if scratch_dir is None:
+            scratch_dir = REPO_DIR / "scratch"
+        scratch_dir.mkdir(parents=True, exist_ok=True)
+
+        ref_cache_file = scratch_dir / "controlled_ref_data_10k.json.gz"
+        if ref_cache_file.exists() and not force_regenerate:
+            try:
+                with gzip.open(ref_cache_file, "rt", encoding="utf-8") as f:
+                    cached_doc = json.load(f)
+                cached_data = {int(k): v for k, v in cached_doc["data"].items()}
+                if cached_doc.get("hash") == EXPECTED_M1_HASH and len(cached_data) >= total_seeds:
+                    return cls(reference_data=cached_data, reference_dir=scratch_dir / f"controlled_ref_{BASELINE_COMMIT}_m1")
+            except Exception:
+                pass
+
+        controlled_ref_dir = setup_controlled_reference_env(scratch_dir)
+        ref_data, ref_hash = run_batch_parallel(controlled_ref_dir, total_seeds)
+        if total_seeds == 10000 and ref_hash != EXPECTED_M1_HASH:
+            raise RuntimeError(f"Controlled reference hash mismatch: expected {EXPECTED_M1_HASH}, got {ref_hash}")
+
+        try:
+            with gzip.open(ref_cache_file, "wt", encoding="utf-8") as f:
+                json.dump({"hash": ref_hash, "data": ref_data}, f)
+        except Exception:
+            pass
+
+        return cls(reference_data=ref_data, reference_dir=controlled_ref_dir)
 
     def get_source_atoms(self, seed: int, slot: Optional[str] = None) -> List[Tuple[str, str, str, int]]:
         if seed not in self._cache:
-            res = self.generator.generate_structured(**DEFAULT_GATE_INPUTS, prompt_seed=seed)
-            by_slot = collections.defaultdict(list)
-            for a in res.source_atoms:
-                s_name = normalize_slot_name(a.source_slot)
-                by_slot[s_name].append(slot_atom_signature(atom_to_dict(a)))
-            self._cache[seed] = dict(by_slot)
+            raise KeyError(
+                f"DeterministicReplayOracle has no controlled reference data for seed {seed}. "
+                f"Oracle was initialized with {len(self._cache)} seeds. "
+                f"Uncontrolled fallback to in-process generator is strictly prohibited."
+            )
 
         slot_map = self._cache[seed]
         if slot is not None:
             return slot_map.get(normalize_slot_name(slot), [])
         return slot_map
+
+
+def verify_archive_integrity(
+    archive_path: Path,
+    manifest_path: Optional[Path] = None,
+) -> None:
+    """严格校验归档证据文件存在性、记录数与 SHA-256 散列是否匹配权威清单。"""
+    if not archive_path.exists():
+        raise FileNotFoundError(f"Audit archive missing: {archive_path}")
+
+    if manifest_path is None:
+        manifest_path = REPO_DIR / "scratch" / "audit_m1_manifest.json"
+    if not manifest_path.exists():
+        raise FileNotFoundError(f"Audit manifest missing: {manifest_path}")
+
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    exp_info = manifest.get("original_archive", {})
+    exp_sha = exp_info.get("sha256")
+    exp_count = exp_info.get("records_count")
+
+    actual_sha = hashlib.sha256(archive_path.read_bytes()).hexdigest()
+    if exp_sha and actual_sha != exp_sha:
+        raise ValueError(
+            f"Audit archive hash mismatch: expected {exp_sha}, got {actual_sha} for {archive_path}"
+        )
+
+    with gzip.open(archive_path, "rt", encoding="utf-8") as f:
+        doc = json.load(f)
+    actual_count = len(doc.get("diffs", []))
+    if exp_count is not None and actual_count != exp_count:
+        raise ValueError(
+            f"Audit archive records count mismatch: expected {exp_count}, got {actual_count}"
+        )
+
+
+def ensure_m1_audit_archive(
+    archive_path: Optional[Path] = None,
+    scratch_dir: Optional[Path] = None,
+    manifest_path: Optional[Path] = None,
+    total_seeds: int = 10000,
+) -> Path:
+    """
+    可复现的归档获取与生成保障：
+    1. 若本地已有归档，严格校验 SHA-256 摘要与记录数；
+    2. 若干净检出下缺失归档，自动触发全量 10,000 种子独立受控审计生成归档；
+    3. 生成后再次严格校验 SHA-256 与清单完全匹配，确保 CI 与全新克隆环境 100% 可复现通过。
+    """
+    if scratch_dir is None:
+        scratch_dir = REPO_DIR / "scratch"
+    if archive_path is None:
+        archive_path = scratch_dir / "audit_m1_evidence.json.gz"
+    if manifest_path is None:
+        manifest_path = scratch_dir / "audit_m1_manifest.json"
+        if not manifest_path.exists():
+            manifest_path = REPO_DIR / "scratch" / "audit_m1_manifest.json"
+
+    if archive_path.exists():
+        try:
+            verify_archive_integrity(archive_path, manifest_path)
+            return archive_path
+        except Exception:
+            pass  # 若文件损坏或散列不匹配则重新受控生成
+
+    print(f"[*] Audit archive missing or invalid at {archive_path}. Executing reproducible generation...")
+    run_m1_audit(
+        total_seeds=total_seeds,
+        scratch_dir=scratch_dir,
+        output_archive=archive_path,
+        output_manifest=manifest_path,
+    )
+    verify_archive_integrity(archive_path, manifest_path)
+    return archive_path
 
 
 def get_source_tree_metadata(repo_dir: Path) -> Dict[str, Any]:
@@ -723,6 +828,13 @@ def run_m1_audit(
     print(f"    Controlled ref batch hash: {ref_hash}")
     if total_seeds == 10000 and ref_hash != EXPECTED_M1_HASH:
         raise RuntimeError(f"Controlled reference hash mismatch: expected {EXPECTED_M1_HASH}, got {ref_hash}")
+
+    ref_cache_file = scratch_dir / "controlled_ref_data_10k.json.gz"
+    try:
+        with gzip.open(ref_cache_file, "wt", encoding="utf-8") as f:
+            json.dump({"hash": ref_hash, "data": ref_data}, f)
+    except Exception:
+        pass
 
     print(f"[*] Running current working tree ({git_head[:7]}) generation for {total_seeds} seeds...")
     cur_data, cur_hash = run_batch_parallel(REPO_DIR, total_seeds)

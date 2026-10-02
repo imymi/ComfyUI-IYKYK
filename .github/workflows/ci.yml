@@ -67,6 +67,11 @@ jobs:
       run: |
         python scripts/validate_data.py --strict
 
+    - name: Generate M1 Divergence Audit Evidence & Verify Manifest
+      if: steps.changes.outputs.docs_only != 'true'
+      run: |
+        python scratch/audit_m1_wildcards_slice.py --seeds 10000
+
     - name: Run Full Test Suite
       if: steps.changes.outputs.docs_only != 'true'
       run: |

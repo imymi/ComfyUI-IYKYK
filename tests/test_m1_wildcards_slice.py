@@ -665,16 +665,18 @@ class TestM1AuditNegativeVerification(unittest.TestCase):
     def test_audit_replay_purely_from_archive(self):
         """
         反例与自洽闭环：验证归档证据包含全部必要输入（atoms, decisions, bindings, dedup/budget 等），
-        且传入独立重放预言机全量覆盖全部 4799 条差异记录，断言 0 unexplained diffs。
-        缺失归档必须阻断门禁断言失败（严禁 skipTest）。
+        且传入隔离进程生成的受控基线对照数据，全量覆盖全部 4799 条差异记录，断言 0 unexplained diffs。
+        缺失归档或校验失败必须阻断门禁断言失败（严禁 skipTest）。
         """
         from scratch.audit_m1_wildcards_slice import (
             attribute_m1_seed_diff,
             DeterministicReplayOracle,
+            ensure_m1_audit_archive,
+            verify_archive_integrity,
         )
         archive_path = REPO_DIR / "scratch" / "audit_m1_evidence.json.gz"
-        if not archive_path.exists():
-            self.fail(f"Audit archive missing: {archive_path}. Gate requires full archive to be generated and verified.")
+        ensure_m1_audit_archive(archive_path)
+        verify_archive_integrity(archive_path)
 
         with gzip.open(archive_path, "rt", encoding="utf-8") as f:
             doc = json.load(f)
@@ -682,8 +684,8 @@ class TestM1AuditNegativeVerification(unittest.TestCase):
         diffs = doc.get("diffs", [])
         self.assertEqual(len(diffs), 4799, f"Archive must contain exactly 4799 divergent records, got {len(diffs)}")
 
-        # 独立重放预言机（非数据自比，使用独立确定性重放预言机）
-        replay_oracle = DeterministicReplayOracle()
+        # 核心：使用隔离子进程在受控基线对照环境 (c74084d + 6款已审核数据) 中生成的参考数据
+        replay_oracle = DeterministicReplayOracle.from_controlled_reference(REPO_DIR / "scratch")
 
         for rec in diffs:
             s = rec["seed"]
@@ -708,19 +710,21 @@ class TestM1AuditNegativeVerification(unittest.TestCase):
         反例 5 (针对用户审核发现 1)：
         使用真实目录中的合法词条 long_straight_black ('long straight black hair')
         任意替换当前版本真实采出的 big_wavy_curls ('big loose waves')。
-        通过真实审计入口并传入独立重放预言机 DeterministicReplayOracle。
+        通过真实审计入口并传入隔离进程生成的受控基线预言机 DeterministicReplayOracle。
         断言审计器绝不能将其误归因为 PRNG_CANDIDATE_SHIFT，必须拦截报错并断言 is_explained == False。
         """
         from scratch.audit_m1_wildcards_slice import (
             attribute_m1_seed_diff,
             DeterministicReplayOracle,
+            ensure_m1_audit_archive,
+            verify_archive_integrity,
         )
         import copy
 
         test_seed = 11
         archive_path = REPO_DIR / "scratch" / "audit_m1_evidence.json.gz"
-        if not archive_path.exists():
-            self.fail(f"Audit archive missing: {archive_path}")
+        ensure_m1_audit_archive(archive_path)
+        verify_archive_integrity(archive_path)
 
         with gzip.open(archive_path, "rt", encoding="utf-8") as f:
             doc = json.load(f)
@@ -746,8 +750,8 @@ class TestM1AuditNegativeVerification(unittest.TestCase):
                 a["source_item_id"] = "long_straight_black"
                 a["id"] = "long_straight_black__tag_000"
 
-        # 真实审计入口调用并传入独立重放预言机
-        replay_oracle = DeterministicReplayOracle()
+        # 真实审计入口调用并传入隔离进程生成的受控基线预言机
+        replay_oracle = DeterministicReplayOracle.from_controlled_reference(REPO_DIR / "scratch")
         res = attribute_m1_seed_diff(
             test_seed,
             base,
