@@ -212,6 +212,51 @@
             "semantic_role": "selector",
             "emotion": "seductive"
           }
+        },
+        {
+          "id": "emotion_seductive__ext_aroused",
+          "text": "aroused expression",
+          "facts": {
+            "emotion": "seductive",
+            "expression_facts": {
+              "emotion": "seductive",
+              "arousal_level": "high"
+            },
+            "governance_metadata": {}
+          }
+        },
+        {
+          "id": "emotion_seductive__ext_lustful",
+          "text": "lustful gaze",
+          "facts": {
+            "emotion": "seductive",
+            "expression_facts": {
+              "emotion": "seductive"
+            },
+            "governance_metadata": {}
+          }
+        },
+        {
+          "id": "emotion_seductive__ext_passionate",
+          "text": "passionate gaze",
+          "facts": {
+            "emotion": "seductive",
+            "expression_facts": {
+              "emotion": "seductive"
+            },
+            "governance_metadata": {}
+          }
+        },
+        {
+          "id": "emotion_seductive__ext_sensual",
+          "text": "sensual expression",
+          "facts": {
+            "emotion": "seductive",
+            "expression_facts": {
+              "emotion": "seductive"
+            },
+            "governance_metadata": {}
+          }
         }
       ],
       "id": "emotion_seductive",
@@ -298,6 +343,17 @@
           "facts": {
             "semantic_role": "selector",
             "emotion": "pleasure"
+          }
+        },
+        {
+          "id": "emotion_pleasure__ext_satisfied",
+          "text": "satisfied smile",
+          "facts": {
+            "emotion": "pleasure",
+            "expression_facts": {
+              "emotion": "pleasure"
+            },
+            "governance_metadata": {}
           }
         }
       ],
@@ -480,6 +536,17 @@
           "facts": {
             "semantic_role": "selector",
             "emotion": "playful"
+          }
+        },
+        {
+          "id": "emotion_playful__ext_smiling",
+          "text": "gentle smiling",
+          "facts": {
+            "emotion": "playful",
+            "expression_facts": {
+              "emotion": "playful"
+            },
+            "governance_metadata": {}
           }
         }
       ],
@@ -670,6 +737,17 @@
           "facts": {
             "semantic_role": "selector",
             "emotion": "fear"
+          }
+        },
+        {
+          "id": "emotion_fear__ext_fearful",
+          "text": "fearful expression",
+          "facts": {
+            "emotion": "fear",
+            "expression_facts": {
+              "emotion": "fear"
+            },
+            "governance_metadata": {}
           }
         }
       ],
@@ -1000,6 +1078,399 @@
       ],
       "id": "emotion_contrast",
       "name_zh": "🔀 反差/矛盾（复合情绪）"
+    },
+    {
+      "id": "emotion_amused",
+      "name": "amused expression",
+      "name_zh": "逗趣莞尔 (Amused)",
+      "tags": [
+        {
+          "id": "emotion_amused__tag_000",
+          "text": "amused expression",
+          "facts": {
+            "emotion": "amused",
+            "expression_facts": {
+              "emotion": "amused",
+              "intensity": "mild"
+            },
+            "governance_metadata": {}
+          }
+        }
+      ]
+    },
+    {
+      "id": "emotion_angry",
+      "name": "angry expression",
+      "name_zh": "愤怒生气 (Angry)",
+      "tags": [
+        {
+          "id": "emotion_angry__tag_000",
+          "text": "angry expression",
+          "facts": {
+            "emotion": "angry",
+            "expression_facts": {
+              "emotion": "angry",
+              "intensity": "strong"
+            },
+            "governance_metadata": {}
+          }
+        }
+      ]
+    },
+    {
+      "id": "emotion_anxious",
+      "name": "anxious expression",
+      "name_zh": "焦虑不安 (Anxious)",
+      "tags": [
+        {
+          "id": "emotion_anxious__tag_000",
+          "text": "anxious expression",
+          "facts": {
+            "emotion": "anxious",
+            "expression_facts": {
+              "emotion": "anxious",
+              "intensity": "moderate"
+            },
+            "governance_metadata": {}
+          }
+        }
+      ]
+    },
+    {
+      "id": "emotion_blissful",
+      "name": "blissful expression",
+      "name_zh": "极乐安详 (Blissful)",
+      "tags": [
+        {
+          "id": "emotion_blissful__tag_000",
+          "text": "blissful expression",
+          "facts": {
+            "emotion": "blissful",
+            "expression_facts": {
+              "emotion": "blissful",
+              "intensity": "serene"
+            },
+            "governance_metadata": {}
+          }
+        }
+      ]
+    },
+    {
+      "id": "emotion_focused",
+      "name": "focused__ext_concentrated expression",
+      "name_zh": "聚精会神 (Focused)",
+      "tags": [
+        {
+          "id": "emotion_focused__ext_concentrated",
+          "text": "concentrated expression",
+          "facts": {
+            "emotion": "focused",
+            "expression_facts": {
+              "emotion": "focused"
+            },
+            "governance_metadata": {}
+          }
+        },
+        {
+          "id": "emotion_focused__tag_000",
+          "text": "focused expression",
+          "facts": {
+            "emotion": "focused",
+            "expression_facts": {
+              "emotion": "focused"
+            },
+            "governance_metadata": {}
+          }
+        }
+      ]
+    },
+    {
+      "id": "emotion_confused",
+      "name": "confused expression",
+      "name_zh": "困惑迷茫 (Confused)",
+      "tags": [
+        {
+          "id": "emotion_confused__tag_000",
+          "text": "confused expression",
+          "facts": {
+            "emotion": "confused",
+            "expression_facts": {
+              "emotion": "confused"
+            },
+            "governance_metadata": {}
+          }
+        },
+        {
+          "id": "emotion_confused__ext_skeptical",
+          "text": "skeptical look",
+          "facts": {
+            "emotion": "confused",
+            "expression_facts": {
+              "emotion": "confused"
+            },
+            "governance_metadata": {}
+          }
+        }
+      ]
+    },
+    {
+      "id": "emotion_contemptuous",
+      "name": "contemptuous expression",
+      "name_zh": "轻蔑鄙夷 (Contemptuous)",
+      "tags": [
+        {
+          "id": "emotion_contemptuous__tag_000",
+          "text": "contemptuous expression",
+          "facts": {
+            "emotion": "contemptuous",
+            "expression_facts": {
+              "emotion": "contemptuous"
+            },
+            "governance_metadata": {}
+          }
+        }
+      ]
+    },
+    {
+      "id": "emotion_crying",
+      "name": "crying expression",
+      "name_zh": "哭泣流泪 (Crying)",
+      "tags": [
+        {
+          "id": "emotion_crying__tag_000",
+          "text": "crying with tears streaming",
+          "facts": {
+            "emotion": "sad",
+            "expression_facts": {
+              "emotion": "sad",
+              "tears": "streaming"
+            },
+            "governance_metadata": {}
+          }
+        }
+      ]
+    },
+    {
+      "id": "emotion_disgusted",
+      "name": "disgusted expression",
+      "name_zh": "厌恶反感 (Disgusted)",
+      "tags": [
+        {
+          "id": "emotion_disgusted__tag_000",
+          "text": "disgusted expression",
+          "facts": {
+            "emotion": "disgusted",
+            "expression_facts": {
+              "emotion": "disgusted"
+            },
+            "governance_metadata": {}
+          }
+        }
+      ]
+    },
+    {
+      "id": "emotion_excited",
+      "name": "excited expression",
+      "name_zh": "兴奋激动 (Excited)",
+      "tags": [
+        {
+          "id": "emotion_excited__tag_000",
+          "text": "excited expression",
+          "facts": {
+            "emotion": "excited",
+            "expression_facts": {
+              "emotion": "excited"
+            },
+            "governance_metadata": {}
+          }
+        }
+      ]
+    },
+    {
+      "id": "emotion_frowning",
+      "name": "frowning expression",
+      "name_zh": "皱眉微蹙 (Frowning)",
+      "tags": [
+        {
+          "id": "emotion_frowning__tag_000",
+          "text": "frowning",
+          "facts": {
+            "pose_facts": {
+              "facial_action": "frown"
+            },
+            "expression_facts": {
+              "emotion_tendency": "serious_or_worried",
+              "facial_action": "frown"
+            },
+            "governance_metadata": {}
+          }
+        }
+      ]
+    },
+    {
+      "id": "emotion_happy",
+      "name": "happy expression",
+      "name_zh": "快乐开朗 (Happy)",
+      "tags": [
+        {
+          "id": "emotion_happy__tag_000",
+          "text": "happy expression",
+          "facts": {
+            "emotion": "happy",
+            "expression_facts": {
+              "emotion": "happy"
+            },
+            "governance_metadata": {}
+          }
+        }
+      ]
+    },
+    {
+      "id": "emotion_intense",
+      "name": "intense expression",
+      "name_zh": "强烈凝视 (Intense)",
+      "tags": [
+        {
+          "id": "emotion_intense__tag_000",
+          "text": "intense stare",
+          "facts": {
+            "gaze": "intense",
+            "expression_facts": {
+              "gaze": "intense",
+              "intensity": "high"
+            },
+            "governance_metadata": {}
+          }
+        }
+      ]
+    },
+    {
+      "id": "emotion_overwhelmed",
+      "name": "overwhelmed expression",
+      "name_zh": "心潮澎湃 (Overwhelmed)",
+      "tags": [
+        {
+          "id": "emotion_overwhelmed__tag_000",
+          "text": "overwhelmed expression",
+          "facts": {
+            "emotion": "overwhelmed",
+            "expression_facts": {
+              "emotion": "overwhelmed"
+            },
+            "governance_metadata": {}
+          }
+        }
+      ]
+    },
+    {
+      "id": "emotion_proud",
+      "name": "proud expression",
+      "name_zh": "自豪自信 (Proud)",
+      "tags": [
+        {
+          "id": "emotion_proud__tag_000",
+          "text": "proud confident smile",
+          "facts": {
+            "emotion": "proud",
+            "expression_facts": {
+              "emotion": "proud"
+            },
+            "governance_metadata": {}
+          }
+        }
+      ]
+    },
+    {
+      "id": "emotion_relaxed",
+      "name": "relaxed expression",
+      "name_zh": "放松松弛 (Relaxed)",
+      "tags": [
+        {
+          "id": "emotion_relaxed__tag_000",
+          "text": "relaxed expression",
+          "facts": {
+            "emotion": "relaxed",
+            "expression_facts": {
+              "emotion": "relaxed",
+              "state": "calm"
+            },
+            "governance_metadata": {}
+          }
+        }
+      ]
+    },
+    {
+      "id": "emotion_sad",
+      "name": "sad expression",
+      "name_zh": "悲伤低落 (Sad)",
+      "tags": [
+        {
+          "id": "emotion_sad__tag_000",
+          "text": "sad expression",
+          "facts": {
+            "emotion": "sad",
+            "expression_facts": {
+              "emotion": "sad"
+            },
+            "governance_metadata": {}
+          }
+        }
+      ]
+    },
+    {
+      "id": "emotion_surprised",
+      "name": "surprised expression",
+      "name_zh": "惊讶意外 (Surprised)",
+      "tags": [
+        {
+          "id": "emotion_surprised__tag_000",
+          "text": "surprised expression",
+          "facts": {
+            "emotion": "surprised",
+            "expression_facts": {
+              "emotion": "surprised"
+            },
+            "governance_metadata": {}
+          }
+        }
+      ]
+    },
+    {
+      "id": "emotion_tired",
+      "name": "tired expression",
+      "name_zh": "疲惫困倦 (Tired)",
+      "tags": [
+        {
+          "id": "emotion_tired__tag_000",
+          "text": "tired expression",
+          "facts": {
+            "emotion": "tired",
+            "expression_facts": {
+              "emotion": "tired"
+            },
+            "governance_metadata": {}
+          }
+        }
+      ]
+    },
+    {
+      "id": "emotion_yearning",
+      "name": "yearning expression",
+      "name_zh": "期盼思念 (Yearning)",
+      "tags": [
+        {
+          "id": "emotion_yearning__tag_000",
+          "text": "yearning look",
+          "facts": {
+            "emotion": "yearning",
+            "expression_facts": {
+              "emotion": "yearning",
+              "intensity": "deep"
+            },
+            "governance_metadata": {}
+          }
+        }
+      ]
     }
   ],
   "gaze_rules": [

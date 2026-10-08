@@ -756,11 +756,15 @@ def attribute_m1_seed_diff(
     catalog_lookup: Dict[Tuple[str, str], Set[str]],
     valid_rules: Set[str] | None = None,
     replay_oracle: Optional[Any] = None,
+    data_dir: Optional[Path] = None,
 ) -> Dict[str, Any]:
     """对单个种子执行严格结构化逐原子跨版本差异因果归因。"""
-    if valid_rules is None:
+    if data_dir is None:
         target_dir = setup_m1_target_env(REPO_DIR / "scratch")
-        valid_rules = load_authoritative_resolver_rules(target_dir / "data")
+        data_dir = target_dir / "data"
+
+    if valid_rules is None:
+        valid_rules = load_authoritative_resolver_rules(data_dir)
 
     base_src = base_item["source_atoms"]
     cur_src = cur_item["source_atoms"]
@@ -901,7 +905,7 @@ def attribute_m1_seed_diff(
             )
 
     # 4B. 统一决策合法性核验
-    replay_errors = replay_and_verify_decisions(cur_src, cur_decs, valid_rules, cur_bindings=cur_bindings, seed=seed)
+    replay_errors = replay_and_verify_decisions(cur_src, cur_decs, valid_rules, cur_bindings=cur_bindings, seed=seed, data_dir=data_dir)
     if replay_errors:
         unexplained_reasons.extend(replay_errors)
 

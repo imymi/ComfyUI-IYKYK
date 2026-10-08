@@ -179,7 +179,9 @@ class TestM1WildcardsProvenanceLedger(unittest.TestCase):
         ledger_leaf_ids = {r["target_leaf_id"] for r in rows}
 
         actual_catalog_ext_aw_leaves = set()
-        for json_path in DATA_DIR.glob("*.json"):
+        hist_data_dir = REPO_DIR / "scratch" / "controlled_ref_6da94cb_m2" / "data"
+        scan_data_dir = hist_data_dir if hist_data_dir.exists() else DATA_DIR
+        for json_path in scan_data_dir.glob("*.json"):
             try:
                 data = json.loads(json_path.read_text(encoding="utf-8"))
             except Exception:
@@ -438,8 +440,10 @@ class TestM1AuditNegativeVerification(unittest.TestCase):
             load_authoritative_catalog_lookup,
             load_authoritative_resolver_rules,
         )
-        cls.catalog_lookup = load_authoritative_catalog_lookup(DATA_DIR)
-        cls.valid_rules = load_authoritative_resolver_rules(DATA_DIR)
+        hist_m1_data = REPO_DIR / "scratch" / "target_6da94cb_m1" / "data"
+        cls.data_dir = hist_m1_data if hist_m1_data.exists() else DATA_DIR
+        cls.catalog_lookup = load_authoritative_catalog_lookup(cls.data_dir)
+        cls.valid_rules = load_authoritative_resolver_rules(cls.data_dir)
 
     def _create_clean_fixture(self):
         """构造一个合法、结构闭环的 baseline 与 current 种子基线，包含 pose、hairstyle、props、lighting 全部四大关键槽位"""
@@ -702,6 +706,7 @@ class TestM1AuditNegativeVerification(unittest.TestCase):
                 self.catalog_lookup,
                 self.valid_rules,
                 replay_oracle=replay_oracle,
+                data_dir=self.data_dir,
             )
             self.assertTrue(
                 res["is_explained"],
@@ -765,6 +770,7 @@ class TestM1AuditNegativeVerification(unittest.TestCase):
             self.catalog_lookup,
             self.valid_rules,
             replay_oracle=replay_oracle,
+            data_dir=self.data_dir,
         )
 
         self.assertFalse(res["is_explained"], "Arbitrary catalog hair replacement must NOT be explained!")

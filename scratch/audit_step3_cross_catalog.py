@@ -627,10 +627,23 @@ def get_catalog_text_lookup(data_dir: Path | str = DATA_DIR) -> Dict[Tuple[str, 
     return _CATALOG_TEXT_LOOKUP
 
 
-def dict_to_prompt_atom(d: Dict[str, Any] | PromptAtom) -> PromptAtom:
+def dict_to_prompt_atom(
+    d: Dict[str, Any] | PromptAtom,
+    models_mod: Any = None,
+) -> PromptAtom:
     """将字典格式原子准确还原为强类型 PromptAtom 实例以复用生产级消解流水线与谓词"""
-    if isinstance(d, PromptAtom):
+    _PromptAtom = getattr(models_mod, "PromptAtom", PromptAtom) if models_mod else PromptAtom
+    _SemanticFacts = getattr(models_mod, "SemanticFacts", SemanticFacts) if models_mod else SemanticFacts
+    _TagProvenance = getattr(models_mod, "TagProvenance", TagProvenance) if models_mod else TagProvenance
+    _SelectionOrigin = getattr(models_mod, "SelectionOrigin", SelectionOrigin) if models_mod else SelectionOrigin
+    _SpanType = getattr(models_mod, "SpanType", SpanType) if models_mod else SpanType
+
+    if isinstance(d, _PromptAtom):
         return d
+    if hasattr(d, "__dataclass_fields__") and not isinstance(d, dict):
+        import dataclasses
+        d = dataclasses.asdict(d)
+
     aid = d.get("atom_id") or d.get("id") or ""
     text = d.get("text") or ""
     slot = (d.get("source_slot") or "").strip()
@@ -639,16 +652,23 @@ def dict_to_prompt_atom(d: Dict[str, Any] | PromptAtom) -> PromptAtom:
     span_order = int(d.get("span_order", 0))
     target_id = d.get("target_id")
 
+    def _clean_dict(val):
+        if isinstance(val, dict):
+            return {k: _clean_dict(v) for k, v in val.items() if k != "explicit_fields"}
+        if isinstance(val, list):
+            return [_clean_dict(x) for x in val]
+        return val
+
     f_d = d.get("facts")
     if isinstance(f_d, dict):
-        facts = SemanticFacts(**{k: tuple(v) if isinstance(v, list) else v for k, v in f_d.items()})
+        facts = _SemanticFacts.from_dict(_clean_dict(f_d))
     else:
         topos = tuple(t for t in (d.get("garment_topologies") or ()) if t in VALID_GARMENT_TOPOLOGIES)
         states = tuple(s for s in (d.get("garment_states") or ()) if s in VALID_GARMENT_STATES)
         regions = tuple(r for r in (d.get("visible_regions") or ()) if r in VALID_VISIBLE_REGIONS)
         pu = d.get("prop_usage")
         prop_usage = pu if pu in VALID_PROP_USAGES else None
-        facts = SemanticFacts(
+        facts = _SemanticFacts(
             visible_regions=regions,
             garment_topologies=topos,
             garment_states=states,
@@ -657,7 +677,7 @@ def dict_to_prompt_atom(d: Dict[str, Any] | PromptAtom) -> PromptAtom:
 
     p_d = d.get("provenance")
     if isinstance(p_d, dict):
-        prov = TagProvenance(**{k: tuple(v) if isinstance(v, list) else v for k, v in p_d.items()})
+        prov = _TagProvenance(**{k: tuple(v) if isinstance(v, list) else v for k, v in p_d.items()})
     else:
         parent_ids = tuple(d.get("parent_ids") or ())
         prov_kind = d.get("provenance_kind") or d.get("kind")
@@ -666,7 +686,7 @@ def dict_to_prompt_atom(d: Dict[str, Any] | PromptAtom) -> PromptAtom:
                 prov_kind = "clothing_state"
             else:
                 prov_kind = slot
-        prov = TagProvenance(
+        prov = _TagProvenance(
             parent_ids=parent_ids,
             item_id=item_id,
             kind=prov_kind,
@@ -674,31 +694,31 @@ def dict_to_prompt_atom(d: Dict[str, Any] | PromptAtom) -> PromptAtom:
 
     o_d = d.get("origin")
     if isinstance(o_d, dict):
-        origin = SelectionOrigin(**{k: tuple(v) if isinstance(v, list) else v for k, v in o_d.items()})
+        origin = _SelectionOrigin(**{k: tuple(v) if isinstance(v, list) else v for k, v in o_d.items()})
     else:
         parent_ids = tuple(d.get("parent_ids") or ())
-        prov_kind = prov.kind or slot
+        prov_kind = getattr(prov, "kind", None) or slot
         origin_selector = "clothing_state" if prov_kind == "clothing_state" else slot
-        origin = SelectionOrigin(
+        origin = _SelectionOrigin(
             selector=origin_selector,
             selected_id=item_id,
             parent_ids=parent_ids,
             mode="explicit",
         )
 
-    st = d.get("span_type", SpanType.PLAIN)
+    st = d.get("span_type", _SpanType.PLAIN)
     if isinstance(st, str):
         try:
-            st = SpanType(st)
+            st = _SpanType(st)
         except ValueError:
-            st = SpanType.PLAIN
+            st = _SpanType.PLAIN
 
     raw_id = d.get("id", "")
     if raw_id == aid:
         raw_id = ""
 
     # 如果缺少 id 或 facts.explicit_fields 为空，通过权威词库快速逆向补全
-    if (not raw_id or not facts.explicit_fields) and text:
+    if (not raw_id or not getattr(facts, "explicit_fields", None)) and text:
         text_lookup = get_catalog_text_lookup(DATA_DIR)
         norm_s = normalize_slot_name(slot)
         txt = text.strip().lower()
@@ -707,11 +727,11 @@ def dict_to_prompt_atom(d: Dict[str, Any] | PromptAtom) -> PromptAtom:
             tag_id, facts_dict = found
             if not raw_id:
                 raw_id = tag_id
-            if not facts.explicit_fields and facts_dict:
-                facts = SemanticFacts.from_dict(facts_dict)
+            if not getattr(facts, "explicit_fields", None) and facts_dict:
+                facts = _SemanticFacts.from_dict(facts_dict)
 
-    if not facts.explicit_fields:
-        facts = SemanticFacts(
+    if not getattr(facts, "explicit_fields", None):
+        facts = _SemanticFacts(
             semantic_role="selector",
             visible_regions=facts.visible_regions,
             garment_topologies=facts.garment_topologies,
@@ -719,7 +739,7 @@ def dict_to_prompt_atom(d: Dict[str, Any] | PromptAtom) -> PromptAtom:
             prop_usage=facts.prop_usage,
         )
 
-    atom = PromptAtom(
+    atom = _PromptAtom(
         text=text,
         span_type=st,
         source_slot=slot,
@@ -752,8 +772,14 @@ def build_replay_entity_key(atom: PromptAtom) -> Optional[str]:
     return ekey
 
 
-def get_active_worn_entities(active_atoms: Sequence[PromptAtom]) -> List[GarmentCarrierEntity]:
+def get_active_worn_entities(
+    active_atoms: Sequence[PromptAtom],
+    find_carrier_fn=None,
+) -> List[GarmentCarrierEntity]:
     """从当前活跃 PromptAtom 序列恢复实体，并精确应用 discarded 状态判定 (复用生产 conflict_resolver.py:2221-2237)"""
+    if find_carrier_fn is None:
+        find_carrier_fn = find_bound_carrier
+
     entities_map: Dict[str, GarmentCarrierEntity] = {}
     for a in active_atoms:
         ekey = build_replay_entity_key(a)
@@ -793,8 +819,9 @@ def get_active_worn_entities(active_atoms: Sequence[PromptAtom]) -> List[Garment
         )
     ]
     for da in discarded_atoms:
-        binding = find_bound_carrier(da, list(entities_map.values()))
-        if binding.status == BindingStatus.BOUND and binding.target_entity:
+        binding = find_carrier_fn(da, list(entities_map.values()))
+        status_name = getattr(binding.status, "name", str(binding.status))
+        if status_name == "BOUND" and binding.target_entity:
             binding.target_entity.is_worn = False
             binding.target_entity.is_ambient = True
             binding.target_entity.discarded_by = da
@@ -824,13 +851,48 @@ def is_panties_qualified_entity(e: GarmentCarrierEntity) -> bool:
     )
 
 
-_CACHED_RESOLVER: Optional[ConflictResolver] = None
+_RESOLVER_CACHE: Dict[str, Any] = {}
 
 def get_conflict_resolver(data_dir: Path | str = DATA_DIR) -> ConflictResolver:
-    global _CACHED_RESOLVER
-    if _CACHED_RESOLVER is None:
-        _CACHED_RESOLVER = ConflictResolver(str(data_dir))
-    return _CACHED_RESOLVER
+    global _RESOLVER_CACHE
+    resolved_data_dir = Path(data_dir).resolve()
+    key = str(resolved_data_dir)
+    if key in _RESOLVER_CACHE:
+        return _RESOLVER_CACHE[key]
+
+    # 检查 data_dir 是否属于历史受控对照环境 (例如 controlled_ref_6da94cb_m2 或 controlled_ref_c74084d_m1)
+    env_root = None
+    for p in [resolved_data_dir.parent, resolved_data_dir.parent.parent]:
+        if (p / "lib" / "conflict_resolver.py").is_file():
+            env_root = p
+            break
+
+    if env_root and env_root != REPO_DIR:
+        import sys
+        old_path = list(sys.path)
+        old_modules = {k: v for k, v in sys.modules.items() if k.startswith("lib.") or k == "lib"}
+        for k in old_modules:
+            del sys.modules[k]
+        try:
+            sys.path.insert(0, str(env_root))
+            import lib.conflict_resolver as hist_cr
+            resolver = hist_cr.ConflictResolver(str(resolved_data_dir))
+            resolver._module = hist_cr
+            _RESOLVER_CACHE[key] = resolver
+            return resolver
+        finally:
+            sys.path = old_path
+            for k in list(sys.modules.keys()):
+                if k.startswith("lib.") or k == "lib":
+                    del sys.modules[k]
+            sys.modules.update(old_modules)
+
+    from lib.conflict_resolver import ConflictResolver
+    import lib.conflict_resolver as cur_cr
+    resolver = ConflictResolver(str(resolved_data_dir))
+    resolver._module = cur_cr
+    _RESOLVER_CACHE[key] = resolver
+    return resolver
 
 
 def is_decision_match(dec_dict: Dict[str, Any], actual_dec: Any) -> bool:
@@ -1070,16 +1132,20 @@ def verify_full_resolution_decisions(
     6. 实时核销活跃原子池，杜绝先删后用的时序漏洞。
     """
     errors: List[str] = []
+    resolver = get_conflict_resolver(data_dir or DATA_DIR)
+    res_mod = getattr(resolver, "_module", None)
+    find_carrier_fn = getattr(res_mod, "find_bound_carrier", find_bound_carrier) if res_mod else find_bound_carrier
+    is_modifier_fn = getattr(res_mod, "is_garment_modifier_atom", is_garment_modifier_atom) if res_mod else is_garment_modifier_atom
+
     source_atom_objs: List[PromptAtom] = []
     active_map: Dict[str, PromptAtom] = {}
     for a in source_atoms:
-        atom_obj = dict_to_prompt_atom(a)
+        atom_obj = dict_to_prompt_atom(a, models_mod=res_mod)
         if atom_obj.id == atom_obj.atom_id:
             object.__setattr__(atom_obj, "id", "")
         source_atom_objs.append(atom_obj)
         active_map[atom_obj.atom_id] = atom_obj
 
-    resolver = get_conflict_resolver(data_dir or DATA_DIR)
     actual_decisions: List[Any] = []
     try:
         _, _, rep = resolver.resolve_atoms_with_full_report(
@@ -1229,7 +1295,7 @@ def verify_full_resolution_decisions(
             if wid not in active_map:
                 errors.append(f"WINNER_NOT_ACTIVE: winner atom '{wid}' is not active at decision time (already dropped or missing)")
 
-        worn_entities = get_active_worn_entities(list(active_map.values()))
+        worn_entities = get_active_worn_entities(list(active_map.values()), find_carrier_fn=find_carrier_fn)
 
         # 3B. 缺席互斥规则
         if rule_id == "absence_state_conflict" or reason_code == "absence_state_conflict":
@@ -1281,21 +1347,22 @@ def verify_full_resolution_decisions(
             if tid in active_map:
                 target_atom = active_map[tid]
                 tslot = (target_atom.source_slot or "").lower()
-                if tslot in NON_GARMENT_DOMAINS or not is_garment_modifier_atom(target_atom):
+                if tslot in NON_GARMENT_DOMAINS or not is_modifier_fn(target_atom):
                     errors.append(
                         f"ILLEGAL_CARRIER_BINDING_TARGET: carrier check rule '{rule_id}' targeted non-modifier atom "
                         f"'{target_atom.text}' (slot='{tslot}', id='{target_atom.source_item_id}')"
                     )
                 else:
-                    binding = find_bound_carrier(target_atom, worn_entities)
+                    binding = find_carrier_fn(target_atom, worn_entities)
+                    status_name = getattr(binding.status, "name", str(binding.status))
                     if action == "drop":
-                        if binding.status == BindingStatus.BOUND:
+                        if status_name == "BOUND":
                             cid = binding.target_entity.selected_id if binding.target_entity else "unknown"
                             errors.append(
                                 f"ILLEGAL_CARRIER_DROP_WHEN_BOUND: Atom '{tid}' ('{target_atom.text}') was dropped for lacking carrier, "
                                 f"but has active bound carrier '{cid}' at decision time"
                             )
-                        elif binding.status == BindingStatus.AMBIGUOUS_MULTIPLE_CANDIDATES:
+                        elif status_name == "AMBIGUOUS_MULTIPLE_CANDIDATES":
                             errors.append(
                                 f"ILLEGAL_CARRIER_DROP_WHEN_BOUND: Atom '{tid}' ('{target_atom.text}') was dropped for lacking carrier, "
                                 f"but has multiple active carrier candidates at decision time (ambiguity preserves atom)"
@@ -1312,23 +1379,28 @@ def verify_full_resolution_decisions(
                 del active_map[tid]
         elif action == "replace":
             old = active_map.pop(tid, None)
+            _TagProv = getattr(res_mod, "TagProvenance", TagProvenance) if res_mod else TagProvenance
+            _SpanT = getattr(res_mod, "SpanType", SpanType) if res_mod else SpanType
+            _PromptA = getattr(res_mod, "PromptAtom", PromptAtom) if res_mod else PromptAtom
             for pid in dec.get("produced_atom_ids", []):
                 slot = old.source_slot if old else "clothing"
                 item_id = old.source_item_id if old else ""
-                active_map[pid] = PromptAtom(
+                active_map[pid] = _PromptA(
                     text=dec.get("after_text") or "",
-                    span_type=SpanType.PLAIN,
+                    span_type=_SpanT.PLAIN,
                     source_slot=slot,
                     source_item_id=item_id,
                     atom_id=pid,
                     id=pid,
-                    provenance=TagProvenance(item_id=item_id, kind=slot, rule_id=rule_id, parent_ids=(tid,) if tid else ()),
+                    provenance=_TagProv(item_id=item_id, kind=slot, rule_id=rule_id, parent_ids=(tid,) if tid else ()),
                 )
         elif action == "inject":
+            _SpanT = getattr(res_mod, "SpanType", SpanType) if res_mod else SpanType
+            _PromptA = getattr(res_mod, "PromptAtom", PromptAtom) if res_mod else PromptAtom
             for pid in dec.get("produced_atom_ids", []):
-                active_map[pid] = PromptAtom(
+                active_map[pid] = _PromptA(
                     text=dec.get("after_text") or "",
-                    span_type=SpanType.PLAIN,
+                    span_type=_SpanT.PLAIN,
                     source_slot="clothing_extension",
                     atom_id=pid,
                     id=pid,

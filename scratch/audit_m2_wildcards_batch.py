@@ -110,6 +110,15 @@ def setup_m2_controlled_reference_env(scratch_dir: Path) -> Path:
 
     for fname, exp_hash in EXPECTED_AUDITED_DATA_HASHES.items():
         src_path = DATA_DIR / fname
+        if not src_path.exists() or hashlib.sha256(src_path.read_bytes()).hexdigest() != exp_hash:
+            # 优先使用匹配的历史数据环境快照
+            snap_path = scratch_dir / "m4_snapshots" / "batch_1_pre_ingest" / fname
+            if snap_path.exists() and hashlib.sha256(snap_path.read_bytes()).hexdigest() == exp_hash:
+                src_path = snap_path
+            else:
+                ref_path = controlled_data_dir / fname
+                if ref_path.exists() and hashlib.sha256(ref_path.read_bytes()).hexdigest() == exp_hash:
+                    src_path = ref_path
         if not src_path.exists():
             raise FileNotFoundError(f"Audited data file missing: {src_path}")
         src_hash = hashlib.sha256(src_path.read_bytes()).hexdigest()
@@ -776,10 +785,18 @@ def attribute_m2_seed_diff(
     catalog_lookup: Dict[Tuple[str, str], Set[str]],
     valid_rules: Set[str] | None = None,
     replay_oracle: Optional[Any] = None,
+    data_dir: Optional[Path] = None,
 ) -> Dict[str, Any]:
     """对单个种子执行严格结构化逐原子跨版本差异因果归因 (6da94cb -> M2)。"""
+    if data_dir is None:
+        hist_ref_data = REPO_DIR / "scratch" / "controlled_ref_6da94cb_m2" / "data"
+        if hist_ref_data.exists():
+            data_dir = hist_ref_data
+        else:
+            data_dir = DATA_DIR
+
     if valid_rules is None:
-        valid_rules = load_authoritative_resolver_rules(DATA_DIR)
+        valid_rules = load_authoritative_resolver_rules(data_dir)
 
     base_src = base_item["source_atoms"]
     cur_src = cur_item["source_atoms"]
@@ -919,7 +936,7 @@ def attribute_m2_seed_diff(
             )
 
     # 4B. 统一决策合法性核验
-    replay_errors = replay_and_verify_decisions(cur_src, cur_decs, valid_rules, cur_bindings=cur_bindings, seed=seed)
+    replay_errors = replay_and_verify_decisions(cur_src, cur_decs, valid_rules, cur_bindings=cur_bindings, seed=seed, data_dir=data_dir)
     if replay_errors:
         unexplained_reasons.extend(replay_errors)
 

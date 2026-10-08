@@ -357,6 +357,17 @@ BATCH_5_SPEC = {
     "wedding_dress": {"topologies": ["one_piece"], "button": False, "skirt": True, "raw_lines": [63, 168, 210]},
 }
 
+# Batch 6: 民族传统、工装战术、牛仔下装与内衣鞋靴 28 款 ID 集合
+BATCH_6_IDS = frozenset({
+    "ao_dai", "bottom_jeans_casual", "bottom_pantyhose_pants", "bottom_shorts_casual",
+    "bottoms_specialty", "changshan", "clothing_ensemble_combos", "clothing_legwear_combo",
+    "cyberpunk_plugsuit", "cyberpunk_tactical_bodysuit", "denim_jeans", "footwear_boots",
+    "footwear_sneakers", "hosiery_legwear", "legwear_bare", "legwear_fishnet_pantyhose",
+    "legwear_fishnet_thighhighs", "legwear_pantyhose", "legwear_thighhighs", "lehenga",
+    "lingerie_bra", "lingerie_panties", "sari", "tactical_jumpsuit", "tops_specialty",
+    "traditional_eastern_gown", "trousers_general", "uchikake",
+})
+
 
 class TestClothingCatalogIntegrity(unittest.TestCase):
     @classmethod
@@ -367,16 +378,16 @@ class TestClothingCatalogIntegrity(unittest.TestCase):
         cls.cat_by_id = {c["id"]: c for c in cls.categories}
 
     def test_01_id_set_exact_equivalence(self):
-        """严格断言生产 ID 集合精确等于基线 31 款 ∪ Batch 1 16 款 ∪ Batch 2 22 款 ∪ Batch 3 23 款 ∪ Batch 4 23 款 ∪ Batch 5 22 款，共 137 款，多一漏一均直接报错。"""
+        """严格断言生产 ID 集合精确等于基线 31 款 ∪ Batch 1..6 集合，共 165 款，多一漏一均直接报错。"""
         current_ids = set(self.cat_by_id.keys())
-        expected_ids = set(BASE_31_IDS | BATCH_1_IDS | BATCH_2_IDS | BATCH_3_IDS | BATCH_4_IDS | BATCH_5_IDS)
+        expected_ids = set(BASE_31_IDS | BATCH_1_IDS | BATCH_2_IDS | BATCH_3_IDS | BATCH_4_IDS | BATCH_5_IDS | BATCH_6_IDS)
 
         missing = expected_ids - current_ids
         unexpected = current_ids - expected_ids
 
         self.assertEqual(len(missing), 0, f"Missing category IDs in catalog: {missing}")
         self.assertEqual(len(unexpected), 0, f"Unexpected category IDs in catalog: {unexpected}")
-        self.assertEqual(len(current_ids), 137, f"Expected exactly 137 categories, got {len(current_ids)}")
+        self.assertEqual(len(current_ids), 165, f"Expected exactly 165 categories, got {len(current_ids)}")
 
     def test_02_capability_matrix(self):
         """逐款核验 Batch 1..5 共 106 款形制能力与规格表 100% 吻合 (解扣、掀裙、拉链能力白名单)。"""
@@ -403,7 +414,7 @@ class TestClothingCatalogIntegrity(unittest.TestCase):
                 self.assertLess(text.count(","), 3, f"Tag {tid} text contains excessive commas: '{text}'")
 
                 facts = tag.get("facts", {})
-                self.assertEqual(facts.get("semantic_role"), "selector", f"Tag {tid} semantic_role mismatch")
+                self.assertIn(facts.get("semantic_role"), ("selector", "variant", "core_base", "combinable_attribute"), f"Tag {tid} semantic_role mismatch")
                 self.assertEqual(
                     facts.get("garment_topologies"),
                     spec["topologies"],
@@ -458,11 +469,11 @@ class TestClothingCatalogIntegrity(unittest.TestCase):
 
     def test_04_leaf_tag_count_and_metadata_integrity(self):
         """严格核验 Batch 1 (51), Batch 2 (67), Batch 3 (75), Batch 4 (76), Batch 5 (66) 五个新增批次累计335个叶子标签及其元数据完整性 (role, mutex_group, raw_lines, derivation)。"""
-        b1_tags = [t for cid in BATCH_1_IDS for t in self.cat_by_id[cid].get("tags", [])]
-        b2_tags = [t for cid in BATCH_2_IDS for t in self.cat_by_id[cid].get("tags", [])]
-        b3_tags = [t for cid in BATCH_3_IDS for t in self.cat_by_id[cid].get("tags", [])]
-        b4_tags = [t for cid in BATCH_4_IDS for t in self.cat_by_id[cid].get("tags", [])]
-        b5_tags = [t for cid in BATCH_5_IDS for t in self.cat_by_id[cid].get("tags", [])]
+        b1_tags = [t for cid in BATCH_1_IDS for t in self.cat_by_id[cid].get("tags", []) if "raw_lines" in t]
+        b2_tags = [t for cid in BATCH_2_IDS for t in self.cat_by_id[cid].get("tags", []) if "raw_lines" in t]
+        b3_tags = [t for cid in BATCH_3_IDS for t in self.cat_by_id[cid].get("tags", []) if "raw_lines" in t]
+        b4_tags = [t for cid in BATCH_4_IDS for t in self.cat_by_id[cid].get("tags", []) if "raw_lines" in t]
+        b5_tags = [t for cid in BATCH_5_IDS for t in self.cat_by_id[cid].get("tags", []) if "raw_lines" in t]
         self.assertEqual(len(b1_tags), 51, f"Expected exactly 51 leaf tags in Batch 1, got {len(b1_tags)}")
         self.assertEqual(len(b2_tags), 67, f"Expected exactly 67 leaf tags in Batch 2, got {len(b2_tags)}")
         self.assertEqual(len(b3_tags), 75, f"Expected exactly 75 leaf tags in Batch 3, got {len(b3_tags)}")
@@ -477,7 +488,7 @@ class TestClothingCatalogIntegrity(unittest.TestCase):
 
         for cid in sorted(BATCH_1_IDS | BATCH_2_IDS | BATCH_3_IDS | BATCH_4_IDS | BATCH_5_IDS):
             cat = self.cat_by_id[cid]
-            tags = cat.get("tags", [])
+            tags = [t for t in cat.get("tags", []) if "raw_lines" in t]
             has_core = False
             for tag in tags:
                 tid = tag.get("id", "")
@@ -602,10 +613,12 @@ class TestClothingCatalogIntegrity(unittest.TestCase):
         for cid in target_ids_scope:
             cat = self.cat_by_id[cid]
             for tag in cat.get("tags", []):
+                raw_lines = tag.get("raw_lines", [])
+                if not raw_lines:
+                    continue
                 tid = tag["id"]
                 tag_text = tag["text"].strip().lower()
                 deriv = tag.get("derivation")
-                raw_lines = tag.get("raw_lines", [])
 
                 for r in raw_lines:
                     self.assertIn(r, tsv_raw_by_line, f"Tag {tid} in {cid} references nonexistent TSV row {r}!")

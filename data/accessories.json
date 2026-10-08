@@ -33,6 +33,17 @@
               "face"
             ]
           }
+        },
+        {
+          "id": "long_straight_black__ext_center_curtain",
+          "text": "long with a center part, hanging in a smooth curtain",
+          "facts": {
+            "hair_facts": {
+              "hairstyle": "long_straight",
+              "parting": "center"
+            },
+            "governance_metadata": {}
+          }
         }
       ]
     },
@@ -78,6 +89,27 @@
             "visible_regions": [
               "face"
             ]
+          }
+        },
+        {
+          "id": "big_wavy_curls__ext_curly",
+          "text": "curly hair",
+          "facts": {
+            "accessory_facts": {
+              "silhouette": "curly"
+            },
+            "governance_metadata": {}
+          }
+        },
+        {
+          "id": "big_wavy_curls__ext_blow_dried",
+          "text": "in voluminous blow-dried waves swept off a side part",
+          "facts": {
+            "hair_facts": {
+              "hairstyle": "big_wavy_curls",
+              "styling": "blow_dried"
+            },
+            "governance_metadata": {}
           }
         }
       ]
@@ -125,6 +157,16 @@
               "face"
             ]
           }
+        },
+        {
+          "id": "twin_tails__ext_pigtails",
+          "text": "in two gathered pigtails, one on each side",
+          "facts": {
+            "hair_facts": {
+              "hairstyle": "twin_tails"
+            },
+            "governance_metadata": {}
+          }
         }
       ]
     },
@@ -171,6 +213,19 @@
               "face"
             ]
           }
+        },
+        {
+          "id": "high_ponytail__ext_crown_falling",
+          "text": "swept into a high ponytail at the crown, lengths falling free",
+          "facts": {
+            "hair_facts": {
+              "hairstyle": "high_ponytail"
+            },
+            "accessory_facts": {
+              "position": "crown"
+            },
+            "governance_metadata": {}
+          }
         }
       ]
     },
@@ -206,6 +261,17 @@
             "visible_regions": [
               "face"
             ]
+          }
+        },
+        {
+          "id": "low_ponytail__ext_straight_lengths",
+          "text": "gathered back into a low ponytail at the nape, lengths hanging straight",
+          "facts": {
+            "hair_facts": {
+              "hairstyle": "low_ponytail",
+              "lengths": "straight"
+            },
+            "governance_metadata": {}
           }
         }
       ]
@@ -252,6 +318,16 @@
             "visible_regions": [
               "face"
             ]
+          }
+        },
+        {
+          "id": "messy_bun__ext_top_knot",
+          "text": "in a top knot gathered high on the head",
+          "facts": {
+            "hair_facts": {
+              "hairstyle": "top_knot"
+            },
+            "governance_metadata": {}
           }
         }
       ]
@@ -325,6 +401,30 @@
               "face"
             ]
           }
+        },
+        {
+          "id": "bob_cut__ext_center_part",
+          "text": "in a chin-length bob with a center part",
+          "facts": {
+            "hair_facts": {
+              "hairstyle": "bob_cut",
+              "parting": "center"
+            },
+            "governance_metadata": {}
+          }
+        },
+        {
+          "id": "bob_cut__ext_angled",
+          "text": "in an angled bob, longer at the front",
+          "facts": {
+            "hair_facts": {
+              "hairstyle": "bob_cut"
+            },
+            "accessory_facts": {
+              "shape": "angled"
+            },
+            "governance_metadata": {}
+          }
         }
       ]
     },
@@ -360,6 +460,19 @@
             "visible_regions": [
               "face"
             ]
+          }
+        },
+        {
+          "id": "collarbone_lob__ext_shaggy",
+          "text": "in a shaggy lob just past the shoulders",
+          "facts": {
+            "hair_facts": {
+              "hairstyle": "lob"
+            },
+            "lighting_facts": {
+              "style": "shaggy"
+            },
+            "governance_metadata": {}
           }
         }
       ]
@@ -727,6 +840,2141 @@
           }
         }
       ]
+    },
+    {
+      "id": "hair_bald",
+      "name_zh": "光头剃光发 (Bald)",
+      "tags": [
+        {
+          "id": "hair_bald__tag_000",
+          "text": "bald with a closely shaved scalp",
+          "facts": {
+            "incompatible_with": [
+              "hair_color_palette",
+              "hair_length_palette",
+              "hair_texture_palette"
+            ],
+            "hair_facts": {
+              "hair_category": "bald",
+              "shaved_level": "close"
+            },
+            "governance_metadata": {}
+          }
+        },
+        {
+          "id": "hair_bald__ext_shiny",
+          "text": "bald, a bare and shiny scalp",
+          "facts": {
+            "incompatible_with": [
+              "hair_color_palette",
+              "hair_length_palette",
+              "hair_texture_palette"
+            ],
+            "hair_facts": {
+              "hair_category": "bald"
+            },
+            "accessory_facts": {
+              "surface": "shiny"
+            },
+            "governance_metadata": {}
+          }
+        },
+        {
+          "id": "hair_bald__ext_stubble",
+          "text": "bald, a shaved head with light stubble",
+          "facts": {
+            "incompatible_with": [
+              "hair_color_palette",
+              "hair_length_palette",
+              "hair_texture_palette"
+            ],
+            "hair_facts": {
+              "hair_category": "bald",
+              "stubble": "light"
+            },
+            "governance_metadata": {}
+          }
+        },
+        {
+          "id": "hair_bald__ext_clean_shaven",
+          "text": "bald, a smooth clean-shaven head",
+          "facts": {
+            "incompatible_with": [
+              "hair_color_palette",
+              "hair_length_palette",
+              "hair_texture_palette"
+            ],
+            "hair_facts": {
+              "hair_category": "bald"
+            },
+            "accessory_facts": {
+              "surface": "smooth"
+            },
+            "governance_metadata": {}
+          }
+        }
+      ]
+    },
+    {
+      "id": "hair_ensemble_composite",
+      "name_zh": "复合多槽位发型组合 (Composite Hairstyle Ensemble)",
+      "tags": [
+        {
+          "id": "hair_ensemble_composite__tag_000",
+          "text": "complete composite hairstyle",
+          "facts": {
+            "accessory_facts": {
+              "dynamic_slots": [
+                {
+                  "slot_name": "length",
+                  "required": true,
+                  "branches": [
+                    {
+                      "weight": 1,
+                      "type": "wildcard_reference",
+                      "target": "02_hair/hair_lengths"
+                    }
+                  ]
+                },
+                {
+                  "slot_name": "styles",
+                  "required": true,
+                  "min_count": 1,
+                  "max_count": 3,
+                  "branches": [
+                    {
+                      "weight": 1,
+                      "type": "wildcard_reference",
+                      "target": "02_hair/hair_styles"
+                    }
+                  ]
+                },
+                {
+                  "slot_name": "color",
+                  "required": true,
+                  "branches": [
+                    {
+                      "weight": 1,
+                      "type": "wildcard_reference",
+                      "target": "09_style/colors"
+                    }
+                  ]
+                },
+                {
+                  "slot_name": "ornaments",
+                  "required": false,
+                  "branches": [
+                    {
+                      "weight": 1,
+                      "type": "empty",
+                      "value": ""
+                    },
+                    {
+                      "weight": 1,
+                      "type": "wildcard_reference",
+                      "target": "02_hair/hair_ornaments"
+                    }
+                  ]
+                }
+              ]
+            },
+            "governance_metadata": {
+              "sampling_compatibility_contract": {
+                "styles_mutex_rules": [
+                  "基础廓形互斥：straight, curly, wavy 间最多抽取 1 个",
+                  "发长级联约束：若 length 抽中 short/very short，则 styles 过滤排除长发专属款式(如 single long braid, waist-length)",
+                  "扎发位置互斥：高马尾与低马尾、盘发与散发互斥"
+                ]
+              },
+              "color_emphasis_wrapper": "({color} hair)",
+              "raw_template_format": "{hair_lengths}, {1-3$$__by_source/skyyysi/02_hair/hair_styles__}, ({colors} hair){|, hair_ornaments}",
+              "is_container_description": true,
+              "is_ensemble_combo": true,
+              "role": "ensemble_combo"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "hair_color_palette",
+      "name_zh": "正交发色库 (Hair Color Palette)",
+      "tags": [
+        {
+          "id": "hair_color__acid_yellow",
+          "text": "acid-yellow hair",
+          "facts": {
+            "mutex_groups": [
+              "hair_color"
+            ],
+            "incompatible_with": [
+              "hair_bald"
+            ],
+            "hair_facts": {
+              "color_group": "yellow"
+            },
+            "governance_metadata": {
+              "max_selections": 1,
+              "attribute_type": "hair_color"
+            }
+          }
+        },
+        {
+          "id": "hair_color__ash_blonde",
+          "text": "ash blonde hair",
+          "facts": {
+            "mutex_groups": [
+              "hair_color"
+            ],
+            "incompatible_with": [
+              "hair_bald"
+            ],
+            "hair_facts": {
+              "color_group": "blonde"
+            },
+            "governance_metadata": {
+              "max_selections": 1,
+              "attribute_type": "hair_color"
+            }
+          }
+        },
+        {
+          "id": "hair_color__bubblegum_pink",
+          "text": "bubblegum-pink hair",
+          "facts": {
+            "mutex_groups": [
+              "hair_color"
+            ],
+            "incompatible_with": [
+              "hair_bald"
+            ],
+            "hair_facts": {
+              "color_group": "pink"
+            },
+            "governance_metadata": {
+              "max_selections": 1,
+              "attribute_type": "hair_color"
+            }
+          }
+        },
+        {
+          "id": "hair_color__chestnut_brown",
+          "text": "chestnut brown hair",
+          "facts": {
+            "mutex_groups": [
+              "hair_color"
+            ],
+            "incompatible_with": [
+              "hair_bald"
+            ],
+            "hair_facts": {
+              "color_group": "brown"
+            },
+            "governance_metadata": {
+              "max_selections": 1,
+              "attribute_type": "hair_color"
+            }
+          }
+        },
+        {
+          "id": "hair_color__copper_red",
+          "text": "copper red hair",
+          "facts": {
+            "mutex_groups": [
+              "hair_color"
+            ],
+            "incompatible_with": [
+              "hair_bald"
+            ],
+            "hair_facts": {
+              "color_group": "red"
+            },
+            "governance_metadata": {
+              "max_selections": 1,
+              "attribute_type": "hair_color"
+            }
+          }
+        },
+        {
+          "id": "hair_color__crimson_red",
+          "text": "crimson red hair",
+          "facts": {
+            "mutex_groups": [
+              "hair_color"
+            ],
+            "incompatible_with": [
+              "hair_bald"
+            ],
+            "hair_facts": {
+              "color_group": "red"
+            },
+            "governance_metadata": {
+              "max_selections": 1,
+              "attribute_type": "hair_color"
+            }
+          }
+        },
+        {
+          "id": "hair_color__dark_auburn",
+          "text": "dark auburn hair",
+          "facts": {
+            "mutex_groups": [
+              "hair_color"
+            ],
+            "incompatible_with": [
+              "hair_bald"
+            ],
+            "hair_facts": {
+              "color_group": "auburn"
+            },
+            "governance_metadata": {
+              "max_selections": 1,
+              "attribute_type": "hair_color"
+            }
+          }
+        },
+        {
+          "id": "hair_color__dark_blonde",
+          "text": "dark blonde hair",
+          "facts": {
+            "mutex_groups": [
+              "hair_color"
+            ],
+            "incompatible_with": [
+              "hair_bald"
+            ],
+            "hair_facts": {
+              "color_group": "blonde"
+            },
+            "governance_metadata": {
+              "max_selections": 1,
+              "attribute_type": "hair_color"
+            }
+          }
+        },
+        {
+          "id": "hair_color__dark_espresso_brown",
+          "text": "dark espresso brown hair",
+          "facts": {
+            "mutex_groups": [
+              "hair_color"
+            ],
+            "incompatible_with": [
+              "hair_bald"
+            ],
+            "hair_facts": {
+              "color_group": "brown"
+            },
+            "governance_metadata": {
+              "max_selections": 1,
+              "attribute_type": "hair_color"
+            }
+          }
+        },
+        {
+          "id": "hair_color__neon_tips",
+          "text": "dark hair with neon-dyed tips",
+          "facts": {
+            "mutex_groups": [
+              "hair_color"
+            ],
+            "incompatible_with": [
+              "hair_bald"
+            ],
+            "hair_facts": {
+              "dye_technique": "dip_dye"
+            },
+            "governance_metadata": {
+              "max_selections": 1,
+              "attribute_type": "hair_color"
+            }
+          }
+        },
+        {
+          "id": "hair_color__deep_burgundy",
+          "text": "deep burgundy hair",
+          "facts": {
+            "mutex_groups": [
+              "hair_color"
+            ],
+            "incompatible_with": [
+              "hair_bald"
+            ],
+            "hair_facts": {
+              "color_group": "burgundy"
+            },
+            "governance_metadata": {
+              "max_selections": 1,
+              "attribute_type": "hair_color"
+            }
+          }
+        },
+        {
+          "id": "hair_color__deep_cobalt_blue",
+          "text": "deep cobalt blue hair",
+          "facts": {
+            "mutex_groups": [
+              "hair_color"
+            ],
+            "incompatible_with": [
+              "hair_bald"
+            ],
+            "hair_facts": {
+              "color_group": "blue"
+            },
+            "governance_metadata": {
+              "max_selections": 1,
+              "attribute_type": "hair_color"
+            }
+          }
+        },
+        {
+          "id": "hair_color__deep_violet",
+          "text": "deep violet hair",
+          "facts": {
+            "mutex_groups": [
+              "hair_color"
+            ],
+            "incompatible_with": [
+              "hair_bald"
+            ],
+            "hair_facts": {
+              "color_group": "purple"
+            },
+            "governance_metadata": {
+              "max_selections": 1,
+              "attribute_type": "hair_color"
+            }
+          }
+        },
+        {
+          "id": "hair_color__electric_blue",
+          "text": "electric blue hair",
+          "facts": {
+            "mutex_groups": [
+              "hair_color"
+            ],
+            "incompatible_with": [
+              "hair_bald"
+            ],
+            "hair_facts": {
+              "color_group": "blue"
+            },
+            "governance_metadata": {
+              "max_selections": 1,
+              "attribute_type": "hair_color"
+            }
+          }
+        },
+        {
+          "id": "hair_color__blue_streaked_black",
+          "text": "electric-blue-streaked black hair",
+          "facts": {
+            "mutex_groups": [
+              "hair_color"
+            ],
+            "incompatible_with": [
+              "hair_bald"
+            ],
+            "hair_facts": {
+              "dye_technique": "streaks"
+            },
+            "governance_metadata": {
+              "max_selections": 1,
+              "attribute_type": "hair_color"
+            }
+          }
+        },
+        {
+          "id": "hair_color__emerald_green",
+          "text": "emerald green hair",
+          "facts": {
+            "mutex_groups": [
+              "hair_color"
+            ],
+            "incompatible_with": [
+              "hair_bald"
+            ],
+            "hair_facts": {
+              "color_group": "green"
+            },
+            "governance_metadata": {
+              "max_selections": 1,
+              "attribute_type": "hair_color"
+            }
+          }
+        },
+        {
+          "id": "hair_color__galaxy_blue_purple",
+          "text": "galaxy blue-and-purple hair",
+          "facts": {
+            "mutex_groups": [
+              "hair_color"
+            ],
+            "incompatible_with": [
+              "hair_bald"
+            ],
+            "hair_facts": {
+              "dye_technique": "galaxy_gradient"
+            },
+            "governance_metadata": {
+              "max_selections": 1,
+              "attribute_type": "hair_color"
+            }
+          }
+        },
+        {
+          "id": "hair_color__ginger_red",
+          "text": "ginger red hair",
+          "facts": {
+            "mutex_groups": [
+              "hair_color"
+            ],
+            "incompatible_with": [
+              "hair_bald"
+            ],
+            "hair_facts": {
+              "color_group": "red"
+            },
+            "governance_metadata": {
+              "max_selections": 1,
+              "attribute_type": "hair_color"
+            }
+          }
+        },
+        {
+          "id": "hair_color__golden_yellow",
+          "text": "golden yellow hair",
+          "facts": {
+            "mutex_groups": [
+              "hair_color"
+            ],
+            "incompatible_with": [
+              "hair_bald"
+            ],
+            "hair_facts": {
+              "color_group": "yellow"
+            },
+            "governance_metadata": {
+              "max_selections": 1,
+              "attribute_type": "hair_color"
+            }
+          }
+        },
+        {
+          "id": "hair_color__gunmetal_grey",
+          "text": "gunmetal grey hair",
+          "facts": {
+            "mutex_groups": [
+              "hair_color"
+            ],
+            "incompatible_with": [
+              "hair_bald"
+            ],
+            "hair_facts": {
+              "color_group": "grey"
+            },
+            "governance_metadata": {
+              "max_selections": 1,
+              "attribute_type": "hair_color"
+            }
+          }
+        },
+        {
+          "id": "hair_color__honey_blonde",
+          "text": "honey blonde hair",
+          "facts": {
+            "mutex_groups": [
+              "hair_color"
+            ],
+            "incompatible_with": [
+              "hair_bald"
+            ],
+            "hair_facts": {
+              "color_group": "blonde"
+            },
+            "governance_metadata": {
+              "max_selections": 1,
+              "attribute_type": "hair_color"
+            }
+          }
+        },
+        {
+          "id": "hair_color__hot_pink",
+          "text": "hot pink hair",
+          "facts": {
+            "mutex_groups": [
+              "hair_color"
+            ],
+            "incompatible_with": [
+              "hair_bald"
+            ],
+            "hair_facts": {
+              "color_group": "pink"
+            },
+            "governance_metadata": {
+              "max_selections": 1,
+              "attribute_type": "hair_color"
+            }
+          }
+        },
+        {
+          "id": "hair_color__icy_blue_white",
+          "text": "icy blue-white hair",
+          "facts": {
+            "mutex_groups": [
+              "hair_color"
+            ],
+            "incompatible_with": [
+              "hair_bald"
+            ],
+            "hair_facts": {
+              "color_group": "white"
+            },
+            "governance_metadata": {
+              "max_selections": 1,
+              "attribute_type": "hair_color"
+            }
+          }
+        },
+        {
+          "id": "hair_color__jet_black",
+          "text": "jet black hair",
+          "facts": {
+            "mutex_groups": [
+              "hair_color"
+            ],
+            "incompatible_with": [
+              "hair_bald"
+            ],
+            "hair_facts": {
+              "color_group": "black"
+            },
+            "governance_metadata": {
+              "max_selections": 1,
+              "attribute_type": "hair_color"
+            }
+          }
+        },
+        {
+          "id": "hair_color__lavender",
+          "text": "lavender hair",
+          "facts": {
+            "mutex_groups": [
+              "hair_color"
+            ],
+            "incompatible_with": [
+              "hair_bald"
+            ],
+            "hair_facts": {
+              "color_group": "purple"
+            },
+            "governance_metadata": {
+              "max_selections": 1,
+              "attribute_type": "hair_color"
+            }
+          }
+        },
+        {
+          "id": "hair_color__light_caramel_brown",
+          "text": "light caramel brown hair",
+          "facts": {
+            "mutex_groups": [
+              "hair_color"
+            ],
+            "incompatible_with": [
+              "hair_bald"
+            ],
+            "hair_facts": {
+              "color_group": "brown"
+            },
+            "governance_metadata": {
+              "max_selections": 1,
+              "attribute_type": "hair_color"
+            }
+          }
+        },
+        {
+          "id": "hair_color__medium_ash_brown",
+          "text": "medium ash brown hair",
+          "facts": {
+            "mutex_groups": [
+              "hair_color"
+            ],
+            "incompatible_with": [
+              "hair_bald"
+            ],
+            "hair_facts": {
+              "color_group": "brown"
+            },
+            "governance_metadata": {
+              "max_selections": 1,
+              "attribute_type": "hair_color"
+            }
+          }
+        },
+        {
+          "id": "hair_color__mint_green",
+          "text": "mint green hair",
+          "facts": {
+            "mutex_groups": [
+              "hair_color"
+            ],
+            "incompatible_with": [
+              "hair_bald"
+            ],
+            "hair_facts": {
+              "color_group": "green"
+            },
+            "governance_metadata": {
+              "max_selections": 1,
+              "attribute_type": "hair_color"
+            }
+          }
+        },
+        {
+          "id": "hair_color__neon_green",
+          "text": "neon green hair",
+          "facts": {
+            "mutex_groups": [
+              "hair_color"
+            ],
+            "incompatible_with": [
+              "hair_bald"
+            ],
+            "hair_facts": {
+              "color_group": "green"
+            },
+            "governance_metadata": {
+              "max_selections": 1,
+              "attribute_type": "hair_color"
+            }
+          }
+        },
+        {
+          "id": "hair_color__oil_slick_iridescent",
+          "text": "oil-slick iridescent hair",
+          "facts": {
+            "mutex_groups": [
+              "hair_color"
+            ],
+            "incompatible_with": [
+              "hair_bald"
+            ],
+            "lighting_facts": {
+              "effect": "iridescent"
+            },
+            "shot_facts": {
+              "effect": "iridescent"
+            },
+            "governance_metadata": {
+              "max_selections": 1,
+              "attribute_type": "hair_color"
+            }
+          }
+        },
+        {
+          "id": "hair_color__pastel_ombre",
+          "text": "pastel ombre hair",
+          "facts": {
+            "mutex_groups": [
+              "hair_color"
+            ],
+            "incompatible_with": [
+              "hair_bald"
+            ],
+            "hair_facts": {
+              "dye_technique": "ombre"
+            },
+            "governance_metadata": {
+              "max_selections": 1,
+              "attribute_type": "hair_color"
+            }
+          }
+        },
+        {
+          "id": "hair_color__pastel_pink",
+          "text": "pastel pink hair",
+          "facts": {
+            "mutex_groups": [
+              "hair_color"
+            ],
+            "incompatible_with": [
+              "hair_bald"
+            ],
+            "hair_facts": {
+              "color_group": "pink"
+            },
+            "governance_metadata": {
+              "max_selections": 1,
+              "attribute_type": "hair_color"
+            }
+          }
+        },
+        {
+          "id": "hair_color__peach_blonde",
+          "text": "peach-blonde hair",
+          "facts": {
+            "mutex_groups": [
+              "hair_color"
+            ],
+            "incompatible_with": [
+              "hair_bald"
+            ],
+            "hair_facts": {
+              "color_group": "blonde"
+            },
+            "governance_metadata": {
+              "max_selections": 1,
+              "attribute_type": "hair_color"
+            }
+          }
+        },
+        {
+          "id": "hair_color__platinum_blonde",
+          "text": "platinum blonde hair",
+          "facts": {
+            "mutex_groups": [
+              "hair_color"
+            ],
+            "incompatible_with": [
+              "hair_bald"
+            ],
+            "hair_facts": {
+              "color_group": "blonde"
+            },
+            "governance_metadata": {
+              "max_selections": 1,
+              "attribute_type": "hair_color"
+            }
+          }
+        },
+        {
+          "id": "hair_color__pink_roots_platinum",
+          "text": "platinum hair with pastel-pink roots",
+          "facts": {
+            "mutex_groups": [
+              "hair_color"
+            ],
+            "incompatible_with": [
+              "hair_bald"
+            ],
+            "hair_facts": {
+              "dye_technique": "root_shadow"
+            },
+            "governance_metadata": {
+              "max_selections": 1,
+              "attribute_type": "hair_color"
+            }
+          }
+        },
+        {
+          "id": "hair_color__rainbow_multicolored",
+          "text": "rainbow-dyed multicolored hair",
+          "facts": {
+            "mutex_groups": [
+              "hair_color"
+            ],
+            "incompatible_with": [
+              "hair_bald"
+            ],
+            "hair_facts": {
+              "dye_technique": "rainbow"
+            },
+            "governance_metadata": {
+              "max_selections": 1,
+              "attribute_type": "hair_color"
+            }
+          }
+        },
+        {
+          "id": "hair_color__rose_gold",
+          "text": "rose gold hair",
+          "facts": {
+            "mutex_groups": [
+              "hair_color"
+            ],
+            "incompatible_with": [
+              "hair_bald"
+            ],
+            "hair_facts": {
+              "color_group": "rose_gold"
+            },
+            "governance_metadata": {
+              "max_selections": 1,
+              "attribute_type": "hair_color"
+            }
+          }
+        },
+        {
+          "id": "hair_color__salt_and_pepper_grey",
+          "text": "salt-and-pepper grey hair",
+          "facts": {
+            "mutex_groups": [
+              "hair_color"
+            ],
+            "incompatible_with": [
+              "hair_bald"
+            ],
+            "hair_facts": {
+              "color_group": "grey"
+            },
+            "governance_metadata": {
+              "max_selections": 1,
+              "attribute_type": "hair_color"
+            }
+          }
+        },
+        {
+          "id": "hair_color__silver_grey",
+          "text": "silver grey hair",
+          "facts": {
+            "mutex_groups": [
+              "hair_color"
+            ],
+            "incompatible_with": [
+              "hair_bald"
+            ],
+            "hair_facts": {
+              "color_group": "silver"
+            },
+            "governance_metadata": {
+              "max_selections": 1,
+              "attribute_type": "hair_color"
+            }
+          }
+        },
+        {
+          "id": "hair_color__snow_white",
+          "text": "snow-white hair",
+          "facts": {
+            "mutex_groups": [
+              "hair_color"
+            ],
+            "incompatible_with": [
+              "hair_bald"
+            ],
+            "hair_facts": {
+              "color_group": "white"
+            },
+            "governance_metadata": {
+              "max_selections": 1,
+              "attribute_type": "hair_color"
+            }
+          }
+        },
+        {
+          "id": "hair_color__soft_black",
+          "text": "soft black hair",
+          "facts": {
+            "mutex_groups": [
+              "hair_color"
+            ],
+            "incompatible_with": [
+              "hair_bald"
+            ],
+            "hair_facts": {
+              "color_group": "black"
+            },
+            "governance_metadata": {
+              "max_selections": 1,
+              "attribute_type": "hair_color"
+            }
+          }
+        },
+        {
+          "id": "hair_color__split_dyed_two_tone",
+          "text": "split-dyed two-tone hair",
+          "facts": {
+            "mutex_groups": [
+              "hair_color"
+            ],
+            "incompatible_with": [
+              "hair_bald"
+            ],
+            "hair_facts": {
+              "dye_technique": "split_dye"
+            },
+            "governance_metadata": {
+              "max_selections": 1,
+              "attribute_type": "hair_color"
+            }
+          }
+        },
+        {
+          "id": "hair_color__steel_grey",
+          "text": "steel grey hair",
+          "facts": {
+            "mutex_groups": [
+              "hair_color"
+            ],
+            "incompatible_with": [
+              "hair_bald"
+            ],
+            "hair_facts": {
+              "color_group": "grey"
+            },
+            "governance_metadata": {
+              "max_selections": 1,
+              "attribute_type": "hair_color"
+            }
+          }
+        },
+        {
+          "id": "hair_color__strawberry_blonde",
+          "text": "strawberry blonde hair",
+          "facts": {
+            "mutex_groups": [
+              "hair_color"
+            ],
+            "incompatible_with": [
+              "hair_bald"
+            ],
+            "hair_facts": {
+              "color_group": "blonde"
+            },
+            "governance_metadata": {
+              "max_selections": 1,
+              "attribute_type": "hair_color"
+            }
+          }
+        },
+        {
+          "id": "hair_color__sunset_orange",
+          "text": "sunset orange hair",
+          "facts": {
+            "mutex_groups": [
+              "hair_color"
+            ],
+            "incompatible_with": [
+              "hair_bald"
+            ],
+            "hair_facts": {
+              "color_group": "orange"
+            },
+            "governance_metadata": {
+              "max_selections": 1,
+              "attribute_type": "hair_color"
+            }
+          }
+        },
+        {
+          "id": "hair_color__sunset_gradient",
+          "text": "sunset-gradient orange-to-pink hair",
+          "facts": {
+            "mutex_groups": [
+              "hair_color"
+            ],
+            "incompatible_with": [
+              "hair_bald"
+            ],
+            "hair_facts": {
+              "dye_technique": "gradient"
+            },
+            "governance_metadata": {
+              "max_selections": 1,
+              "attribute_type": "hair_color"
+            }
+          }
+        },
+        {
+          "id": "hair_color__tangerine_orange",
+          "text": "tangerine orange hair",
+          "facts": {
+            "mutex_groups": [
+              "hair_color"
+            ],
+            "incompatible_with": [
+              "hair_bald"
+            ],
+            "hair_facts": {
+              "color_group": "orange"
+            },
+            "governance_metadata": {
+              "max_selections": 1,
+              "attribute_type": "hair_color"
+            }
+          }
+        },
+        {
+          "id": "hair_color__teal",
+          "text": "teal hair",
+          "facts": {
+            "mutex_groups": [
+              "hair_color"
+            ],
+            "incompatible_with": [
+              "hair_bald"
+            ],
+            "hair_facts": {
+              "color_group": "teal"
+            },
+            "governance_metadata": {
+              "max_selections": 1,
+              "attribute_type": "hair_color"
+            }
+          }
+        },
+        {
+          "id": "hair_color__ultraviolet_purple",
+          "text": "ultraviolet purple hair",
+          "facts": {
+            "mutex_groups": [
+              "hair_color"
+            ],
+            "incompatible_with": [
+              "hair_bald"
+            ],
+            "hair_facts": {
+              "color_group": "purple"
+            },
+            "governance_metadata": {
+              "max_selections": 1,
+              "attribute_type": "hair_color"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "hair_length_palette",
+      "name_zh": "正交发长库 (Hair Length Palette)",
+      "tags": [
+        {
+          "id": "hair_length__long",
+          "text": "long hair",
+          "facts": {
+            "mutex_groups": [
+              "hair_length"
+            ],
+            "incompatible_with": [
+              "ext_aw_hair_bob_blunt_cut",
+              "ext_aw_hair_pixie_textured_crop",
+              "hair_bald"
+            ],
+            "hair_facts": {
+              "length_tier": "long"
+            },
+            "governance_metadata": {
+              "max_selections": 1,
+              "attribute_type": "hair_length"
+            }
+          }
+        },
+        {
+          "id": "hair_length__medium",
+          "text": "medium hair",
+          "facts": {
+            "mutex_groups": [
+              "hair_length"
+            ],
+            "incompatible_with": [
+              "hair_bald"
+            ],
+            "hair_facts": {
+              "length_tier": "medium"
+            },
+            "governance_metadata": {
+              "max_selections": 1,
+              "attribute_type": "hair_length"
+            }
+          }
+        },
+        {
+          "id": "hair_length__short",
+          "text": "short hair",
+          "facts": {
+            "mutex_groups": [
+              "hair_length"
+            ],
+            "incompatible_with": [
+              "ext_aw_hair_single_back_braid",
+              "hair_bald",
+              "hair_waist_feathered"
+            ],
+            "hair_facts": {
+              "length_tier": "short"
+            },
+            "governance_metadata": {
+              "max_selections": 1,
+              "attribute_type": "hair_length"
+            }
+          }
+        },
+        {
+          "id": "hair_length__very_long",
+          "text": "very long hair",
+          "facts": {
+            "mutex_groups": [
+              "hair_length"
+            ],
+            "incompatible_with": [
+              "ext_aw_hair_bob_blunt_cut",
+              "ext_aw_hair_pixie_textured_crop",
+              "hair_bald"
+            ],
+            "hair_facts": {
+              "length_tier": "very_long"
+            },
+            "governance_metadata": {
+              "max_selections": 1,
+              "attribute_type": "hair_length"
+            }
+          }
+        },
+        {
+          "id": "hair_length__very_short",
+          "text": "very short hair",
+          "facts": {
+            "mutex_groups": [
+              "hair_length"
+            ],
+            "incompatible_with": [
+              "ext_aw_hair_single_back_braid",
+              "hair_bald",
+              "hair_waist_feathered",
+              "messy_bun",
+              "twin_tails"
+            ],
+            "hair_facts": {
+              "length_tier": "very_short"
+            },
+            "governance_metadata": {
+              "max_selections": 1,
+              "attribute_type": "hair_length"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "hair_texture_palette",
+      "name_zh": "正交发质质感库 (Hair Texture Palette)",
+      "tags": [
+        {
+          "id": "hair_texture__poker_straight",
+          "text": "with a fine, poker-straight texture",
+          "facts": {
+            "mutex_groups": [
+              "hair_texture"
+            ],
+            "incompatible_with": [
+              "hair_afro",
+              "hair_bald",
+              "hair_box_braids",
+              "hair_locs",
+              "hair_permed_curls"
+            ],
+            "hair_facts": {
+              "texture_type": "straight"
+            },
+            "governance_metadata": {
+              "max_selections": 1,
+              "attribute_type": "hair_texture"
+            }
+          }
+        },
+        {
+          "id": "hair_texture__bouncy_loose_curls",
+          "text": "with bouncy, loose curls",
+          "facts": {
+            "mutex_groups": [
+              "hair_texture"
+            ],
+            "incompatible_with": [
+              "ext_aw_hair_bob_blunt_cut",
+              "ext_aw_hair_vintage_finger_waves",
+              "hair_bald"
+            ],
+            "hair_facts": {
+              "texture_type": "curly"
+            },
+            "governance_metadata": {
+              "max_selections": 1,
+              "attribute_type": "hair_texture"
+            }
+          }
+        },
+        {
+          "id": "hair_texture__coarse_coils",
+          "text": "with coarse, wiry coils packed thick and full",
+          "facts": {
+            "mutex_groups": [
+              "hair_texture"
+            ],
+            "incompatible_with": [
+              "ext_aw_hair_bob_blunt_cut",
+              "ext_aw_hair_vintage_finger_waves",
+              "hair_bald"
+            ],
+            "hair_facts": {
+              "texture_type": "coily"
+            },
+            "governance_metadata": {
+              "max_selections": 1,
+              "attribute_type": "hair_texture"
+            }
+          }
+        },
+        {
+          "id": "hair_texture__springy_waves",
+          "text": "with defined, springy waves and a little natural frizz",
+          "facts": {
+            "mutex_groups": [
+              "hair_texture"
+            ],
+            "incompatible_with": [
+              "hair_afro",
+              "hair_bald"
+            ],
+            "hair_facts": {
+              "texture_type": "wavy"
+            },
+            "governance_metadata": {
+              "max_selections": 1,
+              "attribute_type": "hair_texture"
+            }
+          }
+        },
+        {
+          "id": "hair_texture__corkscrew_curls",
+          "text": "with dense, tight corkscrew curls",
+          "facts": {
+            "mutex_groups": [
+              "hair_texture"
+            ],
+            "incompatible_with": [
+              "ext_aw_hair_bob_blunt_cut",
+              "ext_aw_hair_vintage_finger_waves",
+              "hair_bald"
+            ],
+            "hair_facts": {
+              "texture_type": "curly"
+            },
+            "governance_metadata": {
+              "max_selections": 1,
+              "attribute_type": "hair_texture"
+            }
+          }
+        },
+        {
+          "id": "hair_texture__delicate_coils",
+          "text": "with fine, delicate coils that shrink close to the scalp",
+          "facts": {
+            "mutex_groups": [
+              "hair_texture"
+            ],
+            "incompatible_with": [
+              "ext_aw_hair_bob_blunt_cut",
+              "ext_aw_hair_vintage_finger_waves",
+              "hair_bald"
+            ],
+            "hair_facts": {
+              "texture_type": "coily"
+            },
+            "governance_metadata": {
+              "max_selections": 1,
+              "attribute_type": "hair_texture"
+            }
+          }
+        },
+        {
+          "id": "hair_texture__coarse_waves",
+          "text": "with full, coarse waves that hold plenty of volume",
+          "facts": {
+            "mutex_groups": [
+              "hair_texture"
+            ],
+            "incompatible_with": [
+              "hair_afro",
+              "hair_bald"
+            ],
+            "hair_facts": {
+              "texture_type": "wavy"
+            },
+            "governance_metadata": {
+              "max_selections": 1,
+              "attribute_type": "hair_texture"
+            }
+          }
+        },
+        {
+          "id": "hair_texture__gentle_ends",
+          "text": "with gentle bends that wave only toward the ends",
+          "facts": {
+            "mutex_groups": [
+              "hair_texture"
+            ],
+            "incompatible_with": [
+              "hair_afro",
+              "hair_bald"
+            ],
+            "hair_facts": {
+              "texture_type": "wavy"
+            },
+            "governance_metadata": {
+              "max_selections": 1,
+              "attribute_type": "hair_texture"
+            }
+          }
+        },
+        {
+          "id": "hair_texture__glossy_straight",
+          "text": "with glossy, straight strands and a smooth surface",
+          "facts": {
+            "mutex_groups": [
+              "hair_texture"
+            ],
+            "incompatible_with": [
+              "hair_afro",
+              "hair_bald",
+              "hair_box_braids",
+              "hair_locs",
+              "hair_permed_curls"
+            ],
+            "hair_facts": {
+              "texture_type": "straight"
+            },
+            "governance_metadata": {
+              "max_selections": 1,
+              "attribute_type": "hair_texture"
+            }
+          }
+        },
+        {
+          "id": "hair_texture__s_shaped_waves",
+          "text": "with loose, open S-shaped waves",
+          "facts": {
+            "mutex_groups": [
+              "hair_texture"
+            ],
+            "incompatible_with": [
+              "hair_afro",
+              "hair_bald"
+            ],
+            "hair_facts": {
+              "texture_type": "wavy"
+            },
+            "governance_metadata": {
+              "max_selections": 1,
+              "attribute_type": "hair_texture"
+            }
+          }
+        },
+        {
+          "id": "hair_texture__sleek_straight",
+          "text": "with sleek, straight, medium-weight strands",
+          "facts": {
+            "mutex_groups": [
+              "hair_texture"
+            ],
+            "incompatible_with": [
+              "hair_afro",
+              "hair_bald",
+              "hair_box_braids",
+              "hair_locs",
+              "hair_permed_curls"
+            ],
+            "hair_facts": {
+              "texture_type": "straight"
+            },
+            "governance_metadata": {
+              "max_selections": 1,
+              "attribute_type": "hair_texture"
+            }
+          }
+        },
+        {
+          "id": "hair_texture__soft_coils",
+          "text": "with soft, densely packed coils",
+          "facts": {
+            "mutex_groups": [
+              "hair_texture"
+            ],
+            "incompatible_with": [
+              "ext_aw_hair_bob_blunt_cut",
+              "ext_aw_hair_vintage_finger_waves",
+              "hair_bald"
+            ],
+            "hair_facts": {
+              "texture_type": "coily"
+            },
+            "governance_metadata": {
+              "max_selections": 1,
+              "attribute_type": "hair_texture"
+            }
+          }
+        },
+        {
+          "id": "hair_texture__spiralling_curls",
+          "text": "with soft, loosely spiralling curls that frizz at the edges",
+          "facts": {
+            "mutex_groups": [
+              "hair_texture"
+            ],
+            "incompatible_with": [
+              "ext_aw_hair_bob_blunt_cut",
+              "ext_aw_hair_vintage_finger_waves",
+              "hair_bald"
+            ],
+            "hair_facts": {
+              "texture_type": "curly"
+            },
+            "governance_metadata": {
+              "max_selections": 1,
+              "attribute_type": "hair_texture"
+            }
+          }
+        },
+        {
+          "id": "hair_texture__beachy_waves",
+          "text": "with soft, tousled beachy waves",
+          "facts": {
+            "mutex_groups": [
+              "hair_texture"
+            ],
+            "incompatible_with": [
+              "hair_afro",
+              "hair_bald"
+            ],
+            "hair_facts": {
+              "texture_type": "wavy"
+            },
+            "governance_metadata": {
+              "max_selections": 1,
+              "attribute_type": "hair_texture"
+            }
+          }
+        },
+        {
+          "id": "hair_texture__afro_texture",
+          "text": "with springy, tightly coiled afro texture",
+          "facts": {
+            "mutex_groups": [
+              "hair_texture"
+            ],
+            "incompatible_with": [
+              "hair_bald"
+            ],
+            "hair_facts": {
+              "texture_type": "afro"
+            },
+            "governance_metadata": {
+              "max_selections": 1,
+              "attribute_type": "hair_texture"
+            }
+          }
+        },
+        {
+          "id": "hair_texture__ringlet_curls",
+          "text": "with springy, well-defined ringlet curls",
+          "facts": {
+            "mutex_groups": [
+              "hair_texture"
+            ],
+            "incompatible_with": [
+              "ext_aw_hair_bob_blunt_cut",
+              "ext_aw_hair_vintage_finger_waves",
+              "hair_bald"
+            ],
+            "hair_facts": {
+              "texture_type": "curly"
+            },
+            "governance_metadata": {
+              "max_selections": 1,
+              "attribute_type": "hair_texture"
+            }
+          }
+        },
+        {
+          "id": "hair_texture__flat_straight",
+          "text": "with straight strands that fall flat and resist holding a curl",
+          "facts": {
+            "mutex_groups": [
+              "hair_texture"
+            ],
+            "incompatible_with": [
+              "hair_afro",
+              "hair_bald",
+              "hair_box_braids",
+              "hair_locs",
+              "hair_permed_curls"
+            ],
+            "hair_facts": {
+              "texture_type": "straight"
+            },
+            "governance_metadata": {
+              "max_selections": 1,
+              "attribute_type": "hair_texture"
+            }
+          }
+        },
+        {
+          "id": "hair_texture__heavy_straight",
+          "text": "with thick, heavy, straight strands",
+          "facts": {
+            "mutex_groups": [
+              "hair_texture"
+            ],
+            "incompatible_with": [
+              "hair_afro",
+              "hair_bald",
+              "hair_box_braids",
+              "hair_locs",
+              "hair_permed_curls"
+            ],
+            "hair_facts": {
+              "texture_type": "straight"
+            },
+            "governance_metadata": {
+              "max_selections": 1,
+              "attribute_type": "hair_texture"
+            }
+          }
+        },
+        {
+          "id": "hair_texture__zig_zag_kinks",
+          "text": "with tight zig-zag kinks and a dense, cottony feel",
+          "facts": {
+            "mutex_groups": [
+              "hair_texture"
+            ],
+            "incompatible_with": [
+              "ext_aw_hair_bob_blunt_cut",
+              "ext_aw_hair_vintage_finger_waves",
+              "hair_bald"
+            ],
+            "hair_facts": {
+              "texture_type": "coily"
+            },
+            "governance_metadata": {
+              "max_selections": 1,
+              "attribute_type": "hair_texture"
+            }
+          }
+        },
+        {
+          "id": "hair_texture__voluminous_curls",
+          "text": "with voluminous, full-bodied curls",
+          "facts": {
+            "mutex_groups": [
+              "hair_texture"
+            ],
+            "incompatible_with": [
+              "ext_aw_hair_bob_blunt_cut",
+              "ext_aw_hair_vintage_finger_waves",
+              "hair_bald"
+            ],
+            "hair_facts": {
+              "texture_type": "curly"
+            },
+            "governance_metadata": {
+              "max_selections": 1,
+              "attribute_type": "hair_texture"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "hair_feature_ahoge",
+      "name_zh": "二次元呆毛 (Ahoge)",
+      "tags": [
+        {
+          "id": "hair_feature_ahoge__tag_000",
+          "text": "ahoge",
+          "facts": {
+            "hair_facts": {
+              "hair_feature": "ahoge"
+            },
+            "governance_metadata": {}
+          }
+        }
+      ]
+    },
+    {
+      "id": "hair_bangs",
+      "name_zh": "通用刘海 (Bangs)",
+      "tags": [
+        {
+          "id": "hair_bangs__tag_000",
+          "text": "bangs",
+          "facts": {
+            "hair_facts": {
+              "hair_part": "bangs"
+            },
+            "governance_metadata": {}
+          }
+        },
+        {
+          "id": "hair_bangs__ext_blunt",
+          "text": "blunt bangs",
+          "facts": {
+            "hair_facts": {
+              "hair_part": "bangs"
+            },
+            "lighting_facts": {
+              "style": "blunt"
+            },
+            "governance_metadata": {}
+          }
+        }
+      ]
+    },
+    {
+      "id": "hair_crimped",
+      "name_zh": "玉米须烫发 (Crimped Hair)",
+      "tags": [
+        {
+          "id": "hair_crimped__tag_000",
+          "text": "crimped into dense zig-zag volume",
+          "facts": {
+            "lighting_facts": {
+              "style": "crimped"
+            },
+            "governance_metadata": {}
+          }
+        }
+      ]
+    },
+    {
+      "id": "hair_big_layered_mane",
+      "name_zh": "狮系大层次长发 (Big Layered Mane)",
+      "tags": [
+        {
+          "id": "hair_big_layered_mane__tag_000",
+          "text": "in a big layered mane, voluminous and rounded",
+          "facts": {
+            "hair_facts": {
+              "hairstyle": "layered_mane",
+              "volume": "high"
+            },
+            "governance_metadata": {}
+          }
+        }
+      ]
+    },
+    {
+      "id": "hair_pixie_side_swept",
+      "name_zh": "侧分精灵短发 (Side-Swept Pixie)",
+      "tags": [
+        {
+          "id": "hair_pixie_side_swept__tag_000",
+          "text": "in a cropped pixie swept to one side",
+          "facts": {
+            "hair_facts": {
+              "hairstyle": "pixie_cut",
+              "parting": "side_swept"
+            },
+            "governance_metadata": {}
+          }
+        }
+      ]
+    },
+    {
+      "id": "hair_twist_out",
+      "name_zh": "弹力扭转卷发 (Twist-Out)",
+      "tags": [
+        {
+          "id": "hair_twist_out__tag_000",
+          "text": "in a defined twist-out, full and springy",
+          "facts": {
+            "hair_facts": {
+              "hairstyle": "twist_out"
+            },
+            "governance_metadata": {}
+          }
+        }
+      ]
+    },
+    {
+      "id": "hair_feathered_shag",
+      "name_zh": "及肩羽化碎发 (Feathered Shag)",
+      "tags": [
+        {
+          "id": "hair_feathered_shag__tag_000",
+          "text": "in a feathered shag, layered and tousled to the shoulders",
+          "facts": {
+            "hair_facts": {
+              "hairstyle": "shag"
+            },
+            "governance_metadata": {}
+          }
+        }
+      ]
+    },
+    {
+      "id": "hair_afro",
+      "name_zh": "圆蓬爆炸头 (Afro)",
+      "tags": [
+        {
+          "id": "hair_afro__tag_000",
+          "text": "in a full rounded afro, even and picked out",
+          "facts": {
+            "hair_facts": {
+              "hairstyle": "afro"
+            },
+            "accessory_facts": {
+              "shape": "rounded"
+            },
+            "governance_metadata": {}
+          }
+        },
+        {
+          "id": "hair_afro__ext_tapered",
+          "text": "in a tapered afro, fuller at the crown with faded sides",
+          "facts": {
+            "hair_facts": {
+              "hairstyle": "afro",
+              "tapered": true
+            },
+            "governance_metadata": {}
+          }
+        }
+      ]
+    },
+    {
+      "id": "hair_pageboy",
+      "name_zh": "复古内扣侍童头 (Pageboy Bob)",
+      "tags": [
+        {
+          "id": "hair_pageboy__tag_000",
+          "text": "in a rounded pageboy that curves under at the ends",
+          "facts": {
+            "hair_facts": {
+              "hairstyle": "pageboy"
+            },
+            "governance_metadata": {}
+          }
+        }
+      ]
+    },
+    {
+      "id": "hair_shag_mullet",
+      "name_zh": "碎层次鲻鱼头 (Shag Mullet)",
+      "tags": [
+        {
+          "id": "hair_shag_mullet__tag_000",
+          "text": "in a shag mullet, feathered short on top with long layered lengths behind",
+          "facts": {
+            "hair_facts": {
+              "hairstyle": "mullet"
+            },
+            "governance_metadata": {}
+          }
+        }
+      ]
+    },
+    {
+      "id": "hair_wedge_cut",
+      "name_zh": "堆叠楔形短发 (Stacked Wedge Cut)",
+      "tags": [
+        {
+          "id": "hair_wedge_cut__tag_000",
+          "text": "in a stacked wedge cut, fuller at the crown",
+          "facts": {
+            "hair_facts": {
+              "hairstyle": "wedge_cut"
+            },
+            "governance_metadata": {}
+          }
+        }
+      ]
+    },
+    {
+      "id": "hair_cornrows",
+      "name_zh": "地垄辫编发 (Cornrows)",
+      "tags": [
+        {
+          "id": "hair_cornrows__tag_000",
+          "text": "in cornrows braided straight back in neat even rows",
+          "facts": {
+            "hair_facts": {
+              "hairstyle": "cornrows"
+            },
+            "governance_metadata": {}
+          }
+        }
+      ]
+    },
+    {
+      "id": "hair_flat_twists",
+      "name_zh": "平贴头皮拧辫 (Flat Twists)",
+      "tags": [
+        {
+          "id": "hair_flat_twists__tag_000",
+          "text": "in flat twists laid close across the scalp",
+          "facts": {
+            "hair_facts": {
+              "hairstyle": "flat_twists"
+            },
+            "governance_metadata": {}
+          }
+        }
+      ]
+    },
+    {
+      "id": "hair_face_framing_layers",
+      "name_zh": "贴脸修颜层次发 (Face Framing Layers)",
+      "tags": [
+        {
+          "id": "hair_face_framing_layers__tag_000",
+          "text": "in long, face-framing layers",
+          "facts": {
+            "hair_facts": {
+              "hairstyle": "face_framing_layers"
+            },
+            "governance_metadata": {}
+          }
+        }
+      ]
+    },
+    {
+      "id": "hair_locs",
+      "name_zh": "雷鬼脏辫 (Locs / Dreadlocks)",
+      "tags": [
+        {
+          "id": "hair_locs__tag_000",
+          "text": "in medium-length locs",
+          "facts": {
+            "hair_facts": {
+              "hairstyle": "locs"
+            },
+            "governance_metadata": {}
+          }
+        }
+      ]
+    },
+    {
+      "id": "hair_box_braids",
+      "name_zh": "盒状脏辫 (Box Braids)",
+      "tags": [
+        {
+          "id": "hair_box_braids__tag_000",
+          "text": "in shoulder-length box braids",
+          "facts": {
+            "hair_facts": {
+              "hairstyle": "box_braids"
+            },
+            "governance_metadata": {}
+          }
+        }
+      ]
+    },
+    {
+      "id": "hair_feathered_flicked",
+      "name_zh": "复古翻翘羽化发 (Feathered Flicked Layers)",
+      "tags": [
+        {
+          "id": "hair_feathered_flicked__tag_000",
+          "text": "in shoulder-length feathered layers flicked back at the sides",
+          "facts": {
+            "hair_facts": {
+              "hairstyle": "feathered_flicked"
+            },
+            "governance_metadata": {}
+          }
+        }
+      ]
+    },
+    {
+      "id": "hair_curtain_fringe_layers",
+      "name_zh": "八字刘海层次发 (Curtain Fringe Layers)",
+      "tags": [
+        {
+          "id": "hair_curtain_fringe_layers__tag_000",
+          "text": "in shoulder-length layers with a curtain fringe",
+          "facts": {
+            "hair_facts": {
+              "hairstyle": "curtain_fringe"
+            },
+            "governance_metadata": {}
+          }
+        }
+      ]
+    },
+    {
+      "id": "hair_1940s_waves",
+      "name_zh": "40年代复古波浪 (1940s Waves)",
+      "tags": [
+        {
+          "id": "hair_1940s_waves__tag_000",
+          "text": "in structured 1940s-revival waves, deep and sculpted",
+          "facts": {
+            "hair_facts": {
+              "hairstyle": "1940s_waves"
+            },
+            "governance_metadata": {}
+          }
+        }
+      ]
+    },
+    {
+      "id": "hair_permed_curls",
+      "name_zh": "满头烫小卷发 (Permed Curls)",
+      "tags": [
+        {
+          "id": "hair_permed_curls__tag_000",
+          "text": "in tight permed curls, full to the shoulders",
+          "facts": {
+            "hair_facts": {
+              "hairstyle": "permed_curls"
+            },
+            "governance_metadata": {}
+          }
+        }
+      ]
+    },
+    {
+      "id": "hair_two_strand_twists",
+      "name_zh": "双股扭转拧绳发 (Two-Strand Twists)",
+      "tags": [
+        {
+          "id": "hair_two_strand_twists__tag_000",
+          "text": "in two-strand twists falling to the shoulders",
+          "facts": {
+            "hair_facts": {
+              "hairstyle": "two_strand_twists"
+            },
+            "governance_metadata": {}
+          }
+        }
+      ]
+    },
+    {
+      "id": "hair_swept_back_long",
+      "name_zh": "露额后梳长发 (Swept Back Long)",
+      "tags": [
+        {
+          "id": "hair_swept_back_long__tag_000",
+          "text": "long and swept back off the face, full and lifted",
+          "facts": {
+            "hair_facts": {
+              "hairstyle": "swept_back"
+            },
+            "governance_metadata": {}
+          }
+        }
+      ]
+    },
+    {
+      "id": "hair_long_blunt_fringe",
+      "name_zh": "齐刘海长发 (Long Blunt Fringe)",
+      "tags": [
+        {
+          "id": "hair_long_blunt_fringe__tag_000",
+          "text": "long with a blunt fringe straight across the brow",
+          "facts": {
+            "hair_facts": {
+              "hairstyle": "long_hair",
+              "bangs": "blunt"
+            },
+            "governance_metadata": {}
+          }
+        }
+      ]
+    },
+    {
+      "id": "hair_long_deep_side_part",
+      "name_zh": "大侧分刘海长发 (Long Deep Side Part)",
+      "tags": [
+        {
+          "id": "hair_long_deep_side_part__tag_000",
+          "text": "long with a deep side part swept across the forehead",
+          "facts": {
+            "hair_facts": {
+              "hairstyle": "long_hair",
+              "parting": "deep_side"
+            },
+            "governance_metadata": {}
+          }
+        }
+      ]
+    },
+    {
+      "id": "hair_long_blunt_hemline",
+      "name_zh": "一刀切发尾长发 (Long Blunt Hemline)",
+      "tags": [
+        {
+          "id": "hair_long_blunt_hemline__tag_000",
+          "text": "long with a heavy, blunt-cut hemline",
+          "facts": {
+            "hair_facts": {
+              "hairstyle": "long_hair"
+            },
+            "clothing_facts": {
+              "hemline": "blunt"
+            },
+            "governance_metadata": {}
+          }
+        }
+      ]
+    },
+    {
+      "id": "hair_ponytail_general",
+      "name_zh": "通用马尾 (General Ponytail)",
+      "tags": [
+        {
+          "id": "hair_ponytail_general__tag_000",
+          "text": "ponytail",
+          "facts": {
+            "hair_facts": {
+              "hairstyle": "ponytail"
+            },
+            "governance_metadata": {}
+          }
+        }
+      ]
+    },
+    {
+      "id": "hair_straight_general",
+      "name_zh": "通用直发 (Straight Hair)",
+      "tags": [
+        {
+          "id": "hair_straight_general__tag_000",
+          "text": "straight hair",
+          "facts": {
+            "hair_facts": {
+              "hairstyle": "straight"
+            },
+            "governance_metadata": {}
+          }
+        }
+      ]
+    },
+    {
+      "id": "hair_waist_feathered",
+      "name_zh": "及腰羽化长发 (Waist-Length Feathered)",
+      "tags": [
+        {
+          "id": "hair_waist_feathered__tag_000",
+          "text": "waist-length with softly feathered ends",
+          "facts": {
+            "hair_facts": {
+              "hairstyle": "long_hair",
+              "ends": "feathered",
+              "length": "waist"
+            },
+            "governance_metadata": {}
+          }
+        }
+      ]
+    },
+    {
+      "id": "hair_wavy_general",
+      "name_zh": "通用波浪卷发 (Wavy Hair)",
+      "tags": [
+        {
+          "id": "hair_wavy_general__tag_000",
+          "text": "wavy hair",
+          "facts": {
+            "hair_facts": {
+              "hairstyle": "wavy"
+            },
+            "governance_metadata": {}
+          }
+        }
+      ]
     }
   ],
   "headwear_jewelry": [
@@ -875,6 +3123,309 @@
             "semantic_role": "selector",
             "prop_usage": "worn"
           }
+        },
+        {
+          "id": "category_pool__chokers",
+          "text": "choker",
+          "facts": {
+            "prop_usage": "worn",
+            "accessory_facts": {
+              "body_part": "neck"
+            },
+            "governance_metadata": {
+              "pool_reference": "10_accessories/chokers",
+              "selection_strategy": "random_weighted_sample",
+              "is_pool_selector": true
+            }
+          }
+        },
+        {
+          "id": "leather_choker__ext_bow",
+          "text": "bow choker",
+          "facts": {
+            "prop_usage": "worn",
+            "accessory_facts": {
+              "ornament": "bow",
+              "body_part": "neck",
+              "dynamic_slots": [
+                {
+                  "slot_name": "color",
+                  "slot_injection_mode": "prefix_replace_attribute",
+                  "branches": [
+                    {
+                      "weight": 1,
+                      "type": "wildcard_reference",
+                      "target": "09_style/colors"
+                    },
+                    {
+                      "weight": 4,
+                      "type": "literal",
+                      "value": "black"
+                    }
+                  ]
+                }
+              ]
+            },
+            "governance_metadata": {
+              "base_tag_text": "bow choker"
+            }
+          }
+        },
+        {
+          "id": "leather_choker__ext_cross",
+          "text": "cross choker",
+          "facts": {
+            "prop_usage": "worn",
+            "accessory_facts": {
+              "ornament": "cross",
+              "body_part": "neck",
+              "dynamic_slots": [
+                {
+                  "slot_name": "color",
+                  "slot_injection_mode": "prefix_replace_attribute",
+                  "branches": [
+                    {
+                      "weight": 1,
+                      "type": "wildcard_reference",
+                      "target": "09_style/colors"
+                    },
+                    {
+                      "weight": 4,
+                      "type": "literal",
+                      "value": "black"
+                    }
+                  ]
+                }
+              ]
+            },
+            "governance_metadata": {
+              "base_tag_text": "cross choker"
+            }
+          }
+        },
+        {
+          "id": "leather_choker__ext_frilled",
+          "text": "frilled choker",
+          "facts": {
+            "prop_usage": "worn",
+            "accessory_facts": {
+              "body_part": "neck",
+              "material": "frilled",
+              "dynamic_slots": [
+                {
+                  "slot_name": "color",
+                  "slot_injection_mode": "prefix_replace_attribute",
+                  "branches": [
+                    {
+                      "weight": 1,
+                      "type": "wildcard_reference",
+                      "target": "09_style/colors"
+                    },
+                    {
+                      "weight": 4,
+                      "type": "literal",
+                      "value": "black"
+                    }
+                  ]
+                }
+              ]
+            },
+            "governance_metadata": {
+              "base_tag_text": "frilled choker"
+            }
+          }
+        },
+        {
+          "id": "leather_choker__ext_heart",
+          "text": "heart choker",
+          "facts": {
+            "prop_usage": "worn",
+            "accessory_facts": {
+              "ornament": "heart",
+              "body_part": "neck",
+              "dynamic_slots": [
+                {
+                  "slot_name": "color",
+                  "slot_injection_mode": "prefix_replace_attribute",
+                  "branches": [
+                    {
+                      "weight": 1,
+                      "type": "wildcard_reference",
+                      "target": "09_style/colors"
+                    },
+                    {
+                      "weight": 4,
+                      "type": "literal",
+                      "value": "black"
+                    }
+                  ]
+                }
+              ]
+            },
+            "governance_metadata": {
+              "base_tag_text": "heart choker"
+            }
+          }
+        },
+        {
+          "id": "leather_choker__ext_oring",
+          "text": "o-ring choker",
+          "facts": {
+            "prop_usage": "worn",
+            "accessory_facts": {
+              "ornament": "o_ring",
+              "body_part": "neck",
+              "dynamic_slots": [
+                {
+                  "slot_name": "color",
+                  "slot_injection_mode": "prefix_replace_attribute",
+                  "branches": [
+                    {
+                      "weight": 1,
+                      "type": "wildcard_reference",
+                      "target": "09_style/colors"
+                    },
+                    {
+                      "weight": 4,
+                      "type": "literal",
+                      "value": "black"
+                    }
+                  ]
+                }
+              ]
+            },
+            "governance_metadata": {
+              "base_tag_text": "o-ring choker"
+            }
+          }
+        },
+        {
+          "id": "leather_choker__ext_pendant",
+          "text": "pendant choker",
+          "facts": {
+            "prop_usage": "worn",
+            "accessory_facts": {
+              "ornament": "pendant",
+              "body_part": "neck",
+              "dynamic_slots": [
+                {
+                  "slot_name": "color",
+                  "slot_injection_mode": "prefix_replace_attribute",
+                  "branches": [
+                    {
+                      "weight": 1,
+                      "type": "wildcard_reference",
+                      "target": "09_style/colors"
+                    },
+                    {
+                      "weight": 4,
+                      "type": "literal",
+                      "value": "black"
+                    }
+                  ]
+                }
+              ]
+            },
+            "governance_metadata": {
+              "base_tag_text": "pendant choker"
+            }
+          }
+        },
+        {
+          "id": "leather_choker__ext_spiked",
+          "text": "spiked choker",
+          "facts": {
+            "prop_usage": "worn",
+            "accessory_facts": {
+              "ornament": "spikes",
+              "body_part": "neck",
+              "dynamic_slots": [
+                {
+                  "slot_name": "color",
+                  "slot_injection_mode": "prefix_replace_attribute",
+                  "branches": [
+                    {
+                      "weight": 1,
+                      "type": "wildcard_reference",
+                      "target": "09_style/colors"
+                    },
+                    {
+                      "weight": 4,
+                      "type": "literal",
+                      "value": "black"
+                    }
+                  ]
+                }
+              ]
+            },
+            "governance_metadata": {
+              "base_tag_text": "spiked choker"
+            }
+          }
+        },
+        {
+          "id": "leather_choker__ext_star",
+          "text": "star choker",
+          "facts": {
+            "prop_usage": "worn",
+            "accessory_facts": {
+              "ornament": "star",
+              "body_part": "neck",
+              "dynamic_slots": [
+                {
+                  "slot_name": "color",
+                  "slot_injection_mode": "prefix_replace_attribute",
+                  "branches": [
+                    {
+                      "weight": 1,
+                      "type": "wildcard_reference",
+                      "target": "09_style/colors"
+                    },
+                    {
+                      "weight": 4,
+                      "type": "literal",
+                      "value": "black"
+                    }
+                  ]
+                }
+              ]
+            },
+            "governance_metadata": {
+              "base_tag_text": "star choker"
+            }
+          }
+        },
+        {
+          "id": "leather_choker__ext_bell",
+          "text": "neck bell choker",
+          "facts": {
+            "prop_usage": "worn",
+            "accessory_facts": {
+              "ornament": "bell",
+              "body_part": "neck",
+              "dynamic_slots": [
+                {
+                  "slot_name": "color",
+                  "slot_injection_mode": "prefix_replace_attribute",
+                  "branches": [
+                    {
+                      "weight": 1,
+                      "type": "wildcard_reference",
+                      "target": "09_style/colors"
+                    },
+                    {
+                      "weight": 4,
+                      "type": "literal",
+                      "value": "black"
+                    }
+                  ]
+                }
+              ]
+            },
+            "governance_metadata": {
+              "base_tag_text": "neck bell choker"
+            }
+          }
         }
       ]
     },
@@ -897,6 +3448,18 @@
             "semantic_role": "selector",
             "prop_usage": "worn"
           }
+        },
+        {
+          "id": "gold_collarbone_chain__ext_chain",
+          "text": "chain necklace",
+          "facts": {
+            "prop_usage": "worn",
+            "accessory_facts": {
+              "body_part": "neck",
+              "material": "chain"
+            },
+            "governance_metadata": {}
+          }
         }
       ]
     },
@@ -918,6 +3481,18 @@
           "facts": {
             "semantic_role": "selector",
             "prop_usage": "worn"
+          }
+        },
+        {
+          "id": "pearl_necklace__ext_pearl_necklace",
+          "text": "pearl necklace",
+          "facts": {
+            "prop_usage": "worn",
+            "accessory_facts": {
+              "body_part": "neck",
+              "material": "pearl"
+            },
+            "governance_metadata": {}
           }
         }
       ]
@@ -1012,6 +3587,38 @@
             "visible_regions": [
               "upper_body"
             ]
+          }
+        },
+        {
+          "id": "neck_ribbon__ext_lace",
+          "text": "lace ribbon choker",
+          "facts": {
+            "prop_usage": "worn",
+            "accessory_facts": {
+              "body_part": "neck",
+              "material": "lace",
+              "dynamic_slots": [
+                {
+                  "slot_name": "color",
+                  "slot_injection_mode": "prefix_replace_attribute",
+                  "branches": [
+                    {
+                      "weight": 1,
+                      "type": "wildcard_reference",
+                      "target": "09_style/colors"
+                    },
+                    {
+                      "weight": 4,
+                      "type": "literal",
+                      "value": "black"
+                    }
+                  ]
+                }
+              ]
+            },
+            "governance_metadata": {
+              "base_tag_text": "lace ribbon choker"
+            }
           }
         }
       ]
@@ -1258,6 +3865,430 @@
             "visible_regions": [
               "face"
             ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "acc_necklace_general",
+      "name_zh": "通用项链 (Necklaces)",
+      "tags": [
+        {
+          "id": "category_pool__necklaces",
+          "text": "necklace",
+          "facts": {
+            "prop_usage": "worn",
+            "accessory_facts": {
+              "body_part": "neck"
+            },
+            "governance_metadata": {
+              "pool_reference": "10_accessories/necklaces",
+              "selection_strategy": "random_weighted_sample",
+              "is_pool_selector": true
+            }
+          }
+        },
+        {
+          "id": "acc_necklace_general__ext_bead",
+          "text": "bead necklace",
+          "facts": {
+            "prop_usage": "worn",
+            "lighting_facts": {
+              "style": "bead"
+            },
+            "accessory_facts": {
+              "body_part": "neck"
+            },
+            "governance_metadata": {}
+          }
+        },
+        {
+          "id": "acc_necklace_general__ext_cross",
+          "text": "cross necklace",
+          "facts": {
+            "prop_usage": "worn",
+            "accessory_facts": {
+              "pendant": "cross",
+              "body_part": "neck"
+            },
+            "governance_metadata": {}
+          }
+        },
+        {
+          "id": "acc_necklace_general__ext_heart",
+          "text": "heart necklace",
+          "facts": {
+            "prop_usage": "worn",
+            "accessory_facts": {
+              "pendant": "heart",
+              "body_part": "neck"
+            },
+            "governance_metadata": {}
+          }
+        },
+        {
+          "id": "acc_necklace_general__ext_key",
+          "text": "key necklace",
+          "facts": {
+            "prop_usage": "worn",
+            "accessory_facts": {
+              "pendant": "key",
+              "body_part": "neck"
+            },
+            "governance_metadata": {}
+          }
+        },
+        {
+          "id": "acc_necklace_general__ext_lock",
+          "text": "lock necklace",
+          "facts": {
+            "prop_usage": "worn",
+            "accessory_facts": {
+              "pendant": "lock",
+              "body_part": "neck"
+            },
+            "governance_metadata": {}
+          }
+        },
+        {
+          "id": "acc_necklace_general__ext_magatama",
+          "text": "magatama necklace",
+          "facts": {
+            "prop_usage": "worn",
+            "accessory_facts": {
+              "pendant": "magatama",
+              "body_part": "neck"
+            },
+            "governance_metadata": {}
+          }
+        },
+        {
+          "id": "acc_necklace_general__ext_ring",
+          "text": "ring necklace",
+          "facts": {
+            "prop_usage": "worn",
+            "accessory_facts": {
+              "pendant": "ring",
+              "body_part": "neck"
+            },
+            "governance_metadata": {}
+          }
+        },
+        {
+          "id": "acc_necklace_general__ext_star",
+          "text": "star necklace",
+          "facts": {
+            "prop_usage": "worn",
+            "accessory_facts": {
+              "pendant": "star",
+              "body_part": "neck"
+            },
+            "governance_metadata": {}
+          }
+        },
+        {
+          "id": "acc_necklace_general__ext_tooth",
+          "text": "tooth necklace",
+          "facts": {
+            "prop_usage": "worn",
+            "accessory_facts": {
+              "pendant": "tooth",
+              "body_part": "neck"
+            },
+            "governance_metadata": {}
+          }
+        }
+      ]
+    },
+    {
+      "id": "acc_bowtie",
+      "name_zh": "领结蝴蝶结 (Bowtie)",
+      "tags": [
+        {
+          "id": "acc_bowtie__tag_000",
+          "text": "bowtie",
+          "facts": {
+            "prop_usage": "worn",
+            "accessory_facts": {
+              "body_part": "neck",
+              "dynamic_slots": [
+                {
+                  "slot_name": "color",
+                  "slot_injection_mode": "prefix_replace_attribute",
+                  "branches": [
+                    {
+                      "weight": 1,
+                      "type": "wildcard_reference",
+                      "target": "09_style/colors"
+                    }
+                  ]
+                }
+              ]
+            },
+            "governance_metadata": {
+              "base_tag_text": "bowtie"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "acc_necktie",
+      "name_zh": "领带制服领饰 (Necktie)",
+      "tags": [
+        {
+          "id": "acc_necktie__tag_000",
+          "text": "necktie",
+          "facts": {
+            "prop_usage": "worn",
+            "accessory_facts": {
+              "body_part": "neck",
+              "dynamic_slots": [
+                {
+                  "slot_name": "color",
+                  "slot_injection_mode": "prefix_replace_attribute",
+                  "branches": [
+                    {
+                      "weight": 1,
+                      "type": "wildcard_reference",
+                      "target": "09_style/colors"
+                    }
+                  ]
+                }
+              ]
+            },
+            "governance_metadata": {
+              "base_tag_text": "necktie"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "combo_necklace_choker",
+      "name_zh": "项圈项链叠戴组合 (Choker and Necklace Combo)",
+      "tags": [
+        {
+          "id": "combo_necklace_choker__tag_000",
+          "text": "necklace and choker combo",
+          "facts": {
+            "prop_usage": "worn",
+            "accessory_facts": {
+              "body_part": "neck"
+            },
+            "governance_metadata": {
+              "is_ensemble_combo": true,
+              "is_container_description": true,
+              "combo_id": "combo_necklace_choker",
+              "source_entity_id": "SRC_ACC_06897",
+              "mandatory_components": [
+                {
+                  "component_id": "acc_necklace_general",
+                  "tag_id": "category_pool__necklaces",
+                  "pool_reference": "10_accessories/necklaces"
+                },
+                {
+                  "component_id": "leather_choker",
+                  "tag_id": "category_pool__chokers",
+                  "pool_reference": "10_accessories/chokers"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "acc_hair_ornament",
+      "name_zh": "泛用发饰 (Hair Ornament)",
+      "tags": [
+        {
+          "id": "acc_hair_ornament__tag_000",
+          "text": "hair ornament",
+          "facts": {
+            "prop_usage": "worn",
+            "accessory_facts": {
+              "body_part": "head_hair"
+            },
+            "governance_metadata": {}
+          }
+        },
+        {
+          "id": "acc_hair_ornament__ext_butterfly",
+          "text": "butterfly hair ornament",
+          "facts": {
+            "prop_usage": "worn",
+            "accessory_facts": {
+              "motif": "butterfly",
+              "body_part": "head_hair"
+            },
+            "governance_metadata": {}
+          }
+        },
+        {
+          "id": "acc_hair_ornament__ext_cat",
+          "text": "cat hair ornament",
+          "facts": {
+            "prop_usage": "worn",
+            "accessory_facts": {
+              "motif": "cat",
+              "body_part": "head_hair"
+            },
+            "governance_metadata": {}
+          }
+        },
+        {
+          "id": "acc_hair_ornament__ext_crescent",
+          "text": "crescent hair ornament",
+          "facts": {
+            "prop_usage": "worn",
+            "accessory_facts": {
+              "motif": "crescent",
+              "body_part": "head_hair"
+            },
+            "governance_metadata": {}
+          }
+        },
+        {
+          "id": "acc_hair_ornament__ext_feather",
+          "text": "feather hair ornament",
+          "facts": {
+            "prop_usage": "worn",
+            "accessory_facts": {
+              "body_part": "head_hair",
+              "material": "feather"
+            },
+            "governance_metadata": {}
+          }
+        },
+        {
+          "id": "acc_hair_ornament__ext_frog",
+          "text": "frog hair ornament",
+          "facts": {
+            "prop_usage": "worn",
+            "accessory_facts": {
+              "motif": "frog",
+              "body_part": "head_hair"
+            },
+            "governance_metadata": {}
+          }
+        },
+        {
+          "id": "acc_hair_ornament__ext_bell",
+          "text": "hair bell",
+          "facts": {
+            "prop_usage": "worn",
+            "accessory_facts": {
+              "motif": "bell",
+              "body_part": "head_hair"
+            },
+            "governance_metadata": {}
+          }
+        },
+        {
+          "id": "acc_hair_ornament__ext_flower",
+          "text": "hair flower",
+          "facts": {
+            "prop_usage": "worn",
+            "accessory_facts": {
+              "motif": "flower",
+              "body_part": "head_hair"
+            },
+            "governance_metadata": {}
+          }
+        },
+        {
+          "id": "acc_hair_ornament__ext_heart",
+          "text": "heart hair ornament",
+          "facts": {
+            "prop_usage": "worn",
+            "accessory_facts": {
+              "motif": "heart",
+              "body_part": "head_hair"
+            },
+            "governance_metadata": {}
+          }
+        },
+        {
+          "id": "acc_hair_ornament__ext_leaf",
+          "text": "leaf hair ornament",
+          "facts": {
+            "prop_usage": "worn",
+            "accessory_facts": {
+              "motif": "leaf",
+              "body_part": "head_hair"
+            },
+            "governance_metadata": {}
+          }
+        },
+        {
+          "id": "acc_hair_ornament__ext_skull",
+          "text": "skull hair ornament",
+          "facts": {
+            "prop_usage": "worn",
+            "accessory_facts": {
+              "motif": "skull",
+              "body_part": "head_hair"
+            },
+            "governance_metadata": {}
+          }
+        },
+        {
+          "id": "acc_hair_ornament__ext_star",
+          "text": "star hair ornament",
+          "facts": {
+            "prop_usage": "worn",
+            "accessory_facts": {
+              "motif": "star",
+              "body_part": "head_hair"
+            },
+            "governance_metadata": {}
+          }
+        },
+        {
+          "id": "acc_hair_ornament__ext_x",
+          "text": "x hair ornament",
+          "facts": {
+            "prop_usage": "worn",
+            "accessory_facts": {
+              "motif": "x",
+              "body_part": "head_hair"
+            },
+            "governance_metadata": {}
+          }
+        }
+      ]
+    },
+    {
+      "id": "acc_hairband",
+      "name_zh": "发箍发带 (Hairband)",
+      "tags": [
+        {
+          "id": "acc_hairband__tag_000",
+          "text": "hairband",
+          "facts": {
+            "prop_usage": "worn",
+            "accessory_facts": {
+              "body_part": "head_hair"
+            },
+            "governance_metadata": {}
+          }
+        }
+      ]
+    },
+    {
+      "id": "acc_hairclip",
+      "name_zh": "发夹边夹 (Hairclip)",
+      "tags": [
+        {
+          "id": "acc_hairclip__tag_000",
+          "text": "hairclip",
+          "facts": {
+            "prop_usage": "worn",
+            "accessory_facts": {
+              "body_part": "head_hair"
+            },
+            "governance_metadata": {}
           }
         }
       ]

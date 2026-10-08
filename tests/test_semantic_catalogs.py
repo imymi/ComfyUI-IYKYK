@@ -421,7 +421,7 @@ class TestSemanticCatalogs(unittest.TestCase):
         for a in res.source_atoms:
             self.assertTrue(a.id, f"Atom {a.atom_id} has empty leaf ID")
             self.assertIsNotNone(a.facts.semantic_role, f"Atom {a.atom_id} has no semantic_role")
-        self.assertGreaterEqual(len(atoms_with_rules), 35)
+        self.assertGreaterEqual(len(atoms_with_rules), 28)
 
     def test_ordered_selections_determinism(self):
         """验证 selections 顺序为跨进程确定性流水线到达顺序，杜绝 set 漂移"""

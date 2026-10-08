@@ -17,4 +17,22 @@ scratch/baseline_*
 scratch/controlled_ref_*
 scratch/target_*
 scratch/*reproduced_manifest.json
+scratch/apply_*
+scratch/generate_*
+scratch/check_*
+scratch/report_*
+scratch/inspect_*
+scratch/print_*
+scratch/build_*
+scratch/update_*
+scratch/verify_*
+scratch/test_*
+scratch/run_*
+scratch/step7575*
+scratch/m33_*
+scratch/m3_*
+scratch/m4_*
+scratch/rc10_*
+scratch/ledger_history/
+
 

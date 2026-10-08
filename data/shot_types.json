@@ -90,6 +90,54 @@
               "upper_body"
             ]
           }
+        },
+        {
+          "id": "close_up__ext_portrait_shot",
+          "text": "close up portrait shot",
+          "facts": {
+            "shot_facts": {
+              "shot_size": "close_up",
+              "genre": "portrait",
+              "dimension": "shot_size_framing"
+            },
+            "governance_metadata": {}
+          }
+        },
+        {
+          "id": "close_up__ext_cropped_dramatic",
+          "text": "cropped dramatic shot",
+          "facts": {
+            "shot_facts": {
+              "shot_size": "close_up",
+              "crop_style": "dramatic",
+              "dimension": "shot_size_framing"
+            },
+            "governance_metadata": {}
+          }
+        },
+        {
+          "id": "close_up__ext_headshot",
+          "text": "headshot",
+          "facts": {
+            "shot_facts": {
+              "shot_size": "close_up",
+              "framing": "head_and_neck",
+              "dimension": "shot_size_framing"
+            },
+            "governance_metadata": {}
+          }
+        },
+        {
+          "id": "close_up__ext_tight_portrait",
+          "text": "tight portrait shot",
+          "facts": {
+            "shot_facts": {
+              "shot_size": "close_up",
+              "framing": "tight",
+              "dimension": "shot_size_framing"
+            },
+            "governance_metadata": {}
+          }
         }
       ]
     },
@@ -135,6 +183,30 @@
             "visible_regions": [
               "upper_body"
             ]
+          }
+        },
+        {
+          "id": "medium_close_up__ext_shoulder_up",
+          "text": "shoulder up portrait shot",
+          "facts": {
+            "shot_facts": {
+              "shot_size": "medium_close_up",
+              "framing": "shoulder_up",
+              "dimension": "shot_size_framing"
+            },
+            "governance_metadata": {}
+          }
+        },
+        {
+          "id": "medium_close_up__ext_upper_torso",
+          "text": "upper torso emphasis shot",
+          "facts": {
+            "shot_facts": {
+              "shot_size": "medium_close_up",
+              "focus": "upper_torso",
+              "dimension": "shot_size_framing"
+            },
+            "governance_metadata": {}
           }
         }
       ]
@@ -182,6 +254,30 @@
               "upper_body"
             ]
           }
+        },
+        {
+          "id": "medium_shot__ext_hip_up",
+          "text": "hip up shot",
+          "facts": {
+            "shot_facts": {
+              "shot_size": "medium_shot",
+              "framing": "hip_up",
+              "dimension": "shot_size_framing"
+            },
+            "governance_metadata": {}
+          }
+        },
+        {
+          "id": "medium_shot__ext_torso_focused",
+          "text": "torso focused shot",
+          "facts": {
+            "shot_facts": {
+              "shot_size": "medium_shot",
+              "focus": "torso",
+              "dimension": "shot_size_framing"
+            },
+            "governance_metadata": {}
+          }
         }
       ]
     },
@@ -217,6 +313,33 @@
             "visible_regions": [
               "upper_body"
             ]
+          }
+        },
+        {
+          "id": "medium_long_shot__ext_cowboy",
+          "text": "cowboy shot",
+          "facts": {
+            "shot_facts": {
+              "shot_size": "medium_long_shot",
+              "framing": "cowboy_mid_thigh",
+              "dimension": "shot_size_framing"
+            },
+            "governance_metadata": {}
+          }
+        },
+        {
+          "id": "medium_long_shot__ext_reclining",
+          "text": "reclining body shot",
+          "facts": {
+            "pose_facts": {
+              "pose_orientation": "reclining"
+            },
+            "shot_facts": {
+              "shot_size": "medium_long_shot",
+              "dimension": "shot_size_framing",
+              "pose_orientation": "reclining"
+            },
+            "governance_metadata": {}
           }
         }
       ]
@@ -264,6 +387,53 @@
               "upper_body"
             ]
           }
+        },
+        {
+          "id": "full_body_shot__ext_establishing",
+          "text": "establishing shot",
+          "facts": {
+            "shot_facts": {
+              "shot_size": "wide",
+              "dimension": "shot_size_framing",
+              "function": "establishing_context"
+            },
+            "governance_metadata": {}
+          }
+        },
+        {
+          "id": "full_body_shot__ext_long_shot",
+          "text": "long shot",
+          "facts": {
+            "shot_facts": {
+              "shot_size": "long_shot",
+              "dimension": "shot_size_framing"
+            },
+            "governance_metadata": {}
+          }
+        },
+        {
+          "id": "full_body_shot__ext_full_body_portrait",
+          "text": "full body portrait",
+          "facts": {
+            "shot_facts": {
+              "shot_size": "full_body",
+              "genre": "portrait",
+              "dimension": "shot_size_framing"
+            },
+            "governance_metadata": {}
+          }
+        },
+        {
+          "id": "full_body_shot__ext_wide_character",
+          "text": "wide character shot",
+          "facts": {
+            "shot_facts": {
+              "shot_size": "full_body",
+              "focus": "character_in_environment",
+              "dimension": "shot_size_framing"
+            },
+            "governance_metadata": {}
+          }
         }
       ]
     },
@@ -309,6 +479,416 @@
             "visible_regions": [
               "face"
             ]
+          }
+        },
+        {
+          "id": "erotic_close_up__ext_hip_up_intimate",
+          "text": "hip up intimate shot",
+          "facts": {
+            "lighting_facts": {
+              "mood": "intimate"
+            },
+            "shot_facts": {
+              "shot_size": "erotic_close_up",
+              "framing": "hip_up",
+              "mood": "intimate",
+              "dimension": "shot_size_framing"
+            },
+            "governance_metadata": {}
+          }
+        },
+        {
+          "id": "erotic_close_up__ext_intimate_close",
+          "text": "intimate close shot",
+          "facts": {
+            "lighting_facts": {
+              "mood": "intimate"
+            },
+            "shot_facts": {
+              "shot_size": "erotic_close_up",
+              "mood": "intimate",
+              "dimension": "shot_size_framing"
+            },
+            "governance_metadata": {}
+          }
+        },
+        {
+          "id": "erotic_close_up__ext_intimate_proximity",
+          "text": "intimate proximity shot",
+          "facts": {
+            "shot_facts": {
+              "shot_size": "erotic_close_up",
+              "distance": "proximity",
+              "dimension": "shot_size_framing"
+            },
+            "governance_metadata": {}
+          }
+        },
+        {
+          "id": "erotic_close_up__ext_lower_body",
+          "text": "lower body emphasis shot",
+          "facts": {
+            "shot_facts": {
+              "shot_size": "erotic_close_up",
+              "focus": "lower_body",
+              "dimension": "shot_size_framing"
+            },
+            "governance_metadata": {}
+          }
+        },
+        {
+          "id": "erotic_close_up__ext_partial_reveal",
+          "text": "partial body reveal shot",
+          "facts": {
+            "shot_facts": {
+              "shot_size": "erotic_close_up",
+              "dimension": "shot_size_framing",
+              "reveal": "partial"
+            },
+            "governance_metadata": {}
+          }
+        },
+        {
+          "id": "erotic_close_up__ext_suggestive_crop",
+          "text": "suggestive crop shot",
+          "facts": {
+            "lighting_facts": {
+              "mood": "suggestive"
+            },
+            "shot_facts": {
+              "shot_size": "erotic_close_up",
+              "mood": "suggestive",
+              "dimension": "shot_size_framing"
+            },
+            "governance_metadata": {}
+          }
+        }
+      ]
+    },
+    {
+      "id": "camera_motion",
+      "name_zh": "动态运镜 (Camera Motion)",
+      "tags": [
+        {
+          "id": "cam_motion__boom_shot",
+          "text": "boom shot",
+          "facts": {
+            "pose_facts": {
+              "motion_type": "boom"
+            },
+            "shot_facts": {
+              "axis": "vertical",
+              "motion_type": "boom",
+              "dimension": "camera_motion"
+            },
+            "governance_metadata": {}
+          }
+        },
+        {
+          "id": "cam_motion__crane_shot",
+          "text": "crane shot",
+          "facts": {
+            "pose_facts": {
+              "motion_type": "crane"
+            },
+            "shot_facts": {
+              "axis": "elevated_vertical",
+              "motion_type": "crane",
+              "dimension": "camera_motion"
+            },
+            "governance_metadata": {}
+          }
+        },
+        {
+          "id": "cam_motion__dolly_shot",
+          "text": "dolly shot",
+          "facts": {
+            "pose_facts": {
+              "motion_type": "dolly"
+            },
+            "shot_facts": {
+              "axis": "depth_movement",
+              "motion_type": "dolly",
+              "dimension": "camera_motion"
+            },
+            "governance_metadata": {}
+          }
+        },
+        {
+          "id": "cam_motion__handheld_shot",
+          "text": "handheld shot",
+          "facts": {
+            "pose_facts": {
+              "motion_type": "handheld"
+            },
+            "shot_facts": {
+              "motion_type": "handheld",
+              "dimension": "camera_motion",
+              "stability": "organic_shake"
+            },
+            "governance_metadata": {}
+          }
+        },
+        {
+          "id": "cam_motion__jib_shot",
+          "text": "jib shot",
+          "facts": {
+            "pose_facts": {
+              "motion_type": "jib"
+            },
+            "shot_facts": {
+              "axis": "fluid_arc",
+              "motion_type": "jib",
+              "dimension": "camera_motion"
+            },
+            "governance_metadata": {}
+          }
+        },
+        {
+          "id": "cam_motion__steadicam_shot",
+          "text": "steadicam shot",
+          "facts": {
+            "pose_facts": {
+              "motion_type": "steadicam"
+            },
+            "shot_facts": {
+              "motion_type": "steadicam",
+              "dimension": "camera_motion",
+              "stability": "stabilized_smooth"
+            },
+            "governance_metadata": {}
+          }
+        },
+        {
+          "id": "cam_motion__tilt_shot",
+          "text": "tilt shot",
+          "facts": {
+            "pose_facts": {
+              "motion_type": "tilt"
+            },
+            "shot_facts": {
+              "axis": "vertical_rotation",
+              "motion_type": "tilt",
+              "dimension": "camera_motion"
+            },
+            "governance_metadata": {}
+          }
+        },
+        {
+          "id": "cam_motion__tracking_shot",
+          "text": "tracking shot",
+          "facts": {
+            "pose_facts": {
+              "motion_type": "tracking"
+            },
+            "shot_facts": {
+              "axis": "lateral_follow",
+              "motion_type": "tracking",
+              "dimension": "camera_motion"
+            },
+            "governance_metadata": {}
+          }
+        },
+        {
+          "id": "cam_motion__zoom_shot",
+          "text": "zoom shot",
+          "facts": {
+            "pose_facts": {
+              "motion_type": "zoom"
+            },
+            "shot_facts": {
+              "axis": "focal_length_transition",
+              "motion_type": "zoom",
+              "dimension": "camera_motion"
+            },
+            "governance_metadata": {}
+          }
+        }
+      ]
+    },
+    {
+      "id": "specialty_lens_fisheye",
+      "name_zh": "鱼眼镜头光学畸变 (Fisheye Lens)",
+      "tags": [
+        {
+          "id": "specialty_lens__fisheye",
+          "text": "fisheye lens",
+          "facts": {
+            "shot_facts": {
+              "distortion": "barrel_distortion",
+              "lens_type": "fisheye",
+              "dimension": "lens_optical_effect"
+            },
+            "governance_metadata": {}
+          }
+        }
+      ]
+    },
+    {
+      "id": "perspective_optical",
+      "name_zh": "光学透视缩短 (Optical Foreshortening)",
+      "tags": [
+        {
+          "id": "perspective__foreshortening",
+          "text": "foreshortening",
+          "facts": {
+            "lighting_facts": {
+              "effect": "foreshortening"
+            },
+            "shot_facts": {
+              "effect": "foreshortening",
+              "dimension": "optical_perspective"
+            },
+            "governance_metadata": {}
+          }
+        }
+      ]
+    },
+    {
+      "id": "shot_composition_action",
+      "name_zh": "动态透视动作构图 (Dynamic Action Composition)",
+      "tags": [
+        {
+          "id": "shot_comp__action_foreshortening",
+          "text": "action shot with dynamic foreshortening",
+          "facts": {
+            "lighting_facts": {
+              "mood": "action"
+            },
+            "shot_facts": {
+              "composition": "dynamic_foreshortening",
+              "mood": "action",
+              "dimension": "shot_composition"
+            },
+            "governance_metadata": {}
+          }
+        }
+      ]
+    },
+    {
+      "id": "shot_composition_rules",
+      "name_zh": "构图法则与平衡 (Composition Rules)",
+      "tags": [
+        {
+          "id": "shot_comp__asymmetrical",
+          "text": "asymmetrical composition",
+          "facts": {
+            "shot_facts": {
+              "composition": "asymmetrical",
+              "dimension": "shot_composition",
+              "rule": "balance"
+            },
+            "governance_metadata": {}
+          }
+        },
+        {
+          "id": "shot_comp__off_center",
+          "text": "off center composition",
+          "facts": {
+            "shot_facts": {
+              "composition": "rule_of_thirds",
+              "dimension": "shot_composition",
+              "placement": "off_center"
+            },
+            "governance_metadata": {}
+          }
+        }
+      ]
+    },
+    {
+      "id": "shot_composition_occlusion",
+      "name_zh": "环境遮挡层次构图 (Environmental Occlusion)",
+      "tags": [
+        {
+          "id": "shot_comp__environmental_occlusion",
+          "text": "environmental occlusion composition",
+          "facts": {
+            "shot_facts": {
+              "composition": "occlusion",
+              "layer": "environment",
+              "dimension": "shot_composition"
+            },
+            "governance_metadata": {}
+          }
+        },
+        {
+          "id": "shot_comp__fabric_obscured",
+          "text": "fabric obscured composition",
+          "facts": {
+            "shot_facts": {
+              "composition": "occlusion",
+              "element": "fabric",
+              "dimension": "shot_composition"
+            },
+            "governance_metadata": {}
+          }
+        },
+        {
+          "id": "shot_comp__foreground_occluded",
+          "text": "foreground occluded composition",
+          "facts": {
+            "shot_facts": {
+              "composition": "occlusion",
+              "layer": "foreground",
+              "dimension": "shot_composition"
+            },
+            "governance_metadata": {}
+          }
+        }
+      ]
+    },
+    {
+      "id": "shot_composition_framing",
+      "name_zh": "边缘诱导裁切构图 (Framing Edge Crop)",
+      "tags": [
+        {
+          "id": "shot_comp__just_out_of_frame",
+          "text": "just out of frame crop",
+          "facts": {
+            "shot_facts": {
+              "composition": "crop_tension",
+              "edge": "out_of_frame",
+              "dimension": "shot_composition"
+            },
+            "governance_metadata": {}
+          }
+        }
+      ]
+    },
+    {
+      "id": "shot_framing_genre",
+      "name_zh": "自拍摄影视角 (Self-Portrait Framing)",
+      "tags": [
+        {
+          "id": "shot_framing__self_portrait",
+          "text": "self-portrait",
+          "facts": {
+            "shot_facts": {
+              "perspective": "personal",
+              "genre": "self_portrait",
+              "dimension": "shot_framing_genre"
+            },
+            "governance_metadata": {}
+          }
+        }
+      ]
+    },
+    {
+      "id": "shot_composition_lighting",
+      "name_zh": "剪影强调构图 (Silhouette Lighting)",
+      "tags": [
+        {
+          "id": "shot_comp__silhouette_emphasis",
+          "text": "silhouette emphasis shot",
+          "facts": {
+            "lighting_facts": {
+              "lighting": "backlit"
+            },
+            "shot_facts": {
+              "composition": "silhouette",
+              "dimension": "shot_composition"
+            },
+            "governance_metadata": {}
           }
         }
       ]
@@ -384,6 +964,18 @@
               "upper_body"
             ]
           }
+        },
+        {
+          "id": "low_angle__ext_from_below",
+          "text": "from below",
+          "facts": {
+            "shot_facts": {
+              "direction": "upward",
+              "height_tier": "low",
+              "dimension": "camera_height_angle"
+            },
+            "governance_metadata": {}
+          }
         }
       ]
     },
@@ -420,6 +1012,18 @@
               "upper_body"
             ]
           }
+        },
+        {
+          "id": "high_angle__ext_from_above",
+          "text": "from above",
+          "facts": {
+            "shot_facts": {
+              "direction": "downward",
+              "height_tier": "high",
+              "dimension": "camera_height_angle"
+            },
+            "governance_metadata": {}
+          }
         }
       ]
     },
@@ -455,6 +1059,17 @@
             "visible_regions": [
               "upper_body"
             ]
+          }
+        },
+        {
+          "id": "overhead_birds_eye__ext_overhead_shot",
+          "text": "overhead shot",
+          "facts": {
+            "shot_facts": {
+              "height_tier": "overhead",
+              "dimension": "camera_height_angle"
+            },
+            "governance_metadata": {}
           }
         }
       ]
@@ -538,6 +1153,28 @@
               "upper_body"
             ]
           }
+        },
+        {
+          "id": "dutch_angle__ext_oblique_angle",
+          "text": "oblique angle",
+          "facts": {
+            "shot_facts": {
+              "angle_type": "oblique",
+              "dimension": "canted_angle"
+            },
+            "governance_metadata": {}
+          }
+        },
+        {
+          "id": "dutch_angle__ext_diagonal_body",
+          "text": "diagonal body shot",
+          "facts": {
+            "shot_facts": {
+              "framing": "diagonal_body",
+              "dimension": "canted_angle"
+            },
+            "governance_metadata": {}
+          }
         }
       ]
     },
@@ -619,6 +1256,39 @@
             "visible_regions": [
               "upper_body"
             ]
+          }
+        },
+        {
+          "id": "pov_first_person__ext_pov_above",
+          "text": "pov from above",
+          "facts": {
+            "shot_facts": {
+              "direction": "downward",
+              "dimension": "first_person_pov"
+            },
+            "governance_metadata": {}
+          }
+        },
+        {
+          "id": "pov_first_person__ext_pov_behind",
+          "text": "pov from behind",
+          "facts": {
+            "shot_facts": {
+              "direction": "rear",
+              "dimension": "first_person_pov"
+            },
+            "governance_metadata": {}
+          }
+        },
+        {
+          "id": "pov_first_person__ext_pov_below",
+          "text": "pov from below",
+          "facts": {
+            "shot_facts": {
+              "direction": "upward",
+              "dimension": "first_person_pov"
+            },
+            "governance_metadata": {}
           }
         }
       ]
@@ -711,6 +1381,96 @@
             "visible_regions": [
               "upper_body"
             ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "camera_orientation_rear",
+      "name_zh": "背向观察视 (Rear Orientation)",
+      "tags": [
+        {
+          "id": "cam_orient__from_behind",
+          "text": "from behind",
+          "facts": {
+            "shot_facts": {
+              "view_axis": "back",
+              "orientation": "rear",
+              "dimension": "subject_orientation"
+            },
+            "governance_metadata": {}
+          }
+        }
+      ]
+    },
+    {
+      "id": "camera_orientation_side",
+      "name_zh": "侧面观察视 (Side Orientation)",
+      "tags": [
+        {
+          "id": "cam_orient__from_side",
+          "text": "from side",
+          "facts": {
+            "shot_facts": {
+              "view_axis": "lateral",
+              "orientation": "side",
+              "dimension": "subject_orientation"
+            },
+            "governance_metadata": {}
+          }
+        }
+      ]
+    },
+    {
+      "id": "camera_orientation_frontal",
+      "name_zh": "正面观察视 (Frontal Orientation)",
+      "tags": [
+        {
+          "id": "cam_orient__frontal_view",
+          "text": "frontal view",
+          "facts": {
+            "shot_facts": {
+              "view_axis": "front",
+              "orientation": "frontal",
+              "dimension": "subject_orientation"
+            },
+            "governance_metadata": {}
+          }
+        }
+      ]
+    },
+    {
+      "id": "camera_orientation_profile",
+      "name_zh": "正侧剪影视 (Profile Orientation)",
+      "tags": [
+        {
+          "id": "cam_orient__profile_view",
+          "text": "profile view",
+          "facts": {
+            "shot_facts": {
+              "view_axis": "lateral_90deg",
+              "orientation": "profile",
+              "dimension": "subject_orientation"
+            },
+            "governance_metadata": {}
+          }
+        }
+      ]
+    },
+    {
+      "id": "camera_orientation_three_quarter",
+      "name_zh": "斜侧四分之三视 (Three-Quarter Orientation)",
+      "tags": [
+        {
+          "id": "cam_orient__three_quarter_view",
+          "text": "three-quarter view",
+          "facts": {
+            "shot_facts": {
+              "view_axis": "oblique_45deg",
+              "orientation": "three_quarter",
+              "dimension": "subject_orientation"
+            },
+            "governance_metadata": {}
           }
         }
       ]

@@ -23,6 +23,7 @@ RUNTIME_LIB_FILES: Tuple[str, ...] = (
     "errors.py",
     "lexer.py",
     "models.py",
+    "pool_resolver.py",
     "rng.py",
     "rule_contract.py",
     "runtime_manifest.py",

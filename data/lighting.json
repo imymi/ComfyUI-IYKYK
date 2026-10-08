@@ -878,6 +878,16 @@
             "light_sources": [],
             "color_modes": []
           }
+        },
+        {
+          "id": "professional_lighting_04__ext_strong_side",
+          "text": "strong side key lights",
+          "facts": {
+            "lighting_facts": {
+              "light_role": "key"
+            },
+            "governance_metadata": {}
+          }
         }
       ],
       "erotic_tags": [
@@ -1424,6 +1434,16 @@
             "light_sources": [],
             "color_modes": []
           }
+        },
+        {
+          "id": "professional_lighting_08__ext_diffused",
+          "text": "soft diffused lighting",
+          "facts": {
+            "lighting_facts": {
+              "light_type": "soft"
+            },
+            "governance_metadata": {}
+          }
         }
       ],
       "erotic_tags": [
@@ -1603,6 +1623,16 @@
             "time_of_day": null,
             "light_sources": [],
             "color_modes": []
+          }
+        },
+        {
+          "id": "professional_lighting_09__ext_hard_shadows",
+          "text": "hard shadows",
+          "facts": {
+            "lighting_facts": {
+              "shadow": "hard"
+            },
+            "governance_metadata": {}
           }
         }
       ],
@@ -1923,6 +1953,26 @@
             "time_of_day": null,
             "light_sources": [],
             "color_modes": []
+          }
+        },
+        {
+          "id": "professional_lighting_11__ext_contre_jour",
+          "text": "contre-jour lighting",
+          "facts": {
+            "lighting_facts": {
+              "light_type": "silhouette"
+            },
+            "governance_metadata": {}
+          }
+        },
+        {
+          "id": "professional_lighting_11__ext_window_sil",
+          "text": "silhouetted against the bright window",
+          "facts": {
+            "lighting_facts": {
+              "light_type": "silhouette"
+            },
+            "governance_metadata": {}
           }
         }
       ],
@@ -2278,6 +2328,281 @@
         }
       ],
       "erotic_tags": []
+    },
+    {
+      "id": "prof_light_accent",
+      "name": "重点强调光 (Accent Light)",
+      "tags": [
+        {
+          "id": "prof_light_accent__tag_000",
+          "text": "accent lighting",
+          "facts": {
+            "lighting_facts": {
+              "light_type": "accent"
+            },
+            "governance_metadata": {}
+          }
+        }
+      ]
+    },
+    {
+      "id": "prof_light_ambient",
+      "name": "环境漫射光 (Ambient Light)",
+      "tags": [
+        {
+          "id": "prof_light_ambient__tag_000",
+          "text": "ambient lighting",
+          "facts": {
+            "lighting_facts": {
+              "light_type": "ambient"
+            },
+            "governance_metadata": {}
+          }
+        },
+        {
+          "id": "prof_light_ambient__ext_colortemp",
+          "text": "color temperature lighting",
+          "facts": {
+            "lighting_facts": {
+              "property": "temperature"
+            },
+            "governance_metadata": {}
+          }
+        },
+        {
+          "id": "prof_light_ambient__ext_fill",
+          "text": "soft fill lighting",
+          "facts": {
+            "lighting_facts": {
+              "light_role": "fill"
+            },
+            "governance_metadata": {}
+          }
+        }
+      ]
+    },
+    {
+      "id": "prof_light_clamshell",
+      "name": "贝壳光 (Clamshell Lighting)",
+      "tags": [
+        {
+          "id": "prof_light_clamshell__tag_000",
+          "text": "clamshell lighting",
+          "facts": {
+            "lighting_facts": {
+              "light_type": "beauty_portrait"
+            },
+            "governance_metadata": {}
+          }
+        }
+      ]
+    },
+    {
+      "id": "prof_light_fluorescent",
+      "name": "荧光冷白光 (Fluorescent Lighting)",
+      "tags": [
+        {
+          "id": "prof_light_fluorescent__tag_000",
+          "text": "fluorescent lighting",
+          "facts": {
+            "light_sources": [
+              "fluorescent"
+            ],
+            "lighting_facts": {
+              "light_source": "fluorescent"
+            },
+            "governance_metadata": {}
+          }
+        }
+      ]
+    },
+    {
+      "id": "prof_light_fresnel",
+      "name": "菲涅尔透镜聚光 (Fresnel Lighting)",
+      "tags": [
+        {
+          "id": "prof_light_fresnel__tag_000",
+          "text": "fresnel lighting",
+          "facts": {
+            "lighting_facts": {
+              "light_type": "cinematic_lens"
+            },
+            "governance_metadata": {}
+          }
+        }
+      ]
+    },
+    {
+      "id": "prof_light_gelled",
+      "name": "色片滤光 (Gelled Lighting)",
+      "tags": [
+        {
+          "id": "prof_light_gelled__tag_000",
+          "text": "gelled lighting",
+          "facts": {
+            "lighting_facts": {
+              "light_type": "color_gel"
+            },
+            "governance_metadata": {}
+          }
+        }
+      ]
+    },
+    {
+      "id": "prof_light_high_key",
+      "name": "高调明亮光 (High-key Lighting)",
+      "tags": [
+        {
+          "id": "prof_light_high_key__tag_000",
+          "text": "high-key lighting",
+          "facts": {
+            "lighting_facts": {
+              "key_type": "high_key"
+            },
+            "governance_metadata": {}
+          }
+        }
+      ]
+    },
+    {
+      "id": "prof_light_hmi",
+      "name": "镝灯日光模拟 (HMI Lighting)",
+      "tags": [
+        {
+          "id": "prof_light_hmi__tag_000",
+          "text": "hmi lighting",
+          "facts": {
+            "light_sources": [
+              "hmi"
+            ],
+            "lighting_facts": {
+              "light_source": "hmi"
+            },
+            "governance_metadata": {}
+          }
+        }
+      ]
+    },
+    {
+      "id": "prof_light_led_panel",
+      "name": "LED平板柔光 (LED Panel Light)",
+      "tags": [
+        {
+          "id": "prof_light_led_panel__tag_000",
+          "text": "led panel lighting",
+          "facts": {
+            "light_sources": [
+              "led"
+            ],
+            "lighting_facts": {
+              "light_source": "led"
+            },
+            "governance_metadata": {}
+          }
+        }
+      ]
+    },
+    {
+      "id": "prof_light_painting",
+      "name": "光绘摄影 (Light Painting)",
+      "tags": [
+        {
+          "id": "prof_light_painting__tag_000",
+          "text": "light painting",
+          "facts": {
+            "lighting_facts": {
+              "style": "light_painting"
+            },
+            "governance_metadata": {}
+          }
+        }
+      ]
+    },
+    {
+      "id": "prof_light_low_key",
+      "name": "低调暗黑光 (Low-key Lighting)",
+      "tags": [
+        {
+          "id": "prof_light_low_key__tag_000",
+          "text": "low-key lighting",
+          "facts": {
+            "lighting_facts": {
+              "key_type": "low_key"
+            },
+            "governance_metadata": {}
+          }
+        }
+      ]
+    },
+    {
+      "id": "prof_light_practical",
+      "name": "实景道具光 (Practical Lighting)",
+      "tags": [
+        {
+          "id": "prof_light_practical__tag_000",
+          "text": "practical lighting",
+          "facts": {
+            "lighting_facts": {
+              "source_in_scene": true
+            },
+            "governance_metadata": {}
+          }
+        }
+      ]
+    },
+    {
+      "id": "prof_light_strobe",
+      "name": "频闪闪光灯 (Strobe Lighting)",
+      "tags": [
+        {
+          "id": "prof_light_strobe__tag_000",
+          "text": "strobe lighting",
+          "facts": {
+            "light_sources": [
+              "strobe"
+            ],
+            "lighting_facts": {
+              "light_source": "strobe"
+            },
+            "governance_metadata": {}
+          }
+        }
+      ]
+    },
+    {
+      "id": "prof_light_three_point",
+      "name": "经典三点布光 (Three-point Lighting)",
+      "tags": [
+        {
+          "id": "prof_light_three_point__tag_000",
+          "text": "three-point lighting",
+          "facts": {
+            "lighting_facts": {
+              "setup": "three_point"
+            },
+            "governance_metadata": {}
+          }
+        }
+      ]
+    },
+    {
+      "id": "prof_light_tungsten",
+      "name": "钨丝暖光 (Tungsten Lighting)",
+      "tags": [
+        {
+          "id": "prof_light_tungsten__tag_000",
+          "text": "tungsten lighting",
+          "facts": {
+            "light_sources": [
+              "tungsten"
+            ],
+            "lighting_facts": {
+              "light_source": "tungsten"
+            },
+            "governance_metadata": {}
+          }
+        }
+      ]
     }
   ],
   "cinematic_lighting": [
@@ -2697,6 +3022,16 @@
             "light_sources": [],
             "color_modes": []
           }
+        },
+        {
+          "id": "cinematic_lighting_02__ext_bright_neon",
+          "text": "bright neon lighting",
+          "facts": {
+            "lighting_facts": {
+              "light_type": "neon"
+            },
+            "governance_metadata": {}
+          }
         }
       ],
       "id": "cinematic_lighting_02",
@@ -2818,6 +3153,29 @@
             "light_sources": [],
             "color_modes": []
           }
+        },
+        {
+          "id": "cinematic_lighting_03__ext_moody_low",
+          "text": "moody low-light",
+          "facts": {
+            "lighting_facts": {
+              "mood": "low_light"
+            },
+            "governance_metadata": {}
+          }
+        },
+        {
+          "id": "cinematic_lighting_03__ext_natural",
+          "text": "soft natural lighting",
+          "facts": {
+            "light_sources": [
+              "natural"
+            ],
+            "lighting_facts": {
+              "light_source": "natural"
+            },
+            "governance_metadata": {}
+          }
         }
       ],
       "id": "cinematic_lighting_03",
@@ -2877,6 +3235,26 @@
               "artificial_cool"
             ],
             "color_modes": []
+          }
+        },
+        {
+          "id": "ext_aw_light_bioluminescent__ext_glowy_lumi",
+          "text": "glowy luminescence",
+          "facts": {
+            "lighting_facts": {
+              "glow": "luminescence"
+            },
+            "governance_metadata": {}
+          }
+        },
+        {
+          "id": "ext_aw_light_bioluminescent__ext_lumi",
+          "text": "luminescence",
+          "facts": {
+            "lighting_facts": {
+              "glow": "luminescence"
+            },
+            "governance_metadata": {}
           }
         }
       ],
@@ -3006,6 +3384,26 @@
             "light_sources": [],
             "color_modes": []
           }
+        },
+        {
+          "id": "special_effects_00__ext_glowy_translucency",
+          "text": "glowy translucency",
+          "facts": {
+            "lighting_facts": {
+              "effect": "translucent"
+            },
+            "governance_metadata": {}
+          }
+        },
+        {
+          "id": "special_effects_00__ext_translucency",
+          "text": "translucency",
+          "facts": {
+            "lighting_facts": {
+              "effect": "translucent"
+            },
+            "governance_metadata": {}
+          }
         }
       ],
       "id": "special_effects_00",
@@ -3134,6 +3532,26 @@
             "time_of_day": null,
             "light_sources": [],
             "color_modes": []
+          }
+        },
+        {
+          "id": "special_effects_01__ext_iridescent",
+          "text": "iridescent light",
+          "facts": {
+            "lighting_facts": {
+              "effect": "iridescent"
+            },
+            "governance_metadata": {}
+          }
+        },
+        {
+          "id": "special_effects_01__ext_specular",
+          "text": "specular lighting",
+          "facts": {
+            "lighting_facts": {
+              "effect": "specular"
+            },
+            "governance_metadata": {}
           }
         }
       ],

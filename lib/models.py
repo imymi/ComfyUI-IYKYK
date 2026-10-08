@@ -6,7 +6,12 @@ from __future__ import annotations
 import math
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, Iterable, List, Optional, Sequence, Set, Tuple, Union
+
+if __package__:
+    from .errors import UnresolvedEnsembleRelationError
+else:
+    from lib.errors import UnresolvedEnsembleRelationError
 
 
 class SpanType(Enum):
@@ -67,32 +72,80 @@ ORDERED_CONTEXT_IDS: Tuple[str, ...] = (
     "generic",
 )
 
-VALID_SEMANTIC_ROLES: Tuple[str, ...] = ("scene_anchor", "scene_detail", "selector", "effect", "quality")
-VALID_SPACE_KINDS: Tuple[str, ...] = ("indoor", "outdoor", "mixed", "neutral")
+class _UnspecifiedType:
+    _instance: Optional["_UnspecifiedType"] = None
+
+    def __new__(cls) -> "_UnspecifiedType":
+        if cls._instance is None:
+            cls._instance = super().__new__(cls)
+        return cls._instance
+
+    def __repr__(self) -> str:
+        return "UNSPECIFIED"
+
+    def __str__(self) -> str:
+        return "unspecified"
+
+    def __eq__(self, other: Any) -> bool:
+        return other is self or other == "unspecified"
+
+    def __hash__(self) -> int:
+        return hash("UNSPECIFIED")
+
+
+UNSPECIFIED = _UnspecifiedType()
+
+
+class _AbsentType:
+    _instance: Optional["_AbsentType"] = None
+
+    def __new__(cls) -> "_AbsentType":
+        if cls._instance is None:
+            cls._instance = super().__new__(cls)
+        return cls._instance
+
+    def __repr__(self) -> str:
+        return "_ABSENT"
+
+
+_ABSENT = _AbsentType()
+
+
+VALID_SEMANTIC_ROLES: Tuple[str, ...] = (
+    "scene_anchor", "scene_detail", "selector", "effect", "quality", "variant"
+)
+VALID_SPACE_KINDS: Tuple[str, ...] = (
+    "indoor", "outdoor", "semi_open", "subterranean", "mixed", "neutral",
+    "indoor_or_outdoor", "outdoor_or_indoor", "indoor_or_semi_open", "unspecified"
+)
 VALID_VISIBLE_REGIONS: Tuple[str, ...] = (
     "face", "upper_body", "lower_body", "hands", "feet", "full_body", "intimate_lower_body"
 )
 VALID_GARMENT_TOPOLOGIES: Tuple[str, ...] = (
-    "one_piece", "top", "bottom_pants", "bottom_skirt", "underwear", "outerwear", "none"
+    "one_piece", "top", "bottom_pants", "bottom_skirt", "underwear", "outerwear", "ensemble_outfit", "none"
 )
 VALID_GARMENT_STATES: Tuple[str, ...] = (
     "worn", "loosened", "opened", "lifted", "lowered", "removed", "discarded", "wet_clinging", "torn"
 )
 VALID_HAND_STATES: Tuple[str, ...] = (
-    "free", "one_busy", "both_busy", "supports_body", "restrained", "intense_motion"
+    "free", "one_busy", "both_busy", "supports_body", "restrained", "intense_motion", "unspecified"
 )
 VALID_PROP_USAGES: Tuple[str, ...] = ("handheld", "worn", "ambient", "body_contact", "furniture")
 VALID_EMOTIONS: Tuple[str, ...] = (
     "shy", "seductive", "pleasure", "submissive", "playful", "pain", "fear", "dazed",
-    "restrained", "detached", "contrast", "neutral"
+    "restrained", "detached", "contrast", "neutral",
+    "amused", "angry", "anxious", "blissful", "confused", "contemptuous", "disgusted",
+    "excited", "focused", "happy", "overwhelmed", "proud", "relaxed", "sad",
+    "surprised", "tired", "yearning"
 )
 VALID_GAZES: Tuple[str, ...] = (
-    "camera", "away", "down", "up", "side", "over_shoulder", "eyes_closed", "obscured", "neutral"
+    "camera", "away", "down", "up", "side", "over_shoulder", "eyes_closed", "obscured", "neutral", "intense"
 )
 VALID_OCCLUSIONS: Tuple[str, ...] = ("none", "eyes", "face", "lower_body")
-VALID_TIMES_OF_DAY: Tuple[str, ...] = ("day", "dawn", "dusk", "night", "neutral")
+VALID_TIMES_OF_DAY: Tuple[str, ...] = ("day", "dawn", "dusk", "night", "neutral", "unspecified")
 VALID_LIGHT_SOURCES: Tuple[str, ...] = (
-    "daylight", "artificial_warm", "artificial_cool", "neon", "candle", "screen", "studio", "mixed", "neutral"
+    "daylight", "artificial_warm", "artificial_cool", "neon", "candle", "screen", "studio", "mixed", "neutral",
+    "flash", "fluorescent", "hmi", "led", "natural", "strobe", "tungsten"
 )
 VALID_COLOR_MODES: Tuple[str, ...] = ("color", "monochrome", "sepia", "high_saturation", "neutral")
 VALID_CAPTURE_DEVICES: Tuple[str, ...] = ("professional", "phone", "cctv", "digital_camera", "film_camera", "neutral")
@@ -103,112 +156,1758 @@ VALID_LIQUID_KINDS: Tuple[str, ...] = ("water", "sweat", "saliva", "oil", "sexua
 VALID_LIQUID_LOCATIONS: Tuple[str, ...] = ("face", "mouth", "hair", "skin", "torso", "lower_body", "background")
 VALID_LIQUID_AMOUNTS: Tuple[str, ...] = ("trace", "light", "normal")
 
+VALID_NECKLINES: Tuple[str, ...] = (
+    "unspecified", "cowl_neck", "sweetheart", "square_neck", "mock_neck",
+    "turtleneck", "halter", "off_shoulder", "v_neck", "boat_neck",
+    "mandarin_collar", "sailor_collar", "strapless", "scoop_neck"
+)
+VALID_SLEEVE_LENGTHS: Tuple[str, ...] = (
+    "unspecified", "sleeveless", "detached_sleeves", "long_sleeves",
+    "bell_sleeves", "puff_sleeves", "short_sleeves", "cap_sleeves", "three_quarter_sleeves"
+)
+VALID_HEMLINE_LENGTHS: Tuple[str, ...] = (
+    "unspecified", "micro", "mini", "maxi", "knee_length", "tea_length", "floor_length", "ankle_length"
+)
+VALID_FIT_SILHOUETTES: Tuple[str, ...] = (
+    "unspecified", "loose", "form_fitting", "flared_a_line", "pleated", "oversized", "tailored"
+)
+
+CUT_FEATURE_VALID_ENUMS: Dict[str, Tuple[str, ...]] = {
+    "neckline": VALID_NECKLINES,
+    "sleeve_length": VALID_SLEEVE_LENGTHS,
+    "hemline_length": VALID_HEMLINE_LENGTHS,
+    "fit_silhouette": VALID_FIT_SILHOUETTES,
+}
+
+VALID_ENSEMBLE_SLOTS: Tuple[str, ...] = (
+    "main_garments", "top_pieces", "bottom_pieces", "outer_layers", "footwear", "accessories", "styling_details"
+)
+
+VALID_BINDING_ROLES: Tuple[str, ...] = (
+    "standalone", "over", "worn_over", "layered_over", "under", "worn_under", "layered_under",
+    "tucked_into", "bloused_into", "cinched_into", "split_over", "paired_with", "coordinated_with"
+)
+
+VALID_RELATION_KINDS: Tuple[str, ...] = (
+    "worn_over", "worn_under", "tucked_into", "split_over", "coordinated_with"
+)
+
+VALID_RELATION_DIRECTIONS: Tuple[str, ...] = (
+    "outer_to_inner", "inner_to_outer", "tucked_into", "split_over", "peer_to_peer"
+)
+
+VALID_BODY_SUPPORTS: Tuple[str, ...] = (
+    "unspecified", "standing", "crouched", "supported_by_surface",
+    "sitting", "kneeling", "lying", "aquatic", "airborne", "quadrupedal", "suspended", "neutral"
+)
+
+AMBIGUOUS_POSE_SUPPORT_OPTIONS: Dict[str, Tuple[str, ...]] = {
+    "ground_or_held": ("ground", "held"),
+    "standing_or_crouched": ("crouched", "standing"),
+    "standing_or_sitting": ("sitting", "standing"),
+    "unspecified": (),
+}
+
+VALID_EXTENDED_SPACE_KINDS: Tuple[str, ...] = VALID_SPACE_KINDS
+VALID_EXTENDED_TIMES_OF_DAY: Tuple[str, ...] = VALID_TIMES_OF_DAY
+
+
+@dataclass(frozen=True)
+class CutFeatures:
+    """服装剪裁与廓形特征模型 (统一入口类型校验与四态保真序列化)。"""
+    neckline: Any = field(default=_ABSENT)
+    sleeve_length: Any = field(default=_ABSENT)
+    hemline_length: Any = field(default=_ABSENT)
+    fit_silhouette: Any = field(default=_ABSENT)
+    explicit_fields: Tuple[str, ...] = field(default=())
+
+    def __post_init__(self) -> None:
+        allowed_fields = ("neckline", "sleeve_length", "hemline_length", "fit_silhouette")
+        explicit_set = set()
+
+        passed_ef = self.explicit_fields
+        if passed_ef:
+            if isinstance(passed_ef, str):
+                raise TypeError("explicit_fields must be a collection of str, got str")
+            if not isinstance(passed_ef, (list, tuple, set, frozenset)):
+                raise TypeError(f"explicit_fields must be a collection of str, got {type(passed_ef).__name__}")
+            for x in passed_ef:
+                if not isinstance(x, str) or isinstance(x, bool):
+                    raise TypeError(f"Elements of explicit_fields must be str, got {type(x).__name__}")
+                if x not in allowed_fields:
+                    raise KeyError(f"Unknown field {x!r} in explicit_fields")
+                explicit_set.add(x)
+
+        for fld in allowed_fields:
+            val = getattr(self, fld)
+            if val is not _ABSENT:
+                explicit_set.add(fld)
+                if isinstance(val, bool) or (not isinstance(val, str) and val is not UNSPECIFIED):
+                    raise TypeError(f"{fld} must be str or UNSPECIFIED, got {type(val).__name__}")
+                if val == "unspecified" or val is UNSPECIFIED:
+                    object.__setattr__(self, fld, UNSPECIFIED)
+                else:
+                    if val not in CUT_FEATURE_VALID_ENUMS[fld]:
+                        raise ValueError(f"Invalid {fld}: {val!r}")
+                    object.__setattr__(self, fld, val)
+            else:
+                object.__setattr__(self, fld, None)
+
+        object.__setattr__(self, "explicit_fields", tuple(sorted(explicit_set)))
+
+    @classmethod
+    def from_dict(cls, d: Optional[Dict[str, Any]]) -> "CutFeatures":
+        if not d:
+            return cls()
+        if not isinstance(d, dict):
+            raise TypeError(f"CutFeatures data must be a dict, got {type(d).__name__}")
+        allowed = {"neckline", "sleeve_length", "hemline_length", "fit_silhouette"}
+        unexpected = set(d.keys()) - allowed
+        if unexpected:
+            raise KeyError(f"Unexpected keys in CutFeatures: {sorted(unexpected)}")
+        return cls(**d)
+
+    def to_dict(self) -> Dict[str, Any]:
+        res: Dict[str, Any] = {}
+        for fld in ("neckline", "sleeve_length", "hemline_length", "fit_silhouette"):
+            if fld in self.explicit_fields:
+                val = getattr(self, fld)
+                res[fld] = "unspecified" if (val is UNSPECIFIED or val == "unspecified") else val
+        return res
+
+
+@dataclass(frozen=True)
+class PieceBinding:
+    """多件套构件绑定模型 (统一入口类型校验、集合元素防护与四态保真序列化)。"""
+    piece_id: Any = field(default=_ABSENT)
+    piece_slot: Any = field(default=_ABSENT)
+    piece_text: Any = field(default=_ABSENT)
+    binding_role: Any = field(default=_ABSENT)
+    garment_topology: Any = field(default=_ABSENT)
+    cut_features: Any = field(default=_ABSENT)
+    fabric_materials: Any = field(default=_ABSENT)
+    pattern_textures: Any = field(default=_ABSENT)
+    explicit_fields: Tuple[str, ...] = field(default=())
+
+    def __post_init__(self) -> None:
+        allowed_fields = {
+            "piece_id", "piece_slot", "piece_text", "binding_role",
+            "garment_topology", "cut_features", "fabric_materials", "pattern_textures"
+        }
+        explicit_set = set()
+
+        passed_ef = self.explicit_fields
+        if passed_ef:
+            if isinstance(passed_ef, str):
+                raise TypeError("explicit_fields must be a collection of str, got str")
+            if not isinstance(passed_ef, (list, tuple, set, frozenset)):
+                raise TypeError(f"explicit_fields must be a collection of str, got {type(passed_ef).__name__}")
+            for x in passed_ef:
+                if not isinstance(x, str) or isinstance(x, bool):
+                    raise TypeError(f"Elements of explicit_fields must be str, got {type(x).__name__}")
+                if x not in allowed_fields:
+                    raise KeyError(f"Unknown field {x!r} in explicit_fields")
+                explicit_set.add(x)
+
+        # piece_id
+        p_id = self.piece_id
+        if p_id is not _ABSENT:
+            explicit_set.add("piece_id")
+            if not isinstance(p_id, str) or isinstance(p_id, bool):
+                raise TypeError(f"piece_id must be str, got {type(p_id).__name__}")
+            object.__setattr__(self, "piece_id", p_id)
+        else:
+            object.__setattr__(self, "piece_id", "")
+
+        # piece_slot
+        p_slot = self.piece_slot
+        if p_slot is not _ABSENT:
+            explicit_set.add("piece_slot")
+            if not isinstance(p_slot, str) or isinstance(p_slot, bool):
+                raise TypeError(f"piece_slot must be str, got {type(p_slot).__name__}")
+            if p_slot not in VALID_ENSEMBLE_SLOTS:
+                raise ValueError(f"Invalid piece_slot: {p_slot!r}")
+            object.__setattr__(self, "piece_slot", p_slot)
+        else:
+            object.__setattr__(self, "piece_slot", "")
+
+        # piece_text
+        p_text = self.piece_text
+        if p_text is not _ABSENT:
+            explicit_set.add("piece_text")
+            if not isinstance(p_text, str) or isinstance(p_text, bool):
+                raise TypeError(f"piece_text must be str, got {type(p_text).__name__}")
+            object.__setattr__(self, "piece_text", p_text)
+        else:
+            object.__setattr__(self, "piece_text", "")
+
+        # binding_role
+        b_role = self.binding_role
+        if b_role is not _ABSENT:
+            explicit_set.add("binding_role")
+            if not isinstance(b_role, str) or isinstance(b_role, bool):
+                raise TypeError(f"binding_role must be str, got {type(b_role).__name__}")
+            if b_role not in VALID_BINDING_ROLES:
+                raise ValueError(f"Invalid binding_role: {b_role!r}")
+            object.__setattr__(self, "binding_role", b_role)
+        else:
+            object.__setattr__(self, "binding_role", "standalone")
+
+        # garment_topology
+        g_topo = self.garment_topology
+        if g_topo is not _ABSENT:
+            explicit_set.add("garment_topology")
+            if g_topo is not None:
+                if not isinstance(g_topo, str) or isinstance(g_topo, bool):
+                    raise TypeError(f"garment_topology must be str, got {type(g_topo).__name__}")
+                if g_topo not in VALID_GARMENT_TOPOLOGIES:
+                    raise ValueError(f"Invalid garment_topology: {g_topo!r}")
+                object.__setattr__(self, "garment_topology", g_topo)
+            else:
+                object.__setattr__(self, "garment_topology", None)
+        else:
+            object.__setattr__(self, "garment_topology", None)
+
+        # cut_features
+        cf = self.cut_features
+        if cf is not _ABSENT:
+            explicit_set.add("cut_features")
+            if isinstance(cf, dict):
+                object.__setattr__(self, "cut_features", CutFeatures.from_dict(cf))
+            elif isinstance(cf, CutFeatures):
+                object.__setattr__(self, "cut_features", cf)
+            elif cf is None:
+                object.__setattr__(self, "cut_features", None)
+            else:
+                raise TypeError(f"cut_features must be CutFeatures, dict or None, got {type(cf).__name__}")
+        else:
+            object.__setattr__(self, "cut_features", None)
+
+        # fabric_materials & pattern_textures
+        for fld in ("fabric_materials", "pattern_textures"):
+            val = getattr(self, fld)
+            if val is not _ABSENT:
+                explicit_set.add(fld)
+                if isinstance(val, str):
+                    raise TypeError(f"{fld} must be a list/tuple/set of str, got str")
+                if val is None:
+                    object.__setattr__(self, fld, None)
+                elif isinstance(val, (list, tuple, set, frozenset)):
+                    for x in val:
+                        if not isinstance(x, str) or isinstance(x, bool):
+                            raise TypeError(f"Elements of {fld} must be str, got {type(x).__name__}")
+                    object.__setattr__(self, fld, tuple(sorted(set(val))))
+                else:
+                    raise TypeError(f"{fld} must be a list/tuple/set of str, got {type(val).__name__}")
+            else:
+                object.__setattr__(self, fld, None)
+
+        object.__setattr__(self, "explicit_fields", tuple(sorted(explicit_set)))
+
+    @classmethod
+    def from_dict(cls, d: Optional[Dict[str, Any]]) -> "PieceBinding":
+        if not d:
+            return cls()
+        if not isinstance(d, dict):
+            raise TypeError(f"PieceBinding data must be a dict, got {type(d).__name__}")
+        allowed = {
+            "piece_id", "piece_slot", "piece_text", "binding_role",
+            "garment_topology", "cut_features", "fabric_materials", "pattern_textures"
+        }
+        unexpected = set(d.keys()) - allowed
+        if unexpected:
+            raise KeyError(f"Unexpected keys in PieceBinding: {sorted(unexpected)}")
+        return cls(**d)
+
+    def to_dict(self) -> Dict[str, Any]:
+        res: Dict[str, Any] = {}
+        for fld in ("piece_id", "piece_slot", "piece_text", "binding_role", "garment_topology"):
+            if fld in self.explicit_fields:
+                res[fld] = getattr(self, fld)
+        if "cut_features" in self.explicit_fields:
+            cf = self.cut_features
+            res["cut_features"] = cf.to_dict() if cf else None
+        for fld in ("fabric_materials", "pattern_textures"):
+            if fld in self.explicit_fields:
+                val = getattr(self, fld)
+                res[fld] = list(val) if val is not None else None
+        return res
+
+
+@dataclass(frozen=True)
+class EnsembleRelation:
+    """多件套构件关系三元组 (有向图边)。"""
+    relation_kind: str
+    source_piece_id: str
+    target_piece_id: str
+    relation_direction: str
+
+    def __post_init__(self) -> None:
+        for fld in ("relation_kind", "source_piece_id", "target_piece_id", "relation_direction"):
+            val = getattr(self, fld)
+            if not isinstance(val, str) or isinstance(val, bool) or not val.strip():
+                raise TypeError(f"EnsembleRelation.{fld} must be non-empty str, got {val!r}")
+        if self.relation_kind not in VALID_RELATION_KINDS:
+            raise ValueError(f"Invalid relation_kind: {self.relation_kind!r}")
+        if self.relation_direction not in VALID_RELATION_DIRECTIONS:
+            raise ValueError(f"Invalid relation_direction: {self.relation_direction!r}")
+        if self.source_piece_id == self.target_piece_id:
+            raise UnresolvedEnsembleRelationError(f"Self-loop relation forbidden: source={self.source_piece_id!r}, target={self.target_piece_id!r}")
+
+    def to_dict(self) -> Dict[str, Any]:
+        return {
+            "relation_kind": self.relation_kind,
+            "source_piece_id": self.source_piece_id,
+            "target_piece_id": self.target_piece_id,
+            "relation_direction": self.relation_direction,
+        }
+
+    @classmethod
+    def from_dict(cls, d: Dict[str, Any]) -> "EnsembleRelation":
+        if not isinstance(d, dict):
+            raise TypeError(f"EnsembleRelation data must be a dict, got {type(d).__name__}")
+        allowed = {"relation_kind", "source_piece_id", "target_piece_id", "relation_direction"}
+        unexpected = set(d.keys()) - allowed
+        if unexpected:
+            raise KeyError(f"Unexpected keys in EnsembleRelation: {sorted(unexpected)}")
+        return cls(
+            relation_kind=d["relation_kind"],
+            source_piece_id=d["source_piece_id"],
+            target_piece_id=d["target_piece_id"],
+            relation_direction=d["relation_direction"],
+        )
+
+
+@dataclass(frozen=True)
+class EnsemblePieces:
+    """多件套结构化构件模型 (含槽位拆分、独立构件绑定、DAG 拓扑关系与环路校验)。"""
+    main_garments: Tuple[str, ...] = ()
+    top_pieces: Tuple[str, ...] = ()
+    bottom_pieces: Tuple[str, ...] = ()
+    outer_layers: Tuple[str, ...] = ()
+    footwear: Tuple[str, ...] = ()
+    accessories: Tuple[str, ...] = ()
+    styling_details: Tuple[str, ...] = ()
+    piece_bindings: Tuple[PieceBinding, ...] = ()
+    relations: Tuple[EnsembleRelation, ...] = ()
+
+    def __post_init__(self) -> None:
+        slot_fields = (
+            "main_garments", "top_pieces", "bottom_pieces",
+            "outer_layers", "footwear", "accessories", "styling_details"
+        )
+        for sf in slot_fields:
+            val = getattr(self, sf)
+            if val is not None:
+                if isinstance(val, str):
+                    raise TypeError(f"{sf} must be a list/tuple of str, got str")
+                if isinstance(val, (list, tuple, set)):
+                    for x in val:
+                        if not isinstance(x, str) or isinstance(x, bool):
+                            raise TypeError(f"Elements of {sf} must be str, got {type(x).__name__}")
+                    object.__setattr__(self, sf, tuple(val))
+                else:
+                    raise TypeError(f"{sf} must be a list/tuple of str, got {type(val).__name__}")
+            else:
+                object.__setattr__(self, sf, ())
+
+        pb_val = self.piece_bindings
+        if pb_val is None:
+            object.__setattr__(self, "piece_bindings", ())
+        elif isinstance(pb_val, (list, tuple)):
+            converted_pbs = []
+            for pb in pb_val:
+                if isinstance(pb, dict):
+                    converted_pbs.append(PieceBinding.from_dict(pb))
+                elif isinstance(pb, PieceBinding):
+                    converted_pbs.append(pb)
+                else:
+                    raise TypeError(f"piece_bindings elements must be PieceBinding or dict, got {type(pb).__name__}")
+            object.__setattr__(self, "piece_bindings", tuple(converted_pbs))
+        else:
+            raise TypeError(f"piece_bindings must be a list/tuple, got {type(pb_val).__name__}")
+
+        rel_val = self.relations
+        if rel_val is None:
+            object.__setattr__(self, "relations", ())
+        elif isinstance(rel_val, (list, tuple)):
+            converted_rels = []
+            for rel in rel_val:
+                if isinstance(rel, dict):
+                    converted_rels.append(EnsembleRelation.from_dict(rel))
+                elif isinstance(rel, EnsembleRelation):
+                    converted_rels.append(rel)
+                else:
+                    raise TypeError(f"relations elements must be EnsembleRelation or dict, got {type(rel).__name__}")
+            object.__setattr__(self, "relations", tuple(converted_rels))
+        else:
+            raise TypeError(f"relations must be a list/tuple, got {type(rel_val).__name__}")
+
+        self.validate_dag()
+
+    def validate_dag(self) -> None:
+        """验证 relations 构成有向无环图 (DAG)，且无自环、无悬空引用。"""
+        piece_ids = {pb.piece_id for pb in self.piece_bindings if pb.piece_id}
+        adj: Dict[str, List[str]] = {}
+        for rel in self.relations:
+            if piece_ids:
+                if rel.source_piece_id not in piece_ids:
+                    raise UnresolvedEnsembleRelationError(
+                        f"Relation source_piece_id {rel.source_piece_id!r} not found in piece_bindings"
+                    )
+                if rel.target_piece_id not in piece_ids:
+                    raise UnresolvedEnsembleRelationError(
+                        f"Relation target_piece_id {rel.target_piece_id!r} not found in piece_bindings"
+                    )
+            adj.setdefault(rel.source_piece_id, []).append(rel.target_piece_id)
+
+        visited: Dict[str, int] = {}
+        for node in adj:
+            if visited.get(node, 0) == 0:
+                stack = [(node, 0)]
+                while stack:
+                    curr, idx = stack[-1]
+                    if visited.get(curr, 0) == 0:
+                        visited[curr] = 1
+                    children = adj.get(curr, [])
+                    if idx < len(children):
+                        next_child = children[idx]
+                        stack[-1] = (curr, idx + 1)
+                        if visited.get(next_child, 0) == 1:
+                            raise UnresolvedEnsembleRelationError(
+                                f"Cycle detected in ensemble relations involving {curr} -> {next_child}"
+                            )
+                        elif visited.get(next_child, 0) == 0:
+                            stack.append((next_child, 0))
+                    else:
+                        visited[curr] = 2
+                        stack.pop()
+
+    def to_dict(self) -> Dict[str, Any]:
+        res: Dict[str, Any] = {}
+        slot_fields = (
+            "main_garments", "top_pieces", "bottom_pieces",
+            "outer_layers", "footwear", "accessories", "styling_details"
+        )
+        for sf in slot_fields:
+            val = getattr(self, sf)
+            res[sf] = list(val)
+        res["piece_bindings"] = [pb.to_dict() for pb in self.piece_bindings]
+        if self.relations:
+            res["relations"] = [rel.to_dict() for rel in self.relations]
+        return res
+
+    @classmethod
+    def from_dict(cls, d: Optional[Dict[str, Any]]) -> "EnsemblePieces":
+        if not d:
+            return cls()
+        if not isinstance(d, dict):
+            raise TypeError(f"EnsemblePieces data must be a dict, got {type(d).__name__}")
+        allowed = {
+            "main_garments", "top_pieces", "bottom_pieces",
+            "outer_layers", "footwear", "accessories", "styling_details",
+            "piece_bindings", "relations"
+        }
+        unexpected = set(d.keys()) - allowed
+        if unexpected:
+            raise KeyError(f"Unexpected keys in EnsemblePieces: {sorted(unexpected)}")
+        return cls(
+            main_garments=d.get("main_garments", ()),
+            top_pieces=d.get("top_pieces", ()),
+            bottom_pieces=d.get("bottom_pieces", ()),
+            outer_layers=d.get("outer_layers", ()),
+            footwear=d.get("footwear", ()),
+            accessories=d.get("accessories", ()),
+            styling_details=d.get("styling_details", ()),
+            piece_bindings=d.get("piece_bindings", ()),
+            relations=d.get("relations", ()),
+        )
+
+
+@dataclass(frozen=True)
+class PosePhysicalFacts:
+    """姿态物理事实扩展模型 (支持模糊姿态候选集合 support_options 保真)。"""
+    body_support: Any = field(default=_ABSENT)
+    support_options: Tuple[str, ...] = field(default=_ABSENT)
+    hand_state: Any = field(default=_ABSENT)
+    hands_required: int = field(default=_ABSENT)
+    is_restrained: Any = field(default=_ABSENT)
+    restraint_type: Optional[str] = field(default=_ABSENT)
+    restrained_body_part: Optional[str] = field(default=_ABSENT)
+    role_relationship: Optional[str] = field(default=_ABSENT)
+    sitting_orientation: Optional[str] = field(default=_ABSENT)
+    leg_state: Optional[str] = field(default=_ABSENT)
+    gaze_direction: Optional[str] = field(default=_ABSENT)
+    gesture_type: Optional[str] = field(default=_ABSENT)
+    limb_position: Optional[str] = field(default=_ABSENT)
+    limb_category: Optional[str] = field(default=_ABSENT)
+    pose_orientation: Optional[str] = field(default=_ABSENT)
+    interlocked_fingers: Optional[bool] = field(default=_ABSENT)
+    facial_action: Optional[str] = field(default=_ABSENT)
+    interaction_type: Optional[str] = field(default=_ABSENT)
+    motion_type: Optional[str] = field(default=_ABSENT)
+    posture_group: Optional[str] = field(default=_ABSENT)
+    posture_type: Optional[str] = field(default=_ABSENT)
+    template_style: Optional[str] = field(default=_ABSENT)
+    is_signature_meme: Any = field(default=_ABSENT)
+    is_prose_template: Any = field(default=_ABSENT)
+    explicit_fields: Tuple[str, ...] = field(default=())
+
+    def __post_init__(self) -> None:
+        allowed = {
+            "body_support", "support_options", "hand_state", "hands_required",
+            "is_restrained", "restraint_type", "restrained_body_part", "role_relationship",
+            "sitting_orientation", "leg_state", "gaze_direction", "gesture_type",
+            "limb_position", "limb_category", "pose_orientation", "interlocked_fingers",
+            "facial_action", "interaction_type", "motion_type", "posture_group",
+            "posture_type", "template_style", "is_signature_meme", "is_prose_template"
+        }
+        explicit_set = set()
+        passed_ef = self.explicit_fields
+        if passed_ef:
+            if isinstance(passed_ef, str):
+                raise TypeError("explicit_fields must be a collection of str, got str")
+            if not isinstance(passed_ef, (list, tuple, set, frozenset)):
+                raise TypeError(f"explicit_fields must be a collection of str, got {type(passed_ef).__name__}")
+            for x in passed_ef:
+                if not isinstance(x, str) or isinstance(x, bool):
+                    raise TypeError(f"Elements of explicit_fields must be str, got {type(x).__name__}")
+                if x not in allowed:
+                    raise KeyError(f"Unknown field {x!r} in explicit_fields")
+                explicit_set.add(x)
+
+        # body_support & support_options
+        bs = self.body_support
+        so = self.support_options
+        if bs is not _ABSENT:
+            explicit_set.add("body_support")
+            if isinstance(bs, bool) or (not isinstance(bs, str) and bs is not UNSPECIFIED):
+                raise TypeError(f"body_support must be str or UNSPECIFIED, got {type(bs).__name__}")
+            if bs in AMBIGUOUS_POSE_SUPPORT_OPTIONS:
+                object.__setattr__(self, "body_support", UNSPECIFIED)
+                if so is _ABSENT:
+                    object.__setattr__(self, "support_options", tuple(sorted(AMBIGUOUS_POSE_SUPPORT_OPTIONS[bs])))
+                    explicit_set.add("support_options")
+            elif bs == "unspecified" or bs is UNSPECIFIED:
+                object.__setattr__(self, "body_support", UNSPECIFIED)
+                if so is _ABSENT:
+                    object.__setattr__(self, "support_options", ())
+            else:
+                if bs not in VALID_BODY_SUPPORTS:
+                    raise ValueError(f"Invalid body_support: {bs!r}")
+                object.__setattr__(self, "body_support", bs)
+                if so is _ABSENT:
+                    object.__setattr__(self, "support_options", (bs,))
+        else:
+            object.__setattr__(self, "body_support", None)
+
+        if so is not _ABSENT:
+            explicit_set.add("support_options")
+            if isinstance(so, str):
+                raise TypeError("support_options must be a collection of str, got str")
+            if not isinstance(so, (list, tuple, set, frozenset)):
+                raise TypeError(f"support_options must be a collection of str, got {type(so).__name__}")
+            for x in so:
+                if not isinstance(x, str) or isinstance(x, bool):
+                    raise TypeError(f"Elements of support_options must be str, got {type(x).__name__}")
+            object.__setattr__(self, "support_options", tuple(sorted(set(so))))
+        elif self.support_options is _ABSENT:
+            object.__setattr__(self, "support_options", ())
+
+        # hands_required
+        hr = self.hands_required
+        if hr is not _ABSENT:
+            explicit_set.add("hands_required")
+            if isinstance(hr, bool) or not isinstance(hr, int):
+                raise TypeError(f"hands_required must be int, got {type(hr).__name__}")
+            if hr not in (0, 1, 2):
+                raise ValueError(f"hands_required must be 0, 1, or 2, got {hr}")
+            object.__setattr__(self, "hands_required", hr)
+        else:
+            object.__setattr__(self, "hands_required", 0)
+
+        # is_restrained
+        ir = self.is_restrained
+        if ir is not _ABSENT:
+            explicit_set.add("is_restrained")
+            if isinstance(ir, bool):
+                object.__setattr__(self, "is_restrained", ir)
+            elif isinstance(ir, str):
+                if ir == "context_dependent":
+                    object.__setattr__(self, "is_restrained", "context_dependent")
+                elif ir.lower() in ("true", "false"):
+                    object.__setattr__(self, "is_restrained", ir.lower() == "true")
+                else:
+                    raise ValueError(f"Invalid is_restrained string: {ir!r}")
+            else:
+                raise TypeError(f"is_restrained must be bool or str, got {type(ir).__name__}")
+        else:
+            object.__setattr__(self, "is_restrained", False)
+
+        # boolean flags: is_signature_meme, is_prose_template
+        for bf in ("is_signature_meme", "is_prose_template"):
+            val = getattr(self, bf)
+            if val is not _ABSENT:
+                explicit_set.add(bf)
+                if isinstance(val, bool):
+                    object.__setattr__(self, bf, val)
+                elif isinstance(val, str) and val.lower() in ("true", "false"):
+                    object.__setattr__(self, bf, val.lower() == "true")
+                elif val is None:
+                    object.__setattr__(self, bf, False)
+                else:
+                    raise TypeError(f"{bf} must be bool, got {type(val).__name__}")
+            else:
+                object.__setattr__(self, bf, False)
+
+        # hand_state
+        hs = self.hand_state
+        if hs is not _ABSENT:
+            explicit_set.add("hand_state")
+            if hs == "unspecified" or hs is UNSPECIFIED:
+                object.__setattr__(self, "hand_state", UNSPECIFIED)
+            elif isinstance(hs, str) and not isinstance(hs, bool):
+                object.__setattr__(self, "hand_state", hs)
+            else:
+                raise TypeError(f"hand_state must be str or UNSPECIFIED, got {type(hs).__name__}")
+        else:
+            object.__setattr__(self, "hand_state", None)
+
+        # Other string fields
+        for fld in (
+            "restraint_type", "restrained_body_part", "role_relationship",
+            "sitting_orientation", "leg_state", "gaze_direction", "gesture_type",
+            "limb_position", "limb_category", "pose_orientation", "facial_action",
+            "interaction_type", "motion_type", "posture_group", "posture_type",
+            "template_style"
+        ):
+            val = getattr(self, fld)
+            if val is not _ABSENT:
+                explicit_set.add(fld)
+                if val is not None and (not isinstance(val, str) or isinstance(val, bool)):
+                    raise TypeError(f"{fld} must be str or None, got {type(val).__name__}")
+                object.__setattr__(self, fld, val)
+            else:
+                object.__setattr__(self, fld, None)
+
+        if self.interlocked_fingers is not _ABSENT:
+            explicit_set.add("interlocked_fingers")
+            if self.interlocked_fingers is not None and not isinstance(self.interlocked_fingers, bool):
+                raise TypeError(f"interlocked_fingers must be bool or None, got {type(self.interlocked_fingers).__name__}")
+            object.__setattr__(self, "interlocked_fingers", self.interlocked_fingers)
+        else:
+            object.__setattr__(self, "interlocked_fingers", None)
+
+        object.__setattr__(self, "explicit_fields", tuple(sorted(explicit_set)))
+
+    def to_dict(self) -> Dict[str, Any]:
+        res: Dict[str, Any] = {}
+        for fld in (
+            "hand_state", "hands_required", "is_restrained", "restraint_type",
+            "restrained_body_part", "role_relationship", "sitting_orientation",
+            "leg_state", "gaze_direction", "gesture_type", "limb_position",
+            "limb_category", "pose_orientation", "interlocked_fingers", "facial_action",
+            "interaction_type", "motion_type", "posture_group", "posture_type",
+            "template_style", "is_signature_meme", "is_prose_template"
+        ):
+            if fld in self.explicit_fields:
+                val = getattr(self, fld)
+                res[fld] = "unspecified" if (val is UNSPECIFIED or val == "unspecified") else val
+        if "body_support" in self.explicit_fields:
+            bs = self.body_support
+            res["body_support"] = "unspecified" if (bs is UNSPECIFIED or bs == "unspecified") else bs
+        if "support_options" in self.explicit_fields:
+            res["support_options"] = list(self.support_options)
+        return res
+
+    @classmethod
+    def from_dict(cls, d: Optional[Dict[str, Any]]) -> "PosePhysicalFacts":
+        if not d:
+            return cls()
+        if not isinstance(d, dict):
+            raise TypeError(f"PosePhysicalFacts data must be a dict, got {type(d).__name__}")
+        allowed = {
+            "body_support", "support_options", "hand_state", "hands_required",
+            "is_restrained", "restraint_type", "restrained_body_part", "role_relationship",
+            "sitting_orientation", "leg_state", "gaze_direction", "gesture_type",
+            "limb_position", "limb_category", "pose_orientation", "interlocked_fingers",
+            "facial_action", "interaction_type", "motion_type", "posture_group",
+            "posture_type", "template_style", "is_signature_meme", "is_prose_template"
+        }
+        unexpected = set(d.keys()) - allowed
+        if unexpected:
+            raise KeyError(f"Unexpected keys in PosePhysicalFacts: {sorted(unexpected)}")
+        return cls(**d)
+
+
+@dataclass(frozen=True)
+class SceneEnvironmentalFacts:
+    """场景环境事实扩展模型 (支持拓展场所空间及时间四态)。"""
+    space_kind: Any = field(default=_ABSENT)
+    time_of_day: Any = field(default=_ABSENT)
+    venue_category: Optional[str] = field(default=_ABSENT)
+    venue_type: Optional[str] = field(default=_ABSENT)
+    venue_name: Optional[str] = field(default=_ABSENT)
+    extracted_venue: Optional[str] = field(default=_ABSENT)
+    setting_genre: Optional[str] = field(default=_ABSENT)
+    is_prose_template: bool = field(default=_ABSENT)
+    is_composite_event: bool = field(default=_ABSENT)
+    embedded_lighting: Optional[str] = field(default=_ABSENT)
+    embedded_palette: Optional[str] = field(default=_ABSENT)
+    embedded_props: Tuple[str, ...] = field(default=_ABSENT)
+    deconstructed_event: Any = field(default=_ABSENT)
+    location_type: Optional[str] = field(default=_ABSENT)
+    condition: Optional[str] = field(default=_ABSENT)
+    decay_state: Optional[str] = field(default=_ABSENT)
+    theme: Optional[str] = field(default=_ABSENT)
+    baseline_default_time_of_day: Optional[str] = field(default=_ABSENT)
+    explicit_fields: Tuple[str, ...] = field(default=())
+
+    def __post_init__(self) -> None:
+        allowed = {
+            "space_kind", "time_of_day", "venue_category", "venue_type",
+            "venue_name", "extracted_venue", "setting_genre", "is_prose_template",
+            "is_composite_event", "embedded_lighting", "embedded_palette",
+            "embedded_props", "deconstructed_event", "location_type",
+            "condition", "decay_state", "theme", "baseline_default_time_of_day"
+        }
+        explicit_set = set()
+        passed_ef = self.explicit_fields
+        if passed_ef:
+            if isinstance(passed_ef, str):
+                raise TypeError("explicit_fields must be a collection of str, got str")
+            if not isinstance(passed_ef, (list, tuple, set, frozenset)):
+                raise TypeError(f"explicit_fields must be a collection of str, got {type(passed_ef).__name__}")
+            for x in passed_ef:
+                if not isinstance(x, str) or isinstance(x, bool):
+                    raise TypeError(f"Elements of explicit_fields must be str, got {type(x).__name__}")
+                if x not in allowed:
+                    raise KeyError(f"Unknown field {x!r} in explicit_fields")
+                explicit_set.add(x)
+
+        # space_kind (four-state)
+        sk = self.space_kind
+        if sk is not _ABSENT:
+            explicit_set.add("space_kind")
+            if sk == "unspecified" or sk is UNSPECIFIED:
+                object.__setattr__(self, "space_kind", UNSPECIFIED)
+            elif isinstance(sk, str) and not isinstance(sk, bool):
+                if sk not in VALID_SPACE_KINDS:
+                    raise ValueError(f"Invalid space_kind: {sk!r}")
+                object.__setattr__(self, "space_kind", sk)
+            elif sk is None:
+                object.__setattr__(self, "space_kind", None)
+            else:
+                raise TypeError(f"space_kind must be str or UNSPECIFIED, got {type(sk).__name__}")
+        else:
+            object.__setattr__(self, "space_kind", None)
+
+        # time_of_day (four-state)
+        tod = self.time_of_day
+        if tod is not _ABSENT:
+            explicit_set.add("time_of_day")
+            if tod == "unspecified" or tod is UNSPECIFIED:
+                object.__setattr__(self, "time_of_day", UNSPECIFIED)
+            elif isinstance(tod, str) and not isinstance(tod, bool):
+                if tod not in VALID_TIMES_OF_DAY:
+                    raise ValueError(f"Invalid time_of_day: {tod!r}")
+                object.__setattr__(self, "time_of_day", tod)
+            elif tod is None:
+                object.__setattr__(self, "time_of_day", None)
+            else:
+                raise TypeError(f"time_of_day must be str or UNSPECIFIED, got {type(tod).__name__}")
+        else:
+            object.__setattr__(self, "time_of_day", None)
+
+        # boolean flags
+        for bf in ("is_prose_template", "is_composite_event"):
+            val = getattr(self, bf)
+            if val is not _ABSENT:
+                explicit_set.add(bf)
+                if not isinstance(val, bool):
+                    raise TypeError(f"{bf} must be bool, got {type(val).__name__}")
+                object.__setattr__(self, bf, val)
+            else:
+                object.__setattr__(self, bf, False)
+
+        # embedded_props
+        ep = self.embedded_props
+        if ep is not _ABSENT:
+            explicit_set.add("embedded_props")
+            if isinstance(ep, str):
+                raise TypeError("embedded_props must be a collection of str, got str")
+            if ep is None:
+                object.__setattr__(self, "embedded_props", ())
+            elif isinstance(ep, (list, tuple, set, frozenset)):
+                for x in ep:
+                    if not isinstance(x, str) or isinstance(x, bool):
+                        raise TypeError(f"Elements of embedded_props must be str, got {type(x).__name__}")
+                object.__setattr__(self, "embedded_props", tuple(sorted(set(ep))))
+            else:
+                raise TypeError(f"embedded_props must be a collection of str, got {type(ep).__name__}")
+        else:
+            object.__setattr__(self, "embedded_props", ())
+
+        # deconstructed_event
+        de = self.deconstructed_event
+        if de is not _ABSENT:
+            explicit_set.add("deconstructed_event")
+            if de is not None and (not isinstance(de, (str, dict)) or isinstance(de, bool)):
+                raise TypeError(f"deconstructed_event must be str, dict, or None, got {type(de).__name__}")
+            object.__setattr__(self, "deconstructed_event", de)
+        else:
+            object.__setattr__(self, "deconstructed_event", None)
+
+        # Other string fields
+        for fld in (
+            "venue_category", "venue_type", "venue_name", "extracted_venue",
+            "setting_genre", "embedded_lighting", "embedded_palette",
+            "location_type", "condition", "decay_state", "theme",
+            "baseline_default_time_of_day"
+        ):
+            val = getattr(self, fld)
+            if val is not _ABSENT:
+                explicit_set.add(fld)
+                if val is not None and (not isinstance(val, str) or isinstance(val, bool)):
+                    raise TypeError(f"{fld} must be str or None, got {type(val).__name__}")
+                object.__setattr__(self, fld, val)
+            else:
+                object.__setattr__(self, fld, None)
+
+        object.__setattr__(self, "explicit_fields", tuple(sorted(explicit_set)))
+
+    def to_dict(self) -> Dict[str, Any]:
+        res: Dict[str, Any] = {}
+        for fld in (
+            "venue_category", "venue_type", "venue_name", "extracted_venue",
+            "setting_genre", "is_prose_template", "is_composite_event",
+            "embedded_lighting", "embedded_palette", "deconstructed_event",
+            "location_type", "condition", "decay_state", "theme",
+            "baseline_default_time_of_day"
+        ):
+            if fld in self.explicit_fields:
+                res[fld] = getattr(self, fld)
+        if "space_kind" in self.explicit_fields:
+            sk = self.space_kind
+            res["space_kind"] = "unspecified" if (sk is UNSPECIFIED or sk == "unspecified") else sk
+        if "time_of_day" in self.explicit_fields:
+            tod = self.time_of_day
+            res["time_of_day"] = "unspecified" if (tod is UNSPECIFIED or tod == "unspecified") else tod
+        if "embedded_props" in self.explicit_fields:
+            res["embedded_props"] = list(self.embedded_props)
+        return res
+
+    @classmethod
+    def from_dict(cls, d: Optional[Dict[str, Any]]) -> "SceneEnvironmentalFacts":
+        if not d:
+            return cls()
+        if not isinstance(d, dict):
+            raise TypeError(f"SceneEnvironmentalFacts data must be a dict, got {type(d).__name__}")
+        allowed = {
+            "space_kind", "time_of_day", "venue_category", "venue_type",
+            "venue_name", "extracted_venue", "setting_genre", "is_prose_template",
+            "is_composite_event", "embedded_lighting", "embedded_palette",
+            "embedded_props", "deconstructed_event", "location_type",
+            "condition", "decay_state", "theme", "baseline_default_time_of_day"
+        }
+        unexpected = set(d.keys()) - allowed
+        if unexpected:
+            raise KeyError(f"Unexpected keys in SceneEnvironmentalFacts: {sorted(unexpected)}")
+        return cls(**d)
+
+
+@dataclass(frozen=True)
+class CameraHardwareFacts:
+    """相机硬件与胶片规格事实扩展模型。"""
+    device_category: Optional[str] = field(default=_ABSENT)
+    device_type: Optional[str] = field(default=_ABSENT)
+    film_name: Optional[str] = field(default=_ABSENT)
+    manufacturer_brand: Optional[str] = field(default=_ABSENT)
+    camera_brand: Optional[str] = field(default=_ABSENT)
+    camera_model: Optional[str] = field(default=_ABSENT)
+    lens_spec: Optional[str] = field(default=_ABSENT)
+    lens_mount: Optional[str] = field(default=_ABSENT)
+    measured_iso: Optional[int] = field(default=_ABSENT)
+    recommended_ei: Optional[int] = field(default=_ABSENT)
+    nominal_name_rating: Optional[int] = field(default=_ABSENT)
+    iso_display: Optional[str] = field(default=_ABSENT)
+    iso_spec_note: Optional[str] = field(default=_ABSENT)
+    emulsion_type: Optional[str] = field(default=_ABSENT)
+    developing_process: Optional[str] = field(default=_ABSENT)
+    is_camera_film: Any = field(default=_ABSENT)
+    sensor_format: Optional[str] = field(default=_ABSENT)
+    color_mode: Optional[str] = field(default=_ABSENT)
+    explicit_fields: Tuple[str, ...] = field(default=())
+
+    def __post_init__(self) -> None:
+        allowed = {
+            "device_category", "device_type", "film_name", "manufacturer_brand",
+            "camera_brand", "camera_model", "lens_spec", "lens_mount",
+            "measured_iso", "recommended_ei", "nominal_name_rating", "iso_display",
+            "iso_spec_note", "emulsion_type", "developing_process", "is_camera_film",
+            "sensor_format", "color_mode"
+        }
+        explicit_set = set()
+        passed_ef = self.explicit_fields
+        if passed_ef:
+            if isinstance(passed_ef, str) or not isinstance(passed_ef, (list, tuple, set, frozenset)):
+                raise TypeError("explicit_fields must be a collection of str")
+            for x in passed_ef:
+                if x not in allowed:
+                    raise KeyError(f"Unknown field {x!r} in explicit_fields")
+                explicit_set.add(x)
+
+        for fld in (
+            "device_category", "device_type", "film_name", "manufacturer_brand",
+            "camera_brand", "camera_model", "lens_spec", "lens_mount",
+            "iso_display", "iso_spec_note", "emulsion_type", "developing_process",
+            "sensor_format", "color_mode"
+        ):
+            val = getattr(self, fld)
+            if val is not _ABSENT:
+                explicit_set.add(fld)
+                if val is not None and not isinstance(val, str):
+                    raise TypeError(f"{fld} must be str or None, got {type(val).__name__}")
+                object.__setattr__(self, fld, val)
+            else:
+                object.__setattr__(self, fld, None)
+
+        for int_fld in ("measured_iso", "recommended_ei", "nominal_name_rating"):
+            val = getattr(self, int_fld)
+            if val is not _ABSENT:
+                explicit_set.add(int_fld)
+                if val is not None and (isinstance(val, bool) or not isinstance(val, int)):
+                    raise TypeError(f"{int_fld} must be int or None, got {type(val).__name__}")
+                object.__setattr__(self, int_fld, val)
+            else:
+                object.__setattr__(self, int_fld, None)
+
+        if self.is_camera_film is not _ABSENT:
+            explicit_set.add("is_camera_film")
+            val = self.is_camera_film
+            if isinstance(val, bool):
+                object.__setattr__(self, "is_camera_film", val)
+            elif isinstance(val, str) and val.lower() in ("true", "false"):
+                object.__setattr__(self, "is_camera_film", val.lower() == "true")
+            elif val is None:
+                object.__setattr__(self, "is_camera_film", False)
+            else:
+                raise TypeError(f"is_camera_film must be bool, got {type(val).__name__}")
+        else:
+            object.__setattr__(self, "is_camera_film", False)
+
+        object.__setattr__(self, "explicit_fields", tuple(sorted(explicit_set)))
+
+    def to_dict(self) -> Dict[str, Any]:
+        res: Dict[str, Any] = {}
+        for fld in (
+            "device_category", "device_type", "film_name", "manufacturer_brand",
+            "camera_brand", "camera_model", "lens_spec", "lens_mount",
+            "measured_iso", "recommended_ei", "nominal_name_rating", "iso_display",
+            "iso_spec_note", "emulsion_type", "developing_process", "is_camera_film",
+            "sensor_format", "color_mode"
+        ):
+            if fld in self.explicit_fields:
+                res[fld] = getattr(self, fld)
+        return res
+
+    @classmethod
+    def from_dict(cls, d: Optional[Dict[str, Any]]) -> "CameraHardwareFacts":
+        if not d:
+            return cls()
+        if not isinstance(d, dict):
+            raise TypeError(f"CameraHardwareFacts data must be a dict, got {type(d).__name__}")
+        allowed = {
+            "device_category", "device_type", "film_name", "manufacturer_brand",
+            "camera_brand", "camera_model", "lens_spec", "lens_mount",
+            "measured_iso", "recommended_ei", "nominal_name_rating", "iso_display",
+            "iso_spec_note", "emulsion_type", "developing_process", "is_camera_film",
+            "sensor_format", "color_mode"
+        }
+        unexpected = set(d.keys()) - allowed
+        if unexpected:
+            raise KeyError(f"Unexpected keys in CameraHardwareFacts: {sorted(unexpected)}")
+        return cls(**d)
+
+
+@dataclass(frozen=True)
+class HairAttributeFacts:
+    """发型与毛发属性事实扩展模型。"""
+    hair_category: Optional[str] = field(default=_ABSENT)
+    hair_feature: Optional[str] = field(default=_ABSENT)
+    hair_part: Optional[str] = field(default=_ABSENT)
+    hairstyle: Optional[str] = field(default=_ABSENT)
+    parting: Optional[str] = field(default=_ABSENT)
+    shaved_level: Optional[str] = field(default=_ABSENT)
+    stubble: Optional[str] = field(default=_ABSENT)
+    color_group: Optional[str] = field(default=_ABSENT)
+    dye_technique: Optional[str] = field(default=_ABSENT)
+    volume: Optional[str] = field(default=_ABSENT)
+    ends: Optional[str] = field(default=_ABSENT)
+    tapered: Any = field(default=_ABSENT)
+    length: Optional[str] = field(default=_ABSENT)
+    length_tier: Optional[str] = field(default=_ABSENT)
+    lengths: Optional[str] = field(default=_ABSENT)
+    ears: Optional[str] = field(default=_ABSENT)
+    bangs: Optional[str] = field(default=_ABSENT)
+    styling: Optional[str] = field(default=_ABSENT)
+    texture_type: Optional[str] = field(default=_ABSENT)
+    explicit_fields: Tuple[str, ...] = field(default=())
+
+    def __post_init__(self) -> None:
+        allowed = {
+            "hair_category", "hair_feature", "hair_part", "hairstyle",
+            "parting", "shaved_level", "stubble", "color_group",
+            "dye_technique", "volume", "ends", "tapered", "length",
+            "length_tier", "lengths", "ears", "bangs", "styling",
+            "texture_type"
+        }
+        explicit_set = set()
+        passed_ef = self.explicit_fields
+        if passed_ef:
+            if isinstance(passed_ef, str) or not isinstance(passed_ef, (list, tuple, set, frozenset)):
+                raise TypeError("explicit_fields must be a collection of str")
+            for x in passed_ef:
+                if x not in allowed:
+                    raise KeyError(f"Unknown field {x!r} in explicit_fields")
+                explicit_set.add(x)
+
+        for fld in (
+            "hair_category", "hair_feature", "hair_part", "hairstyle",
+            "parting", "shaved_level", "stubble", "color_group",
+            "dye_technique", "volume", "ends", "length",
+            "length_tier", "lengths", "ears", "bangs", "styling",
+            "texture_type"
+        ):
+            val = getattr(self, fld)
+            if val is not _ABSENT:
+                explicit_set.add(fld)
+                if val is not None and not isinstance(val, str):
+                    raise TypeError(f"{fld} must be str or None, got {type(val).__name__}")
+                object.__setattr__(self, fld, val)
+            else:
+                object.__setattr__(self, fld, None)
+
+        if self.tapered is not _ABSENT:
+            explicit_set.add("tapered")
+            val = self.tapered
+            if isinstance(val, bool):
+                object.__setattr__(self, "tapered", val)
+            elif isinstance(val, str) and val.lower() in ("true", "false"):
+                object.__setattr__(self, "tapered", val.lower() == "true")
+            elif val is None:
+                object.__setattr__(self, "tapered", False)
+            else:
+                raise TypeError(f"tapered must be bool, got {type(val).__name__}")
+        else:
+            object.__setattr__(self, "tapered", False)
+
+        object.__setattr__(self, "explicit_fields", tuple(sorted(explicit_set)))
+
+    def to_dict(self) -> Dict[str, Any]:
+        res: Dict[str, Any] = {}
+        for fld in (
+            "hair_category", "hair_feature", "hair_part", "hairstyle",
+            "parting", "shaved_level", "stubble", "color_group",
+            "dye_technique", "volume", "ends", "tapered", "length",
+            "length_tier", "lengths", "ears", "bangs", "styling",
+            "texture_type"
+        ):
+            if fld in self.explicit_fields:
+                res[fld] = getattr(self, fld)
+        return res
+
+    @classmethod
+    def from_dict(cls, d: Optional[Dict[str, Any]]) -> "HairAttributeFacts":
+        if not d:
+            return cls()
+        if not isinstance(d, dict):
+            raise TypeError(f"HairAttributeFacts data must be a dict, got {type(d).__name__}")
+        allowed = {
+            "hair_category", "hair_feature", "hair_part", "hairstyle",
+            "parting", "shaved_level", "stubble", "color_group",
+            "dye_technique", "volume", "ends", "tapered", "length",
+            "length_tier", "lengths", "ears", "bangs", "styling",
+            "texture_type"
+        }
+        unexpected = set(d.keys()) - allowed
+        if unexpected:
+            raise KeyError(f"Unexpected keys in HairAttributeFacts: {sorted(unexpected)}")
+        return cls(**d)
+
+
+@dataclass(frozen=True)
+class LightingFacts:
+    """光照与布光属性事实扩展模型。"""
+    light_source: Optional[str] = field(default=_ABSENT)
+    light_type: Optional[str] = field(default=_ABSENT)
+    light_role: Optional[str] = field(default=_ABSENT)
+    key_type: Optional[str] = field(default=_ABSENT)
+    setup: Optional[str] = field(default=_ABSENT)
+    shadow: Optional[str] = field(default=_ABSENT)
+    source_in_scene: Any = field(default=_ABSENT)
+    glow: Optional[str] = field(default=_ABSENT)
+    lighting: Optional[str] = field(default=_ABSENT)
+    mood: Optional[str] = field(default=_ABSENT)
+    style: Optional[str] = field(default=_ABSENT)
+    property: Optional[str] = field(default=_ABSENT)
+    effect: Optional[str] = field(default=_ABSENT)
+    time: Optional[str] = field(default=_ABSENT)
+    explicit_fields: Tuple[str, ...] = field(default=())
+
+    def __post_init__(self) -> None:
+        allowed = {
+            "light_source", "light_type", "light_role", "key_type",
+            "setup", "shadow", "source_in_scene", "glow", "lighting",
+            "mood", "style", "property", "effect", "time"
+        }
+        explicit_set = set()
+        passed_ef = self.explicit_fields
+        if passed_ef:
+            if isinstance(passed_ef, str) or not isinstance(passed_ef, (list, tuple, set, frozenset)):
+                raise TypeError("explicit_fields must be a collection of str")
+            for x in passed_ef:
+                if x not in allowed:
+                    raise KeyError(f"Unknown field {x!r} in explicit_fields")
+                explicit_set.add(x)
+
+        for fld in (
+            "light_source", "light_type", "light_role", "key_type",
+            "setup", "shadow", "glow", "lighting",
+            "mood", "style", "property", "effect", "time"
+        ):
+            val = getattr(self, fld)
+            if val is not _ABSENT:
+                explicit_set.add(fld)
+                if val is not None and not isinstance(val, str):
+                    raise TypeError(f"{fld} must be str or None, got {type(val).__name__}")
+                object.__setattr__(self, fld, val)
+            else:
+                object.__setattr__(self, fld, None)
+
+        if self.source_in_scene is not _ABSENT:
+            explicit_set.add("source_in_scene")
+            val = self.source_in_scene
+            if isinstance(val, bool):
+                object.__setattr__(self, "source_in_scene", val)
+            elif isinstance(val, str) and val.lower() in ("true", "false"):
+                object.__setattr__(self, "source_in_scene", val.lower() == "true")
+            elif val is None:
+                object.__setattr__(self, "source_in_scene", False)
+            else:
+                raise TypeError(f"source_in_scene must be bool, got {type(val).__name__}")
+        else:
+            object.__setattr__(self, "source_in_scene", False)
+
+        object.__setattr__(self, "explicit_fields", tuple(sorted(explicit_set)))
+
+    def to_dict(self) -> Dict[str, Any]:
+        res: Dict[str, Any] = {}
+        for fld in (
+            "light_source", "light_type", "light_role", "key_type",
+            "setup", "shadow", "source_in_scene", "glow", "lighting",
+            "mood", "style", "property", "effect", "time"
+        ):
+            if fld in self.explicit_fields:
+                res[fld] = getattr(self, fld)
+        return res
+
+    @classmethod
+    def from_dict(cls, d: Optional[Dict[str, Any]]) -> "LightingFacts":
+        if not d:
+            return cls()
+        if not isinstance(d, dict):
+            raise TypeError(f"LightingFacts data must be a dict, got {type(d).__name__}")
+        allowed = {
+            "light_source", "light_type", "light_role", "key_type",
+            "setup", "shadow", "source_in_scene", "glow", "lighting",
+            "mood", "style", "property", "effect", "time"
+        }
+        unexpected = set(d.keys()) - allowed
+        if unexpected:
+            raise KeyError(f"Unexpected keys in LightingFacts: {sorted(unexpected)}")
+        return cls(**d)
+
+
+@dataclass(frozen=True)
+class ShotCompositionFacts:
+    """镜头构图与运镜属性事实扩展模型。"""
+    shot_size: Optional[str] = field(default=_ABSENT)
+    angle_name: Optional[str] = field(default=_ABSENT)
+    angle_type: Optional[str] = field(default=_ABSENT)
+    axis: Optional[str] = field(default=_ABSENT)
+    view_axis: Optional[str] = field(default=_ABSENT)
+    perspective: Optional[str] = field(default=_ABSENT)
+    direction: Optional[str] = field(default=_ABSENT)
+    orientation: Optional[str] = field(default=_ABSENT)
+    distance: Optional[str] = field(default=_ABSENT)
+    distortion: Optional[str] = field(default=_ABSENT)
+    focus: Optional[str] = field(default=_ABSENT)
+    framing: Optional[str] = field(default=_ABSENT)
+    crop_style: Optional[str] = field(default=_ABSENT)
+    composition: Optional[str] = field(default=_ABSENT)
+    height_tier: Optional[str] = field(default=_ABSENT)
+    layer: Optional[str] = field(default=_ABSENT)
+    lens_type: Optional[str] = field(default=_ABSENT)
+    mood: Optional[str] = field(default=_ABSENT)
+    genre: Optional[str] = field(default=_ABSENT)
+    motion_type: Optional[str] = field(default=_ABSENT)
+    effect: Optional[str] = field(default=_ABSENT)
+    element: Optional[str] = field(default=_ABSENT)
+    edge: Optional[str] = field(default=_ABSENT)
+    dimension: Optional[str] = field(default=_ABSENT)
+    function: Optional[str] = field(default=_ABSENT)
+    placement: Optional[str] = field(default=_ABSENT)
+    reveal: Optional[str] = field(default=_ABSENT)
+    rule: Optional[str] = field(default=_ABSENT)
+    stability: Optional[str] = field(default=_ABSENT)
+    pose_orientation: Optional[str] = field(default=_ABSENT)
+    explicit_fields: Tuple[str, ...] = field(default=())
+
+    def __post_init__(self) -> None:
+        allowed = {
+            "shot_size", "angle_name", "angle_type", "axis", "view_axis",
+            "perspective", "direction", "orientation", "distance",
+            "distortion", "focus", "framing", "crop_style", "composition",
+            "height_tier", "layer", "lens_type", "mood", "genre",
+            "motion_type", "effect", "element", "edge", "dimension",
+            "function", "placement", "reveal", "rule", "stability",
+            "pose_orientation"
+        }
+        explicit_set = set()
+        passed_ef = self.explicit_fields
+        if passed_ef:
+            if isinstance(passed_ef, str) or not isinstance(passed_ef, (list, tuple, set, frozenset)):
+                raise TypeError("explicit_fields must be a collection of str")
+            for x in passed_ef:
+                if x not in allowed:
+                    raise KeyError(f"Unknown field {x!r} in explicit_fields")
+                explicit_set.add(x)
+
+        for fld in (
+            "shot_size", "angle_name", "angle_type", "axis", "view_axis",
+            "perspective", "direction", "orientation", "distance",
+            "distortion", "focus", "framing", "crop_style", "composition",
+            "height_tier", "layer", "lens_type", "mood", "genre",
+            "motion_type", "effect", "element", "edge", "dimension",
+            "function", "placement", "reveal", "rule", "stability",
+            "pose_orientation"
+        ):
+            val = getattr(self, fld)
+            if val is not _ABSENT:
+                explicit_set.add(fld)
+                if val is not None and not isinstance(val, str):
+                    raise TypeError(f"{fld} must be str or None, got {type(val).__name__}")
+                object.__setattr__(self, fld, val)
+            else:
+                object.__setattr__(self, fld, None)
+
+        object.__setattr__(self, "explicit_fields", tuple(sorted(explicit_set)))
+
+    def to_dict(self) -> Dict[str, Any]:
+        res: Dict[str, Any] = {}
+        for fld in (
+            "shot_size", "angle_name", "angle_type", "axis", "view_axis",
+            "perspective", "direction", "orientation", "distance",
+            "distortion", "focus", "framing", "crop_style", "composition",
+            "height_tier", "layer", "lens_type", "mood", "genre",
+            "motion_type", "effect", "element", "edge", "dimension",
+            "function", "placement", "reveal", "rule", "stability",
+            "pose_orientation"
+        ):
+            if fld in self.explicit_fields:
+                res[fld] = getattr(self, fld)
+        return res
+
+    @classmethod
+    def from_dict(cls, d: Optional[Dict[str, Any]]) -> "ShotCompositionFacts":
+        if not d:
+            return cls()
+        if not isinstance(d, dict):
+            raise TypeError(f"ShotCompositionFacts data must be a dict, got {type(d).__name__}")
+        allowed = {
+            "shot_size", "angle_name", "angle_type", "axis", "view_axis",
+            "perspective", "direction", "orientation", "distance",
+            "distortion", "focus", "framing", "crop_style", "composition",
+            "height_tier", "layer", "lens_type", "mood", "genre",
+            "motion_type", "effect", "element", "edge", "dimension",
+            "function", "placement", "reveal", "rule", "stability",
+            "pose_orientation"
+        }
+        unexpected = set(d.keys()) - allowed
+        if unexpected:
+            raise KeyError(f"Unexpected keys in ShotCompositionFacts: {sorted(unexpected)}")
+        return cls(**d)
+
+
+@dataclass(frozen=True)
+class ClothingAttributeFacts:
+    """服装细分属性事实扩展模型。"""
+    clothing_slot: Optional[str] = field(default=_ABSENT)
+    asymmetric: Any = field(default=_ABSENT)
+    coverage: Optional[str] = field(default=_ABSENT)
+    height: Optional[str] = field(default=_ABSENT)
+    layers: Tuple[str, ...] = field(default=_ABSENT)
+    material: Optional[str] = field(default=_ABSENT)
+    core_base_tags: Tuple[str, ...] = field(default=_ABSENT)
+    hemline: Optional[str] = field(default=_ABSENT)
+    explicit_fields: Tuple[str, ...] = field(default=())
+
+    def __post_init__(self) -> None:
+        allowed = {
+            "clothing_slot", "asymmetric", "coverage", "height",
+            "layers", "material", "core_base_tags", "hemline"
+        }
+        explicit_set = set()
+        passed_ef = self.explicit_fields
+        if passed_ef:
+            if isinstance(passed_ef, str) or not isinstance(passed_ef, (list, tuple, set, frozenset)):
+                raise TypeError("explicit_fields must be a collection of str")
+            for x in passed_ef:
+                if x not in allowed:
+                    raise KeyError(f"Unknown field {x!r} in explicit_fields")
+                explicit_set.add(x)
+
+        for fld in ("clothing_slot", "coverage", "height", "material", "hemline"):
+            val = getattr(self, fld)
+            if val is not _ABSENT:
+                explicit_set.add(fld)
+                if val is not None and not isinstance(val, str):
+                    raise TypeError(f"{fld} must be str or None, got {type(val).__name__}")
+                object.__setattr__(self, fld, val)
+            else:
+                object.__setattr__(self, fld, None)
+
+        if self.asymmetric is not _ABSENT:
+            explicit_set.add("asymmetric")
+            val = self.asymmetric
+            if isinstance(val, bool):
+                object.__setattr__(self, "asymmetric", val)
+            elif isinstance(val, str) and val.lower() in ("true", "false"):
+                object.__setattr__(self, "asymmetric", val.lower() == "true")
+            elif val is None:
+                object.__setattr__(self, "asymmetric", False)
+            else:
+                raise TypeError(f"asymmetric must be bool, got {type(val).__name__}")
+        else:
+            object.__setattr__(self, "asymmetric", False)
+
+        for tf in ("layers", "core_base_tags"):
+            val = getattr(self, tf)
+            if val is not _ABSENT:
+                explicit_set.add(tf)
+                if val is None:
+                    object.__setattr__(self, tf, ())
+                elif isinstance(val, (list, tuple, set, frozenset)):
+                    for x in val:
+                        if not isinstance(x, str) or isinstance(x, bool):
+                            raise TypeError(f"Elements of {tf} must be str, got {type(x).__name__}")
+                    object.__setattr__(self, tf, tuple(sorted(set(val))))
+                else:
+                    raise TypeError(f"{tf} must be a collection of str, got {type(val).__name__}")
+            else:
+                object.__setattr__(self, tf, ())
+
+        object.__setattr__(self, "explicit_fields", tuple(sorted(explicit_set)))
+
+    def to_dict(self) -> Dict[str, Any]:
+        res: Dict[str, Any] = {}
+        for fld in ("clothing_slot", "asymmetric", "coverage", "height", "material", "hemline"):
+            if fld in self.explicit_fields:
+                res[fld] = getattr(self, fld)
+        for tf in ("layers", "core_base_tags"):
+            if tf in self.explicit_fields:
+                res[tf] = list(getattr(self, tf))
+        return res
+
+    @classmethod
+    def from_dict(cls, d: Optional[Dict[str, Any]]) -> "ClothingAttributeFacts":
+        if not d:
+            return cls()
+        if not isinstance(d, dict):
+            raise TypeError(f"ClothingAttributeFacts data must be a dict, got {type(d).__name__}")
+        allowed = {
+            "clothing_slot", "asymmetric", "coverage", "height",
+            "layers", "material", "core_base_tags", "hemline"
+        }
+        unexpected = set(d.keys()) - allowed
+        if unexpected:
+            raise KeyError(f"Unexpected keys in ClothingAttributeFacts: {sorted(unexpected)}")
+        return cls(**d)
+
+
+@dataclass(frozen=True)
+class ExpressionFacts:
+    """表情与面部动作属性事实扩展模型。"""
+    emotion: Optional[str] = field(default=_ABSENT)
+    emotion_tendency: Optional[str] = field(default=_ABSENT)
+    arousal_level: Optional[str] = field(default=_ABSENT)
+    gaze: Optional[str] = field(default=_ABSENT)
+    intensity: Optional[str] = field(default=_ABSENT)
+    facial_action: Optional[str] = field(default=_ABSENT)
+    state: Optional[str] = field(default=_ABSENT)
+    tears: Optional[str] = field(default=_ABSENT)
+    explicit_fields: Tuple[str, ...] = field(default=())
+
+    def __post_init__(self) -> None:
+        allowed = {
+            "emotion", "emotion_tendency", "arousal_level", "gaze",
+            "intensity", "facial_action", "state", "tears"
+        }
+        explicit_set = set()
+        passed_ef = self.explicit_fields
+        if passed_ef:
+            if isinstance(passed_ef, str) or not isinstance(passed_ef, (list, tuple, set, frozenset)):
+                raise TypeError("explicit_fields must be a collection of str")
+            for x in passed_ef:
+                if x not in allowed:
+                    raise KeyError(f"Unknown field {x!r} in explicit_fields")
+                explicit_set.add(x)
+
+        for fld in (
+            "emotion", "emotion_tendency", "arousal_level", "gaze",
+            "intensity", "facial_action", "state", "tears"
+        ):
+            val = getattr(self, fld)
+            if val is not _ABSENT:
+                explicit_set.add(fld)
+                if val is not None and not isinstance(val, str):
+                    raise TypeError(f"{fld} must be str or None, got {type(val).__name__}")
+                object.__setattr__(self, fld, val)
+            else:
+                object.__setattr__(self, fld, None)
+
+        object.__setattr__(self, "explicit_fields", tuple(sorted(explicit_set)))
+
+    def to_dict(self) -> Dict[str, Any]:
+        res: Dict[str, Any] = {}
+        for fld in (
+            "emotion", "emotion_tendency", "arousal_level", "gaze",
+            "intensity", "facial_action", "state", "tears"
+        ):
+            if fld in self.explicit_fields:
+                res[fld] = getattr(self, fld)
+        return res
+
+    @classmethod
+    def from_dict(cls, d: Optional[Dict[str, Any]]) -> "ExpressionFacts":
+        if not d:
+            return cls()
+        if not isinstance(d, dict):
+            raise TypeError(f"ExpressionFacts data must be a dict, got {type(d).__name__}")
+        allowed = {
+            "emotion", "emotion_tendency", "arousal_level", "gaze",
+            "intensity", "facial_action", "state", "tears"
+        }
+        unexpected = set(d.keys()) - allowed
+        if unexpected:
+            raise KeyError(f"Unexpected keys in ExpressionFacts: {sorted(unexpected)}")
+        return cls(**d)
+
+
+@dataclass(frozen=True)
+class AccessoryAttributeFacts:
+    """配饰与挂件属性事实扩展模型。"""
+    ornament: Optional[str] = field(default=_ABSENT)
+    pendant: Optional[str] = field(default=_ABSENT)
+    motif: Optional[str] = field(default=_ABSENT)
+    surface: Optional[str] = field(default=_ABSENT)
+    shape: Optional[str] = field(default=_ABSENT)
+    silhouette: Optional[str] = field(default=_ABSENT)
+    position: Optional[str] = field(default=_ABSENT)
+    action_type: Optional[str] = field(default=_ABSENT)
+    body_part: Optional[str] = field(default=_ABSENT)
+    dynamic_slots: Tuple[str, ...] = field(default=_ABSENT)
+    material: Optional[str] = field(default=_ABSENT)
+    explicit_fields: Tuple[str, ...] = field(default=())
+
+    def __post_init__(self) -> None:
+        allowed = {
+            "ornament", "pendant", "motif", "surface", "shape",
+            "silhouette", "position", "action_type", "body_part",
+            "dynamic_slots", "material"
+        }
+        explicit_set = set()
+        passed_ef = self.explicit_fields
+        if passed_ef:
+            if isinstance(passed_ef, str) or not isinstance(passed_ef, (list, tuple, set, frozenset)):
+                raise TypeError("explicit_fields must be a collection of str")
+            for x in passed_ef:
+                if x not in allowed:
+                    raise KeyError(f"Unknown field {x!r} in explicit_fields")
+                explicit_set.add(x)
+
+        for fld in (
+            "ornament", "pendant", "motif", "surface", "shape",
+            "silhouette", "position", "action_type", "body_part", "material"
+        ):
+            val = getattr(self, fld)
+            if val is not _ABSENT:
+                explicit_set.add(fld)
+                if val is not None and not isinstance(val, str):
+                    raise TypeError(f"{fld} must be str or None, got {type(val).__name__}")
+                object.__setattr__(self, fld, val)
+            else:
+                object.__setattr__(self, fld, None)
+
+        val_ds = self.dynamic_slots
+        if val_ds is not _ABSENT:
+            explicit_set.add("dynamic_slots")
+            if val_ds is None:
+                object.__setattr__(self, "dynamic_slots", ())
+            elif isinstance(val_ds, (list, tuple, set, frozenset)):
+                for x in val_ds:
+                    if not isinstance(x, (str, dict)) or isinstance(x, bool):
+                        raise TypeError(f"Elements of dynamic_slots must be str or dict, got {type(x).__name__}")
+                object.__setattr__(self, "dynamic_slots", tuple(val_ds))
+            else:
+                raise TypeError(f"dynamic_slots must be a collection of str or dict, got {type(val_ds).__name__}")
+        else:
+            object.__setattr__(self, "dynamic_slots", ())
+
+        object.__setattr__(self, "explicit_fields", tuple(sorted(explicit_set)))
+
+    def to_dict(self) -> Dict[str, Any]:
+        res: Dict[str, Any] = {}
+        for fld in (
+            "ornament", "pendant", "motif", "surface", "shape",
+            "silhouette", "position", "action_type", "body_part", "material"
+        ):
+            if fld in self.explicit_fields:
+                res[fld] = getattr(self, fld)
+        if "dynamic_slots" in self.explicit_fields:
+            res["dynamic_slots"] = list(self.dynamic_slots)
+        return res
+
+    @classmethod
+    def from_dict(cls, d: Optional[Dict[str, Any]]) -> "AccessoryAttributeFacts":
+        if not d:
+            return cls()
+        if not isinstance(d, dict):
+            raise TypeError(f"AccessoryAttributeFacts data must be a dict, got {type(d).__name__}")
+        allowed = {
+            "ornament", "pendant", "motif", "surface", "shape",
+            "silhouette", "position", "action_type", "body_part",
+            "dynamic_slots", "material"
+        }
+        unexpected = set(d.keys()) - allowed
+        if unexpected:
+            raise KeyError(f"Unexpected keys in AccessoryAttributeFacts: {sorted(unexpected)}")
+        return cls(**d)
+
 
 @dataclass(frozen=True)
 class SemanticFacts:
-    """不可变语义事实契约 (rc8 核心数据模型)。
+    """不可变语义事实契约 (rc8/rc10 核心数据模型)。
 
     所有字段具备安全默认值，所有集合字段使用有序去重 Tuple。
+    支持四态层级继承与往返保真序列化 (ABSENT, EXPLICIT_UNSPECIFIED, EXPLICIT_EMPTY, EXPLICIT_VALUE)。
+    统一入口强校验防绕过，无论通过直接构造函数还是 from_dict 均执行完全一致的类型与枚举校验。
     """
-    semantic_role: Optional[str] = None
-    space_kind: Optional[str] = None
-    venue_ids: Tuple[str, ...] = ()
-    visible_regions: Tuple[str, ...] = ()
-    garment_topologies: Tuple[str, ...] = ()
-    garment_states: Tuple[str, ...] = ()
-    hand_state: Optional[str] = None
-    prop_usage: Optional[str] = None
-    hands_required: int = 0
-    emotion: Optional[str] = None
-    gaze: Optional[str] = None
-    occlusion: Optional[str] = None
-    time_of_day: Optional[str] = None
-    light_sources: Tuple[str, ...] = ()
-    color_modes: Tuple[str, ...] = ()
-    capture_device: Optional[str] = None
-    quality_class: Optional[str] = None
-    makeup_base: Optional[str] = None
-    makeup_effects: Tuple[str, ...] = ()
-    liquid_kind: Optional[str] = None
-    liquid_locations: Tuple[str, ...] = ()
-    liquid_amount: Optional[str] = None
-    mutex_groups: Tuple[str, ...] = ()
-    explicit_fields: Tuple[str, ...] = ()
+    semantic_role: Any = field(default=_ABSENT)
+    space_kind: Any = field(default=_ABSENT)
+    venue_ids: Any = field(default=_ABSENT)
+    visible_regions: Any = field(default=_ABSENT)
+    garment_topologies: Any = field(default=_ABSENT)
+    garment_states: Any = field(default=_ABSENT)
+    hand_state: Any = field(default=_ABSENT)
+    prop_usage: Any = field(default=_ABSENT)
+    hands_required: Any = field(default=_ABSENT)
+    emotion: Any = field(default=_ABSENT)
+    gaze: Any = field(default=_ABSENT)
+    occlusion: Any = field(default=_ABSENT)
+    time_of_day: Any = field(default=_ABSENT)
+    light_sources: Any = field(default=_ABSENT)
+    color_modes: Any = field(default=_ABSENT)
+    capture_device: Any = field(default=_ABSENT)
+    quality_class: Any = field(default=_ABSENT)
+    makeup_base: Any = field(default=_ABSENT)
+    makeup_effects: Any = field(default=_ABSENT)
+    liquid_kind: Any = field(default=_ABSENT)
+    liquid_locations: Any = field(default=_ABSENT)
+    liquid_amount: Any = field(default=_ABSENT)
+    mutex_groups: Any = field(default=_ABSENT)
+    is_ensemble: Any = field(default=_ABSENT)
+    style_genre: Any = field(default=_ABSENT)
+    fabric_materials: Any = field(default=_ABSENT)
+    pattern_textures: Any = field(default=_ABSENT)
+    incompatible_with: Any = field(default=_ABSENT)
+    cut_features: Any = field(default=_ABSENT)
+    ensemble_pieces: Any = field(default=_ABSENT)
+    pose_facts: Any = field(default=_ABSENT)
+    scene_facts: Any = field(default=_ABSENT)
+    camera_facts: Any = field(default=_ABSENT)
+    hair_facts: Any = field(default=_ABSENT)
+    lighting_facts: Any = field(default=_ABSENT)
+    shot_facts: Any = field(default=_ABSENT)
+    clothing_facts: Any = field(default=_ABSENT)
+    expression_facts: Any = field(default=_ABSENT)
+    accessory_facts: Any = field(default=_ABSENT)
+    governance_metadata: Any = field(default=_ABSENT)
+    explicit_fields: Tuple[str, ...] = field(default=())
 
     def __post_init__(self) -> None:
+        allowed_fields = set(self.__dataclass_fields__.keys()) - {"explicit_fields"}
+        explicit_set = set()
+
+        passed_ef = self.explicit_fields
+        if passed_ef:
+            if isinstance(passed_ef, str):
+                raise TypeError("explicit_fields must be a collection of str, got str")
+            if not isinstance(passed_ef, (list, tuple, set, frozenset)):
+                raise TypeError(f"explicit_fields must be a collection of str, got {type(passed_ef).__name__}")
+            for x in passed_ef:
+                if not isinstance(x, str) or isinstance(x, bool):
+                    raise TypeError(f"Elements of explicit_fields must be str, got {type(x).__name__}")
+                if x not in allowed_fields:
+                    raise ValueError(f"Unknown field {x!r} in explicit_fields")
+                explicit_set.add(x)
+
+        # 1. 嵌套模型校验与强类型归一化 (防绕过核心)
+        submodel_factories = {
+            "cut_features": (CutFeatures, CutFeatures.from_dict),
+            "ensemble_pieces": (EnsemblePieces, EnsemblePieces.from_dict),
+            "pose_facts": (PosePhysicalFacts, PosePhysicalFacts.from_dict),
+            "scene_facts": (SceneEnvironmentalFacts, SceneEnvironmentalFacts.from_dict),
+            "camera_facts": (CameraHardwareFacts, CameraHardwareFacts.from_dict),
+            "hair_facts": (HairAttributeFacts, HairAttributeFacts.from_dict),
+            "lighting_facts": (LightingFacts, LightingFacts.from_dict),
+            "shot_facts": (ShotCompositionFacts, ShotCompositionFacts.from_dict),
+            "clothing_facts": (ClothingAttributeFacts, ClothingAttributeFacts.from_dict),
+            "expression_facts": (ExpressionFacts, ExpressionFacts.from_dict),
+            "accessory_facts": (AccessoryAttributeFacts, AccessoryAttributeFacts.from_dict),
+        }
+        for sm_name, (cls_type, factory) in submodel_factories.items():
+            val = getattr(self, sm_name)
+            if val is not _ABSENT:
+                explicit_set.add(sm_name)
+                if isinstance(val, cls_type):
+                    object.__setattr__(self, sm_name, val)
+                elif val is None:
+                    object.__setattr__(self, sm_name, None)
+                else:
+                    raise TypeError(f"{sm_name} must be {cls_type.__name__} or None, got {type(val).__name__}")
+            else:
+                object.__setattr__(self, sm_name, None)
+
+        # 2. 治理元数据
+        gov_val = self.governance_metadata
+        if gov_val is not _ABSENT:
+            explicit_set.add("governance_metadata")
+            if isinstance(gov_val, dict):
+                object.__setattr__(self, "governance_metadata", dict(gov_val))
+            elif gov_val is None:
+                object.__setattr__(self, "governance_metadata", {})
+            else:
+                raise TypeError(f"governance_metadata must be dict or None, got {type(gov_val).__name__}")
+        else:
+            object.__setattr__(self, "governance_metadata", {})
+
+        # 3. Tuple 集合字段强类型与有序去重归一化
         tuple_fields = (
             "venue_ids", "visible_regions", "garment_topologies", "garment_states",
-            "light_sources", "color_modes", "makeup_effects", "liquid_locations", "mutex_groups"
+            "light_sources", "color_modes", "makeup_effects", "liquid_locations",
+            "mutex_groups", "fabric_materials", "pattern_textures", "incompatible_with"
         )
         for tf in tuple_fields:
             val = getattr(self, tf)
-            if isinstance(val, str):
-                raise TypeError(f"{tf} must be a tuple, list or set of str, got str")
-            if val is None:
-                object.__setattr__(self, tf, ())
-            elif isinstance(val, (list, set, tuple)):
-                for x in val:
-                    if not isinstance(x, str) or isinstance(x, bool):
-                        raise TypeError(f"Elements of {tf} must be str, got {type(x).__name__}")
-                object.__setattr__(self, tf, tuple(sorted(set(val))))
+            if val is not _ABSENT:
+                explicit_set.add(tf)
+                if isinstance(val, str):
+                    raise TypeError(f"{tf} must be a tuple, list or set of str, got str")
+                if val is None:
+                    object.__setattr__(self, tf, ())
+                elif isinstance(val, (list, set, tuple, frozenset)):
+                    for x in val:
+                        if not isinstance(x, str) or isinstance(x, bool):
+                            raise TypeError(f"Elements of {tf} must be str, got {type(x).__name__}")
+                    object.__setattr__(self, tf, tuple(sorted(set(val))))
+                else:
+                    raise TypeError(f"{tf} must be a tuple, list or set of str, got {type(val).__name__}")
             else:
-                raise TypeError(f"{tf} must be a tuple, list or set of str, got {type(val).__name__}")
+                object.__setattr__(self, tf, ())
 
-        valid_fields = set(self.__dataclass_fields__.keys()) - {"explicit_fields"}
-        if self.explicit_fields is not None:
-            if isinstance(self.explicit_fields, str):
-                raise TypeError("explicit_fields must be a collection of str, got str")
-            if not isinstance(self.explicit_fields, (list, tuple, set)):
-                raise TypeError(f"explicit_fields must be a collection of str, got {type(self.explicit_fields).__name__}")
-            for x in self.explicit_fields:
-                if not isinstance(x, str) or isinstance(x, bool):
-                    raise TypeError(f"Elements of explicit_fields must be str, got {type(x).__name__}")
-                if x not in valid_fields:
-                    raise ValueError(f"Unknown field '{x}' in explicit_fields")
-            object.__setattr__(self, "explicit_fields", tuple(sorted(set(self.explicit_fields))))
-        else:
-            object.__setattr__(self, "explicit_fields", ())
-
-        if not self.explicit_fields:
-            computed = set()
-            for f_name in valid_fields:
-                v = getattr(self, f_name)
-                if f_name == "hands_required":
-                    if v != 0:
-                        computed.add(f_name)
-                elif v is not None and v != ():
-                    computed.add(f_name)
-            object.__setattr__(self, "explicit_fields", tuple(sorted(computed)))
-
+        # 4. hands_required 标量数值校验
         hr = self.hands_required
-        if hr is not None and (not isinstance(hr, int) or isinstance(hr, bool)):
-            raise TypeError(f"hands_required must be an int, got {type(hr).__name__}")
-        self.validate()
+        if hr is not _ABSENT:
+            explicit_set.add("hands_required")
+            if hr is not None and (not isinstance(hr, int) or isinstance(hr, bool)):
+                raise TypeError(f"hands_required must be an int, got {type(hr).__name__}")
+            if hr is None:
+                object.__setattr__(self, "hands_required", 0)
+            elif hr not in (0, 1, 2):
+                raise ValueError(f"hands_required must be 0, 1, or 2, got {hr!r}")
+            else:
+                object.__setattr__(self, "hands_required", hr)
+        else:
+            object.__setattr__(self, "hands_required", 0)
 
-    def validate(self) -> None:
-        """校验事实枚举与数值约束，Fail-Closed。"""
+        # 5. is_ensemble
+        ie = self.is_ensemble
+        if ie is not _ABSENT:
+            explicit_set.add("is_ensemble")
+            if not isinstance(ie, bool):
+                raise TypeError(f"is_ensemble must be bool, got {type(ie).__name__}")
+            object.__setattr__(self, "is_ensemble", ie)
+        else:
+            object.__setattr__(self, "is_ensemble", False)
+
+        # 6. 四态标量 (space_kind, time_of_day, hand_state)
+        for fld, valid_enums in (
+            ("space_kind", VALID_SPACE_KINDS),
+            ("time_of_day", VALID_TIMES_OF_DAY),
+            ("hand_state", VALID_HAND_STATES),
+        ):
+            val = getattr(self, fld)
+            if val is not _ABSENT:
+                explicit_set.add(fld)
+                if val == "unspecified" or val is UNSPECIFIED:
+                    object.__setattr__(self, fld, UNSPECIFIED)
+                elif val is None:
+                    object.__setattr__(self, fld, None)
+                elif isinstance(val, str) and not isinstance(val, bool):
+                    if val not in valid_enums and val != "unspecified":
+                        raise ValueError(f"Invalid {fld}: {val!r}")
+                    object.__setattr__(self, fld, val)
+                else:
+                    raise TypeError(f"{fld} must be str, UNSPECIFIED or None, got {type(val).__name__}")
+            else:
+                object.__setattr__(self, fld, None)
+
+        # 7. 其余标量字符串枚举
         str_scalars = {
             "semantic_role": VALID_SEMANTIC_ROLES,
-            "space_kind": VALID_SPACE_KINDS,
-            "hand_state": VALID_HAND_STATES,
             "prop_usage": VALID_PROP_USAGES,
             "emotion": VALID_EMOTIONS,
             "gaze": VALID_GAZES,
             "occlusion": VALID_OCCLUSIONS,
-            "time_of_day": VALID_TIMES_OF_DAY,
             "capture_device": VALID_CAPTURE_DEVICES,
             "quality_class": VALID_QUALITY_CLASSES,
             "makeup_base": VALID_MAKEUP_BASES,
             "liquid_kind": VALID_LIQUID_KINDS,
             "liquid_amount": VALID_LIQUID_AMOUNTS,
+            "style_genre": None,
         }
         for fld, valid_enums in str_scalars.items():
             val = getattr(self, fld)
-            if val is not None:
-                if not isinstance(val, str) or isinstance(val, bool):
-                    raise TypeError(f"{fld} must be str or None, got {type(val).__name__}")
-                if val not in valid_enums:
-                    raise ValueError(f"Invalid {fld}: {val!r}")
+            if val is not _ABSENT:
+                explicit_set.add(fld)
+                if val is not None:
+                    if not isinstance(val, str) or isinstance(val, bool):
+                        raise TypeError(f"{fld} must be str or None, got {type(val).__name__}")
+                    if valid_enums is not None and val not in valid_enums:
+                        raise ValueError(f"Invalid {fld}: {val!r}")
+                    object.__setattr__(self, fld, val)
+                else:
+                    object.__setattr__(self, fld, None)
+            else:
+                object.__setattr__(self, fld, None)
+
+        object.__setattr__(self, "explicit_fields", tuple(sorted(explicit_set)))
+        self.validate()
+
+    def validate(self) -> None:
+        """校验事实枚举与数值约束，Fail-Closed。"""
         for vr in self.visible_regions:
             if vr not in VALID_VISIBLE_REGIONS:
                 raise ValueError(f"Invalid visible_region: {vr!r}")
@@ -218,8 +1917,6 @@ class SemanticFacts:
         for gs in self.garment_states:
             if gs not in VALID_GARMENT_STATES:
                 raise ValueError(f"Invalid garment_state: {gs!r}")
-        if self.hands_required not in (0, 1, 2):
-            raise ValueError(f"hands_required must be 0, 1, or 2, got {self.hands_required!r}")
         for ls in self.light_sources:
             if ls not in VALID_LIGHT_SOURCES:
                 raise ValueError(f"Invalid light_source: {ls!r}")
@@ -232,11 +1929,10 @@ class SemanticFacts:
         for ll in self.liquid_locations:
             if ll not in VALID_LIQUID_LOCATIONS:
                 raise ValueError(f"Invalid liquid_location: {ll!r}")
-                raise ValueError(f"Invalid liquid_location: {ll!r}")
         if self.liquid_amount is not None and self.liquid_amount not in VALID_LIQUID_AMOUNTS:
             raise ValueError(f"Invalid liquid_amount: {self.liquid_amount!r}")
 
-        # 校验同一叶子的矛盾事实 (6.6.2 要求)
+        # 校验同一叶子的矛盾事实
         if "none" in self.garment_topologies and len(self.garment_topologies) > 1:
             raise ValueError(f"garment_topologies cannot contain 'none' alongside other topologies: {self.garment_topologies!r}")
         if any(s in ("removed", "discarded") for s in self.garment_states) and any(s in ("worn", "loosened") for s in self.garment_states):
@@ -246,55 +1942,92 @@ class SemanticFacts:
         if "monochrome" in self.color_modes and any(c in ("color", "high_saturation") for c in self.color_modes):
             raise ValueError(f"color_modes cannot contain both monochrome and color/high_saturation: {self.color_modes!r}")
 
-    def merge(self, child: Optional[SemanticFacts]) -> SemanticFacts:
-        """合并规则：叶子显式值覆盖父项单值，元组字段做有序去重并集。"""
+    def merge(self, child: Optional["SemanticFacts"]) -> "SemanticFacts":
+        """四态层级继承合并规则 (真值表严格闭包)：
+        - Child 缺席 (ABSENT): 保留 Parent 默认值/集合；
+        - Child 显式未知 (EXPLICIT_UNSPECIFIED): 清除 Parent 默认值，置为 UNSPECIFIED；
+        - Child 显式空集合 (EXPLICIT_EMPTY): 清空 Parent 继承集合，置为 ()；
+        - Child 显式具体值 (EXPLICIT_VALUE): 标量覆盖 Parent，集合执行并集合并。
+        """
         if child is None:
             return self
 
-        def _merge_val(parent_v, child_v):
-            return child_v if child_v is not None else parent_v
+        def _merge_scalar(p_val: Any, c_val: Any, fld: str) -> Any:
+            if fld in child.explicit_fields:
+                return c_val
+            return p_val
 
-        def _merge_tuple(parent_t, child_t):
-            combined = set(parent_t or ()).union(set(child_t or ()))
-            return tuple(sorted(combined))
+        def _merge_tuple(p_tup: Tuple[str, ...], c_tup: Tuple[str, ...], fld: str) -> Tuple[str, ...]:
+            if fld in child.explicit_fields:
+                if not c_tup:
+                    return ()
+                combined = set(p_tup or ()).union(set(c_tup))
+                return tuple(sorted(combined))
+            return p_tup or ()
+
+        def _merge_submodel(p_sm: Any, c_sm: Any, fld: str) -> Any:
+            if fld in child.explicit_fields:
+                return c_sm
+            return p_sm
 
         if "hands_required" in child.explicit_fields or child.hands_required != 0:
             hands_req = child.hands_required
         else:
             hands_req = self.hands_required
 
+        merged_gov = dict(self.governance_metadata)
+        if "governance_metadata" in child.explicit_fields:
+            merged_gov.update(child.governance_metadata)
+
         merged_explicit = tuple(sorted(set(self.explicit_fields).union(set(child.explicit_fields))))
 
         merged = SemanticFacts(
-            semantic_role=_merge_val(self.semantic_role, child.semantic_role),
-            space_kind=_merge_val(self.space_kind, child.space_kind),
-            venue_ids=_merge_tuple(self.venue_ids, child.venue_ids),
-            visible_regions=_merge_tuple(self.visible_regions, child.visible_regions),
-            garment_topologies=_merge_tuple(self.garment_topologies, child.garment_topologies),
-            garment_states=_merge_tuple(self.garment_states, child.garment_states),
-            hand_state=_merge_val(self.hand_state, child.hand_state),
-            prop_usage=_merge_val(self.prop_usage, child.prop_usage),
+            semantic_role=_merge_scalar(self.semantic_role, child.semantic_role, "semantic_role"),
+            space_kind=_merge_scalar(self.space_kind, child.space_kind, "space_kind"),
+            venue_ids=_merge_tuple(self.venue_ids, child.venue_ids, "venue_ids"),
+            visible_regions=_merge_tuple(self.visible_regions, child.visible_regions, "visible_regions"),
+            garment_topologies=_merge_tuple(self.garment_topologies, child.garment_topologies, "garment_topologies"),
+            garment_states=_merge_tuple(self.garment_states, child.garment_states, "garment_states"),
+            hand_state=_merge_scalar(self.hand_state, child.hand_state, "hand_state"),
+            prop_usage=_merge_scalar(self.prop_usage, child.prop_usage, "prop_usage"),
             hands_required=hands_req,
-            emotion=_merge_val(self.emotion, child.emotion),
-            gaze=_merge_val(self.gaze, child.gaze),
-            occlusion=_merge_val(self.occlusion, child.occlusion),
-            time_of_day=_merge_val(self.time_of_day, child.time_of_day),
-            light_sources=_merge_tuple(self.light_sources, child.light_sources),
-            color_modes=_merge_tuple(self.color_modes, child.color_modes),
-            capture_device=_merge_val(self.capture_device, child.capture_device),
-            quality_class=_merge_val(self.quality_class, child.quality_class),
-            makeup_base=_merge_val(self.makeup_base, child.makeup_base),
-            makeup_effects=_merge_tuple(self.makeup_effects, child.makeup_effects),
-            liquid_kind=_merge_val(self.liquid_kind, child.liquid_kind),
-            liquid_locations=_merge_tuple(self.liquid_locations, child.liquid_locations),
-            liquid_amount=_merge_val(self.liquid_amount, child.liquid_amount),
-            mutex_groups=_merge_tuple(self.mutex_groups, child.mutex_groups),
+            emotion=_merge_scalar(self.emotion, child.emotion, "emotion"),
+            gaze=_merge_scalar(self.gaze, child.gaze, "gaze"),
+            occlusion=_merge_scalar(self.occlusion, child.occlusion, "occlusion"),
+            time_of_day=_merge_scalar(self.time_of_day, child.time_of_day, "time_of_day"),
+            light_sources=_merge_tuple(self.light_sources, child.light_sources, "light_sources"),
+            color_modes=_merge_tuple(self.color_modes, child.color_modes, "color_modes"),
+            capture_device=_merge_scalar(self.capture_device, child.capture_device, "capture_device"),
+            quality_class=_merge_scalar(self.quality_class, child.quality_class, "quality_class"),
+            makeup_base=_merge_scalar(self.makeup_base, child.makeup_base, "makeup_base"),
+            makeup_effects=_merge_tuple(self.makeup_effects, child.makeup_effects, "makeup_effects"),
+            liquid_kind=_merge_scalar(self.liquid_kind, child.liquid_kind, "liquid_kind"),
+            liquid_locations=_merge_tuple(self.liquid_locations, child.liquid_locations, "liquid_locations"),
+            liquid_amount=_merge_scalar(self.liquid_amount, child.liquid_amount, "liquid_amount"),
+            mutex_groups=_merge_tuple(self.mutex_groups, child.mutex_groups, "mutex_groups"),
+            is_ensemble=_merge_scalar(self.is_ensemble, child.is_ensemble, "is_ensemble"),
+            style_genre=_merge_scalar(self.style_genre, child.style_genre, "style_genre"),
+            fabric_materials=_merge_tuple(self.fabric_materials, child.fabric_materials, "fabric_materials"),
+            pattern_textures=_merge_tuple(self.pattern_textures, child.pattern_textures, "pattern_textures"),
+            incompatible_with=_merge_tuple(self.incompatible_with, child.incompatible_with, "incompatible_with"),
+            cut_features=_merge_submodel(self.cut_features, child.cut_features, "cut_features"),
+            ensemble_pieces=_merge_submodel(self.ensemble_pieces, child.ensemble_pieces, "ensemble_pieces"),
+            pose_facts=_merge_submodel(self.pose_facts, child.pose_facts, "pose_facts"),
+            scene_facts=_merge_submodel(self.scene_facts, child.scene_facts, "scene_facts"),
+            camera_facts=_merge_submodel(self.camera_facts, child.camera_facts, "camera_facts"),
+            hair_facts=_merge_submodel(self.hair_facts, child.hair_facts, "hair_facts"),
+            lighting_facts=_merge_submodel(self.lighting_facts, child.lighting_facts, "lighting_facts"),
+            shot_facts=_merge_submodel(self.shot_facts, child.shot_facts, "shot_facts"),
+            clothing_facts=_merge_submodel(self.clothing_facts, child.clothing_facts, "clothing_facts"),
+            expression_facts=_merge_submodel(self.expression_facts, child.expression_facts, "expression_facts"),
+            accessory_facts=_merge_submodel(self.accessory_facts, child.accessory_facts, "accessory_facts"),
+            governance_metadata=merged_gov,
             explicit_fields=merged_explicit,
         )
         return merged
 
     @classmethod
-    def from_dict(cls, d: Optional[Dict[str, Any]]) -> SemanticFacts:
+    def from_dict(cls, d: Optional[Dict[str, Any]]) -> "SemanticFacts":
         if not d:
             return cls()
         if not isinstance(d, dict):
@@ -302,45 +2035,45 @@ class SemanticFacts:
         known_fields = set(cls.__dataclass_fields__.keys()) - {"explicit_fields"}
         unexpected = set(d.keys()) - known_fields
         if unexpected:
-            raise ValueError(f"Unexpected keys in SemanticFacts: {sorted(unexpected)}")
-        cleaned: Dict[str, Any] = {}
-        tuple_fields = {
-            "venue_ids", "visible_regions", "garment_topologies", "garment_states",
-            "light_sources", "color_modes", "makeup_effects", "liquid_locations", "mutex_groups"
+            raise KeyError(f"Unexpected keys in SemanticFacts: {sorted(unexpected)}")
+        submodel_factories = {
+            "cut_features": CutFeatures.from_dict,
+            "ensemble_pieces": EnsemblePieces.from_dict,
+            "pose_facts": PosePhysicalFacts.from_dict,
+            "scene_facts": SceneEnvironmentalFacts.from_dict,
+            "camera_facts": CameraHardwareFacts.from_dict,
+            "hair_facts": HairAttributeFacts.from_dict,
+            "lighting_facts": LightingFacts.from_dict,
+            "shot_facts": ShotCompositionFacts.from_dict,
+            "clothing_facts": ClothingAttributeFacts.from_dict,
+            "expression_facts": ExpressionFacts.from_dict,
+            "accessory_facts": AccessoryAttributeFacts.from_dict,
         }
-        for k, v in d.items():
-            if k in tuple_fields:
-                if isinstance(v, (list, tuple)):
-                    for x in v:
-                        if not isinstance(x, str):
-                            raise TypeError(f"Elements of {k!r} must be str, got {type(x).__name__}")
-                    cleaned[k] = tuple(sorted(set(v)))
-                elif v is None:
-                    cleaned[k] = ()
-                else:
-                    raise TypeError(f"Field {k!r} must be a list/tuple of strings, got {type(v).__name__}")
-            elif k == "hands_required":
-                if not isinstance(v, int) or isinstance(v, bool):
-                    raise TypeError(f"hands_required must be an int, got {type(v).__name__}")
-                cleaned[k] = v
-            else:
-                if v is not None and not isinstance(v, str):
-                    raise TypeError(f"Field {k!r} must be a string or null, got {type(v).__name__}")
-                cleaned[k] = v
-        cleaned["explicit_fields"] = tuple(sorted(k for k in d.keys() if k in known_fields))
-        inst = cls(**cleaned)
-        inst.validate()
-        return inst
+        kwargs = dict(d)
+        for sm_name, factory in submodel_factories.items():
+            if sm_name in kwargs:
+                raw_sm = kwargs[sm_name]
+                if isinstance(raw_sm, dict):
+                    kwargs[sm_name] = factory(raw_sm)
+        return cls(**kwargs)
 
     def to_dict(self) -> Dict[str, Any]:
         res: Dict[str, Any] = {}
         for f_name in self.__dataclass_fields__.keys():
             if f_name == "explicit_fields":
                 continue
-            val = getattr(self, f_name)
-            if val is not None and val != () and val != 0:
-                res[f_name] = list(val) if isinstance(val, tuple) else val
+            if f_name in self.explicit_fields:
+                val = getattr(self, f_name)
+                if val is UNSPECIFIED or val == "unspecified":
+                    res[f_name] = "unspecified"
+                elif isinstance(val, tuple):
+                    res[f_name] = list(val)
+                elif hasattr(val, "to_dict"):
+                    res[f_name] = val.to_dict()
+                elif val is not None:
+                    res[f_name] = val
         return res
+
 
 
 VALID_ENTRY_POINTS: Tuple[str, ...] = ("generator", "preset_browser", "custom_combiner", "diagnostics")

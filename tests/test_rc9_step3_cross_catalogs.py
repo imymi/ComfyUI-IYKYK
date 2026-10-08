@@ -19,6 +19,7 @@ tests/test_rc9_step3_cross_catalogs.py — 第 3 步跨词库 10 项条目专项
 from __future__ import annotations
 
 import json
+from dataclasses import asdict
 from pathlib import Path
 from random import Random
 import unittest
@@ -65,9 +66,9 @@ class TestRC9Step3CrossCatalogs(unittest.TestCase):
     # 1. 目录规模指标精确断言
     # ─────────────────────────────────────────────────────────────
     def test_01_catalog_counts(self):
-        """验证目录规模：配饰 19、内衣 12、微瑕 8、服装状态 23、服装款式 137"""
+        """验证目录规模：配饰 29、内衣 12、微瑕 8、服装状态 23、服装款式 154"""
         jewelry_items = self.accessories_doc.get("headwear_jewelry", [])
-        self.assertEqual(len(jewelry_items), 19, f"Expected 19 jewelry items, got {len(jewelry_items)}")
+        self.assertEqual(len(jewelry_items), 29, f"Expected 29 jewelry items, got {len(jewelry_items)}")
 
         lingerie_items = self.clothing_doc.get("lingerie_wardrobe", [])
         self.assertEqual(len(lingerie_items), 12, f"Expected 12 lingerie items, got {len(lingerie_items)}")
@@ -79,7 +80,7 @@ class TestRC9Step3CrossCatalogs(unittest.TestCase):
         self.assertEqual(len(clothing_states), 23, f"Expected 23 clothing states, got {len(clothing_states)}")
 
         clothing_categories = self.clothing_doc.get("categories", [])
-        self.assertEqual(len(clothing_categories), 137, f"Expected 137 clothing categories, got {len(clothing_categories)}")
+        self.assertEqual(len(clothing_categories), 165, f"Expected 165 clothing categories, got {len(clothing_categories)}")
 
         # 验证 10 项新增条目 ID 均存在
         expected_new_jewelry = {"neck_ribbon", "hooded_cloak", "cloak", "poncho", "waist_belt", "winter_scarf", "fur_shawl"}
@@ -627,6 +628,7 @@ class TestRC9Step3CrossCatalogs(unittest.TestCase):
                 "garment_states": list(a.facts.garment_states) if a.facts else [],
                 "visible_regions": list(a.facts.visible_regions) if a.facts else [],
                 "prop_usage": a.facts.prop_usage if a.facts else None,
+                "facts": asdict(a.facts) if a.facts else None,
             }
 
         def dec_to_dict(d):

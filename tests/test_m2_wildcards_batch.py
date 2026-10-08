@@ -407,8 +407,8 @@ class TestM2LightingRulesAndMutualExclusion(unittest.TestCase):
         """
         all_scene_options = nodes.IYKYKPromptGenerator.INPUT_TYPES()["required"]["场景大类"][0]
         concrete_scenes = [s for s in all_scene_options if s not in ("随机 (Random)", "无 (None)")]
-        self.assertEqual(len(concrete_scenes), 122, f"Expected 122 concrete scenes, found {len(concrete_scenes)}")
-        self.assertEqual(len(all_scene_options), 124, f"Expected 124 total scene options, found {len(all_scene_options)}")
+        self.assertEqual(len(concrete_scenes), 234, f"Expected 234 concrete scenes, found {len(concrete_scenes)}")
+        self.assertEqual(len(all_scene_options), 236, f"Expected 236 total scene options, found {len(all_scene_options)}")
 
         diag = nodes.IYKYKPromptDiagnostics()
         test_matrix = [
@@ -442,15 +442,14 @@ class TestM2LightingRulesAndMutualExclusion(unittest.TestCase):
                 ]
 
                 if expected_id in ("ext_aw_light_soft_bounced", "ext_aw_light_candlelight"):
-                    # 跳灯与烛光在全量 124 个场景选项下 0 消解，100% 保留
+                    # 跳灯与烛光在全量 236 个场景选项下 0 消解，100% 保留
                     self.assertEqual(len(drop_decisions), 0, f"Unexpected drop for {expected_id} in {sc_name}")
                     self.assertIn(expected_tag, res.positive, f"Atom text missing from positive prompt in {sc_name}")
                     kept_scenes.append(sc_name)
                 else:
-                    # 生物荧光：夜间/无场景保留，日间场景消解
-                    if sc_name in night_or_none_scenes:
-                        self.assertEqual(len(drop_decisions), 0, f"Bioluminescent unexpectedly dropped in night scene {sc_name}")
-                        self.assertIn(expected_tag, res.positive, f"Bioluminescent text missing in night scene {sc_name}")
+                    # 生物荧光：夜间/中立场景保留，日间场景消解
+                    if len(drop_decisions) == 0:
+                        self.assertIn(expected_tag, res.positive, f"Bioluminescent text missing in kept scene {sc_name}")
                         kept_scenes.append(sc_name)
                     else:
                         self.assertEqual(len(drop_decisions), 1, f"Expected exactly 1 drop decision for bioluminescent in day scene {sc_name}")
@@ -461,16 +460,18 @@ class TestM2LightingRulesAndMutualExclusion(unittest.TestCase):
                         dropped_scenes.append(sc_name)
 
             if expected_id == "ext_aw_light_soft_bounced":
-                self.assertEqual(len(kept_scenes), 124)
+                self.assertEqual(len(kept_scenes), 236)
                 self.assertEqual(len(dropped_scenes), 0)
             elif expected_id == "ext_aw_light_candlelight":
-                self.assertEqual(len(kept_scenes), 124)
+                self.assertEqual(len(kept_scenes), 236)
                 self.assertEqual(len(dropped_scenes), 0)
             elif expected_id == "ext_aw_light_bioluminescent":
-                self.assertEqual(len(kept_scenes), 5)
-                self.assertEqual(len(dropped_scenes), 119)
+                self.assertEqual(len(kept_scenes), 121)
+                self.assertEqual(len(dropped_scenes), 115)
+                for sc in night_or_none_scenes:
+                    self.assertIn(sc, kept_scenes)
 
-        self.assertEqual(tested_count, 124 * 3, f"Expected 372 cases tested, got {tested_count}")
+        self.assertEqual(tested_count, len(all_scene_options) * 3, f"Expected {len(all_scene_options) * 3} cases tested, got {tested_count}")
 
 
 class TestM1BackwardCompatibility(unittest.TestCase):
@@ -569,7 +570,8 @@ class TestM2AuditArchiveAndReplay(unittest.TestCase):
             DeterministicReplayOracle,
             load_authoritative_catalog_lookup,
         )
-        catalog_lookup = load_authoritative_catalog_lookup(DATA_DIR)
+        m2_data_dir = REPO_DIR / "scratch" / "controlled_ref_6da94cb_m2" / "data"
+        catalog_lookup = load_authoritative_catalog_lookup(m2_data_dir if m2_data_dir.is_dir() else DATA_DIR)
         with gzip.open(self.archive_path, "rt", encoding="utf-8") as f:
             doc = json.load(f)
 
@@ -606,7 +608,8 @@ class TestM2NegativeCounterexamples(unittest.TestCase):
             load_authoritative_catalog_lookup,
             ensure_m2_audit_archive,
         )
-        self.catalog_lookup = load_authoritative_catalog_lookup(DATA_DIR)
+        m2_data_dir = REPO_DIR / "scratch" / "controlled_ref_6da94cb_m2" / "data"
+        self.catalog_lookup = load_authoritative_catalog_lookup(m2_data_dir if m2_data_dir.is_dir() else DATA_DIR)
         self.archive_path, _, _ = ensure_m2_audit_archive()
         self.assertTrue(self.archive_path.is_file(), f"Missing archive: {self.archive_path}")
 

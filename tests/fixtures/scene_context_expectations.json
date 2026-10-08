@@ -75,7 +75,7 @@
     "label": "图书馆/自习室",
     "category": "学校场景（JAV核心主题）",
     "expected_context": "school",
-    "exclusive_group": "school",
+    "exclusive_group": "library",
     "anchor_count": 3,
     "detail_count": 6
   },
