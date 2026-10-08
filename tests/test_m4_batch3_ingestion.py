@@ -252,7 +252,7 @@ class TestM4Batch3Ingestion(unittest.TestCase):
             self.assertFalse(cf.get("is_camera_film", True))
 
         # 3. 14 款相机器材套机原生卡口与规格核验
-        lenses_by_id = {l["id"]: l for l in fs_data.get("cinema_lenses", [])}
+        lenses_by_id = {lens["id"]: lens for lens in fs_data.get("cinema_lenses", [])}
         expected_brands = [
             "canon", "dji", "fujifilm", "gopro", "hasselblad", "kodak",
             "leica", "nikon", "olympus", "panasonic", "pentax", "ricoh",

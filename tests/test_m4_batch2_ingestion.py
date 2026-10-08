@@ -349,7 +349,7 @@ class TestM4Batch2Ingestion(unittest.TestCase):
         # 1. 发长词池
         lengths_file = wildcards_base / "hair_lengths.txt"
         self.assertTrue(lengths_file.exists())
-        src_lengths = [l.strip().lower() for l in lengths_file.read_text(encoding="utf-8").splitlines() if l.strip() and not l.strip().startswith("#")]
+        src_lengths = [line.strip().lower() for line in lengths_file.read_text(encoding="utf-8").splitlines() if line.strip() and not line.strip().startswith("#")]
         reg_lengths = BATCH1_POOL_REGISTRY["02_hair/hair_lengths"]
         self.assertEqual(len(src_lengths), 5)
         self.assertEqual(len(reg_lengths), 5)
@@ -359,7 +359,7 @@ class TestM4Batch2Ingestion(unittest.TestCase):
         # 2. 发型款式词池
         styles_file = wildcards_base / "hair_styles.txt"
         self.assertTrue(styles_file.exists())
-        src_styles = [l.strip().lower() for l in styles_file.read_text(encoding="utf-8").splitlines() if l.strip() and not l.strip().startswith("#")]
+        src_styles = [line.strip().lower() for line in styles_file.read_text(encoding="utf-8").splitlines() if line.strip() and not line.strip().startswith("#")]
         reg_styles = BATCH1_POOL_REGISTRY["02_hair/hair_styles"]
         self.assertEqual(len(src_styles), 9)
         self.assertEqual(len(reg_styles), 9)
@@ -369,7 +369,7 @@ class TestM4Batch2Ingestion(unittest.TestCase):
         # 3. 发饰词池
         orn_file = wildcards_base / "hair_ornaments.txt"
         self.assertTrue(orn_file.exists())
-        src_orns = [l.strip().lower() for l in orn_file.read_text(encoding="utf-8").splitlines() if l.strip() and not l.strip().startswith("#")]
+        src_orns = [line.strip().lower() for line in orn_file.read_text(encoding="utf-8").splitlines() if line.strip() and not line.strip().startswith("#")]
         reg_orns = BATCH1_POOL_REGISTRY["02_hair/hair_ornaments"]
         self.assertEqual(len(src_orns), 15)
         self.assertEqual(len(reg_orns), 15)

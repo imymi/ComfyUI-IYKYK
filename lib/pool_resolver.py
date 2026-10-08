@@ -274,7 +274,7 @@ def expand_pattern_template(
     depth: int = 0,
 ) -> str:
     """递归展开动态模式模板（包含加权分支与嵌套词池引用）。
-    
+
     例如: '{__by_source/skyyysi/09_style/colors__|4::black} bow choker'
     -> 依据权重裁决后递归解析颜色词池，最终输出 'black bow choker' 或 'red bow choker' 等具体自然文本。
     """
@@ -330,7 +330,7 @@ def resolve_pool_reference(
     depth: int = 0,
 ) -> str:
     """展开词池引用，具备严格深度限制、缺失引用校验、空池校验与循环依赖防护。
-    
+
     异常契约：
     - 缺失池或未知引用：抛出 PoolResolutionError；
     - 空词池：抛出 PoolResolutionError；
@@ -384,7 +384,7 @@ def resolve_dynamic_slots(
     base_text: str = "",
 ) -> Tuple[str, List[str]]:
     """展开动态槽位。
-    
+
     返回:
         (modified_base_text, list_of_additional_component_tags)
     """

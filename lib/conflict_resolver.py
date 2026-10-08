@@ -18,21 +18,17 @@ from random import Random
 from typing import Any, Dict, FrozenSet, List, Optional, Sequence, Set, Tuple
 
 if __package__:
-    from .errors import QuarantineLeakageError, RuleConfigurationError, UnresolvedConflictError, UnresolvedEnsembleRelationError
+    from .errors import QuarantineLeakageError, RuleConfigurationError, UnresolvedConflictError
     from .models import (
         CANONICAL_SELECTORS_BY_ENTRY_POINT,
         FORMAL_ORIGIN_MODES,
         ContextProfile,
-        CutFeatures,
-        EnsemblePieces,
-        EnsembleRelation,
         PieceBinding,
         PosePhysicalFacts,
         PromptAtom,
         PromptFragment,
         ResolutionDecision,
         ResolutionReport,
-        SceneEnvironmentalFacts,
         SelectionOrigin,
         SemanticFacts,
         SpanType,
@@ -53,21 +49,17 @@ if __package__:
     )
     from .slot_contract import SLOT_ALIASES, normalize_slot_name
 else:
-    from lib.errors import QuarantineLeakageError, RuleConfigurationError, UnresolvedConflictError, UnresolvedEnsembleRelationError
+    from lib.errors import QuarantineLeakageError, RuleConfigurationError, UnresolvedConflictError
     from lib.models import (
         CANONICAL_SELECTORS_BY_ENTRY_POINT,
         FORMAL_ORIGIN_MODES,
         ContextProfile,
-        CutFeatures,
-        EnsemblePieces,
-        EnsembleRelation,
         PieceBinding,
         PosePhysicalFacts,
         PromptAtom,
         PromptFragment,
         ResolutionDecision,
         ResolutionReport,
-        SceneEnvironmentalFacts,
         SelectionOrigin,
         SemanticFacts,
         SpanType,
@@ -139,7 +131,7 @@ def is_quarantined_payload(
     entity_id: Optional[str] = None,
 ) -> bool:
     """判定任意对象、字典、PromptAtom 或 ID 是否触发物理隔离防护门禁 (Fail-Closed)。
-    
+
     拦截规则：
     1. entity_id 在 QUARANTINE_ENTITY_IDS 中；
     2. 显式隔离标志: is_quarantined is True / 'true';

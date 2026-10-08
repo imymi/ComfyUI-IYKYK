@@ -6,7 +6,7 @@ from __future__ import annotations
 import math
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Any, Dict, Iterable, List, Optional, Sequence, Set, Tuple, Union
+from typing import Any, Dict, List, Optional, Tuple
 
 if __package__:
     from .errors import UnresolvedEnsembleRelationError

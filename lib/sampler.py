@@ -549,8 +549,6 @@ class DataSampler:
             for t in all_tags:
                 if isinstance(t, dict):
                     role = t.get("role")
-                    facts = t.get("facts", {})
-                    srole = facts.get("semantic_role") if isinstance(facts, dict) else None
 
                     if role == "combinable_attribute":
                         attribute_candidates.append(t)
