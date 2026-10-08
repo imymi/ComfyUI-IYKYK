@@ -47,7 +47,82 @@ sys.path.insert(0, str(REPO_DIR))
 sys.path.insert(0, str(REPO_DIR / "scratch"))
 
 from m33_adapter_and_relation_migrator import build_runtime_semantic_facts
-from generate_batch5_scene_script import DEFERRED_ITEMS
+
+try:
+    from scratch.generate_batch5_scene_script import DEFERRED_ITEMS
+except ImportError:
+    try:
+        from generate_batch5_scene_script import DEFERRED_ITEMS
+    except ImportError:
+        # 71 条绝对物理隔离项 (DEFERRED_ITEMS) 兜底 SSOT
+        DEFERRED_ITEMS = {
+            "SRC_SCENE_05281": ("a surprise proposal while ice skating", "ACTIVITY_WITHOUT_VENUE", "仅含求婚交互与滑冰运动动作，缺少具体物理空间场所名称，隔离排除出场景库"),
+            "SRC_SCENE_05282": ("a surprise proposal while stargazing", "ACTIVITY_WITHOUT_VENUE", "仅含求婚交互与观星行为动作，缺少具体物理空间场所名称，隔离排除出场景库"),
+            "SRC_SCENE_05057": ("a romantic kiss on a scenic bike ride", "ACTIVITY_WITHOUT_VENUE", "仅含接吻与自行车骑行行程，缺少具体物理空间场所名称，隔离排除出场景库"),
+            "SRC_SCENE_05059": ("a romantic kiss on a scenic road trip", "ACTIVITY_WITHOUT_VENUE", "仅含接吻与公路旅行旅程，缺少具体物理空间场所名称，隔离排除出场景库"),
+            "SRC_SCENE_05273": ("a surprise proposal on a scenic drive", "ACTIVITY_WITHOUT_VENUE", "仅含求婚交互与汽车驾驶路程，缺少具体物理空间场所名称，隔离排除出场景库"),
+            "SRC_SCENE_04689": ("a group of survivors in a zombie outbreak", "EVENT_WITHOUT_VENUE", "仅含幸存者群体与丧尸爆发危机事件背景，缺少具体物理空间场所名称，隔离排除出场景库"),
+            "SRC_SCENE_04684": ("a group of explorers set out to find a legendary city made of gold", "QUEST_WITHOUT_VENUE", "仅含探险队出发寻找黄金城的任务动机，缺少当前具体物理空间场所，隔离排除出场景库"),
+            "SRC_SCENE_04982": ("a quest for a legendary sword", "NON_SPATIAL_QUEST_HOOK", "上游词表将寻找传说之剑的任务情节误分入场景库，无实体场所名词，隔离排除"),
+            "SRC_SCENE_04983": ("a quest to defeat an ancient evil", "NON_SPATIAL_QUEST_HOOK", "上游词表将击败远古邪恶的任务情节误分入场景库，无实体场所名词，隔离排除"),
+            "SRC_SCENE_04984": ("a quest to find a magical grail", "NON_SPATIAL_QUEST_HOOK", "上游词表将寻找圣杯的任务情节误分入场景库，无实体场所名词，隔离排除"),
+            "SRC_SCENE_04985": ("a quest to retrieve a powerful artifact", "NON_SPATIAL_QUEST_HOOK", "上游词表将寻找神器的任务情节误分入场景库，无实体场所名词，隔离排除"),
+            "SRC_SCENE_04986": ("a quest to save a magical kingdom", "NON_SPATIAL_QUEST_HOOK", "上游词表将拯救王国的任务情节误分入场景库，无实体场所名词，隔离排除"),
+            "SRC_SCENE_04459": ("a cursed object brings death and destruction", "NON_SPATIAL_PLOT_HOOK", "上游词表将诅咒物品抽象剧情误分入场景库，不含空间场所环境描述，隔离排除"),
+            "SRC_SCENE_04460": ("a cursed object brings death to its owner", "NON_SPATIAL_PLOT_HOOK", "上游词表将诅咒物品抽象剧情误分入场景库，不含空间场所环境描述，隔离排除"),
+            "SRC_SCENE_04461": ("a cursed object brings inanimate objects to life", "NON_SPATIAL_PLOT_HOOK", "上游词表将诅咒物品抽象设定误分入场景库，不含空间场所环境描述，隔离排除"),
+            "SRC_SCENE_04462": ("a cursed object brings misfortune to life", "NON_SPATIAL_PLOT_HOOK", "上游词表将诅咒物品抽象剧情误分入场景库，不含空间场所环境描述，隔离排除"),
+            "SRC_SCENE_04463": ("a cursed object with deadly powers", "NON_SPATIAL_PLOT_HOOK", "上游词表将道具属性设定误分入场景库，不含空间场所环境描述，隔离排除"),
+            "SRC_SCENE_04464": ("a cursed object with mysterious powers", "NON_SPATIAL_PLOT_HOOK", "上游词表将道具属性设定误分入场景库，不含空间场所环境描述，隔离排除"),
+            "SRC_SCENE_04465": ("a cursed object with reality-bending powers", "NON_SPATIAL_PLOT_HOOK", "上游词表将道具属性设定误分入场景库，不含空间场所环境描述，隔离排除"),
+            "SRC_SCENE_04466": ("a cursed object with supernatural power", "NON_SPATIAL_PLOT_HOOK", "上游词表将道具属性设定误分入场景库，不含空间场所环境描述，隔离排除"),
+            "SRC_SCENE_04686": ("a group of knights set out to defeat a powerful sorcerer who threatens to destroy the world", "CHARACTER_QUEST_PLOT", "上游词表将骑士讨伐巫师剧情误分入场景库，无实体场所名词，隔离排除"),
+            "SRC_SCENE_04687": ("a group of rebels attempt to overthrow a tyrannical king who possesses a powerful magical artifact", "CHARACTER_QUEST_PLOT", "上游词表将起义军推翻暴君剧情误分入场景库，无实体场所名词，隔离排除"),
+            "SRC_SCENE_04696": ("a group of travelers journey to a faraway land to find a powerful sorcerer who can help them defeat a great evil", "CHARACTER_QUEST_PLOT", "上游词表将旅人寻找巫师任务误分入场景库，无实体场所名词，隔离排除"),
+            "SRC_SCENE_04697": ("a group of warriors set out to defeat a powerful necromancer who seeks to conquer the world", "CHARACTER_QUEST_PLOT", "上游词表将战士讨伐死灵法师误分入场景库，无实体场所名词，隔离排除"),
+            "SRC_SCENE_04698": ("a group of warriors set out to defeat an immortal warlord who seeks to conquer the world and enslave mankind", "CHARACTER_QUEST_PLOT", "上游词表将战士对抗军阀剧情误分入场景库，无实体场所名词，隔离排除"),
+            "SRC_SCENE_04699": ("a group of warriors set out to find and destroy an ancient cursed weapon before it falls into the wrong hands", "CHARACTER_QUEST_PLOT", "上游词表将战士销毁武器剧情误分入场景库，无实体场所名词，隔离排除"),
+            "SRC_SCENE_04763": ("a human-alien hybrid fights for acceptance", "CHARACTER_IDENTITY_PLOT", "上游词表将人外混血剧情误分入场景库，属角色设定，隔离排除"),
+            "SRC_SCENE_04764": ("a human-alien hybrid fights for freedom", "CHARACTER_IDENTITY_PLOT", "上游词表将人外混血斗争剧情误分入场景库，属角色设定，隔离排除"),
+            "SRC_SCENE_04765": ("a human-like robots are hunted by humanity", "CHARACTER_IDENTITY_PLOT", "上游词表将人形机器人被捕猎剧情误分入场景库，属角色关系，隔离排除"),
+            "SRC_SCENE_04766": ("a human-like robots demand equal rights", "CHARACTER_IDENTITY_PLOT", "上游词表将机器人平权运动误分入场景库，属世界观设定，隔离排除"),
+            "SRC_SCENE_04767": ("a human-like robots gain consciousness", "CHARACTER_IDENTITY_PLOT", "上游词表将机器人觉醒剧情误分入场景库，属角色剧情，隔离排除"),
+            "SRC_SCENE_04816": ("a malfunctioning teleportation experiment", "ABSTRACT_SCIENCE_CONCEPT", "上游词表将传送实验故障抽象事件误分入场景库，无具体场所名词，隔离排除"),
+            "SRC_SCENE_04817": ("a malfunctioning teleportation experiment leads to disaster", "ABSTRACT_SCIENCE_CONCEPT", "上游词表将传送灾难情节误分入场景库，无具体场所名词，隔离排除"),
+            "SRC_SCENE_05004": ("a reality-bending supernatural experiment", "ABSTRACT_SCIENCE_CONCEPT", "上游词表将超现实实验抽象设定误分入场景库，无实体空间名词，隔离排除"),
+            "SRC_SCENE_05240": ("a supernatural political campaign", "ABSTRACT_SOCIAL_CONCEPT", "上游词表将超自然政治竞选抽象概念误分入场景库，无实体空间，隔离排除"),
+            "SRC_SCENE_05114": ("a scientist creates a creature that turns on him", "CHARACTER_PLOT_HOOK", "上游词表将科学家造物反噬剧情误分入场景库，无空间名词，隔离排除"),
+            "SRC_SCENE_05116": ("a scientist creates a new form of life", "CHARACTER_PLOT_HOOK", "上游词表将科学家创造生命剧情误分入场景库，无空间名词，隔离排除"),
+            "SRC_SCENE_05117": ("a scientist creates a new species", "CHARACTER_PLOT_HOOK", "上游词表将科学家创造物种剧情误分入场景库，无空间名词，隔离排除"),
+            "SRC_SCENE_05118": ("a scientist creates a time machine", "CHARACTER_PLOT_HOOK", "上游词表将科学家造时光机剧情误分入场景库，无空间名词，隔离排除"),
+            "SRC_SCENE_05132": ("a secret society of alchemists", "CHARACTER_FACTION_LORE", "上游词表将炼金术士秘密结社阵营误分入场景库，非空间场所，隔离排除"),
+            "SRC_SCENE_05133": ("a secret society of immortal humans", "CHARACTER_FACTION_LORE", "上游词表将永生者组织误分入场景库，非空间场所，隔离排除"),
+            "SRC_SCENE_05134": ("a secret society of magic wielders", "CHARACTER_FACTION_LORE", "上游词表将施法者结社误分入场景库，非空间场所，隔离排除"),
+            "SRC_SCENE_05135": ("a secret society of powerful magic wielders fights a mysterious force", "CHARACTER_FACTION_LORE", "上游词表将结社战斗剧情误分入场景库，非空间场所，隔离排除"),
+            "SRC_SCENE_05136": ("a secret society of powerful witches", "CHARACTER_FACTION_LORE", "上游词表将女巫结社误分入场景库，非空间场所，隔离排除"),
+            "SRC_SCENE_05137": ("a secret society of shapeshifters", "CHARACTER_FACTION_LORE", "上游词表将变形者结社误分入场景库，非空间场所，隔离排除"),
+            "SRC_SCENE_05138": ("a secret society of shapeshifting humans", "CHARACTER_FACTION_LORE", "上游词表将变形者社团误分入场景库，非空间场所，隔离排除"),
+            "SRC_SCENE_05139": ("a secret society of supernatural beings", "CHARACTER_FACTION_LORE", "上游词表将超自然社团误分入场景库，非空间场所，隔离排除"),
+            "SRC_SCENE_05140": ("a secret society of time travelers", "CHARACTER_FACTION_LORE", "上游词表将时间旅行者社团误分入场景库，非空间场所，隔离排除"),
+            "SRC_SCENE_05141": ("a secret society of vampire nobles", "CHARACTER_FACTION_LORE", "上游词表将吸血鬼贵族社团误分入场景库，非空间场所，隔离排除"),
+            "SRC_SCENE_05142": ("a secret society of witches and warlocks", "CHARACTER_FACTION_LORE", "上游词表将男女巫结社误分入场景库，非空间场所，隔离排除"),
+            "SRC_SCENE_05143": ("a secret society of witches in modern times", "CHARACTER_FACTION_LORE", "上游词表将现代女巫结社误分入场景库，非空间场所，隔离排除"),
+            "SRC_SCENE_05181": ("a society where people can communicate telepathically", "ABSTRACT_WORLDBUILDING", "上游词表将心灵感应社会设定误分入场景库，非实体空间，隔离排除"),
+            "SRC_SCENE_05182": ("a society where people can control gravity", "ABSTRACT_WORLDBUILDING", "上游词表将重力控制社会设定误分入场景库，非实体空间，隔离排除"),
+            "SRC_SCENE_05183": ("a society where people can control the elements", "ABSTRACT_WORLDBUILDING", "上游词表将元素控制社会设定误分入场景库，非实体空间，隔离排除"),
+            "SRC_SCENE_05184": ("a society where people can control their dreams", "ABSTRACT_WORLDBUILDING", "上游词表将梦境控制社会设定误分入场景库，非实体空间，隔离排除"),
+            "SRC_SCENE_05185": ("a society where people can genetically enhance themselves to have extraordinary abilities", "ABSTRACT_WORLDBUILDING", "上游词表将基因强化社会设定误分入场景库，非实体空间，隔离排除"),
+            "SRC_SCENE_05186": ("a society where people can teleport", "ABSTRACT_WORLDBUILDING", "上游词表将传送社会设定误分入场景库，非实体空间，隔离排除"),
+            "SRC_SCENE_05187": ("a society where people can upload their consciousness to a virtual world", "ABSTRACT_WORLDBUILDING", "上游词表将意识上传设定误分入场景库，非实体空间，隔离排除"),
+            "SRC_SCENE_05188": ("a society where people's memories can be edited or erased", "ABSTRACT_WORLDBUILDING", "上游词表将记忆擦除设定误分入场景库，非实体空间，隔离排除"),
+            "SRC_SCENE_05303": ("a time traveler changes history unintentionally", "TIME_TRAVEL_PLOT_HOOK", "上游词表将改变历史剧情误分入场景库，无实体场所，隔离排除"),
+            "SRC_SCENE_05304": ("a time traveler changes the past", "TIME_TRAVEL_PLOT_HOOK", "上游词表将改变过去剧情误分入场景库，无实体场所，隔离排除"),
+            "SRC_SCENE_05310": ("a time traveler's conundrum", "TIME_TRAVEL_PLOT_HOOK", "上游词表将时间旅行者难题误分入场景库，无实体场所，隔离排除"),
+            "SRC_SCENE_05311": ("a time traveler's mission to prevent a disaster", "TIME_TRAVEL_PLOT_HOOK", "上游词表将阻止灾难剧情误分入场景库，无实体场所，隔离排除"),
+            "SRC_SCENE_05312": ("a time traveler's mission to save humanity", "TIME_TRAVEL_PLOT_HOOK", "上游词表将拯救人类剧情误分入场景库，无实体场所，隔离排除"),
+            "SRC_SCENE_05313": ("a time traveler's struggle to change the future", "TIME_TRAVEL_PLOT_HOOK", "上游词表将改变未来剧情误分入场景库，无实体场所，隔离排除"),
+            "SRC_SCENE_05314": ("a time traveler's struggle to prevent a catastrophic future", "TIME_TRAVEL_PLOT_HOOK", "上游词表将阻止浩劫剧情误分入场景库，无实体场所，隔离排除"),
+        }
 
 # 71 条绝对物理隔离项
 BATCH5_QUARANTINE_ENTITY_IDS: Set[str] = set(DEFERRED_ITEMS.keys())

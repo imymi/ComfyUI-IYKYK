@@ -21,6 +21,7 @@ scratch/*reproduced_manifest.json
 # Ephemeral scratch scripts and temp working data
 scratch/apply_m32_*
 scratch/generate_*
+!scratch/generate_batch5_scene_script.py
 scratch/check_*
 scratch/inspect_*
 scratch/print_*
