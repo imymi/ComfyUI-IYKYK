@@ -20,7 +20,6 @@ from typing import Any, Dict, List, Optional, Set, Tuple
 from lib.conflict_resolver import QUARANTINE_ENTITY_IDS, is_quarantined_payload
 from lib.errors import QuarantineLeakageError, UnresolvedEnsembleRelationError
 from lib.models import (
-    AMBIGUOUS_POSE_SUPPORT_OPTIONS,
     AccessoryAttributeFacts,
     CameraHardwareFacts,
     ClothingAttributeFacts,
@@ -35,16 +34,6 @@ from lib.models import (
     SceneEnvironmentalFacts,
     SemanticFacts,
     ShotCompositionFacts,
-    UNSPECIFIED,
-    VALID_BINDING_ROLES,
-    VALID_BODY_SUPPORTS,
-    VALID_ENSEMBLE_SLOTS,
-    VALID_EXTENDED_SPACE_KINDS,
-    VALID_EXTENDED_TIMES_OF_DAY,
-    VALID_GARMENT_TOPOLOGIES,
-    VALID_HAND_STATES,
-    VALID_RELATION_DIRECTIONS,
-    VALID_RELATION_KINDS,
 )
 
 GOVERNANCE_FACT_KEYS: Set[str] = {
@@ -295,7 +284,7 @@ def build_runtime_semantic_facts(
     target_catalog_file: str = "",
 ) -> SemanticFacts:
     """将台账中的 172 键事实完整、无损、强契约映射为运行时的不可变 SemanticFacts 对象。
-    
+
     门禁守则：
     1. is_quarantined_payload(raw_facts, source_entity_id) 拦截隔离池实体及隔离载荷 (Fail-Closed)；
     2. 172 个台账事实键 100% 具备确定性归宿，零未映射字段；

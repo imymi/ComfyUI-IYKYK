@@ -36,7 +36,6 @@ scratch/apply_m4_batch4_ingestion.py — M4 Batch 4 动作姿态库正式增量�
 from __future__ import annotations
 
 import argparse
-import copy
 import csv
 import hashlib
 import json
@@ -49,7 +48,6 @@ REPO_DIR = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(REPO_DIR))
 sys.path.insert(0, str(REPO_DIR / "scratch"))
 
-from lib.models import SemanticFacts
 from m33_adapter_and_relation_migrator import build_runtime_semantic_facts
 
 # 7 个新增类别中文显示名称字典 (SSOT)

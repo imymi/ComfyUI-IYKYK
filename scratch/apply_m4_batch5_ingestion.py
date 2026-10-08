@@ -33,7 +33,6 @@ scratch/apply_m4_batch5_ingestion.py — M4 Batch 5 场景环境库增量入库�
 from __future__ import annotations
 
 import argparse
-import copy
 import csv
 import hashlib
 import json
@@ -47,7 +46,6 @@ REPO_DIR = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(REPO_DIR))
 sys.path.insert(0, str(REPO_DIR / "scratch"))
 
-from lib.models import SemanticFacts
 from m33_adapter_and_relation_migrator import build_runtime_semantic_facts
 from generate_batch5_scene_script import DEFERRED_ITEMS
 
@@ -569,7 +567,7 @@ def main():
     parser.add_argument("--data-dir", type=str, default=str(REPO_DIR / "data"), help="Path to data directory")
     args = parser.parse_args()
 
-    print(f"=== M4 Batch 5 场景环境库增量入库工具 ===")
+    print("=== M4 Batch 5 场景环境库增量入库工具 ===")
     res = execute_batch5_ingestion(
         data_dir=Path(args.data_dir),
         dry_run=args.dry_run,

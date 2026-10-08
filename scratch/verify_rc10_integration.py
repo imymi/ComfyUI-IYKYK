@@ -10,8 +10,7 @@ from collections import Counter
 
 from nodes import IYKYKPromptGenerator
 from lib.sampler import DataSampler
-from lib.conflict_resolver import ConflictResolver
-from lib.models import PromptAtom, SemanticFacts, TagProvenance
+from lib.models import PromptAtom
 
 ROOT = Path("/Users/jacobyang/Hermes/ComfyUI-IYKYK")
 DATA_DIR = ROOT / "data"
@@ -136,7 +135,7 @@ def verify_targeted_isolation():
             print("  Leak:", l)
         all_ok = False
     else:
-        print(f"[PASS] All 83 quarantined entities confirmed 100% physically isolated from production slots.")
+        print("[PASS] All 83 quarantined entities confirmed 100% physically isolated from production slots.")
 
     # 2.2 验证合法同词主题 cosplay 完整保留
     themes_doc = json.loads((DATA_DIR / "themes.json").read_text(encoding="utf-8"))
@@ -176,7 +175,7 @@ def verify_targeted_isolation():
 
 def find_unexpanded_templates(prompt: str):
     """检测最终提示词中残留的各类未展开模板与通配符语法。
-    
+
     涵盖：
     1. 裸通配符引用: __by_source/...__ 或 __wildcard__
     2. 分支选择候选项: {red|blue}, {4::black|white}, {|, suffix}
@@ -612,7 +611,7 @@ def run_500_seed_and_slot_verification():
                 print("[FAIL] Monochrome film leaked color paper into prompt!")
                 all_ok = False
             else:
-                print(f"[PASS] Case Monochrome Film: Kodak Tri-X 400 verified with monochrome fact and 0 color paper leakage.")
+                print("[PASS] Case Monochrome Film: Kodak Tri-X 400 verified with monochrome fact and 0 color paper leakage.")
 
     # [Case 6] L1 遮蔽过滤
     l1_res = sampler.sample_pose_result("dynamic__03__tag_023", Random(0), nudity_level_code="L1")
@@ -624,7 +623,7 @@ def run_500_seed_and_slot_verification():
         print("[FAIL] L3 failed to return tag dynamic__03__tag_023!")
         all_ok = False
     else:
-        print(f"[PASS] Case L1 Nudity: 'skirt lifted' successfully filtered out under L1, retained under L3.")
+        print("[PASS] Case L1 Nudity: 'skirt lifted' successfully filtered out under L1, retained under L3.")
 
     # [Case 7] 皱眉微蹙 (emotion_frowning) 面部动作契约
     r_frown = gen.generate_structured(情绪表情="皱眉微蹙 (Frowning)", prompt_seed=10)
@@ -638,7 +637,7 @@ def run_500_seed_and_slot_verification():
             print(f"[FAIL] Frowning atoms missing 'frown': {[a.text for a in frown_atoms]}")
             all_ok = False
         else:
-            print(f"[PASS] Case Emotion Frowning: facial action 'frown' verified without contract crash.")
+            print("[PASS] Case Emotion Frowning: facial action 'frown' verified without contract crash.")
 
     return all_ok
 

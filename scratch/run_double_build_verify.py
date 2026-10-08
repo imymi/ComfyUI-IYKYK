@@ -4,7 +4,6 @@ import os
 import shutil
 import subprocess
 import sys
-import tempfile
 from pathlib import Path
 
 REPO_DIR = Path("/Users/jacobyang/Hermes/ComfyUI-IYKYK")

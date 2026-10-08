@@ -41,6 +41,7 @@ ignore = ["E501"]
 "tests/*" = ["E402", "F401", "F841"]
 "validate_data.py" = ["E402"]
 "scripts/*" = ["E402"]
+"scratch/*" = ["E402", "F401", "F841", "E741"]
 
 [project.urls]
 Repository = "https://github.com/imymi/ComfyUI-IYKYK"

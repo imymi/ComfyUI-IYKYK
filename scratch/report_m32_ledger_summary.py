@@ -89,7 +89,7 @@ def generate_ledger_summary() -> str:
 
         reviewed = c_tot - c_pending
         pct = (reviewed / c_tot * 100) if c_tot else 0.0
-        status_str = f"**100%**" if c_pending == 0 else (f"{pct:.1f}%" if reviewed > 0 else "0.0%")
+        status_str = "**100%**" if c_pending == 0 else (f"{pct:.1f}%" if reviewed > 0 else "0.0%")
 
         lines.append(f"| {cat_names[c]} (`{c}`) | {c_tot} | {c_reuse} | {c_var} | {c_new} | {c_combo} | {c_deferred} | {c_pending} | {c_maps} | {status_str} |")
 

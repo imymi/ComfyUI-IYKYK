@@ -5,11 +5,11 @@
 - **文件计数**：43
 - **权威发布 ZIP SHA-256**：
   ```text
-  887770b8a9e6a108be3120a091442e423d4881ec72d99b07d677ffed522cb236
+  64407483bfa704f44b3ff9a270e6ccb7a121ac7619e2758a8d8529ea030593bd
   ```
 - **双构建一致性状态**：
-  - Build A SHA-256: `887770b8a9e6a108be3120a091442e423d4881ec72d99b07d677ffed522cb236`
-  - Build B SHA-256: `887770b8a9e6a108be3120a091442e423d4881ec72d99b07d677ffed522cb236`
+  - Build A SHA-256: `64407483bfa704f44b3ff9a270e6ccb7a121ac7619e2758a8d8529ea030593bd`
+  - Build B SHA-256: `64407483bfa704f44b3ff9a270e6ccb7a121ac7619e2758a8d8529ea030593bd`
   - 产物差异：Bit-for-Bit Identical (零差异)
 
 ---

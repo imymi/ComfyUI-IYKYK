@@ -23,20 +23,18 @@ scratch/apply_m4_batch1_ingestion.py — M4 Batch 1 正式增量入库、模式�
 from __future__ import annotations
 
 import argparse
-import copy
 import csv
 import hashlib
 import json
 from pathlib import Path
 import shutil
 import sys
-from typing import Any, Dict, List, Optional, Set, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
 REPO_DIR = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(REPO_DIR))
 sys.path.insert(0, str(REPO_DIR / "scratch"))
 
-from lib.models import SemanticFacts
 from m33_adapter_and_relation_migrator import build_runtime_semantic_facts
 
 # 规范中文显示名称字典 (SSOT)

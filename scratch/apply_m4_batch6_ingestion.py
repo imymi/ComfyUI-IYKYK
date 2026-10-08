@@ -45,7 +45,6 @@ REPO_DIR = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(REPO_DIR))
 sys.path.insert(0, str(REPO_DIR / "scratch"))
 
-from lib.models import SemanticFacts
 from m33_adapter_and_relation_migrator import build_runtime_semantic_facts
 
 # 3 条绝对物理隔离项 (DEFERRED_ISSUE)

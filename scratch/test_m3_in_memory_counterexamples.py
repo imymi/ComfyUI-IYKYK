@@ -889,7 +889,7 @@ def test_m32_pose_semantics_and_decoupling():
 
     normal_cluster_errs = check_cluster_facts_persistence(pose_mappings)
     assert len(normal_cluster_errs) == 0, f"聚类定义事实落盘校验失败: {normal_cluster_errs}"
-    print(f"  [OK] 验证“聚类定义 → 生成结果 → 台账”全部聚类条目结构化事实 100% 完整落盘，0 丢键。")
+    print("  [OK] 验证“聚类定义 → 生成结果 → 台账”全部聚类条目结构化事实 100% 完整落盘，0 丢键。")
 
     # 内存反例 M: [P2 解决] 聚类扩展结构化事实 (如 sitting_orientation / leg_state) 丢弃未落盘拦截
     mock_bad_facts = copy.deepcopy(pose_mappings[0])

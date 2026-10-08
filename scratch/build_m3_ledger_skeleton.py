@@ -442,7 +442,7 @@ def main():
         # 6.2 强校验：目标映射表中所有 incompatible_with 声明的目标 ID 均可被现有运行时库或本台账已规划目标解析
         with open(target_mappings_path, "r", encoding="utf-8") as f:
             all_mappings = list(csv.DictReader(f, delimiter="\t"))
-        
+
         known_ids = set()
         for fn in ["accessories.json", "shot_types.json", "film_stocks.json"]:
             fpath = REPO_DIR / "data" / fn
