@@ -227,7 +227,7 @@ def run_batch_parallel(
 
     futures = []
     num_workers = min(8, os.cpu_count() or 4)
-    with concurrent.futures.ProcessPoolExecutor(max_workers=num_workers) as pool:
+    with concurrent.futures.ThreadPoolExecutor(max_workers=num_workers) as pool:
         for chunk_idx in range(num_chunks):
             start = chunk_idx * chunk_size
             count = min(chunk_size, seeds_count - start)

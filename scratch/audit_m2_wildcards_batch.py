@@ -18,6 +18,7 @@ from __future__ import annotations
 
 import argparse
 import collections
+import gc
 import gzip
 import hashlib
 import io
@@ -299,12 +300,16 @@ def load_authoritative_catalog_lookup(data_dir: Path) -> Dict[Tuple[str, str], S
     return lookup
 
 
-def save_deterministic_gzip_json(path: Path, data: Any) -> None:
-    raw_json = json.dumps(data, ensure_ascii=False, indent=2, sort_keys=True).encode("utf-8")
-    buf = io.BytesIO()
-    with gzip.GzipFile(filename="", mode="wb", fileobj=buf, mtime=0) as gz:
-        gz.write(raw_json)
-    path.write_bytes(buf.getvalue())
+def save_deterministic_gzip_json(path: Path, data: Any, indent: Optional[int] = 2) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with open(path, "wb") as f:
+        with gzip.GzipFile(filename="", mode="wb", fileobj=f, mtime=0) as gz:
+            if indent is None:
+                with io.TextIOWrapper(gz, encoding="utf-8") as tf:
+                    json.dump(data, tf, ensure_ascii=False, sort_keys=True)
+            else:
+                raw_json = json.dumps(data, ensure_ascii=False, indent=indent, sort_keys=True).encode("utf-8")
+                gz.write(raw_json)
 
 
 def compute_source_atoms_digest(data_dict: Dict[int, Dict[str, Any]], total_seeds: int) -> str:
@@ -705,11 +710,10 @@ class DeterministicReplayOracle:
                 "DeterministicReplayOracle requires non-empty reference_data generated from controlled reference baseline! "
                 "Use DeterministicReplayOracle.from_controlled_reference(scratch_dir) to generate."
             )
-        self._reference_data = reference_data
         self._reference_dir = reference_dir
         self._cache: Dict[int, Dict[str, List[Tuple[str, str, str, int]]]] = {}
 
-        for s, item in self._reference_data.items():
+        for s, item in reference_data.items():
             by_slot = collections.defaultdict(list)
             for a in item.get("source_atoms", []):
                 slot = normalize_slot_name(a.get("source_slot", "") if isinstance(a, dict) else a.source_slot)
@@ -780,7 +784,9 @@ class DeterministicReplayOracle:
             expected_digest=EXPECTED_M2_SOURCE_ATOMS_DIGEST if total_seeds == 10000 else None,
             expected_final_digest=EXPECTED_M2_FINAL_ATOMS_DIGEST if total_seeds == 10000 else None,
         )
-        save_deterministic_gzip_json(ref_cache_file, ref_cache_doc)
+        save_deterministic_gzip_json(ref_cache_file, ref_cache_doc, indent=None)
+        del ref_cache_doc
+        gc.collect()
         print(f"[+] M2 Controlled reference cache saved: {ref_cache_file}")
 
         return cls(reference_data=ref_data, reference_dir=controlled_ref_dir)
@@ -1260,7 +1266,9 @@ def run_m2_audit(
                 "final_atoms_digest": base_final_digest,
                 "data": base_data,
             }
-            save_deterministic_gzip_json(base_cache_file, base_cache_doc)
+            save_deterministic_gzip_json(base_cache_file, base_cache_doc, indent=None)
+            del base_cache_doc
+            gc.collect()
     else:
         print(f"[*] Generating baseline batch ({total_seeds} seeds) from {BASELINE_COMMIT}...")
         base_data, base_hash = run_batch_parallel(base_dir, total_seeds)
@@ -1280,7 +1288,9 @@ def run_m2_audit(
             "final_atoms_digest": base_final_digest,
             "data": base_data,
         }
-        save_deterministic_gzip_json(base_cache_file, base_cache_doc)
+        save_deterministic_gzip_json(base_cache_file, base_cache_doc, indent=None)
+        del base_cache_doc
+        gc.collect()
 
     print(f"    Baseline batch hash: {base_hash}")
     if total_seeds == 10000 and base_hash != EXPECTED_BASELINE_HASH:
@@ -1329,7 +1339,9 @@ def run_m2_audit(
         ref_cache_file = scratch_dir / "controlled_ref_data_m2_10k.json.gz"
     else:
         ref_cache_file = scratch_dir / f"controlled_ref_data_m2_{total_seeds}.json.gz"
-    save_deterministic_gzip_json(ref_cache_file, ref_cache_doc)
+    save_deterministic_gzip_json(ref_cache_file, ref_cache_doc, indent=None)
+    del ref_cache_doc
+    gc.collect()
     print(f"[+] Controlled reference cache saved: {ref_cache_file}")
 
     # 4. 运行被测目标（固定快照环境 e0d0459）
@@ -1342,6 +1354,8 @@ def run_m2_audit(
     # 5. 执行因果审计
     print("[*] Auditing seed divergences with atomic causal verification & independent controlled reference replay...")
     replay_oracle = DeterministicReplayOracle(reference_data=ref_data, reference_dir=controlled_ref_dir)
+    del ref_data
+    gc.collect()
     identical_count = 0
     divergent_count = 0
     unexplained_seeds: Dict[int, List[str]] = {}
@@ -1389,6 +1403,11 @@ def run_m2_audit(
     for cat, cnt in category_counts.most_common():
         print(f"      - {cat}: {cnt} ({cnt / (divergent_count or 1) * 100:.2f}%)")
 
+    # Free memory before writing archive
+    del base_data
+    del cur_data
+    gc.collect()
+
     # 6. 保存完整归档
     archive_path = output_archive or (scratch_dir / "audit_m2_evidence.json.gz" if total_seeds == 10000 else scratch_dir / f"audit_m2_evidence_{total_seeds}.json.gz")
     archive_payload = {
@@ -1405,7 +1424,10 @@ def run_m2_audit(
         },
         "diffs": audited_diffs,
     }
-    save_deterministic_gzip_json(archive_path, archive_payload)
+    save_deterministic_gzip_json(archive_path, archive_payload, indent=2)
+    del archive_payload
+    del audited_diffs
+    gc.collect()
     archive_sha256 = hashlib.sha256(archive_path.read_bytes()).hexdigest()
     print(f"[+] M2 Evidence archive saved: {archive_path} ({archive_path.stat().st_size} bytes, sha256={archive_sha256})")
 
