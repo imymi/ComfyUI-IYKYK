@@ -1,0 +1,56 @@
+{
+  "provenance_version": "1.0.0",
+  "created_at": "2026-10-09T02:20:00+08:00",
+  "description": "Fixed-version wildcard fixtures and upstream provenance tracking for M4 Batch 1 & Batch 2 test fidelity verification",
+  "fixtures": {
+    "09_style/colors.txt": {
+      "relative_path": "tests/fixtures/wildcards/09_style/colors.txt",
+      "sha256": "1e4f0bcc3e298bc4ea62d9b5371294f593ae60c7e2ae1e1b76667c2a550e6ba2",
+      "line_count": 312,
+      "upstream": {
+        "repository": "mattjaybe/sd-wildcards",
+        "url": "https://github.com/mattjaybe/sd-wildcards",
+        "branch": "main",
+        "commit": "e1902157613943e884c9cfa4f7fc97692898664d",
+        "upstream_file": "wildcards/color.txt",
+        "license": "LICENSE"
+      }
+    },
+    "by_source/skyyysi/02_hair/hair_lengths.txt": {
+      "relative_path": "tests/fixtures/wildcards/by_source/skyyysi/02_hair/hair_lengths.txt",
+      "sha256": "57afdf4a3a138243c09022c03df0ff863553fad4e45167e26948e95d033f96f9",
+      "line_count": 5,
+      "upstream": {
+        "repository": "SkyyySi/sd-dp-wildcards-collection",
+        "url": "https://github.com/SkyyySi/sd-dp-wildcards-collection",
+        "branch": "master",
+        "commit": "fe01e52105b5483b7e3c6dfd9651a0088687c33c",
+        "upstream_file": "wildcards/02_hair/hair_lengths.txt"
+      }
+    },
+    "by_source/skyyysi/02_hair/hair_styles.txt": {
+      "relative_path": "tests/fixtures/wildcards/by_source/skyyysi/02_hair/hair_styles.txt",
+      "sha256": "779519388b66aa719fd5a09842a811383f4dd56ccf411b73fa836b760b10bcd5",
+      "line_count": 9,
+      "upstream": {
+        "repository": "SkyyySi/sd-dp-wildcards-collection",
+        "url": "https://github.com/SkyyySi/sd-dp-wildcards-collection",
+        "branch": "master",
+        "commit": "fe01e52105b5483b7e3c6dfd9651a0088687c33c",
+        "upstream_file": "wildcards/02_hair/hair_styles.txt"
+      }
+    },
+    "by_source/skyyysi/02_hair/hair_ornaments.txt": {
+      "relative_path": "tests/fixtures/wildcards/by_source/skyyysi/02_hair/hair_ornaments.txt",
+      "sha256": "f294e149a22d43b91a3027303ba6cf8b520af74d50cbd490a5a326b2e68122e3",
+      "line_count": 15,
+      "upstream": {
+        "repository": "SkyyySi/sd-dp-wildcards-collection",
+        "url": "https://github.com/SkyyySi/sd-dp-wildcards-collection",
+        "branch": "master",
+        "commit": "fe01e52105b5483b7e3c6dfd9651a0088687c33c",
+        "upstream_file": "wildcards/02_hair/hair_ornaments.txt"
+      }
+    }
+  }
+}

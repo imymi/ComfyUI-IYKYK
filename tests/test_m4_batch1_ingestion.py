@@ -378,8 +378,19 @@ class TestM4Batch1Ingestion(unittest.TestCase):
         self.assertTrue(all("4::black" in c for c in chokers_pool), "Chokers pool lost 4::black weighted branch")
 
         # 验证颜色依赖池完整来源于冻结源 09_style/colors.txt (312 来源候选 100% 一致，无遗漏无额外加入)
-        colors_file = REPO_DIR.parent / "ai-image-wildcards" / "wildcards" / "09_style" / "colors.txt"
+        fixture_colors = REPO_DIR / "tests" / "fixtures" / "wildcards" / "09_style" / "colors.txt"
+        external_colors = REPO_DIR.parent / "ai-image-wildcards" / "wildcards" / "09_style" / "colors.txt"
+        colors_file = fixture_colors if fixture_colors.is_file() else external_colors
         self.assertTrue(colors_file.exists(), f"Source colors file missing: {colors_file}")
+
+        # 固定版本黄金摘要校验：严格防止来源篡改或漂移
+        EXPECTED_COLORS_SHA256 = "1e4f0bcc3e298bc4ea62d9b5371294f593ae60c7e2ae1e1b76667c2a550e6ba2"
+        self.assertEqual(
+            get_sha256(colors_file),
+            EXPECTED_COLORS_SHA256,
+            f"Source colors file SHA-256 mismatch! Expected {EXPECTED_COLORS_SHA256}, got {get_sha256(colors_file)}",
+        )
+
         source_colors = [
             line.strip().lower()
             for line in colors_file.read_text(encoding="utf-8").splitlines()

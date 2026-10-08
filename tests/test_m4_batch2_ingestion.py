@@ -344,11 +344,22 @@ class TestM4Batch2Ingestion(unittest.TestCase):
 
     def test_09_pool_registry_hair_fidelity(self):
         """核验 02_hair 词池保真度：发长(5项)、发型款式(9项)、发饰(15项)与冻结来源 100% 对齐。"""
-        wildcards_base = REPO_DIR.parent / "ai-image-wildcards" / "wildcards" / "by_source" / "skyyysi" / "02_hair"
+        fixture_base = REPO_DIR / "tests" / "fixtures" / "wildcards" / "by_source" / "skyyysi" / "02_hair"
+        external_base = REPO_DIR.parent / "ai-image-wildcards" / "wildcards" / "by_source" / "skyyysi" / "02_hair"
+        wildcards_base = fixture_base if fixture_base.is_dir() else external_base
+
+        EXPECTED_LENGTHS_SHA256 = "57afdf4a3a138243c09022c03df0ff863553fad4e45167e26948e95d033f96f9"
+        EXPECTED_STYLES_SHA256 = "779519388b66aa719fd5a09842a811383f4dd56ccf411b73fa836b760b10bcd5"
+        EXPECTED_ORNS_SHA256 = "f294e149a22d43b91a3027303ba6cf8b520af74d50cbd490a5a326b2e68122e3"
 
         # 1. 发长词池
         lengths_file = wildcards_base / "hair_lengths.txt"
-        self.assertTrue(lengths_file.exists())
+        self.assertTrue(lengths_file.exists(), f"hair_lengths.txt missing: {lengths_file}")
+        self.assertEqual(
+            get_sha256(lengths_file),
+            EXPECTED_LENGTHS_SHA256,
+            f"hair_lengths.txt SHA-256 mismatch! Expected {EXPECTED_LENGTHS_SHA256}, got {get_sha256(lengths_file)}"
+        )
         src_lengths = [line.strip().lower() for line in lengths_file.read_text(encoding="utf-8").splitlines() if line.strip() and not line.strip().startswith("#")]
         reg_lengths = BATCH1_POOL_REGISTRY["02_hair/hair_lengths"]
         self.assertEqual(len(src_lengths), 5)
@@ -358,7 +369,12 @@ class TestM4Batch2Ingestion(unittest.TestCase):
 
         # 2. 发型款式词池
         styles_file = wildcards_base / "hair_styles.txt"
-        self.assertTrue(styles_file.exists())
+        self.assertTrue(styles_file.exists(), f"hair_styles.txt missing: {styles_file}")
+        self.assertEqual(
+            get_sha256(styles_file),
+            EXPECTED_STYLES_SHA256,
+            f"hair_styles.txt SHA-256 mismatch! Expected {EXPECTED_STYLES_SHA256}, got {get_sha256(styles_file)}"
+        )
         src_styles = [line.strip().lower() for line in styles_file.read_text(encoding="utf-8").splitlines() if line.strip() and not line.strip().startswith("#")]
         reg_styles = BATCH1_POOL_REGISTRY["02_hair/hair_styles"]
         self.assertEqual(len(src_styles), 9)
@@ -368,13 +384,27 @@ class TestM4Batch2Ingestion(unittest.TestCase):
 
         # 3. 发饰词池
         orn_file = wildcards_base / "hair_ornaments.txt"
-        self.assertTrue(orn_file.exists())
+        self.assertTrue(orn_file.exists(), f"hair_ornaments.txt missing: {orn_file}")
+        self.assertEqual(
+            get_sha256(orn_file),
+            EXPECTED_ORNS_SHA256,
+            f"hair_ornaments.txt SHA-256 mismatch! Expected {EXPECTED_ORNS_SHA256}, got {get_sha256(orn_file)}"
+        )
         src_orns = [line.strip().lower() for line in orn_file.read_text(encoding="utf-8").splitlines() if line.strip() and not line.strip().startswith("#")]
         reg_orns = BATCH1_POOL_REGISTRY["02_hair/hair_ornaments"]
         self.assertEqual(len(src_orns), 15)
         self.assertEqual(len(reg_orns), 15)
         self.assertEqual(reg_orns, src_orns)
         self.assertEqual(set(reg_orns), set(src_orns))
+
+        # 4. 溯源元数据自洽校验
+        provenance_file = REPO_DIR / "tests" / "fixtures" / "wildcards" / "PROVENANCE.json"
+        if provenance_file.is_file():
+            prov_data = json.loads(provenance_file.read_text(encoding="utf-8"))
+            fixtures = prov_data.get("fixtures", {})
+            self.assertEqual(fixtures["by_source/skyyysi/02_hair/hair_lengths.txt"]["sha256"], EXPECTED_LENGTHS_SHA256)
+            self.assertEqual(fixtures["by_source/skyyysi/02_hair/hair_styles.txt"]["sha256"], EXPECTED_STYLES_SHA256)
+            self.assertEqual(fixtures["by_source/skyyysi/02_hair/hair_ornaments.txt"]["sha256"], EXPECTED_ORNS_SHA256)
 
     def test_10_fixed_seed_counterexamples_and_palette_single_selection(self):
         """针对评审指出的固定种子反例与属性调色板单选约束进行专项回归验证。"""
