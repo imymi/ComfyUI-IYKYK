@@ -44,6 +44,7 @@ from lib.conflict_resolver import normalize_slot_name  # noqa: E402
 
 # M2 增量基线为已通过验收的 M1 终态提交 6da94cb
 BASELINE_COMMIT = "6da94cb"
+M2_TARGET_COMMIT = "e0d0459"
 EXPECTED_BASELINE_HASH = "aa7581bc2304f6f75530d95ab4e1b75e7e1101720b1dfaf14c2a1c328fcd1139"
 EXPECTED_BASELINE_SOURCE_ATOMS_DIGEST = "b79fdee3ea57dba2b0280771873523126cbe1965497c921690eec7371a98466f"
 EXPECTED_BASELINE_FINAL_ATOMS_DIGEST = "537fb0f93a1fc3962022ad48c5796ad1f593c6b82c52dc3a0a0bc08e28f64f1f"
@@ -97,19 +98,29 @@ def atom_to_dict(a: Any) -> Dict[str, Any]:
     }
 
 
+def setup_m2_target_env(scratch_dir: Path) -> Path:
+    """导出固定 M2 终态提交 (e0d0459) 作为可重复验证的历史快照环境。"""
+    target_dir = scratch_dir / f"target_{M2_TARGET_COMMIT}_m2"
+    export_commit(M2_TARGET_COMMIT, target_dir)
+    return target_dir
+
+
 def setup_m2_controlled_reference_env(scratch_dir: Path) -> Path:
     """
     构建受控对照基线环境 (Controlled Reference Environment for M2)：
     1. 基于固定 M1 终态基线 6da94cb 导出代码树；
-    2. 将已审核通过的 M2 样本数据 (accessories.json, lighting.json) 写入对应目录并强校验 SHA-256；
+    2. 基于固定 M2 终态快照 (e0d0459) 提取已审核通过的 M2 样本数据 (accessories.json, lighting.json) 写入对应目录并强校验 SHA-256；
     3. 杜绝主进程中模块缓存污染与数据自比，充当因果审计的独立预言机。
     """
     controlled_dir = (scratch_dir / f"controlled_ref_{BASELINE_COMMIT}_m2").resolve()
     export_commit(BASELINE_COMMIT, controlled_dir)
     controlled_data_dir = controlled_dir / "data"
 
+    target_dir = setup_m2_target_env(scratch_dir)
     for fname, exp_hash in EXPECTED_AUDITED_DATA_HASHES.items():
-        src_path = DATA_DIR / fname
+        src_path = target_dir / "data" / fname
+        if not src_path.exists():
+            src_path = DATA_DIR / fname
         if not src_path.exists() or hashlib.sha256(src_path.read_bytes()).hexdigest() != exp_hash:
             # 优先使用匹配的历史数据环境快照
             snap_path = scratch_dir / "m4_snapshots" / "batch_1_pre_ingest" / fname
@@ -720,8 +731,10 @@ class DeterministicReplayOracle:
         else:
             ref_cache_file = scratch_dir / f"controlled_ref_data_m2_{total_seeds}.json.gz"
 
+        controlled_ref_dir = setup_m2_controlled_reference_env(scratch_dir)
+        ref_catalog_lookup = load_authoritative_catalog_lookup(controlled_ref_dir / "data")
         if catalog_lookup is None:
-            catalog_lookup = load_authoritative_catalog_lookup(DATA_DIR)
+            catalog_lookup = ref_catalog_lookup
 
         if ref_cache_file.exists() and not force_regenerate:
             try:
@@ -730,7 +743,7 @@ class DeterministicReplayOracle:
                 ref_data = validate_reference_cache_integrity(
                     doc,
                     total_seeds,
-                    catalog_lookup,
+                    ref_catalog_lookup,
                     expected_hash=EXPECTED_M2_HASH if total_seeds == 10000 else None,
                     expected_digest=EXPECTED_M2_SOURCE_ATOMS_DIGEST if total_seeds == 10000 else None,
                     expected_final_digest=EXPECTED_M2_FINAL_ATOMS_DIGEST if total_seeds == 10000 else None,
@@ -739,7 +752,6 @@ class DeterministicReplayOracle:
             except Exception as e:
                 print(f"[!] M2 Reference cache validation failed at {ref_cache_file}: {e}. Regenerating...")
 
-        controlled_ref_dir = setup_m2_controlled_reference_env(scratch_dir)
         print(f"[*] Generating M2 controlled reference data ({total_seeds} seeds) via isolated worker...")
         ref_data, ref_hash = run_batch_parallel(controlled_ref_dir, total_seeds)
         atoms_digest = compute_source_atoms_digest(ref_data, total_seeds)
@@ -763,7 +775,7 @@ class DeterministicReplayOracle:
         validate_reference_cache_integrity(
             ref_cache_doc,
             total_seeds,
-            catalog_lookup,
+            ref_catalog_lookup,
             expected_hash=EXPECTED_M2_HASH if total_seeds == 10000 else None,
             expected_digest=EXPECTED_M2_SOURCE_ATOMS_DIGEST if total_seeds == 10000 else None,
             expected_final_digest=EXPECTED_M2_FINAL_ATOMS_DIGEST if total_seeds == 10000 else None,
@@ -1284,8 +1296,11 @@ def run_m2_audit(
     final_atoms_digest = compute_final_atoms_digest(ref_data, total_seeds)
     print(f"    Controlled ref final atoms digest: {final_atoms_digest}")
 
-    catalog_lookup = load_authoritative_catalog_lookup(DATA_DIR)
-    valid_rules = load_authoritative_resolver_rules(DATA_DIR)
+    ref_catalog_lookup = load_authoritative_catalog_lookup(controlled_ref_dir / "data")
+
+    target_dir = setup_m2_target_env(scratch_dir)
+    target_catalog_lookup = load_authoritative_catalog_lookup(target_dir / "data")
+    valid_rules = load_authoritative_resolver_rules(target_dir / "data")
 
     ref_cache_doc = {
         "metadata": {
@@ -1305,7 +1320,7 @@ def run_m2_audit(
     validate_reference_cache_integrity(
         ref_cache_doc,
         total_seeds,
-        catalog_lookup,
+        ref_catalog_lookup,
         expected_hash=EXPECTED_M2_HASH if total_seeds == 10000 else None,
         expected_digest=EXPECTED_M2_SOURCE_ATOMS_DIGEST if total_seeds == 10000 else None,
         expected_final_digest=EXPECTED_M2_FINAL_ATOMS_DIGEST if total_seeds == 10000 else None,
@@ -1317,10 +1332,12 @@ def run_m2_audit(
     save_deterministic_gzip_json(ref_cache_file, ref_cache_doc)
     print(f"[+] Controlled reference cache saved: {ref_cache_file}")
 
-    # 4. 运行被测目标（当前工作区）
-    print(f"[*] Running current target batch generation for {total_seeds} seeds...")
-    cur_data, cur_hash = run_batch_parallel(REPO_DIR, total_seeds)
-    print(f"    Current target batch hash: {cur_hash}")
+    # 4. 运行被测目标（固定快照环境 e0d0459）
+    print(f"[*] Running fixed M2 target snapshot ({M2_TARGET_COMMIT}) generation for {total_seeds} seeds...")
+    cur_data, cur_hash = run_batch_parallel(target_dir, total_seeds)
+    print(f"    Target batch hash: {cur_hash}")
+    if total_seeds == 10000 and cur_hash != EXPECTED_M2_HASH:
+        raise RuntimeError(f"Target hash mismatch: expected {EXPECTED_M2_HASH}, got {cur_hash}")
 
     # 5. 执行因果审计
     print("[*] Auditing seed divergences with atomic causal verification & independent controlled reference replay...")
@@ -1332,7 +1349,7 @@ def run_m2_audit(
     audited_diffs: List[Dict[str, Any]] = []
 
     for s in range(total_seeds):
-        res = attribute_m2_seed_diff(s, base_data[s], cur_data[s], catalog_lookup, valid_rules, replay_oracle=replay_oracle)
+        res = attribute_m2_seed_diff(s, base_data[s], cur_data[s], target_catalog_lookup, valid_rules, replay_oracle=replay_oracle)
 
         if not res["is_explained"]:
             unexplained_seeds[s] = res["unexplained_reasons"]
@@ -1373,7 +1390,7 @@ def run_m2_audit(
         print(f"      - {cat}: {cnt} ({cnt / (divergent_count or 1) * 100:.2f}%)")
 
     # 6. 保存完整归档
-    archive_path = output_archive or (scratch_dir / "audit_m2_evidence.json.gz")
+    archive_path = output_archive or (scratch_dir / "audit_m2_evidence.json.gz" if total_seeds == 10000 else scratch_dir / f"audit_m2_evidence_{total_seeds}.json.gz")
     archive_payload = {
         "metadata": {
             "baseline_commit": BASELINE_COMMIT,
@@ -1393,7 +1410,7 @@ def run_m2_audit(
     print(f"[+] M2 Evidence archive saved: {archive_path} ({archive_path.stat().st_size} bytes, sha256={archive_sha256})")
 
     # 7. 保存清单
-    manifest_path = output_manifest or (scratch_dir / "audit_m2_manifest.json")
+    manifest_path = output_manifest or (scratch_dir / "audit_m2_manifest.json" if total_seeds == 10000 else scratch_dir / f"audit_m2_manifest_{total_seeds}.json")
     manifest_payload = {
         "archive_file": archive_path.name,
         "archive_sha256": archive_sha256,
@@ -1414,13 +1431,13 @@ def run_m2_audit(
     print(f"[+] M2 Manifest saved: {manifest_path}")
 
     # 8. 保存 Markdown 报告
-    report_path = output_report_md or (scratch_dir / "audit_m2_report.md")
+    report_path = output_report_md or (scratch_dir / "audit_m2_report.md" if total_seeds == 10000 else scratch_dir / f"audit_m2_report_{total_seeds}.md")
     report_path.parent.mkdir(parents=True, exist_ok=True)
     md_lines = [
         "# M2 Wildcards Batch Divergence Audit Report",
         "",
         f"- **Baseline Commit**: `{BASELINE_COMMIT}` (M1 Verified Baseline: `{base_hash}`)",
-        f"- **Current Target**: Working Tree (`{cur_hash}`)",
+        f"- **Current Target**: Fixed M2 Target Snapshot ({M2_TARGET_COMMIT}: `{cur_hash}`)",
         f"- **Total Seeds**: {total_seeds:,}",
         f"- **Identical Seeds**: {identical_count:,} ({identical_count / total_seeds * 100:.2f}%)",
         f"- **Divergent Seeds**: {divergent_count:,} ({divergent_count / total_seeds * 100:.2f}%)",
@@ -1487,7 +1504,7 @@ def main():
     )
 
     auth_manifest = scratch_dir / "audit_m2_manifest.json"
-    if auth_manifest.exists() and not args.update_manifest:
+    if auth_manifest.exists() and not args.update_manifest and args.seeds == 10000:
         try:
             archive_path = args.output_archive or (scratch_dir / "audit_m2_evidence.json.gz")
             verify_historical_archive(archive_path, auth_manifest)
