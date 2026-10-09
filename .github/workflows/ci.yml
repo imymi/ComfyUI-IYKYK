@@ -86,6 +86,7 @@ jobs:
     - name: Double Build & Compare SHA256
       if: steps.changes.outputs.docs_only != 'true'
       run: |
+        git checkout -- scratch/ 2>/dev/null || true
         mkdir -p /tmp/build_a /tmp/build_b
         python scripts/build_release.py --mode verify --output-dir /tmp/build_a
         python scripts/build_release.py --mode verify --output-dir /tmp/build_b

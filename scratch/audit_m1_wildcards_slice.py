@@ -525,7 +525,10 @@ class DeterministicReplayOracle:
             target_dir = setup_m1_target_env(scratch_dir)
             catalog_lookup = load_authoritative_catalog_lookup(target_dir / "data")
 
-        ref_cache_file = scratch_dir / "controlled_ref_data_10k.json.gz"
+        if total_seeds == 10000:
+            ref_cache_file = scratch_dir / "controlled_ref_data_10k.json.gz"
+        else:
+            ref_cache_file = scratch_dir / f"controlled_ref_data_{total_seeds}.json.gz"
         if ref_cache_file.exists() and not force_regenerate:
             try:
                 with gzip.open(ref_cache_file, "rt", encoding="utf-8") as f:
@@ -1191,8 +1194,8 @@ def run_m1_audit(
     archive_sha256 = save_deterministic_gzip_json(archive_path, archive_payload)
     print(f"[+] Full audit archive saved deterministically to: {archive_path} (SHA-256: {archive_sha256})")
 
-    # 2. 保存 Markdown 报告
-    report_path = output_report_md or (scratch_dir / "audit_m1_report.md")
+    # 2. 保存 Markdown 报告 (若未指定，默认输出到独立的 audit_m1_reproduced_report.md，严禁意外覆盖权威报告)
+    report_path = output_report_md or (scratch_dir / "audit_m1_reproduced_report.md" if total_seeds == 10000 else scratch_dir / f"audit_m1_report_{total_seeds}.md")
     report_path.parent.mkdir(parents=True, exist_ok=True)
     md_lines = [
         "# M1 Wildcards Vertical Slice Divergence Audit Report",
@@ -1265,11 +1268,16 @@ def main():
     parser = argparse.ArgumentParser(description="M1 Wildcards Slice Divergence Auditor")
     parser.add_argument("--seeds", type=int, default=10000)
     parser.add_argument("--scratch-dir", type=Path, default=REPO_DIR / "scratch")
-    parser.add_argument("--output-archive", type=Path, default=REPO_DIR / "scratch" / "audit_m1_evidence.json.gz")
-    parser.add_argument("--output-report", type=Path, default=REPO_DIR / "scratch" / "audit_m1_report.md")
+    parser.add_argument("--output-archive", type=Path, default=None)
+    parser.add_argument("--output-report", type=Path, default=None)
+    parser.add_argument("--update-report", action="store_true", help="Explicitly update the committed audit_m1_report.md")
     parser.add_argument("--output-manifest", type=Path, default=None)
     parser.add_argument("--update-manifest", action="store_true", help="Explicitly update the committed audit_m1_manifest.json")
     args = parser.parse_args()
+
+    archive_target = args.output_archive
+    if archive_target is None:
+        archive_target = args.scratch_dir / "audit_m1_evidence.json.gz" if args.seeds == 10000 else args.scratch_dir / f"audit_m1_evidence_{args.seeds}.json.gz"
 
     manifest_target = args.output_manifest
     if manifest_target is None:
@@ -1278,11 +1286,18 @@ def main():
         else:
             manifest_target = args.scratch_dir / "audit_m1_reproduced_manifest.json"
 
+    report_target = args.output_report
+    if report_target is None:
+        if args.update_report:
+            report_target = args.scratch_dir / "audit_m1_report.md"
+        else:
+            report_target = args.scratch_dir / "audit_m1_reproduced_report.md" if args.seeds == 10000 else args.scratch_dir / f"audit_m1_report_{args.seeds}.md"
+
     rep = run_m1_audit(
         total_seeds=args.seeds,
         scratch_dir=args.scratch_dir,
-        output_archive=args.output_archive,
-        output_report_md=args.output_report,
+        output_archive=archive_target,
+        output_report_md=report_target,
         output_manifest=manifest_target,
     )
 

@@ -17,6 +17,8 @@ scratch/baseline_*
 scratch/controlled_ref_*
 scratch/target_*
 scratch/*reproduced_manifest.json
+scratch/*reproduced_report.md
+scratch/audit_*_report_*.md
 
 # Ephemeral scratch scripts and temp working data
 scratch/apply_m32_*

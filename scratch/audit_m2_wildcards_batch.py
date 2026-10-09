@@ -1344,6 +1344,11 @@ def run_m2_audit(
     gc.collect()
     print(f"[+] Controlled reference cache saved: {ref_cache_file}")
 
+    # 构建重放预言机并立即释放 ref_data 全量原始数据，避免与 cur_data 并存导致内存尖峰
+    replay_oracle = DeterministicReplayOracle(reference_data=ref_data, reference_dir=controlled_ref_dir)
+    del ref_data
+    gc.collect()
+
     # 4. 运行被测目标（固定快照环境 e0d0459）
     print(f"[*] Running fixed M2 target snapshot ({M2_TARGET_COMMIT}) generation for {total_seeds} seeds...")
     cur_data, cur_hash = run_batch_parallel(target_dir, total_seeds)
@@ -1353,9 +1358,6 @@ def run_m2_audit(
 
     # 5. 执行因果审计
     print("[*] Auditing seed divergences with atomic causal verification & independent controlled reference replay...")
-    replay_oracle = DeterministicReplayOracle(reference_data=ref_data, reference_dir=controlled_ref_dir)
-    del ref_data
-    gc.collect()
     identical_count = 0
     divergent_count = 0
     unexplained_seeds: Dict[int, List[str]] = {}
@@ -1363,7 +1365,9 @@ def run_m2_audit(
     audited_diffs: List[Dict[str, Any]] = []
 
     for s in range(total_seeds):
-        res = attribute_m2_seed_diff(s, base_data[s], cur_data[s], target_catalog_lookup, valid_rules, replay_oracle=replay_oracle)
+        b_item = base_data.pop(s, None)
+        c_item = cur_data.pop(s, None)
+        res = attribute_m2_seed_diff(s, b_item, c_item, target_catalog_lookup, valid_rules, replay_oracle=replay_oracle)
 
         if not res["is_explained"]:
             unexplained_seeds[s] = res["unexplained_reasons"]
@@ -1374,8 +1378,8 @@ def run_m2_audit(
                 "is_explained": False,
                 "unexplained_reasons": res["unexplained_reasons"],
                 "attributions": res["attributions"],
-                "base_item": base_data[s],
-                "cur_item": cur_data[s],
+                "base_item": b_item,
+                "cur_item": c_item,
             })
         elif res["is_identical"]:
             identical_count += 1
@@ -1389,8 +1393,8 @@ def run_m2_audit(
                 "is_identical": False,
                 "is_explained": True,
                 "attributions": res["attributions"],
-                "base_item": base_data[s],
-                "cur_item": cur_data[s],
+                "base_item": b_item,
+                "cur_item": c_item,
             })
 
     elapsed = time.time() - start_time
@@ -1431,8 +1435,8 @@ def run_m2_audit(
     archive_sha256 = hashlib.sha256(archive_path.read_bytes()).hexdigest()
     print(f"[+] M2 Evidence archive saved: {archive_path} ({archive_path.stat().st_size} bytes, sha256={archive_sha256})")
 
-    # 7. 保存清单
-    manifest_path = output_manifest or (scratch_dir / "audit_m2_manifest.json" if total_seeds == 10000 else scratch_dir / f"audit_m2_manifest_{total_seeds}.json")
+    # 7. 保存清单 (若未指定，默认输出到独立的 audit_m2_reproduced_manifest.json，严禁意外覆盖权威清单)
+    manifest_path = output_manifest or (scratch_dir / "audit_m2_reproduced_manifest.json" if total_seeds == 10000 else scratch_dir / f"audit_m2_manifest_{total_seeds}.json")
     manifest_payload = {
         "archive_file": archive_path.name,
         "archive_sha256": archive_sha256,
@@ -1452,8 +1456,8 @@ def run_m2_audit(
     manifest_path.write_text(json.dumps(manifest_payload, indent=2, sort_keys=True, ensure_ascii=False), encoding="utf-8")
     print(f"[+] M2 Manifest saved: {manifest_path}")
 
-    # 8. 保存 Markdown 报告
-    report_path = output_report_md or (scratch_dir / "audit_m2_report.md" if total_seeds == 10000 else scratch_dir / f"audit_m2_report_{total_seeds}.md")
+    # 8. 保存 Markdown 报告 (若未指定，默认输出到独立的 audit_m2_reproduced_report.md，严禁意外覆盖权威报告)
+    report_path = output_report_md or (scratch_dir / "audit_m2_reproduced_report.md" if total_seeds == 10000 else scratch_dir / f"audit_m2_report_{total_seeds}.md")
     report_path.parent.mkdir(parents=True, exist_ok=True)
     md_lines = [
         "# M2 Wildcards Batch Divergence Audit Report",
@@ -1507,6 +1511,7 @@ def main():
     parser.add_argument("--output-manifest", type=Path, default=None, help="Output manifest path")
     parser.add_argument("--output-report", type=Path, default=None, help="Output report path")
     parser.add_argument("--update-manifest", action="store_true", help="Explicitly update scratch/audit_m2_manifest.json")
+    parser.add_argument("--update-report", action="store_true", help="Explicitly update scratch/audit_m2_report.md")
     args = parser.parse_args()
 
     scratch_dir = Path(args.scratch_dir)
@@ -1517,12 +1522,19 @@ def main():
         else:
             manifest_target = scratch_dir / "audit_m2_reproduced_manifest.json"
 
+    report_target = args.output_report
+    if report_target is None:
+        if args.update_report:
+            report_target = scratch_dir / "audit_m2_report.md"
+        else:
+            report_target = scratch_dir / "audit_m2_reproduced_report.md" if args.seeds == 10000 else scratch_dir / f"audit_m2_report_{args.seeds}.md"
+
     res = run_m2_audit(
         total_seeds=args.seeds,
         scratch_dir=scratch_dir,
         output_archive=args.output_archive,
         output_manifest=manifest_target,
-        output_report_md=args.output_report,
+        output_report_md=report_target,
     )
 
     auth_manifest = scratch_dir / "audit_m2_manifest.json"
