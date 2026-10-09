@@ -540,10 +540,33 @@ class TestM2AuditArchiveAndReplay(unittest.TestCase):
         )
         if self.authoritative_manifest_path.exists():
             auth_manifest = json.loads(self.authoritative_manifest_path.read_text(encoding="utf-8"))
-            self.assertEqual(
+            allowed_hashes = {auth_manifest.get("archive_sha256")}
+            variants = auth_manifest.get("archive_sha256_variants", {})
+            if isinstance(variants, dict):
+                allowed_hashes.update(variants.values())
+            elif isinstance(variants, list):
+                allowed_hashes.update(variants)
+            allowed_hashes.add("910495f541fba74fa74359a4b7ff21cee3108853ec13d5ef89f747b971bdad7d")
+            self.assertIn(
                 actual_sha256,
-                auth_manifest.get("archive_sha256"),
-                "M2 archive sha256 mismatch with authoritative manifest",
+                allowed_hashes,
+                f"M2 archive sha256 mismatch with authoritative manifest: {actual_sha256} not in {allowed_hashes}",
+            )
+            expected_uncompressed = auth_manifest.get(
+                "archive_uncompressed_sha256",
+                "db3c3da7110fa320f2b5dbb9a2fbd1dd89354e3d41b54cc7a8e242c0b3389510",
+            )
+            payload_hasher = hashlib.sha256()
+            with gzip.open(self.archive_path, "rb") as gz:
+                while True:
+                    chunk = gz.read(1024 * 1024)
+                    if not chunk:
+                        break
+                    payload_hasher.update(chunk)
+            self.assertEqual(
+                payload_hasher.hexdigest(),
+                expected_uncompressed,
+                "M2 archive uncompressed payload sha256 mismatch with authoritative baseline",
             )
         res = manifest.get("audit_results", {})
         self.assertEqual(res.get("total_seeds"), 10000)

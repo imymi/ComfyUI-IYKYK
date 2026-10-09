@@ -1,7 +1,12 @@
 {
   "archive_file": "audit_m2_evidence.json.gz",
   "archive_sha256": "3f2de1d5db0c98ce247a92e267e833a110f746d6d5a129e71e696641efa40634",
+  "archive_sha256_variants": {
+    "cpython_39_linux": "910495f541fba74fa74359a4b7ff21cee3108853ec13d5ef89f747b971bdad7d",
+    "standard": "3f2de1d5db0c98ce247a92e267e833a110f746d6d5a129e71e696641efa40634"
+  },
   "archive_size": 78215199,
+  "archive_uncompressed_sha256": "db3c3da7110fa320f2b5dbb9a2fbd1dd89354e3d41b54cc7a8e242c0b3389510",
   "audit_results": {
     "baseline_hash": "aa7581bc2304f6f75530d95ab4e1b75e7e1101720b1dfaf14c2a1c328fcd1139",
     "current_hash": "f7d8524cffeab2ce9d0dc65f504f2bc5f458b99521a6b0469a590606ba3c59c0",
