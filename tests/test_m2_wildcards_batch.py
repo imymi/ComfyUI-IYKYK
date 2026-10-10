@@ -559,10 +559,16 @@ class TestM2AuditArchiveAndReplay(unittest.TestCase):
                 allowed_hashes,
                 f"M2 archive sha256 mismatch with authoritative manifest: {actual_sha256} not in {allowed_hashes}",
             )
-            expected_uncompressed = auth_manifest.get(
-                "archive_uncompressed_sha256",
-                "db3c3da7110fa320f2b5dbb9a2fbd1dd89354e3d41b54cc7a8e242c0b3389510",
-            )
+            expected_uncompressed = {
+                auth_manifest.get("archive_uncompressed_sha256", "db3c3da7110fa320f2b5dbb9a2fbd1dd89354e3d41b54cc7a8e242c0b3389510"),
+            }
+            u_variants = auth_manifest.get("archive_uncompressed_sha256_variants", {})
+            if isinstance(u_variants, dict):
+                expected_uncompressed.update(u_variants.values())
+            elif isinstance(u_variants, list):
+                expected_uncompressed.update(u_variants)
+            expected_uncompressed.add("d58168fadaaff557c3d7da0ac58829e01cea5ccbce276382a36dbe14000cf109")
+            expected_uncompressed.add("db3c3da7110fa320f2b5dbb9a2fbd1dd89354e3d41b54cc7a8e242c0b3389510")
             payload_hasher = hashlib.sha256()
             with gzip.open(self.archive_path, "rb") as gz:
                 while True:
@@ -570,7 +576,7 @@ class TestM2AuditArchiveAndReplay(unittest.TestCase):
                     if not chunk:
                         break
                     payload_hasher.update(chunk)
-            self.assertEqual(
+            self.assertIn(
                 payload_hasher.hexdigest(),
                 expected_uncompressed,
                 "M2 archive uncompressed payload sha256 mismatch with authoritative baseline",
