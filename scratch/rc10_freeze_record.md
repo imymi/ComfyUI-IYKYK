@@ -4,7 +4,8 @@
 - **PR 验证 HEAD**：`6b301756c439dcb06f6a3a62bf0e9a8c4cf317f2`
 - **Merge Commit (main)**：`4d267c503e3bc3bb76e188847304e89e69749487`
 - **正式发布 HEAD (main)**：`843d9cebe1ecf4cbd630f47fd5d4b0767a862bdc`
-- **GitHub Release**：https://github.com/imymi/ComfyUI-IYKYK/releases/tag/v1.1.0-rc10
+- **GitHub Release**：https://github.com/imymi/ComfyUI-IYKYK/releases/tag/v1.1.0-rc10 (Pre-release)
+- **发布方式说明**：远端 Release 工作流（Run 38038414204）因 120m 超时 cancelled；主分支 CI（Run 38038400337）146 分钟 100% 全绿通过后，基于提交 843d9ce 本地严格构建并通过 GitHub API 手动发布。
 - **冻结时间戳**：2026-10-09T01:31:00Z
 - **文件计数**：43
 - **候选发布 ZIP SHA-256（Candidate Mode）**：
@@ -15,6 +16,7 @@
   ```text
   adbc7e1b414627933a53ef7305e94a7502148d102c52882c60e4df781b57cac1
   ```
+  *(注：候选包与正式发布包内 43 个核心文件内容完全一致；ZIP SHA-256 差异源自条目时间戳不同，提交 SHA 与生成时间记录在包外 MANIFEST.json 中)*
 - **双构建一致性状态**：
   - Build A SHA-256: `64407483bfa704f44b3ff9a270e6ccb7a121ac7619e2758a8d8529ea030593bd`
   - Build B SHA-256: `64407483bfa704f44b3ff9a270e6ccb7a121ac7619e2758a8d8529ea030593bd`
