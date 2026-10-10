@@ -480,19 +480,19 @@ def _generate_structured(
     primary_context = scene_res.context_ids[0] if (scene_res and scene_res.context_ids) else "generic"
     context = primary_context if primary_context != "generic" else sampler.detect_context(场景大类, 剧情主题)
 
+    # 槽位 3 & 4: 裸露等级与服装穿脱联动 (优先解析裸露等级以约束视角与服装)
+    rng_nudity = derive_substream_rng(effective_seed, "selector:nudity")
+    nudity_res, lvl_code = sampler.sample_nudity_result(裸露等级, rng_nudity)
+    slots["nudity"] = _make_slot_fragments(nudity_res, "nudity", 裸露等级, entry_point)
+
     # 槽位 2: 景别 + 视角
     rng_shot = derive_substream_rng(effective_seed, "selector:shot_type")
     shot_res = sampler.sample_shot_type_result(景别构图, rng_shot, context_profile=context_profile)
     slots["shot_type"] = _make_slot_fragments(shot_res, "shot_type", 景别构图, entry_point)
 
     rng_angle = derive_substream_rng(effective_seed, "selector:camera_angle")
-    angle_res = sampler.sample_camera_angle_result(拍摄视角, rng_angle, context_profile=context_profile)
+    angle_res = sampler.sample_camera_angle_result(拍摄视角, rng_angle, context_profile=context_profile, nudity_level_code=lvl_code)
     slots["camera_angle"] = _make_slot_fragments(angle_res, "camera_angle", 拍摄视角, entry_point)
-
-    # 槽位 3 & 4: 裸露等级与服装穿脱联动
-    rng_nudity = derive_substream_rng(effective_seed, "selector:nudity")
-    nudity_res, lvl_code = sampler.sample_nudity_result(裸露等级, rng_nudity)
-    slots["nudity"] = _make_slot_fragments(nudity_res, "nudity", 裸露等级, entry_point)
 
     rng_clothing = derive_substream_rng(effective_seed, "selector:clothing")
     clothing_res = sampler.sample_clothing_result(

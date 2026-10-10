@@ -1,0 +1,1289 @@
+{
+  "stats": {
+    "total_mappings": 127,
+    "reuse_existing": 21,
+    "style_variant": 51,
+    "new_style": 43,
+    "ensemble_combo": 6,
+    "added_items": 50,
+    "added_tags": 101
+  },
+  "file_hashes": {
+    "expressions.json": "b2052279dbf12657bff56668291a2301c6b5783809ae44b6691f68a6c61248ef",
+    "lighting.json": "ce7950c99822156b39eb6a859856c57d4d0e33dc337f7b92ca9c1b17d2f2c3ac",
+    "accessories.json": "5405fff9abd49e84b4d1178dca091dd3a7951a82a6a175d6383543a9fe94540b",
+    "clothing.json": "01ebaa879ff2ab8fde439d855a37c74da61033cf748fd5d02f5375adcb7407d6"
+  },
+  "records": [
+    {
+      "mapping_id": "MAP_00001",
+      "source_entity_id": "SRC_EXPR_06860",
+      "decision": "NEW_STYLE",
+      "target_file": "expressions.json",
+      "target_item_id": "emotion_amused",
+      "target_tag_id": "emotion_amused__tag_000",
+      "clean_text": "amused expression",
+      "action": "APPENDED_NEW_STYLE"
+    },
+    {
+      "mapping_id": "MAP_00002",
+      "source_entity_id": "SRC_EXPR_06861",
+      "decision": "NEW_STYLE",
+      "target_file": "expressions.json",
+      "target_item_id": "emotion_angry",
+      "target_tag_id": "emotion_angry__tag_000",
+      "clean_text": "angry expression",
+      "action": "APPENDED_NEW_STYLE"
+    },
+    {
+      "mapping_id": "MAP_00003",
+      "source_entity_id": "SRC_EXPR_06862",
+      "decision": "NEW_STYLE",
+      "target_file": "expressions.json",
+      "target_item_id": "emotion_anxious",
+      "target_tag_id": "emotion_anxious__tag_000",
+      "clean_text": "anxious expression",
+      "action": "APPENDED_NEW_STYLE"
+    },
+    {
+      "mapping_id": "MAP_00004",
+      "source_entity_id": "SRC_EXPR_06863",
+      "decision": "STYLE_VARIANT",
+      "target_file": "expressions.json",
+      "target_item_id": "emotion_seductive",
+      "target_tag_id": "emotion_seductive__ext_aroused",
+      "clean_text": "aroused expression",
+      "action": "APPENDED_VARIANT"
+    },
+    {
+      "mapping_id": "MAP_00005",
+      "source_entity_id": "SRC_EXPR_06864",
+      "decision": "NEW_STYLE",
+      "target_file": "expressions.json",
+      "target_item_id": "emotion_blissful",
+      "target_tag_id": "emotion_blissful__tag_000",
+      "clean_text": "blissful expression",
+      "action": "APPENDED_NEW_STYLE"
+    },
+    {
+      "mapping_id": "MAP_00006",
+      "source_entity_id": "SRC_EXPR_06865",
+      "decision": "REUSE_EXISTING",
+      "target_file": "expressions.json",
+      "target_item_id": "emotion_detached",
+      "target_tag_id": "emotion_detached__tag_000",
+      "clean_text": "bored expression",
+      "action": "AUDITED_REUSE"
+    },
+    {
+      "mapping_id": "MAP_00007",
+      "source_entity_id": "SRC_EXPR_06866",
+      "decision": "STYLE_VARIANT",
+      "target_file": "expressions.json",
+      "target_item_id": "emotion_focused",
+      "target_tag_id": "emotion_focused__ext_concentrated",
+      "clean_text": "concentrated expression",
+      "action": "APPENDED_VARIANT"
+    },
+    {
+      "mapping_id": "MAP_00008",
+      "source_entity_id": "SRC_EXPR_06867",
+      "decision": "NEW_STYLE",
+      "target_file": "expressions.json",
+      "target_item_id": "emotion_confused",
+      "target_tag_id": "emotion_confused__tag_000",
+      "clean_text": "confused expression",
+      "action": "APPENDED_NEW_STYLE"
+    },
+    {
+      "mapping_id": "MAP_00009",
+      "source_entity_id": "SRC_EXPR_06868",
+      "decision": "NEW_STYLE",
+      "target_file": "expressions.json",
+      "target_item_id": "emotion_contemptuous",
+      "target_tag_id": "emotion_contemptuous__tag_000",
+      "clean_text": "contemptuous expression",
+      "action": "APPENDED_NEW_STYLE"
+    },
+    {
+      "mapping_id": "MAP_00010",
+      "source_entity_id": "SRC_EXPR_06869",
+      "decision": "NEW_STYLE",
+      "target_file": "expressions.json",
+      "target_item_id": "emotion_crying",
+      "target_tag_id": "emotion_crying__tag_000",
+      "clean_text": "crying with tears streaming",
+      "action": "APPENDED_NEW_STYLE"
+    },
+    {
+      "mapping_id": "MAP_00011",
+      "source_entity_id": "SRC_EXPR_06870",
+      "decision": "NEW_STYLE",
+      "target_file": "expressions.json",
+      "target_item_id": "emotion_disgusted",
+      "target_tag_id": "emotion_disgusted__tag_000",
+      "clean_text": "disgusted expression",
+      "action": "APPENDED_NEW_STYLE"
+    },
+    {
+      "mapping_id": "MAP_00012",
+      "source_entity_id": "SRC_EXPR_06871",
+      "decision": "REUSE_EXISTING",
+      "target_file": "expressions.json",
+      "target_item_id": "emotion_pleasure",
+      "target_tag_id": "emotion_pleasure__tag_000",
+      "clean_text": "ecstatic expression",
+      "action": "AUDITED_REUSE"
+    },
+    {
+      "mapping_id": "MAP_00013",
+      "source_entity_id": "SRC_EXPR_06872",
+      "decision": "REUSE_EXISTING",
+      "target_file": "expressions.json",
+      "target_item_id": "emotion_shy",
+      "target_tag_id": "emotion_shy__tag_003",
+      "clean_text": "embarrassed smile",
+      "action": "AUDITED_REUSE"
+    },
+    {
+      "mapping_id": "MAP_00014",
+      "source_entity_id": "SRC_EXPR_06873",
+      "decision": "NEW_STYLE",
+      "target_file": "expressions.json",
+      "target_item_id": "emotion_excited",
+      "target_tag_id": "emotion_excited__tag_000",
+      "clean_text": "excited expression",
+      "action": "APPENDED_NEW_STYLE"
+    },
+    {
+      "mapping_id": "MAP_00015",
+      "source_entity_id": "SRC_EXPR_06874",
+      "decision": "STYLE_VARIANT",
+      "target_file": "expressions.json",
+      "target_item_id": "emotion_fear",
+      "target_tag_id": "emotion_fear__ext_fearful",
+      "clean_text": "fearful expression",
+      "action": "APPENDED_VARIANT"
+    },
+    {
+      "mapping_id": "MAP_00016",
+      "source_entity_id": "SRC_EXPR_06875",
+      "decision": "NEW_STYLE",
+      "target_file": "expressions.json",
+      "target_item_id": "emotion_focused",
+      "target_tag_id": "emotion_focused__tag_000",
+      "clean_text": "focused expression",
+      "action": "APPENDED_NEW_STYLE"
+    },
+    {
+      "mapping_id": "MAP_00017",
+      "source_entity_id": "SRC_EXPR_06876",
+      "decision": "NEW_STYLE",
+      "target_file": "expressions.json",
+      "target_item_id": "emotion_frowning",
+      "target_tag_id": "emotion_frowning__tag_000",
+      "clean_text": "frowning",
+      "action": "APPENDED_NEW_STYLE"
+    },
+    {
+      "mapping_id": "MAP_00018",
+      "source_entity_id": "SRC_EXPR_06877",
+      "decision": "NEW_STYLE",
+      "target_file": "expressions.json",
+      "target_item_id": "emotion_happy",
+      "target_tag_id": "emotion_happy__tag_000",
+      "clean_text": "happy expression",
+      "action": "APPENDED_NEW_STYLE"
+    },
+    {
+      "mapping_id": "MAP_00019",
+      "source_entity_id": "SRC_EXPR_06878",
+      "decision": "NEW_STYLE",
+      "target_file": "expressions.json",
+      "target_item_id": "emotion_intense",
+      "target_tag_id": "emotion_intense__tag_000",
+      "clean_text": "intense stare",
+      "action": "APPENDED_NEW_STYLE"
+    },
+    {
+      "mapping_id": "MAP_00020",
+      "source_entity_id": "SRC_EXPR_06879",
+      "decision": "REUSE_EXISTING",
+      "target_file": "expressions.json",
+      "target_item_id": "emotion_playful",
+      "target_tag_id": "emotion_playful__tag_005",
+      "clean_text": "laughing",
+      "action": "AUDITED_REUSE"
+    },
+    {
+      "mapping_id": "MAP_00021",
+      "source_entity_id": "SRC_EXPR_06880",
+      "decision": "STYLE_VARIANT",
+      "target_file": "expressions.json",
+      "target_item_id": "emotion_seductive",
+      "target_tag_id": "emotion_seductive__ext_lustful",
+      "clean_text": "lustful gaze",
+      "action": "APPENDED_VARIANT"
+    },
+    {
+      "mapping_id": "MAP_00022",
+      "source_entity_id": "SRC_EXPR_06881",
+      "decision": "REUSE_EXISTING",
+      "target_file": "expressions.json",
+      "target_item_id": "mouth_closed",
+      "target_tag_id": "mouth_closed__tag_002",
+      "clean_text": "neutral expression",
+      "action": "AUDITED_REUSE"
+    },
+    {
+      "mapping_id": "MAP_00023",
+      "source_entity_id": "SRC_EXPR_06882",
+      "decision": "NEW_STYLE",
+      "target_file": "expressions.json",
+      "target_item_id": "emotion_overwhelmed",
+      "target_tag_id": "emotion_overwhelmed__tag_000",
+      "clean_text": "overwhelmed expression",
+      "action": "APPENDED_NEW_STYLE"
+    },
+    {
+      "mapping_id": "MAP_00024",
+      "source_entity_id": "SRC_EXPR_06883",
+      "decision": "STYLE_VARIANT",
+      "target_file": "expressions.json",
+      "target_item_id": "emotion_seductive",
+      "target_tag_id": "emotion_seductive__ext_passionate",
+      "clean_text": "passionate gaze",
+      "action": "APPENDED_VARIANT"
+    },
+    {
+      "mapping_id": "MAP_00025",
+      "source_entity_id": "SRC_EXPR_06884",
+      "decision": "NEW_STYLE",
+      "target_file": "expressions.json",
+      "target_item_id": "emotion_proud",
+      "target_tag_id": "emotion_proud__tag_000",
+      "clean_text": "proud confident smile",
+      "action": "APPENDED_NEW_STYLE"
+    },
+    {
+      "mapping_id": "MAP_00026",
+      "source_entity_id": "SRC_EXPR_06885",
+      "decision": "NEW_STYLE",
+      "target_file": "expressions.json",
+      "target_item_id": "emotion_relaxed",
+      "target_tag_id": "emotion_relaxed__tag_000",
+      "clean_text": "relaxed expression",
+      "action": "APPENDED_NEW_STYLE"
+    },
+    {
+      "mapping_id": "MAP_00027",
+      "source_entity_id": "SRC_EXPR_06886",
+      "decision": "NEW_STYLE",
+      "target_file": "expressions.json",
+      "target_item_id": "emotion_sad",
+      "target_tag_id": "emotion_sad__tag_000",
+      "clean_text": "sad expression",
+      "action": "APPENDED_NEW_STYLE"
+    },
+    {
+      "mapping_id": "MAP_00028",
+      "source_entity_id": "SRC_EXPR_06887",
+      "decision": "STYLE_VARIANT",
+      "target_file": "expressions.json",
+      "target_item_id": "emotion_pleasure",
+      "target_tag_id": "emotion_pleasure__ext_satisfied",
+      "clean_text": "satisfied smile",
+      "action": "APPENDED_VARIANT"
+    },
+    {
+      "mapping_id": "MAP_00029",
+      "source_entity_id": "SRC_EXPR_06888",
+      "decision": "STYLE_VARIANT",
+      "target_file": "expressions.json",
+      "target_item_id": "emotion_seductive",
+      "target_tag_id": "emotion_seductive__ext_sensual",
+      "clean_text": "sensual expression",
+      "action": "APPENDED_VARIANT"
+    },
+    {
+      "mapping_id": "MAP_00030",
+      "source_entity_id": "SRC_EXPR_06889",
+      "decision": "REUSE_EXISTING",
+      "target_file": "expressions.json",
+      "target_item_id": "emotion_fear",
+      "target_tag_id": "emotion_fear__tag_000",
+      "clean_text": "shocked expression",
+      "action": "AUDITED_REUSE"
+    },
+    {
+      "mapping_id": "MAP_00031",
+      "source_entity_id": "SRC_EXPR_06890",
+      "decision": "STYLE_VARIANT",
+      "target_file": "expressions.json",
+      "target_item_id": "emotion_confused",
+      "target_tag_id": "emotion_confused__ext_skeptical",
+      "clean_text": "skeptical look",
+      "action": "APPENDED_VARIANT"
+    },
+    {
+      "mapping_id": "MAP_00032",
+      "source_entity_id": "SRC_EXPR_06891",
+      "decision": "STYLE_VARIANT",
+      "target_file": "expressions.json",
+      "target_item_id": "emotion_playful",
+      "target_tag_id": "emotion_playful__ext_smiling",
+      "clean_text": "gentle smiling",
+      "action": "APPENDED_VARIANT"
+    },
+    {
+      "mapping_id": "MAP_00033",
+      "source_entity_id": "SRC_EXPR_06892",
+      "decision": "NEW_STYLE",
+      "target_file": "expressions.json",
+      "target_item_id": "emotion_surprised",
+      "target_tag_id": "emotion_surprised__tag_000",
+      "clean_text": "surprised expression",
+      "action": "APPENDED_NEW_STYLE"
+    },
+    {
+      "mapping_id": "MAP_00034",
+      "source_entity_id": "SRC_EXPR_06893",
+      "decision": "NEW_STYLE",
+      "target_file": "expressions.json",
+      "target_item_id": "emotion_tired",
+      "target_tag_id": "emotion_tired__tag_000",
+      "clean_text": "tired expression",
+      "action": "APPENDED_NEW_STYLE"
+    },
+    {
+      "mapping_id": "MAP_00035",
+      "source_entity_id": "SRC_EXPR_06894",
+      "decision": "NEW_STYLE",
+      "target_file": "expressions.json",
+      "target_item_id": "emotion_yearning",
+      "target_tag_id": "emotion_yearning__tag_000",
+      "clean_text": "yearning look",
+      "action": "APPENDED_NEW_STYLE"
+    },
+    {
+      "mapping_id": "MAP_00036",
+      "source_entity_id": "SRC_LIGHT_06814",
+      "decision": "NEW_STYLE",
+      "target_file": "lighting.json",
+      "target_item_id": "prof_light_accent",
+      "target_tag_id": "prof_light_accent__tag_000",
+      "clean_text": "accent lighting",
+      "action": "APPENDED_NEW_STYLE"
+    },
+    {
+      "mapping_id": "MAP_00037",
+      "source_entity_id": "SRC_LIGHT_06815",
+      "decision": "NEW_STYLE",
+      "target_file": "lighting.json",
+      "target_item_id": "prof_light_ambient",
+      "target_tag_id": "prof_light_ambient__tag_000",
+      "clean_text": "ambient lighting",
+      "action": "APPENDED_NEW_STYLE"
+    },
+    {
+      "mapping_id": "MAP_00038",
+      "source_entity_id": "SRC_LIGHT_06816",
+      "decision": "REUSE_EXISTING",
+      "target_file": "lighting.json",
+      "target_item_id": "professional_lighting_00",
+      "target_tag_id": "professional_lighting_00__tag_000",
+      "clean_text": "rim light",
+      "action": "AUDITED_REUSE"
+    },
+    {
+      "mapping_id": "MAP_00039",
+      "source_entity_id": "SRC_LIGHT_06817",
+      "decision": "STYLE_VARIANT",
+      "target_file": "lighting.json",
+      "target_item_id": "cinematic_lighting_02",
+      "target_tag_id": "cinematic_lighting_02__ext_bright_neon",
+      "clean_text": "bright neon lighting",
+      "action": "APPENDED_VARIANT"
+    },
+    {
+      "mapping_id": "MAP_00040",
+      "source_entity_id": "SRC_LIGHT_06818",
+      "decision": "REUSE_EXISTING",
+      "target_file": "lighting.json",
+      "target_item_id": "professional_lighting_07",
+      "target_tag_id": "professional_lighting_07__tag_000",
+      "clean_text": "broad lighting",
+      "action": "AUDITED_REUSE"
+    },
+    {
+      "mapping_id": "MAP_00041",
+      "source_entity_id": "SRC_LIGHT_06819",
+      "decision": "REUSE_EXISTING",
+      "target_file": "lighting.json",
+      "target_item_id": "ext_aw_light_candlelight",
+      "target_tag_id": "ext_aw_light_candlelight__tag_000",
+      "clean_text": "warm flickering candlelight illuminating face and shadows",
+      "action": "AUDITED_REUSE"
+    },
+    {
+      "mapping_id": "MAP_00042",
+      "source_entity_id": "SRC_LIGHT_06820",
+      "decision": "REUSE_EXISTING",
+      "target_file": "lighting.json",
+      "target_item_id": "professional_lighting_02",
+      "target_tag_id": "professional_lighting_02__tag_000",
+      "clean_text": "Rembrandt lighting",
+      "action": "AUDITED_REUSE"
+    },
+    {
+      "mapping_id": "MAP_00043",
+      "source_entity_id": "SRC_LIGHT_06821",
+      "decision": "NEW_STYLE",
+      "target_file": "lighting.json",
+      "target_item_id": "prof_light_clamshell",
+      "target_tag_id": "prof_light_clamshell__tag_000",
+      "clean_text": "clamshell lighting",
+      "action": "APPENDED_NEW_STYLE"
+    },
+    {
+      "mapping_id": "MAP_00044",
+      "source_entity_id": "SRC_LIGHT_06822",
+      "decision": "STYLE_VARIANT",
+      "target_file": "lighting.json",
+      "target_item_id": "prof_light_ambient",
+      "target_tag_id": "prof_light_ambient__ext_colortemp",
+      "clean_text": "color temperature lighting",
+      "action": "APPENDED_VARIANT"
+    },
+    {
+      "mapping_id": "MAP_00045",
+      "source_entity_id": "SRC_LIGHT_06823",
+      "decision": "STYLE_VARIANT",
+      "target_file": "lighting.json",
+      "target_item_id": "professional_lighting_11",
+      "target_tag_id": "professional_lighting_11__ext_contre_jour",
+      "clean_text": "contre-jour lighting",
+      "action": "APPENDED_VARIANT"
+    },
+    {
+      "mapping_id": "MAP_00046",
+      "source_entity_id": "SRC_LIGHT_06824",
+      "decision": "REUSE_EXISTING",
+      "target_file": "lighting.json",
+      "target_item_id": "ext_aw_light_direct_flash",
+      "target_tag_id": "ext_aw_light_direct_flash__tag_000",
+      "clean_text": "direct flash photography",
+      "action": "AUDITED_REUSE"
+    },
+    {
+      "mapping_id": "MAP_00047",
+      "source_entity_id": "SRC_LIGHT_06825",
+      "decision": "NEW_STYLE",
+      "target_file": "lighting.json",
+      "target_item_id": "prof_light_fluorescent",
+      "target_tag_id": "prof_light_fluorescent__tag_000",
+      "clean_text": "fluorescent lighting",
+      "action": "APPENDED_NEW_STYLE"
+    },
+    {
+      "mapping_id": "MAP_00048",
+      "source_entity_id": "SRC_LIGHT_06826",
+      "decision": "NEW_STYLE",
+      "target_file": "lighting.json",
+      "target_item_id": "prof_light_fresnel",
+      "target_tag_id": "prof_light_fresnel__tag_000",
+      "clean_text": "fresnel lighting",
+      "action": "APPENDED_NEW_STYLE"
+    },
+    {
+      "mapping_id": "MAP_00049",
+      "source_entity_id": "SRC_LIGHT_06827",
+      "decision": "NEW_STYLE",
+      "target_file": "lighting.json",
+      "target_item_id": "prof_light_gelled",
+      "target_tag_id": "prof_light_gelled__tag_000",
+      "clean_text": "gelled lighting",
+      "action": "APPENDED_NEW_STYLE"
+    },
+    {
+      "mapping_id": "MAP_00050",
+      "source_entity_id": "SRC_LIGHT_06828",
+      "decision": "STYLE_VARIANT",
+      "target_file": "lighting.json",
+      "target_item_id": "ext_aw_light_bioluminescent",
+      "target_tag_id": "ext_aw_light_bioluminescent__ext_glowy_lumi",
+      "clean_text": "glowy luminescence",
+      "action": "APPENDED_VARIANT"
+    },
+    {
+      "mapping_id": "MAP_00051",
+      "source_entity_id": "SRC_LIGHT_06829",
+      "decision": "STYLE_VARIANT",
+      "target_file": "lighting.json",
+      "target_item_id": "special_effects_00",
+      "target_tag_id": "special_effects_00__ext_glowy_translucency",
+      "clean_text": "glowy translucency",
+      "action": "APPENDED_VARIANT"
+    },
+    {
+      "mapping_id": "MAP_00052",
+      "source_entity_id": "SRC_LIGHT_06830",
+      "decision": "STYLE_VARIANT",
+      "target_file": "lighting.json",
+      "target_item_id": "professional_lighting_09",
+      "target_tag_id": "professional_lighting_09__ext_hard_shadows",
+      "clean_text": "hard shadows",
+      "action": "APPENDED_VARIANT"
+    },
+    {
+      "mapping_id": "MAP_00053",
+      "source_entity_id": "SRC_LIGHT_06831",
+      "decision": "NEW_STYLE",
+      "target_file": "lighting.json",
+      "target_item_id": "prof_light_high_key",
+      "target_tag_id": "prof_light_high_key__tag_000",
+      "clean_text": "high-key lighting",
+      "action": "APPENDED_NEW_STYLE"
+    },
+    {
+      "mapping_id": "MAP_00054",
+      "source_entity_id": "SRC_LIGHT_06832",
+      "decision": "NEW_STYLE",
+      "target_file": "lighting.json",
+      "target_item_id": "prof_light_hmi",
+      "target_tag_id": "prof_light_hmi__tag_000",
+      "clean_text": "hmi lighting",
+      "action": "APPENDED_NEW_STYLE"
+    },
+    {
+      "mapping_id": "MAP_00055",
+      "source_entity_id": "SRC_LIGHT_06833",
+      "decision": "STYLE_VARIANT",
+      "target_file": "lighting.json",
+      "target_item_id": "special_effects_01",
+      "target_tag_id": "special_effects_01__ext_iridescent",
+      "clean_text": "iridescent light",
+      "action": "APPENDED_VARIANT"
+    },
+    {
+      "mapping_id": "MAP_00056",
+      "source_entity_id": "SRC_LIGHT_06834",
+      "decision": "NEW_STYLE",
+      "target_file": "lighting.json",
+      "target_item_id": "prof_light_led_panel",
+      "target_tag_id": "prof_light_led_panel__tag_000",
+      "clean_text": "led panel lighting",
+      "action": "APPENDED_NEW_STYLE"
+    },
+    {
+      "mapping_id": "MAP_00057",
+      "source_entity_id": "SRC_LIGHT_06835",
+      "decision": "NEW_STYLE",
+      "target_file": "lighting.json",
+      "target_item_id": "prof_light_painting",
+      "target_tag_id": "prof_light_painting__tag_000",
+      "clean_text": "light painting",
+      "action": "APPENDED_NEW_STYLE"
+    },
+    {
+      "mapping_id": "MAP_00058",
+      "source_entity_id": "SRC_LIGHT_06836",
+      "decision": "REUSE_EXISTING",
+      "target_file": "lighting.json",
+      "target_item_id": "professional_lighting_05",
+      "target_tag_id": "professional_lighting_05__tag_000",
+      "clean_text": "loop lighting",
+      "action": "AUDITED_REUSE"
+    },
+    {
+      "mapping_id": "MAP_00059",
+      "source_entity_id": "SRC_LIGHT_06837",
+      "decision": "NEW_STYLE",
+      "target_file": "lighting.json",
+      "target_item_id": "prof_light_low_key",
+      "target_tag_id": "prof_light_low_key__tag_000",
+      "clean_text": "low-key lighting",
+      "action": "APPENDED_NEW_STYLE"
+    },
+    {
+      "mapping_id": "MAP_00060",
+      "source_entity_id": "SRC_LIGHT_06838",
+      "decision": "STYLE_VARIANT",
+      "target_file": "lighting.json",
+      "target_item_id": "ext_aw_light_bioluminescent",
+      "target_tag_id": "ext_aw_light_bioluminescent__ext_lumi",
+      "clean_text": "luminescence",
+      "action": "APPENDED_VARIANT"
+    },
+    {
+      "mapping_id": "MAP_00061",
+      "source_entity_id": "SRC_LIGHT_06839",
+      "decision": "STYLE_VARIANT",
+      "target_file": "lighting.json",
+      "target_item_id": "cinematic_lighting_03",
+      "target_tag_id": "cinematic_lighting_03__ext_moody_low",
+      "clean_text": "moody low-light",
+      "action": "APPENDED_VARIANT"
+    },
+    {
+      "mapping_id": "MAP_00062",
+      "source_entity_id": "SRC_LIGHT_06840",
+      "decision": "REUSE_EXISTING",
+      "target_file": "lighting.json",
+      "target_item_id": "cinematic_lighting_00",
+      "target_tag_id": "cinematic_lighting_00__tag_011",
+      "clean_text": "motivated lighting",
+      "action": "AUDITED_REUSE"
+    },
+    {
+      "mapping_id": "MAP_00063",
+      "source_entity_id": "SRC_LIGHT_06841",
+      "decision": "REUSE_EXISTING",
+      "target_file": "lighting.json",
+      "target_item_id": "professional_lighting_03",
+      "target_tag_id": "professional_lighting_03__tag_001",
+      "clean_text": "Paramount lighting",
+      "action": "AUDITED_REUSE"
+    },
+    {
+      "mapping_id": "MAP_00064",
+      "source_entity_id": "SRC_LIGHT_06842",
+      "decision": "NEW_STYLE",
+      "target_file": "lighting.json",
+      "target_item_id": "prof_light_practical",
+      "target_tag_id": "prof_light_practical__tag_000",
+      "clean_text": "practical lighting",
+      "action": "APPENDED_NEW_STYLE"
+    },
+    {
+      "mapping_id": "MAP_00065",
+      "source_entity_id": "SRC_LIGHT_06843",
+      "decision": "REUSE_EXISTING",
+      "target_file": "lighting.json",
+      "target_item_id": "cinematic_lighting_00",
+      "target_tag_id": "cinematic_lighting_00__tag_001",
+      "clean_text": "volumetric light",
+      "action": "AUDITED_REUSE"
+    },
+    {
+      "mapping_id": "MAP_00066",
+      "source_entity_id": "SRC_LIGHT_06844",
+      "decision": "REUSE_EXISTING",
+      "target_file": "lighting.json",
+      "target_item_id": "professional_lighting_02",
+      "target_tag_id": "professional_lighting_02__tag_000",
+      "clean_text": "Rembrandt lighting",
+      "action": "AUDITED_REUSE"
+    },
+    {
+      "mapping_id": "MAP_00067",
+      "source_entity_id": "SRC_LIGHT_06845",
+      "decision": "REUSE_EXISTING",
+      "target_file": "lighting.json",
+      "target_item_id": "professional_lighting_00",
+      "target_tag_id": "professional_lighting_00__tag_000",
+      "clean_text": "rim light",
+      "action": "AUDITED_REUSE"
+    },
+    {
+      "mapping_id": "MAP_00068",
+      "source_entity_id": "SRC_LIGHT_06846",
+      "decision": "REUSE_EXISTING",
+      "target_file": "lighting.json",
+      "target_item_id": "professional_lighting_06",
+      "target_tag_id": "professional_lighting_06__tag_000",
+      "clean_text": "short lighting",
+      "action": "AUDITED_REUSE"
+    },
+    {
+      "mapping_id": "MAP_00069",
+      "source_entity_id": "SRC_LIGHT_06847",
+      "decision": "STYLE_VARIANT",
+      "target_file": "lighting.json",
+      "target_item_id": "professional_lighting_11",
+      "target_tag_id": "professional_lighting_11__ext_window_sil",
+      "clean_text": "silhouetted against the bright window",
+      "action": "APPENDED_VARIANT"
+    },
+    {
+      "mapping_id": "MAP_00070",
+      "source_entity_id": "SRC_LIGHT_06848",
+      "decision": "REUSE_EXISTING",
+      "target_file": "lighting.json",
+      "target_item_id": "ext_aw_light_soft_bounced",
+      "target_tag_id": "ext_aw_light_soft_bounced__tag_000",
+      "clean_text": "soft bounced fill light from neutral reflector",
+      "action": "AUDITED_REUSE"
+    },
+    {
+      "mapping_id": "MAP_00071",
+      "source_entity_id": "SRC_LIGHT_06849",
+      "decision": "STYLE_VARIANT",
+      "target_file": "lighting.json",
+      "target_item_id": "professional_lighting_08",
+      "target_tag_id": "professional_lighting_08__ext_diffused",
+      "clean_text": "soft diffused lighting",
+      "action": "APPENDED_VARIANT"
+    },
+    {
+      "mapping_id": "MAP_00072",
+      "source_entity_id": "SRC_LIGHT_06850",
+      "decision": "STYLE_VARIANT",
+      "target_file": "lighting.json",
+      "target_item_id": "prof_light_ambient",
+      "target_tag_id": "prof_light_ambient__ext_fill",
+      "clean_text": "soft fill lighting",
+      "action": "APPENDED_VARIANT"
+    },
+    {
+      "mapping_id": "MAP_00073",
+      "source_entity_id": "SRC_LIGHT_06851",
+      "decision": "STYLE_VARIANT",
+      "target_file": "lighting.json",
+      "target_item_id": "cinematic_lighting_03",
+      "target_tag_id": "cinematic_lighting_03__ext_natural",
+      "clean_text": "soft natural lighting",
+      "action": "APPENDED_VARIANT"
+    },
+    {
+      "mapping_id": "MAP_00074",
+      "source_entity_id": "SRC_LIGHT_06852",
+      "decision": "STYLE_VARIANT",
+      "target_file": "lighting.json",
+      "target_item_id": "special_effects_01",
+      "target_tag_id": "special_effects_01__ext_specular",
+      "clean_text": "specular lighting",
+      "action": "APPENDED_VARIANT"
+    },
+    {
+      "mapping_id": "MAP_00075",
+      "source_entity_id": "SRC_LIGHT_06853",
+      "decision": "REUSE_EXISTING",
+      "target_file": "lighting.json",
+      "target_item_id": "professional_lighting_04",
+      "target_tag_id": "professional_lighting_04__tag_000",
+      "clean_text": "split lighting",
+      "action": "AUDITED_REUSE"
+    },
+    {
+      "mapping_id": "MAP_00076",
+      "source_entity_id": "SRC_LIGHT_06854",
+      "decision": "NEW_STYLE",
+      "target_file": "lighting.json",
+      "target_item_id": "prof_light_strobe",
+      "target_tag_id": "prof_light_strobe__tag_000",
+      "clean_text": "strobe lighting",
+      "action": "APPENDED_NEW_STYLE"
+    },
+    {
+      "mapping_id": "MAP_00077",
+      "source_entity_id": "SRC_LIGHT_06855",
+      "decision": "STYLE_VARIANT",
+      "target_file": "lighting.json",
+      "target_item_id": "professional_lighting_04",
+      "target_tag_id": "professional_lighting_04__ext_strong_side",
+      "clean_text": "strong side key lights",
+      "action": "APPENDED_VARIANT"
+    },
+    {
+      "mapping_id": "MAP_00078",
+      "source_entity_id": "SRC_LIGHT_06856",
+      "decision": "NEW_STYLE",
+      "target_file": "lighting.json",
+      "target_item_id": "prof_light_three_point",
+      "target_tag_id": "prof_light_three_point__tag_000",
+      "clean_text": "three-point lighting",
+      "action": "APPENDED_NEW_STYLE"
+    },
+    {
+      "mapping_id": "MAP_00079",
+      "source_entity_id": "SRC_LIGHT_06857",
+      "decision": "STYLE_VARIANT",
+      "target_file": "lighting.json",
+      "target_item_id": "special_effects_00",
+      "target_tag_id": "special_effects_00__ext_translucency",
+      "clean_text": "translucency",
+      "action": "APPENDED_VARIANT"
+    },
+    {
+      "mapping_id": "MAP_00080",
+      "source_entity_id": "SRC_LIGHT_06858",
+      "decision": "NEW_STYLE",
+      "target_file": "lighting.json",
+      "target_item_id": "prof_light_tungsten",
+      "target_tag_id": "prof_light_tungsten__tag_000",
+      "clean_text": "tungsten lighting",
+      "action": "APPENDED_NEW_STYLE"
+    },
+    {
+      "mapping_id": "MAP_00081",
+      "source_entity_id": "SRC_LIGHT_06859",
+      "decision": "REUSE_EXISTING",
+      "target_file": "lighting.json",
+      "target_item_id": "ext_aw_light_warm_golden_hour",
+      "target_tag_id": "ext_aw_light_warm_golden_hour__tag_000",
+      "clean_text": "warm golden hour lighting during sunset",
+      "action": "AUDITED_REUSE"
+    },
+    {
+      "mapping_id": "MAP_00082",
+      "source_entity_id": "SRC_ACC_06895",
+      "decision": "ENSEMBLE_COMBO",
+      "target_file": "accessories.json",
+      "target_item_id": "leather_choker",
+      "target_tag_id": "category_pool__chokers",
+      "clean_text": "choker",
+      "action": "APPENDED_COMBO"
+    },
+    {
+      "mapping_id": "MAP_00083",
+      "source_entity_id": "SRC_ACC_06896",
+      "decision": "ENSEMBLE_COMBO",
+      "target_file": "accessories.json",
+      "target_item_id": "acc_necklace_general",
+      "target_tag_id": "category_pool__necklaces",
+      "clean_text": "necklace",
+      "action": "APPENDED_COMBO"
+    },
+    {
+      "mapping_id": "MAP_00084",
+      "source_entity_id": "SRC_ACC_06897",
+      "decision": "ENSEMBLE_COMBO",
+      "target_file": "accessories.json",
+      "target_item_id": "acc_necklace_general",
+      "target_tag_id": "category_pool__necklaces",
+      "clean_text": "necklace",
+      "action": "IDEMPOTENT_EXISTING"
+    },
+    {
+      "mapping_id": "MAP_00085",
+      "source_entity_id": "SRC_ACC_06897",
+      "decision": "ENSEMBLE_COMBO",
+      "target_file": "accessories.json",
+      "target_item_id": "leather_choker",
+      "target_tag_id": "category_pool__chokers",
+      "clean_text": "choker",
+      "action": "IDEMPOTENT_EXISTING"
+    },
+    {
+      "mapping_id": "MAP_00086",
+      "source_entity_id": "SRC_ACC_06898",
+      "decision": "ENSEMBLE_COMBO",
+      "target_file": "clothing.json",
+      "target_item_id": "clothing_legwear_combo",
+      "target_tag_id": "clothing_legwear_combo__tag_000",
+      "clean_text": "legwear with optional footwear",
+      "action": "APPENDED_COMBO"
+    },
+    {
+      "mapping_id": "MAP_00087",
+      "source_entity_id": "SRC_ACC_06899",
+      "decision": "STYLE_VARIANT",
+      "target_file": "clothing.json",
+      "target_item_id": "legwear_bare",
+      "target_tag_id": "legwear_bare__tag_000",
+      "clean_text": "bare legs",
+      "action": "APPENDED_VARIANT"
+    },
+    {
+      "mapping_id": "MAP_00088",
+      "source_entity_id": "SRC_ACC_06900",
+      "decision": "NEW_STYLE",
+      "target_file": "accessories.json",
+      "target_item_id": "acc_bowtie",
+      "target_tag_id": "acc_bowtie__tag_000",
+      "clean_text": "bowtie",
+      "action": "APPENDED_NEW_STYLE"
+    },
+    {
+      "mapping_id": "MAP_00089",
+      "source_entity_id": "SRC_ACC_06901",
+      "decision": "STYLE_VARIANT",
+      "target_file": "accessories.json",
+      "target_item_id": "leather_choker",
+      "target_tag_id": "leather_choker__ext_dynamic_color",
+      "clean_text": "choker",
+      "action": "DEDUP_TEXT_EXISTS"
+    },
+    {
+      "mapping_id": "MAP_00090",
+      "source_entity_id": "SRC_ACC_06902",
+      "decision": "STYLE_VARIANT",
+      "target_file": "accessories.json",
+      "target_item_id": "leather_choker",
+      "target_tag_id": "leather_choker__ext_bow",
+      "clean_text": "bow choker",
+      "action": "APPENDED_VARIANT"
+    },
+    {
+      "mapping_id": "MAP_00091",
+      "source_entity_id": "SRC_ACC_06903",
+      "decision": "STYLE_VARIANT",
+      "target_file": "accessories.json",
+      "target_item_id": "leather_choker",
+      "target_tag_id": "leather_choker__ext_cross",
+      "clean_text": "cross choker",
+      "action": "APPENDED_VARIANT"
+    },
+    {
+      "mapping_id": "MAP_00092",
+      "source_entity_id": "SRC_ACC_06904",
+      "decision": "STYLE_VARIANT",
+      "target_file": "accessories.json",
+      "target_item_id": "leather_choker",
+      "target_tag_id": "leather_choker__ext_frilled",
+      "clean_text": "frilled choker",
+      "action": "APPENDED_VARIANT"
+    },
+    {
+      "mapping_id": "MAP_00093",
+      "source_entity_id": "SRC_ACC_06905",
+      "decision": "STYLE_VARIANT",
+      "target_file": "accessories.json",
+      "target_item_id": "leather_choker",
+      "target_tag_id": "leather_choker__ext_heart",
+      "clean_text": "heart choker",
+      "action": "APPENDED_VARIANT"
+    },
+    {
+      "mapping_id": "MAP_00094",
+      "source_entity_id": "SRC_ACC_06906",
+      "decision": "STYLE_VARIANT",
+      "target_file": "accessories.json",
+      "target_item_id": "neck_ribbon",
+      "target_tag_id": "neck_ribbon__ext_lace",
+      "clean_text": "lace ribbon choker",
+      "action": "APPENDED_VARIANT"
+    },
+    {
+      "mapping_id": "MAP_00095",
+      "source_entity_id": "SRC_ACC_06907",
+      "decision": "STYLE_VARIANT",
+      "target_file": "accessories.json",
+      "target_item_id": "leather_choker",
+      "target_tag_id": "leather_choker__ext_oring",
+      "clean_text": "o-ring choker",
+      "action": "APPENDED_VARIANT"
+    },
+    {
+      "mapping_id": "MAP_00096",
+      "source_entity_id": "SRC_ACC_06908",
+      "decision": "STYLE_VARIANT",
+      "target_file": "accessories.json",
+      "target_item_id": "leather_choker",
+      "target_tag_id": "leather_choker__ext_pendant",
+      "clean_text": "pendant choker",
+      "action": "APPENDED_VARIANT"
+    },
+    {
+      "mapping_id": "MAP_00097",
+      "source_entity_id": "SRC_ACC_06909",
+      "decision": "STYLE_VARIANT",
+      "target_file": "accessories.json",
+      "target_item_id": "neck_ribbon",
+      "target_tag_id": "neck_ribbon__ext_dynamic_color",
+      "clean_text": "neck ribbon",
+      "action": "DEDUP_TEXT_EXISTS"
+    },
+    {
+      "mapping_id": "MAP_00098",
+      "source_entity_id": "SRC_ACC_06910",
+      "decision": "STYLE_VARIANT",
+      "target_file": "accessories.json",
+      "target_item_id": "leather_choker",
+      "target_tag_id": "leather_choker__ext_spiked",
+      "clean_text": "spiked choker",
+      "action": "APPENDED_VARIANT"
+    },
+    {
+      "mapping_id": "MAP_00099",
+      "source_entity_id": "SRC_ACC_06911",
+      "decision": "STYLE_VARIANT",
+      "target_file": "accessories.json",
+      "target_item_id": "leather_choker",
+      "target_tag_id": "leather_choker__ext_star",
+      "clean_text": "star choker",
+      "action": "APPENDED_VARIANT"
+    },
+    {
+      "mapping_id": "MAP_00100",
+      "source_entity_id": "SRC_ACC_06912",
+      "decision": "NEW_STYLE",
+      "target_file": "clothing.json",
+      "target_item_id": "legwear_fishnet_pantyhose",
+      "target_tag_id": "legwear_fishnet_pantyhose__tag_000",
+      "clean_text": "fishnet pantyhose",
+      "action": "APPENDED_NEW_STYLE"
+    },
+    {
+      "mapping_id": "MAP_00101",
+      "source_entity_id": "SRC_ACC_06913",
+      "decision": "STYLE_VARIANT",
+      "target_file": "clothing.json",
+      "target_item_id": "legwear_fishnet_thighhighs",
+      "target_tag_id": "legwear_fishnet_thighhighs__ext_single",
+      "clean_text": "single fishnet thighhigh",
+      "action": "APPENDED_VARIANT"
+    },
+    {
+      "mapping_id": "MAP_00102",
+      "source_entity_id": "SRC_ACC_06914",
+      "decision": "NEW_STYLE",
+      "target_file": "clothing.json",
+      "target_item_id": "legwear_fishnet_thighhighs",
+      "target_tag_id": "legwear_fishnet_thighhighs__tag_000",
+      "clean_text": "fishnet thighhighs",
+      "action": "APPENDED_NEW_STYLE"
+    },
+    {
+      "mapping_id": "MAP_00103",
+      "source_entity_id": "SRC_ACC_06915",
+      "decision": "ENSEMBLE_COMBO",
+      "target_file": "clothing.json",
+      "target_item_id": "bottom_jeans_casual",
+      "target_tag_id": "bottom_jeans_casual__tag_000",
+      "clean_text": "jeans pants",
+      "action": "APPENDED_COMBO"
+    },
+    {
+      "mapping_id": "MAP_00104",
+      "source_entity_id": "SRC_ACC_06916",
+      "decision": "STYLE_VARIANT",
+      "target_file": "accessories.json",
+      "target_item_id": "leather_choker",
+      "target_tag_id": "leather_choker__ext_bell",
+      "clean_text": "neck bell choker",
+      "action": "APPENDED_VARIANT"
+    },
+    {
+      "mapping_id": "MAP_00105",
+      "source_entity_id": "SRC_ACC_06917",
+      "decision": "NEW_STYLE",
+      "target_file": "accessories.json",
+      "target_item_id": "acc_necklace_general",
+      "target_tag_id": "acc_necklace_general__tag_000",
+      "clean_text": "necklace",
+      "action": "DEDUP_TEXT_EXISTS"
+    },
+    {
+      "mapping_id": "MAP_00106",
+      "source_entity_id": "SRC_ACC_06918",
+      "decision": "STYLE_VARIANT",
+      "target_file": "accessories.json",
+      "target_item_id": "acc_necklace_general",
+      "target_tag_id": "acc_necklace_general__ext_bead",
+      "clean_text": "bead necklace",
+      "action": "APPENDED_VARIANT"
+    },
+    {
+      "mapping_id": "MAP_00107",
+      "source_entity_id": "SRC_ACC_06919",
+      "decision": "STYLE_VARIANT",
+      "target_file": "accessories.json",
+      "target_item_id": "gold_collarbone_chain",
+      "target_tag_id": "gold_collarbone_chain__ext_chain",
+      "clean_text": "chain necklace",
+      "action": "APPENDED_VARIANT"
+    },
+    {
+      "mapping_id": "MAP_00108",
+      "source_entity_id": "SRC_ACC_06920",
+      "decision": "STYLE_VARIANT",
+      "target_file": "accessories.json",
+      "target_item_id": "acc_necklace_general",
+      "target_tag_id": "acc_necklace_general__ext_cross",
+      "clean_text": "cross necklace",
+      "action": "APPENDED_VARIANT"
+    },
+    {
+      "mapping_id": "MAP_00109",
+      "source_entity_id": "SRC_ACC_06921",
+      "decision": "STYLE_VARIANT",
+      "target_file": "accessories.json",
+      "target_item_id": "acc_necklace_general",
+      "target_tag_id": "acc_necklace_general__ext_heart",
+      "clean_text": "heart necklace",
+      "action": "APPENDED_VARIANT"
+    },
+    {
+      "mapping_id": "MAP_00110",
+      "source_entity_id": "SRC_ACC_06922",
+      "decision": "STYLE_VARIANT",
+      "target_file": "accessories.json",
+      "target_item_id": "acc_necklace_general",
+      "target_tag_id": "acc_necklace_general__ext_key",
+      "clean_text": "key necklace",
+      "action": "APPENDED_VARIANT"
+    },
+    {
+      "mapping_id": "MAP_00111",
+      "source_entity_id": "SRC_ACC_06923",
+      "decision": "STYLE_VARIANT",
+      "target_file": "accessories.json",
+      "target_item_id": "acc_necklace_general",
+      "target_tag_id": "acc_necklace_general__ext_lock",
+      "clean_text": "lock necklace",
+      "action": "APPENDED_VARIANT"
+    },
+    {
+      "mapping_id": "MAP_00112",
+      "source_entity_id": "SRC_ACC_06924",
+      "decision": "STYLE_VARIANT",
+      "target_file": "accessories.json",
+      "target_item_id": "acc_necklace_general",
+      "target_tag_id": "acc_necklace_general__ext_magatama",
+      "clean_text": "magatama necklace",
+      "action": "APPENDED_VARIANT"
+    },
+    {
+      "mapping_id": "MAP_00113",
+      "source_entity_id": "SRC_ACC_06925",
+      "decision": "STYLE_VARIANT",
+      "target_file": "accessories.json",
+      "target_item_id": "pearl_necklace",
+      "target_tag_id": "pearl_necklace__ext_pearl_necklace",
+      "clean_text": "pearl necklace",
+      "action": "APPENDED_VARIANT"
+    },
+    {
+      "mapping_id": "MAP_00114",
+      "source_entity_id": "SRC_ACC_06926",
+      "decision": "STYLE_VARIANT",
+      "target_file": "accessories.json",
+      "target_item_id": "acc_necklace_general",
+      "target_tag_id": "acc_necklace_general__ext_ring",
+      "clean_text": "ring necklace",
+      "action": "APPENDED_VARIANT"
+    },
+    {
+      "mapping_id": "MAP_00115",
+      "source_entity_id": "SRC_ACC_06927",
+      "decision": "STYLE_VARIANT",
+      "target_file": "accessories.json",
+      "target_item_id": "acc_necklace_general",
+      "target_tag_id": "acc_necklace_general__ext_star",
+      "clean_text": "star necklace",
+      "action": "APPENDED_VARIANT"
+    },
+    {
+      "mapping_id": "MAP_00116",
+      "source_entity_id": "SRC_ACC_06928",
+      "decision": "STYLE_VARIANT",
+      "target_file": "accessories.json",
+      "target_item_id": "acc_necklace_general",
+      "target_tag_id": "acc_necklace_general__ext_tooth",
+      "clean_text": "tooth necklace",
+      "action": "APPENDED_VARIANT"
+    },
+    {
+      "mapping_id": "MAP_00117",
+      "source_entity_id": "SRC_ACC_06929",
+      "decision": "NEW_STYLE",
+      "target_file": "accessories.json",
+      "target_item_id": "acc_necktie",
+      "target_tag_id": "acc_necktie__tag_000",
+      "clean_text": "necktie",
+      "action": "APPENDED_NEW_STYLE"
+    },
+    {
+      "mapping_id": "MAP_00118",
+      "source_entity_id": "SRC_ACC_06930",
+      "decision": "NEW_STYLE",
+      "target_file": "clothing.json",
+      "target_item_id": "legwear_pantyhose",
+      "target_tag_id": "legwear_pantyhose__tag_000",
+      "clean_text": "pantyhose",
+      "action": "APPENDED_NEW_STYLE"
+    },
+    {
+      "mapping_id": "MAP_00119",
+      "source_entity_id": "SRC_ACC_06931",
+      "decision": "ENSEMBLE_COMBO",
+      "target_file": "clothing.json",
+      "target_item_id": "bottom_pantyhose_pants",
+      "target_tag_id": "bottom_pantyhose_pants__tag_000",
+      "clean_text": "pantyhose under pants",
+      "action": "APPENDED_COMBO"
+    },
+    {
+      "mapping_id": "MAP_00120",
+      "source_entity_id": "SRC_ACC_06932",
+      "decision": "ENSEMBLE_COMBO",
+      "target_file": "clothing.json",
+      "target_item_id": "denim_shorts",
+      "target_tag_id": "denim_shorts__tag_000",
+      "clean_text": "denim shorts",
+      "action": "ENRICHED_DYNAMIC_SLOTS"
+    },
+    {
+      "mapping_id": "MAP_00121",
+      "source_entity_id": "SRC_ACC_06933",
+      "decision": "ENSEMBLE_COMBO",
+      "target_file": "clothing.json",
+      "target_item_id": "bottom_shorts_casual",
+      "target_tag_id": "bottom_shorts_casual__tag_000",
+      "clean_text": "casual shorts",
+      "action": "APPENDED_COMBO"
+    },
+    {
+      "mapping_id": "MAP_00122",
+      "source_entity_id": "SRC_ACC_06934",
+      "decision": "STYLE_VARIANT",
+      "target_file": "clothing.json",
+      "target_item_id": "legwear_thighhighs",
+      "target_tag_id": "legwear_thighhighs__ext_single",
+      "clean_text": "single thighhigh",
+      "action": "APPENDED_VARIANT"
+    },
+    {
+      "mapping_id": "MAP_00123",
+      "source_entity_id": "SRC_ACC_06935",
+      "decision": "NEW_STYLE",
+      "target_file": "clothing.json",
+      "target_item_id": "legwear_thighhighs",
+      "target_tag_id": "legwear_thighhighs__tag_000",
+      "clean_text": "thighhighs",
+      "action": "APPENDED_NEW_STYLE"
+    },
+    {
+      "mapping_id": "MAP_00124",
+      "source_entity_id": "SRC_ACC_06936",
+      "decision": "NEW_STYLE",
+      "target_file": "clothing.json",
+      "target_item_id": "footwear_boots",
+      "target_tag_id": "footwear_boots__tag_000",
+      "clean_text": "boots",
+      "action": "APPENDED_NEW_STYLE"
+    },
+    {
+      "mapping_id": "MAP_00125",
+      "source_entity_id": "SRC_ACC_06937",
+      "decision": "STYLE_VARIANT",
+      "target_file": "clothing.json",
+      "target_item_id": "footwear_boots",
+      "target_tag_id": "footwear_boots__ext_ankle",
+      "clean_text": "ankle boots",
+      "action": "APPENDED_VARIANT"
+    },
+    {
+      "mapping_id": "MAP_00126",
+      "source_entity_id": "SRC_ACC_06938",
+      "decision": "STYLE_VARIANT",
+      "target_file": "clothing.json",
+      "target_item_id": "footwear_boots",
+      "target_tag_id": "footwear_boots__ext_thigh",
+      "clean_text": "thigh boots",
+      "action": "APPENDED_VARIANT"
+    },
+    {
+      "mapping_id": "MAP_00127",
+      "source_entity_id": "SRC_ACC_06939",
+      "decision": "NEW_STYLE",
+      "target_file": "clothing.json",
+      "target_item_id": "footwear_sneakers",
+      "target_tag_id": "footwear_sneakers__tag_000",
+      "clean_text": "sneakers",
+      "action": "APPENDED_NEW_STYLE"
+    }
+  ]
+}

@@ -224,6 +224,79 @@ class TestNudityLevels(unittest.TestCase):
                         f"L5 + {style} contained wearing clothing tags: {pos}"
                     )
 
+    def test_in_memory_ensemble_violating_pool_fails_closed_under_l1(self):
+        """纯内存反例验证：当套装/复合穿搭候选池仅包含违规条目（如 silk bra and panties）时，
+        在 L1 下必须 Fail-Closed 返回空列表，严禁放行或回退原池。
+        同时验证 sample_clothing_result 与直达标签 target_tag 在违规时均返回空 base_tags。
+        """
+        from random import Random
+
+        rng = Random(42)
+        violating_ensemble_style = {
+            "id": "clothing_ensemble_combos",
+            "is_ensemble": True,
+            "tags": [
+                {"text": "silk bra and panties", "facts": {"style_genre": "boudoir_lingerie"}},
+                "black lace bra and panties",
+                "sheer lingerie set",
+            ]
+        }
+
+        # 1. 验证 _select_clothing_style_tags 在全违规池下返回空列表 []
+        selected = self.sampler._select_clothing_style_tags(
+            violating_ensemble_style,
+            rng,
+            nudity_level_code="L1"
+        )
+        self.assertEqual(selected, [], "All-violating ensemble tags under L1 must return [] (fail-closed)")
+
+        # 2. 验证非 L1 模式下（如 L3）正常抽取候选
+        selected_l3 = self.sampler._select_clothing_style_tags(
+            violating_ensemble_style,
+            rng,
+            nudity_level_code="L3"
+        )
+        self.assertEqual(len(selected_l3), 1, "Non-L1 mode should sample normally from ensemble pool")
+
+        # 3. 验证通过 sample_clothing_result 遭遇全违规套装时严格返回空 base_tags
+        violating_tag = {"text": "silk bra and panties", "facts": {"style_genre": "boudoir_lingerie"}}
+        categories = self.sampler._load("clothing").get("categories", [])
+        mock_style = {
+            "id": "mock_violating_ensemble",
+            "name": "纯违规内衣测试套装",
+            "is_ensemble": True,
+            "tags": [violating_tag]
+        }
+        categories.append(mock_style)
+        try:
+            res_l1 = self.sampler.sample_clothing_result(
+                style="mock_violating_ensemble",
+                state="无 (None)",
+                nudity_level_code="L1",
+                rng=Random(42)
+            )
+            self.assertEqual(
+                res_l1.base_tags,
+                (),
+                "sample_clothing_result with violating ensemble must have empty base_tags under L1"
+            )
+
+            # 验证 target_tag 直达输入违规词时的拦截
+            res_target_l1 = self.sampler.sample_clothing_result(
+                style="silk bra and panties",
+                state="无 (None)",
+                nudity_level_code="L1",
+                rng=Random(42)
+            )
+            self.assertEqual(
+                res_target_l1.base_tags,
+                (),
+                "sample_clothing_result with violating target_tag must have empty base_tags under L1"
+            )
+        finally:
+            categories.pop()
+
 
 if __name__ == "__main__":
     unittest.main()
+

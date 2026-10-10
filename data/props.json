@@ -544,6 +544,36 @@
           ]
         }
       ]
+    },
+    {
+      "id": "fashion_clutch_bag",
+      "name_zh": "👛 精致手拿包 (Clutch Bag)",
+      "tags": [
+        {
+          "id": "ext_aw_prop_clutch_bag__tag_000",
+          "text": "elegant clutch bag held in hand",
+          "facts": {
+            "semantic_role": "selector",
+            "prop_usage": "handheld",
+            "hands_required": 1
+          }
+        }
+      ]
+    },
+    {
+      "id": "fashion_baguette_bag",
+      "name_zh": "👜 复古腋下包 (Baguette Bag)",
+      "tags": [
+        {
+          "id": "ext_aw_prop_baguette_bag__tag_000",
+          "text": "baguette bag worn over shoulder under arm",
+          "facts": {
+            "semantic_role": "selector",
+            "prop_usage": "worn",
+            "hands_required": 0
+          }
+        }
+      ]
     }
   ]
 }

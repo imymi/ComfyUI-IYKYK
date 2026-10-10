@@ -1,0 +1,41 @@
+{
+  "manifest_version": "1.0",
+  "tested_component": "M1 Wildcard Vertical Slice (6 samples)",
+  "tested_commit_target": "aee93a458cd57eba68cd3969d1507ffcd4c51647",
+  "tree_hash": "377f3078e40b4ff91137660c5de1974ba7a99191",
+  "is_dirty": false,
+  "source_tree": {
+    "git_commit": "aee93a458cd57eba68cd3969d1507ffcd4c51647",
+    "git_tree": "377f3078e40b4ff91137660c5de1974ba7a99191",
+    "is_dirty": false,
+    "uncommitted_changes": [],
+    "audit_script_hash": "1f04b28653b6ce40d8b2bd069ba277bbeef478121e58368acd9c9e1085244cfa",
+    "data_hashes": {
+      "accessories.json": "b7cc189be606288bcfd4efb463770cb63c3d764bf26164f524316468d04e87ad",
+      "lighting.json": "bdfe81d6846c9e50a0f607414561275ec868d09c592476bf15ca814c65191766",
+      "props.json": "e0496d2ca8866a755ebe6f4bfc3f9304a17189ab893808bf5cc6d612f05845be"
+    }
+  },
+  "original_archive": {
+    "filename": "audit_m1_evidence.json.gz",
+    "sha256": "5c0532c88f99f9a4d069a43d652f7a6292ca9a845ba4a20989e8bf03cf94aaeb",
+    "records_count": 4799
+  },
+  "audit_results": {
+    "baseline_commit": "c74084d",
+    "baseline_hash": "ab5a633cfb3fde70d9a6c629ee65a540955d87ee143e66570d780743246cab89",
+    "current_hash": "aa7581bc2304f6f75530d95ab4e1b75e7e1101720b1dfaf14c2a1c328fcd1139",
+    "total_seeds": 10000,
+    "identical_seeds": 5201,
+    "divergent_seeds": 4799,
+    "unexplained_seeds_count": 0,
+    "gate_status": "PASS"
+  },
+  "category_breakdown": {
+    "NEW_HAIRSTYLE_SAMPLED": 182,
+    "NEW_PROP_SAMPLED": 162,
+    "PRNG_CANDIDATE_REPLACED": 3749,
+    "PRNG_CANDIDATE_SHIFT": 3498,
+    "RESOLVED_BY_RULE": 93
+  }
+}

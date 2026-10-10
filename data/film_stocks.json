@@ -103,6 +103,56 @@
             ],
             "capture_device": null
           }
+        },
+        {
+          "id": "kodak_portra_400__ext_kodak_portra_160",
+          "text": "Kodak Portra 160",
+          "facts": {
+            "color_modes": [
+              "color"
+            ],
+            "camera_facts": {
+              "film_name": "Kodak Portra 160",
+              "manufacturer_brand": "Kodak",
+              "measured_iso": 160,
+              "recommended_ei": 160,
+              "nominal_name_rating": 160,
+              "iso_display": "ISO 160",
+              "emulsion_type": "pro_smooth_skin_tone_negative",
+              "developing_process": "C-41",
+              "is_camera_film": true,
+              "color_mode": "color_negative"
+            },
+            "governance_metadata": {
+              "verification_source": "https://imaging.kodakalaris.com/sites/default/files/files/resources/e4051_portra_160.pdf",
+              "spec_verified": true
+            }
+          }
+        },
+        {
+          "id": "kodak_portra_400__ext_kodak_portra_400",
+          "text": "Kodak Portra 400",
+          "facts": {
+            "color_modes": [
+              "color"
+            ],
+            "camera_facts": {
+              "film_name": "Kodak Portra 400",
+              "manufacturer_brand": "Kodak",
+              "measured_iso": 400,
+              "recommended_ei": 400,
+              "nominal_name_rating": 400,
+              "iso_display": "ISO 400",
+              "emulsion_type": "benchmark_portrait_negative",
+              "developing_process": "C-41",
+              "is_camera_film": true,
+              "color_mode": "color_negative"
+            },
+            "governance_metadata": {
+              "verification_source": "https://imaging.kodakalaris.com/sites/default/files/files/resources/e4050_portra_400.pdf",
+              "spec_verified": true
+            }
+          }
         }
       ],
       "scenarios": "卧室私密、情人旅馆、素人日常"
@@ -210,6 +260,31 @@
             ],
             "capture_device": null
           }
+        },
+        {
+          "id": "kodak_gold_200__ext_kodak_gold_200",
+          "text": "Kodak Gold 200",
+          "facts": {
+            "color_modes": [
+              "color"
+            ],
+            "camera_facts": {
+              "film_name": "Kodak Gold 200",
+              "manufacturer_brand": "Kodak",
+              "measured_iso": 200,
+              "recommended_ei": 200,
+              "nominal_name_rating": 200,
+              "iso_display": "ISO 200",
+              "emulsion_type": "warm_golden_consumer_negative",
+              "developing_process": "C-41",
+              "is_camera_film": true,
+              "color_mode": "color_negative"
+            },
+            "governance_metadata": {
+              "verification_source": "https://imaging.kodakalaris.com/sites/default/files/files/resources/e4040_gold_200.pdf",
+              "spec_verified": true
+            }
+          }
         }
       ],
       "scenarios": "日常偷拍、家庭感、温馨时刻"
@@ -305,6 +380,31 @@
               "color"
             ],
             "capture_device": null
+          }
+        },
+        {
+          "id": "kodak_ektar_100__ext_kodak_ektar_100",
+          "text": "Kodak Ektar 100",
+          "facts": {
+            "color_modes": [
+              "color"
+            ],
+            "camera_facts": {
+              "film_name": "Kodak Ektar 100",
+              "manufacturer_brand": "Kodak",
+              "measured_iso": 100,
+              "recommended_ei": 100,
+              "nominal_name_rating": 100,
+              "iso_display": "ISO 100",
+              "emulsion_type": "ultra_fine_grain_color_negative",
+              "developing_process": "C-41",
+              "is_camera_film": true,
+              "color_mode": "color_negative"
+            },
+            "governance_metadata": {
+              "verification_source": "https://imaging.kodakalaris.com/sites/default/files/files/resources/e4046_ektar_100.pdf",
+              "spec_verified": true
+            }
           }
         }
       ],
@@ -402,6 +502,56 @@
             ],
             "capture_device": null
           }
+        },
+        {
+          "id": "fujifilm_superia_400__ext_fujifilm_superia_venus_800",
+          "text": "Fujifilm Superia Venus 800",
+          "facts": {
+            "color_modes": [
+              "color"
+            ],
+            "camera_facts": {
+              "film_name": "Fujifilm Superia Venus 800",
+              "manufacturer_brand": "Fujifilm",
+              "measured_iso": 800,
+              "recommended_ei": 800,
+              "nominal_name_rating": 800,
+              "iso_display": "ISO 800",
+              "emulsion_type": "high_speed_color_negative",
+              "developing_process": "C-41",
+              "is_camera_film": true,
+              "color_mode": "color_negative"
+            },
+            "governance_metadata": {
+              "verification_source": "https://www.fujifilm.com/jp/ja/consumer/films/negative/venus800",
+              "spec_verified": true
+            }
+          }
+        },
+        {
+          "id": "fujifilm_superia_400__ext_fujifilm_superia_x_tra_400",
+          "text": "Fujifilm Superia X-TRA 400",
+          "facts": {
+            "color_modes": [
+              "color"
+            ],
+            "camera_facts": {
+              "film_name": "Fujifilm Superia X-TRA 400",
+              "manufacturer_brand": "Fujifilm",
+              "measured_iso": 400,
+              "recommended_ei": 400,
+              "nominal_name_rating": 400,
+              "iso_display": "ISO 400",
+              "emulsion_type": "4th_layer_versatile_color_negative",
+              "developing_process": "C-41",
+              "is_camera_film": true,
+              "color_mode": "color_negative"
+            },
+            "governance_metadata": {
+              "verification_source": "https://www.fujifilm.com/products/consumer_film/pdf/superia_xtra400_datasheet.pdf",
+              "spec_verified": true
+            }
+          }
         }
       ],
       "scenarios": "素人感、日常记录"
@@ -498,6 +648,32 @@
             ],
             "capture_device": null
           }
+        },
+        {
+          "id": "cinestill_800t__ext_cinestill_800t",
+          "text": "Cinestill 800T",
+          "facts": {
+            "color_modes": [
+              "color"
+            ],
+            "camera_facts": {
+              "film_name": "Cinestill 800T",
+              "manufacturer_brand": "CineStill",
+              "measured_iso": 500,
+              "recommended_ei": 800,
+              "nominal_name_rating": 800,
+              "iso_display": "EI 500 (ECN-2) / EI 800 (C-41)",
+              "iso_spec_note": "由 Kodak Vision3 500T 去碳膜改造，C-41 工艺下等效推荐感光度为 EI 800",
+              "emulsion_type": "tungsten_motion_picture_c41",
+              "developing_process": "C-41",
+              "is_camera_film": true,
+              "color_mode": "color_negative"
+            },
+            "governance_metadata": {
+              "verification_source": "https://cinestillfilm.com/products/800tungsten-high-speed-color-negative-film-35mm-36-exp",
+              "spec_verified": true
+            }
+          }
         }
       ],
       "scenarios": "夜景、霓虹、风俗街"
@@ -582,6 +758,31 @@
               "color"
             ],
             "capture_device": null
+          }
+        },
+        {
+          "id": "kodak_max_400__ext_kodak_ultramax_400",
+          "text": "Kodak Ultramax 400",
+          "facts": {
+            "color_modes": [
+              "color"
+            ],
+            "camera_facts": {
+              "film_name": "Kodak Ultramax 400",
+              "manufacturer_brand": "Kodak",
+              "measured_iso": 400,
+              "recommended_ei": 400,
+              "nominal_name_rating": 400,
+              "iso_display": "ISO 400",
+              "emulsion_type": "versatile_consumer_negative",
+              "developing_process": "C-41",
+              "is_camera_film": true,
+              "color_mode": "color_negative"
+            },
+            "governance_metadata": {
+              "verification_source": "https://imaging.kodakalaris.com/sites/default/files/files/resources/e4040_gold_200.pdf",
+              "spec_verified": true
+            }
           }
         }
       ],
@@ -679,6 +880,31 @@
             ],
             "capture_device": null
           }
+        },
+        {
+          "id": "fujifilm_velvia_50__ext_fujifilm_velvia_50",
+          "text": "Fujifilm Velvia 50",
+          "facts": {
+            "color_modes": [
+              "color"
+            ],
+            "camera_facts": {
+              "film_name": "Fujifilm Velvia 50",
+              "manufacturer_brand": "Fujifilm",
+              "measured_iso": 50,
+              "recommended_ei": 50,
+              "nominal_name_rating": 50,
+              "iso_display": "ISO 50",
+              "emulsion_type": "ultra_saturated_reversal",
+              "developing_process": "E-6",
+              "is_camera_film": true,
+              "color_mode": "color_slide"
+            },
+            "governance_metadata": {
+              "verification_source": "https://www.fujifilm.com/products/professional_films/pdf/velvia_50_datasheet.pdf",
+              "spec_verified": true
+            }
+          }
         }
       ],
       "scenarios": "户外露出、泳池、制服"
@@ -774,6 +1000,31 @@
               "color"
             ],
             "capture_device": null
+          }
+        },
+        {
+          "id": "fujifilm_pro_400h__ext_fujifilm_pro_400h",
+          "text": "Fujifilm Pro 400H",
+          "facts": {
+            "color_modes": [
+              "color"
+            ],
+            "camera_facts": {
+              "film_name": "Fujifilm Pro 400H",
+              "manufacturer_brand": "Fujifilm",
+              "measured_iso": 400,
+              "recommended_ei": 400,
+              "nominal_name_rating": 400,
+              "iso_display": "ISO 400",
+              "emulsion_type": "4th_layer_portrait_color_negative",
+              "developing_process": "C-41",
+              "is_camera_film": true,
+              "color_mode": "color_negative"
+            },
+            "governance_metadata": {
+              "verification_source": "https://www.fujifilm.com/products/professional_films/pdf/pro_400h_datasheet.pdf",
+              "spec_verified": true
+            }
           }
         }
       ],
@@ -1052,6 +1303,57 @@
             ],
             "capture_device": null
           }
+        },
+        {
+          "id": "kodak_tmax_400__ext_kodak_t_max_100",
+          "text": "Kodak T-Max 100",
+          "facts": {
+            "color_modes": [
+              "monochrome"
+            ],
+            "camera_facts": {
+              "film_name": "Kodak T-Max 100",
+              "manufacturer_brand": "Kodak",
+              "measured_iso": 100,
+              "recommended_ei": 100,
+              "nominal_name_rating": 100,
+              "iso_display": "ISO 100",
+              "emulsion_type": "t_grain_high_res_bw",
+              "developing_process": "Standard B&W",
+              "is_camera_film": true,
+              "color_mode": "bw"
+            },
+            "governance_metadata": {
+              "verification_source": "https://imaging.kodakalaris.com/sites/default/files/files/resources/f4016_TMax_100.pdf",
+              "spec_verified": true
+            }
+          }
+        },
+        {
+          "id": "kodak_tmax_400__ext_kodak_tmax_3200",
+          "text": "Kodak Tmax 3200",
+          "facts": {
+            "color_modes": [
+              "monochrome"
+            ],
+            "camera_facts": {
+              "film_name": "Kodak Tmax 3200",
+              "manufacturer_brand": "Kodak",
+              "measured_iso": 1000,
+              "recommended_ei": 3200,
+              "nominal_name_rating": 3200,
+              "iso_display": "ISO 800-1000 (EI 3200)",
+              "iso_spec_note": "官方数据表 F-32 明确标定原生测定速度为 ISO 800-1000，设计专用于增感冲洗并标称推荐曝光指数 EI 3200",
+              "emulsion_type": "ultra_high_speed_t_grain_bw",
+              "developing_process": "Standard B&W",
+              "is_camera_film": true,
+              "color_mode": "bw"
+            },
+            "governance_metadata": {
+              "verification_source": "https://imaging.kodakalaris.com/sites/default/files/files/resources/f32_TMax_P3200.pdf",
+              "spec_verified": true
+            }
+          }
         }
       ],
       "scenarios": "专业黑白人像、纪实风格"
@@ -1136,6 +1438,56 @@
               "monochrome"
             ],
             "capture_device": null
+          }
+        },
+        {
+          "id": "fujifilm_acros_100__ext_fujifilm_acros_ii",
+          "text": "Fujifilm Acros II",
+          "facts": {
+            "color_modes": [
+              "monochrome"
+            ],
+            "camera_facts": {
+              "film_name": "Fujifilm Acros II",
+              "manufacturer_brand": "Fujifilm",
+              "measured_iso": 100,
+              "recommended_ei": 100,
+              "nominal_name_rating": 100,
+              "iso_display": "ISO 100",
+              "emulsion_type": "super_fine_sigma_grain_bw",
+              "developing_process": "Standard B&W",
+              "is_camera_film": true,
+              "color_mode": "bw"
+            },
+            "governance_metadata": {
+              "verification_source": "https://fujifilm-x.com/global/products/films/neopan-100-acrosii/",
+              "spec_verified": true
+            }
+          }
+        },
+        {
+          "id": "fujifilm_acros_100__ext_fujifilm_neopan_acros_100",
+          "text": "Fujifilm Neopan Acros 100",
+          "facts": {
+            "color_modes": [
+              "monochrome"
+            ],
+            "camera_facts": {
+              "film_name": "Fujifilm Neopan Acros 100",
+              "manufacturer_brand": "Fujifilm",
+              "measured_iso": 100,
+              "recommended_ei": 100,
+              "nominal_name_rating": 100,
+              "iso_display": "ISO 100",
+              "emulsion_type": "original_acros_bw",
+              "developing_process": "Standard B&W",
+              "is_camera_film": true,
+              "color_mode": "bw"
+            },
+            "governance_metadata": {
+              "verification_source": "https://www.fujifilm.com/products/professional_films/pdf/acros_100_datasheet.pdf",
+              "spec_verified": true
+            }
           }
         }
       ],
@@ -1233,6 +1585,31 @@
             ],
             "capture_device": null
           }
+        },
+        {
+          "id": "kodak_trix_400__ext_kodak_tri_x_400",
+          "text": "Kodak Tri-X 400",
+          "facts": {
+            "color_modes": [
+              "monochrome"
+            ],
+            "camera_facts": {
+              "film_name": "Kodak Tri-X 400",
+              "manufacturer_brand": "Kodak",
+              "measured_iso": 400,
+              "recommended_ei": 400,
+              "nominal_name_rating": 400,
+              "iso_display": "ISO 400",
+              "emulsion_type": "gritty_high_contrast_street_bw",
+              "developing_process": "Standard B&W",
+              "is_camera_film": true,
+              "color_mode": "bw"
+            },
+            "governance_metadata": {
+              "verification_source": "https://imaging.kodakalaris.com/sites/default/files/files/resources/f4017_TriX.pdf",
+              "spec_verified": true
+            }
+          }
         }
       ],
       "scenarios": "街头、监禁、硬派压抑"
@@ -1318,6 +1695,31 @@
             ],
             "capture_device": null
           }
+        },
+        {
+          "id": "ilford_hp5_plus__ext_ilford_hp5_plus_400",
+          "text": "Ilford HP5 Plus 400",
+          "facts": {
+            "color_modes": [
+              "monochrome"
+            ],
+            "camera_facts": {
+              "film_name": "Ilford HP5 Plus 400",
+              "manufacturer_brand": "Ilford",
+              "measured_iso": 400,
+              "recommended_ei": 400,
+              "nominal_name_rating": 400,
+              "iso_display": "ISO 400",
+              "emulsion_type": "traditional_high_speed_documentary_bw",
+              "developing_process": "Standard B&W",
+              "is_camera_film": true,
+              "color_mode": "bw"
+            },
+            "governance_metadata": {
+              "verification_source": "https://www.ilfordphoto.com/amfile/file/download/file/1903/product/693/",
+              "spec_verified": true
+            }
+          }
         }
       ],
       "scenarios": "日常黑白、纪实"
@@ -1392,6 +1794,82 @@
             ],
             "capture_device": null
           }
+        },
+        {
+          "id": "ilford_delta_3200__ext_ilford_delta_100",
+          "text": "Ilford Delta 100",
+          "facts": {
+            "color_modes": [
+              "monochrome"
+            ],
+            "camera_facts": {
+              "film_name": "Ilford Delta 100",
+              "manufacturer_brand": "Ilford",
+              "measured_iso": 100,
+              "recommended_ei": 100,
+              "nominal_name_rating": 100,
+              "iso_display": "ISO 100",
+              "emulsion_type": "core_shell_tabular_bw",
+              "developing_process": "Standard B&W",
+              "is_camera_film": true,
+              "color_mode": "bw"
+            },
+            "governance_metadata": {
+              "verification_source": "https://www.ilfordphoto.com/amfile/file/download/file/1911/product/680/",
+              "spec_verified": true
+            }
+          }
+        },
+        {
+          "id": "ilford_delta_3200__ext_ilford_delta_3200",
+          "text": "Ilford Delta 3200",
+          "facts": {
+            "color_modes": [
+              "monochrome"
+            ],
+            "camera_facts": {
+              "film_name": "Ilford Delta 3200",
+              "manufacturer_brand": "Ilford",
+              "measured_iso": 1000,
+              "recommended_ei": 3200,
+              "nominal_name_rating": 3200,
+              "iso_display": "ISO 1000 (EI 3200)",
+              "iso_spec_note": "官方技术手册明确标定实际测定感光度为 ISO 1000/31°，产品设计推荐曝光指数为 EI 3200/36°，绝非原生 ISO 3200",
+              "emulsion_type": "ultra_high_speed_tabular_bw",
+              "developing_process": "Standard B&W",
+              "is_camera_film": true,
+              "color_mode": "bw"
+            },
+            "governance_metadata": {
+              "verification_source": "https://www.ilfordphoto.com/amfile/file/download/file/1913/product/682/",
+              "spec_verified": true
+            }
+          }
+        },
+        {
+          "id": "ilford_delta_3200__ext_ilford_delta_400",
+          "text": "Ilford Delta 400",
+          "facts": {
+            "color_modes": [
+              "monochrome"
+            ],
+            "camera_facts": {
+              "film_name": "Ilford Delta 400",
+              "manufacturer_brand": "Ilford",
+              "measured_iso": 400,
+              "recommended_ei": 400,
+              "nominal_name_rating": 400,
+              "iso_display": "ISO 400",
+              "emulsion_type": "core_shell_tabular_bw",
+              "developing_process": "Standard B&W",
+              "is_camera_film": true,
+              "color_mode": "bw"
+            },
+            "governance_metadata": {
+              "verification_source": "https://www.ilfordphoto.com/amfile/file/download/file/1912/product/681/",
+              "spec_verified": true
+            }
+          }
         }
       ],
       "scenarios": "暗光场景、粗粒黑白"
@@ -1465,6 +1943,31 @@
               "monochrome"
             ],
             "capture_device": null
+          }
+        },
+        {
+          "id": "kodak_double_x__ext_cinestill_bwxx",
+          "text": "Cinestill BwXX",
+          "facts": {
+            "color_modes": [
+              "monochrome"
+            ],
+            "camera_facts": {
+              "film_name": "Cinestill BwXX",
+              "manufacturer_brand": "CineStill",
+              "measured_iso": 250,
+              "recommended_ei": 250,
+              "nominal_name_rating": 250,
+              "iso_display": "ISO 250 (Daylight) / ISO 200 (Tungsten)",
+              "emulsion_type": "double_x_motion_picture_bw",
+              "developing_process": "Standard B&W",
+              "is_camera_film": true,
+              "color_mode": "bw"
+            },
+            "governance_metadata": {
+              "verification_source": "https://cinestillfilm.com/products/cinestill-bwxx-double-x-black-and-white-negative-film-35mm-36exp",
+              "spec_verified": true
+            }
           }
         }
       ],
@@ -1625,6 +2128,56 @@
             ],
             "capture_device": null
           }
+        },
+        {
+          "id": "fujifilm_ektachrome_e100__ext_kodak_ektachrome_64",
+          "text": "Kodak Ektachrome 64",
+          "facts": {
+            "color_modes": [
+              "color"
+            ],
+            "camera_facts": {
+              "film_name": "Kodak Ektachrome 64",
+              "manufacturer_brand": "Kodak",
+              "measured_iso": 64,
+              "recommended_ei": 64,
+              "nominal_name_rating": 64,
+              "iso_display": "ISO 64",
+              "emulsion_type": "classic_natgeo_slide",
+              "developing_process": "E-6",
+              "is_camera_film": true,
+              "color_mode": "color_slide"
+            },
+            "governance_metadata": {
+              "verification_source": "https://imaging.kodakalaris.com/sites/default/files/files/resources/e4000_Ektachrome_E100.pdf",
+              "spec_verified": true
+            }
+          }
+        },
+        {
+          "id": "fujifilm_ektachrome_e100__ext_kodak_ektachrome_e100",
+          "text": "Kodak Ektachrome E100",
+          "facts": {
+            "color_modes": [
+              "color"
+            ],
+            "camera_facts": {
+              "film_name": "Kodak Ektachrome E100",
+              "manufacturer_brand": "Kodak",
+              "measured_iso": 100,
+              "recommended_ei": 100,
+              "nominal_name_rating": 100,
+              "iso_display": "ISO 100",
+              "emulsion_type": "cool_clean_slide",
+              "developing_process": "E-6",
+              "is_camera_film": true,
+              "color_mode": "color_slide"
+            },
+            "governance_metadata": {
+              "verification_source": "https://imaging.kodakalaris.com/sites/default/files/files/resources/e4000_Ektachrome_E100.pdf",
+              "spec_verified": true
+            }
+          }
         }
       ],
       "scenarios": "医疗场景、科技感"
@@ -1709,6 +2262,56 @@
               "color"
             ],
             "capture_device": null
+          }
+        },
+        {
+          "id": "fujifilm_provia_100f__ext_fujichrome_provia_100f",
+          "text": "Fujichrome Provia 100F",
+          "facts": {
+            "color_modes": [
+              "color"
+            ],
+            "camera_facts": {
+              "film_name": "Fujichrome Provia 100F",
+              "manufacturer_brand": "Fujifilm",
+              "measured_iso": 100,
+              "recommended_ei": 100,
+              "nominal_name_rating": 100,
+              "iso_display": "ISO 100",
+              "emulsion_type": "neutral_color_reversal",
+              "developing_process": "E-6",
+              "is_camera_film": true,
+              "color_mode": "color_slide"
+            },
+            "governance_metadata": {
+              "verification_source": "https://www.fujifilm.com/products/professional_films/pdf/provia_100f_datasheet.pdf",
+              "spec_verified": true
+            }
+          }
+        },
+        {
+          "id": "fujifilm_provia_100f__ext_fujifilm_provia_400x",
+          "text": "Fujifilm Provia 400X",
+          "facts": {
+            "color_modes": [
+              "color"
+            ],
+            "camera_facts": {
+              "film_name": "Fujifilm Provia 400X",
+              "manufacturer_brand": "Fujifilm",
+              "measured_iso": 400,
+              "recommended_ei": 400,
+              "nominal_name_rating": 400,
+              "iso_display": "ISO 400",
+              "emulsion_type": "high_speed_color_reversal",
+              "developing_process": "E-6",
+              "is_camera_film": true,
+              "color_mode": "color_slide"
+            },
+            "governance_metadata": {
+              "verification_source": "https://www.fujifilm.com/products/professional_films/pdf/provia_400x_datasheet.pdf",
+              "spec_verified": true
+            }
           }
         }
       ],
@@ -1795,6 +2398,81 @@
             ],
             "capture_device": null
           }
+        },
+        {
+          "id": "lomography_color__ext_lomography_color_negative_800",
+          "text": "Lomography Color Negative 800",
+          "facts": {
+            "color_modes": [
+              "color"
+            ],
+            "camera_facts": {
+              "film_name": "Lomography Color Negative 800",
+              "manufacturer_brand": "Lomography",
+              "measured_iso": 800,
+              "recommended_ei": 800,
+              "nominal_name_rating": 800,
+              "iso_display": "ISO 800",
+              "emulsion_type": "saturated_grainy_color_negative",
+              "developing_process": "C-41",
+              "is_camera_film": true,
+              "color_mode": "color_negative"
+            },
+            "governance_metadata": {
+              "verification_source": "https://www.lomography.com/films/871961233-lomography-color-negative-800-35mm/facts",
+              "spec_verified": true
+            }
+          }
+        },
+        {
+          "id": "lomography_color__ext_lomography_redscale_xr_50_200",
+          "text": "Lomography Redscale XR 50-200",
+          "facts": {
+            "color_modes": [
+              "color"
+            ],
+            "camera_facts": {
+              "film_name": "Lomography Redscale XR 50-200",
+              "manufacturer_brand": "Lomography",
+              "measured_iso": 100,
+              "recommended_ei": 100,
+              "nominal_name_rating": 200,
+              "iso_display": "EI 50-200 (Extended Range)",
+              "emulsion_type": "reverse_exposure_redscale",
+              "developing_process": "C-41",
+              "is_camera_film": true,
+              "color_mode": "color_redscale_specialty"
+            },
+            "governance_metadata": {
+              "verification_source": "https://www.lomography.com/films/871961240-lomography-redscale-xr-50-200-35mm/facts",
+              "spec_verified": true
+            }
+          }
+        },
+        {
+          "id": "lomography_color__ext_lomography_x_pro_200",
+          "text": "Lomography X-Pro 200",
+          "facts": {
+            "color_modes": [
+              "color"
+            ],
+            "camera_facts": {
+              "film_name": "Lomography X-Pro 200",
+              "manufacturer_brand": "Lomography",
+              "measured_iso": 200,
+              "recommended_ei": 200,
+              "nominal_name_rating": 200,
+              "iso_display": "ISO 200 (Cross-Process in C-41)",
+              "emulsion_type": "cross_process_slide",
+              "developing_process": "C-41 / E-6",
+              "is_camera_film": true,
+              "color_mode": "color_slide_cross_process"
+            },
+            "governance_metadata": {
+              "verification_source": "https://www.lomography.com/films/871961239-lomography-x-pro-chrome-200-35mm/facts",
+              "spec_verified": true
+            }
+          }
         }
       ],
       "scenarios": "艺术写真、创意风格"
@@ -1879,6 +2557,31 @@
               "color"
             ],
             "capture_device": null
+          }
+        },
+        {
+          "id": "cinestill_50d__ext_cinestill_50d",
+          "text": "Cinestill 50D",
+          "facts": {
+            "color_modes": [
+              "color"
+            ],
+            "camera_facts": {
+              "film_name": "Cinestill 50D",
+              "manufacturer_brand": "CineStill",
+              "measured_iso": 50,
+              "recommended_ei": 50,
+              "nominal_name_rating": 50,
+              "iso_display": "ISO 50",
+              "emulsion_type": "daylight_motion_picture_c41",
+              "developing_process": "C-41",
+              "is_camera_film": true,
+              "color_mode": "color_negative"
+            },
+            "governance_metadata": {
+              "verification_source": "https://cinestillfilm.com/products/cinestill-50d-daylight-balanced-color-negative-film-35mm-36-exp",
+              "spec_verified": true
+            }
           }
         }
       ],
@@ -1979,6 +2682,1517 @@
         }
       ],
       "scenarios": "复古、年代感、破损记忆"
+    },
+    {
+      "id": "film_stock_adox",
+      "name_zh": "ADOX 经典胶卷 (Adox Film Stocks)",
+      "tags": [
+        {
+          "id": "film__adox_cms_20_ii",
+          "text": "Adox CMS 20 II",
+          "facts": {
+            "color_modes": [
+              "monochrome"
+            ],
+            "camera_facts": {
+              "film_name": "Adox CMS 20 II",
+              "manufacturer_brand": "ADOX",
+              "measured_iso": 20,
+              "recommended_ei": 20,
+              "nominal_name_rating": 20,
+              "iso_display": "ISO 20",
+              "emulsion_type": "orthopanchromatic_microfilm",
+              "developing_process": "CMS 20 Developer",
+              "is_camera_film": true,
+              "color_mode": "bw"
+            },
+            "governance_metadata": {
+              "verification_source": "https://www.adox.de/Photo/adox-films/cms-20-ii/",
+              "spec_verified": true
+            }
+          }
+        },
+        {
+          "id": "film__adox_silvermax_100",
+          "text": "Adox Silvermax 100",
+          "facts": {
+            "color_modes": [
+              "monochrome"
+            ],
+            "camera_facts": {
+              "film_name": "Adox Silvermax 100",
+              "manufacturer_brand": "ADOX",
+              "measured_iso": 100,
+              "recommended_ei": 100,
+              "nominal_name_rating": 100,
+              "iso_display": "ISO 100",
+              "emulsion_type": "high_silver_panchromatic",
+              "developing_process": "Standard B&W",
+              "is_camera_film": true,
+              "color_mode": "bw"
+            },
+            "governance_metadata": {
+              "verification_source": "https://www.adox.de/Photo/adox-films/silvermax/",
+              "spec_verified": true
+            }
+          }
+        }
+      ],
+      "series": "⚫ 黑白/单色系",
+      "scenarios": "超微粒黑白、极高解像力、翻拍与科学摄影"
+    },
+    {
+      "id": "film_stock_agfa",
+      "name_zh": "爱克发经典专业胶卷 (Agfa Professional Film)",
+      "tags": [
+        {
+          "id": "film__agfa_ortho_25_professional",
+          "text": "Agfa Ortho 25 Professional",
+          "facts": {
+            "color_modes": [
+              "monochrome"
+            ],
+            "camera_facts": {
+              "film_name": "Agfa Ortho 25 Professional",
+              "manufacturer_brand": "Agfa",
+              "measured_iso": 25,
+              "recommended_ei": 25,
+              "nominal_name_rating": 25,
+              "iso_display": "ISO 25",
+              "emulsion_type": "orthochromatic",
+              "developing_process": "Standard B&W",
+              "is_camera_film": true,
+              "color_mode": "bw"
+            },
+            "governance_metadata": {
+              "verification_source": "https://agfa.com/archive/ortho25.pdf",
+              "spec_verified": true
+            }
+          }
+        },
+        {
+          "id": "film__agfa_scala_200x",
+          "text": "Agfa Scala 200x",
+          "facts": {
+            "color_modes": [
+              "monochrome"
+            ],
+            "camera_facts": {
+              "film_name": "Agfa Scala 200x",
+              "manufacturer_brand": "Agfa",
+              "measured_iso": 200,
+              "recommended_ei": 200,
+              "nominal_name_rating": 200,
+              "iso_display": "ISO 200",
+              "emulsion_type": "monochrome_reversal",
+              "developing_process": "Scala Reversal",
+              "is_camera_film": true,
+              "color_mode": "bw_slide"
+            },
+            "governance_metadata": {
+              "verification_source": "https://agfa.com/archive/scala200x.pdf",
+              "spec_verified": true
+            }
+          }
+        }
+      ],
+      "series": "⚫ 黑白/单色系",
+      "scenarios": "正色黑白、工业摄影、历史胶片质感"
+    },
+    {
+      "id": "film_stock_agfaphoto",
+      "name_zh": "爱克发彩色与黑白胶卷 (AgfaPhoto Film Stocks)",
+      "tags": [
+        {
+          "id": "film__agfa_precisa_ct_100",
+          "text": "Agfa Precisa CT 100",
+          "facts": {
+            "color_modes": [
+              "color"
+            ],
+            "camera_facts": {
+              "film_name": "Agfa Precisa CT 100",
+              "manufacturer_brand": "AgfaPhoto",
+              "measured_iso": 100,
+              "recommended_ei": 100,
+              "nominal_name_rating": 100,
+              "iso_display": "ISO 100",
+              "emulsion_type": "daylight_reversal",
+              "developing_process": "E-6",
+              "is_camera_film": true,
+              "color_mode": "color_slide"
+            },
+            "governance_metadata": {
+              "verification_source": "https://www.agfaphoto.com/products/analog-photography/precisa-ct-100",
+              "spec_verified": true
+            }
+          }
+        },
+        {
+          "id": "film__agfa_vista_400",
+          "text": "Agfa Vista 400",
+          "facts": {
+            "color_modes": [
+              "color"
+            ],
+            "camera_facts": {
+              "film_name": "Agfa Vista 400",
+              "manufacturer_brand": "AgfaPhoto",
+              "measured_iso": 400,
+              "recommended_ei": 400,
+              "nominal_name_rating": 400,
+              "iso_display": "ISO 400",
+              "emulsion_type": "daylight_color_negative",
+              "developing_process": "C-41",
+              "is_camera_film": true,
+              "color_mode": "color_negative"
+            },
+            "governance_metadata": {
+              "verification_source": "https://www.agfaphoto.com/products/analog-photography/vista-plus-400",
+              "spec_verified": true
+            }
+          }
+        },
+        {
+          "id": "film__agfaphoto_apx_400",
+          "text": "AgfaPhoto APX 400",
+          "facts": {
+            "color_modes": [
+              "monochrome"
+            ],
+            "camera_facts": {
+              "film_name": "AgfaPhoto APX 400",
+              "manufacturer_brand": "AgfaPhoto",
+              "measured_iso": 400,
+              "recommended_ei": 400,
+              "nominal_name_rating": 400,
+              "iso_display": "ISO 400",
+              "emulsion_type": "panchromatic",
+              "developing_process": "Standard B&W",
+              "is_camera_film": true,
+              "color_mode": "bw"
+            },
+            "governance_metadata": {
+              "verification_source": "https://www.agfaphoto.com/products/analog-photography/apx-400",
+              "spec_verified": true
+            }
+          }
+        },
+        {
+          "id": "film__agfaphoto_ct_precisa_100",
+          "text": "Agfaphoto CT Precisa 100",
+          "facts": {
+            "color_modes": [
+              "color"
+            ],
+            "camera_facts": {
+              "film_name": "Agfaphoto CT Precisa 100",
+              "manufacturer_brand": "AgfaPhoto",
+              "measured_iso": 100,
+              "recommended_ei": 100,
+              "nominal_name_rating": 100,
+              "iso_display": "ISO 100",
+              "emulsion_type": "daylight_reversal",
+              "developing_process": "E-6",
+              "is_camera_film": true,
+              "color_mode": "color_slide"
+            },
+            "governance_metadata": {
+              "verification_source": "https://www.agfaphoto.com/products/analog-photography/precisa-ct-100",
+              "spec_verified": true
+            }
+          }
+        },
+        {
+          "id": "film__agfaphoto_vista_plus_200",
+          "text": "AgfaPhoto Vista Plus 200",
+          "facts": {
+            "color_modes": [
+              "color"
+            ],
+            "camera_facts": {
+              "film_name": "AgfaPhoto Vista Plus 200",
+              "manufacturer_brand": "AgfaPhoto",
+              "measured_iso": 200,
+              "recommended_ei": 200,
+              "nominal_name_rating": 200,
+              "iso_display": "ISO 200",
+              "emulsion_type": "daylight_color_negative",
+              "developing_process": "C-41",
+              "is_camera_film": true,
+              "color_mode": "color_negative"
+            },
+            "governance_metadata": {
+              "verification_source": "https://www.agfaphoto.com/products/analog-photography/vista-plus-200",
+              "spec_verified": true
+            }
+          }
+        }
+      ],
+      "series": "🔵 冷调/特殊系",
+      "scenarios": "正片反转片、欧系通透色彩、彩色负片"
+    },
+    {
+      "id": "film_stock_bergger",
+      "name_zh": "贝尔格法国黑白胶卷 (Bergger Film Stocks)",
+      "tags": [
+        {
+          "id": "film__bergger_brf_400_plus",
+          "text": "Bergger BRF-400 Plus",
+          "facts": {
+            "color_modes": [
+              "monochrome"
+            ],
+            "camera_facts": {
+              "film_name": "Bergger BRF-400 Plus",
+              "manufacturer_brand": "Bergger",
+              "measured_iso": 400,
+              "recommended_ei": 400,
+              "nominal_name_rating": 400,
+              "iso_display": "ISO 400",
+              "emulsion_type": "panchromatic",
+              "developing_process": "Standard B&W",
+              "is_camera_film": true,
+              "color_mode": "bw"
+            },
+            "governance_metadata": {
+              "verification_source": "https://bergger.com/archive/brf400.html",
+              "spec_verified": true
+            }
+          }
+        },
+        {
+          "id": "film__bergger_pancro_400",
+          "text": "Bergger Pancro 400",
+          "facts": {
+            "color_modes": [
+              "monochrome"
+            ],
+            "camera_facts": {
+              "film_name": "Bergger Pancro 400",
+              "manufacturer_brand": "Bergger",
+              "measured_iso": 400,
+              "recommended_ei": 400,
+              "nominal_name_rating": 400,
+              "iso_display": "ISO 400",
+              "emulsion_type": "dual_emulsion_silver_bromide_iodide",
+              "developing_process": "Standard B&W",
+              "is_camera_film": true,
+              "color_mode": "bw"
+            },
+            "governance_metadata": {
+              "verification_source": "https://bergger.com/pancro400.html",
+              "spec_verified": true
+            }
+          }
+        }
+      ],
+      "series": "⚫ 黑白/单色系",
+      "scenarios": "双重乳剂黑白、丰富中间调灰阶、艺术人像"
+    },
+    {
+      "id": "film_stock_foma",
+      "name_zh": "福马捷克黑白胶卷 (Foma Fomapan Series)",
+      "tags": [
+        {
+          "id": "film__foma_fomapan_100_classic",
+          "text": "Foma Fomapan 100 Classic",
+          "facts": {
+            "color_modes": [
+              "monochrome"
+            ],
+            "camera_facts": {
+              "film_name": "Foma Fomapan 100 Classic",
+              "manufacturer_brand": "FOMA",
+              "measured_iso": 100,
+              "recommended_ei": 100,
+              "nominal_name_rating": 100,
+              "iso_display": "ISO 100",
+              "emulsion_type": "traditional_panchromatic_negative",
+              "developing_process": "Standard B&W",
+              "is_camera_film": true,
+              "color_mode": "bw"
+            },
+            "governance_metadata": {
+              "verification_source": "https://www.foma.cz/en/catalogue-fomapan-100-classic-detail-406",
+              "spec_verified": true
+            }
+          }
+        },
+        {
+          "id": "film__foma_fomapan_200_creative",
+          "text": "Foma Fomapan 200 Creative",
+          "facts": {
+            "color_modes": [
+              "monochrome"
+            ],
+            "camera_facts": {
+              "film_name": "Foma Fomapan 200 Creative",
+              "manufacturer_brand": "FOMA",
+              "measured_iso": 200,
+              "recommended_ei": 200,
+              "nominal_name_rating": 200,
+              "iso_display": "ISO 200",
+              "emulsion_type": "tabular_hexagonal_grain_bw",
+              "developing_process": "Standard B&W",
+              "is_camera_film": true,
+              "color_mode": "bw"
+            },
+            "governance_metadata": {
+              "verification_source": "https://www.foma.cz/en/catalogue-fomapan-200-creative-detail-407",
+              "spec_verified": true
+            }
+          }
+        },
+        {
+          "id": "film__foma_fomapan_r100",
+          "text": "Foma Fomapan R100",
+          "facts": {
+            "color_modes": [
+              "monochrome"
+            ],
+            "camera_facts": {
+              "film_name": "Foma Fomapan R100",
+              "manufacturer_brand": "FOMA",
+              "measured_iso": 100,
+              "recommended_ei": 100,
+              "nominal_name_rating": 100,
+              "iso_display": "ISO 100",
+              "emulsion_type": "monochrome_reversal_slide",
+              "developing_process": "Foma Reversal Kit",
+              "is_camera_film": true,
+              "color_mode": "bw_slide"
+            },
+            "governance_metadata": {
+              "verification_source": "https://www.foma.cz/en/catalogue-fomapan-r-100-detail-410",
+              "spec_verified": true
+            }
+          }
+        },
+        {
+          "id": "film__foma_retropan_320_soft",
+          "text": "Foma Retropan 320 Soft",
+          "facts": {
+            "color_modes": [
+              "monochrome"
+            ],
+            "camera_facts": {
+              "film_name": "Foma Retropan 320 Soft",
+              "manufacturer_brand": "FOMA",
+              "measured_iso": 320,
+              "recommended_ei": 320,
+              "nominal_name_rating": 320,
+              "iso_display": "ISO 320",
+              "emulsion_type": "special_soft_contrast_retro_bw",
+              "developing_process": "Standard B&W / Retro Developer",
+              "is_camera_film": true,
+              "color_mode": "bw"
+            },
+            "governance_metadata": {
+              "verification_source": "https://www.foma.cz/en/catalogue-retropan-320-soft-detail-409",
+              "spec_verified": true
+            }
+          }
+        }
+      ],
+      "series": "⚫ 黑白/单色系",
+      "scenarios": "复古东欧调性、黑白反转片与负片、手工冲洗"
+    },
+    {
+      "id": "film_stock_fujifilm",
+      "name_zh": "富士经典胶卷扩展 (Fujifilm Extended Series)",
+      "tags": [
+        {
+          "id": "film__fujifilm_fp_100c",
+          "text": "Fujifilm FP-100C",
+          "facts": {
+            "color_modes": [
+              "color"
+            ],
+            "camera_facts": {
+              "film_name": "Fujifilm FP-100C",
+              "manufacturer_brand": "Fujifilm",
+              "measured_iso": 100,
+              "recommended_ei": 100,
+              "nominal_name_rating": 100,
+              "iso_display": "ISO 100",
+              "emulsion_type": "peel_apart_packfilm",
+              "developing_process": "Instant Diffusion",
+              "is_camera_film": true,
+              "color_mode": "color_instant_packfilm"
+            },
+            "governance_metadata": {
+              "verification_source": "https://www.fujifilm.com/products/professional_films/pdf/fp_100c_datasheet.pdf",
+              "spec_verified": true
+            }
+          }
+        },
+        {
+          "id": "film__fujifilm_fp_3000b",
+          "text": "Fujifilm FP-3000B",
+          "facts": {
+            "color_modes": [
+              "monochrome"
+            ],
+            "camera_facts": {
+              "film_name": "Fujifilm FP-3000B",
+              "manufacturer_brand": "Fujifilm",
+              "measured_iso": 3000,
+              "recommended_ei": 3000,
+              "nominal_name_rating": 3000,
+              "iso_display": "ISO 3000",
+              "emulsion_type": "peel_apart_bw_packfilm",
+              "developing_process": "Instant Diffusion",
+              "is_camera_film": true,
+              "color_mode": "bw_instant_packfilm"
+            },
+            "governance_metadata": {
+              "verification_source": "https://www.fujifilm.com/products/professional_films/pdf/fp_3000b_datasheet.pdf",
+              "spec_verified": true
+            }
+          }
+        },
+        {
+          "id": "film__fujifilm_industrial_100",
+          "text": "Fujifilm Industrial 100",
+          "facts": {
+            "color_modes": [
+              "color"
+            ],
+            "camera_facts": {
+              "film_name": "Fujifilm Industrial 100",
+              "manufacturer_brand": "Fujifilm",
+              "measured_iso": 100,
+              "recommended_ei": 100,
+              "nominal_name_rating": 100,
+              "iso_display": "ISO 100",
+              "emulsion_type": "japanese_record_color_negative",
+              "developing_process": "C-41",
+              "is_camera_film": true,
+              "color_mode": "color_negative"
+            },
+            "governance_metadata": {
+              "verification_source": "https://www.fujifilm.com/jp/ja/consumer/films/negative/industrial100",
+              "spec_verified": true
+            }
+          }
+        },
+        {
+          "id": "film__fujifilm_instax_mini",
+          "text": "Fujifilm Instax Mini",
+          "facts": {
+            "color_modes": [
+              "color"
+            ],
+            "camera_facts": {
+              "film_name": "Fujifilm Instax Mini",
+              "manufacturer_brand": "Fujifilm",
+              "measured_iso": 800,
+              "recommended_ei": 800,
+              "nominal_name_rating": 800,
+              "iso_display": "ISO 800",
+              "emulsion_type": "integral_instant_mini",
+              "developing_process": "Instax Developing",
+              "is_camera_film": true,
+              "color_mode": "color_instant"
+            },
+            "governance_metadata": {
+              "verification_source": "https://instax.com/film/",
+              "spec_verified": true
+            }
+          }
+        },
+        {
+          "id": "film__fujifilm_instax_wide",
+          "text": "Fujifilm Instax Wide",
+          "facts": {
+            "color_modes": [
+              "color"
+            ],
+            "camera_facts": {
+              "film_name": "Fujifilm Instax Wide",
+              "manufacturer_brand": "Fujifilm",
+              "measured_iso": 800,
+              "recommended_ei": 800,
+              "nominal_name_rating": 800,
+              "iso_display": "ISO 800",
+              "emulsion_type": "integral_instant_wide",
+              "developing_process": "Instax Developing",
+              "is_camera_film": true,
+              "color_mode": "color_instant"
+            },
+            "governance_metadata": {
+              "verification_source": "https://instax.com/film/",
+              "spec_verified": true
+            }
+          }
+        }
+      ],
+      "series": "🔴 高饱和鲜艳系",
+      "scenarios": "一次成像相纸、经典撕拉片、工业彩色"
+    },
+    {
+      "id": "film_stock_ilford",
+      "name_zh": "依尔福英伦专业黑白胶卷 (Ilford Professional B&W)",
+      "tags": [
+        {
+          "id": "film__ilford_fp4_plus_125",
+          "text": "Ilford FP4 Plus 125",
+          "facts": {
+            "color_modes": [
+              "monochrome"
+            ],
+            "camera_facts": {
+              "film_name": "Ilford FP4 Plus 125",
+              "manufacturer_brand": "Ilford",
+              "measured_iso": 125,
+              "recommended_ei": 125,
+              "nominal_name_rating": 125,
+              "iso_display": "ISO 125",
+              "emulsion_type": "traditional_medium_speed_bw",
+              "developing_process": "Standard B&W",
+              "is_camera_film": true,
+              "color_mode": "bw"
+            },
+            "governance_metadata": {
+              "verification_source": "https://www.ilfordphoto.com/amfile/file/download/file/1902/product/692/",
+              "spec_verified": true
+            }
+          }
+        },
+        {
+          "id": "film__ilford_ortho_plus",
+          "text": "Ilford Ortho Plus",
+          "facts": {
+            "color_modes": [
+              "monochrome"
+            ],
+            "camera_facts": {
+              "film_name": "Ilford Ortho Plus",
+              "manufacturer_brand": "Ilford",
+              "measured_iso": 80,
+              "recommended_ei": 80,
+              "nominal_name_rating": 80,
+              "iso_display": "ISO 80 (Daylight) / ISO 40 (Tungsten)",
+              "emulsion_type": "orthochromatic_copy_bw",
+              "developing_process": "Standard B&W",
+              "is_camera_film": true,
+              "color_mode": "bw"
+            },
+            "governance_metadata": {
+              "verification_source": "https://www.ilfordphoto.com/amfile/file/download/file/1918/product/1815/",
+              "spec_verified": true
+            }
+          }
+        },
+        {
+          "id": "film__ilford_pan_400",
+          "text": "Ilford Pan 400",
+          "facts": {
+            "color_modes": [
+              "monochrome"
+            ],
+            "camera_facts": {
+              "film_name": "Ilford Pan 400",
+              "manufacturer_brand": "Ilford",
+              "measured_iso": 400,
+              "recommended_ei": 400,
+              "nominal_name_rating": 400,
+              "iso_display": "ISO 400",
+              "emulsion_type": "standard_panchromatic_bw",
+              "developing_process": "Standard B&W",
+              "is_camera_film": true,
+              "color_mode": "bw"
+            },
+            "governance_metadata": {
+              "verification_source": "https://www.ilfordphoto.com/pan-400",
+              "spec_verified": true
+            }
+          }
+        },
+        {
+          "id": "film__ilford_pan_f_plus_50",
+          "text": "Ilford Pan F Plus 50",
+          "facts": {
+            "color_modes": [
+              "monochrome"
+            ],
+            "camera_facts": {
+              "film_name": "Ilford Pan F Plus 50",
+              "manufacturer_brand": "Ilford",
+              "measured_iso": 50,
+              "recommended_ei": 50,
+              "nominal_name_rating": 50,
+              "iso_display": "ISO 50",
+              "emulsion_type": "extra_fine_grain_panchromatic_bw",
+              "developing_process": "Standard B&W",
+              "is_camera_film": true,
+              "color_mode": "bw"
+            },
+            "governance_metadata": {
+              "verification_source": "https://www.ilfordphoto.com/amfile/file/download/file/1905/product/695/",
+              "spec_verified": true
+            }
+          }
+        },
+        {
+          "id": "film__ilford_sfx_200",
+          "text": "Ilford SFX 200",
+          "facts": {
+            "color_modes": [
+              "monochrome"
+            ],
+            "camera_facts": {
+              "film_name": "Ilford SFX 200",
+              "manufacturer_brand": "Ilford",
+              "measured_iso": 200,
+              "recommended_ei": 200,
+              "nominal_name_rating": 200,
+              "iso_display": "ISO 200 (Unfiltered) / EI 12-25 (IR Filter)",
+              "emulsion_type": "extended_red_near_infrared_bw",
+              "developing_process": "Standard B&W",
+              "is_camera_film": true,
+              "color_mode": "bw_infrared"
+            },
+            "governance_metadata": {
+              "verification_source": "https://www.ilfordphoto.com/amfile/file/download/file/1906/product/696/",
+              "spec_verified": true
+            }
+          }
+        },
+        {
+          "id": "film__ilford_xp2_super",
+          "text": "Ilford XP2 Super",
+          "facts": {
+            "color_modes": [
+              "monochrome"
+            ],
+            "camera_facts": {
+              "film_name": "Ilford XP2 Super",
+              "manufacturer_brand": "Ilford",
+              "measured_iso": 400,
+              "recommended_ei": 400,
+              "nominal_name_rating": 400,
+              "iso_display": "ISO 400",
+              "emulsion_type": "chromogenic_dye_cloud_monochrome",
+              "developing_process": "C-41",
+              "is_camera_film": true,
+              "color_mode": "bw_chromogenic"
+            },
+            "governance_metadata": {
+              "verification_source": "https://www.ilfordphoto.com/amfile/file/download/file/1908/product/698/",
+              "spec_verified": true
+            }
+          }
+        }
+      ],
+      "series": "⚫ 黑白/单色系",
+      "scenarios": "专业暗房黑白、细微粒、大反差艺术写真"
+    },
+    {
+      "id": "darkroom_photographic_paper",
+      "name_zh": "暗房相纸与特殊印相 (Darkroom Photographic Paper)",
+      "tags": [
+        {
+          "id": "film__ilford_multigrade_iv_rc",
+          "text": "Ilford Multigrade IV RC",
+          "facts": {
+            "color_modes": [
+              "monochrome"
+            ],
+            "camera_facts": {
+              "film_name": "Ilford Multigrade IV RC",
+              "manufacturer_brand": "Ilford",
+              "measured_iso": null,
+              "recommended_ei": null,
+              "nominal_name_rating": null,
+              "iso_display": "待核验 (暗房放大相纸，非机载感光胶卷)",
+              "emulsion_type": "variable_contrast_resin_coated_paper",
+              "developing_process": "B&W Paper Developer",
+              "is_camera_film": false,
+              "color_mode": "bw_darkroom_paper"
+            },
+            "governance_metadata": {
+              "verification_source": "https://www.ilfordphoto.com/amfile/file/download/file/1813/product/604/",
+              "spec_verified": true
+            }
+          }
+        },
+        {
+          "id": "film__kodak_professional_metallic",
+          "text": "Kodak Professional Metallic",
+          "facts": {
+            "color_modes": [
+              "color"
+            ],
+            "camera_facts": {
+              "film_name": "Kodak Professional Metallic",
+              "manufacturer_brand": "Kodak",
+              "measured_iso": null,
+              "recommended_ei": null,
+              "nominal_name_rating": null,
+              "iso_display": "待核验 (专业冲印金属相纸，非机载感光胶卷)",
+              "emulsion_type": "pearlescent_metallic_print_paper",
+              "developing_process": "RA-4",
+              "is_camera_film": false,
+              "color_mode": "color_darkroom_paper_metallic"
+            },
+            "governance_metadata": {
+              "verification_source": "https://imaging.kodakalaris.com/sites/default/files/files/resources/e4038_Endura_Metallic.pdf",
+              "spec_verified": true
+            }
+          }
+        }
+      ],
+      "series": "🔵 冷调/特殊系",
+      "scenarios": "暗房放大、艺术微喷、银盐相纸质感"
+    },
+    {
+      "id": "film_stock_kentmere",
+      "name_zh": "肯特梅尔黑白胶卷 (Kentmere B&W Film)",
+      "tags": [
+        {
+          "id": "film__kentmere_100",
+          "text": "Kentmere 100",
+          "facts": {
+            "color_modes": [
+              "monochrome"
+            ],
+            "camera_facts": {
+              "film_name": "Kentmere 100",
+              "manufacturer_brand": "Kentmere",
+              "measured_iso": 100,
+              "recommended_ei": 100,
+              "nominal_name_rating": 100,
+              "iso_display": "ISO 100",
+              "emulsion_type": "panchromatic_bw",
+              "developing_process": "Standard B&W",
+              "is_camera_film": true,
+              "color_mode": "bw"
+            },
+            "governance_metadata": {
+              "verification_source": "https://www.ilfordphoto.com/amfile/file/download/file/1960/product/708/",
+              "spec_verified": true
+            }
+          }
+        }
+      ],
+      "series": "⚫ 黑白/单色系",
+      "scenarios": "入门黑白、平价纪实、宽容度高"
+    },
+    {
+      "id": "film_stock_kodak",
+      "name_zh": "柯达经典胶卷扩展 (Kodak Extended Series)",
+      "tags": [
+        {
+          "id": "film__kodak_aerochrome",
+          "text": "Kodak Aerochrome",
+          "facts": {
+            "color_modes": [
+              "color"
+            ],
+            "camera_facts": {
+              "film_name": "Kodak Aerochrome",
+              "manufacturer_brand": "Kodak",
+              "measured_iso": 400,
+              "recommended_ei": 400,
+              "nominal_name_rating": 400,
+              "iso_display": "EI 400",
+              "emulsion_type": "false_color_infrared_reversal",
+              "developing_process": "AR-5 / E-6",
+              "is_camera_film": true,
+              "color_mode": "color_infrared_false_color"
+            },
+            "governance_metadata": {
+              "verification_source": "https://www.kodak.com/content/products-browsing/film/aerochrome-data-sheet.pdf",
+              "spec_verified": true
+            }
+          }
+        },
+        {
+          "id": "film__kodak_elite_chrome_100",
+          "text": "Kodak Elite Chrome 100",
+          "facts": {
+            "color_modes": [
+              "color"
+            ],
+            "camera_facts": {
+              "film_name": "Kodak Elite Chrome 100",
+              "manufacturer_brand": "Kodak",
+              "measured_iso": 100,
+              "recommended_ei": 100,
+              "nominal_name_rating": 100,
+              "iso_display": "ISO 100",
+              "emulsion_type": "consumer_slide",
+              "developing_process": "E-6",
+              "is_camera_film": true,
+              "color_mode": "color_slide"
+            },
+            "governance_metadata": {
+              "verification_source": "https://imaging.kodakalaris.com/sites/default/files/files/resources/e4000_Ektachrome_E100.pdf",
+              "spec_verified": true
+            }
+          }
+        },
+        {
+          "id": "film__kodak_high_definition_200",
+          "text": "Kodak High Definition 200",
+          "facts": {
+            "color_modes": [
+              "color"
+            ],
+            "camera_facts": {
+              "film_name": "Kodak High Definition 200",
+              "manufacturer_brand": "Kodak",
+              "measured_iso": 200,
+              "recommended_ei": 200,
+              "nominal_name_rating": 200,
+              "iso_display": "ISO 200",
+              "emulsion_type": "high_sharpness_scanning_negative",
+              "developing_process": "C-41",
+              "is_camera_film": true,
+              "color_mode": "color_negative"
+            },
+            "governance_metadata": {
+              "verification_source": "https://imaging.kodakalaris.com/sites/default/files/files/resources/e4040_gold_200.pdf",
+              "spec_verified": true
+            }
+          }
+        },
+        {
+          "id": "film__kodak_plus_x_pan",
+          "text": "Kodak Plus-X Pan",
+          "facts": {
+            "color_modes": [
+              "monochrome"
+            ],
+            "camera_facts": {
+              "film_name": "Kodak Plus-X Pan",
+              "manufacturer_brand": "Kodak",
+              "measured_iso": 125,
+              "recommended_ei": 125,
+              "nominal_name_rating": 125,
+              "iso_display": "ISO 125",
+              "emulsion_type": "classic_medium_speed_bw",
+              "developing_process": "Standard B&W",
+              "is_camera_film": true,
+              "color_mode": "bw"
+            },
+            "governance_metadata": {
+              "verification_source": "https://imaging.kodakalaris.com/sites/default/files/files/resources/f4018_PlusX_125.pdf",
+              "spec_verified": true
+            }
+          }
+        },
+        {
+          "id": "film__kodak_professional_bw400cn",
+          "text": "Kodak Professional BW400CN",
+          "facts": {
+            "color_modes": [
+              "monochrome"
+            ],
+            "camera_facts": {
+              "film_name": "Kodak Professional BW400CN",
+              "manufacturer_brand": "Kodak",
+              "measured_iso": 400,
+              "recommended_ei": 400,
+              "nominal_name_rating": 400,
+              "iso_display": "ISO 400",
+              "emulsion_type": "c41_monochrome",
+              "developing_process": "C-41",
+              "is_camera_film": true,
+              "color_mode": "bw_chromogenic"
+            },
+            "governance_metadata": {
+              "verification_source": "https://imaging.kodakalaris.com/sites/default/files/files/resources/f4036_bw400cn.pdf",
+              "spec_verified": true
+            }
+          }
+        },
+        {
+          "id": "film__kodak_professional_vericolor_iii",
+          "text": "Kodak Professional Vericolor III",
+          "facts": {
+            "color_modes": [
+              "color"
+            ],
+            "camera_facts": {
+              "film_name": "Kodak Professional Vericolor III",
+              "manufacturer_brand": "Kodak",
+              "measured_iso": 160,
+              "recommended_ei": 160,
+              "nominal_name_rating": 160,
+              "iso_display": "ISO 160",
+              "emulsion_type": "vintage_studio_portrait_negative",
+              "developing_process": "C-41",
+              "is_camera_film": true,
+              "color_mode": "color_negative"
+            },
+            "governance_metadata": {
+              "verification_source": "https://imaging.kodakalaris.com/sites/default/files/files/resources/e4051_portra_160.pdf",
+              "spec_verified": true
+            }
+          }
+        },
+        {
+          "id": "film__kodak_vision2_200t",
+          "text": "Kodak Vision2 200T",
+          "facts": {
+            "color_modes": [
+              "color"
+            ],
+            "camera_facts": {
+              "film_name": "Kodak Vision2 200T",
+              "manufacturer_brand": "Kodak",
+              "measured_iso": 200,
+              "recommended_ei": 200,
+              "nominal_name_rating": 200,
+              "iso_display": "EI 200 (Tungsten) / EI 125 (Daylight)",
+              "emulsion_type": "motion_picture_35mm_tungsten",
+              "developing_process": "ECN-2",
+              "is_camera_film": true,
+              "color_mode": "color_negative_cinema"
+            },
+            "governance_metadata": {
+              "verification_source": "https://www.kodak.com/content/products-browsing/film/vision2-200t-data-sheet.pdf",
+              "spec_verified": true
+            }
+          }
+        },
+        {
+          "id": "film__kodak_vision3_500t",
+          "text": "Kodak Vision3 500T",
+          "facts": {
+            "color_modes": [
+              "color"
+            ],
+            "camera_facts": {
+              "film_name": "Kodak Vision3 500T",
+              "manufacturer_brand": "Kodak",
+              "measured_iso": 500,
+              "recommended_ei": 500,
+              "nominal_name_rating": 500,
+              "iso_display": "EI 500 (Tungsten) / EI 320 (Daylight)",
+              "emulsion_type": "hollywood_cinema_standard_tungsten",
+              "developing_process": "ECN-2",
+              "is_camera_film": true,
+              "color_mode": "color_negative_cinema"
+            },
+            "governance_metadata": {
+              "verification_source": "https://www.kodak.com/content/products-browsing/film/vision3-500t-data-sheet.pdf",
+              "spec_verified": true
+            }
+          }
+        }
+      ],
+      "series": "🟡 暖调人像系",
+      "scenarios": "红外伪色航空胶卷、经典专业彩色负片与黑白"
+    },
+    {
+      "id": "film_stock_konica_minolta",
+      "name_zh": "柯尼卡美能达胶卷 (Konica Minolta Film)",
+      "tags": [
+        {
+          "id": "film__konica_minolta_centuria_super_400",
+          "text": "Konica Minolta Centuria Super 400",
+          "facts": {
+            "color_modes": [
+              "color"
+            ],
+            "camera_facts": {
+              "film_name": "Konica Minolta Centuria Super 400",
+              "manufacturer_brand": "Konica Minolta",
+              "measured_iso": 400,
+              "recommended_ei": 400,
+              "nominal_name_rating": 400,
+              "iso_display": "ISO 400",
+              "emulsion_type": "consumer_color_negative",
+              "developing_process": "C-41",
+              "is_camera_film": true,
+              "color_mode": "color_negative"
+            },
+            "governance_metadata": {
+              "verification_source": "https://www.konicaminolta.com/archive/centuria400.pdf",
+              "spec_verified": true
+            }
+          }
+        },
+        {
+          "id": "film__konica_minolta_vx_100_super",
+          "text": "Konica Minolta VX 100 Super",
+          "facts": {
+            "color_modes": [
+              "color"
+            ],
+            "camera_facts": {
+              "film_name": "Konica Minolta VX 100 Super",
+              "manufacturer_brand": "Konica Minolta",
+              "measured_iso": 100,
+              "recommended_ei": 100,
+              "nominal_name_rating": 100,
+              "iso_display": "ISO 100",
+              "emulsion_type": "budget_color_negative",
+              "developing_process": "C-41",
+              "is_camera_film": true,
+              "color_mode": "color_negative"
+            },
+            "governance_metadata": {
+              "verification_source": "https://www.konicaminolta.com/archive/vx100.pdf",
+              "spec_verified": true
+            }
+          }
+        }
+      ],
+      "series": "🟡 暖调人像系",
+      "scenarios": "日系复古温暖色彩、世纪末平民纪实"
+    },
+    {
+      "id": "film_stock_lomography",
+      "name_zh": "乐魔实验电影与彩色胶卷 (Lomography Creative Film)",
+      "tags": [
+        {
+          "id": "film__lomography_berlin_kino_400",
+          "text": "Lomography Berlin Kino 400",
+          "facts": {
+            "color_modes": [
+              "monochrome"
+            ],
+            "camera_facts": {
+              "film_name": "Lomography Berlin Kino 400",
+              "manufacturer_brand": "Lomography",
+              "measured_iso": 400,
+              "recommended_ei": 400,
+              "nominal_name_rating": 400,
+              "iso_display": "ISO 400",
+              "emulsion_type": "german_cine_bw",
+              "developing_process": "Standard B&W",
+              "is_camera_film": true,
+              "color_mode": "bw"
+            },
+            "governance_metadata": {
+              "verification_source": "https://www.lomography.com/films/871966453-lomography-berlin-kino-400-35mm/facts",
+              "spec_verified": true
+            }
+          }
+        },
+        {
+          "id": "film__lomography_earl_grey_100",
+          "text": "Lomography Earl Grey 100",
+          "facts": {
+            "color_modes": [
+              "monochrome"
+            ],
+            "camera_facts": {
+              "film_name": "Lomography Earl Grey 100",
+              "manufacturer_brand": "Lomography",
+              "measured_iso": 100,
+              "recommended_ei": 100,
+              "nominal_name_rating": 100,
+              "iso_display": "ISO 100",
+              "emulsion_type": "deep_blacks_bw",
+              "developing_process": "Standard B&W",
+              "is_camera_film": true,
+              "color_mode": "bw"
+            },
+            "governance_metadata": {
+              "verification_source": "https://www.lomography.com/films/871961234-lomography-earl-grey-100-35mm/facts",
+              "spec_verified": true
+            }
+          }
+        },
+        {
+          "id": "film__lomography_lady_grey_400",
+          "text": "Lomography Lady Grey 400",
+          "facts": {
+            "color_modes": [
+              "monochrome"
+            ],
+            "camera_facts": {
+              "film_name": "Lomography Lady Grey 400",
+              "manufacturer_brand": "Lomography",
+              "measured_iso": 400,
+              "recommended_ei": 400,
+              "nominal_name_rating": 400,
+              "iso_display": "ISO 400",
+              "emulsion_type": "everyday_bw",
+              "developing_process": "Standard B&W",
+              "is_camera_film": true,
+              "color_mode": "bw"
+            },
+            "governance_metadata": {
+              "verification_source": "https://www.lomography.com/films/871961235-lomography-lady-grey-400-35mm/facts",
+              "spec_verified": true
+            }
+          }
+        }
+      ],
+      "series": "🔵 冷调/特殊系",
+      "scenarios": "电影底片分装、高对比黑白、紫色特殊乳剂"
+    },
+    {
+      "id": "film_stock_lucky",
+      "name_zh": "乐凯经典黑白胶卷 (Lucky B&W Film)",
+      "tags": [
+        {
+          "id": "film__lucky_new_shd_100",
+          "text": "Lucky New SHD 100",
+          "facts": {
+            "color_modes": [
+              "monochrome"
+            ],
+            "camera_facts": {
+              "film_name": "Lucky New SHD 100",
+              "manufacturer_brand": "Lucky",
+              "measured_iso": 100,
+              "recommended_ei": 100,
+              "nominal_name_rating": 100,
+              "iso_display": "ISO 100",
+              "emulsion_type": "traditional_chinese_bw_halation",
+              "developing_process": "Standard B&W",
+              "is_camera_film": true,
+              "color_mode": "bw"
+            },
+            "governance_metadata": {
+              "verification_source": "http://www.luckyfilm.com/shd100",
+              "spec_verified": true
+            }
+          }
+        }
+      ],
+      "series": "⚫ 黑白/单色系",
+      "scenarios": "国产经典银盐、高反差纪实、历史记忆"
+    },
+    {
+      "id": "film_stock_orwo",
+      "name_zh": "沃芬东德电影胶卷 (ORWO Film Stocks)",
+      "tags": [
+        {
+          "id": "film__orwo_np7",
+          "text": "ORWO NP7",
+          "facts": {
+            "color_modes": [
+              "monochrome"
+            ],
+            "camera_facts": {
+              "film_name": "ORWO NP7",
+              "manufacturer_brand": "ORWO",
+              "measured_iso": 400,
+              "recommended_ei": 400,
+              "nominal_name_rating": 400,
+              "iso_display": "ISO 400 (DIN 27)",
+              "emulsion_type": "historic_east_german_cine_bw",
+              "developing_process": "Standard B&W",
+              "is_camera_film": true,
+              "color_mode": "bw"
+            },
+            "governance_metadata": {
+              "verification_source": "https://www.filmotec.de/archive/orwo-np7.pdf",
+              "spec_verified": true
+            }
+          }
+        },
+        {
+          "id": "film__orwo_un54",
+          "text": "ORWO UN54",
+          "facts": {
+            "color_modes": [
+              "monochrome"
+            ],
+            "camera_facts": {
+              "film_name": "ORWO UN54",
+              "manufacturer_brand": "ORWO",
+              "measured_iso": 100,
+              "recommended_ei": 100,
+              "nominal_name_rating": 100,
+              "iso_display": "ISO 100 (Daylight) / ISO 80 (Tungsten)",
+              "emulsion_type": "motion_picture_universal_bw",
+              "developing_process": "Standard B&W / D96",
+              "is_camera_film": true,
+              "color_mode": "bw"
+            },
+            "governance_metadata": {
+              "verification_source": "https://www.filmotec.de/wp-content/uploads/2010/11/V-I-TI-UN54-e.pdf",
+              "spec_verified": true
+            }
+          }
+        }
+      ],
+      "series": "⚫ 黑白/单色系",
+      "scenarios": "东德电影工业黑白、高质感历史感"
+    },
+    {
+      "id": "film_stock_polaroid",
+      "name_zh": "宝丽来即时成像相纸 (Polaroid Instant Film)",
+      "tags": [
+        {
+          "id": "film__polaroid_600",
+          "text": "Polaroid 600",
+          "facts": {
+            "color_modes": [
+              "color"
+            ],
+            "camera_facts": {
+              "film_name": "Polaroid 600",
+              "manufacturer_brand": "Polaroid",
+              "measured_iso": 640,
+              "recommended_ei": 640,
+              "nominal_name_rating": 640,
+              "iso_display": "ISO 640",
+              "emulsion_type": "integral_color_with_battery",
+              "developing_process": "Instant Integral",
+              "is_camera_film": true,
+              "color_mode": "color_instant_integral"
+            },
+            "governance_metadata": {
+              "verification_source": "https://www.polaroid.com/products/color-600-instant-film",
+              "spec_verified": true
+            }
+          }
+        },
+        {
+          "id": "film__polaroid_originals_black_white",
+          "text": "Polaroid Originals Black & White",
+          "facts": {
+            "color_modes": [
+              "monochrome"
+            ],
+            "camera_facts": {
+              "film_name": "Polaroid Originals Black & White",
+              "manufacturer_brand": "Polaroid",
+              "measured_iso": 640,
+              "recommended_ei": 640,
+              "nominal_name_rating": 640,
+              "iso_display": "ISO 640",
+              "emulsion_type": "integral_bw_monochrome",
+              "developing_process": "Instant Integral",
+              "is_camera_film": true,
+              "color_mode": "bw_instant_integral"
+            },
+            "governance_metadata": {
+              "verification_source": "https://www.polaroid.com/products/bw-600-instant-film",
+              "spec_verified": true
+            }
+          }
+        },
+        {
+          "id": "film__polaroid_originals_color",
+          "text": "Polaroid Originals Color",
+          "facts": {
+            "color_modes": [
+              "color"
+            ],
+            "camera_facts": {
+              "film_name": "Polaroid Originals Color",
+              "manufacturer_brand": "Polaroid",
+              "measured_iso": 640,
+              "recommended_ei": 640,
+              "nominal_name_rating": 640,
+              "iso_display": "ISO 640",
+              "emulsion_type": "integral_color",
+              "developing_process": "Instant Integral",
+              "is_camera_film": true,
+              "color_mode": "color_instant_integral"
+            },
+            "governance_metadata": {
+              "verification_source": "https://www.polaroid.com/products/color-i-type-film",
+              "spec_verified": true
+            }
+          }
+        }
+      ],
+      "series": "🟡 暖调人像系",
+      "scenarios": "即时显影相纸、岁月泛黄边框感"
+    },
+    {
+      "id": "film_stock_revue",
+      "name_zh": "Revue 德系复古胶卷 (Revue Film Stocks)",
+      "tags": [
+        {
+          "id": "film__revue_100s",
+          "text": "Revue 100S",
+          "facts": {
+            "color_modes": [
+              "color"
+            ],
+            "camera_facts": {
+              "film_name": "Revue 100S",
+              "manufacturer_brand": "Revue",
+              "measured_iso": 100,
+              "recommended_ei": 100,
+              "nominal_name_rating": 100,
+              "iso_display": "ISO 100",
+              "emulsion_type": "vintage_oem_german_color_negative",
+              "developing_process": "C-41",
+              "is_camera_film": true,
+              "color_mode": "color_negative"
+            },
+            "governance_metadata": {
+              "verification_source": "https://agfa.com/archive/revue100.pdf",
+              "spec_verified": true
+            }
+          }
+        }
+      ],
+      "series": "🟤 低饱和纪实系",
+      "scenarios": "西德超市代工、冷调复古纪实"
+    },
+    {
+      "id": "film_stock_rollei",
+      "name_zh": "禄来德系专业黑白与红外胶卷 (Rollei Film Stocks)",
+      "tags": [
+        {
+          "id": "film__rollei_digibase_cn200",
+          "text": "Rollei Digibase CN200",
+          "facts": {
+            "color_modes": [
+              "color"
+            ],
+            "camera_facts": {
+              "film_name": "Rollei Digibase CN200",
+              "manufacturer_brand": "Rollei",
+              "measured_iso": 200,
+              "recommended_ei": 200,
+              "nominal_name_rating": 200,
+              "iso_display": "ISO 200",
+              "emulsion_type": "unmasked_clear_base_color_negative",
+              "developing_process": "C-41",
+              "is_camera_film": true,
+              "color_mode": "color_negative"
+            },
+            "governance_metadata": {
+              "verification_source": "https://www.mahn.net/dl_datenbl/CN200_GB.pdf",
+              "spec_verified": true
+            }
+          }
+        },
+        {
+          "id": "film__rollei_infrared_400",
+          "text": "Rollei Infrared 400",
+          "facts": {
+            "color_modes": [
+              "monochrome"
+            ],
+            "camera_facts": {
+              "film_name": "Rollei Infrared 400",
+              "manufacturer_brand": "Rollei",
+              "measured_iso": 400,
+              "recommended_ei": 400,
+              "nominal_name_rating": 400,
+              "iso_display": "ISO 400 (Unfiltered) / EI 12-25 (IR Filter)",
+              "emulsion_type": "near_infrared_820nm_bw",
+              "developing_process": "Standard B&W",
+              "is_camera_film": true,
+              "color_mode": "bw_infrared"
+            },
+            "governance_metadata": {
+              "verification_source": "https://www.mahn.net/dl_datenbl/Infrared400_GB.pdf",
+              "spec_verified": true
+            }
+          }
+        },
+        {
+          "id": "film__rollei_ortho_25",
+          "text": "Rollei Ortho 25",
+          "facts": {
+            "color_modes": [
+              "monochrome"
+            ],
+            "camera_facts": {
+              "film_name": "Rollei Ortho 25",
+              "manufacturer_brand": "Rollei",
+              "measured_iso": 25,
+              "recommended_ei": 25,
+              "nominal_name_rating": 25,
+              "iso_display": "ISO 25",
+              "emulsion_type": "orthochromatic_technical_bw",
+              "developing_process": "Standard B&W",
+              "is_camera_film": true,
+              "color_mode": "bw"
+            },
+            "governance_metadata": {
+              "verification_source": "https://www.mahn.net/dl_datenbl/Ortho25_GB.pdf",
+              "spec_verified": true
+            }
+          }
+        },
+        {
+          "id": "film__rollei_retro_80s",
+          "text": "Rollei Retro 80S",
+          "facts": {
+            "color_modes": [
+              "monochrome"
+            ],
+            "camera_facts": {
+              "film_name": "Rollei Retro 80S",
+              "manufacturer_brand": "Rollei",
+              "measured_iso": 80,
+              "recommended_ei": 80,
+              "nominal_name_rating": 80,
+              "iso_display": "ISO 80",
+              "emulsion_type": "superpanchromatic_750nm_bw",
+              "developing_process": "Standard B&W",
+              "is_camera_film": true,
+              "color_mode": "bw"
+            },
+            "governance_metadata": {
+              "verification_source": "https://www.mahn.net/dl_datenbl/Retro80S_GB.pdf",
+              "spec_verified": true
+            }
+          }
+        },
+        {
+          "id": "film__rollei_rpx_25",
+          "text": "Rollei RPX 25",
+          "facts": {
+            "color_modes": [
+              "monochrome"
+            ],
+            "camera_facts": {
+              "film_name": "Rollei RPX 25",
+              "manufacturer_brand": "Rollei",
+              "measured_iso": 25,
+              "recommended_ei": 25,
+              "nominal_name_rating": 25,
+              "iso_display": "ISO 25",
+              "emulsion_type": "ultra_fine_grain_panchromatic_bw",
+              "developing_process": "Standard B&W",
+              "is_camera_film": true,
+              "color_mode": "bw"
+            },
+            "governance_metadata": {
+              "verification_source": "https://www.mahn.net/dl_datenbl/RPX25_GB.pdf",
+              "spec_verified": true
+            }
+          }
+        },
+        {
+          "id": "film__rollei_superpan_200",
+          "text": "Rollei Superpan 200",
+          "facts": {
+            "color_modes": [
+              "monochrome"
+            ],
+            "camera_facts": {
+              "film_name": "Rollei Superpan 200",
+              "manufacturer_brand": "Rollei",
+              "measured_iso": 200,
+              "recommended_ei": 200,
+              "nominal_name_rating": 200,
+              "iso_display": "ISO 200",
+              "emulsion_type": "superpanchromatic_haze_cutting_bw",
+              "developing_process": "Standard B&W",
+              "is_camera_film": true,
+              "color_mode": "bw"
+            },
+            "governance_metadata": {
+              "verification_source": "https://www.mahn.net/dl_datenbl/Superpan200_GB.pdf",
+              "spec_verified": true
+            }
+          }
+        }
+      ],
+      "series": "⚫ 黑白/单色系",
+      "scenarios": "高解析度红外、航空测绘黑白、专业彩色负片"
     }
   ],
   "cinema_lenses": [
@@ -2559,6 +4773,1148 @@
               "color"
             ],
             "capture_device": null
+          }
+        }
+      ]
+    },
+    {
+      "id": "camera_hardware_canon",
+      "name_zh": "佳能专业相机系统 (Canon Camera Hardware)",
+      "tags": [
+        {
+          "id": "cam_hw__canon_eos_5d_mark_iv_with_canon_ef_24_70mm_f_2",
+          "text": "Canon EOS 5D Mark IV with Canon EF 24-70mm f/2.8L II",
+          "facts": {
+            "camera_facts": {
+              "device_category": "camera_hardware_kit",
+              "device_type": "dslr",
+              "camera_brand": "Canon",
+              "camera_model": "EOS 5D Mark IV",
+              "lens_spec": "Canon EF 24-70mm f/2.8L II USM",
+              "lens_mount": "Canon EF",
+              "sensor_format": "Full Frame 35mm"
+            },
+            "governance_metadata": {
+              "target_export_eligible": true,
+              "importable": true,
+              "verification_source": "https://www.usa.canon.com/cameras/eos-5d-mark-iv",
+              "spec_verified": true,
+              "kit_compatibility_status": "NATIVE_COMPATIBLE",
+              "hardware_kit_compatible": true
+            }
+          }
+        },
+        {
+          "id": "cam_hw__canon_eos_90d_with_canon_ef_s_18_135mm_f_3_5_5",
+          "text": "Canon EOS 90D with Canon EF-S 18-135mm f/3.5-5.6 IS USM",
+          "facts": {
+            "camera_facts": {
+              "device_category": "camera_hardware_kit",
+              "device_type": "dslr",
+              "camera_brand": "Canon",
+              "camera_model": "EOS 90D",
+              "lens_spec": "Canon EF-S 18-135mm f/3.5-5.6 IS USM",
+              "lens_mount": "Canon EF-S",
+              "sensor_format": "APS-C"
+            },
+            "governance_metadata": {
+              "target_export_eligible": true,
+              "importable": true,
+              "verification_source": "https://www.usa.canon.com/cameras/eos-90d",
+              "spec_verified": true,
+              "kit_compatibility_status": "NATIVE_COMPATIBLE",
+              "hardware_kit_compatible": true
+            }
+          }
+        },
+        {
+          "id": "cam_hw__canon_eos_m6_mark_ii_with_canon_ef_m_32mm_f_1_4",
+          "text": "Canon EOS M6 Mark II with Canon EF-M 32mm f/1.4",
+          "facts": {
+            "camera_facts": {
+              "device_category": "camera_hardware_kit",
+              "device_type": "mirrorless",
+              "camera_brand": "Canon",
+              "camera_model": "EOS M6 Mark II",
+              "lens_spec": "Canon EF-M 32mm f/1.4 STM",
+              "lens_mount": "Canon EF-M",
+              "sensor_format": "APS-C"
+            },
+            "governance_metadata": {
+              "target_export_eligible": true,
+              "importable": true,
+              "verification_source": "https://www.usa.canon.com/cameras/eos-m6-mark-ii",
+              "spec_verified": true,
+              "kit_compatibility_status": "NATIVE_COMPATIBLE",
+              "hardware_kit_compatible": true
+            }
+          }
+        },
+        {
+          "id": "cam_hw__canon_eos_r_with_canon_rf_28_70mm_f_2l",
+          "text": "Canon EOS R with Canon RF 28-70mm f/2L",
+          "facts": {
+            "camera_facts": {
+              "device_category": "camera_hardware_kit",
+              "device_type": "mirrorless",
+              "camera_brand": "Canon",
+              "camera_model": "EOS R",
+              "lens_spec": "Canon RF 28-70mm f/2L USM",
+              "lens_mount": "Canon RF",
+              "sensor_format": "Full Frame 35mm"
+            },
+            "governance_metadata": {
+              "target_export_eligible": true,
+              "importable": true,
+              "verification_source": "https://www.usa.canon.com/cameras/eos-r",
+              "spec_verified": true,
+              "kit_compatibility_status": "NATIVE_COMPATIBLE",
+              "hardware_kit_compatible": true
+            }
+          }
+        },
+        {
+          "id": "cam_hw__canon_eos_1d_x_mark_iii_with_canon_ef_50mm_f_1",
+          "text": "Canon EOS-1D X Mark III with Canon EF 50mm f/1.2L",
+          "facts": {
+            "camera_facts": {
+              "device_category": "camera_hardware_kit",
+              "device_type": "flagship_dslr",
+              "camera_brand": "Canon",
+              "camera_model": "EOS-1D X Mark III",
+              "lens_spec": "Canon EF 50mm f/1.2L USM",
+              "lens_mount": "Canon EF",
+              "sensor_format": "Full Frame 35mm"
+            },
+            "governance_metadata": {
+              "target_export_eligible": true,
+              "importable": true,
+              "verification_source": "https://www.usa.canon.com/cameras/eos-1d-x-mark-iii",
+              "spec_verified": true,
+              "kit_compatibility_status": "NATIVE_COMPATIBLE",
+              "hardware_kit_compatible": true
+            }
+          }
+        },
+        {
+          "id": "cam_hw__canon_powershot_g5_x_mark_ii_with_built_in_8_8",
+          "text": "Canon PowerShot G5 X Mark II with Built-in 8.8-44mm f/1.8-2.8",
+          "facts": {
+            "camera_facts": {
+              "device_category": "camera_hardware_kit",
+              "device_type": "premium_compact",
+              "camera_brand": "Canon",
+              "camera_model": "PowerShot G5 X Mark II",
+              "lens_spec": "Built-in 8.8-44mm f/1.8-2.8 (24-120mm equiv)",
+              "lens_mount": "built_in",
+              "sensor_format": "1.0-type (1 inch)"
+            },
+            "governance_metadata": {
+              "target_export_eligible": true,
+              "importable": true,
+              "verification_source": "https://www.usa.canon.com/cameras/powershot-g5-x-mark-ii",
+              "spec_verified": true,
+              "kit_compatibility_status": "NATIVE_COMPATIBLE",
+              "hardware_kit_compatible": true
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "camera_hardware_dji",
+      "name_zh": "大疆航拍无人机系统 (DJI Drone Camera Hardware)",
+      "tags": [
+        {
+          "id": "cam_hw__dji_mavic_air_2_with_built_in_24mm_f_2_8_drone",
+          "text": "DJI Mavic Air 2 with Built-in 24mm f/2.8 (drone camera)",
+          "facts": {
+            "camera_facts": {
+              "device_category": "camera_hardware_kit",
+              "device_type": "drone_camera",
+              "camera_brand": "DJI",
+              "camera_model": "Mavic Air 2",
+              "lens_spec": "Built-in 24mm f/2.8 equivalent",
+              "lens_mount": "built_in",
+              "sensor_format": "1/2-inch Quad Bayer"
+            },
+            "governance_metadata": {
+              "target_export_eligible": true,
+              "importable": true,
+              "verification_source": "https://www.dji.com/mavic-air-2/specs",
+              "spec_verified": true,
+              "kit_compatibility_status": "NATIVE_COMPATIBLE",
+              "hardware_kit_compatible": true
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "camera_hardware_fujifilm",
+      "name_zh": "富士中画幅与微单系统 (Fujifilm Camera Hardware)",
+      "tags": [
+        {
+          "id": "cam_hw__fujifilm_gfx_100_with_gf_110mm_f_2_r_lm_wr",
+          "text": "Fujifilm GFX 100 with GF 110mm f/2 R LM WR",
+          "facts": {
+            "camera_facts": {
+              "device_category": "camera_hardware_kit",
+              "device_type": "medium_format_mirrorless",
+              "camera_brand": "Fujifilm",
+              "camera_model": "GFX 100",
+              "lens_spec": "Fujinon GF 110mm f/2 R LM WR",
+              "lens_mount": "Fujifilm G",
+              "sensor_format": "Medium Format (43.8x32.9mm)"
+            },
+            "governance_metadata": {
+              "target_export_eligible": true,
+              "importable": true,
+              "verification_source": "https://fujifilm-x.com/global/products/cameras/gfx100/specifications/",
+              "spec_verified": true,
+              "kit_compatibility_status": "NATIVE_COMPATIBLE",
+              "hardware_kit_compatible": true
+            }
+          }
+        },
+        {
+          "id": "cam_hw__fujifilm_x_pro3_with_fujinon_xf_56mm_f_1_2_r",
+          "text": "Fujifilm X-Pro3 with Fujinon XF 56mm f/1.2 R",
+          "facts": {
+            "camera_facts": {
+              "device_category": "camera_hardware_kit",
+              "device_type": "rangefinder_mirrorless",
+              "camera_brand": "Fujifilm",
+              "camera_model": "X-Pro3",
+              "lens_spec": "Fujinon XF 56mm f/1.2 R",
+              "lens_mount": "Fujifilm X",
+              "sensor_format": "APS-C X-Trans"
+            },
+            "governance_metadata": {
+              "target_export_eligible": true,
+              "importable": true,
+              "verification_source": "https://fujifilm-x.com/global/products/cameras/x-pro3/specifications/",
+              "spec_verified": true,
+              "kit_compatibility_status": "NATIVE_COMPATIBLE",
+              "hardware_kit_compatible": true
+            }
+          }
+        },
+        {
+          "id": "cam_hw__fujifilm_x_s10_with_fujinon_xf_10_24mm_f_4_r_oi",
+          "text": "Fujifilm X-S10 with Fujinon XF 10-24mm f/4 R OIS WR",
+          "facts": {
+            "camera_facts": {
+              "device_category": "camera_hardware_kit",
+              "device_type": "mirrorless",
+              "camera_brand": "Fujifilm",
+              "camera_model": "X-S10",
+              "lens_spec": "Fujinon XF 10-24mm f/4 R OIS WR",
+              "lens_mount": "Fujifilm X",
+              "sensor_format": "APS-C X-Trans"
+            },
+            "governance_metadata": {
+              "target_export_eligible": true,
+              "importable": true,
+              "verification_source": "https://fujifilm-x.com/global/products/cameras/x-s10/specifications/",
+              "spec_verified": true,
+              "kit_compatibility_status": "NATIVE_COMPATIBLE",
+              "hardware_kit_compatible": true
+            }
+          }
+        },
+        {
+          "id": "cam_hw__fujifilm_x_t4_with_fujinon_xf_35mm_f_2_r_wr",
+          "text": "FujiFilm X-T4 with Fujinon XF 35mm f/2 R WR",
+          "facts": {
+            "camera_facts": {
+              "device_category": "camera_hardware_kit",
+              "device_type": "mirrorless",
+              "camera_brand": "Fujifilm",
+              "camera_model": "X-T4",
+              "lens_spec": "Fujinon XF 35mm f/2 R WR",
+              "lens_mount": "Fujifilm X",
+              "sensor_format": "APS-C X-Trans"
+            },
+            "governance_metadata": {
+              "target_export_eligible": true,
+              "importable": true,
+              "verification_source": "https://fujifilm-x.com/global/products/cameras/x-t4/specifications/",
+              "spec_verified": true,
+              "kit_compatibility_status": "NATIVE_COMPATIBLE",
+              "hardware_kit_compatible": true
+            }
+          }
+        },
+        {
+          "id": "cam_hw__fujifilm_x100v_with_fujinon_23mm_f_2",
+          "text": "Fujifilm X100V with Fujinon 23mm f/2",
+          "facts": {
+            "camera_facts": {
+              "device_category": "camera_hardware_kit",
+              "device_type": "premium_compact",
+              "camera_brand": "Fujifilm",
+              "camera_model": "X100V",
+              "lens_spec": "Built-in Fujinon 23mm f/2 (35mm equiv)",
+              "lens_mount": "built_in",
+              "sensor_format": "APS-C X-Trans"
+            },
+            "governance_metadata": {
+              "target_export_eligible": true,
+              "importable": true,
+              "verification_source": "https://fujifilm-x.com/global/products/cameras/x100v/specifications/",
+              "spec_verified": true,
+              "kit_compatibility_status": "NATIVE_COMPATIBLE",
+              "hardware_kit_compatible": true
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "camera_hardware_gopro",
+      "name_zh": "GoPro 运动相机系统 (GoPro Action Camera Hardware)",
+      "tags": [
+        {
+          "id": "cam_hw__gopro_hero9_with_built_in_f_2_8_ultra_wide_acti",
+          "text": "GoPro HERO9 with Built-in f/2.8 Ultra-Wide (action camera)",
+          "facts": {
+            "camera_facts": {
+              "device_category": "camera_hardware_kit",
+              "device_type": "action_camera",
+              "camera_brand": "GoPro",
+              "camera_model": "HERO9 Black",
+              "lens_spec": "Built-in f/2.8 Ultra-Wide (16mm equiv)",
+              "lens_mount": "built_in",
+              "sensor_format": "1/2.3-inch"
+            },
+            "governance_metadata": {
+              "target_export_eligible": true,
+              "importable": true,
+              "verification_source": "https://gopro.com/en/us/update/hero9-black",
+              "spec_verified": true,
+              "kit_compatibility_status": "NATIVE_COMPATIBLE",
+              "hardware_kit_compatible": true
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "camera_hardware_hasselblad",
+      "name_zh": "哈苏中画幅相机系统 (Hasselblad Camera Hardware)",
+      "tags": [
+        {
+          "id": "cam_hw__hasselblad_907x_with_hasselblad_xcd_30mm_f_3_5",
+          "text": "Hasselblad 907X with Hasselblad XCD 30mm f/3.5",
+          "facts": {
+            "camera_facts": {
+              "device_category": "camera_hardware_kit",
+              "device_type": "modular_medium_format",
+              "camera_brand": "Hasselblad",
+              "camera_model": "907X 50C",
+              "lens_spec": "Hasselblad XCD 30mm f/3.5",
+              "lens_mount": "Hasselblad XCD",
+              "sensor_format": "Medium Format (43.8x32.9mm)"
+            },
+            "governance_metadata": {
+              "target_export_eligible": true,
+              "importable": true,
+              "verification_source": "https://www.hasselblad.com/v-system/907x-50c/",
+              "spec_verified": true,
+              "kit_compatibility_status": "NATIVE_COMPATIBLE",
+              "hardware_kit_compatible": true
+            }
+          }
+        },
+        {
+          "id": "cam_hw__hasselblad_x1d_ii_with_hasselblad_xcd_65mm_f_2",
+          "text": "Hasselblad X1D II with Hasselblad XCD 65mm f/2.8",
+          "facts": {
+            "camera_facts": {
+              "device_category": "camera_hardware_kit",
+              "device_type": "medium_format_mirrorless",
+              "camera_brand": "Hasselblad",
+              "camera_model": "X1D II 50C",
+              "lens_spec": "Hasselblad XCD 65mm f/2.8",
+              "lens_mount": "Hasselblad XCD",
+              "sensor_format": "Medium Format (43.8x32.9mm)"
+            },
+            "governance_metadata": {
+              "target_export_eligible": true,
+              "importable": true,
+              "verification_source": "https://www.hasselblad.com/x-system/x1d-ii-50c/",
+              "spec_verified": true,
+              "kit_compatibility_status": "NATIVE_COMPATIBLE",
+              "hardware_kit_compatible": true
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "camera_hardware_kodak",
+      "name_zh": "柯达长焦数码相机 (Kodak Pixpro Camera Hardware)",
+      "tags": [
+        {
+          "id": "cam_hw__kodak_pixpro_az901_with_built_in_4_3_258mm_f_2",
+          "text": "Kodak PIXPRO AZ901 with Built-in 4.3-258mm f/2.9-6.7 (superzoom)",
+          "facts": {
+            "camera_facts": {
+              "device_category": "camera_hardware_kit",
+              "device_type": "bridge_superzoom",
+              "camera_brand": "Kodak",
+              "camera_model": "PIXPRO AZ901",
+              "lens_spec": "Built-in 4.3-258mm f/2.9-6.7 (90x zoom, 22-1980mm)",
+              "lens_mount": "built_in",
+              "sensor_format": "1/2.3-inch BSI CMOS"
+            },
+            "governance_metadata": {
+              "target_export_eligible": true,
+              "importable": true,
+              "verification_source": "https://kodakpixpro.com/cameras/astro-zoom/az901/",
+              "spec_verified": true,
+              "kit_compatibility_status": "NATIVE_COMPATIBLE",
+              "hardware_kit_compatible": true
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "camera_hardware_leica",
+      "name_zh": "徕卡旁轴与微单系统 (Leica Camera Hardware)",
+      "tags": [
+        {
+          "id": "cam_hw__leica_cl_with_leica_summilux_tl_35mm_f_1_4_asph",
+          "text": "Leica CL with Leica Summilux-TL 35mm f/1.4 ASPH",
+          "facts": {
+            "camera_facts": {
+              "device_category": "camera_hardware_kit",
+              "device_type": "mirrorless",
+              "camera_brand": "Leica",
+              "camera_model": "Leica CL",
+              "lens_spec": "Leica Summilux-TL 35mm f/1.4 ASPH",
+              "lens_mount": "Leica L (TL)",
+              "sensor_format": "APS-C"
+            },
+            "governance_metadata": {
+              "target_export_eligible": true,
+              "importable": true,
+              "verification_source": "https://leica-camera.com/en-int/photography/cameras/cl-tl2/cl",
+              "spec_verified": true,
+              "kit_compatibility_status": "NATIVE_COMPATIBLE",
+              "hardware_kit_compatible": true
+            }
+          }
+        },
+        {
+          "id": "cam_hw__leica_m10_with_leica_35mm_f_2_summicron_m_asph",
+          "text": "Leica M10 with LEICA 35mm f/2 SUMMICRON-M ASPH",
+          "facts": {
+            "camera_facts": {
+              "device_category": "camera_hardware_kit",
+              "device_type": "digital_rangefinder",
+              "camera_brand": "Leica",
+              "camera_model": "Leica M10",
+              "lens_spec": "Leica Summicron-M 35mm f/2 ASPH",
+              "lens_mount": "Leica M",
+              "sensor_format": "Full Frame 35mm"
+            },
+            "governance_metadata": {
+              "target_export_eligible": true,
+              "importable": true,
+              "verification_source": "https://leica-camera.com/en-int/photography/cameras/m/m10",
+              "spec_verified": true,
+              "kit_compatibility_status": "NATIVE_COMPATIBLE",
+              "hardware_kit_compatible": true
+            }
+          }
+        },
+        {
+          "id": "cam_hw__leica_q2_with_summilux_28mm_f_1_7_asph",
+          "text": "Leica Q2 with Summilux 28mm f/1.7 ASPH",
+          "facts": {
+            "camera_facts": {
+              "device_category": "camera_hardware_kit",
+              "device_type": "premium_compact",
+              "camera_brand": "Leica",
+              "camera_model": "Leica Q2",
+              "lens_spec": "Built-in Leica Summilux 28mm f/1.7 ASPH",
+              "lens_mount": "built_in",
+              "sensor_format": "Full Frame 35mm"
+            },
+            "governance_metadata": {
+              "target_export_eligible": true,
+              "importable": true,
+              "verification_source": "https://leica-camera.com/en-int/photography/cameras/q/q2",
+              "spec_verified": true,
+              "kit_compatibility_status": "NATIVE_COMPATIBLE",
+              "hardware_kit_compatible": true
+            }
+          }
+        },
+        {
+          "id": "cam_hw__leica_sl2_with_leica_apo_summicron_sl_50mm_f_2",
+          "text": "Leica SL2 with Leica APO-Summicron-SL 50mm f/2 ASPH",
+          "facts": {
+            "camera_facts": {
+              "device_category": "camera_hardware_kit",
+              "device_type": "mirrorless",
+              "camera_brand": "Leica",
+              "camera_model": "Leica SL2",
+              "lens_spec": "Leica APO-Summicron-SL 50mm f/2 ASPH",
+              "lens_mount": "Leica L",
+              "sensor_format": "Full Frame 35mm"
+            },
+            "governance_metadata": {
+              "target_export_eligible": true,
+              "importable": true,
+              "verification_source": "https://leica-camera.com/en-int/photography/cameras/sl/sl2",
+              "spec_verified": true,
+              "kit_compatibility_status": "NATIVE_COMPATIBLE",
+              "hardware_kit_compatible": true
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "camera_hardware_nikon",
+      "name_zh": "尼康专业相机与长焦机 (Nikon Camera Hardware)",
+      "tags": [
+        {
+          "id": "cam_hw__nikon_coolpix_p950_with_built_in_24_2000mm_f_2",
+          "text": "Nikon Coolpix P950 with Built-in 24-2000mm f/2.8-6.5 (superzoom)",
+          "facts": {
+            "camera_facts": {
+              "device_category": "camera_hardware_kit",
+              "device_type": "bridge_superzoom",
+              "camera_brand": "Nikon",
+              "camera_model": "Coolpix P950",
+              "lens_spec": "Built-in 4.3-357mm f/2.8-6.5 (83x zoom, 24-2000mm)",
+              "lens_mount": "built_in",
+              "sensor_format": "1/2.3-inch"
+            },
+            "governance_metadata": {
+              "target_export_eligible": true,
+              "importable": true,
+              "verification_source": "https://www.nikonusa.com/en/nikon-products/product/compact-digital-cameras/coolpix-p950.html",
+              "spec_verified": true,
+              "kit_compatibility_status": "NATIVE_COMPATIBLE",
+              "hardware_kit_compatible": true
+            }
+          }
+        },
+        {
+          "id": "cam_hw__nikon_d780_with_nikkor_14_24mm_f_2_8g",
+          "text": "Nikon D780 with Nikkor 14-24mm f/2.8G",
+          "facts": {
+            "camera_facts": {
+              "device_category": "camera_hardware_kit",
+              "device_type": "dslr",
+              "camera_brand": "Nikon",
+              "camera_model": "Nikon D780",
+              "lens_spec": "AF-S NIKKOR 14-24mm f/2.8G ED",
+              "lens_mount": "Nikon F",
+              "sensor_format": "Full Frame 35mm (FX)"
+            },
+            "governance_metadata": {
+              "target_export_eligible": true,
+              "importable": true,
+              "verification_source": "https://www.nikonusa.com/en/nikon-products/product/dslr-cameras/d780.html",
+              "spec_verified": true,
+              "kit_compatibility_status": "NATIVE_COMPATIBLE",
+              "hardware_kit_compatible": true
+            }
+          }
+        },
+        {
+          "id": "cam_hw__nikon_d850_with_nikkor_50mm_f_1_8",
+          "text": "Nikon D850 with Nikkor 50mm f/1.8",
+          "facts": {
+            "camera_facts": {
+              "device_category": "camera_hardware_kit",
+              "device_type": "high_res_dslr",
+              "camera_brand": "Nikon",
+              "camera_model": "Nikon D850",
+              "lens_spec": "AF-S NIKKOR 50mm f/1.8G",
+              "lens_mount": "Nikon F",
+              "sensor_format": "Full Frame 35mm (FX, 45.7MP)"
+            },
+            "governance_metadata": {
+              "target_export_eligible": true,
+              "importable": true,
+              "verification_source": "https://www.nikonusa.com/en/nikon-products/product/dslr-cameras/d850.html",
+              "spec_verified": true,
+              "kit_compatibility_status": "NATIVE_COMPATIBLE",
+              "hardware_kit_compatible": true
+            }
+          }
+        },
+        {
+          "id": "cam_hw__nikon_z50_with_nikon_z_dx_16_50mm_f_3_5_6_3",
+          "text": "Nikon Z50 with Nikon Z DX 16-50mm f/3.5-6.3",
+          "facts": {
+            "camera_facts": {
+              "device_category": "camera_hardware_kit",
+              "device_type": "mirrorless",
+              "camera_brand": "Nikon",
+              "camera_model": "Nikon Z50",
+              "lens_spec": "NIKKOR Z DX 16-50mm f/3.5-6.3 VR",
+              "lens_mount": "Nikon Z",
+              "sensor_format": "APS-C (DX)"
+            },
+            "governance_metadata": {
+              "target_export_eligible": true,
+              "importable": true,
+              "verification_source": "https://www.nikonusa.com/en/nikon-products/product/mirrorless-cameras/z-50.html",
+              "spec_verified": true,
+              "kit_compatibility_status": "NATIVE_COMPATIBLE",
+              "hardware_kit_compatible": true
+            }
+          }
+        },
+        {
+          "id": "cam_hw__nikon_z6_ii_with_nikon_z_24_70mm_f_4_s",
+          "text": "Nikon Z6 II with Nikon Z 24-70mm f/4 S",
+          "facts": {
+            "camera_facts": {
+              "device_category": "camera_hardware_kit",
+              "device_type": "mirrorless",
+              "camera_brand": "Nikon",
+              "camera_model": "Nikon Z6 II",
+              "lens_spec": "NIKKOR Z 24-70mm f/4 S",
+              "lens_mount": "Nikon Z",
+              "sensor_format": "Full Frame 35mm (FX)"
+            },
+            "governance_metadata": {
+              "target_export_eligible": true,
+              "importable": true,
+              "verification_source": "https://www.nikonusa.com/en/nikon-products/product/mirrorless-cameras/z-6ii.html",
+              "spec_verified": true,
+              "kit_compatibility_status": "NATIVE_COMPATIBLE",
+              "hardware_kit_compatible": true
+            }
+          }
+        },
+        {
+          "id": "cam_hw__nikon_z7_with_nikon_z_70_200mm_f_2_8_vr_s",
+          "text": "Nikon Z7 with Nikon Z 70-200mm f/2.8 VR S",
+          "facts": {
+            "camera_facts": {
+              "device_category": "camera_hardware_kit",
+              "device_type": "high_res_mirrorless",
+              "camera_brand": "Nikon",
+              "camera_model": "Nikon Z7",
+              "lens_spec": "NIKKOR Z 70-200mm f/2.8 VR S",
+              "lens_mount": "Nikon Z",
+              "sensor_format": "Full Frame 35mm (FX, 45.7MP)"
+            },
+            "governance_metadata": {
+              "target_export_eligible": true,
+              "importable": true,
+              "verification_source": "https://www.nikonusa.com/en/nikon-products/product/mirrorless-cameras/z-7.html",
+              "spec_verified": true,
+              "kit_compatibility_status": "NATIVE_COMPATIBLE",
+              "hardware_kit_compatible": true
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "camera_hardware_olympus",
+      "name_zh": "奥林巴斯微单系统 (Olympus Camera Hardware)",
+      "tags": [
+        {
+          "id": "cam_hw__olympus_om_d_e_m1_mark_iii_with_m_zuiko_12_40mm",
+          "text": "Olympus OM-D E-M1 Mark III with M.Zuiko 12-40mm f/2.8",
+          "facts": {
+            "camera_facts": {
+              "device_category": "camera_hardware_kit",
+              "device_type": "mirrorless",
+              "camera_brand": "Olympus",
+              "camera_model": "OM-D E-M1 Mark III",
+              "lens_spec": "M.Zuiko Digital ED 12-40mm f/2.8 PRO",
+              "lens_mount": "Micro Four Thirds",
+              "sensor_format": "Micro Four Thirds"
+            },
+            "governance_metadata": {
+              "target_export_eligible": true,
+              "importable": true,
+              "verification_source": "https://explore.omsystem.com/us/en/om-d-e-m1-mark-iii",
+              "spec_verified": true,
+              "kit_compatibility_status": "NATIVE_COMPATIBLE",
+              "hardware_kit_compatible": true
+            }
+          }
+        },
+        {
+          "id": "cam_hw__olympus_om_d_e_m5_mark_iii_with_m_zuiko_40_150m",
+          "text": "Olympus OM-D E-M5 Mark III with M.Zuiko 40-150mm f/2.8",
+          "facts": {
+            "camera_facts": {
+              "device_category": "camera_hardware_kit",
+              "device_type": "mirrorless",
+              "camera_brand": "Olympus",
+              "camera_model": "OM-D E-M5 Mark III",
+              "lens_spec": "M.Zuiko Digital ED 40-150mm f/2.8 PRO",
+              "lens_mount": "Micro Four Thirds",
+              "sensor_format": "Micro Four Thirds"
+            },
+            "governance_metadata": {
+              "target_export_eligible": true,
+              "importable": true,
+              "verification_source": "https://explore.omsystem.com/us/en/om-d-e-m5-mark-iii",
+              "spec_verified": true,
+              "kit_compatibility_status": "NATIVE_COMPATIBLE",
+              "hardware_kit_compatible": true
+            }
+          }
+        },
+        {
+          "id": "cam_hw__olympus_pen_f_with_m_zuiko_17mm_f_1_8",
+          "text": "Olympus PEN-F with M.Zuiko 17mm f/1.8",
+          "facts": {
+            "camera_facts": {
+              "device_category": "camera_hardware_kit",
+              "device_type": "rangefinder_mirrorless",
+              "camera_brand": "Olympus",
+              "camera_model": "PEN-F",
+              "lens_spec": "M.Zuiko Digital 17mm f/1.8",
+              "lens_mount": "Micro Four Thirds",
+              "sensor_format": "Micro Four Thirds"
+            },
+            "governance_metadata": {
+              "target_export_eligible": true,
+              "importable": true,
+              "verification_source": "https://learnandsupport.getolympus.com/support/pen-f",
+              "spec_verified": true,
+              "kit_compatibility_status": "NATIVE_COMPATIBLE",
+              "hardware_kit_compatible": true
+            }
+          }
+        },
+        {
+          "id": "cam_hw__olympus_tough_tg_6_with_built_in_4_5_18mm_f_2_4",
+          "text": "Olympus Tough TG-6 with Built-in 4.5-18mm f/2-4.9 (rugged compact)",
+          "facts": {
+            "camera_facts": {
+              "device_category": "camera_hardware_kit",
+              "device_type": "rugged_waterproof_compact",
+              "camera_brand": "Olympus",
+              "camera_model": "Tough TG-6",
+              "lens_spec": "Built-in 4.5-18mm f/2.0-4.9 (25-100mm)",
+              "lens_mount": "built_in",
+              "sensor_format": "1/2.33-inch BSI CMOS"
+            },
+            "governance_metadata": {
+              "target_export_eligible": true,
+              "importable": true,
+              "verification_source": "https://explore.omsystem.com/us/en/tough-tg-6",
+              "spec_verified": true,
+              "kit_compatibility_status": "NATIVE_COMPATIBLE",
+              "hardware_kit_compatible": true
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "camera_hardware_panasonic",
+      "name_zh": "松下微单数码相机系统 (Panasonic Camera Hardware)",
+      "tags": [
+        {
+          "id": "cam_hw__panasonic_lumix_g9_with_leica_dg_42_5mm_f_1_2",
+          "text": "Panasonic Lumix G9 with Leica DG 42.5mm f/1.2",
+          "facts": {
+            "camera_facts": {
+              "device_category": "camera_hardware_kit",
+              "device_type": "mirrorless",
+              "camera_brand": "Panasonic",
+              "camera_model": "Lumix DC-G9",
+              "lens_spec": "Leica DG Nocticron 42.5mm f/1.2 ASPH.",
+              "lens_mount": "Micro Four Thirds",
+              "sensor_format": "Micro Four Thirds"
+            },
+            "governance_metadata": {
+              "target_export_eligible": true,
+              "importable": true,
+              "verification_source": "https://www.panasonic.com/global/consumer/lumix/g9.html",
+              "spec_verified": true,
+              "kit_compatibility_status": "NATIVE_COMPATIBLE",
+              "hardware_kit_compatible": true
+            }
+          }
+        },
+        {
+          "id": "cam_hw__panasonic_lumix_gh5_with_leica_dg_25mm_f_1_4",
+          "text": "Panasonic Lumix GH5 with Leica DG 25mm f/1.4",
+          "facts": {
+            "camera_facts": {
+              "device_category": "camera_hardware_kit",
+              "device_type": "hybrid_cinema_mirrorless",
+              "camera_brand": "Panasonic",
+              "camera_model": "Lumix DC-GH5",
+              "lens_spec": "Leica DG Summilux 25mm f/1.4 II ASPH.",
+              "lens_mount": "Micro Four Thirds",
+              "sensor_format": "Micro Four Thirds"
+            },
+            "governance_metadata": {
+              "target_export_eligible": true,
+              "importable": true,
+              "verification_source": "https://www.panasonic.com/global/consumer/lumix/gh5.html",
+              "spec_verified": true,
+              "kit_compatibility_status": "NATIVE_COMPATIBLE",
+              "hardware_kit_compatible": true
+            }
+          }
+        },
+        {
+          "id": "cam_hw__panasonic_lumix_s5_with_lumix_s_pro_70_200mm_f",
+          "text": "Panasonic Lumix S5 with Lumix S PRO 70-200mm f/2.8 O.I.S.",
+          "facts": {
+            "camera_facts": {
+              "device_category": "camera_hardware_kit",
+              "device_type": "mirrorless",
+              "camera_brand": "Panasonic",
+              "camera_model": "Lumix DC-S5",
+              "lens_spec": "Lumix S PRO 70-200mm f/2.8 O.I.S.",
+              "lens_mount": "Leica L",
+              "sensor_format": "Full Frame 35mm"
+            },
+            "governance_metadata": {
+              "target_export_eligible": true,
+              "importable": true,
+              "verification_source": "https://www.panasonic.com/global/consumer/lumix/s5.html",
+              "spec_verified": true,
+              "kit_compatibility_status": "NATIVE_COMPATIBLE",
+              "hardware_kit_compatible": true
+            }
+          }
+        },
+        {
+          "id": "cam_hw__panasonic_s1r_with_lumix_s_50mm_f_1_4",
+          "text": "Panasonic S1R with Lumix S 50mm f/1.4",
+          "facts": {
+            "camera_facts": {
+              "device_category": "camera_hardware_kit",
+              "device_type": "high_res_mirrorless",
+              "camera_brand": "Panasonic",
+              "camera_model": "Lumix DC-S1R",
+              "lens_spec": "Lumix S PRO 50mm f/1.4",
+              "lens_mount": "Leica L",
+              "sensor_format": "Full Frame 35mm (47.3MP)"
+            },
+            "governance_metadata": {
+              "target_export_eligible": true,
+              "importable": true,
+              "verification_source": "https://www.panasonic.com/global/consumer/lumix/s1r.html",
+              "spec_verified": true,
+              "kit_compatibility_status": "NATIVE_COMPATIBLE",
+              "hardware_kit_compatible": true
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "camera_hardware_pentax",
+      "name_zh": "宾得中画幅与单反系统 (Pentax Camera Hardware)",
+      "tags": [
+        {
+          "id": "cam_hw__pentax_645z_with_pentax_d_fa_645_55mm_f_2_8",
+          "text": "Pentax 645Z with Pentax-D FA 645 55mm f/2.8",
+          "facts": {
+            "camera_facts": {
+              "device_category": "camera_hardware_kit",
+              "device_type": "medium_format_dslr",
+              "camera_brand": "Pentax",
+              "camera_model": "Pentax 645Z",
+              "lens_spec": "smc PENTAX-D FA 645 55mm f/2.8 AL SDM AW",
+              "lens_mount": "Pentax 645AF2",
+              "sensor_format": "Medium Format (43.8x32.8mm)"
+            },
+            "governance_metadata": {
+              "target_export_eligible": true,
+              "importable": true,
+              "verification_source": "https://www.ricoh-imaging.co.jp/english/products/645z/",
+              "spec_verified": true,
+              "kit_compatibility_status": "NATIVE_COMPATIBLE",
+              "hardware_kit_compatible": true
+            }
+          }
+        },
+        {
+          "id": "cam_hw__pentax_k_1_mark_ii_with_pentax_fa_43mm_f_1_9_li",
+          "text": "Pentax K-1 Mark II with Pentax FA 43mm f/1.9 Limited",
+          "facts": {
+            "camera_facts": {
+              "device_category": "camera_hardware_kit",
+              "device_type": "dslr",
+              "camera_brand": "Pentax",
+              "camera_model": "Pentax K-1 Mark II",
+              "lens_spec": "HD PENTAX-FA 43mm f/1.9 Limited",
+              "lens_mount": "Pentax KAF2",
+              "sensor_format": "Full Frame 35mm"
+            },
+            "governance_metadata": {
+              "target_export_eligible": true,
+              "importable": true,
+              "verification_source": "https://www.ricoh-imaging.co.jp/english/products/k-1-2/",
+              "spec_verified": true,
+              "kit_compatibility_status": "NATIVE_COMPATIBLE",
+              "hardware_kit_compatible": true
+            }
+          }
+        },
+        {
+          "id": "cam_hw__pentax_kp_with_pentax_hd_da_20_40mm_f_2_8_4",
+          "text": "Pentax KP with Pentax HD DA 20-40mm f/2.8-4",
+          "facts": {
+            "camera_facts": {
+              "device_category": "camera_hardware_kit",
+              "device_type": "dslr",
+              "camera_brand": "Pentax",
+              "camera_model": "Pentax KP",
+              "lens_spec": "HD PENTAX-DA 20-40mm f/2.8-4 ED Limited DC WR",
+              "lens_mount": "Pentax KAF3",
+              "sensor_format": "APS-C"
+            },
+            "governance_metadata": {
+              "target_export_eligible": true,
+              "importable": true,
+              "verification_source": "https://www.ricoh-imaging.co.jp/english/products/kp/",
+              "spec_verified": true,
+              "kit_compatibility_status": "NATIVE_COMPATIBLE",
+              "hardware_kit_compatible": true
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "camera_hardware_ricoh",
+      "name_zh": "理光街拍便携相机 (Ricoh GR Camera Hardware)",
+      "tags": [
+        {
+          "id": "cam_hw__ricoh_gr_iii_with_gr_18_3mm_f_2_8",
+          "text": "Ricoh GR III with GR 18.3mm f/2.8",
+          "facts": {
+            "camera_facts": {
+              "device_category": "camera_hardware_kit",
+              "device_type": "premium_street_compact",
+              "camera_brand": "Ricoh",
+              "camera_model": "Ricoh GR III",
+              "lens_spec": "Built-in GR 18.3mm f/2.8 (28mm equiv)",
+              "lens_mount": "built_in",
+              "sensor_format": "APS-C (23.5x15.6mm, 24.24MP)"
+            },
+            "governance_metadata": {
+              "target_export_eligible": true,
+              "importable": true,
+              "verification_source": "https://www.ricoh-imaging.co.jp/english/products/gr-3/feature/",
+              "spec_verified": true,
+              "kit_compatibility_status": "NATIVE_COMPATIBLE",
+              "hardware_kit_compatible": true
+            }
+          }
+        },
+        {
+          "id": "cam_hw__ricoh_theta_z1_with_built_in_14mm_f_2_1_360_deg",
+          "text": "Ricoh Theta Z1 with Built-in 14mm f/2.1 (360-degree camera)",
+          "facts": {
+            "camera_facts": {
+              "device_category": "camera_hardware_kit",
+              "device_type": "spherical_360_camera",
+              "camera_brand": "Ricoh",
+              "camera_model": "Ricoh Theta Z1",
+              "lens_spec": "Dual Built-in Fisheye 14mm f/2.1 (360 spherical)",
+              "lens_mount": "built_in",
+              "sensor_format": "Dual 1.0-inch BSI CMOS"
+            },
+            "governance_metadata": {
+              "target_export_eligible": true,
+              "importable": true,
+              "verification_source": "https://theta360.com/en/about/theta/z1.html",
+              "spec_verified": true,
+              "kit_compatibility_status": "NATIVE_COMPATIBLE",
+              "hardware_kit_compatible": true
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "camera_hardware_sigma",
+      "name_zh": "适马全画幅微单系统 (Sigma Camera Hardware)",
+      "tags": [
+        {
+          "id": "cam_hw__sigma_fp_with_sigma_45mm_f_2_8_dg_dn",
+          "text": "Sigma fp with Sigma 45mm f/2.8 DG DN",
+          "facts": {
+            "camera_facts": {
+              "device_category": "camera_hardware_kit",
+              "device_type": "ultra_compact_mirrorless",
+              "camera_brand": "Sigma",
+              "camera_model": "Sigma fp",
+              "lens_spec": "Sigma 45mm f/2.8 DG DN Contemporary",
+              "lens_mount": "Leica L",
+              "sensor_format": "Full Frame 35mm"
+            },
+            "governance_metadata": {
+              "target_export_eligible": true,
+              "importable": true,
+              "verification_source": "https://www.sigma-global.com/en/cameras/fp/",
+              "spec_verified": true,
+              "kit_compatibility_status": "NATIVE_COMPATIBLE",
+              "hardware_kit_compatible": true
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "camera_hardware_sony",
+      "name_zh": "索尼全画幅微单系统 (Sony Alpha Camera Hardware)",
+      "tags": [
+        {
+          "id": "cam_hw__sony_a1_with_sony_fe_20mm_f_1_8_g",
+          "text": "Sony A1 with Sony FE 20mm f/1.8 G",
+          "facts": {
+            "camera_facts": {
+              "device_category": "camera_hardware_kit",
+              "device_type": "flagship_mirrorless",
+              "camera_brand": "Sony",
+              "camera_model": "Sony Alpha 1 (ILCE-1)",
+              "lens_spec": "Sony FE 20mm f/1.8 G",
+              "lens_mount": "Sony E",
+              "sensor_format": "Full Frame 35mm (50.1MP stacked)"
+            },
+            "governance_metadata": {
+              "target_export_eligible": true,
+              "importable": true,
+              "verification_source": "https://electronics.sony.com/imaging/interchangeable-lens-cameras/all-interchangeable-lens-cameras/p/ilce1-b",
+              "spec_verified": true,
+              "kit_compatibility_status": "NATIVE_COMPATIBLE",
+              "hardware_kit_compatible": true
+            }
+          }
+        },
+        {
+          "id": "cam_hw__sony_a6400_with_sony_e_35mm_f_1_8_oss",
+          "text": "Sony A6400 with Sony E 35mm f/1.8 OSS",
+          "facts": {
+            "camera_facts": {
+              "device_category": "camera_hardware_kit",
+              "device_type": "mirrorless",
+              "camera_brand": "Sony",
+              "camera_model": "Sony Alpha 6400 (ILCE-6400)",
+              "lens_spec": "Sony E 35mm f/1.8 OSS",
+              "lens_mount": "Sony E",
+              "sensor_format": "APS-C"
+            },
+            "governance_metadata": {
+              "target_export_eligible": true,
+              "importable": true,
+              "verification_source": "https://electronics.sony.com/imaging/interchangeable-lens-cameras/all-interchangeable-lens-cameras/p/ilce6400-b",
+              "spec_verified": true,
+              "kit_compatibility_status": "NATIVE_COMPATIBLE",
+              "hardware_kit_compatible": true
+            }
+          }
+        },
+        {
+          "id": "cam_hw__sony_a7c_with_sony_fe_28_60mm_f_4_5_6",
+          "text": "Sony A7C with Sony FE 28-60mm f/4-5.6",
+          "facts": {
+            "camera_facts": {
+              "device_category": "camera_hardware_kit",
+              "device_type": "compact_full_frame_mirrorless",
+              "camera_brand": "Sony",
+              "camera_model": "Sony Alpha 7C (ILCE-7C)",
+              "lens_spec": "Sony FE 28-60mm f/4-5.6",
+              "lens_mount": "Sony E",
+              "sensor_format": "Full Frame 35mm"
+            },
+            "governance_metadata": {
+              "target_export_eligible": true,
+              "importable": true,
+              "verification_source": "https://electronics.sony.com/imaging/interchangeable-lens-cameras/all-interchangeable-lens-cameras/p/ilce7c-b",
+              "spec_verified": true,
+              "kit_compatibility_status": "NATIVE_COMPATIBLE",
+              "hardware_kit_compatible": true
+            }
+          }
+        },
+        {
+          "id": "cam_hw__sony_a7r_iv_with_sony_fe_85mm_f_1_4_gm",
+          "text": "Sony A7R IV with Sony FE 85mm f/1.4 GM",
+          "facts": {
+            "camera_facts": {
+              "device_category": "camera_hardware_kit",
+              "device_type": "high_res_mirrorless",
+              "camera_brand": "Sony",
+              "camera_model": "Sony Alpha 7R IV (ILCE-7RM4)",
+              "lens_spec": "Sony FE 85mm f/1.4 GM",
+              "lens_mount": "Sony E",
+              "sensor_format": "Full Frame 35mm (61.0MP)"
+            },
+            "governance_metadata": {
+              "target_export_eligible": true,
+              "importable": true,
+              "verification_source": "https://electronics.sony.com/imaging/interchangeable-lens-cameras/all-interchangeable-lens-cameras/p/ilce7rm4-b",
+              "spec_verified": true,
+              "kit_compatibility_status": "NATIVE_COMPATIBLE",
+              "hardware_kit_compatible": true
+            }
+          }
+        },
+        {
+          "id": "cam_hw__sony_a9_ii_with_sony_fe_24_70mm_f_2_8_gm",
+          "text": "Sony A9 II with Sony FE 24-70mm f/2.8 GM",
+          "facts": {
+            "camera_facts": {
+              "device_category": "camera_hardware_kit",
+              "device_type": "sports_mirrorless",
+              "camera_brand": "Sony",
+              "camera_model": "Sony Alpha 9 II (ILCE-9M2)",
+              "lens_spec": "Sony FE 24-70mm f/2.8 GM",
+              "lens_mount": "Sony E",
+              "sensor_format": "Full Frame 35mm stacked"
+            },
+            "governance_metadata": {
+              "target_export_eligible": true,
+              "importable": true,
+              "verification_source": "https://electronics.sony.com/imaging/interchangeable-lens-cameras/all-interchangeable-lens-cameras/p/ilce9m2-b",
+              "spec_verified": true,
+              "kit_compatibility_status": "NATIVE_COMPATIBLE",
+              "hardware_kit_compatible": true
+            }
+          }
+        },
+        {
+          "id": "cam_hw__sony_rx100_vii_with_built_in_24_200mm_f_2_8_4_5",
+          "text": "Sony RX100 VII with Built-in 24-200mm f/2.8-4.5 (compact camera)",
+          "facts": {
+            "camera_facts": {
+              "device_category": "camera_hardware_kit",
+              "device_type": "premium_pocket_compact",
+              "camera_brand": "Sony",
+              "camera_model": "Cyber-shot DSC-RX100 VII",
+              "lens_spec": "Built-in ZEISS Vario-Sonnar 9-72mm f/2.8-4.5 (24-200mm)",
+              "lens_mount": "built_in",
+              "sensor_format": "1.0-type (1 inch) stacked CMOS"
+            },
+            "governance_metadata": {
+              "target_export_eligible": true,
+              "importable": true,
+              "verification_source": "https://electronics.sony.com/imaging/compact-cameras/all-compact-cameras/p/dscrx100m7",
+              "spec_verified": true,
+              "kit_compatibility_status": "NATIVE_COMPATIBLE",
+              "hardware_kit_compatible": true
+            }
           }
         }
       ]

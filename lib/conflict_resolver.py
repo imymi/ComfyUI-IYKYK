@@ -15,14 +15,16 @@ import re
 from enum import Enum
 from pathlib import Path
 from random import Random
-from typing import Any, Dict, List, Optional, Sequence, Set, Tuple
+from typing import Any, Dict, FrozenSet, List, Optional, Sequence, Set, Tuple
 
 if __package__:
-    from .errors import RuleConfigurationError, UnresolvedConflictError
+    from .errors import QuarantineLeakageError, RuleConfigurationError, UnresolvedConflictError
     from .models import (
         CANONICAL_SELECTORS_BY_ENTRY_POINT,
         FORMAL_ORIGIN_MODES,
         ContextProfile,
+        PieceBinding,
+        PosePhysicalFacts,
         PromptAtom,
         PromptFragment,
         ResolutionDecision,
@@ -31,6 +33,7 @@ if __package__:
         SemanticFacts,
         SpanType,
         TagProvenance,
+        UNSPECIFIED,
     )
     from .rng import derive_substream_rng, recover_effective_seed
     from .rule_contract import (
@@ -46,11 +49,13 @@ if __package__:
     )
     from .slot_contract import SLOT_ALIASES, normalize_slot_name
 else:
-    from lib.errors import RuleConfigurationError, UnresolvedConflictError
+    from lib.errors import QuarantineLeakageError, RuleConfigurationError, UnresolvedConflictError
     from lib.models import (
         CANONICAL_SELECTORS_BY_ENTRY_POINT,
         FORMAL_ORIGIN_MODES,
         ContextProfile,
+        PieceBinding,
+        PosePhysicalFacts,
         PromptAtom,
         PromptFragment,
         ResolutionDecision,
@@ -59,6 +64,7 @@ else:
         SemanticFacts,
         SpanType,
         TagProvenance,
+        UNSPECIFIED,
     )
     from lib.rng import derive_substream_rng, recover_effective_seed
     from lib.rule_contract import (
@@ -76,8 +82,150 @@ else:
 
 
 # ═══════════════════════════════════════════════════════════════════════════
-# 服装实体聚合与绑定判定 SSOT 生产级实现
+# 隔离池阻断与服装实体聚合 SSOT 生产级实现
 # ═══════════════════════════════════════════════════════════════════════════
+
+QUARANTINE_ENTITY_IDS: FrozenSet[str] = frozenset({
+    'SRC_CAM_06691', 'SRC_CLOTH_00317', 'SRC_CLOTH_00368', 'SRC_CLOTH_00387',
+    'SRC_POSE_03788', 'SRC_POSE_03931', 'SRC_POSE_03952', 'SRC_POSE_03992',
+    'SRC_POSE_04004', 'SRC_POSE_04018', 'SRC_POSE_04266', 'SRC_POSE_04270',
+    'SRC_SCENE_04459', 'SRC_SCENE_04460', 'SRC_SCENE_04461', 'SRC_SCENE_04462',
+    'SRC_SCENE_04463', 'SRC_SCENE_04464', 'SRC_SCENE_04465', 'SRC_SCENE_04466',
+    'SRC_SCENE_04519', 'SRC_SCENE_04521', 'SRC_SCENE_04525', 'SRC_SCENE_04684',
+    'SRC_SCENE_04686', 'SRC_SCENE_04687', 'SRC_SCENE_04689', 'SRC_SCENE_04696',
+    'SRC_SCENE_04697', 'SRC_SCENE_04698', 'SRC_SCENE_04699', 'SRC_SCENE_04763',
+    'SRC_SCENE_04764', 'SRC_SCENE_04765', 'SRC_SCENE_04766', 'SRC_SCENE_04767',
+    'SRC_SCENE_04816', 'SRC_SCENE_04817', 'SRC_SCENE_04982', 'SRC_SCENE_04983',
+    'SRC_SCENE_04984', 'SRC_SCENE_04985', 'SRC_SCENE_04986', 'SRC_SCENE_05004',
+    'SRC_SCENE_05057', 'SRC_SCENE_05059', 'SRC_SCENE_05114', 'SRC_SCENE_05116',
+    'SRC_SCENE_05117', 'SRC_SCENE_05118', 'SRC_SCENE_05132', 'SRC_SCENE_05133',
+    'SRC_SCENE_05134', 'SRC_SCENE_05135', 'SRC_SCENE_05136', 'SRC_SCENE_05137',
+    'SRC_SCENE_05138', 'SRC_SCENE_05139', 'SRC_SCENE_05140', 'SRC_SCENE_05141',
+    'SRC_SCENE_05142', 'SRC_SCENE_05143', 'SRC_SCENE_05181', 'SRC_SCENE_05182',
+    'SRC_SCENE_05183', 'SRC_SCENE_05184', 'SRC_SCENE_05185', 'SRC_SCENE_05186',
+    'SRC_SCENE_05187', 'SRC_SCENE_05188', 'SRC_SCENE_05240', 'SRC_SCENE_05273',
+    'SRC_SCENE_05281', 'SRC_SCENE_05282', 'SRC_SCENE_05303', 'SRC_SCENE_05304',
+    'SRC_SCENE_05310', 'SRC_SCENE_05311', 'SRC_SCENE_05312', 'SRC_SCENE_05313',
+    'SRC_SCENE_05314', 'SRC_SCENE_05361', 'SRC_SCENE_05362'
+})
+
+
+def is_pose_support_compatible(pose_input: Any, required_support: str) -> bool:
+    """评估姿态物理支撑与场景/约束要求是否兼容。
+    若 body_support 为单一确定值，直接比对；
+    若 body_support 为 UNSPECIFIED，但存在 support_options 候选集合，只要 required_support 在候选集合中即兼容；
+    若 support_options 为空（全自由态），恒兼容。
+    """
+    if hasattr(pose_input, "pose_facts") and getattr(pose_input, "pose_facts", None) is not None:
+        return is_pose_support_compatible(getattr(pose_input, "pose_facts"), required_support)
+    pose_facts: Optional[PosePhysicalFacts] = pose_input
+    if not pose_facts or not getattr(pose_facts, "support_options", None):
+        return True
+    if pose_facts.body_support and pose_facts.body_support is not UNSPECIFIED and pose_facts.body_support != "unspecified":
+        return pose_facts.body_support == required_support
+    return required_support in pose_facts.support_options
+
+
+def is_quarantined_payload(
+    obj: Any,
+    entity_id: Optional[str] = None,
+) -> bool:
+    """判定任意对象、字典、PromptAtom 或 ID 是否触发物理隔离防护门禁 (Fail-Closed)。
+
+    拦截规则：
+    1. entity_id 在 QUARANTINE_ENTITY_IDS 中；
+    2. 显式隔离标志: is_quarantined is True / 'true';
+    3. 隔离原因/策略: 含有非空 quarantine_reason 或 quarantine_policy;
+    4. 禁止入库/导出标志: importable is False (或 'false') 或 target_export_eligible is False.
+    """
+    if entity_id and entity_id in QUARANTINE_ENTITY_IDS:
+        return True
+
+    if isinstance(obj, str):
+        return obj in QUARANTINE_ENTITY_IDS
+
+    if isinstance(obj, dict):
+        for id_k in ("source_entity_id", "entity_id", "id", "target_item_id", "selected_id", "source_item_id"):
+            val = obj.get(id_k)
+            if isinstance(val, str) and val in QUARANTINE_ENTITY_IDS:
+                return True
+        if obj.get("is_quarantined") is True or str(obj.get("is_quarantined", "")).lower() == "true":
+            return True
+        if bool(obj.get("quarantine_reason")) or bool(obj.get("quarantine_policy")):
+            return True
+        if obj.get("importable") is False or str(obj.get("importable", "")).lower() == "false":
+            return True
+        if obj.get("target_export_eligible") is False or str(obj.get("target_export_eligible", "")).lower() == "false":
+            return True
+
+    elif hasattr(obj, "facts") or hasattr(obj, "origin") or hasattr(obj, "id"):
+        # PromptAtom
+        atom_id = getattr(obj, "id", None)
+        source_id = getattr(obj, "source_item_id", None)
+        if (atom_id and atom_id in QUARANTINE_ENTITY_IDS) or (source_id and source_id in QUARANTINE_ENTITY_IDS):
+            return True
+        origin = getattr(obj, "origin", None)
+        if origin:
+            sel_id = getattr(origin, "selected_id", None)
+            if sel_id and sel_id in QUARANTINE_ENTITY_IDS:
+                return True
+        facts = getattr(obj, "facts", None)
+        if facts is not None:
+            gov = getattr(facts, "governance_metadata", None)
+            if isinstance(gov, dict) and is_quarantined_payload(gov):
+                return True
+        meta = getattr(obj, "metadata", None)
+        if isinstance(meta, dict) and is_quarantined_payload(meta):
+            return True
+
+    return False
+
+
+def does_garment_support_modifier(carrier_facts: Optional[SemanticFacts], modifier_topology: str) -> bool:
+    """检查在穿服装是否支持特定部位修饰（支持多件套构件穿透）。"""
+    if not carrier_facts:
+        return False
+    if carrier_facts.garment_topologies:
+        if modifier_topology in carrier_facts.garment_topologies:
+            return True
+        if "ensemble_outfit" in carrier_facts.garment_topologies and carrier_facts.ensemble_pieces:
+            for pb in carrier_facts.ensemble_pieces.piece_bindings:
+                if pb.garment_topology:
+                    if pb.garment_topology == modifier_topology:
+                        return True
+                    continue
+                # 当构件未显式指定拓扑时的严格槽位与文本判定：严禁裤装/裙装混淆
+                p_txt = (pb.piece_text or pb.piece_id or "").lower()
+                if modifier_topology == "top" and pb.piece_slot in ("top_pieces", "main_garments"):
+                    return True
+                if modifier_topology == "bottom_skirt" and pb.piece_slot in ("bottom_pieces", "main_garments"):
+                    if any(k in p_txt for k in ("skirt", "dress", "pleated", "tutu", "petticoat", "kilt", "sarong")) and not any(k in p_txt for k in ("pants", "jeans", "shorts", "trousers", "slacks", "leggings")):
+                        return True
+                    continue
+                if modifier_topology == "bottom_pants" and pb.piece_slot in ("bottom_pieces", "main_garments"):
+                    if any(k in p_txt for k in ("pants", "jeans", "shorts", "trousers", "slacks", "leggings")) and not any(k in p_txt for k in ("skirt", "dress")):
+                        return True
+                    continue
+                if modifier_topology == "outerwear" and pb.piece_slot == "outer_layers":
+                    return True
+                if modifier_topology == "underwear" and pb.piece_slot in ("underwear", "styling_details"):
+                    return True
+            if modifier_topology == "top" and (carrier_facts.ensemble_pieces.top_pieces or carrier_facts.ensemble_pieces.main_garments):
+                return True
+            if modifier_topology == "bottom_skirt" and carrier_facts.ensemble_pieces.bottom_pieces:
+                for bp in carrier_facts.ensemble_pieces.bottom_pieces:
+                    bp_lower = bp.lower()
+                    if any(k in bp_lower for k in ("skirt", "dress", "pleated", "tutu", "petticoat", "kilt")) and not any(k in bp_lower for k in ("pants", "jeans", "shorts", "trousers", "slacks", "leggings")):
+                        return True
+            if modifier_topology == "bottom_pants" and carrier_facts.ensemble_pieces.bottom_pieces:
+                for bp in carrier_facts.ensemble_pieces.bottom_pieces:
+                    bp_lower = bp.lower()
+                    if any(k in bp_lower for k in ("pants", "jeans", "shorts", "trousers", "slacks", "leggings")) and not any(k in bp_lower for k in ("skirt", "dress")):
+                        return True
+            if modifier_topology == "outerwear" and carrier_facts.ensemble_pieces.outer_layers:
+                return True
+    return False
+
 
 class BindingStatus(str, Enum):
     BOUND = "bound"
@@ -96,6 +244,17 @@ class GarmentCarrierEntity:
     is_worn: bool = True
     is_ambient: bool = False
     discarded_by: Optional[PromptAtom] = None
+
+    def __post_init__(self) -> None:
+        if is_quarantined_payload(self.entity_id) or is_quarantined_payload(self.selected_id):
+            raise QuarantineLeakageError(
+                f"Quarantined entity '{self.selected_id or self.entity_id}' cannot form a GarmentCarrierEntity!"
+            )
+        for a in self.member_atoms:
+            if is_quarantined_payload(a):
+                raise QuarantineLeakageError(
+                    f"Quarantined atom '{getattr(a, 'id', 'unknown')}' cannot be part of GarmentCarrierEntity!"
+                )
 
 
 @dataclass
@@ -143,31 +302,349 @@ RE_PANTS_ACTION = re.compile(r"\b(?:pants|jeans|shorts)\b", re.IGNORECASE)
 RE_SKIRT_ACTION = re.compile(r"\b(?:skirt)\b", re.IGNORECASE)
 
 
+class CapabilitySupport(Enum):
+    """构件/服装物理开合能力判定三态契约：明确支持、明确不支持、未知。"""
+    SUPPORTED = "supported"        # 明确支持
+    UNSUPPORTED = "unsupported"    # 明确不支持
+    UNKNOWN = "unknown"            # 未知
+
+
+RE_BUTTON_NEGATION = re.compile(
+    r"\b(?:buttonless|no\s+buttons?|without\s+buttons?|zipper\s+only)\b",
+    re.IGNORECASE,
+)
+RE_BUTTON_EXCLUDED_TYPES = re.compile(
+    r"\b(?:t-shirt|tee|tshirt|tank\s*top|crop\s*top|tube\s*top|sports\s+bra|camisole|bralette|pullover|sweater|sweatshirt|hoodie|swimsuit|bikini|monokini|leotard|bodysuit|catsuit|zentai)\b",
+    re.IGNORECASE,
+)
+RE_BUTTON_AFFIRMATION = re.compile(
+    r"\b(?:button-down|button-up|buttoned-up|buttoned|buttons?|single-breasted|double-breasted)\b",
+    re.IGNORECASE,
+)
+RE_BUTTON_STYLE_KEYWORDS = re.compile(
+    r"\b(?:shirt|blouse|cardigan|blazer|waistcoat|vest|polo\s+shirt|polo|trench\s+coat|lab\s+coat|dungarees|overcoat|duffel\s+coat|tailcoat)\b",
+    re.IGNORECASE,
+)
+
+RE_ZIPPER_NEGATION = re.compile(
+    r"\b(?:zipperless|no\s+(?:zipper|zippers|zip)\b|without\s+(?:zipper|zippers|zip)\b|button(?:s|-down|-up)?\s+only)\b",
+    re.IGNORECASE,
+)
+RE_ZIPPER_EXCLUDED_TYPES = re.compile(
+    r"\b(?:t-shirt|tee|tshirt|tank\s*top|crop\s*top|tube\s*top|sports\s+bra|camisole|bralette|pullover|sweater|sweatshirt|button-down\s+shirt|dress\s+shirt|swimsuit|bikini|monokini)\b",
+    re.IGNORECASE,
+)
+RE_ZIPPER_AFFIRMATION = re.compile(
+    r"\b(?:zippers?|zippered|zipped|zipping|zip-up|full-zip|half-zip|quarter-zip|front\s+zip(?:per)?)\b",
+    re.IGNORECASE,
+)
+
+
+def _extract_capability_inspect_text(item: Any) -> str:
+    """提取构件、原子或实体的全部相关标识与文本描述。"""
+    parts: List[str] = []
+    if isinstance(item, str):
+        parts.append(item)
+    elif hasattr(item, "member_atoms"):
+        if getattr(item, "selected_id", None):
+            parts.append(str(item.selected_id))
+        if getattr(item, "entity_id", None):
+            parts.append(str(item.entity_id))
+        for a in item.member_atoms:
+            if getattr(a, "text", None):
+                parts.append(a.text)
+            if getattr(a, "source_item_id", None):
+                parts.append(a.source_item_id)
+    elif hasattr(item, "piece_text"):
+        parts.append(getattr(item, "piece_text", ""))
+        parts.append(getattr(item, "piece_id", ""))
+        parts.append(getattr(item, "piece_slot", ""))
+    elif hasattr(item, "text"):
+        parts.append(getattr(item, "text", ""))
+        if getattr(item, "source_item_id", None):
+            parts.append(item.source_item_id)
+    return " ".join(p for p in parts if p).lower()
+
+
+def get_button_capability(item: Any) -> CapabilitySupport:
+    """判定构件或实体的纽扣开合能力：优先处理明确否定，区分明确支持、明确不支持、未知。"""
+    s = _extract_capability_inspect_text(item)
+    # 1. 优先处理明确否定
+    if RE_BUTTON_NEGATION.search(s):
+        return CapabilitySupport.UNSUPPORTED
+    # 2. 结构上无纽扣的排他款式（未包含纽扣正面肯定词时）
+    if RE_BUTTON_EXCLUDED_TYPES.search(s) and not RE_BUTTON_AFFIRMATION.search(s):
+        return CapabilitySupport.UNSUPPORTED
+    # 3. 显式肯定词
+    if RE_BUTTON_AFFIRMATION.search(s):
+        return CapabilitySupport.SUPPORTED
+    # 4. 白名单款式
+    sid = getattr(item, "selected_id", None) or getattr(item, "piece_id", None)
+    if sid and sid in ALLOWED_BUTTON_STYLES:
+        return CapabilitySupport.SUPPORTED
+    if any(st in s.split() for st in ALLOWED_BUTTON_STYLES):
+        return CapabilitySupport.SUPPORTED
+    # 5. 未知款式（严格 Fail-Closed）
+    return CapabilitySupport.UNKNOWN
+
+
+def get_zipper_capability(item: Any) -> CapabilitySupport:
+    """判定构件或实体的拉链开合能力：优先处理明确否定，区分明确支持、明确不支持、未知。"""
+    s = _extract_capability_inspect_text(item)
+    # 1. 优先处理明确否定
+    if RE_ZIPPER_NEGATION.search(s):
+        return CapabilitySupport.UNSUPPORTED
+    # 2. 结构上无拉链的排他款式（未包含拉链正面肯定词时）
+    if RE_ZIPPER_EXCLUDED_TYPES.search(s) and not RE_ZIPPER_AFFIRMATION.search(s):
+        return CapabilitySupport.UNSUPPORTED
+    # 3. 显式肯定词
+    if RE_ZIPPER_AFFIRMATION.search(s):
+        return CapabilitySupport.SUPPORTED
+    # 4. 白名单款式
+    sid = getattr(item, "selected_id", None) or getattr(item, "piece_id", None)
+    if sid and sid in ALLOWED_ZIPPER_STYLES:
+        return CapabilitySupport.SUPPORTED
+    if any(st in s.split() for st in ALLOWED_ZIPPER_STYLES):
+        return CapabilitySupport.SUPPORTED
+    # 5. 未知款式（如普通未标拉链的 hoodie, jacket 等未指明拉链结构者，均视为未知）
+    return CapabilitySupport.UNKNOWN
+
+
+def piece_has_button_capability(piece: Any) -> bool:
+    """判定构件是否具备纽扣开合能力：仅明确支持返回 True，未知与明确不支持均 Fail-Closed。"""
+    return get_button_capability(piece) == CapabilitySupport.SUPPORTED
+
+
+def piece_has_zipper_capability(piece: Any) -> bool:
+    """判定构件是否具备拉链开合能力：仅明确支持返回 True，未知与明确不支持均 Fail-Closed。"""
+    return get_zipper_capability(piece) == CapabilitySupport.SUPPORTED
+
+
+def _infer_piece_topology(pb: Any) -> str:
+    """获取或推导构件的服装拓扑。"""
+    topo = getattr(pb, "garment_topology", None)
+    if topo:
+        return topo
+    slot = getattr(pb, "piece_slot", "")
+    p_text = (getattr(pb, "piece_text", "") or getattr(pb, "piece_id", "") or (pb if isinstance(pb, str) else "")).lower()
+    if slot in ("top_pieces", "tops"):
+        return "top"
+    elif slot == "outer_layers":
+        return "outerwear"
+    elif slot in ("main_garments", "one_piece"):
+        return "one_piece"
+    elif slot == "bottom_pieces":
+        if any(k in p_text for k in ("skirt", "pleated", "tutu", "petticoat", "kilt", "sarong")) and not any(k in p_text for k in ("pants", "jeans", "shorts", "trousers", "slacks", "leggings")):
+            return "bottom_skirt"
+        elif any(k in p_text for k in ("pants", "jeans", "shorts", "trousers", "slacks", "leggings")):
+            return "bottom_pants"
+        return "bottom"
+    if any(k in p_text for k in ("jacket", "coat", "vest", "parka", "overcoat", "cardigan", "blazer", "hoodie")):
+        return "outerwear"
+    elif any(k in p_text for k in ("shirt", "blouse", "top", "tee", "polo")):
+        return "top"
+    elif any(k in p_text for k in ("skirt", "dress")):
+        return "bottom_skirt"
+    elif any(k in p_text for k in ("pants", "jeans", "shorts")):
+        return "bottom_pants"
+    return ""
+
+
+def _extract_ensemble_pieces_list(entity: GarmentCarrierEntity) -> List[Any]:
+    """提取实体中的全部套装构件（优先 piece_bindings，回退至文本列表）。"""
+    for a in entity.member_atoms:
+        if a.facts and getattr(a.facts, "ensemble_pieces", None):
+            ep = a.facts.ensemble_pieces
+            if getattr(ep, "piece_bindings", None) and len(ep.piece_bindings) > 0:
+                return list(ep.piece_bindings)
+            pieces = []
+            for tp in getattr(ep, "top_pieces", ()):
+                pieces.append(PieceBinding(piece_id=tp, piece_slot="top_pieces", piece_text=tp, garment_topology="top"))
+            for ol in getattr(ep, "outer_layers", ()):
+                pieces.append(PieceBinding(piece_id=ol, piece_slot="outer_layers", piece_text=ol, garment_topology="outerwear"))
+            for mg in getattr(ep, "main_garments", ()):
+                pieces.append(PieceBinding(piece_id=mg, piece_slot="main_garments", piece_text=mg, garment_topology="one_piece"))
+            for bp in getattr(ep, "bottom_pieces", ()):
+                bp_topo = "bottom_skirt" if "skirt" in bp.lower() else ("bottom_pants" if any(k in bp.lower() for k in ("pants", "jeans", "shorts")) else "bottom")
+                pieces.append(PieceBinding(piece_id=bp, piece_slot="bottom_pieces", piece_text=bp, garment_topology=bp_topo))
+            return pieces
+    return []
+
+
+def _resolve_target_pieces_for_ensemble(
+    pieces: Sequence[Any],
+    state_id: str,
+    state_atom: Optional[PromptAtom],
+    entity: Optional[GarmentCarrierEntity] = None,
+    target_id: Optional[str] = None,
+) -> Tuple[List[Any], bool]:
+    """确定动作在套装中的目标构件集合，返回 (target_pieces, is_specifically_targeted)。"""
+    if not pieces:
+        return [], False
+
+    effective_target_id = target_id if target_id is not None else (getattr(state_atom, "target_id", None) if state_atom else None)
+    atom_text = (state_atom.text or "").lower() if state_atom else ""
+    atom_topos = set(state_atom.facts.garment_topologies) if (state_atom and state_atom.facts and state_atom.facts.garment_topologies) else set()
+
+    # 1. 显式 target_id 处理
+    if effective_target_id is not None:
+        target_id_lower = effective_target_id.lower()
+        # 区分：若 effective_target_id 匹配套装/实体自身 ID (entity.selected_id / entity_id)，说明动作显式靶向整套服装实体，
+        # 而非限定于特定子构件！已有实体目标不能被误当成构件 ID，应下沉至动作语义解析具体的承载构件。
+        is_entity_level_target = False
+        if entity is not None:
+            if target_id_lower in (entity.selected_id.lower(), entity.entity_id.lower()):
+                is_entity_level_target = True
+
+        if not is_entity_level_target:
+            matched = [
+                pb for pb in pieces
+                if getattr(pb, "piece_id", "").lower() == target_id_lower
+                or getattr(pb, "piece_slot", "").lower() == target_id_lower
+                or (getattr(pb, "piece_text", "") and target_id_lower in getattr(pb, "piece_text", "").lower())
+            ]
+            return matched, True
+
+    # 2. 动作通过文本正则或形制事实明确指定目标构件形制
+    if RE_SKIRT_ACTION.search(atom_text) or atom_topos == {"bottom_skirt"}:
+        matched = [
+            pb for pb in pieces
+            if _infer_piece_topology(pb) == "bottom_skirt"
+            or (getattr(pb, "piece_slot", "") in ("bottom_pieces", "main_garments") and RE_SKIRT_ACTION.search(getattr(pb, "piece_text", "") or ""))
+        ]
+        return matched, True
+
+    if RE_PANTS_ACTION.search(atom_text) or atom_topos == {"bottom_pants"}:
+        matched = [
+            pb for pb in pieces
+            if _infer_piece_topology(pb) == "bottom_pants"
+            or (getattr(pb, "piece_slot", "") in ("bottom_pieces", "main_garments") and RE_PANTS_ACTION.search(getattr(pb, "piece_text", "") or ""))
+        ]
+        return matched, True
+
+    if RE_OUTERWEAR_ACTION.search(atom_text) or atom_topos == {"outerwear"}:
+        matched = [
+            pb for pb in pieces
+            if _infer_piece_topology(pb) == "outerwear"
+            or getattr(pb, "piece_slot", "") == "outer_layers"
+            or RE_OUTERWEAR_ACTION.search(getattr(pb, "piece_text", "") or "")
+        ]
+        return matched, True
+
+    if RE_SHIRT_ACTION.search(atom_text) or (atom_topos == {"top"} and not RE_CHEST_ACTION.search(atom_text)):
+        matched = [
+            pb for pb in pieces
+            if _infer_piece_topology(pb) == "top"
+            or getattr(pb, "piece_slot", "") == "top_pieces"
+            or RE_SHIRT_ACTION.search(getattr(pb, "piece_text", "") or "")
+        ]
+        return matched, True
+
+    if RE_ROBE_ACTION.search(atom_text):
+        matched = [
+            pb for pb in pieces
+            if any(k in (getattr(pb, "piece_text", "") or "").lower() for k in ("robe", "bathrobe", "cassock", "gown"))
+        ]
+        return matched, True
+
+    if RE_SUIT_ACTION.search(atom_text):
+        matched = [
+            pb for pb in pieces
+            if any(k in (getattr(pb, "piece_text", "") or "").lower() for k in ("suit", "racing"))
+        ]
+        return matched, True
+
+    if RE_CHEST_ACTION.search(atom_text):
+        matched = [
+            pb for pb in pieces
+            if _infer_piece_topology(pb) in ("top", "outerwear", "one_piece")
+            or getattr(pb, "piece_slot", "") in ("top_pieces", "outer_layers", "main_garments")
+        ]
+        return matched, True
+
+    # 3. 通用动作（默认靶向上身承载构件）
+    upper_pieces = [
+        pb for pb in pieces
+        if _infer_piece_topology(pb) in ("top", "outerwear", "one_piece")
+        or getattr(pb, "piece_slot", "") in ("top_pieces", "outer_layers", "main_garments")
+    ]
+    if upper_pieces:
+        return upper_pieces, False
+
+    return list(pieces), False
+
+
 def is_garment_compatible_with_state(
     entity: GarmentCarrierEntity,
     state_id: str,
     state_atom: Optional[PromptAtom] = None,
+    target_id: Optional[str] = None,
 ) -> bool:
-    """判定服装实体是否具备承载特定状态原子的物理形制能力（按特定款式的产品业务规则判定）。"""
+    """判定服装实体是否具备承载特定状态原子的物理形制能力（按特定款式的产品业务规则判定，支持多件套构件穿透）。"""
     if state_id in ("lifted_up", "lifted", "lifted_skirt"):
         is_skirt_compatible = any(
             a.facts and (
                 "bottom_skirt" in a.facts.garment_topologies or
+                does_garment_support_modifier(a.facts, "bottom_skirt") or
                 ("one_piece" in a.facts.garment_topologies and entity.selected_id not in NON_SKIRT_ONE_PIECE)
             )
             for a in entity.member_atoms
         )
         if not is_skirt_compatible:
             return False
-    elif state_id in ("unbuttoned", "opened"):
-        if entity.selected_id not in ALLOWED_BUTTON_STYLES:
-            return False
-    elif state_id == "unzipped":
-        if entity.selected_id not in ALLOWED_ZIPPER_STYLES:
-            return False
+    elif state_id in ("unbuttoned", "opened", "unzipped"):
+        pieces = _extract_ensemble_pieces_list(entity)
+        is_zip = (state_id == "unzipped")
+
+        if pieces:
+            # ── 多件套构件判定 ──
+            # 1. 确定动作对应的目标构件（不能借其他构件能力，也不能被无关构件否定）
+            target_pieces, is_specifically_targeted = _resolve_target_pieces_for_ensemble(
+                pieces, state_id, state_atom, entity=entity, target_id=target_id
+            )
+            if not target_pieces:
+                return False
+
+            # 2. 检查目标构件的能力（否定优先限定在明确被该动作靶向的构件内）
+            if is_specifically_targeted:
+                has_negation = any(
+                    (get_zipper_capability(pb) == CapabilitySupport.UNSUPPORTED if is_zip else get_button_capability(pb) == CapabilitySupport.UNSUPPORTED)
+                    for pb in target_pieces
+                )
+                if has_negation:
+                    return False
+                has_support = any(
+                    (piece_has_zipper_capability(pb) if is_zip else piece_has_button_capability(pb))
+                    for pb in target_pieces
+                )
+                if not has_support:
+                    return False
+            else:
+                supported_pieces = [
+                    pb for pb in target_pieces
+                    if (piece_has_zipper_capability(pb) if is_zip else piece_has_button_capability(pb))
+                ]
+                if not supported_pieces:
+                    return False
+        else:
+            # ── 单品实体判定 ──
+            effective_target_id = target_id if target_id is not None else (getattr(state_atom, "target_id", None) if state_atom else None)
+            if effective_target_id is not None:
+                eff_lower = effective_target_id.lower()
+                if eff_lower != entity.selected_id.lower() and eff_lower != entity.entity_id.lower():
+                    return False
+            if is_zip:
+                if get_zipper_capability(entity) != CapabilitySupport.SUPPORTED:
+                    return False
+            else:
+                if get_button_capability(entity) != CapabilitySupport.SUPPORTED:
+                    return False
     elif state_id == "pulled_down":
         is_pulled_compatible = any(
-            a.facts and any(t in a.facts.garment_topologies for t in ("bottom_pants", "bottom_skirt", "underwear", "top", "one_piece"))
+            a.facts and any(
+                t in a.facts.garment_topologies or does_garment_support_modifier(a.facts, t)
+                for t in ("bottom_pants", "bottom_skirt", "underwear", "top", "one_piece")
+            )
             for a in entity.member_atoms
         )
         if not is_pulled_compatible:
@@ -179,10 +656,14 @@ def is_garment_compatible_with_state(
             if a.facts and a.facts.garment_topologies:
                 entity_topologies.update(a.facts.garment_topologies)
 
-        # 1. 结构化事实匹配：若动作原子声明了所需服装拓扑，实体拓扑必须相交
+        # 1. 结构化事实匹配：若动作原子声明了所需服装拓扑，实体拓扑必须相交（或通过构件穿透支持）
         if state_atom.facts and state_atom.facts.garment_topologies:
             atom_topos = set(state_atom.facts.garment_topologies)
-            if entity_topologies and not (entity_topologies & atom_topos):
+            has_matching_topo = any(
+                a.facts and any(does_garment_support_modifier(a.facts, topo) for topo in atom_topos)
+                for a in entity.member_atoms
+            )
+            if entity_topologies and not (entity_topologies & atom_topos) and not has_matching_topo:
                 return False
 
         # 2. 动作短语语义正则核验 (单源真实源，覆盖跨形制细化)
@@ -205,6 +686,7 @@ def is_garment_compatible_with_state(
                 has_skirt = any(
                     a.facts and (
                         "bottom_skirt" in a.facts.garment_topologies or
+                        does_garment_support_modifier(a.facts, "bottom_skirt") or
                         ("one_piece" in a.facts.garment_topologies and entity.selected_id not in NON_SKIRT_ONE_PIECE)
                     )
                     for a in entity.member_atoms
@@ -212,12 +694,15 @@ def is_garment_compatible_with_state(
                 if not has_skirt:
                     return False
 
-        elif state_id in ("unbuttoned", "opened"):
+        elif state_id in ("unbuttoned", "opened", "unzipped"):
             # 2.3 外套开扣/开襟动作 (如 jacket unbuttoned / coat open / jacket open / unbuttoned coat):
             # 必须具备外套拓扑 (outerwear)，纯上装衬衫与下装绝对禁止冒充承载！
             if RE_OUTERWEAR_ACTION.search(atom_text):
                 has_outer = any(
-                    a.facts and "outerwear" in a.facts.garment_topologies
+                    a.facts and (
+                        "outerwear" in a.facts.garment_topologies or
+                        does_garment_support_modifier(a.facts, "outerwear")
+                    )
                     for a in entity.member_atoms
                 )
                 if not has_outer:
@@ -227,7 +712,10 @@ def is_garment_compatible_with_state(
             # 必须为真实衬衫/上装 (top 拓扑，或款式标签明确包含衬衫语义)；纯外套、纯下装及浴袍/长袍/连体衣绝对禁止冒用！
             if RE_SHIRT_ACTION.search(atom_text):
                 has_shirt = any(
-                    a.facts and "top" in a.facts.garment_topologies
+                    a.facts and (
+                        "top" in a.facts.garment_topologies or
+                        does_garment_support_modifier(a.facts, "top")
+                    )
                     for a in entity.member_atoms
                 ) or any("shirt" in (a.text or "").lower() for a in entity.member_atoms)
                 if not has_shirt:
@@ -254,7 +742,10 @@ def is_garment_compatible_with_state(
             # 必须具备上身覆盖 (top, one_piece, outerwear)，纯下装绝对禁止承载！
             if RE_CHEST_ACTION.search(atom_text):
                 has_chest = any(
-                    a.facts and any(t in a.facts.garment_topologies for t in ("top", "one_piece", "outerwear"))
+                    a.facts and any(
+                        t in a.facts.garment_topologies or does_garment_support_modifier(a.facts, t)
+                        for t in ("top", "one_piece", "outerwear")
+                    )
                     for a in entity.member_atoms
                 )
                 if not has_chest:
@@ -264,7 +755,10 @@ def is_garment_compatible_with_state(
             # 必须为裤装 (bottom_pants, one_piece)，半身裙与纯上装绝对禁止承载！
             if RE_PANTS_ACTION.search(atom_text):
                 has_pants = any(
-                    a.facts and any(t in a.facts.garment_topologies for t in ("bottom_pants", "one_piece"))
+                    a.facts and (
+                        any(t in a.facts.garment_topologies for t in ("bottom_pants", "one_piece")) or
+                        does_garment_support_modifier(a.facts, "bottom_pants")
+                    )
                     for a in entity.member_atoms
                 )
                 if not has_pants:
@@ -276,6 +770,7 @@ def is_garment_compatible_with_state(
                 has_skirt = any(
                     a.facts and (
                         "bottom_skirt" in a.facts.garment_topologies or
+                        does_garment_support_modifier(a.facts, "bottom_skirt") or
                         ("one_piece" in a.facts.garment_topologies and entity.selected_id not in NON_SKIRT_ONE_PIECE)
                     )
                     for a in entity.member_atoms
@@ -331,13 +826,21 @@ RE_PURE_BODY_EXPOSURE = re.compile(
 
 def get_canonical_state_id(atom: PromptAtom) -> str:
     """提取原子的规范状态 ID，优先结构化事实与规范 ID，集中处理历史文本短语兼容（单源真实源 SSOT）。"""
+    raw_id = atom.source_item_id or (atom.origin.selected_id if atom.origin else "")
+    clean_text = atom.text.lower().strip() if atom.text else ""
+
     # 1. 优先结构化事实
     if atom.facts and atom.facts.garment_states:
         for gs in atom.facts.garment_states:
-            if gs in ("unbuttoned", "opened"):
-                return "unbuttoned"
-            elif gs == "unzipped":
+            if gs == "unzipped":
                 return "unzipped"
+            elif gs == "unbuttoned":
+                return "unbuttoned"
+            elif gs == "opened":
+                # opened 为通用枚举，若标识明确为 unzipped 或文本匹配拉链动作，归为 unzipped，否则归为 unbuttoned
+                if raw_id == "unzipped" or RE_ZIPPER_ACTION.search(clean_text):
+                    return "unzipped"
+                return "unbuttoned"
             elif gs in ("lifted", "lifted_up", "lifted_skirt"):
                 return "lifted_up"
             elif gs == "pulled_down":
@@ -346,7 +849,6 @@ def get_canonical_state_id(atom: PromptAtom) -> str:
                 return gs
 
     # 2. 规范 item_id / origin.selected_id
-    raw_id = atom.source_item_id or (atom.origin.selected_id if atom.origin else "")
     if raw_id in CANONICAL_MODIFIER_STATES or raw_id in CANONICAL_ABSENCE_STATES or raw_id in CANONICAL_LAYERING_STATES or raw_id == "discarded":
         return raw_id
 
@@ -508,12 +1010,30 @@ def find_bound_carrier(
     state_id = get_canonical_state_id(state_atom)
     effective_target_id = target_id if target_id is not None else getattr(state_atom, "target_id", None)
 
-    # 阶梯 1：显式目标匹配（规范 ID 精确匹配，快速失败，绝不回退改绑其他衣物）
+    # 阶梯 1：显式目标匹配（规范 ID 精确匹配，支持实体目标与构件目标解析，快速失败，绝不回退改绑其他衣物）
     if effective_target_id is not None:
+        eff_lower = effective_target_id.lower()
+        # 1.1 实体级显式目标匹配 (selected_id 或 entity_id)
         matched = [
             e for e in active_entities
-            if e.selected_id == effective_target_id or e.entity_id == effective_target_id
+            if e.selected_id == effective_target_id
+            or e.entity_id == effective_target_id
+            or e.selected_id.lower() == eff_lower
+            or e.entity_id.lower() == eff_lower
         ]
+        # 1.2 构件级目标解析所属实体 (构件 → 所属实体)
+        if not matched:
+            for e in active_entities:
+                pieces = _extract_ensemble_pieces_list(e)
+                if any(
+                    getattr(pb, "piece_id", "").lower() == eff_lower
+                    or getattr(pb, "piece_slot", "").lower() == eff_lower
+                    or (getattr(pb, "piece_text", "") and eff_lower in getattr(pb, "piece_text", "").lower())
+                    for pb in pieces
+                ):
+                    if e not in matched:
+                        matched.append(e)
+
         if not matched:
             return BindingResult(
                 status=BindingStatus.UNBOUND_TARGET_NOT_FOUND,
@@ -521,7 +1041,7 @@ def find_bound_carrier(
             )
         if len(matched) == 1:
             target_entity = matched[0]
-            if not is_garment_compatible_with_state(target_entity, state_id, state_atom):
+            if not is_garment_compatible_with_state(target_entity, state_id, state_atom, target_id=effective_target_id):
                 return BindingResult(
                     status=BindingStatus.UNBOUND_INCOMPATIBLE,
                     target_entity=target_entity,
@@ -533,7 +1053,7 @@ def find_bound_carrier(
                 reason="explicit_target_match",
             )
         else:
-            compatible_matched = [e for e in matched if is_garment_compatible_with_state(e, state_id, state_atom)]
+            compatible_matched = [e for e in matched if is_garment_compatible_with_state(e, state_id, state_atom, target_id=effective_target_id)]
             if len(compatible_matched) == 1:
                 return BindingResult(
                     status=BindingStatus.BOUND,
@@ -611,6 +1131,45 @@ def is_formal_atom(a: PromptAtom) -> bool:
     return False
 
 
+def is_camera_hardware_atom(a: Any) -> bool:
+    """判断给定原子是否属于相机硬件套机/机身/光学器材（而非感光胶片/相纸乳剂）。
+
+    器材套机与光学镜头具有机械/光学属性，不承载感光乳剂色彩模式，不适用黑白胶片互斥规则。
+    暗房相纸等非机载感光介质属于印相材料，承载真实色彩模式（黑白/彩色），必须参与色彩互斥消解。
+    """
+    facts = getattr(a, "facts", None)
+    if facts:
+        cf = getattr(facts, "camera_facts", None)
+        if cf:
+            # 必须凭明确的器材类别判断，严禁将 is_camera_film=False（如暗房相纸）误判为硬件
+            if getattr(cf, "device_category", None) == "camera_hardware_kit":
+                return True
+            if any(getattr(cf, f, None) for f in ("camera_brand", "camera_model", "lens_mount", "lens_spec", "device_type")):
+                return True
+        if getattr(facts, "capture_device", None):
+            return True
+
+    # 检查 ID 标识 (支持 source_item_id, id, provenance, origin)
+    for attr in ("source_item_id", "id"):
+        val = getattr(a, attr, None) or ""
+        if val.startswith("camera_hardware_") or val.startswith("cam_hw__") or val == "cinema_lenses":
+            return True
+
+    prov = getattr(a, "provenance", None)
+    if prov:
+        p_item = getattr(prov, "item_id", None) or ""
+        if p_item.startswith("camera_hardware_") or p_item.startswith("cam_hw__") or p_item == "cinema_lenses":
+            return True
+
+    origin = getattr(a, "origin", None)
+    if origin:
+        o_item = getattr(origin, "selected_id", None) or ""
+        if o_item.startswith("camera_hardware_") or o_item.startswith("cam_hw__") or o_item == "cinema_lenses":
+            return True
+
+    return False
+
+
 def make_replaced_atom(
     target: PromptAtom,
     new_text: str,
@@ -676,9 +1235,10 @@ class OneTimeIndex:
             self._index_atom(a)
 
     def _index_atom(self, a: PromptAtom) -> None:
-        if a.atom_id in self._indexed_atom_ids:
+        atom_key = a.atom_id if a.atom_id else f"_anon_{id(a)}"
+        if atom_key in self._indexed_atom_ids:
             return
-        self._indexed_atom_ids.add(a.atom_id)
+        self._indexed_atom_ids.add(atom_key)
         norm_slot = normalize_slot_name(a.source_slot)
         slots_to_index = {a.source_slot, norm_slot}
         if a.source_slot == "scene_theme" or norm_slot == "scene_theme":
@@ -818,6 +1378,11 @@ class OneTimeIndex:
         return sorted([a for a in self._all_atoms if a.atom_id not in self._tombstones], key=lambda x: (x.tag_order, x.span_order))
 
 
+ALLOWED_RUNTIME_REASON_CODES: Mapping[str, Tuple[str, ...]] = {
+    "spatial_environmental_mutual_exclusion": ("spatial_pose_support_incompatible",),
+}
+
+
 class DecisionLedger:
     """原子级消解决策审计账本。"""
     def __init__(self, rule_registry: Optional[RuleRegistry] = None):
@@ -829,7 +1394,8 @@ class DecisionLedger:
     def _validate_reason_code(self, rule_id: str, reason_code: str) -> None:
         if self._registry:
             rule = self._registry.get_rule(rule_id)
-            if reason_code not in rule.reason_codes:
+            declared_codes = set(rule.reason_codes) | set(ALLOWED_RUNTIME_REASON_CODES.get(rule_id, ()))
+            if reason_code not in declared_codes:
                 raise RuleConfigurationError(
                     f"Reason code '{reason_code}' is not declared in rule '{rule_id}' reason_codes: {rule.reason_codes}"
                 )
@@ -1224,12 +1790,16 @@ class ConflictResolver:
         self.text_fallback_hits: int = 0
         self.last_report: Optional[ResolutionReport] = None
 
-    def _validate_formal_atom(self, a: PromptAtom, rule_id: str) -> None:
+    def _validate_formal_atom(self, a: PromptAtom, rule_id: str, index: Optional[OneTimeIndex] = None) -> None:
         """验证正式目录/预设/配方原子是否携带当前规则所需的基础语义事实。若事实缺失则 Fail-Closed (R2R2-P1-001)。"""
         if not is_formal_atom(a):
             return
 
         if a.origin and a.origin.mode == "resolver":
+            return
+
+        # 相机器材/光学镜头具有机械光学属性，不承载感光乳剂色彩模式，不适用黑白胶片互斥契约校验
+        if rule_id == "monochrome_film_chroma_coherence" and is_camera_hardware_atom(a):
             return
 
         rule_item = self.registry.get_rule_item(rule_id)
@@ -1300,9 +1870,30 @@ class ConflictResolver:
                 raise RuleConfigurationError(
                     f"Formal atom '{a.atom_id}' ({leaf_id}) hands_required conflicts with catalog: atom={a.facts.hands_required} vs catalog={canon.hands_required}"
                 )
-            object.__setattr__(a, "facts", canon.merge(a.facts))
+            merged_facts = canon.merge(a.facts)
+            object.__setattr__(a, "facts", merged_facts)
+            if index is not None:
+                for sib in index.get_all_active_ordered():
+                    if (
+                        sib.tag_order == a.tag_order
+                        and sib.source_slot == a.source_slot
+                        and sib.id == a.id
+                        and sib.origin == a.origin
+                        and sib.atom_id != a.atom_id
+                    ):
+                        object.__setattr__(sib, "facts", merged_facts)
         elif canon and a.facts is None:
             object.__setattr__(a, "facts", canon)
+            if index is not None:
+                for sib in index.get_all_active_ordered():
+                    if (
+                        sib.tag_order == a.tag_order
+                        and sib.source_slot == a.source_slot
+                        and sib.id == a.id
+                        and sib.origin == a.origin
+                        and sib.atom_id != a.atom_id
+                    ):
+                        object.__setattr__(sib, "facts", canon)
 
         if a.facts is None:
             raise RuleConfigurationError(
@@ -1402,6 +1993,8 @@ class ConflictResolver:
                             )
         elif rule_id == "monochrome_film_chroma_coherence":
             if slot in ("film", "film_stock"):
+                if is_camera_hardware_atom(a):
+                    return
                 if not facts.color_modes:
                     raise RuleConfigurationError(
                         f"Formal film atom '{a.atom_id}' missing required color_modes for rule '{rule_id}'"
@@ -1444,10 +2037,21 @@ class ConflictResolver:
                         )
         elif rule_id == "emotion_gaze_affinity":
             if slot in ("expression", "expressions"):
-                if not (facts.emotion or facts.gaze):
-                    raise RuleConfigurationError(
-                        f"Formal expression atom '{a.atom_id}' missing required emotion facts for rule '{rule_id}'"
-                    )
+                item_id = leaf_id.lower() if leaf_id else ""
+                ef = facts.expression_facts
+                pf = facts.pose_facts
+                ef_action = ef.get("facial_action") if isinstance(ef, dict) else getattr(ef, "facial_action", None)
+                pf_action = pf.get("facial_action") if isinstance(pf, dict) else getattr(pf, "facial_action", None)
+                has_facial_action = bool(ef_action or pf_action)
+                if not (
+                    item_id.startswith("mouth_")
+                    or any(k in item_id for k in ("mouth", "lip", "teeth", "tongue", "frown"))
+                    or has_facial_action
+                ):
+                    if not (facts.emotion or facts.gaze):
+                        raise RuleConfigurationError(
+                            f"Formal expression atom '{a.atom_id}' missing required emotion facts for rule '{rule_id}'"
+                        )
         elif rule_id == "gaze_mutual_exclusion":
             if slot in ("expression", "expressions"):
                 item_id = leaf_id.lower() if leaf_id else ""
@@ -1473,6 +2077,14 @@ class ConflictResolver:
         """按 DAG 冻结顺序执行 17 条冲突消解规则并产出完备审计报告与零硬冲突闭环。"""
         if rng is None:
             rng = Random(42)
+
+        # 隔离池第二道物理防线拦截 (QuarantinePool 零泄漏，覆盖 ID 及载荷隔离标志)
+        for a in atoms:
+            if is_quarantined_payload(a):
+                raise QuarantineLeakageError(
+                    f"Quarantined payload detected in ConflictResolver! "
+                    f"id={getattr(a, 'id', None)}, source_item_id={getattr(a, 'source_item_id', None)}"
+                )
 
         self.text_fallback_hits = 0
 
@@ -1577,6 +2189,13 @@ class ConflictResolver:
             return []
         if rng is None:
             rng = Random(42)
+
+        for f in fragments:
+            if is_quarantined_payload(f):
+                raise QuarantineLeakageError(
+                    f"Quarantined fragment detected in ConflictResolver! "
+                    f"id={getattr(f, 'id', None)}, source_item_id={getattr(f, 'source_item_id', None)}"
+                )
 
         from .atomizer import atoms_to_fragments, fragments_to_atoms
         _, atoms = fragments_to_atoms(fragments)
@@ -1797,6 +2416,39 @@ class ConflictResolver:
                         a,
                     )
 
+        # 4. 空间与姿态物理支撑约束消解 (R3-POSE-ENV-001)
+        active_poses = [a for a in index.get_active_by_slot("pose") if a.can_detect and index.is_active(a)]
+        active_scenes = [a for a in index.get_active_by_slot("scene") if a.can_detect and index.is_active(a)]
+
+        if active_poses and active_scenes:
+            # 仅当场景显式要求水体环境或处于水下/沉浸环境时（排除泳池岸边/普通水边，仅针对真正水下/沉浸环境），
+            # 且姿态显式声明了不相容的坚实地面支撑方式时，才属于冲突。
+            submerged_scenes = [
+                a for a in active_scenes
+                if (
+                    (a.facts and a.facts.scene_facts and getattr(a.facts.scene_facts, "venue_category", "") in ("underwater", "submerged", "deep_water"))
+                    or (a.facts and a.facts.venue_ids and any(v in ("underwater", "submerged", "deep_sea") for v in a.facts.venue_ids))
+                    or any(w in (a.text or "").lower() for w in ("underwater", "submerged", "deep underwater", "scuba diving", "bottom of the ocean", "bottom of the sea"))
+                )
+            ]
+            if submerged_scenes:
+                for p_atom in active_poses:
+                    if not p_atom.can_detect or not index.is_active(p_atom):
+                        continue
+                    if p_atom.facts and p_atom.facts.pose_facts:
+                        pf = p_atom.facts.pose_facts
+                        # 如果姿态显式要求坚实地面/坐卧支撑，且不支持水体
+                        if pf.body_support in ("standing", "sitting", "kneeling", "crouched") and not is_pose_support_compatible(pf, "aquatic"):
+                            if p_atom.can_delete_atom:
+                                index.drop(p_atom.atom_id)
+                                ledger.record_drop(
+                                    rule_item.id,
+                                    rule_item.phase,
+                                    "spatial_pose_support_incompatible",
+                                    tuple(s.atom_id for s in submerged_scenes if index.is_active(s)),
+                                    p_atom,
+                                )
+
         return index.get_all_active_ordered()
 
     # ─── 规则 2: nudity_clothing_conflicts (anchors, 110) ───
@@ -1907,15 +2559,23 @@ class ConflictResolver:
                             should_drop = True
                             is_fallback = True
                 elif dominant_lvl in ("L1", "L2"):
-                    if is_formal_atom(a):
-                        item_id = ((a.source_item_id or "") + " " + ((a.provenance.item_id or "") if a.provenance else "") + " " + ((a.origin.selected_id or "") if a.origin else "")).lower()
-                        if a.facts and any(r in a.facts.visible_regions for r in ("intimate_lower_body",)):
-                            should_drop = True
-                        elif dominant_lvl == "L1" and (
-                            "erotic_close_up" in item_id
+                    if dominant_lvl == "L1" and a.source_slot in ("clothing", "clothing_state", "clothing_extension", "underwear", "camera_angle", "shot_type", "shot", "pose"):
+                        item_id = ((a.source_item_id or "") + " " + ((a.provenance.item_id or "") if a.provenance else "") + " " + ((a.origin.selected_id or "") if a.origin else "")).lower().replace("_", " ")
+                        text_lower = a.text.lower()
+                        banned_l1_pattern = re.compile(
+                            r"\b(upskirt|panties|bra|bare breasts|topless|pussy|nude|naked|undressed|crotch close-up|between legs angle|crotch level view|thong|g-string)\b"
+                        )
+                        if (
+                            "between legs angle" in item_id
+                            or "erotic close up" in item_id
+                            or (a.facts and getattr(a.facts, "style_genre", None) == "boudoir_lingerie")
+                            or (a.facts and any(r in a.facts.visible_regions for r in ("intimate_lower_body", "cleavage", "breasts", "crotch", "buttocks", "underboob", "sideboob")))
                             or (a.facts and any(s in a.facts.garment_states for s in ("lifted", "opened", "removed", "lifted_skirt")))
-                            or (a.facts and any(r in a.facts.visible_regions for r in ("cleavage", "breasts", "crotch", "buttocks", "underboob", "sideboob")))
+                            or bool(banned_l1_pattern.search(text_lower))
                         ):
+                            should_drop = True
+                    elif is_formal_atom(a):
+                        if a.facts and any(r in a.facts.visible_regions for r in ("intimate_lower_body",)):
                             should_drop = True
                     elif tf.enabled:
                         lvl_rule = level_rules.get(dominant_lvl)
@@ -1928,11 +2588,12 @@ class ConflictResolver:
                         continue
                     if is_fallback:
                         self.text_fallback_hits += 1
+                    underwear_pattern = re.compile(r"\b(underwear|bikini|panties|bra|lingerie)\b")
                     is_underwear = (
                         "underwear" in a.source_slot
                         or (a.facts and any(t in a.facts.garment_topologies for t in ("underwear", "panties", "bra", "bikini", "lingerie")))
-                        or any(u in (a.source_item_id or "").lower() for u in ("underwear", "bikini", "panties", "bra", "lingerie"))
-                        or any(u in ((a.provenance.item_id if a.provenance else "") or "").lower() for u in ("underwear", "bikini", "panties", "bra", "lingerie"))
+                        or bool(underwear_pattern.search((a.source_item_id or "").lower().replace("_", " ")))
+                        or bool(underwear_pattern.search(((a.provenance.item_id if a.provenance else "") or "").lower().replace("_", " ")))
                     )
                     rc = "nudity_removes_underwear" if is_underwear else "nudity_removes_clothing"
                     index.drop(a.atom_id)
@@ -2266,27 +2927,27 @@ class ConflictResolver:
                             binding = find_bound_carrier(a, worn_entities)
                             if binding.status == BindingStatus.BOUND and binding.target_entity:
                                 # 若绑定的目标实体自身不支持纽扣能力，则判定冲突
-                                if binding.target_entity.selected_id not in ALLOWED_BUTTON_STYLES:
+                                if not is_garment_compatible_with_state(binding.target_entity, "unbuttoned", a):
                                     is_loser = True
                             elif binding.status in (BindingStatus.UNBOUND_NO_CANDIDATE, BindingStatus.UNBOUND_INCOMPATIBLE, BindingStatus.UNBOUND_TARGET_NOT_FOUND):
-                                if any(oe.selected_id not in ALLOWED_BUTTON_STYLES for oe in op_entities):
+                                if any(not is_garment_compatible_with_state(oe, "unbuttoned", a) for oe in op_entities):
                                     is_loser = True
                         elif state_id == "unzipped":
                             # 使用四阶绑定阶梯检查拉链目标
                             binding = find_bound_carrier(a, worn_entities)
                             if binding.status == BindingStatus.BOUND and binding.target_entity:
-                                if binding.target_entity.selected_id not in ALLOWED_ZIPPER_STYLES:
+                                if not is_garment_compatible_with_state(binding.target_entity, "unzipped", a):
                                     is_loser = True
                             elif binding.status in (BindingStatus.UNBOUND_NO_CANDIDATE, BindingStatus.UNBOUND_INCOMPATIBLE, BindingStatus.UNBOUND_TARGET_NOT_FOUND):
-                                if any(oe.selected_id not in ALLOWED_ZIPPER_STYLES for oe in op_entities):
+                                if any(not is_garment_compatible_with_state(oe, "unzipped", a) for oe in op_entities):
                                     is_loser = True
                         elif state_id == "lifted_up" or (a.facts and any(s in a.facts.garment_states for s in ("lifted", "lifted_up", "lifted_skirt"))):
                             binding = find_bound_carrier(a, worn_entities)
                             if binding.status == BindingStatus.BOUND and binding.target_entity:
-                                if binding.target_entity.selected_id in NON_SKIRT_ONE_PIECE:
+                                if not is_garment_compatible_with_state(binding.target_entity, "lifted_up", a):
                                     is_loser = True
                             elif binding.status in (BindingStatus.UNBOUND_NO_CANDIDATE, BindingStatus.UNBOUND_INCOMPATIBLE, BindingStatus.UNBOUND_TARGET_NOT_FOUND):
-                                if any(oe.selected_id in NON_SKIRT_ONE_PIECE for oe in op_entities):
+                                if any(not is_garment_compatible_with_state(oe, "lifted_up", a) for oe in op_entities):
                                     is_loser = True
                         elif a.facts and "removed" in a.facts.garment_states:
                             # 缺席状态 (braless, underwearless) 属于内衣层缺席声明，由后续 step 4 缺席状态专用互斥逻辑裁决，不得在此被误判为连体外装冲突
@@ -2505,7 +3166,7 @@ class ConflictResolver:
 
         clothing_atoms = index.get_active_by_slot("clothing") + index.get_active_by_slot("clothing_state")
         for a in clothing_atoms:
-            if not index.is_active(a) or not a.can_modify_internal or not a.can_detect:
+            if not index.is_active(a) or not a.can_detect:
                 continue
             if (
                 a.source_slot == "clothing_extension"
@@ -2515,7 +3176,7 @@ class ConflictResolver:
             if a.provenance and a.provenance.rule_id == rule_item.id:
                 continue
 
-            self._validate_formal_atom(a, rule_item.id)
+            self._validate_formal_atom(a, rule_item.id, index=index)
             matched = False
             is_fallback = False
             if is_formal_atom(a):
@@ -2529,6 +3190,8 @@ class ConflictResolver:
                     is_fallback = True
 
             if matched and replacements:
+                if not a.can_modify_internal:
+                    continue
                 rep_text = rng.choice(replacements)
                 new_facts = None
                 if a.facts:
@@ -2760,12 +3423,16 @@ class ConflictResolver:
         for a in mono_fact_atoms:
             if not a.can_detect or not index.is_active(a):
                 continue
+            if is_camera_hardware_atom(a):
+                continue
             self._validate_formal_atom(a, rule_item.id)
             seen_mono_ids.add(a.atom_id)
             mono_atoms.append(a)
 
         for a in index.get_active_by_slots("film", "film_stock"):
             if a.atom_id in seen_mono_ids or not a.can_detect or not index.is_active(a):
+                continue
+            if is_camera_hardware_atom(a):
                 continue
             self._validate_formal_atom(a, rule_item.id)
             if is_formal_atom(a):
@@ -2781,6 +3448,8 @@ class ConflictResolver:
             mono_winner = min(mono_atoms, key=lambda x: (x.tag_order, x.span_order))
             for a in index.get_active_by_slots("lighting", "lighting_palette", "film", "film_stock"):
                 if a in mono_atoms or not a.can_detect or not index.is_active(a):
+                    continue
+                if is_camera_hardware_atom(a):
                     continue
                 self._validate_formal_atom(a, rule_item.id)
                 is_loser = False
@@ -3197,13 +3866,15 @@ class ConflictResolver:
 
         liquid_atoms = index.get_active_by_slot("liquids") + index.get_active_by_slot("liquid")
         for a in liquid_atoms:
-            if not index.is_active(a) or not a.can_modify_internal:
+            if not index.is_active(a) or not a.can_detect:
                 continue
-            self._validate_formal_atom(a, rule_item.id)
+            self._validate_formal_atom(a, rule_item.id, index=index)
 
             # 1. 替换高危组合
             if is_formal_atom(a):
                 if a.facts and a.facts.liquid_kind in ("sexual_fluid", "cum", "semen") and any(loc in a.facts.liquid_locations for loc in ("eyes", "closed_eyes", "face")):
+                    if not a.can_modify_internal:
+                        continue
                     new_text = "few drops of semen on stomach"
                     new_facts = replace(a.facts, liquid_locations=("torso",))
                     new_a = make_replaced_atom(a, new_text, rule_item.id, new_facts=new_facts)
@@ -3712,14 +4383,14 @@ class ConflictResolver:
         r10_chroma_pats = select_fallback_patterns(r10_tf, role="banned", group_id="monochrome")
         mono_atoms = [
             a for a in detectable
-            if a.source_slot in ("film", "film_stock") and (
+            if a.source_slot in ("film", "film_stock") and not is_camera_hardware_atom(a) and (
                 (is_formal_atom(a) and a.facts and "monochrome" in a.facts.color_modes)
                 or (not is_formal_atom(a) and any(t.matches(a.text) for t in r10_mono_pats))
             )
         ]
         chroma_atoms = [
             a for a in detectable
-            if a.source_slot in ("lighting", "lighting_palette", "film", "film_stock") and (
+            if a.source_slot in ("lighting", "lighting_palette", "film", "film_stock") and not is_camera_hardware_atom(a) and (
                 (is_formal_atom(a) and a.facts and any(c in a.facts.color_modes for c in ("color", "high_saturation", "neon")))
                 or (not is_formal_atom(a) and any(b.matches(a.text) for b in r10_chroma_pats))
             )

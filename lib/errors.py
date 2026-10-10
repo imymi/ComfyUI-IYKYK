@@ -57,3 +57,13 @@ class UnresolvedConflictError(RuntimeError):
         self.reason = reason
         self.unresolved_conflicts = tuple(unresolved_conflicts)
         self.report = report
+
+
+class UnresolvedEnsembleRelationError(RuntimeError):
+    """多件套构件关系消歧失败或存在环路异常 (Fail-Closed, 阻断迁移与入库)。"""
+    pass
+
+
+class QuarantineLeakageError(RuntimeError):
+    """隔离项泄漏异常：试图将处于物理隔离池中的条目载入生产运行时 (Fail-Closed)。"""
+    pass

@@ -1,0 +1,379 @@
+{
+  "schema_version": "1.0.0",
+  "purpose": "ComfyUI-IYKYK rc10 M3.1 Baseline & Dependency Freeze Manifest",
+  "baselines": {
+    "iykyk_repo": {
+      "expected_commit": "e0d045998a4bcdf32ea0b06d6e1da1d2db6b53ea",
+      "current_head": "e0d045998a4bcdf32ea0b06d6e1da1d2db6b53ea",
+      "commit_matched": true,
+      "is_tracked_clean": true,
+      "untracked_files_count": 5,
+      "untracked_files": [
+        "scratch/build_m3_ledger_skeleton.py",
+        "scratch/generate_m3_baseline_freeze.py",
+        "scratch/m3_baseline_freeze_manifest.json",
+        "scratch/rc10_source_entities.tsv",
+        "scratch/rc10_target_mappings.tsv"
+      ],
+      "runtime_data_files_count": 20,
+      "runtime_files": {
+        "accessories.json": {
+          "path": "data/accessories.json",
+          "size_bytes": 31325,
+          "sha256": "224d6633c2810dd010f4d332798914b1f8730fd49129389ea83bef6e9e9b5cb2"
+        },
+        "characters.json": {
+          "path": "data/characters.json",
+          "size_bytes": 10037,
+          "sha256": "f41cd8e5e61b1db7d4d1f60233c8bcde020c5635e52f0c43e579c87f97ed5618"
+        },
+        "clothing.json": {
+          "path": "data/clothing.json",
+          "size_bytes": 439314,
+          "sha256": "d383a7e4090331e55f95347f7009bb6a7f380c51dc54abdfc53e14555192ad47"
+        },
+        "conflict_rules.json": {
+          "path": "data/conflict_rules.json",
+          "size_bytes": 163011,
+          "sha256": "eb8c8f0e83e2d93789d6fd1813be528d7e218bb0ceb06537c8c86b781e1baa6b"
+        },
+        "context_affinity.json": {
+          "path": "data/context_affinity.json",
+          "size_bytes": 70518,
+          "sha256": "b68c0490d932f90907563a88e7647d70e977d63b67d485dbee93bdb46e58e5ef"
+        },
+        "expressions.json": {
+          "path": "data/expressions.json",
+          "size_bytes": 58087,
+          "sha256": "672444a636e03701fb6dc31a47dc324ce18546e06d05f87493bac4d0097c94de"
+        },
+        "film_stocks.json": {
+          "path": "data/film_stocks.json",
+          "size_bytes": 90687,
+          "sha256": "877bded806f791cdc9a14eb72fcf950e39a0b32042911e2e222ad0bbb1e1c614"
+        },
+        "imperfections.json": {
+          "path": "data/imperfections.json",
+          "size_bytes": 6070,
+          "sha256": "ebfa6d027449c0d2ac35c2184b5e02db7e8bd00fbd9c076cd5b564a33494b4fc"
+        },
+        "lighting.json": {
+          "path": "data/lighting.json",
+          "size_bytes": 116118,
+          "sha256": "5a0abac2ab371d7a14c147e8f2927d59351cef0761eff0959b0cddf40047f7e2"
+        },
+        "makeup.json": {
+          "path": "data/makeup.json",
+          "size_bytes": 26751,
+          "sha256": "57e57c908275d6e8ff929799e4025e1ab2386f7758b4f97ff0e55e96b6988d1f"
+        },
+        "negative_prompts.json": {
+          "path": "data/negative_prompts.json",
+          "size_bytes": 636,
+          "sha256": "ea8da0ea2e14fcbe99c6c18c29ee32cbc972f8af3bf89a9205d4e216267a1b9b"
+        },
+        "nudity_levels.json": {
+          "path": "data/nudity_levels.json",
+          "size_bytes": 157010,
+          "sha256": "9041ad4f741fbe94cddd66a7f86095e5c49995f9db96f22396b155caf59cc3aa"
+        },
+        "poses.json": {
+          "path": "data/poses.json",
+          "size_bytes": 394176,
+          "sha256": "3a2fa28264207adb680b4759870a8ed1fe1417792f5023b0ea19209424277f03"
+        },
+        "presets.json": {
+          "path": "data/presets.json",
+          "size_bytes": 949175,
+          "sha256": "576ff68d91a534ff9d837906973f5c939c54a1b3b05f196b494cc8c2ee6aea95"
+        },
+        "props.json": {
+          "path": "data/props.json",
+          "size_bytes": 16312,
+          "sha256": "e0496d2ca8866a755ebe6f4bfc3f9304a17189ab893808bf5cc6d612f05845be"
+        },
+        "scenes.json": {
+          "path": "data/scenes.json",
+          "size_bytes": 869802,
+          "sha256": "baa1099742ff027396067a219af8494cbc32c10c845c30dcfde701befab2366f"
+        },
+        "shot_types.json": {
+          "path": "data/shot_types.json",
+          "size_bytes": 17518,
+          "sha256": "893e6790134cf218c76495328abecfd47f54eb2f87aaa1d9b028eb10e9d46165"
+        },
+        "style_recipes.json": {
+          "path": "data/style_recipes.json",
+          "size_bytes": 83403,
+          "sha256": "44873d98f4c365d1a25448d6996f84df310b1b2ac1e526a5e492124fb6279e44"
+        },
+        "tattoos.json": {
+          "path": "data/tattoos.json",
+          "size_bytes": 8602,
+          "sha256": "37fa5158d826e6ce1b35dc730fec20494f2d41b8626a2cf2d4bdeceef1951bdd"
+        },
+        "themes.json": {
+          "path": "data/themes.json",
+          "size_bytes": 162593,
+          "sha256": "d15509a75939757d7e27225bff0a1cd871a562ceeeeddad4d7f636ae70290287"
+        }
+      }
+    },
+    "wildcards_source_repo": {
+      "snapshot_at": "2026-10-02T00:39:23+08:00",
+      "repositories": {
+        "Avaray": {
+          "url": "https://github.com/Avaray/stable-diffusion-simple-wildcards",
+          "commit": "c1a8b43df879a4e5889c69dc69b8405ac7981dc2",
+          "branch": "sdxl",
+          "status": "downloaded_and_classified"
+        },
+        "BKWILDCARDS": {
+          "url": "https://github.com/bkidderz/BKWILDCARDS",
+          "commit": "df9e1f759f00c55526e7533c717389333f322393",
+          "branch": "main",
+          "status": "downloaded_and_classified"
+        },
+        "SkyyySi": {
+          "url": "https://github.com/SkyyySi/sd-dp-wildcards-collection",
+          "commit": "fe01e52105b5483b7e3c6dfd9651a0088687c33c",
+          "branch": "master",
+          "status": "downloaded_and_classified"
+        },
+        "DuoUmiWild": {
+          "url": "https://github.com/UndefinedUo/ComfyUI_DuoUmiWild",
+          "commit": "638d47a3349064959794234086c2d39dc381d803",
+          "branch": "main",
+          "status": "repository_downloaded_no_bundled_wildcard_data"
+        },
+        "mattjaybe": {
+          "url": "https://github.com/mattjaybe/sd-wildcards",
+          "commit": "e1902157613943e884c9cfa4f7fc97692898664d",
+          "branch": "main",
+          "status": "downloaded_and_classified"
+        },
+        "BooruPromptGallery": {
+          "url": "https://github.com/Mexes-GM/booru-prompt-gallery",
+          "commit": "e12ff36bc3d4c4bb3483f7ad55f5f0bc93d11a19",
+          "branch": "main",
+          "status": "downloaded_and_classified"
+        }
+      }
+    },
+    "catalog_dependencies": {
+      "entries_jsonl": {
+        "file_relpath": "catalog/entries.jsonl",
+        "size_bytes": 22329568,
+        "sha256": "61ff03775efd352b3b8a2d995acff0da2d7a90234fe7ebc85032d52b11b52b48"
+      }
+    }
+  },
+  "eight_input_categories": {
+    "total_pre_dedup_entries": 6939,
+    "categories": {
+      "hair": {
+        "source_file": "catalog/gender-analysis/hair-gender.csv",
+        "filter_rule": "gender in ('\u5973', '\u901a\u7528')",
+        "entries_count": 145,
+        "sha256": "4fe2aa506eda6aa46a22eeeb9851e06d4eb6aa37264381e310e57eb5fc34a59a"
+      },
+      "clothing": {
+        "source_file": "catalog/gender-analysis/clothing-gender.csv",
+        "filter_rule": "gender in ('\u5973', '\u901a\u7528')",
+        "entries_count": 3607,
+        "sha256": "52ee77afd43b5650d5bcb1e92b7c42c8869554f01861f46b2eb3ed825f8293b5"
+      },
+      "pose_action": {
+        "source_file": "wildcards/04_pose/action.txt",
+        "entries_count": 524,
+        "sha256": "6b1d4efe9c309f661796a099d8ef145c780f157da868bfed97108206fb4a57e8"
+      },
+      "scene": {
+        "source_file": "wildcards/05_scene/scene.txt",
+        "entries_count": 2335,
+        "sha256": "8b6268ce71b54e089b7c9470f87996cba483c4b68a98ec70945ea5714b3884b9"
+      },
+      "camera": {
+        "dir": "wildcards/06_camera",
+        "unique_entries_count": 202,
+        "files": {
+          "angle.txt": {
+            "path": "wildcards/06_camera/angle.txt",
+            "sha256": "2092f469a54c55c4edab1058fb47844c46b3cb7da329bc530925ab896bb8a67a",
+            "lines": 39
+          },
+          "camera.txt": {
+            "path": "wildcards/06_camera/camera.txt",
+            "sha256": "6fc6e7a7aa35826561b8b491c9d32df6f21ae7b7b296686627e57b903311e794",
+            "lines": 47
+          },
+          "film.txt": {
+            "path": "wildcards/06_camera/film.txt",
+            "sha256": "f43dc705107347e8ff8772b2d9a69e0d687c732c6b318fe638eda8da8a94430b",
+            "lines": 83
+          },
+          "shot_size.txt": {
+            "path": "wildcards/06_camera/shot_size.txt",
+            "sha256": "d7c52c60f6cc121d8a3aef205065511f69a565c52e18048a11d53e268e48a24f",
+            "lines": 33
+          }
+        }
+      },
+      "lighting": {
+        "source_file": "wildcards/07_lighting/lighting.txt",
+        "entries_count": 46,
+        "sha256": "5b6d8e43c0ee75a216e1cdf055b12bccca8839f1e72d26d4a67a4558704f2fe1"
+      },
+      "expression": {
+        "source_file": "wildcards/08_expression/expression.txt",
+        "entries_count": 35,
+        "sha256": "64e969562de986d70cd42bf5bed9ee01b02722b579d33c6f1088e1f41d168131"
+      },
+      "accessories": {
+        "dir": "wildcards/10_accessories",
+        "unique_entries_count": 45,
+        "files": {
+          "accessories.txt": {
+            "path": "wildcards/10_accessories/accessories.txt",
+            "sha256": "57edca4acd0742b962861e8d0c1e0771ef768e697bd787afdd577fbfe37d76ab",
+            "lines": 41
+          },
+          "chokers.txt": {
+            "path": "wildcards/10_accessories/chokers.txt",
+            "sha256": "5c2bf7b7df3c73c84bfa1f2717c5a62dbf7fe439407a0c35a2804b179f31ec48",
+            "lines": 12
+          },
+          "necklaces.txt": {
+            "path": "wildcards/10_accessories/necklaces.txt",
+            "sha256": "1566828333791b3d8b6d6b433b61581bf575c4ba697e8f1669ef8a94d80db8c9",
+            "lines": 12
+          },
+          "neckwear.txt": {
+            "path": "wildcards/10_accessories/neckwear.txt",
+            "sha256": "4908e44043cfc32cfadbeea9eaa56c4c9502fa48d85a1052422ae59dd90f7ac8",
+            "lines": 5
+          },
+          "shoes.txt": {
+            "path": "wildcards/10_accessories/shoes.txt",
+            "sha256": "1833921e78d3d6561ebcc4d59ea582e77e62a82383cd7f96a94fa5e2e4d6b61c",
+            "lines": 4
+          },
+          "socks.txt": {
+            "path": "wildcards/10_accessories/socks.txt",
+            "sha256": "688bd4466514e03b21d9b26e02d1dff5ab3bfaa4b7ba3be29126286066b15d78",
+            "lines": 12
+          }
+        }
+      }
+    }
+  },
+  "recursive_dependencies_closure": {
+    "total_files": 10,
+    "dag_verified": true,
+    "max_dependency_depth": 2,
+    "dependency_graph_edges": {
+      "wildcards/by_source/skyyysi/10_accessories/legwear.txt": [
+        "wildcards/by_source/skyyysi/10_accessories/footwear.txt",
+        "wildcards/by_source/skyyysi/10_accessories/secondary_legwear.txt"
+      ],
+      "wildcards/by_source/skyyysi/09_style/colors.txt": [],
+      "wildcards/by_source/skyyysi/02_hair/hair_lengths.txt": [],
+      "wildcards/by_source/skyyysi/02_hair/hair_styles.txt": [],
+      "wildcards/by_source/skyyysi/10_accessories/necklaces.txt": [],
+      "wildcards/by_source/skyyysi/10_accessories/neckwear.txt": [
+        "wildcards/by_source/skyyysi/09_style/colors.txt",
+        "wildcards/by_source/skyyysi/10_accessories/chokers.txt",
+        "wildcards/by_source/skyyysi/10_accessories/necklaces.txt"
+      ],
+      "wildcards/by_source/skyyysi/02_hair/hair_ornaments.txt": [],
+      "wildcards/by_source/skyyysi/10_accessories/footwear.txt": [],
+      "wildcards/by_source/skyyysi/10_accessories/secondary_legwear.txt": [],
+      "wildcards/by_source/skyyysi/10_accessories/chokers.txt": [
+        "wildcards/by_source/skyyysi/09_style/colors.txt"
+      ]
+    },
+    "files": {
+      "wildcards/by_source/skyyysi/10_accessories/legwear.txt": {
+        "ref_token": "__by_source/skyyysi/10_accessories/legwear__",
+        "file_relpath": "wildcards/by_source/skyyysi/10_accessories/legwear.txt",
+        "entries_count": 6,
+        "sha256": "58ca817d09e7d890c1e24c13c5baeacbd4b43a98018f824b214a75407d154482",
+        "upstream_repo": "SkyyySi",
+        "license": "\u5f85\u6838\u9a8c (\u65e0\u6839\u76ee\u5f55\u8bb8\u53ef\u6587\u4ef6\uff0c\u9075\u5faa\u539f\u59cb\u4e0a\u6e38\u58f0\u660e)"
+      },
+      "wildcards/by_source/skyyysi/09_style/colors.txt": {
+        "ref_token": "__by_source/skyyysi/09_style/colors__",
+        "file_relpath": "wildcards/by_source/skyyysi/09_style/colors.txt",
+        "entries_count": 16,
+        "sha256": "18ac096e63ad14eccb8481412c541ad1cd30c2afe055d498ac2b1c4edd85c21c",
+        "upstream_repo": "SkyyySi",
+        "license": "\u5f85\u6838\u9a8c (\u65e0\u6839\u76ee\u5f55\u8bb8\u53ef\u6587\u4ef6\uff0c\u9075\u5faa\u539f\u59cb\u4e0a\u6e38\u58f0\u660e)"
+      },
+      "wildcards/by_source/skyyysi/02_hair/hair_lengths.txt": {
+        "ref_token": "__by_source/skyyysi/02_hair/hair_lengths__",
+        "file_relpath": "wildcards/by_source/skyyysi/02_hair/hair_lengths.txt",
+        "entries_count": 5,
+        "sha256": "57afdf4a3a138243c09022c03df0ff863553fad4e45167e26948e95d033f96f9",
+        "upstream_repo": "SkyyySi",
+        "license": "\u5f85\u6838\u9a8c (\u65e0\u6839\u76ee\u5f55\u8bb8\u53ef\u6587\u4ef6\uff0c\u9075\u5faa\u539f\u59cb\u4e0a\u6e38\u58f0\u660e)"
+      },
+      "wildcards/by_source/skyyysi/02_hair/hair_styles.txt": {
+        "ref_token": "__by_source/skyyysi/02_hair/hair_styles__",
+        "file_relpath": "wildcards/by_source/skyyysi/02_hair/hair_styles.txt",
+        "entries_count": 9,
+        "sha256": "779519388b66aa719fd5a09842a811383f4dd56ccf411b73fa836b760b10bcd5",
+        "upstream_repo": "SkyyySi",
+        "license": "\u5f85\u6838\u9a8c (\u65e0\u6839\u76ee\u5f55\u8bb8\u53ef\u6587\u4ef6\uff0c\u9075\u5faa\u539f\u59cb\u4e0a\u6e38\u58f0\u660e)"
+      },
+      "wildcards/by_source/skyyysi/10_accessories/necklaces.txt": {
+        "ref_token": "__by_source/skyyysi/10_accessories/necklaces__",
+        "file_relpath": "wildcards/by_source/skyyysi/10_accessories/necklaces.txt",
+        "entries_count": 12,
+        "sha256": "1566828333791b3d8b6d6b433b61581bf575c4ba697e8f1669ef8a94d80db8c9",
+        "upstream_repo": "SkyyySi",
+        "license": "\u5f85\u6838\u9a8c (\u65e0\u6839\u76ee\u5f55\u8bb8\u53ef\u6587\u4ef6\uff0c\u9075\u5faa\u539f\u59cb\u4e0a\u6e38\u58f0\u660e)"
+      },
+      "wildcards/by_source/skyyysi/10_accessories/neckwear.txt": {
+        "ref_token": "__by_source/skyyysi/10_accessories/neckwear__",
+        "file_relpath": "wildcards/by_source/skyyysi/10_accessories/neckwear.txt",
+        "entries_count": 5,
+        "sha256": "4908e44043cfc32cfadbeea9eaa56c4c9502fa48d85a1052422ae59dd90f7ac8",
+        "upstream_repo": "SkyyySi",
+        "license": "\u5f85\u6838\u9a8c (\u65e0\u6839\u76ee\u5f55\u8bb8\u53ef\u6587\u4ef6\uff0c\u9075\u5faa\u539f\u59cb\u4e0a\u6e38\u58f0\u660e)"
+      },
+      "wildcards/by_source/skyyysi/02_hair/hair_ornaments.txt": {
+        "ref_token": "__by_source/skyyysi/02_hair/hair_ornaments__",
+        "file_relpath": "wildcards/by_source/skyyysi/02_hair/hair_ornaments.txt",
+        "entries_count": 15,
+        "sha256": "f294e149a22d43b91a3027303ba6cf8b520af74d50cbd490a5a326b2e68122e3",
+        "upstream_repo": "SkyyySi",
+        "license": "\u5f85\u6838\u9a8c (\u65e0\u6839\u76ee\u5f55\u8bb8\u53ef\u6587\u4ef6\uff0c\u9075\u5faa\u539f\u59cb\u4e0a\u6e38\u58f0\u660e)"
+      },
+      "wildcards/by_source/skyyysi/10_accessories/footwear.txt": {
+        "ref_token": "__by_source/skyyysi/10_accessories/footwear__",
+        "file_relpath": "wildcards/by_source/skyyysi/10_accessories/footwear.txt",
+        "entries_count": 4,
+        "sha256": "1833921e78d3d6561ebcc4d59ea582e77e62a82383cd7f96a94fa5e2e4d6b61c",
+        "upstream_repo": "SkyyySi",
+        "license": "\u5f85\u6838\u9a8c (\u65e0\u6839\u76ee\u5f55\u8bb8\u53ef\u6587\u4ef6\uff0c\u9075\u5faa\u539f\u59cb\u4e0a\u6e38\u58f0\u660e)"
+      },
+      "wildcards/by_source/skyyysi/10_accessories/secondary_legwear.txt": {
+        "ref_token": "__by_source/skyyysi/10_accessories/secondary_legwear__",
+        "file_relpath": "wildcards/by_source/skyyysi/10_accessories/secondary_legwear.txt",
+        "entries_count": 6,
+        "sha256": "1f8198ac68f31ea9027a56edf9383d9580eedb08f9e43e225b0c5d4b98274649",
+        "upstream_repo": "SkyyySi",
+        "license": "\u5f85\u6838\u9a8c (\u65e0\u6839\u76ee\u5f55\u8bb8\u53ef\u6587\u4ef6\uff0c\u9075\u5faa\u539f\u59cb\u4e0a\u6e38\u58f0\u660e)"
+      },
+      "wildcards/by_source/skyyysi/10_accessories/chokers.txt": {
+        "ref_token": "__by_source/skyyysi/10_accessories/chokers__",
+        "file_relpath": "wildcards/by_source/skyyysi/10_accessories/chokers.txt",
+        "entries_count": 12,
+        "sha256": "5c2bf7b7df3c73c84bfa1f2717c5a62dbf7fe439407a0c35a2804b179f31ec48",
+        "upstream_repo": "SkyyySi",
+        "license": "\u5f85\u6838\u9a8c (\u65e0\u6839\u76ee\u5f55\u8bb8\u53ef\u6587\u4ef6\uff0c\u9075\u5faa\u539f\u59cb\u4e0a\u6e38\u58f0\u660e)"
+      }
+    }
+  },
+  "generated_at": "2026-10-03T01:50:00+08:00"
+}

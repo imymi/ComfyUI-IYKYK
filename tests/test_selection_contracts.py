@@ -163,7 +163,7 @@ class TestSelectionContracts(unittest.TestCase):
         """遍历 122 个场景 label，在 100 个随机种子下断言 100% 精确唯一映射，杜绝错位抽取 (杜绝 range(5) 假声明)"""
         data = json.loads((self.data_dir / "scenes.json").read_text(encoding="utf-8"))
         all_items = [item for g in data["scenes"] for item in g["items"]]
-        self.assertEqual(len(all_items), 122)
+        self.assertEqual(len(all_items), 234)
 
         for item in all_items:
             label = item["label"]
@@ -230,7 +230,7 @@ class TestSelectionContracts(unittest.TestCase):
                 except Exception as e:
                     self.fail(f"Real call failed for UI option '{opt}' in slot '{slot_name}': {e}")
 
-        self.assertEqual(called_count, 585, f"Expected exactly 585 explicit UI options (577 + 7 jewelry + 1 imperfection), called {called_count}")
+        self.assertEqual(called_count, 837, f"Expected exactly 837 explicit UI options, called {called_count}")
 
     def test_strict_negative_selectors_fail_fast(self):
         """

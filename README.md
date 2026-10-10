@@ -7,7 +7,7 @@
 
 ComfyUI-IYKYK 是一套面向东亚人像与剧情场景的提示词生成节点。它把场景、人物、服装、构图、光线等选择组织成结构化语义，再通过冲突规则生成更自洽的正向提示词、负向提示词和中文说明。
 
-当前版本：**v1.1.0-rc9**。本版本完成服装词库扩充、服装状态与跨词库条目迁移，并加强承载绑定和冲突消解。
+当前版本：**v1.1.0-rc10**。本版本完成全量词库合流与结构化变体治理、L1/L5 裸露纯净度防护、服装动作载体相容性加固与历史快照受控门禁。
 
 > 本项目包含仅适合成年人的 SFW/NSFW 词库。请先阅读[内容与授权](#内容与授权)。
 
@@ -26,7 +26,7 @@ ComfyUI-IYKYK 是一套面向东亚人像与剧情场景的提示词生成节点
 
 ### Release ZIP（推荐）
 
-1. 从 [GitHub Releases](https://github.com/imymi/ComfyUI-IYKYK/releases) 下载 `ComfyUI-IYKYK-v1.1.0-rc9.zip`。
+1. 从 [GitHub Releases](https://github.com/imymi/ComfyUI-IYKYK/releases) 下载 `ComfyUI-IYKYK-v1.1.0-rc10.zip`。
 2. 解压到 `ComfyUI/custom_nodes/ComfyUI-IYKYK`。
 3. 重启 ComfyUI，在节点搜索中输入 `IYKYK`。
 
@@ -41,7 +41,7 @@ git clone https://github.com/imymi/ComfyUI-IYKYK.git
 
 ```bash
 cd ComfyUI-IYKYK
-git checkout v1.1.0-rc9
+git checkout v1.1.0-rc10
 ```
 
 ### ComfyUI Manager
@@ -177,9 +177,9 @@ counts
 
 ## 确定性与兼容性
 
-- `prompt_seed >= 0`：同一 rc9 版本、相同输入得到相同输出与诊断 JSON。
+- `prompt_seed >= 0`：同一 rc10 版本、相同输入得到相同输出与诊断 JSON。
 - `prompt_seed = -1`：按 ComfyUI 的生成周期更新结果。
-- rc8 与 rc9 扩充了采样目录，同一个 seed 的输出可能变化；升级后应在 rc9 内重新固定并验证预期结果。
+- 升级至 rc10 扩充了采样目录与变体结构，同一个 seed 的输出可能变化；升级后应在 rc10 内重新固定并验证预期结果。
 - 四个节点的输出数量与类型保持不变；旧工作流中的服装选项 ID 继续保留。
 - 输出是普通字符串，可接入常见 ComfyUI 文本编码流程；最终模型效果仍取决于 checkpoint、文本编码器、采样参数和工作流。
 
@@ -203,7 +203,15 @@ python -m unittest discover -s tests -q
 python scripts/build_release.py --mode verify
 ```
 
-rc9 发布前的本地审核记录包括：
+rc10 候选冻结的本地审核记录包括：
+
+- 165 款服装大类、234 个场景、837 个 UI 显式选项。
+- 完整全量回归 574 项测试通过；针对性专项复测（服装 14 项、L1 纯净度 6 项、RC8 质量门禁 5 项）全部通过。
+- 历史万种子缓存内容完整性逐条重算通过，阶段 4 差异归因审计未解释项为 0。
+- 发布包包含 43 个核心运行时文件，独立双构建逐字节一致。
+- 详细冻结报告见 [`docs/v1.1.0-rc10_freeze_report.md`](docs/v1.1.0-rc10_freeze_report.md)。
+
+rc9 历史发布审核记录包括：
 
 - 137 款服装、23 条服装状态、19 项头饰配饰、12 项内衣和 8 项微瑕进入目录。
 - 10,000 种子分阶段差异审计未解释项为 0；本地全量 413 项测试通过。
@@ -218,7 +226,7 @@ rc8 历史发布审核记录包括：
 - 24-Atom 本机夹具 p95 约 2.12 ms；该数字用于本机回归，不作为跨机器性能承诺。
 - 固定构建时间的双构建产物逐字节一致；发布包包含 42 个运行时文件。
 
-rc8 的冲突引擎实现规格见 [`docs/v1.1.0-rc8-conflict-affinity-implementation-spec.md`](docs/v1.1.0-rc8-conflict-affinity-implementation-spec.md)；rc9 的词库迁移记录见 [`docs/data_migration/catalog_diff_report.md`](docs/data_migration/catalog_diff_report.md)，版本变化见 [`CHANGELOG.md`](CHANGELOG.md)。
+rc8 的冲突引擎实现规格见 [`docs/v1.1.0-rc8-conflict-affinity-implementation-spec.md`](docs/v1.1.0-rc8-conflict-affinity-implementation-spec.md)；rc9 的词库迁移记录见 [`docs/data_migration/catalog_diff_report.md`](docs/data_migration/catalog_diff_report.md)；rc10 冻结报告见 [`docs/v1.1.0-rc10_freeze_report.md`](docs/v1.1.0-rc10_freeze_report.md)，版本变化见 [`CHANGELOG.md`](CHANGELOG.md)。
 
 ## 常见问题
 
@@ -236,13 +244,22 @@ rc8 的冲突引擎实现规格见 [`docs/v1.1.0-rc8-conflict-affinity-implement
 
 ### 为什么升级后同一个 seed 变了
 
-确定性边界是版本内，而不是跨版本。rc9 扩充了候选目录，可能改变同一 seed 的抽样结果。
+确定性边界是版本内，而不是跨版本。rc10 扩充了候选目录与变体结构，可能改变同一 seed 的抽样结果。
 
 ## 内容与授权
 
 - 本项目仅面向成年人。不得用于涉及未成年人、无同意行为、真实人物侵害或其他违法内容的生成与传播。
 - 用户须自行遵守所在地区法律、模型许可证、平台政策和所使用素材的授权条件。
 - 项目词库与早期结构参考了 [`ShuaiHui/nsfw-prompt-templates-asian`](https://github.com/ShuaiHui/nsfw-prompt-templates-asian)；来源范围、上游授权线索与待确认事项见 [THIRD_PARTY.md](THIRD_PARTY.md)。
+- **词库扩充来源与开源许可归属 (M1/M2 增补)**：
+  - **BKWILDCARDS**：作者 `bkidderz`（[bkidderz/BKWILDCARDS](https://github.com/bkidderz/BKWILDCARDS)），词库内容遵循 [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/) 许可协议。入选条目包括：
+    - M1 发型：`sleek blunt-cut short bob` 与 `long hair, parted down the middle and tucked behind the ears`；
+    - M2 发型：`textured pixie cut`、`crown braid updo`、`single braid down the back`、`half-up half-down hairstyle`、`vintage finger waves`、`low chignon at the nape`。衍生使用保持该协议归属。
+  - **mattjaybe**：作者 `mattjaybe`（[mattjaybe/sd-wildcards](https://github.com/mattjaybe/sd-wildcards)），声明遵循 [CC0 1.0 Universal 公共领域贡献](https://creativecommons.org/publicdomain/zero/1.0/)。入选条目包括：
+    - M1 直闪光 `direct flash photography`、黄昏夕阳光（改编限定版 `warm golden hour lighting during sunset`）、手拿包 `elegant clutch bag held in hand`、腋下包 `baguette bag worn over shoulder under arm`；
+    - M2 首饰与发饰：`pearl drop earrings`、`classic silver hoop earrings`、真丝发圈 `silk fabric scrunchie holding hair`；
+    - M2 光影：柔和跳灯 `soft bounced lighting`、烛光 `flickering candlelight`、微弱生物荧光 `subtle bioluminescent ambient lighting`。
+  - 其他上游来源（如 BooruPromptGallery 采用 GNU AGPL v3）因适用范围待核实，未纳入本版本核心发行包。详细溯源见 `docs/data_migration/ai_wildcards_provenance_ledger.tsv`。
 - **当前仓库未包含 `LICENSE` 文件。** 不应仅凭历史 README 的 Apache-2.0 表述推定本仓库或上游素材已经获得该许可证授权；复制、再分发或制作衍生版本前，请向仓库维护者核实适用条款及上游授权。
 
 问题与缺陷请提交到 [GitHub Issues](https://github.com/imymi/ComfyUI-IYKYK/issues)。

@@ -13,4 +13,21 @@ build/
 
 # Large divergence audit archives (>100MB blocked by GitHub)
 scratch/*.gz
+scratch/baseline_*
+scratch/controlled_ref_*
+scratch/target_*
+scratch/*reproduced_manifest.json
+scratch/*reproduced_report.md
+scratch/audit_*_report_*.md
+
+# Ephemeral scratch scripts and temp working data
+scratch/apply_m32_*
+scratch/generate_*
+!scratch/generate_batch5_scene_script.py
+scratch/check_*
+scratch/inspect_*
+scratch/print_*
+scratch/step7575*
+scratch/m4_temp_data/
+
 

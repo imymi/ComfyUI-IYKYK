@@ -219,6 +219,1173 @@
             "type": "string",
             "minLength": 1
           }
+        },
+        "is_ensemble": {
+          "type": "boolean"
+        },
+        "style_genre": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "fabric_materials": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "pattern_textures": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "incompatible_with": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "cut_features": {
+          "type": "object",
+          "properties": {
+            "neckline": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "sleeve_length": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "hemline_length": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "fit_silhouette": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          "additionalProperties": false
+        },
+        "ensemble_pieces": {
+          "type": "object",
+          "properties": {
+            "main_garments": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "top_pieces": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "bottom_pieces": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "outer_layers": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "footwear": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "accessories": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "styling_details": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "piece_bindings": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "piece_id": {
+                    "type": "string"
+                  },
+                  "piece_slot": {
+                    "type": "string"
+                  },
+                  "piece_text": {
+                    "type": "string"
+                  },
+                  "binding_role": {
+                    "type": "string"
+                  },
+                  "garment_topology": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "cut_features": {
+                    "type": [
+                      "object",
+                      "null"
+                    ]
+                  },
+                  "fabric_materials": {
+                    "type": [
+                      "array",
+                      "null"
+                    ],
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "pattern_textures": {
+                    "type": [
+                      "array",
+                      "null"
+                    ],
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "required": [
+                  "piece_id",
+                  "piece_slot",
+                  "binding_role"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "relations": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "relation_kind": {
+                    "type": "string"
+                  },
+                  "source_piece_id": {
+                    "type": "string"
+                  },
+                  "target_piece_id": {
+                    "type": "string"
+                  },
+                  "relation_direction": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "relation_kind",
+                  "source_piece_id",
+                  "target_piece_id",
+                  "relation_direction"
+                ],
+                "additionalProperties": false
+              }
+            }
+          },
+          "additionalProperties": false
+        },
+        "pose_facts": {
+          "type": "object",
+          "properties": {
+            "body_support": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "support_options": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "hand_state": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "hands_required": {
+              "type": [
+                "integer",
+                "null"
+              ]
+            },
+            "is_restrained": {
+              "type": [
+                "boolean",
+                "string",
+                "null"
+              ]
+            },
+            "restraint_type": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "restrained_body_part": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "role_relationship": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "sitting_orientation": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "leg_state": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "gaze_direction": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "gesture_type": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "limb_position": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "limb_category": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "pose_orientation": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "interlocked_fingers": {
+              "type": [
+                "boolean",
+                "null"
+              ]
+            },
+            "facial_action": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "interaction_type": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "motion_type": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "posture_group": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "posture_type": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "template_style": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "is_signature_meme": {
+              "type": [
+                "boolean",
+                "null"
+              ]
+            },
+            "is_prose_template": {
+              "type": [
+                "boolean",
+                "null"
+              ]
+            }
+          },
+          "additionalProperties": false
+        },
+        "scene_facts": {
+          "type": "object",
+          "properties": {
+            "space_kind": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "time_of_day": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "venue_category": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "venue_type": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "venue_name": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "extracted_venue": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "setting_genre": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "is_prose_template": {
+              "type": [
+                "boolean",
+                "null"
+              ]
+            },
+            "is_composite_event": {
+              "type": [
+                "boolean",
+                "null"
+              ]
+            },
+            "embedded_lighting": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "embedded_palette": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "embedded_props": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "deconstructed_event": {
+              "type": [
+                "string",
+                "object",
+                "null"
+              ]
+            },
+            "location_type": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "condition": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "decay_state": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "theme": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "baseline_default_time_of_day": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          "additionalProperties": false
+        },
+        "camera_facts": {
+          "type": "object",
+          "properties": {
+            "device_category": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "device_type": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "film_name": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "manufacturer_brand": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "camera_brand": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "camera_model": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "lens_spec": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "lens_mount": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "measured_iso": {
+              "type": [
+                "integer",
+                "number",
+                "null"
+              ]
+            },
+            "recommended_ei": {
+              "type": [
+                "integer",
+                "number",
+                "null"
+              ]
+            },
+            "nominal_name_rating": {
+              "type": [
+                "string",
+                "integer",
+                "number",
+                "null"
+              ]
+            },
+            "iso_display": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "iso_spec_note": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "emulsion_type": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "developing_process": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "is_camera_film": {
+              "type": [
+                "boolean",
+                "null"
+              ]
+            },
+            "sensor_format": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "color_mode": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          "additionalProperties": false
+        },
+        "hair_facts": {
+          "type": "object",
+          "properties": {
+            "hair_category": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "hair_feature": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "hair_part": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "hairstyle": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "parting": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "shaved_level": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "stubble": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "color_group": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "dye_technique": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "volume": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "ends": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "tapered": {
+              "type": [
+                "boolean",
+                "string",
+                "null"
+              ]
+            },
+            "length": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "length_tier": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "lengths": {
+              "type": [
+                "string",
+                "array",
+                "null"
+              ],
+              "items": {
+                "type": "string"
+              }
+            },
+            "ears": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "bangs": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "styling": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "texture_type": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          "additionalProperties": false
+        },
+        "lighting_facts": {
+          "type": "object",
+          "properties": {
+            "light_source": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "light_type": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "light_role": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "key_type": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "setup": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "shadow": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "source_in_scene": {
+              "type": [
+                "boolean",
+                "string",
+                "null"
+              ]
+            },
+            "glow": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "lighting": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "mood": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "style": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "property": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "effect": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "time": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          "additionalProperties": false
+        },
+        "shot_facts": {
+          "type": "object",
+          "properties": {
+            "shot_size": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "angle_name": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "angle_type": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "axis": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "view_axis": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "perspective": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "direction": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "orientation": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "distance": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "distortion": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "focus": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "framing": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "crop_style": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "composition": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "height_tier": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "layer": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "lens_type": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "mood": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "genre": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "motion_type": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "effect": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "element": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "edge": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "dimension": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "function": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "placement": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "reveal": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "rule": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "stability": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "pose_orientation": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          "additionalProperties": false
+        },
+        "clothing_facts": {
+          "type": "object",
+          "properties": {
+            "clothing_slot": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "asymmetric": {
+              "type": [
+                "string",
+                "boolean",
+                "null"
+              ]
+            },
+            "coverage": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "height": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "layers": {
+              "type": [
+                "array",
+                "null"
+              ],
+              "items": {
+                "type": "string"
+              }
+            },
+            "material": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "core_base_tags": {
+              "type": [
+                "array",
+                "null"
+              ],
+              "items": {
+                "type": "string"
+              }
+            },
+            "hemline": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          "additionalProperties": false
+        },
+        "expression_facts": {
+          "type": "object",
+          "properties": {
+            "emotion": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "emotion_tendency": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "arousal_level": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "gaze": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "intensity": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "facial_action": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "state": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "tears": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          "additionalProperties": false
+        },
+        "accessory_facts": {
+          "type": "object",
+          "properties": {
+            "ornament": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "pendant": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "motif": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "surface": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "shape": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "silhouette": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "position": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "action_type": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "body_part": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "dynamic_slots": {
+              "type": "array",
+              "items": {
+                "type": [
+                  "string",
+                  "object"
+                ]
+              }
+            },
+            "material": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          "additionalProperties": false
+        },
+        "governance_metadata": {
+          "type": "object"
         }
       }
     }

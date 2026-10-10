@@ -1,0 +1,1854 @@
+{
+  "hairstyles": [
+    {
+      "id": "long_straight_black",
+      "name_zh": "黑长直散发 (Long Straight Black Hair)",
+      "tags": [
+        {
+          "id": "long_straight_black__tag_000",
+          "text": "long straight black hair",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "face"
+            ]
+          }
+        },
+        {
+          "id": "long_straight_black__tag_001",
+          "text": "pin-straight hair",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "face"
+            ]
+          }
+        },
+        {
+          "id": "long_straight_black__tag_002",
+          "text": "silky smooth hair flowing over shoulders",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "face"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "big_wavy_curls",
+      "name_zh": "大波浪卷发 (Big Voluminous Waves)",
+      "tags": [
+        {
+          "id": "big_wavy_curls__tag_000",
+          "text": "big loose waves",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "face"
+            ]
+          }
+        },
+        {
+          "id": "big_wavy_curls__tag_001",
+          "text": "voluminous bouncy curls",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "face"
+            ]
+          }
+        },
+        {
+          "id": "big_wavy_curls__tag_002",
+          "text": "glamorous wavy hair",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "face"
+            ]
+          }
+        },
+        {
+          "id": "big_wavy_curls__tag_003",
+          "text": "rich texture",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "face"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "twin_tails",
+      "name_zh": "双马尾 (Twin Tails / Pigtails)",
+      "tags": [
+        {
+          "id": "twin_tails__tag_000",
+          "text": "twin tails",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "face"
+            ]
+          }
+        },
+        {
+          "id": "twin_tails__tag_001",
+          "text": "pigtails tied high",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "face"
+            ]
+          }
+        },
+        {
+          "id": "twin_tails__tag_002",
+          "text": "long twin ponytails framing face",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "face"
+            ]
+          }
+        },
+        {
+          "id": "twin_tails__tag_003",
+          "text": "cute ribbons",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "face"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "high_ponytail",
+      "name_zh": "高马尾 (High Ponytail)",
+      "tags": [
+        {
+          "id": "high_ponytail__tag_000",
+          "text": "high ponytail",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "face"
+            ]
+          }
+        },
+        {
+          "id": "high_ponytail__tag_001",
+          "text": "hair pulled up tight",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "face"
+            ]
+          }
+        },
+        {
+          "id": "high_ponytail__tag_002",
+          "text": "sleek high ponytail swaying",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "face"
+            ]
+          }
+        },
+        {
+          "id": "high_ponytail__tag_003",
+          "text": "exposed neck",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "face"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "low_ponytail",
+      "name_zh": "低马尾 (Low Ponytail)",
+      "tags": [
+        {
+          "id": "low_ponytail__tag_000",
+          "text": "low ponytail gathered at nape",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "face"
+            ]
+          }
+        },
+        {
+          "id": "low_ponytail__tag_001",
+          "text": "loose elegant ponytail",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "face"
+            ]
+          }
+        },
+        {
+          "id": "low_ponytail__tag_002",
+          "text": "loose side strands framing face",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "face"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "messy_bun",
+      "name_zh": "丸子头 (Messy Top Knot Bun)",
+      "tags": [
+        {
+          "id": "messy_bun__tag_000",
+          "text": "messy bun",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "face"
+            ]
+          }
+        },
+        {
+          "id": "messy_bun__tag_001",
+          "text": "hair in a high bun",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "face"
+            ]
+          }
+        },
+        {
+          "id": "messy_bun__tag_002",
+          "text": "loose tendrils escaping",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "face"
+            ]
+          }
+        },
+        {
+          "id": "messy_bun__tag_003",
+          "text": "casual top knot",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "face"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "space_buns",
+      "name_zh": "双丸子头 (Space Buns)",
+      "tags": [
+        {
+          "id": "space_buns__tag_000",
+          "text": "space buns on top of head",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "face"
+            ]
+          }
+        },
+        {
+          "id": "space_buns__tag_001",
+          "text": "twin buns",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "face"
+            ]
+          }
+        },
+        {
+          "id": "space_buns__tag_002",
+          "text": "playful anime hair buns",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "face"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "bob_cut",
+      "name_zh": "齐下巴短发 (Chin Length Bob Cut)",
+      "tags": [
+        {
+          "id": "bob_cut__tag_000",
+          "text": "chin length bob",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "face"
+            ]
+          }
+        },
+        {
+          "id": "bob_cut__tag_001",
+          "text": "sleek modern bob",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "face"
+            ]
+          }
+        },
+        {
+          "id": "bob_cut__tag_002",
+          "text": "hair curving around jawline",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "face"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "collarbone_lob",
+      "name_zh": "齐肩锁骨发 (Collarbone Length Lob)",
+      "tags": [
+        {
+          "id": "collarbone_lob__tag_000",
+          "text": "collarbone length hair",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "face"
+            ]
+          }
+        },
+        {
+          "id": "collarbone_lob__tag_001",
+          "text": "soft layered lob",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "face"
+            ]
+          }
+        },
+        {
+          "id": "collarbone_lob__tag_002",
+          "text": "gentle wavy ends",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "face"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "hime_cut",
+      "name_zh": "日系公主切 (Hime Cut)",
+      "tags": [
+        {
+          "id": "hime_cut__tag_000",
+          "text": "hime cut",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "face"
+            ]
+          }
+        },
+        {
+          "id": "hime_cut__tag_001",
+          "text": "princess cut with blunt side pieces framing cheeks",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "face"
+            ]
+          }
+        },
+        {
+          "id": "hime_cut__tag_002",
+          "text": "straight bangs",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "face"
+            ]
+          }
+        },
+        {
+          "id": "hime_cut__tag_003",
+          "text": "long black hair",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "face"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "braided_twins",
+      "name_zh": "麻花双辫 (Braided Twin Pigtails)",
+      "tags": [
+        {
+          "id": "braided_twins__tag_000",
+          "text": "twin braids",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "face"
+            ]
+          }
+        },
+        {
+          "id": "braided_twins__tag_001",
+          "text": "braided pigtails resting on shoulders",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "face"
+            ]
+          }
+        },
+        {
+          "id": "braided_twins__tag_002",
+          "text": "neat woven braids",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "face"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "wet_hair_face",
+      "name_zh": "湿发贴脸 (Wet Hair Clinging to Face)",
+      "tags": [
+        {
+          "id": "wet_hair_face__tag_000",
+          "text": "wet hair clinging to face and neck",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "face"
+            ]
+          }
+        },
+        {
+          "id": "wet_hair_face__tag_001",
+          "text": "damp strands sticking to sweaty skin",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "face"
+            ]
+          }
+        },
+        {
+          "id": "wet_hair_face__tag_002",
+          "text": "soaked heavy hair",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "face"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "messy_bedhead",
+      "name_zh": "凌乱事后散发 (Messy Disheveled Bedhead)",
+      "tags": [
+        {
+          "id": "messy_bedhead__tag_000",
+          "text": "messy disheveled hair",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "face"
+            ]
+          }
+        },
+        {
+          "id": "messy_bedhead__tag_001",
+          "text": "tousled bedhead hair",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "face"
+            ]
+          }
+        },
+        {
+          "id": "messy_bedhead__tag_002",
+          "text": "hair spread across pillow",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "face"
+            ]
+          }
+        },
+        {
+          "id": "messy_bedhead__tag_003",
+          "text": "tangled locks",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "face"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "hair_over_breast",
+      "name_zh": "发丝遮乳/纯欲 (Hair Draped Over Breasts)",
+      "tags": [
+        {
+          "id": "hair_over_breast__tag_000",
+          "text": "long hair draped over bare chest",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "face"
+            ]
+          }
+        },
+        {
+          "id": "hair_over_breast__tag_001",
+          "text": "strands partially covering breasts",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "face"
+            ]
+          }
+        },
+        {
+          "id": "hair_over_breast__tag_002",
+          "text": "hair cascading over torso",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "face"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "hair_in_mouth",
+      "name_zh": "嘴咬发丝 (Strand of Hair in Mouth)",
+      "tags": [
+        {
+          "id": "hair_in_mouth__tag_000",
+          "text": "strand of hair between parted lips",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "face"
+            ]
+          }
+        },
+        {
+          "id": "hair_in_mouth__tag_001",
+          "text": "biting hair sensually",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "face"
+            ]
+          }
+        },
+        {
+          "id": "hair_in_mouth__tag_002",
+          "text": "hair falling across eyes",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "face"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "ext_aw_hair_bob_blunt_cut",
+      "name_zh": "齐发尾短波波头 (Blunt-cut Short Bob)",
+      "tags": [
+        {
+          "id": "ext_aw_hair_bob_blunt_cut__tag_000",
+          "text": "sleek blunt-cut short bob",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "face"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "ext_aw_hair_long_parted_behind_ears",
+      "name_zh": "中分长发挂耳 (Long Hair Tucked Behind Ears)",
+      "tags": [
+        {
+          "id": "ext_aw_hair_long_parted_behind_ears__tag_000",
+          "text": "long hair, parted down the middle and tucked behind the ears",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "face"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "ext_aw_hair_pixie_textured_crop",
+      "name_zh": "碎发质感精灵短发 (Textured Pixie Crop)",
+      "tags": [
+        {
+          "id": "ext_aw_hair_pixie_textured_crop__tag_000",
+          "text": "textured pixie crop, piecey and short",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "face"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "ext_aw_hair_crown_braid_updo",
+      "name_zh": "盘头花冠编发 (Crown Braid Updo)",
+      "tags": [
+        {
+          "id": "ext_aw_hair_crown_braid_updo__tag_000",
+          "text": "crown braid wrapped around the head",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "face"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "ext_aw_hair_single_back_braid",
+      "name_zh": "后背单条垂长辫 (Single Long Back Braid)",
+      "tags": [
+        {
+          "id": "ext_aw_hair_single_back_braid__tag_000",
+          "text": "single long braid down the back",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "face"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "ext_aw_hair_half_up_half_down",
+      "name_zh": "半扎半披公主发 (Half-Up Half-Down)",
+      "tags": [
+        {
+          "id": "ext_aw_hair_half_up_half_down__tag_000",
+          "text": "half-up hair, top pulled back with loose lengths",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "face"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "ext_aw_hair_vintage_finger_waves",
+      "name_zh": "复古手推波浪卷发 (Vintage Finger Waves)",
+      "tags": [
+        {
+          "id": "ext_aw_hair_vintage_finger_waves__tag_000",
+          "text": "vintage finger waves close to head in structured ridges",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "face"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "ext_aw_hair_low_nape_chignon",
+      "name_zh": "颈后低发髻盘发 (Low Nape Chignon)",
+      "tags": [
+        {
+          "id": "ext_aw_hair_low_nape_chignon__tag_000",
+          "text": "smooth elegant chignon bun gathered at the nape",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "face"
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "headwear_jewelry": [
+    {
+      "id": "cat_ears",
+      "name_zh": "猫耳发箍 (Cat Ear Headband)",
+      "tags": [
+        {
+          "id": "cat_ears__tag_000",
+          "text": "fluffy cat ear headband",
+          "facts": {
+            "semantic_role": "selector",
+            "prop_usage": "worn"
+          }
+        },
+        {
+          "id": "cat_ears__tag_001",
+          "text": "neko ears with pink inner",
+          "facts": {
+            "semantic_role": "selector",
+            "prop_usage": "worn"
+          }
+        }
+      ]
+    },
+    {
+      "id": "bunny_ears",
+      "name_zh": "兔耳发箍 (Bunny Ears Headband)",
+      "tags": [
+        {
+          "id": "bunny_ears__tag_000",
+          "text": "tall satin bunny ears headband",
+          "facts": {
+            "semantic_role": "selector",
+            "prop_usage": "worn"
+          }
+        },
+        {
+          "id": "bunny_ears__tag_001",
+          "text": "playboy bunny ears",
+          "facts": {
+            "semantic_role": "selector",
+            "prop_usage": "worn"
+          }
+        }
+      ]
+    },
+    {
+      "id": "maid_headdress",
+      "name_zh": "女仆蕾丝头饰 (Maid Lace Headdress)",
+      "tags": [
+        {
+          "id": "maid_headdress__tag_000",
+          "text": "white ruffled maid headband",
+          "facts": {
+            "semantic_role": "selector",
+            "prop_usage": "worn"
+          }
+        },
+        {
+          "id": "maid_headdress__tag_001",
+          "text": "lace maid headdress",
+          "facts": {
+            "semantic_role": "selector",
+            "prop_usage": "worn"
+          }
+        }
+      ]
+    },
+    {
+      "id": "nurse_cap",
+      "name_zh": "护士帽 (Nurse Cap)",
+      "tags": [
+        {
+          "id": "nurse_cap__tag_000",
+          "text": "white nurse cap with red cross logo",
+          "facts": {
+            "semantic_role": "selector",
+            "prop_usage": "worn"
+          }
+        }
+      ]
+    },
+    {
+      "id": "ribbon_bow",
+      "name_zh": "丝带蝴蝶结 (Silk Ribbon Bow)",
+      "tags": [
+        {
+          "id": "ribbon_bow__tag_000",
+          "text": "red ribbon bow in hair",
+          "facts": {
+            "semantic_role": "selector",
+            "prop_usage": "worn"
+          }
+        },
+        {
+          "id": "ribbon_bow__tag_001",
+          "text": "cute side hair bow clip",
+          "facts": {
+            "semantic_role": "selector",
+            "prop_usage": "worn"
+          }
+        }
+      ]
+    },
+    {
+      "id": "lace_blindfold",
+      "name_zh": "蕾丝眼罩 (Lace Blindfold)",
+      "tags": [
+        {
+          "id": "lace_blindfold__tag_000",
+          "text": "black lace blindfold covering eyes",
+          "facts": {
+            "semantic_role": "selector",
+            "prop_usage": "worn",
+            "occlusion": "eyes"
+          }
+        },
+        {
+          "id": "lace_blindfold__tag_001",
+          "text": "sheer patterned eye mask",
+          "facts": {
+            "semantic_role": "selector",
+            "prop_usage": "worn",
+            "occlusion": "eyes"
+          }
+        }
+      ]
+    },
+    {
+      "id": "leather_choker",
+      "name_zh": "皮质项圈Choker (Leather O-ring Choker)",
+      "tags": [
+        {
+          "id": "leather_choker__tag_000",
+          "text": "black leather choker with metal O-ring",
+          "facts": {
+            "semantic_role": "selector",
+            "prop_usage": "worn"
+          }
+        },
+        {
+          "id": "leather_choker__tag_001",
+          "text": "tight neck collar",
+          "facts": {
+            "semantic_role": "selector",
+            "prop_usage": "worn"
+          }
+        },
+        {
+          "id": "category_pool__chokers",
+          "text": "choker",
+          "facts": {
+            "prop_usage": "worn",
+            "accessory_facts": {
+              "body_part": "neck"
+            },
+            "governance_metadata": {
+              "pool_reference": "10_accessories/chokers",
+              "selection_strategy": "random_weighted_sample",
+              "is_pool_selector": true
+            }
+          }
+        },
+        {
+          "id": "leather_choker__ext_bow",
+          "text": "bow choker",
+          "facts": {
+            "prop_usage": "worn",
+            "accessory_facts": {
+              "ornament": "bow",
+              "body_part": "neck",
+              "dynamic_slots": [
+                {
+                  "slot_name": "color",
+                  "slot_injection_mode": "prefix_replace_attribute",
+                  "branches": [
+                    {
+                      "weight": 1,
+                      "type": "wildcard_reference",
+                      "target": "09_style/colors"
+                    },
+                    {
+                      "weight": 4,
+                      "type": "literal",
+                      "value": "black"
+                    }
+                  ]
+                }
+              ]
+            },
+            "governance_metadata": {
+              "base_tag_text": "bow choker"
+            }
+          }
+        },
+        {
+          "id": "leather_choker__ext_cross",
+          "text": "cross choker",
+          "facts": {
+            "prop_usage": "worn",
+            "accessory_facts": {
+              "ornament": "cross",
+              "body_part": "neck",
+              "dynamic_slots": [
+                {
+                  "slot_name": "color",
+                  "slot_injection_mode": "prefix_replace_attribute",
+                  "branches": [
+                    {
+                      "weight": 1,
+                      "type": "wildcard_reference",
+                      "target": "09_style/colors"
+                    },
+                    {
+                      "weight": 4,
+                      "type": "literal",
+                      "value": "black"
+                    }
+                  ]
+                }
+              ]
+            },
+            "governance_metadata": {
+              "base_tag_text": "cross choker"
+            }
+          }
+        },
+        {
+          "id": "leather_choker__ext_frilled",
+          "text": "frilled choker",
+          "facts": {
+            "prop_usage": "worn",
+            "accessory_facts": {
+              "body_part": "neck",
+              "material": "frilled",
+              "dynamic_slots": [
+                {
+                  "slot_name": "color",
+                  "slot_injection_mode": "prefix_replace_attribute",
+                  "branches": [
+                    {
+                      "weight": 1,
+                      "type": "wildcard_reference",
+                      "target": "09_style/colors"
+                    },
+                    {
+                      "weight": 4,
+                      "type": "literal",
+                      "value": "black"
+                    }
+                  ]
+                }
+              ]
+            },
+            "governance_metadata": {
+              "base_tag_text": "frilled choker"
+            }
+          }
+        },
+        {
+          "id": "leather_choker__ext_heart",
+          "text": "heart choker",
+          "facts": {
+            "prop_usage": "worn",
+            "accessory_facts": {
+              "ornament": "heart",
+              "body_part": "neck",
+              "dynamic_slots": [
+                {
+                  "slot_name": "color",
+                  "slot_injection_mode": "prefix_replace_attribute",
+                  "branches": [
+                    {
+                      "weight": 1,
+                      "type": "wildcard_reference",
+                      "target": "09_style/colors"
+                    },
+                    {
+                      "weight": 4,
+                      "type": "literal",
+                      "value": "black"
+                    }
+                  ]
+                }
+              ]
+            },
+            "governance_metadata": {
+              "base_tag_text": "heart choker"
+            }
+          }
+        },
+        {
+          "id": "leather_choker__ext_oring",
+          "text": "o-ring choker",
+          "facts": {
+            "prop_usage": "worn",
+            "accessory_facts": {
+              "ornament": "o_ring",
+              "body_part": "neck",
+              "dynamic_slots": [
+                {
+                  "slot_name": "color",
+                  "slot_injection_mode": "prefix_replace_attribute",
+                  "branches": [
+                    {
+                      "weight": 1,
+                      "type": "wildcard_reference",
+                      "target": "09_style/colors"
+                    },
+                    {
+                      "weight": 4,
+                      "type": "literal",
+                      "value": "black"
+                    }
+                  ]
+                }
+              ]
+            },
+            "governance_metadata": {
+              "base_tag_text": "o-ring choker"
+            }
+          }
+        },
+        {
+          "id": "leather_choker__ext_pendant",
+          "text": "pendant choker",
+          "facts": {
+            "prop_usage": "worn",
+            "accessory_facts": {
+              "ornament": "pendant",
+              "body_part": "neck",
+              "dynamic_slots": [
+                {
+                  "slot_name": "color",
+                  "slot_injection_mode": "prefix_replace_attribute",
+                  "branches": [
+                    {
+                      "weight": 1,
+                      "type": "wildcard_reference",
+                      "target": "09_style/colors"
+                    },
+                    {
+                      "weight": 4,
+                      "type": "literal",
+                      "value": "black"
+                    }
+                  ]
+                }
+              ]
+            },
+            "governance_metadata": {
+              "base_tag_text": "pendant choker"
+            }
+          }
+        },
+        {
+          "id": "leather_choker__ext_spiked",
+          "text": "spiked choker",
+          "facts": {
+            "prop_usage": "worn",
+            "accessory_facts": {
+              "ornament": "spikes",
+              "body_part": "neck",
+              "dynamic_slots": [
+                {
+                  "slot_name": "color",
+                  "slot_injection_mode": "prefix_replace_attribute",
+                  "branches": [
+                    {
+                      "weight": 1,
+                      "type": "wildcard_reference",
+                      "target": "09_style/colors"
+                    },
+                    {
+                      "weight": 4,
+                      "type": "literal",
+                      "value": "black"
+                    }
+                  ]
+                }
+              ]
+            },
+            "governance_metadata": {
+              "base_tag_text": "spiked choker"
+            }
+          }
+        },
+        {
+          "id": "leather_choker__ext_star",
+          "text": "star choker",
+          "facts": {
+            "prop_usage": "worn",
+            "accessory_facts": {
+              "ornament": "star",
+              "body_part": "neck",
+              "dynamic_slots": [
+                {
+                  "slot_name": "color",
+                  "slot_injection_mode": "prefix_replace_attribute",
+                  "branches": [
+                    {
+                      "weight": 1,
+                      "type": "wildcard_reference",
+                      "target": "09_style/colors"
+                    },
+                    {
+                      "weight": 4,
+                      "type": "literal",
+                      "value": "black"
+                    }
+                  ]
+                }
+              ]
+            },
+            "governance_metadata": {
+              "base_tag_text": "star choker"
+            }
+          }
+        },
+        {
+          "id": "leather_choker__ext_bell",
+          "text": "neck bell choker",
+          "facts": {
+            "prop_usage": "worn",
+            "accessory_facts": {
+              "ornament": "bell",
+              "body_part": "neck",
+              "dynamic_slots": [
+                {
+                  "slot_name": "color",
+                  "slot_injection_mode": "prefix_replace_attribute",
+                  "branches": [
+                    {
+                      "weight": 1,
+                      "type": "wildcard_reference",
+                      "target": "09_style/colors"
+                    },
+                    {
+                      "weight": 4,
+                      "type": "literal",
+                      "value": "black"
+                    }
+                  ]
+                }
+              ]
+            },
+            "governance_metadata": {
+              "base_tag_text": "neck bell choker"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "gold_collarbone_chain",
+      "name_zh": "细金锁骨链 (Dainty Collarbone Chain)",
+      "tags": [
+        {
+          "id": "gold_collarbone_chain__tag_000",
+          "text": "thin delicate gold chain resting on collarbone",
+          "facts": {
+            "semantic_role": "selector",
+            "prop_usage": "worn"
+          }
+        },
+        {
+          "id": "gold_collarbone_chain__tag_001",
+          "text": "pendant in collarbone hollow",
+          "facts": {
+            "semantic_role": "selector",
+            "prop_usage": "worn"
+          }
+        },
+        {
+          "id": "gold_collarbone_chain__ext_chain",
+          "text": "chain necklace",
+          "facts": {
+            "prop_usage": "worn",
+            "accessory_facts": {
+              "body_part": "neck",
+              "material": "chain"
+            },
+            "governance_metadata": {}
+          }
+        }
+      ]
+    },
+    {
+      "id": "pearl_necklace",
+      "name_zh": "珍珠项链 (Pearl Strand Necklace)",
+      "tags": [
+        {
+          "id": "pearl_necklace__tag_000",
+          "text": "single strand white pearl necklace",
+          "facts": {
+            "semantic_role": "selector",
+            "prop_usage": "worn"
+          }
+        },
+        {
+          "id": "pearl_necklace__tag_001",
+          "text": "pearls resting on skin",
+          "facts": {
+            "semantic_role": "selector",
+            "prop_usage": "worn"
+          }
+        },
+        {
+          "id": "pearl_necklace__ext_pearl_necklace",
+          "text": "pearl necklace",
+          "facts": {
+            "prop_usage": "worn",
+            "accessory_facts": {
+              "body_part": "neck",
+              "material": "pearl"
+            },
+            "governance_metadata": {}
+          }
+        }
+      ]
+    },
+    {
+      "id": "body_chain",
+      "name_zh": "性感身体链/乳链 (Body Chain Harness)",
+      "tags": [
+        {
+          "id": "body_chain__tag_000",
+          "text": "delicate gold body chain across bare chest and waist",
+          "facts": {
+            "semantic_role": "selector",
+            "prop_usage": "worn"
+          }
+        },
+        {
+          "id": "body_chain__tag_001",
+          "text": "cross-torso body jewelry",
+          "facts": {
+            "semantic_role": "selector",
+            "prop_usage": "worn"
+          }
+        }
+      ]
+    },
+    {
+      "id": "nipple_rings",
+      "name_zh": "乳环饰品 (Nipple Piercing Jewelry)",
+      "tags": [
+        {
+          "id": "nipple_rings__tag_000",
+          "text": "small barbell nipple rings",
+          "facts": {
+            "semantic_role": "selector",
+            "prop_usage": "worn"
+          }
+        },
+        {
+          "id": "nipple_rings__tag_001",
+          "text": "silver piercing flush against areola",
+          "facts": {
+            "semantic_role": "selector",
+            "prop_usage": "worn"
+          }
+        }
+      ]
+    },
+    {
+      "id": "ankle_bracelet",
+      "name_zh": "细金脚链 (Delicate Anklet)",
+      "tags": [
+        {
+          "id": "ankle_bracelet__tag_000",
+          "text": "thin gold anklet around bare ankle",
+          "facts": {
+            "semantic_role": "selector",
+            "prop_usage": "worn"
+          }
+        },
+        {
+          "id": "ankle_bracelet__tag_001",
+          "text": "tiny dangling charm on ankle",
+          "facts": {
+            "semantic_role": "selector",
+            "prop_usage": "worn"
+          }
+        }
+      ]
+    },
+    {
+      "id": "neck_ribbon",
+      "name_zh": "丝带颈带 (Silk Neck Ribbon)",
+      "tags": [
+        {
+          "id": "neck_ribbon__tag_000",
+          "text": "neck ribbon",
+          "facts": {
+            "semantic_role": "selector",
+            "prop_usage": "worn",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "neck_ribbon__tag_001",
+          "text": "tied silk neck ribbon",
+          "facts": {
+            "semantic_role": "selector",
+            "prop_usage": "worn",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "neck_ribbon__ext_lace",
+          "text": "lace ribbon choker",
+          "facts": {
+            "prop_usage": "worn",
+            "accessory_facts": {
+              "body_part": "neck",
+              "material": "lace",
+              "dynamic_slots": [
+                {
+                  "slot_name": "color",
+                  "slot_injection_mode": "prefix_replace_attribute",
+                  "branches": [
+                    {
+                      "weight": 1,
+                      "type": "wildcard_reference",
+                      "target": "09_style/colors"
+                    },
+                    {
+                      "weight": 4,
+                      "type": "literal",
+                      "value": "black"
+                    }
+                  ]
+                }
+              ]
+            },
+            "governance_metadata": {
+              "base_tag_text": "lace ribbon choker"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "hooded_cloak",
+      "name_zh": "连帽防风斗篷 (Hooded Cloak)",
+      "tags": [
+        {
+          "id": "hooded_cloak__tag_000",
+          "text": "hooded cloak",
+          "facts": {
+            "garment_topologies": [
+              "outerwear"
+            ],
+            "prop_usage": "worn",
+            "semantic_role": "selector",
+            "visible_regions": [
+              "lower_body",
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "hooded_cloak__tag_001",
+          "text": "cape hood draped over shoulders",
+          "facts": {
+            "garment_topologies": [
+              "outerwear"
+            ],
+            "prop_usage": "worn",
+            "semantic_role": "selector",
+            "visible_regions": [
+              "lower_body",
+              "upper_body"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "cloak",
+      "name_zh": "无帽长披风 (Long Cloak / Cape)",
+      "tags": [
+        {
+          "id": "cloak__tag_000",
+          "text": "cloak",
+          "facts": {
+            "garment_topologies": [
+              "outerwear"
+            ],
+            "prop_usage": "worn",
+            "semantic_role": "selector",
+            "visible_regions": [
+              "lower_body",
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "cloak__tag_001",
+          "text": "long flowing cape",
+          "facts": {
+            "garment_topologies": [
+              "outerwear"
+            ],
+            "prop_usage": "worn",
+            "semantic_role": "selector",
+            "visible_regions": [
+              "lower_body",
+              "upper_body"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "poncho",
+      "name_zh": "套头小披风 (Poncho)",
+      "tags": [
+        {
+          "id": "poncho__tag_000",
+          "text": "poncho",
+          "facts": {
+            "garment_topologies": [
+              "outerwear"
+            ],
+            "prop_usage": "worn",
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "poncho__tag_001",
+          "text": "warm knitted poncho",
+          "facts": {
+            "garment_topologies": [
+              "outerwear"
+            ],
+            "prop_usage": "worn",
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "waist_belt",
+      "name_zh": "基础皮革腰带 (Leather Waist Belt)",
+      "tags": [
+        {
+          "id": "waist_belt__tag_000",
+          "text": "leather waist belt",
+          "facts": {
+            "prop_usage": "worn",
+            "semantic_role": "selector",
+            "visible_regions": [
+              "lower_body",
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "waist_belt__tag_001",
+          "text": "belt around waist",
+          "facts": {
+            "prop_usage": "worn",
+            "semantic_role": "selector",
+            "visible_regions": [
+              "lower_body",
+              "upper_body"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "winter_scarf",
+      "name_zh": "针织保暖围巾 (Winter Scarf)",
+      "tags": [
+        {
+          "id": "winter_scarf__tag_000",
+          "text": "winter scarf",
+          "facts": {
+            "prop_usage": "worn",
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "winter_scarf__tag_001",
+          "text": "knitted warm scarf wrapped around neck",
+          "facts": {
+            "prop_usage": "worn",
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "fur_shawl",
+      "name_zh": "保暖皮草披肩 (Fur Shawl)",
+      "tags": [
+        {
+          "id": "fur_shawl__tag_000",
+          "text": "fur shawl",
+          "facts": {
+            "garment_topologies": [
+              "outerwear"
+            ],
+            "prop_usage": "worn",
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        },
+        {
+          "id": "fur_shawl__tag_001",
+          "text": "luxurious fur shoulder wrap",
+          "facts": {
+            "garment_topologies": [
+              "outerwear"
+            ],
+            "prop_usage": "worn",
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "ext_aw_jewelry_pearl_drop_earrings",
+      "name_zh": "优雅水滴珍珠耳坠 (Pearl Drop Earrings)",
+      "tags": [
+        {
+          "id": "ext_aw_jewelry_pearl_drop_earrings__tag_000",
+          "text": "elegant pearl drop earrings",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "face"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "ext_aw_jewelry_silver_hoop_earrings",
+      "name_zh": "极简纯银圈形耳环 (Silver Hoop Earrings)",
+      "tags": [
+        {
+          "id": "ext_aw_jewelry_silver_hoop_earrings__tag_000",
+          "text": "minimalist silver hoop earrings",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "face"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "ext_aw_headwear_silk_scrunchie",
+      "name_zh": "法式真丝大肠发圈 (Silk Scrunchie)",
+      "tags": [
+        {
+          "id": "ext_aw_headwear_silk_scrunchie__tag_000",
+          "text": "silk fabric scrunchie holding hair",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "face"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "acc_necklace_general",
+      "name_zh": "通用项链 (Necklaces)",
+      "tags": [
+        {
+          "id": "category_pool__necklaces",
+          "text": "necklace",
+          "facts": {
+            "prop_usage": "worn",
+            "accessory_facts": {
+              "body_part": "neck"
+            },
+            "governance_metadata": {
+              "pool_reference": "10_accessories/necklaces",
+              "selection_strategy": "random_weighted_sample",
+              "is_pool_selector": true
+            }
+          }
+        },
+        {
+          "id": "acc_necklace_general__ext_bead",
+          "text": "bead necklace",
+          "facts": {
+            "prop_usage": "worn",
+            "lighting_facts": {
+              "style": "bead"
+            },
+            "accessory_facts": {
+              "body_part": "neck"
+            },
+            "governance_metadata": {}
+          }
+        },
+        {
+          "id": "acc_necklace_general__ext_cross",
+          "text": "cross necklace",
+          "facts": {
+            "prop_usage": "worn",
+            "accessory_facts": {
+              "pendant": "cross",
+              "body_part": "neck"
+            },
+            "governance_metadata": {}
+          }
+        },
+        {
+          "id": "acc_necklace_general__ext_heart",
+          "text": "heart necklace",
+          "facts": {
+            "prop_usage": "worn",
+            "accessory_facts": {
+              "pendant": "heart",
+              "body_part": "neck"
+            },
+            "governance_metadata": {}
+          }
+        },
+        {
+          "id": "acc_necklace_general__ext_key",
+          "text": "key necklace",
+          "facts": {
+            "prop_usage": "worn",
+            "accessory_facts": {
+              "pendant": "key",
+              "body_part": "neck"
+            },
+            "governance_metadata": {}
+          }
+        },
+        {
+          "id": "acc_necklace_general__ext_lock",
+          "text": "lock necklace",
+          "facts": {
+            "prop_usage": "worn",
+            "accessory_facts": {
+              "pendant": "lock",
+              "body_part": "neck"
+            },
+            "governance_metadata": {}
+          }
+        },
+        {
+          "id": "acc_necklace_general__ext_magatama",
+          "text": "magatama necklace",
+          "facts": {
+            "prop_usage": "worn",
+            "accessory_facts": {
+              "pendant": "magatama",
+              "body_part": "neck"
+            },
+            "governance_metadata": {}
+          }
+        },
+        {
+          "id": "acc_necklace_general__ext_ring",
+          "text": "ring necklace",
+          "facts": {
+            "prop_usage": "worn",
+            "accessory_facts": {
+              "pendant": "ring",
+              "body_part": "neck"
+            },
+            "governance_metadata": {}
+          }
+        },
+        {
+          "id": "acc_necklace_general__ext_star",
+          "text": "star necklace",
+          "facts": {
+            "prop_usage": "worn",
+            "accessory_facts": {
+              "pendant": "star",
+              "body_part": "neck"
+            },
+            "governance_metadata": {}
+          }
+        },
+        {
+          "id": "acc_necklace_general__ext_tooth",
+          "text": "tooth necklace",
+          "facts": {
+            "prop_usage": "worn",
+            "accessory_facts": {
+              "pendant": "tooth",
+              "body_part": "neck"
+            },
+            "governance_metadata": {}
+          }
+        }
+      ]
+    },
+    {
+      "id": "acc_bowtie",
+      "name_zh": "领结蝴蝶结 (Bowtie)",
+      "tags": [
+        {
+          "id": "acc_bowtie__tag_000",
+          "text": "bowtie",
+          "facts": {
+            "prop_usage": "worn",
+            "accessory_facts": {
+              "body_part": "neck",
+              "dynamic_slots": [
+                {
+                  "slot_name": "color",
+                  "slot_injection_mode": "prefix_replace_attribute",
+                  "branches": [
+                    {
+                      "weight": 1,
+                      "type": "wildcard_reference",
+                      "target": "09_style/colors"
+                    }
+                  ]
+                }
+              ]
+            },
+            "governance_metadata": {
+              "base_tag_text": "bowtie"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "acc_necktie",
+      "name_zh": "领带制服领饰 (Necktie)",
+      "tags": [
+        {
+          "id": "acc_necktie__tag_000",
+          "text": "necktie",
+          "facts": {
+            "prop_usage": "worn",
+            "accessory_facts": {
+              "body_part": "neck",
+              "dynamic_slots": [
+                {
+                  "slot_name": "color",
+                  "slot_injection_mode": "prefix_replace_attribute",
+                  "branches": [
+                    {
+                      "weight": 1,
+                      "type": "wildcard_reference",
+                      "target": "09_style/colors"
+                    }
+                  ]
+                }
+              ]
+            },
+            "governance_metadata": {
+              "base_tag_text": "necktie"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "combo_necklace_choker",
+      "name_zh": "项圈项链叠戴组合 (Choker and Necklace Combo)",
+      "tags": [
+        {
+          "id": "combo_necklace_choker__tag_000",
+          "text": "necklace and choker combo",
+          "facts": {
+            "prop_usage": "worn",
+            "accessory_facts": {
+              "body_part": "neck"
+            },
+            "governance_metadata": {
+              "is_ensemble_combo": true,
+              "is_container_description": true,
+              "combo_id": "combo_necklace_choker",
+              "source_entity_id": "SRC_ACC_06897",
+              "mandatory_components": [
+                {
+                  "component_id": "acc_necklace_general",
+                  "tag_id": "category_pool__necklaces",
+                  "pool_reference": "10_accessories/necklaces"
+                },
+                {
+                  "component_id": "leather_choker",
+                  "tag_id": "category_pool__chokers",
+                  "pool_reference": "10_accessories/chokers"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

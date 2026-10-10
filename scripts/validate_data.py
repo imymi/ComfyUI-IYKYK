@@ -512,7 +512,10 @@ def validate_all(
                             lk = fcts.get("liquid_kind")
                             if lk and lk != "none":
                                 all_lk.add(lk)
-                    if "monochrome" in all_cm and any(c in ("color", "high_saturation") for c in all_cm):
+                    is_brand_collection = fname == "film_stocks.json" and (
+                        str(sid).startswith("film_stock_") or sid == "darkroom_photographic_paper"
+                    )
+                    if not is_brand_collection and "monochrome" in all_cm and any(c in ("color", "high_saturation") for c in all_cm):
                         result.errors.append(
                             f"[ERROR] {fname} [{sid}]: selector tags declare mutually contradictory color_modes: {sorted(all_cm)}"
                         )

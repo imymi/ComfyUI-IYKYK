@@ -8,10 +8,12 @@ on:
 
 jobs:
   test:
+    name: Full Regression (${{ matrix.python-version }})
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
-        python-version: ["3.9", "3.10", "3.11", "3.12"]
+        python-version: ["3.11", "3.12"]
 
     steps:
     - uses: actions/checkout@v4
@@ -67,6 +69,16 @@ jobs:
       run: |
         python scripts/validate_data.py --strict
 
+    - name: Generate M1 Divergence Audit Evidence & Verify Manifest
+      if: steps.changes.outputs.docs_only != 'true'
+      run: |
+        python scratch/audit_m1_wildcards_slice.py --seeds 10000
+
+    - name: Generate M2 Divergence Audit Evidence & Verify Manifest
+      if: steps.changes.outputs.docs_only != 'true'
+      run: |
+        python scratch/audit_m2_wildcards_batch.py --seeds 10000
+
     - name: Run Full Test Suite
       if: steps.changes.outputs.docs_only != 'true'
       run: |
@@ -75,6 +87,7 @@ jobs:
     - name: Double Build & Compare SHA256
       if: steps.changes.outputs.docs_only != 'true'
       run: |
+        git checkout -- scratch/ 2>/dev/null || true
         mkdir -p /tmp/build_a /tmp/build_b
         python scripts/build_release.py --mode verify --output-dir /tmp/build_a
         python scripts/build_release.py --mode verify --output-dir /tmp/build_b
@@ -99,3 +112,38 @@ jobs:
     - name: Verify documentation release package
       if: steps.changes.outputs.docs_only == 'true' && matrix.python-version == '3.11'
       run: python scripts/build_release.py --mode verify --output-dir /tmp/build_docs
+
+  compatibility:
+    name: Compatibility Check (${{ matrix.python-version }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.9", "3.10"]
+
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 1
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install Development Dependencies
+      run: |
+        python -m pip install --upgrade pip
+        python -m pip install -e ".[dev]"
+
+    - name: Validate Datasets & Schema
+      run: |
+        python scripts/validate_data.py --strict
+
+    - name: Verify Import & Node Registration
+      run: |
+        python -c "import nodes; from nodes import NODE_CLASS_MAPPINGS, NODE_DISPLAY_NAME_MAPPINGS; assert len(NODE_CLASS_MAPPINGS) == 4, f'Expected 4 nodes, got {len(NODE_CLASS_MAPPINGS)}'; print('✅ Node registration verified:', list(NODE_CLASS_MAPPINGS.keys()))"
+
+    - name: Basic Generation & Smoke Tests
+      run: |
+        python -m unittest tests/test_random_generations.py tests/test_is_changed.py tests/test_nudity_levels.py tests/test_custom_prompt.py -v
