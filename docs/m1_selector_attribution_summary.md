@@ -11,21 +11,21 @@
 
 | 采样槽位 (Slot) | 注册选择器总数 | 分配特定情境数 (assigned_contexts) | 仅保留全局探索数 (intentional_global_only) | 待审核数 (pending_review) | 审核覆盖率 |
 |---|---|---|---|---|---|
-| [`clothing`](file:///Users/jacobyang/Hermes/iykyk-affinity-override/docs/m1_selector_attribution_ledger.tsv) | 165 | 49 (29.7%) | 116 (70.3%) | 0 (0.0%) | **100.0%** |
+| [`clothing`](file:///Users/jacobyang/Hermes/iykyk-affinity-override/docs/m1_selector_attribution_ledger.tsv) | 165 | 114 (69.1%) | 51 (30.9%) | 0 (0.0%) | **100.0%** |
 | [`character`](file:///Users/jacobyang/Hermes/iykyk-affinity-override/docs/m1_selector_attribution_ledger.tsv) | 11 | 10 (90.9%) | 1 (9.1%) | 0 (0.0%) | **100.0%** |
 | [`makeup`](file:///Users/jacobyang/Hermes/iykyk-affinity-override/docs/m1_selector_attribution_ledger.tsv) | 17 | 17 (100.0%) | 0 (0.0%) | 0 (0.0%) | **100.0%** |
-| [`hairstyle`](file:///Users/jacobyang/Hermes/iykyk-affinity-override/docs/m1_selector_attribution_ledger.tsv) | 57 | 20 (35.1%) | 37 (64.9%) | 0 (0.0%) | **100.0%** |
-| [`jewelry`](file:///Users/jacobyang/Hermes/iykyk-affinity-override/docs/m1_selector_attribution_ledger.tsv) | 29 | 23 (79.3%) | 6 (20.7%) | 0 (0.0%) | **100.0%** |
+| [`hairstyle`](file:///Users/jacobyang/Hermes/iykyk-affinity-override/docs/m1_selector_attribution_ledger.tsv) | 57 | 26 (45.6%) | 31 (54.4%) | 0 (0.0%) | **100.0%** |
+| [`jewelry`](file:///Users/jacobyang/Hermes/iykyk-affinity-override/docs/m1_selector_attribution_ledger.tsv) | 29 | 26 (89.7%) | 3 (10.3%) | 0 (0.0%) | **100.0%** |
 | [`props`](file:///Users/jacobyang/Hermes/iykyk-affinity-override/docs/m1_selector_attribution_ledger.tsv) | 23 | 22 (95.7%) | 1 (4.3%) | 0 (0.0%) | **100.0%** |
 | [`tattoo`](file:///Users/jacobyang/Hermes/iykyk-affinity-override/docs/m1_selector_attribution_ledger.tsv) | 12 | 11 (91.7%) | 1 (8.3%) | 0 (0.0%) | **100.0%** |
 | [`liquids`](file:///Users/jacobyang/Hermes/iykyk-affinity-override/docs/m1_selector_attribution_ledger.tsv) | 7 | 6 (85.7%) | 1 (14.3%) | 0 (0.0%) | **100.0%** |
 | [`pose`](file:///Users/jacobyang/Hermes/iykyk-affinity-override/docs/m1_selector_attribution_ledger.tsv) | 15 | 10 (66.7%) | 5 (33.3%) | 0 (0.0%) | **100.0%** |
-| [`expression`](file:///Users/jacobyang/Hermes/iykyk-affinity-override/docs/m1_selector_attribution_ledger.tsv) | 31 | 17 (54.8%) | 14 (45.2%) | 0 (0.0%) | **100.0%** |
-| [`lighting`](file:///Users/jacobyang/Hermes/iykyk-affinity-override/docs/m1_selector_attribution_ledger.tsv) | 59 | 28 (47.5%) | 31 (52.5%) | 0 (0.0%) | **100.0%** |
-| [`film`](file:///Users/jacobyang/Hermes/iykyk-affinity-override/docs/m1_selector_attribution_ledger.tsv) | 39 | 11 (28.2%) | 28 (71.8%) | 0 (0.0%) | **100.0%** |
+| [`expression`](file:///Users/jacobyang/Hermes/iykyk-affinity-override/docs/m1_selector_attribution_ledger.tsv) | 31 | 19 (61.3%) | 12 (38.7%) | 0 (0.0%) | **100.0%** |
+| [`lighting`](file:///Users/jacobyang/Hermes/iykyk-affinity-override/docs/m1_selector_attribution_ledger.tsv) | 59 | 39 (66.1%) | 20 (33.9%) | 0 (0.0%) | **100.0%** |
+| [`film`](file:///Users/jacobyang/Hermes/iykyk-affinity-override/docs/m1_selector_attribution_ledger.tsv) | 39 | 19 (48.7%) | 20 (51.3%) | 0 (0.0%) | **100.0%** |
 | [`shot_type`](file:///Users/jacobyang/Hermes/iykyk-affinity-override/docs/m1_selector_attribution_ledger.tsv) | 16 | 7 (43.8%) | 9 (56.2%) | 0 (0.0%) | **100.0%** |
 | [`camera_angle`](file:///Users/jacobyang/Hermes/iykyk-affinity-override/docs/m1_selector_attribution_ledger.tsv) | 15 | 10 (66.7%) | 5 (33.3%) | 0 (0.0%) | **100.0%** |
-| **合计 (Total)** | **496** | **241 (48.6%)** | **255 (51.4%)** | **0 (0.0%)** | **100.0%** |
+| **合计 (Total)** | **496** | **336 (67.7%)** | **160 (32.3%)** | **0 (0.0%)** | **100.0%** |
 
 ---
 
@@ -37,9 +37,9 @@
    - **弱关联 (Weight 1)**：条目具备弱关联或过渡特征，在部分混合情境中可作为低频辅助采样。
    - **全局探索池 (Weight 0 / 15% 全局池)**：通用中性款式（如基础白衬衫、普通纯色T恤、中性影棚光照、常规平视机位），不进入特定情境加权候选池，保留全局 $G_s$ 探索机会。
 
-2. **generic 情境中性抽样确定语义**：
-   - 依据审核方要求，14 个槽位在 `generic` 情境下统一废除原先 4 候选的小集合限制，全部配置为 `mode="neutral"`。
-   - **确定语义**：$C(generic, s) = G_s$。在未识别情境或通用场景下，各槽位对全部合法候选做中性均匀无偏置抽样，绝不提前收敛至局部子集。
+2. **中性无偏置抽样规范**：
+   - **generic 情境**：14 个槽位在 `generic` 情境下统一废除原先 4 候选的小集合限制，全部配置为 `mode="neutral"`，严格定义为 $C(generic, s) = G_s$。
+   - **规范情境 tattoo**：`school`, `office`, `medical`, `dining` 4 个槽位依据行业与教育规范，设计为 `mode="neutral"`，杜绝不合常理的纹身强行加权。
 
 ---
 

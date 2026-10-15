@@ -110,7 +110,7 @@ PYTHONPATH=. /Users/jacobyang/Hermes/.venv/bin/python3 -m unittest tests/test_m1
    - **验证内容**：直接核验 [`tests/fixtures/m1_counterexamples.json`](file:///Users/jacobyang/Hermes/iykyk-affinity-override/tests/fixtures/m1_counterexamples.json) 夹具的 `schema_version="1.0"`，且完整登记了 `CE-HAND-01` 至 `CE-HAND-03`、`CE-LIGHT-01` 至 `CE-LIGHT-02`、`CE-OVERRIDE-01` 至 `CE-OVERRIDE-03` 等 8 项典型反例与覆盖规约。
 2. `test_02_baseline_reproduction_ce_hand_01_dual_path`（`CE-HAND-01` 自由文本与结构化事实双路径复现）：
    - **判定分类**：**基线缺陷已复现 (Baseline Defect Reproduced)**
-   - **自由文本路径**：消费 `inputs.free_text_path` (`"wearing wristwatch, holding camera"`)，基线引擎未识别结构化事实，相机表面得以保留（`retained`）。
+   - **自由文本路径**：消费 `inputs.free_text_path`（单手托腮、另一手持相机：`"sitting, hand on cheek, looking at viewer"` + `"holding compact camera with other hand"`），基线引擎未识别结构化事实，相机表面得以保留（`retained`）。
    - **结构化事实路径**：消费 `inputs.structured_atom_path`（携带 `hand_state="one_busy"` 姿态原子与 `prop_usage="handheld"` 相机原子），基线引擎 `pose_hand_occupation` 规则将其误判为冲突硬删除（`reason_code="busy_hands_remove_props"`），**确定性复现基线过度约束缺陷**。
 3. `test_03_baseline_reproduction_ce_hand_02_dual_path`（`CE-HAND-02` 自由文本与结构化事实双路径复现）：
    - **判定分类**：**基线缺陷已复现 (Baseline Defect Reproduced)**
