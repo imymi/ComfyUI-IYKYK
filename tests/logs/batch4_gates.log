@@ -1,0 +1,56 @@
+...........fatal: not a git repository (or any of the parent directories): .git
+fatal: not a git repository (or any of the parent directories): .git
+fatal: not a git repository (or any of the parent directories): .git
+......................../Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/zipfile.py:1505: UserWarning: Duplicate name: 'ComfyUI-IYKYK/README.md'
+  return self._open_to_write(zinfo, force_zip64=force_zip64)
+................../Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/zipfile.py:1505: UserWarning: Duplicate name: 'ComfyUI-IYKYK/README.md'
+  return self._open_to_write(zinfo, force_zip64=force_zip64)
+...........................................................................
+----------------------------------------------------------------------
+Ran 128 tests in 1847.060s
+
+OK
+[*] Exporting git baseline c74084d to /var/folders/dj/9s4rfrbn0yn59sv303mnbg480000gn/T/iykyk_m1_audit_ghv6zxuq/scratch/baseline_c74084d...
+[*] Exporting git baseline c74084d to /var/folders/dj/9s4rfrbn0yn59sv303mnbg480000gn/T/iykyk_m1_audit_ghv6zxuq/scratch/baseline_c74084d...
+[*] Setting up controlled reference environment (c74084d + 6 audited M1 samples)...
+[*] Exporting git baseline c74084d to /var/folders/dj/9s4rfrbn0yn59sv303mnbg480000gn/T/iykyk_m1_audit_ghv6zxuq/scratch/controlled_ref_c74084d_m1...
+[*] Exporting git baseline 6da94cb to /var/folders/dj/9s4rfrbn0yn59sv303mnbg480000gn/T/iykyk_m1_audit_ghv6zxuq/scratch/target_6da94cb_m1...
+[*] Loaded authoritative resolver rules from /var/folders/dj/9s4rfrbn0yn59sv303mnbg480000gn/T/iykyk_m1_audit_ghv6zxuq/scratch/target_6da94cb_m1/data...
+[*] Loaded universal catalog lookup from /var/folders/dj/9s4rfrbn0yn59sv303mnbg480000gn/T/iykyk_m1_audit_ghv6zxuq/scratch/target_6da94cb_m1/data...
+[*] Running baseline (c74084d) generation for 10000 seeds...
+    Baseline batch hash: ab5a633cfb3fde70d9a6c629ee65a540955d87ee143e66570d780743246cab89
+[*] Running controlled reference generation for 10000 seeds...
+    Controlled ref batch hash: aa7581bc2304f6f75530d95ab4e1b75e7e1101720b1dfaf14c2a1c328fcd1139
+[+] Controlled reference cache saved: /var/folders/dj/9s4rfrbn0yn59sv303mnbg480000gn/T/iykyk_m1_audit_ghv6zxuq/scratch/controlled_ref_data_10k.json.gz
+[*] Running fixed M1 target snapshot (unknown) generation for 10000 seeds...
+    Target batch hash:   aa7581bc2304f6f75530d95ab4e1b75e7e1101720b1dfaf14c2a1c328fcd1139
+[*] Auditing seed divergences with atomic causal verification & independent controlled reference replay...
+[*] M1 Audit complete in 392.3s.
+    Total seeds:       10000
+    Identical seeds:   5201 (52.01%)
+    Divergent seeds:   4799 (47.99%)
+    Unexplained seeds: 0 (Gate required: == 0)
+    Category Breakdown:
+      - PRNG_CANDIDATE_REPLACED: 3749 (78.12%)
+      - PRNG_CANDIDATE_SHIFT: 3498 (72.89%)
+      - NEW_HAIRSTYLE_SAMPLED: 182 (3.79%)
+      - NEW_PROP_SAMPLED: 162 (3.38%)
+      - RESOLVED_BY_RULE: 93 (1.94%)
+[+] Full audit archive saved deterministically to: /var/folders/dj/9s4rfrbn0yn59sv303mnbg480000gn/T/iykyk_m1_audit_ghv6zxuq/archive.json.gz (SHA-256: e6c6f526a9fecc43cd9bc64fd943b153e1f7b42df2412037a88a26aa19e89cf7)
+[+] Markdown report saved to: /var/folders/dj/9s4rfrbn0yn59sv303mnbg480000gn/T/iykyk_m1_audit_ghv6zxuq/report.md
+[+] Manifest saved to: /var/folders/dj/9s4rfrbn0yn59sv303mnbg480000gn/T/iykyk_m1_audit_ghv6zxuq/manifest.json
+Data Validation Summary: 20 runtime files checked (Engine: jsonschema-draft7).
+  [WARN] Simulated non-blocking warning for gate testing
+
+❌ Validation FAILED due to --zero-warnings gate: 0 errors (1 warnings).
+Data Validation Summary: 20 runtime files checked (Engine: jsonschema-draft7).
+  [WARN] Simulated non-blocking warning for gate testing
+
+✅ Validation PASSED with 0 errors (1 warnings).
+   ✅ All 25/25 named generation mutations passed Fail-Closed verification.
+🧪 Step 3: Running isolated smoke test on generated package...
+
+Traceback (most recent call last):
+  File "<string>", line 160, in <module>
+ModuleNotFoundError: import of jsonschema halted; None in sys.modules
+

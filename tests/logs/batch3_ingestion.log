@@ -1,0 +1,50 @@
+.........................................................................................../Users/jacobyang/Hermes/iykyk-affinity-override/tests/test_m4_batch1_ingestion.py:92: DeprecationWarning: jsonschema.RefResolver is deprecated as of v4.18.0, in favor of the https://github.com/python-jsonschema/referencing library, which provides more compliant referencing behavior as well as more flexible APIs for customization. A future release will remove RefResolver. Please file a feature request (on referencing) if you are missing an API for the kind of customization you need.
+  resolver = jsonschema.RefResolver.from_schema(schema)
+........../Users/jacobyang/Hermes/iykyk-affinity-override/tests/test_m4_batch2_ingestion.py:91: DeprecationWarning: jsonschema.RefResolver is deprecated as of v4.18.0, in favor of the https://github.com/python-jsonschema/referencing library, which provides more compliant referencing behavior as well as more flexible APIs for customization. A future release will remove RefResolver. Please file a feature request (on referencing) if you are missing an API for the kind of customization you need.
+  resolver = jsonschema.RefResolver.from_schema(schema)
+........../Users/jacobyang/Hermes/iykyk-affinity-override/tests/test_m4_batch3_ingestion.py:109: DeprecationWarning: jsonschema.RefResolver is deprecated as of v4.18.0, in favor of the https://github.com/python-jsonschema/referencing library, which provides more compliant referencing behavior as well as more flexible APIs for customization. A future release will remove RefResolver. Please file a feature request (on referencing) if you are missing an API for the kind of customization you need.
+  resolver = jsonschema.RefResolver.from_schema(schema)
+........./Users/jacobyang/Hermes/iykyk-affinity-override/tests/test_m4_batch4_ingestion.py:111: DeprecationWarning: jsonschema.RefResolver is deprecated as of v4.18.0, in favor of the https://github.com/python-jsonschema/referencing library, which provides more compliant referencing behavior as well as more flexible APIs for customization. A future release will remove RefResolver. Please file a feature request (on referencing) if you are missing an API for the kind of customization you need.
+  resolver = jsonschema.RefResolver.from_schema(schema)
+.........../Users/jacobyang/Hermes/iykyk-affinity-override/tests/test_m4_batch5_ingestion.py:104: DeprecationWarning: jsonschema.RefResolver is deprecated as of v4.18.0, in favor of the https://github.com/python-jsonschema/referencing library, which provides more compliant referencing behavior as well as more flexible APIs for customization. A future release will remove RefResolver. Please file a feature request (on referencing) if you are missing an API for the kind of customization you need.
+  resolver = jsonschema.RefResolver.from_schema(schema)
+.........../Users/jacobyang/Hermes/iykyk-affinity-override/tests/test_m4_batch6_ingestion.py:104: DeprecationWarning: jsonschema.RefResolver is deprecated as of v4.18.0, in favor of the https://github.com/python-jsonschema/referencing library, which provides more compliant referencing behavior as well as more flexible APIs for customization. A future release will remove RefResolver. Please file a feature request (on referencing) if you are missing an API for the kind of customization you need.
+  resolver = jsonschema.RefResolver.from_schema(schema)
+.........
+----------------------------------------------------------------------
+Ran 151 tests in 1343.665s
+
+OK
+[*] Audit archive missing or unverified at /Users/jacobyang/Hermes/iykyk-affinity-override/scratch/audit_m1_evidence.json.gz. Executing clean reproducible audit generation...
+[*] Exporting git baseline c74084d to /Users/jacobyang/Hermes/iykyk-affinity-override/scratch/baseline_c74084d...
+[*] Setting up controlled reference environment (c74084d + 6 audited M1 samples)...
+[*] Loaded authoritative resolver rules from /Users/jacobyang/Hermes/iykyk-affinity-override/scratch/target_6da94cb_m1/data...
+[*] Loaded universal catalog lookup from /Users/jacobyang/Hermes/iykyk-affinity-override/scratch/target_6da94cb_m1/data...
+[*] Running baseline (c74084d) generation for 10000 seeds...
+    Baseline batch hash: ab5a633cfb3fde70d9a6c629ee65a540955d87ee143e66570d780743246cab89
+[*] Running controlled reference generation for 10000 seeds...
+    Controlled ref batch hash: aa7581bc2304f6f75530d95ab4e1b75e7e1101720b1dfaf14c2a1c328fcd1139
+[+] Controlled reference cache saved: /Users/jacobyang/Hermes/iykyk-affinity-override/scratch/controlled_ref_data_10k.json.gz
+[*] Running fixed M1 target snapshot (fb29680) generation for 10000 seeds...
+    Target batch hash:   aa7581bc2304f6f75530d95ab4e1b75e7e1101720b1dfaf14c2a1c328fcd1139
+[*] Auditing seed divergences with atomic causal verification & independent controlled reference replay...
+[*] M1 Audit complete in 407.3s.
+    Total seeds:       10000
+    Identical seeds:   5201 (52.01%)
+    Divergent seeds:   4799 (47.99%)
+    Unexplained seeds: 0 (Gate required: == 0)
+    Category Breakdown:
+      - PRNG_CANDIDATE_REPLACED: 3749 (78.12%)
+      - PRNG_CANDIDATE_SHIFT: 3498 (72.89%)
+      - NEW_HAIRSTYLE_SAMPLED: 182 (3.79%)
+      - NEW_PROP_SAMPLED: 162 (3.38%)
+      - RESOLVED_BY_RULE: 93 (1.94%)
+[+] Full audit archive saved deterministically to: /Users/jacobyang/Hermes/iykyk-affinity-override/scratch/audit_m1_evidence.json.gz (SHA-256: 034b3a1de4d45029e6e78d2b2562818a6be08651d185e5bad3887b7d01fa3d7a)
+[+] Markdown report saved to: /Users/jacobyang/Hermes/iykyk-affinity-override/scratch/audit_m1_reproduced_report.md
+[+] Manifest saved to: /Users/jacobyang/Hermes/iykyk-affinity-override/scratch/audit_m1_reproduced_manifest.json
+[*] Exporting git baseline 6da94cb to /var/folders/dj/9s4rfrbn0yn59sv303mnbg480000gn/T/tmp0ocqobt5/target_6da94cb_m1...
+[*] Exporting git baseline c74084d to /var/folders/dj/9s4rfrbn0yn59sv303mnbg480000gn/T/tmp0ocqobt5/controlled_ref_c74084d_m1...
+[+] Controlled reference cache saved: /var/folders/dj/9s4rfrbn0yn59sv303mnbg480000gn/T/tmp0ocqobt5/controlled_ref_data_1.json.gz
+[*] Exporting git baseline 6da94cb to /var/folders/dj/9s4rfrbn0yn59sv303mnbg480000gn/T/tmplhx1mof_/target_6da94cb_m1...
+[*] Exporting git baseline c74084d to /var/folders/dj/9s4rfrbn0yn59sv303mnbg480000gn/T/tmplhx1mof_/controlled_ref_c74084d_m1...
+[+] Controlled reference cache saved: /var/folders/dj/9s4rfrbn0yn59sv303mnbg480000gn/T/tmplhx1mof_/controlled_ref_data_1.json.gz

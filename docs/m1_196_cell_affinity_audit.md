@@ -1,104 +1,222 @@
-# ComfyUI-IYKYK 196 单元情境亲和矩阵审核与治理方案 (M1-D2 修订版)
+# ComfyUI-IYKYK M1 196 单元情境亲和矩阵完整审核与处置表 (M1-D2)
 
-- **当前矩阵规约**：14 个情境 (Context) × 14 个采样槽位 (Slot)，共 196 个配置单元。
-- **配置基线位置**：[`data/context_affinity.json`](file:///Users/jacobyang/Hermes/iykyk-affinity-override/data/context_affinity.json)
-- **核心计算实现**：[`lib/context_affinity.py`](file:///Users/jacobyang/Hermes/iykyk-affinity-override/lib/context_affinity.py#L27)
-- **真实注册选择器库**：14 槽位共计 **496 个选择器**（经 `load_slot_id_registries` 严谨加载）。
-- **情境范围 (14)**：`school`, `office`, `medical`, `onsen_bath`, `bondage_sm`, `traditional`, `nightlife`, `domestic`, `transit`, `outdoor`, `dining`, `adult`, `special`, `generic`。
-- **采样槽位 (14)**：`clothing`, `character`, `makeup`, `hairstyle`, `jewelry`, `props`, `tattoo`, `liquids`, `pose`, `expression`, `lighting`, `film`, `shot_type`, `camera_angle`。
-
----
-
-## 一、当前 196 单元候选数量全景现状表（精确核实值）
-
-经对 [`data/context_affinity.json`](file:///Users/jacobyang/Hermes/iykyk-affinity-override/data/context_affinity.json) 逐单元遍历，14 情境 × 14 槽位各单元候选出现次数总和精确为 **603 次**：
-
-| 情境 (Context) | 服装 | 角色 | 妆容 | 发型 | 饰品 | 道具 | 纹身 | 液体 | 姿势 | 情绪 | 光影 | 胶片 | 景别 | 视角 | 单元小计 |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| **school** (校园) | 4 | 2 | 4 | 5 | 2 | 4 | 0 | 2 | 3 | 3 | 3 | 3 | 3 | 3 | 41 |
-| **office** (职场) | 4 | 3 | 4 | 4 | 3 | 4 | 0 | 2 | 2 | 3 | 3 | 3 | 3 | 3 | 41 |
-| **medical** (医疗) | 1 | 1 | 3 | 4 | 1 | 2 | 0 | 2 | 3 | 3 | 3 | 3 | 3 | 2 | 31 |
-| **onsen_bath** (温泉浴室) | 4 | 3 | 4 | 3 | 3 | 3 | 0 | 2 | 4 | 3 | 3 | 3 | 3 | 3 | 41 |
-| **bondage_sm** (束缚特种) | 3 | 3 | 4 | 3 | 4 | 3 | 3 | 4 | 4 | 3 | 3 | 3 | 3 | 4 | 47 |
-| **traditional** (传统和风) | 7 | 2 | 4 | 4 | 3 | 3 | 2 | 2 | 3 | 3 | 3 | 3 | 3 | 3 | 47 |
-| **nightlife** (夜生活) | 5 | 2 | 4 | 4 | 4 | 4 | 0 | 2 | 4 | 3 | 3 | 3 | 3 | 3 | 48 |
-| **domestic** (居家生活) | 5 | 2 | 4 | 4 | 3 | 5 | 0 | 2 | 4 | 3 | 3 | 3 | 3 | 3 | 47 |
-| **transit** (交通通勤) | 5 | 3 | 3 | 4 | 2 | 2 | 0 | 2 | 3 | 3 | 3 | 3 | 3 | 3 | 42 |
-| **outdoor** (户外自然) | 5 | 2 | 4 | 4 | 3 | 4 | 0 | 2 | 3 | 3 | 3 | 3 | 3 | 3 | 47 |
-| **dining** (餐饮聚会) | 5 | 4 | 4 | 4 | 3 | 3 | 0 | 2 | 3 | 3 | 3 | 3 | 3 | 3 | 44 |
-| **adult** (私密成人) | 6 | 3 | 4 | 4 | 7 | 4 | 4 | 4 | 4 | 3 | 3 | 3 | 3 | 4 | 56 |
-| **special** (特殊幻想) | 3 | 3 | 4 | 3 | 3 | 3 | 3 | 3 | 4 | 4 | 3 | 4 | 3 | 4 | 47 |
-| **generic** (通用基准) | 4 | 3 | 4 | 4 | 3 | 3 | 0 | 2 | 4 | 3 | 3 | 3 | 3 | 3 | 42 |
-| **槽位候选总和** | 61 | 36 | 55 | 52 | 44 | 47 | 12 | 34 | 48 | 43 | 42 | 43 | 42 | 44 | **603** |
+- **基线 Commit SHA**：`f1b873c2479c287817f5780991e6621e31b9f848`
+- **采样情境集合 (14)**：`school`, `office`, `medical`, `onsen_bath`, `bondage_sm`, `traditional`, `nightlife`, `domestic`, `transit`, `outdoor`, `dining`, `adult`, `special`, `generic`
+- **采样槽位集合 (14)**：`clothing`, `character`, `makeup`, `hairstyle`, `jewelry`, `props`, `tattoo`, `liquids`, `pose`, `expression`, `lighting`, `film`, `shot_type`, `camera_angle`
+- **总单元格数**：14 情境 × 14 槽位 = **196 单元**
+- **数据源绑定**：本表与 [`docs/m1_selector_attribution_ledger.tsv`](file:///Users/jacobyang/Hermes/iykyk-affinity-override/docs/m1_selector_attribution_ledger.tsv) 共享同一 Python SSoT 数据字典，实现**归属与权重 100% 字节级一致，0 处差异，0 个幽灵 ID**。
 
 ---
 
-## 二、真实 ID 边界与三大治理原则
+## 一、196 单元处置状态统计摘要
 
-1. **绝对零幻觉（100% 真实注册 ID）**：
-   - 本轮开发明确不扩充词库规模，所有拟调整的候选 ID **必须全部存在于现有目录注册表中**；
-   - 彻底剔除上一版草稿中的 `sailor_summer`、`doctor_coat`、`lighting_shadowless_surgical` 等伪造 ID，全部替换为已注册的标准 ID（如 `sailor_shirt`、`lab_coat`、`prof_light_fluorescent` 等）。
-2. **权重三级分层（4-2-1 梯度模型）**：
-   - **4 (强关联)**：代表该情境的核心标志性符号（如校园的水手服制服、医院的护士服与白大褂）；
-   - **2 (适配)**：在该情境下高频自然出现、合情合理的搭配（如校园的体操服、通勤的西装风衣）；
-   - **1 (弱关联)**：具备融合可能性的过渡搭配；
-   - **0 (全局探索)**：无亲和依据的选择器不进入加权候选，但保留在 15% 的全局池中，杜绝无故不可达。
-3. **`generic` 中性均分**：
-   - 通用情境 `generic` 消除人为偏倚，所有合法条目按等权处理，保持中性基础。
-
----
-
-## 三、14 情境逐情境真实 ID 拟调整与权重明细表
-
-### 1. 服装槽位 (clothing, 注册总数 165)
-
-| 情境 | 原候选清单 (原覆盖 28 款) | 拟调整后真实候选 ID 清单与权重 (4/2/1) | 调整理由与语义事实依据 |
+| 处置类型 (Disposition) | 单元格数量 | 占比 | 核心语义说明 |
 |---|---|---|---|
-| **school** | `jk_seifuku`, `blazer_uniform`, `gym_uniform`, `korean_school` | `jk_seifuku: 4`<br>`blazer_uniform: 4`<br>`sailor_shirt: 4`<br>`gym_uniform: 2`<br>`korean_school: 2`<br>`swimsuit_school: 1` | 补充真实目录中的水手服上衣 (`sailor_shirt`)；体操服与韩式校服定为适配(2)；死库水泳衣定为弱关联(1)。 |
-| **medical** | `nurse_uniform` | `nurse_uniform: 4`<br>`lab_coat: 4`<br>`hospital_gown: 2` | 彻底解决医疗情境仅 1 款候选的枯竭问题；补充真实目录医生袍 (`lab_coat`) 与病号服 (`hospital_gown`)。 |
-| **office** | `ol_suit`, `knit_sweater`, `evening_dress`, `street_casual` | `ol_suit: 4`<br>`business_suit: 4`<br>`pencil_skirt: 4`<br>`shirts_blouses: 2`<br>`trousers_general: 2`<br>`knit_sweater: 1` | 剔除不合时宜的晚礼服；补充商务西服 (`business_suit`)、铅笔裙与衬衫；针织衫降为弱关联。 |
-| **onsen_bath** | `yukata`, `kimono`, `one_piece_swimsuit`, `bikini_micro` | `yukata: 4`<br>`bathrobe: 4`<br>`silk_robe: 2`<br>`one_piece_swimsuit: 1`<br>`bikini_micro: 1` | 补充真实浴室浴袍 (`bathrobe`) 与丝绸睡袍；连体泳衣与微型比基尼定为弱关联(1)。 |
-| **bondage_sm** | `latex_catsuit`, `leather_corset`, `lingerie_lace` | `latex_catsuit: 4`<br>`leather_corset: 4`<br>`zentai_suit: 2`<br>`leather_skirt: 2`<br>`lingerie_lace: 1` | 补充真实目录全身紧身衣 (`zentai_suit`) 与皮质短裙 (`leather_skirt`)，强化特种物理质感。 |
-| **traditional** | `kimono`, `yukata`, `furisode`, `qipao`, `hanfu`, `modern_chinese`, `hanbok` | `kimono: 4`<br>`furisode: 4`<br>`qipao: 4`<br>`hanfu: 4`<br>`shinto_miko: 4`<br>`yukata: 2`<br>`hanbok: 2`<br>`modern_chinese: 2`<br>`uchikake: 2` | 补充巫女服 (`shinto_miko`) 与打褂礼服 (`uchikake`)；分级区分礼装(4)与节庆休闲(2)。 |
-| **nightlife** | `bunny_suit`, `party_club`, `lingerie_lace`, `latex_catsuit`, `evening_dress` | `party_club: 4`<br>`cocktail_dress: 4`<br>`evening_dress: 4`<br>`leather_skirt: 2`<br>`bunny_suit: 2`<br>`lingerie_lace: 1` | 补充鸡尾酒裙 (`cocktail_dress`)；兔女郎与皮裙作为特色夜店装定为适配(2)。 |
-| **domestic** | `silk_robe`, `camisole_slip`, `knit_sweater`, `street_casual`, `lingerie_lace` | `silk_robe: 4`<br>`camisole_slip: 4`<br>`hoodie: 2`<br>`sweatshirt: 2`<br>`knit_sweater: 2`<br>`apron_dress: 2`<br>`street_casual: 1` | 补充连帽衫 (`hoodie`)、卫衣 (`sweatshirt`) 与围裙 (`apron_dress`)，丰富居家真实感。 |
-| **transit** | `jk_seifuku`, `blazer_uniform`, `ol_suit`, `street_casual`, `knit_sweater` | `ol_suit: 4`<br>`jk_seifuku: 4`<br>`blazer_uniform: 2`<br>`trench_coat: 2`<br>`denim_jacket: 1` | 补充通勤防风风衣 (`trench_coat`) 与牛仔外套；强化早晚电车通学通勤符号。 |
-| **outdoor** | `bikini_micro`, `one_piece_swimsuit`, `street_casual`, `gym_uniform`, `cheerleader` | `denim_shorts: 4`<br>`summer_sundress: 4`<br>`sundress_layered: 2`<br>`hot_pants: 2`<br>`gym_uniform: 2`<br>`street_casual: 2`<br>`bikini_classic: 1` | 补充牛仔短裤 (`denim_shorts`)、太阳裙 (`summer_sundress`) 与热裤 (`hot_pants`)；泳衣降为弱关联。 |
-| **dining** | `maid_dress`, `waitress_uniform`, `street_casual`, `qipao`, `kimono` | `maid_dress: 4`<br>`waitress_uniform: 4`<br>`waist_apron: 4`<br>`qipao: 2`<br>`dress_casual: 2`<br>`street_casual: 1` | 补充餐饮咖啡半身围裙 (`waist_apron`) 与休闲连衣裙；女仆与侍应生为强关联。 |
-| **adult** | `bunny_suit`, `maid_dress`, `latex_catsuit`, `leather_corset`, `bikini_micro`, `lingerie_lace` | `lingerie_lace: 4`<br>`lingerie_bra: 4`<br>`lingerie_panties: 4`<br>`latex_catsuit: 2`<br>`leather_corset: 2`<br>`bikini_micro: 2` | 核心强化真实蕾丝内衣 (`lingerie_lace`, `lingerie_bra`, `lingerie_panties`)。 |
-| **special** | `latex_catsuit`, `leather_corset`, `lingerie_lace` | `cyberpunk_plugsuit: 4`<br>`cyberpunk_tactical_bodysuit: 4`<br>`lolita_gothic: 4`<br>`lolita_sweet: 2`<br>`latex_catsuit: 2` | 补充赛博朋克防护服 (`cyberpunk_plugsuit`) 与哥特洛丽塔 (`lolita_gothic`)。 |
-| **generic** | `street_casual`, `knit_sweater`, `camisole_slip`, `silk_robe` | `street_casual: 1`<br>`knit_sweater: 1`<br>`t_shirt: 1`<br>`denim_jeans: 1` | 消除偏向，采用中性基础便服均权分布。 |
+| `neutral` (中性无偏置抽样) | 14 | 7.1% | 14 个 `generic` 槽位统一执行 $C(generic, s) = G_s$ 中性抽样，无情境偏置，消除原先仅有少数等权候选导致的局部失真 |
+| `propose_expand` (拟扩充候选) | 29 | 14.8% | 针对性扩充高适配度的真实目录选择器，打破服装仅覆盖 28 款、光影仅覆盖 10 款的局限 |
+| `propose_adjust_weight` (拟调整权重) | 149 | 76.0% | 消除原矩阵全部候选权重均为 1.0 的均一化缺陷，确立“强关联 4、适配 2、弱关联 1”的区分度分布 |
+| `retain_as_is` (保持原样) | 4 | 2.0% | 经逐项语义核验，当前候选与权重已自洽自足，本轮保持不变 |
+| **合计** | **196** | **100.0%** | **全量 196 个单元逐格登记完毕，无一遗漏** |
 
 ---
 
-### 2. 光影槽位 (lighting, 注册总数 59)
+## 二、196 单元逐格审核与处置总表
 
-| 情境 | 原候选清单 (原覆盖 10 款) | 拟调整后真实候选 ID 清单与权重 (4/2/1) | 调整理由与光源事实依据 |
-|---|---|---|---|
-| **school** | `japanese_fresh`, `backlit_hair`, `studio_commercial` | `lighting_japanese_fresh: 4`<br>`prof_light_high_key: 4`<br>`prof_light_ambient: 2`<br>`ext_aw_light_warm_golden_hour: 2`<br>`lighting_backlit_hair: 1` | 清新通透自然光与高调光照(4)；补充放学黄昏暖光 (`ext_aw_light_warm_golden_hour`)。 |
-| **office** | `studio_commercial`, `cinematic_dark`, `japanese_fresh` | `prof_light_fluorescent: 4`<br>`lighting_studio_commercial: 4`<br>`prof_light_led_panel: 2`<br>`lighting_japanese_fresh: 1` | 彻底剔除暗夜电影光；补充写字楼真实荧光顶灯 (`prof_light_fluorescent`) 与 LED 平板灯。 |
-| **medical** | `studio_commercial`, `japanese_fresh`, `backlit_hair` | `prof_light_fluorescent: 4`<br>`prof_light_high_key: 4`<br>`lighting_studio_commercial: 2` | 医院冷白荧光顶灯与明亮高调光；消除逆光发丝干扰。 |
-| **onsen_bath** | `onsen_intimate`, `backlit_hair`, `rain_wet` | `lighting_onsen_intimate: 4`<br>`lighting_rain_wet: 4`<br>`prof_light_ambient: 2`<br>`ext_aw_light_candlelight: 2` | 温泉特有私密水汽朦胧光与湿润反光(4)；补充和风烛光暖光。 |
-| **bondage_sm** | `cinematic_dark`, `voyeur_private`, `love_hotel_neon` | `lighting_cinematic_dark: 4`<br>`lighting_voyeur_private: 4`<br>`prof_light_low_key: 4`<br>`prof_light_gelled: 2`<br>`lighting_love_hotel_neon: 1` | 电影暗调与窥视侧光(4)；补充低调深邃光 (`prof_light_low_key`) 与彩胶滤镜光。 |
-| **traditional** | `oil_classical`, `backlit_hair`, `japanese_fresh` | `lighting_oil_classical: 4`<br>`ext_aw_light_candlelight: 4`<br>`ext_aw_light_warm_golden_hour: 2`<br>`lighting_japanese_fresh: 2` | 古典油画暖光与幽微烛光 (`ext_aw_light_candlelight`)；补充庭院黄金落日光。 |
-| **nightlife** | `love_hotel_neon`, `cinematic_dark`, `backlit_hair` | `lighting_love_hotel_neon: 4`<br>`prof_light_tungsten: 4`<br>`lighting_cinematic_dark: 2`<br>`ext_aw_light_direct_flash: 2` | 霓虹氛围光与吧台钨丝灯点光源 (`prof_light_tungsten`)；补充夜场机顶直闪光。 |
-| **domestic** | `bedroom_private`, `japanese_fresh`, `backlit_hair` | `lighting_bedroom_private: 4`<br>`ext_aw_light_soft_bounced: 4`<br>`prof_light_practical: 2`<br>`lighting_japanese_fresh: 1` | 卧室私密暖光与柔和反弹漫射光 (`ext_aw_light_soft_bounced`)；补充实体台灯环境光。 |
-| **transit** | `voyeur_private`, `japanese_fresh`, `rain_wet` | `prof_light_fluorescent: 4`<br>`lighting_voyeur_private: 2`<br>`lighting_rain_wet: 2`<br>`lighting_japanese_fresh: 1` | 补充车站车厢顶灯荧光日光灯 (`prof_light_fluorescent`)。 |
-| **outdoor** | `japanese_fresh`, `backlit_hair`, `rain_wet` | `lighting_japanese_fresh: 4`<br>`ext_aw_light_warm_golden_hour: 4`<br>`prof_light_high_key: 2`<br>`lighting_rain_wet: 2`<br>`lighting_backlit_hair: 1` | 日间自然光与黄金时段斜射日光 (`ext_aw_light_warm_golden_hour`) 作为核心双强关联。 |
-| **dining** | `japanese_fresh`, `oil_classical`, `studio_commercial` | `prof_light_tungsten: 4`<br>`ext_aw_light_candlelight: 2`<br>`lighting_oil_classical: 2`<br>`lighting_studio_commercial: 1` | 餐厅餐桌聚光暖调钨丝灯 (`prof_light_tungsten`) 与浪漫烛光。 |
-| **adult** | `love_hotel_neon`, `cinematic_dark`, `voyeur_private` | `lighting_voyeur_private: 4`<br>`lighting_love_hotel_neon: 4`<br>`lighting_cinematic_dark: 2`<br>`prof_light_low_key: 2` | 私密窥探弱光与情调霓虹灯光(4)；低调暗光(2)。 |
-| **special** | `cinematic_dark`, `voyeur_private`, `love_hotel_neon` | `ext_aw_light_bioluminescent: 4`<br>`prof_light_gelled: 4`<br>`lighting_cinematic_dark: 2`<br>`special_effects_00: 2` | 生物荧光 (`ext_aw_light_bioluminescent`) 与强烈彩胶色光特效 (`prof_light_gelled`)。 |
-| **generic** | `japanese_fresh`, `backlit_hair`, `studio_commercial` | `lighting_japanese_fresh: 1`<br>`lighting_studio_commercial: 1`<br>`prof_light_three_point: 1`<br>`ext_aw_light_soft_bounced: 1` | 标准通用三点光与中性商用光平权均分。 |
-
----
-
-### 3. 其余 12 槽位代表性真实候选调整规约摘要
-
-- **角色 (character, 11)**：校园绑定 `jk_schoolgirl:4`；职场绑定 `female_boss:4, ol_subordinate:4`；医疗绑定 `kind_nurse:4`；餐饮绑定 `french_maid:4`；夜生活绑定 `hostess_cabaret:4`；居家绑定 `married_housewife:4`。
-- **道具 (props, 23)**：校园绑定 `student_leather_bag:4, study_stationery_set:4`；医疗绑定 `medical_stethoscope:4`；传统绑定 `oiled_paper_umbrella:4, embroidered_round_fan:4`；酒吧就餐绑定 `wine_glass_goblet:4`；居家绑定 `cute_cat_on_bed:4, fluffy_teddy_bear:4`；街拍与夜生活适配 `digital_camera_in_hand:2`。
-- **发型 (hairstyle, 57)**：校园适配学生双马尾/双麻花 (`twintails_high:2, braided_twins:2, bob_cut:2`)；职场适配干练大背头与锁骨发 (`slicked_back:2, collarbone_lob:2`)；传统适配姬发与盘发 (`hime_cut:2, ext_aw_hair_crown_braid_updo:2`)；夜宴适配大波浪卷 (`big_wavy_curls:2`)。
-- **妆容 (makeup, 17)**：校园绑定伪素颜 (`school_barely_there:4`)；职场绑定通勤混血立体修容 (`asian_hybrid_contour:4`)；国风传统绑定朱砂古典妆 (`chinese_vermilion:4`)；夜店特种绑定暗黑哥特与烟熏猫眼 (`gothic_dark:4, smoky_cat_eye:4`)；成人私密绑定微醺潮红 (`climax_flush:4`)。
-- **液体 (liquids, 7)**：温泉水疗强关联水滴 (`wet_water_drops:4`)；成人私密强关联精油 (`body_oil_lube:4`)；运动关联微汗 (`sweat_glistening:2`)。
-- **纹身 (tattoo, 12)**：极道传统关联和风刺青龙纹 (`japanese_irezumi_dragon:4`)；特殊科幻关联条形码 (`barcode_serial_number:4`)；成人私密关联下腹与臀部花卉 (`lewd_womb_pubic:4, rose_flower_hip:4`)。
-
-全部 496 个选择器的详细配置与处置详见 [`docs/m1_selector_attribution_ledger.tsv`](file:///Users/jacobyang/Hermes/iykyk-affinity-override/docs/m1_selector_attribution_ledger.tsv)。
+| 情境 (Context) | 采样槽位 (Slot) | 当前基线候选 (Current Baseline) | 拟调整候选与权重 (Proposed Candidates & Weights) | 处置类型 (Disposition) | 调整理由与情境自洽依据 (Rationale) |
+|---|---|---|---|---|---|
+| `school` | `clothing` | `jk_seifuku`, `blazer_uniform`, `gym_uniform`, `korean_school` | `blazer_uniform: 4`<br>`gym_uniform: 4`<br>`sailor_shirt: 4`<br>`swimsuit_school: 4`<br>`duffel_coat: 2`<br>`sundress_layered: 2`<br>`volleyball_uniform: 2` | `propose_adjust_weight` | 精简脱敏不适条目，保留并优化强契合候选的梯度权重分布。 |
+| `school` | `character` | `jk_schoolgirl`, `strict_teacher` | `jk_schoolgirl: 4`<br>`strict_teacher: 4`<br>`neighbor_girlfriend: 2` | `propose_expand` | 在 baseline 候选基础上语义扩充高适配真实选择器，丰富情境抽样多样性，并按 4/2/1 实施差异化权重。 |
+| `school` | `makeup` | `natural_pure`, `cute_peachy`, `sweet_peach_milk`, `clear_water_bare` | `clear_water_bare: 4`<br>`cute_peachy: 4`<br>`natural_pure: 4`<br>`pure_desire_white_peach: 2`<br>`sweet_peach_milk: 2` | `propose_expand` | 在 baseline 候选基础上语义扩充高适配真实选择器，丰富情境抽样多样性，并按 4/2/1 实施差异化权重。 |
+| `school` | `hairstyle` | `twin_tails`, `high_ponytail`, `long_straight_black`, `braided_twins`, `bob_cut` | `bob_cut: 4`<br>`braided_twins: 4`<br>`high_ponytail: 4`<br>`twin_tails: 4`<br>`ext_aw_hair_long_parted_behind_ears: 2`<br>`hair_pageboy: 2`<br>`hime_cut: 2`<br>`long_straight_black: 2` | `propose_expand` | 在 baseline 候选基础上语义扩充高适配真实选择器，丰富情境抽样多样性，并按 4/2/1 实施差异化权重。 |
+| `school` | `jewelry` | `ribbon_bow`, `gold_collarbone_chain` | `acc_bowtie: 4`<br>`acc_hairband: 4`<br>`acc_hairclip: 4`<br>`acc_necktie: 4`<br>`ribbon_bow: 4` | `propose_adjust_weight` | 精简脱敏不适条目，保留并优化强契合候选的梯度权重分布。 |
+| `school` | `props` | `glasses_reading`, `smartphone_recording`, `sex_toy_vibrator`, `plush_doll_teddy` | `glasses_reading: 4`<br>`digital_camera_in_hand: 2`<br>`digital_camera_record: 2`<br>`fluffy_teddy_bear: 2`<br>`smartphone_recording: 2` | `propose_adjust_weight` | 精简脱敏不适条目，保留并优化强契合候选的梯度权重分布。 |
+| `school` | `tattoo` | *none (neutral)* | `cute_heart_star: 2` | `propose_expand` | 在 baseline 候选基础上语义扩充高适配真实选择器，丰富情境抽样多样性，并按 4/2/1 实施差异化权重。 |
+| `school` | `liquids` | `sweat_glistening`, `none` | `sweat_glistening: 2` | `propose_adjust_weight` | 精简脱敏不适条目，保留并优化强契合候选的梯度权重分布。 |
+| `school` | `pose` | `sitting`, `standing`, `dynamic` | `sitting: 4`<br>`standing: 2` | `propose_adjust_weight` | 精简脱敏不适条目，保留并优化强契合候选的梯度权重分布。 |
+| `school` | `expression` | `emotion_shy`, `emotion_playful`, `emotion_restrained` | `emotion_happy: 4`<br>`emotion_playful: 4`<br>`emotion_shy: 4`<br>`emotion_amused: 2`<br>`emotion_focused: 2`<br>`emotion_proud: 2` | `propose_adjust_weight` | 精简脱敏不适条目，保留并优化强契合候选的梯度权重分布。 |
+| `school` | `lighting` | `lighting_japanese_fresh`, `lighting_backlit_hair`, `lighting_studio_commercial` | `lighting_japanese_fresh: 4`<br>`prof_light_high_key: 4`<br>`ext_aw_light_warm_golden_hour: 2`<br>`lighting_backlit_hair: 2`<br>`lighting_studio_commercial: 1` | `propose_expand` | 在 baseline 候选基础上语义扩充高适配真实选择器，丰富情境抽样多样性，并按 4/2/1 实施差异化权重。 |
+| `school` | `film` | `fujifilm_superia_400`, `fujifilm_pro_400h`, `kodak_portra_400` | `fujifilm_superia_400: 4`<br>`fujifilm_pro_400h: 2`<br>`kodak_gold_200: 2` | `propose_adjust_weight` | 精简脱敏不适条目，保留并优化强契合候选的梯度权重分布。 |
+| `school` | `shot_type` | `medium_close_up`, `medium_shot`, `full_body_shot` | `close_up: 2`<br>`medium_close_up: 2`<br>`medium_shot: 2` | `propose_adjust_weight` | 精简脱敏不适条目，保留并优化强契合候选的梯度权重分布。 |
+| `school` | `camera_angle` | `eye_level`, `high_angle`, `over_the_shoulder` | `camera_orientation_frontal: 2`<br>`camera_orientation_three_quarter: 2`<br>`eye_level: 2`<br>`high_angle: 2` | `propose_adjust_weight` | 精简脱敏不适条目，保留并优化强契合候选的梯度权重分布。 |
+| `office` | `clothing` | `ol_suit`, `knit_sweater`, `evening_dress`, `street_casual` | `business_suit: 4`<br>`ol_suit: 4`<br>`pencil_skirt: 4`<br>`lab_coat: 2`<br>`outerwear_coat: 2`<br>`outerwear_overcoat: 2`<br>`trench_coat: 2` | `propose_adjust_weight` | 精简脱敏不适条目，保留并优化强契合候选的梯度权重分布。 |
+| `office` | `character` | `ol_subordinate`, `female_boss`, `strict_teacher` | `female_boss: 4`<br>`ol_subordinate: 4`<br>`strict_teacher: 2` | `propose_adjust_weight` | 保留基线候选集合，将基线均一化的 1.0 权重治理升级为强关联 4 / 适配 2 区分权重。 |
+| `office` | `makeup` | `mature_wife`, `sultry_smoky`, `natural_pure`, `asian_hybrid_contour` | `asian_hybrid_contour: 2`<br>`natural_pure: 2` | `propose_adjust_weight` | 精简脱敏不适条目，保留并优化强契合候选的梯度权重分布。 |
+| `office` | `hairstyle` | `low_ponytail`, `collarbone_lob`, `big_wavy_curls`, `messy_bun` | `collarbone_lob: 4`<br>`ext_aw_hair_long_parted_behind_ears: 4`<br>`hair_long_deep_side_part: 4`<br>`low_ponytail: 4`<br>`bob_cut: 2` | `propose_adjust_weight` | 精简脱敏不适条目，保留并优化强契合候选的梯度权重分布。 |
+| `office` | `jewelry` | `pearl_necklace`, `gold_collarbone_chain`, `leather_choker` | `acc_necktie: 4`<br>`ext_aw_jewelry_pearl_drop_earrings: 2`<br>`pearl_necklace: 2` | `propose_adjust_weight` | 精简脱敏不适条目，保留并优化强契合候选的梯度权重分布。 |
+| `office` | `props` | `glasses_reading`, `wine_glass_bottle`, `smartphone_recording`, `digital_camera_record` | `fashion_baguette_bag: 4`<br>`glasses_reading: 4`<br>`camera_tripod_flash: 2`<br>`fashion_clutch_bag: 2` | `propose_adjust_weight` | 精简脱敏不适条目，保留并优化强契合候选的梯度权重分布。 |
+| `office` | `tattoo` | *none (neutral)* | *none (中性抽样)* | `retain_as_is` | 基线候选与权重已完全自洽，继续保持原样。 |
+| `office` | `liquids` | `sweat_glistening`, `none` | *none (中性抽样)* | `propose_adjust_weight` | 精简脱敏不适条目，保留并优化强契合候选的梯度权重分布。 |
+| `office` | `pose` | `sitting`, `standing` | `sitting: 4`<br>`standing: 2` | `propose_adjust_weight` | 保留基线候选集合，将基线均一化的 1.0 权重治理升级为强关联 4 / 适配 2 区分权重。 |
+| `office` | `expression` | `emotion_restrained`, `emotion_detached`, `emotion_seductive` | `emotion_focused: 4`<br>`emotion_proud: 2` | `propose_adjust_weight` | 精简脱敏不适条目，保留并优化强契合候选的梯度权重分布。 |
+| `office` | `lighting` | `lighting_studio_commercial`, `lighting_cinematic_dark`, `lighting_japanese_fresh` | `lighting_studio_commercial: 4`<br>`prof_light_fluorescent: 4`<br>`prof_light_led_panel: 4`<br>`lighting_japanese_fresh: 2`<br>`lighting_cinematic_dark: 1` | `propose_expand` | 在 baseline 候选基础上语义扩充高适配真实选择器，丰富情境抽样多样性，并按 4/2/1 实施差异化权重。 |
+| `office` | `film` | `fujifilm_classic_chrome`, `kodak_portra_400`, `cinestill_800t` | `kodak_portra_400: 4`<br>`fujifilm_provia_100f: 2` | `propose_adjust_weight` | 精简脱敏不适条目，保留并优化强契合候选的梯度权重分布。 |
+| `office` | `shot_type` | `medium_shot`, `medium_close_up`, `medium_long_shot` | `close_up: 2`<br>`medium_close_up: 2`<br>`medium_shot: 2` | `propose_adjust_weight` | 精简脱敏不适条目，保留并优化强契合候选的梯度权重分布。 |
+| `office` | `camera_angle` | `eye_level`, `low_angle`, `over_the_shoulder` | `camera_orientation_frontal: 2`<br>`camera_orientation_three_quarter: 2`<br>`eye_level: 2` | `propose_adjust_weight` | 精简脱敏不适条目，保留并优化强契合候选的梯度权重分布。 |
+| `medical` | `clothing` | `nurse_uniform` | `lab_coat: 4`<br>`nurse_uniform: 4` | `propose_expand` | 在 baseline 候选基础上语义扩充高适配真实选择器，丰富情境抽样多样性，并按 4/2/1 实施差异化权重。 |
+| `medical` | `character` | `kind_nurse` | `kind_nurse: 4` | `propose_adjust_weight` | 保留基线候选集合，将基线均一化的 1.0 权重治理升级为强关联 4 / 适配 2 区分权重。 |
+| `medical` | `makeup` | `natural_pure`, `cute_peachy`, `clear_water_bare` | *none (中性抽样)* | `propose_adjust_weight` | 精简脱敏不适条目，保留并优化强契合候选的梯度权重分布。 |
+| `medical` | `hairstyle` | `low_ponytail`, `bob_cut`, `twin_tails`, `messy_bun` | *none (中性抽样)* | `propose_adjust_weight` | 精简脱敏不适条目，保留并优化强契合候选的梯度权重分布。 |
+| `medical` | `jewelry` | `nurse_cap` | `nurse_cap: 4` | `propose_adjust_weight` | 保留基线候选集合，将基线均一化的 1.0 权重治理升级为强关联 4 / 适配 2 区分权重。 |
+| `medical` | `props` | `glasses_reading`, `smartphone_recording` | *none (中性抽样)* | `propose_adjust_weight` | 精简脱敏不适条目，保留并优化强契合候选的梯度权重分布。 |
+| `medical` | `tattoo` | *none (neutral)* | *none (中性抽样)* | `retain_as_is` | 基线候选与权重已完全自洽，继续保持原样。 |
+| `medical` | `liquids` | `sweat_glistening`, `body_oil_lube` | *none (中性抽样)* | `propose_adjust_weight` | 精简脱敏不适条目，保留并优化强契合候选的梯度权重分布。 |
+| `medical` | `pose` | `standing`, `sitting`, `lying` | *none (中性抽样)* | `propose_adjust_weight` | 精简脱敏不适条目，保留并优化强契合候选的梯度权重分布。 |
+| `medical` | `expression` | `emotion_shy`, `emotion_submissive`, `emotion_restrained` | *none (中性抽样)* | `propose_adjust_weight` | 精简脱敏不适条目，保留并优化强契合候选的梯度权重分布。 |
+| `medical` | `lighting` | `lighting_studio_commercial`, `lighting_japanese_fresh`, `lighting_backlit_hair` | `lighting_studio_commercial: 4`<br>`prof_light_fluorescent: 4`<br>`prof_light_led_panel: 4`<br>`lighting_backlit_hair: 2`<br>`lighting_japanese_fresh: 1` | `propose_expand` | 在 baseline 候选基础上语义扩充高适配真实选择器，丰富情境抽样多样性，并按 4/2/1 实施差异化权重。 |
+| `medical` | `film` | `kodak_max_400`, `kodak_portra_400`, `fujifilm_pro_400h` | *none (中性抽样)* | `propose_adjust_weight` | 精简脱敏不适条目，保留并优化强契合候选的梯度权重分布。 |
+| `medical` | `shot_type` | `medium_shot`, `medium_close_up`, `full_body_shot` | *none (中性抽样)* | `propose_adjust_weight` | 精简脱敏不适条目，保留并优化强契合候选的梯度权重分布。 |
+| `medical` | `camera_angle` | `eye_level`, `high_angle` | *none (中性抽样)* | `propose_adjust_weight` | 精简脱敏不适条目，保留并优化强契合候选的梯度权重分布。 |
+| `onsen_bath` | `clothing` | `yukata`, `kimono`, `one_piece_swimsuit`, `bikini_micro` | `legwear_bare: 4`<br>`yukata: 4`<br>`kimono: 2`<br>`one_piece_swimsuit: 2`<br>`swimsuit_classic: 2` | `propose_adjust_weight` | 精简脱敏不适条目，保留并优化强契合候选的梯度权重分布。 |
+| `onsen_bath` | `character` | `married_housewife`, `neighbor_girlfriend`, `gravure_idol` | *none (中性抽样)* | `propose_adjust_weight` | 精简脱敏不适条目，保留并优化强契合候选的梯度权重分布。 |
+| `onsen_bath` | `makeup` | `wet_dewy`, `natural_pure`, `climax_flush`, `drunken_milky_youth` | `wet_dewy: 4`<br>`clear_water_bare: 2`<br>`climax_flush: 2` | `propose_adjust_weight` | 精简脱敏不适条目，保留并优化强契合候选的梯度权重分布。 |
+| `onsen_bath` | `hairstyle` | `wet_hair_face`, `messy_bun`, `low_ponytail` | `wet_hair_face: 4` | `propose_adjust_weight` | 精简脱敏不适条目，保留并优化强契合候选的梯度权重分布。 |
+| `onsen_bath` | `jewelry` | `gold_collarbone_chain`, `pearl_necklace`, `ankle_bracelet` | *none (中性抽样)* | `propose_adjust_weight` | 精简脱敏不适条目，保留并优化强契合候选的梯度权重分布。 |
+| `onsen_bath` | `props` | `wine_glass_bottle`, `ice_cubes`, `rose_petals_candles` | `rose_petals_candles: 2` | `propose_adjust_weight` | 精简脱敏不适条目，保留并优化强契合候选的梯度权重分布。 |
+| `onsen_bath` | `tattoo` | *none (neutral)* | `rose_flower_hip: 2` | `propose_expand` | 在 baseline 候选基础上语义扩充高适配真实选择器，丰富情境抽样多样性，并按 4/2/1 实施差异化权重。 |
+| `onsen_bath` | `liquids` | `wet_water_drops`, `sweat_glistening` | `body_oil_lube: 4`<br>`wet_water_drops: 4` | `propose_adjust_weight` | 精简脱敏不适条目，保留并优化强契合候选的梯度权重分布。 |
+| `onsen_bath` | `pose` | `sitting`, `standing`, `lying`, `kneeling` | `gestures_self_touch: 2`<br>`lying: 2` | `propose_adjust_weight` | 精简脱敏不适条目，保留并优化强契合候选的梯度权重分布。 |
+| `onsen_bath` | `expression` | `emotion_pleasure`, `emotion_shy`, `emotion_dazed` | `emotion_blissful: 4`<br>`emotion_relaxed: 4`<br>`emotion_dazed: 2`<br>`emotion_pleasure: 2` | `propose_adjust_weight` | 精简脱敏不适条目，保留并优化强契合候选的梯度权重分布。 |
+| `onsen_bath` | `lighting` | `lighting_onsen_intimate`, `lighting_backlit_hair`, `lighting_rain_wet` | `lighting_onsen_intimate: 4`<br>`lighting_rain_wet: 4`<br>`lighting_backlit_hair: 2`<br>`professional_lighting_14: 2` | `propose_expand` | 在 baseline 候选基础上语义扩充高适配真实选择器，丰富情境抽样多样性，并按 4/2/1 实施差异化权重。 |
+| `onsen_bath` | `film` | `kodak_portra_400`, `fujifilm_pro_400h`, `kodak_gold_200` | *none (中性抽样)* | `propose_adjust_weight` | 精简脱敏不适条目，保留并优化强契合候选的梯度权重分布。 |
+| `onsen_bath` | `shot_type` | `medium_shot`, `full_body_shot`, `medium_close_up` | *none (中性抽样)* | `propose_adjust_weight` | 精简脱敏不适条目，保留并优化强契合候选的梯度权重分布。 |
+| `onsen_bath` | `camera_angle` | `eye_level`, `high_angle`, `overhead_birds_eye` | `high_angle: 2`<br>`overhead_birds_eye: 2`<br>`voyeur_peeping: 2` | `propose_adjust_weight` | 精简脱敏不适条目，保留并优化强契合候选的梯度权重分布。 |
+| `bondage_sm` | `clothing` | `latex_catsuit`, `leather_corset`, `lingerie_lace` | `latex_catsuit: 4`<br>`leotard_bodysuit: 4`<br>`zentai_suit: 4` | `propose_adjust_weight` | 精简脱敏不适条目，保留并优化强契合候选的梯度权重分布。 |
+| `bondage_sm` | `character` | `french_maid`, `ol_subordinate`, `female_boss` | *none (中性抽样)* | `propose_adjust_weight` | 精简脱敏不适条目，保留并优化强契合候选的梯度权重分布。 |
+| `bondage_sm` | `makeup` | `submissive_marked`, `ruined_crying`, `climax_flush`, `gothic_dark` | `gothic_dark: 4`<br>`ruined_crying: 4`<br>`submissive_marked: 4`<br>`climax_flush: 2` | `propose_adjust_weight` | 保留基线候选集合，将基线均一化的 1.0 权重治理升级为强关联 4 / 适配 2 区分权重。 |
+| `bondage_sm` | `hairstyle` | `messy_bedhead`, `twin_tails`, `hair_in_mouth` | *none (中性抽样)* | `propose_adjust_weight` | 精简脱敏不适条目，保留并优化强契合候选的梯度权重分布。 |
+| `bondage_sm` | `jewelry` | `leather_choker`, `lace_blindfold`, `nipple_rings`, `body_chain` | `combo_necklace_choker: 4`<br>`lace_blindfold: 4`<br>`leather_choker: 4`<br>`nipple_rings: 4` | `propose_adjust_weight` | 精简脱敏不适条目，保留并优化强契合候选的梯度权重分布。 |
+| `bondage_sm` | `props` | `bondage_rope_collar`, `sex_toy_vibrator`, `ice_cubes` | `bondage_rope_collar: 4`<br>`sex_toy_vibrator: 4` | `propose_adjust_weight` | 精简脱敏不适条目，保留并优化强契合候选的梯度权重分布。 |
+| `bondage_sm` | `tattoo` | `lewd_womb_pubic`, `barcode_serial_number`, `tally_marks_inner_thigh` | `tally_marks_inner_thigh: 4`<br>`barcode_serial_number: 2`<br>`japanese_irezumi_dragon: 2`<br>`lewd_womb_pubic: 2`<br>`snake_coiling: 2`<br>`underbust_mandala: 2` | `propose_expand` | 在 baseline 候选基础上语义扩充高适配真实选择器，丰富情境抽样多样性，并按 4/2/1 实施差异化权重。 |
+| `bondage_sm` | `liquids` | `saliva_drool`, `sweat_glistening`, `cum_splatter`, `body_oil_lube` | `body_oil_lube: 2`<br>`cum_splatter: 2`<br>`pussy_juice: 2`<br>`saliva_drool: 2`<br>`sweat_glistening: 2` | `propose_expand` | 在 baseline 候选基础上语义扩充高适配真实选择器，丰富情境抽样多样性，并按 4/2/1 实施差异化权重。 |
+| `bondage_sm` | `pose` | `kneeling`, `all_fours`, `lying`, `teasing` | `all_fours: 4`<br>`kneeling: 4`<br>`restraints_holds: 4` | `propose_adjust_weight` | 精简脱敏不适条目，保留并优化强契合候选的梯度权重分布。 |
+| `bondage_sm` | `expression` | `emotion_submissive`, `emotion_pain`, `emotion_dazed` | `emotion_fear: 4`<br>`emotion_pain: 4`<br>`emotion_restrained: 4`<br>`emotion_submissive: 4` | `propose_adjust_weight` | 精简脱敏不适条目，保留并优化强契合候选的梯度权重分布。 |
+| `bondage_sm` | `lighting` | `lighting_cinematic_dark`, `lighting_voyeur_private`, `lighting_love_hotel_neon` | `lighting_cinematic_dark: 4`<br>`lighting_voyeur_private: 4`<br>`prof_light_low_key: 4`<br>`lighting_love_hotel_neon: 2` | `propose_expand` | 在 baseline 候选基础上语义扩充高适配真实选择器，丰富情境抽样多样性，并按 4/2/1 实施差异化权重。 |
+| `bondage_sm` | `film` | `cinestill_800t`, `kodak_trix_400`, `ilford_hp5_plus` | `ilford_hp5_plus: 4`<br>`kodak_trix_400: 4`<br>`fujifilm_acros_100: 2` | `propose_adjust_weight` | 精简脱敏不适条目，保留并优化强契合候选的梯度权重分布。 |
+| `bondage_sm` | `shot_type` | `medium_shot`, `full_body_shot`, `erotic_close_up` | `erotic_close_up: 4`<br>`extreme_close_up: 2` | `propose_adjust_weight` | 精简脱敏不适条目，保留并优化强契合候选的梯度权重分布。 |
+| `bondage_sm` | `camera_angle` | `high_angle`, `low_angle`, `pov_first_person`, `dutch_angle` | `between_legs_angle: 2`<br>`pov_first_person: 2` | `propose_adjust_weight` | 精简脱敏不适条目，保留并优化强契合候选的梯度权重分布。 |
+| `traditional` | `clothing` | `kimono`, `yukata`, `furisode`, `qipao`, `hanfu`, `modern_chinese`, `hanbok` | `dirndl_dress: 4`<br>`kimono: 4`<br>`qipao: 4`<br>`yukata: 4` | `propose_adjust_weight` | 精简脱敏不适条目，保留并优化强契合候选的梯度权重分布。 |
+| `traditional` | `character` | `married_housewife`, `neighbor_girlfriend` | *none (中性抽样)* | `propose_adjust_weight` | 精简脱敏不适条目，保留并优化强契合候选的梯度权重分布。 |
+| `traditional` | `makeup` | `vintage_retro`, `chinese_vermilion`, `natural_pure`, `mature_wife` | `chinese_vermilion: 4`<br>`vintage_retro: 4` | `propose_adjust_weight` | 精简脱敏不适条目，保留并优化强契合候选的梯度权重分布。 |
+| `traditional` | `hairstyle` | `long_straight_black`, `hime_cut`, `low_ponytail`, `braided_twins` | `ext_aw_hair_low_nape_chignon: 4`<br>`hime_cut: 4`<br>`ext_aw_hair_vintage_finger_waves: 2`<br>`hair_pageboy: 2`<br>`long_straight_black: 2` | `propose_adjust_weight` | 精简脱敏不适条目，保留并优化强契合候选的梯度权重分布。 |
+| `traditional` | `jewelry` | `pearl_necklace`, `gold_collarbone_chain`, `ribbon_bow` | `fur_shawl: 2`<br>`pearl_necklace: 2` | `propose_adjust_weight` | 精简脱敏不适条目，保留并优化强契合候选的梯度权重分布。 |
+| `traditional` | `props` | `oriental_fan_umbrella`, `wine_glass_bottle`, `flower_bouquet_petals` | `embroidered_round_fan: 4`<br>`oil_paper_umbrella: 4`<br>`oriental_fan_umbrella: 4`<br>`flower_bouquet_petals: 2` | `propose_adjust_weight` | 精简脱敏不适条目，保留并优化强契合候选的梯度权重分布。 |
+| `traditional` | `tattoo` | `japanese_irezumi_dragon`, `cherry_blossom_shoulder` | `cherry_blossom_shoulder: 4`<br>`japanese_irezumi_dragon: 4`<br>`spine_vertical_script: 2` | `propose_expand` | 在 baseline 候选基础上语义扩充高适配真实选择器，丰富情境抽样多样性，并按 4/2/1 实施差异化权重。 |
+| `traditional` | `liquids` | `sweat_glistening`, `none` | *none (中性抽样)* | `propose_adjust_weight` | 精简脱敏不适条目，保留并优化强契合候选的梯度权重分布。 |
+| `traditional` | `pose` | `kneeling`, `sitting`, `standing` | `kneeling: 2` | `propose_adjust_weight` | 精简脱敏不适条目，保留并优化强契合候选的梯度权重分布。 |
+| `traditional` | `expression` | `emotion_shy`, `emotion_restrained`, `emotion_seductive` | *none (中性抽样)* | `propose_adjust_weight` | 精简脱敏不适条目，保留并优化强契合候选的梯度权重分布。 |
+| `traditional` | `lighting` | `lighting_oil_classical`, `lighting_backlit_hair`, `lighting_japanese_fresh` | `ext_aw_light_candlelight: 4`<br>`lighting_oil_classical: 4`<br>`lighting_backlit_hair: 2`<br>`lighting_japanese_fresh: 2`<br>`professional_lighting_15: 2` | `propose_expand` | 在 baseline 候选基础上语义扩充高适配真实选择器，丰富情境抽样多样性，并按 4/2/1 实施差异化权重。 |
+| `traditional` | `film` | `fujifilm_acros_100`, `kodak_portra_400`, `kodak_gold_200` | `fujifilm_acros_100: 4`<br>`fujifilm_provia_100f: 2`<br>`ilford_hp5_plus: 2`<br>`kodak_trix_400: 2` | `propose_adjust_weight` | 精简脱敏不适条目，保留并优化强契合候选的梯度权重分布。 |
+| `traditional` | `shot_type` | `medium_shot`, `full_body_shot`, `medium_close_up` | `full_body_shot: 2`<br>`medium_long_shot: 2` | `propose_adjust_weight` | 精简脱敏不适条目，保留并优化强契合候选的梯度权重分布。 |
+| `traditional` | `camera_angle` | `eye_level`, `high_angle`, `over_the_shoulder` | *none (中性抽样)* | `propose_adjust_weight` | 精简脱敏不适条目，保留并优化强契合候选的梯度权重分布。 |
+| `nightlife` | `clothing` | `bunny_suit`, `party_club`, `lingerie_lace`, `latex_catsuit`, `evening_dress` | `bunny_suit: 4`<br>`cocktail_dress: 4`<br>`dress_backless: 4`<br>`evening_dress: 4` | `propose_adjust_weight` | 精简脱敏不适条目，保留并优化强契合候选的梯度权重分布。 |
+| `nightlife` | `character` | `hostess_cabaret`, `gravure_idol` | `hostess_cabaret: 4` | `propose_adjust_weight` | 精简脱敏不适条目，保留并优化强契合候选的梯度权重分布。 |
+| `nightlife` | `makeup` | `sultry_smoky`, `climax_flush`, `ruined_crying`, `gothic_dark` | `drunken_milky_youth: 4`<br>`sultry_smoky: 4`<br>`asian_hybrid_contour: 2`<br>`gothic_dark: 2` | `propose_adjust_weight` | 精简脱敏不适条目，保留并优化强契合候选的梯度权重分布。 |
+| `nightlife` | `hairstyle` | `big_wavy_curls`, `twin_tails`, `hime_cut`, `hair_in_mouth` | `big_wavy_curls: 4`<br>`ext_aw_hair_vintage_finger_waves: 4`<br>`hair_1940s_waves: 4`<br>`hair_long_deep_side_part: 2` | `propose_adjust_weight` | 精简脱敏不适条目，保留并优化强契合候选的梯度权重分布。 |
+| `nightlife` | `jewelry` | `leather_choker`, `body_chain`, `bunny_ears`, `cat_ears` | `bunny_ears: 4`<br>`fur_shawl: 4`<br>`cat_ears: 2`<br>`combo_necklace_choker: 2`<br>`ext_aw_jewelry_silver_hoop_earrings: 2`<br>`gold_collarbone_chain: 2` | `propose_adjust_weight` | 精简脱敏不适条目，保留并优化强契合候选的梯度权重分布。 |
+| `nightlife` | `props` | `wine_glass_bottle`, `sex_toy_vibrator`, `smartphone_recording`, `digital_camera_record` | `fashion_clutch_bag: 4`<br>`wine_glass_bottle: 4`<br>`smartphone_recording: 2` | `propose_adjust_weight` | 精简脱敏不适条目，保留并优化强契合候选的梯度权重分布。 |
+| `nightlife` | `tattoo` | *none (neutral)* | `butterfly_lower_back: 2`<br>`snake_coiling: 2` | `propose_expand` | 在 baseline 候选基础上语义扩充高适配真实选择器，丰富情境抽样多样性，并按 4/2/1 实施差异化权重。 |
+| `nightlife` | `liquids` | `sweat_glistening`, `saliva_drool` | *none (中性抽样)* | `propose_adjust_weight` | 精简脱敏不适条目，保留并优化强契合候选的梯度权重分布。 |
+| `nightlife` | `pose` | `standing`, `dynamic`, `teasing`, `sitting` | `teasing: 2` | `propose_adjust_weight` | 精简脱敏不适条目，保留并优化强契合候选的梯度权重分布。 |
+| `nightlife` | `expression` | `emotion_seductive`, `emotion_pleasure`, `emotion_playful` | `emotion_seductive: 4`<br>`emotion_yearning: 2` | `propose_adjust_weight` | 精简脱敏不适条目，保留并优化强契合候选的梯度权重分布。 |
+| `nightlife` | `lighting` | `lighting_love_hotel_neon`, `lighting_cinematic_dark`, `lighting_backlit_hair` | `ext_aw_light_direct_flash: 4`<br>`lighting_love_hotel_neon: 4`<br>`prof_light_gelled: 4`<br>`prof_light_tungsten: 4`<br>`lighting_cinematic_dark: 2`<br>`lighting_backlit_hair: 1` | `propose_expand` | 在 baseline 候选基础上语义扩充高适配真实选择器，丰富情境抽样多样性，并按 4/2/1 实施差异化权重。 |
+| `nightlife` | `film` | `cinestill_800t`, `fujifilm_classic_negative`, `lomography_color` | `cinestill_800t: 4`<br>`expired_film: 2`<br>`film_stock_polaroid: 2` | `propose_adjust_weight` | 精简脱敏不适条目，保留并优化强契合候选的梯度权重分布。 |
+| `nightlife` | `shot_type` | `medium_shot`, `full_body_shot`, `medium_close_up` | *none (中性抽样)* | `propose_adjust_weight` | 精简脱敏不适条目，保留并优化强契合候选的梯度权重分布。 |
+| `nightlife` | `camera_angle` | `low_angle`, `dutch_angle`, `eye_level` | *none (中性抽样)* | `propose_adjust_weight` | 精简脱敏不适条目，保留并优化强契合候选的梯度权重分布。 |
+| `domestic` | `clothing` | `silk_robe`, `camisole_slip`, `knit_sweater`, `street_casual`, `lingerie_lace` | `apron_dress: 4`<br>`silk_robe: 4`<br>`waist_apron: 4`<br>`legwear_bare: 2`<br>`lingerie_bra: 2`<br>`lingerie_lace: 2`<br>`lingerie_panties: 2`<br>`maid_dress: 2`<br>`summer_sundress: 2` | `propose_adjust_weight` | 精简脱敏不适条目，保留并优化强契合候选的梯度权重分布。 |
+| `domestic` | `character` | `married_housewife`, `neighbor_girlfriend` | `married_housewife: 4`<br>`french_maid: 2`<br>`gravure_idol: 2`<br>`neighbor_girlfriend: 2` | `propose_expand` | 在 baseline 候选基础上语义扩充高适配真实选择器，丰富情境抽样多样性，并按 4/2/1 实施差异化权重。 |
+| `domestic` | `makeup` | `mature_wife`, `natural_pure`, `climax_flush`, `pure_desire_white_peach` | `clear_water_bare: 4`<br>`mature_wife: 4`<br>`natural_pure: 2`<br>`pure_desire_white_peach: 2`<br>`sweet_peach_milk: 2` | `propose_adjust_weight` | 精简脱敏不适条目，保留并优化强契合候选的梯度权重分布。 |
+| `domestic` | `hairstyle` | `messy_bedhead`, `messy_bun`, `long_straight_black`, `hair_over_breast` | `messy_bedhead: 4`<br>`messy_bun: 4`<br>`ext_aw_hair_low_nape_chignon: 2` | `propose_adjust_weight` | 精简脱敏不适条目，保留并优化强契合候选的梯度权重分布。 |
+| `domestic` | `jewelry` | `gold_collarbone_chain`, `ribbon_bow`, `ankle_bracelet` | `acc_hairband: 2`<br>`acc_hairclip: 2`<br>`cat_ears: 2`<br>`maid_headdress: 2` | `propose_adjust_weight` | 精简脱敏不适条目，保留并优化强契合候选的梯度权重分布。 |
+| `domestic` | `props` | `cute_cat_on_bed`, `pillow_clutching`, `game_controller`, `wine_glass_bottle`, `rose_petals_candles` | `cute_cat_on_bed: 4`<br>`fluffy_teddy_bear: 4`<br>`game_controller: 4`<br>`pillow_clutching: 4`<br>`plush_doll_teddy: 4`<br>`embroidered_round_fan: 2`<br>`flower_bouquet_petals: 2`<br>`fresh_flower_bouquet: 2`<br>`glasses_reading: 2`<br>`rose_petals_candles: 2` | `propose_adjust_weight` | 精简脱敏不适条目，保留并优化强契合候选的梯度权重分布。 |
+| `domestic` | `tattoo` | *none (neutral)* | `cute_heart_star: 2`<br>`spine_vertical_script: 2` | `propose_expand` | 在 baseline 候选基础上语义扩充高适配真实选择器，丰富情境抽样多样性，并按 4/2/1 实施差异化权重。 |
+| `domestic` | `liquids` | `sweat_glistening`, `saliva_drool` | *none (中性抽样)* | `propose_adjust_weight` | 精简脱敏不适条目，保留并优化强契合候选的梯度权重分布。 |
+| `domestic` | `pose` | `lying`, `sitting`, `standing`, `teasing` | `lying: 4` | `propose_adjust_weight` | 精简脱敏不适条目，保留并优化强契合候选的梯度权重分布。 |
+| `domestic` | `expression` | `emotion_shy`, `emotion_seductive`, `emotion_dazed` | `emotion_relaxed: 4`<br>`emotion_blissful: 2`<br>`emotion_dazed: 2`<br>`emotion_happy: 2`<br>`emotion_playful: 2`<br>`emotion_shy: 2`<br>`emotion_tired: 2` | `propose_adjust_weight` | 精简脱敏不适条目，保留并优化强契合候选的梯度权重分布。 |
+| `domestic` | `lighting` | `lighting_bedroom_private`, `lighting_japanese_fresh`, `lighting_backlit_hair` | `ext_aw_light_soft_bounced: 4`<br>`lighting_bedroom_private: 4`<br>`prof_light_practical: 4`<br>`lighting_japanese_fresh: 2`<br>`lighting_backlit_hair: 1` | `propose_expand` | 在 baseline 候选基础上语义扩充高适配真实选择器，丰富情境抽样多样性，并按 4/2/1 实施差异化权重。 |
+| `domestic` | `film` | `kodak_portra_400`, `kodak_gold_200`, `fujifilm_pro_400h` | `film_stock_polaroid: 4`<br>`expired_film: 2`<br>`kodak_gold_200: 2`<br>`kodak_portra_400: 2` | `propose_adjust_weight` | 精简脱敏不适条目，保留并优化强契合候选的梯度权重分布。 |
+| `domestic` | `shot_type` | `medium_close_up`, `medium_shot`, `full_body_shot` | `close_up: 2`<br>`medium_close_up: 2` | `propose_adjust_weight` | 精简脱敏不适条目，保留并优化强契合候选的梯度权重分布。 |
+| `domestic` | `camera_angle` | `eye_level`, `high_angle`, `over_the_shoulder` | `camera_orientation_frontal: 2`<br>`camera_orientation_three_quarter: 2`<br>`eye_level: 2`<br>`high_angle: 2`<br>`overhead_birds_eye: 2`<br>`pov_first_person: 2`<br>`voyeur_peeping: 2` | `propose_adjust_weight` | 精简脱敏不适条目，保留并优化强契合候选的梯度权重分布。 |
+| `transit` | `clothing` | `jk_seifuku`, `blazer_uniform`, `ol_suit`, `street_casual`, `knit_sweater` | `duffel_coat: 4`<br>`outerwear_coat: 4`<br>`outerwear_overcoat: 4`<br>`rainwear_coat: 4`<br>`trench_coat: 4`<br>`business_suit: 2`<br>`ol_suit: 2` | `propose_adjust_weight` | 精简脱敏不适条目，保留并优化强契合候选的梯度权重分布。 |
+| `transit` | `character` | `jk_schoolgirl`, `ol_subordinate`, `neighbor_girlfriend` | `female_boss: 2`<br>`jk_schoolgirl: 2`<br>`ol_subordinate: 2` | `propose_adjust_weight` | 精简脱敏不适条目，保留并优化强契合候选的梯度权重分布。 |
+| `transit` | `makeup` | `natural_pure`, `cute_peachy`, `climax_flush` | *none (中性抽样)* | `propose_adjust_weight` | 精简脱敏不适条目，保留并优化强契合候选的梯度权重分布。 |
+| `transit` | `hairstyle` | `low_ponytail`, `high_ponytail`, `long_straight_black`, `collarbone_lob` | `collarbone_lob: 2`<br>`low_ponytail: 2` | `propose_adjust_weight` | 精简脱敏不适条目，保留并优化强契合候选的梯度权重分布。 |
+| `transit` | `jewelry` | `gold_collarbone_chain`, `ribbon_bow` | `winter_scarf: 4`<br>`ext_aw_jewelry_silver_hoop_earrings: 2`<br>`poncho: 2` | `propose_adjust_weight` | 精简脱敏不适条目，保留并优化强契合候选的梯度权重分布。 |
+| `transit` | `props` | `smartphone_recording`, `glasses_reading` | `fashion_baguette_bag: 4`<br>`smartphone_recording: 4`<br>`digital_camera_in_hand: 2` | `propose_adjust_weight` | 精简脱敏不适条目，保留并优化强契合候选的梯度权重分布。 |
+| `transit` | `tattoo` | *none (neutral)* | *none (中性抽样)* | `retain_as_is` | 基线候选与权重已完全自洽，继续保持原样。 |
+| `transit` | `liquids` | `sweat_glistening`, `none` | *none (中性抽样)* | `propose_adjust_weight` | 精简脱敏不适条目，保留并优化强契合候选的梯度权重分布。 |
+| `transit` | `pose` | `standing`, `sitting`, `dynamic` | `standing: 4`<br>`sitting: 2` | `propose_adjust_weight` | 精简脱敏不适条目，保留并优化强契合候选的梯度权重分布。 |
+| `transit` | `expression` | `emotion_restrained`, `emotion_shy`, `emotion_fear` | `emotion_tired: 4`<br>`emotion_dazed: 2` | `propose_adjust_weight` | 精简脱敏不适条目，保留并优化强契合候选的梯度权重分布。 |
+| `transit` | `lighting` | `lighting_voyeur_private`, `lighting_japanese_fresh`, `lighting_rain_wet` | `ext_aw_light_direct_flash: 4`<br>`lighting_rain_wet: 4`<br>`lighting_onsen_intimate: 2`<br>`lighting_voyeur_private: 2`<br>`prof_light_fluorescent: 2`<br>`prof_light_led_panel: 2`<br>`lighting_japanese_fresh: 1` | `propose_expand` | 在 baseline 候选基础上语义扩充高适配真实选择器，丰富情境抽样多样性，并按 4/2/1 实施差异化权重。 |
+| `transit` | `film` | `fujifilm_classic_chrome`, `fujifilm_superia_400`, `kodak_max_400` | `cinestill_800t: 2` | `propose_adjust_weight` | 精简脱敏不适条目，保留并优化强契合候选的梯度权重分布。 |
+| `transit` | `shot_type` | `medium_shot`, `full_body_shot`, `medium_close_up` | `full_body_shot: 4`<br>`medium_long_shot: 2`<br>`medium_shot: 2` | `propose_adjust_weight` | 精简脱敏不适条目，保留并优化强契合候选的梯度权重分布。 |
+| `transit` | `camera_angle` | `eye_level`, `voyeur_peeping`, `over_the_shoulder` | `low_angle: 2`<br>`voyeur_peeping: 2`<br>`worms_eye: 2` | `propose_adjust_weight` | 精简脱敏不适条目，保留并优化强契合候选的梯度权重分布。 |
+| `outdoor` | `clothing` | `bikini_micro`, `one_piece_swimsuit`, `street_casual`, `gym_uniform`, `cheerleader` | `one_piece_swimsuit: 4`<br>`summer_sundress: 4`<br>`sundress_layered: 4`<br>`swimsuit_classic: 4`<br>`swimsuit_competition: 4`<br>`swimsuit_creative: 4`<br>`volleyball_uniform: 4`<br>`duffel_coat: 2`<br>`gym_uniform: 2`<br>`rainwear_coat: 2`<br>`swimsuit_school: 2`<br>`tactical_jumpsuit: 2`<br>`trench_coat: 2` | `propose_adjust_weight` | 精简脱敏不适条目，保留并优化强契合候选的梯度权重分布。 |
+| `outdoor` | `character` | `gravure_idol`, `neighbor_girlfriend` | `gravure_idol: 2`<br>`neighbor_girlfriend: 2` | `propose_adjust_weight` | 保留基线候选集合，将基线均一化的 1.0 权重治理升级为强关联 4 / 适配 2 区分权重。 |
+| `outdoor` | `makeup` | `natural_pure`, `cute_peachy`, `wet_dewy`, `sun_kissed` | `sun_kissed: 4`<br>`cute_peachy: 2`<br>`wet_dewy: 2` | `propose_adjust_weight` | 精简脱敏不适条目，保留并优化强契合候选的梯度权重分布。 |
+| `outdoor` | `hairstyle` | `high_ponytail`, `twin_tails`, `space_buns`, `messy_bun` | `high_ponytail: 4`<br>`braided_twins: 2`<br>`hair_pixie_side_swept: 2`<br>`space_buns: 2`<br>`twin_tails: 2` | `propose_adjust_weight` | 精简脱敏不适条目，保留并优化强契合候选的梯度权重分布。 |
+| `outdoor` | `jewelry` | `ribbon_bow`, `gold_collarbone_chain`, `ankle_bracelet` | `poncho: 4`<br>`winter_scarf: 4`<br>`body_chain: 2`<br>`hooded_cloak: 2` | `propose_adjust_weight` | 精简脱敏不适条目，保留并优化强契合候选的梯度权重分布。 |
+| `outdoor` | `props` | `camera_tripod_flash`, `oriental_fan_umbrella`, `smartphone_recording`, `flower_bouquet_petals` | `digital_camera_in_hand: 4`<br>`digital_camera_record: 4`<br>`fresh_flower_bouquet: 2`<br>`oil_paper_umbrella: 2`<br>`oriental_fan_umbrella: 2` | `propose_adjust_weight` | 精简脱敏不适条目，保留并优化强契合候选的梯度权重分布。 |
+| `outdoor` | `tattoo` | *none (neutral)* | `cherry_blossom_shoulder: 2` | `propose_expand` | 在 baseline 候选基础上语义扩充高适配真实选择器，丰富情境抽样多样性，并按 4/2/1 实施差异化权重。 |
+| `outdoor` | `liquids` | `wet_water_drops`, `sweat_glistening` | `sweat_glistening: 4`<br>`wet_water_drops: 2` | `propose_adjust_weight` | 保留基线候选集合，将基线均一化的 1.0 权重治理升级为强关联 4 / 适配 2 区分权重。 |
+| `outdoor` | `pose` | `dynamic`, `standing`, `sitting` | `dynamic: 4`<br>`standing: 4`<br>`combat_action: 2` | `propose_adjust_weight` | 精简脱敏不适条目，保留并优化强契合候选的梯度权重分布。 |
+| `outdoor` | `expression` | `emotion_playful`, `emotion_shy`, `emotion_seductive` | `emotion_happy: 4`<br>`emotion_amused: 2` | `propose_adjust_weight` | 精简脱敏不适条目，保留并优化强契合候选的梯度权重分布。 |
+| `outdoor` | `lighting` | `lighting_japanese_fresh`, `lighting_backlit_hair`, `lighting_rain_wet` | `ext_aw_light_warm_golden_hour: 4`<br>`lighting_japanese_fresh: 4`<br>`prof_light_high_key: 4`<br>`professional_lighting_14: 4`<br>`professional_lighting_15: 4`<br>`lighting_rain_wet: 2`<br>`lighting_backlit_hair: 1` | `propose_expand` | 在 baseline 候选基础上语义扩充高适配真实选择器，丰富情境抽样多样性，并按 4/2/1 实施差异化权重。 |
+| `outdoor` | `film` | `kodak_ektar_100`, `fujifilm_velvia_50`, `cinestill_50d` | `fujifilm_pro_400h: 4`<br>`fujifilm_superia_400: 4`<br>`kodak_gold_200: 4`<br>`fujifilm_provia_100f: 2` | `propose_adjust_weight` | 精简脱敏不适条目，保留并优化强契合候选的梯度权重分布。 |
+| `outdoor` | `shot_type` | `full_body_shot`, `medium_long_shot`, `medium_shot` | `full_body_shot: 4`<br>`medium_long_shot: 2` | `propose_adjust_weight` | 精简脱敏不适条目，保留并优化强契合候选的梯度权重分布。 |
+| `outdoor` | `camera_angle` | `low_angle`, `eye_level`, `high_angle` | `low_angle: 4`<br>`worms_eye: 4` | `propose_adjust_weight` | 精简脱敏不适条目，保留并优化强契合候选的梯度权重分布。 |
+| `dining` | `clothing` | `maid_dress`, `waitress_uniform`, `street_casual`, `qipao`, `kimono` | `evening_dress: 4`<br>`fast_food_uniform: 4`<br>`maid_dress: 4`<br>`tailcoat: 4`<br>`waitress_uniform: 4`<br>`cocktail_dress: 2`<br>`dirndl_dress: 2`<br>`qipao: 2`<br>`waist_apron: 2`<br>`wedding_dress: 2` | `propose_adjust_weight` | 精简脱敏不适条目，保留并优化强契合候选的梯度权重分布。 |
+| `dining` | `character` | `french_maid`, `neighbor_girlfriend`, `ol_subordinate`, `married_housewife` | `french_maid: 4`<br>`married_housewife: 2` | `propose_adjust_weight` | 精简脱敏不适条目，保留并优化强契合候选的梯度权重分布。 |
+| `dining` | `makeup` | `cute_peachy`, `natural_pure`, `mature_wife`, `sweet_peach_milk` | `chinese_vermilion: 2`<br>`drunken_milky_youth: 2`<br>`mature_wife: 2`<br>`vintage_retro: 2` | `propose_adjust_weight` | 精简脱敏不适条目，保留并优化强契合候选的梯度权重分布。 |
+| `dining` | `hairstyle` | `messy_bun`, `collarbone_lob`, `twin_tails`, `bob_cut` | `big_wavy_curls: 2`<br>`hair_1940s_waves: 2` | `propose_adjust_weight` | 精简脱敏不适条目，保留并优化强契合候选的梯度权重分布。 |
+| `dining` | `jewelry` | `maid_headdress`, `pearl_necklace`, `gold_collarbone_chain` | `ext_aw_jewelry_pearl_drop_earrings: 4`<br>`maid_headdress: 4`<br>`pearl_necklace: 4`<br>`acc_bowtie: 2`<br>`gold_collarbone_chain: 2` | `propose_expand` | 在 baseline 候选基础上语义扩充高适配真实选择器，丰富情境抽样多样性，并按 4/2/1 实施差异化权重。 |
+| `dining` | `props` | `wine_glass_bottle`, `glasses_reading`, `smartphone_recording` | `fresh_flower_bouquet: 4`<br>`ice_cubes: 4`<br>`wine_glass_bottle: 4`<br>`fashion_clutch_bag: 2` | `propose_adjust_weight` | 精简脱敏不适条目，保留并优化强契合候选的梯度权重分布。 |
+| `dining` | `tattoo` | *none (neutral)* | *none (中性抽样)* | `retain_as_is` | 基线候选与权重已完全自洽，继续保持原样。 |
+| `dining` | `liquids` | `none`, `sweat_glistening` | *none (中性抽样)* | `propose_adjust_weight` | 精简脱敏不适条目，保留并优化强契合候选的梯度权重分布。 |
+| `dining` | `pose` | `sitting`, `standing`, `teasing` | `sitting: 2` | `propose_adjust_weight` | 精简脱敏不适条目，保留并优化强契合候选的梯度权重分布。 |
+| `dining` | `expression` | `emotion_playful`, `emotion_shy`, `emotion_seductive` | `emotion_amused: 2` | `propose_adjust_weight` | 精简脱敏不适条目，保留并优化强契合候选的梯度权重分布。 |
+| `dining` | `lighting` | `lighting_japanese_fresh`, `lighting_oil_classical`, `lighting_studio_commercial` | `ext_aw_light_candlelight: 4`<br>`lighting_oil_classical: 4`<br>`lighting_japanese_fresh: 2`<br>`prof_light_gelled: 2`<br>`prof_light_tungsten: 2`<br>`lighting_studio_commercial: 1` | `propose_expand` | 在 baseline 候选基础上语义扩充高适配真实选择器，丰富情境抽样多样性，并按 4/2/1 实施差异化权重。 |
+| `dining` | `film` | `kodak_portra_400`, `kodak_gold_200`, `fujifilm_classic_chrome` | `kodak_portra_400: 2` | `propose_adjust_weight` | 精简脱敏不适条目，保留并优化强契合候选的梯度权重分布。 |
+| `dining` | `shot_type` | `medium_shot`, `medium_close_up`, `full_body_shot` | `medium_close_up: 2`<br>`medium_shot: 2` | `propose_adjust_weight` | 精简脱敏不适条目，保留并优化强契合候选的梯度权重分布。 |
+| `dining` | `camera_angle` | `eye_level`, `over_the_shoulder`, `high_angle` | `camera_orientation_three_quarter: 2` | `propose_adjust_weight` | 精简脱敏不适条目，保留并优化强契合候选的梯度权重分布。 |
+| `adult` | `clothing` | `bunny_suit`, `maid_dress`, `latex_catsuit`, `leather_corset`, `bikini_micro`, `lingerie_lace` | `legwear_bare: 4`<br>`lingerie_bra: 4`<br>`lingerie_lace: 4`<br>`lingerie_panties: 4`<br>`apron_dress: 2`<br>`bunny_suit: 2`<br>`dress_backless: 2`<br>`latex_catsuit: 2`<br>`leotard_bodysuit: 2`<br>`one_piece_swimsuit: 2`<br>`slime_dress: 2`<br>`swimsuit_classic: 2`<br>`swimsuit_creative: 2` | `propose_adjust_weight` | 精简脱敏不适条目，保留并优化强契合候选的梯度权重分布。 |
+| `adult` | `character` | `hostess_cabaret`, `gravure_idol`, `french_maid` | `gravure_idol: 2` | `propose_adjust_weight` | 精简脱敏不适条目，保留并优化强契合候选的梯度权重分布。 |
+| `adult` | `makeup` | `sultry_smoky`, `climax_flush`, `ruined_crying`, `submissive_marked` | `climax_flush: 4`<br>`pure_desire_white_peach: 2`<br>`ruined_crying: 2`<br>`submissive_marked: 2`<br>`sultry_smoky: 2` | `propose_expand` | 在 baseline 候选基础上语义扩充高适配真实选择器，丰富情境抽样多样性，并按 4/2/1 实施差异化权重。 |
+| `adult` | `hairstyle` | `twin_tails`, `big_wavy_curls`, `wet_hair_face`, `hair_in_mouth` | `wet_hair_face: 2` | `propose_adjust_weight` | 精简脱敏不适条目，保留并优化强契合候选的梯度权重分布。 |
+| `adult` | `jewelry` | `bunny_ears`, `cat_ears`, `maid_headdress`, `lace_blindfold`, `leather_choker`, `nipple_rings`, `body_chain` | `body_chain: 4`<br>`lace_blindfold: 4`<br>`nipple_rings: 4`<br>`bunny_ears: 2`<br>`leather_choker: 2` | `propose_adjust_weight` | 精简脱敏不适条目，保留并优化强契合候选的梯度权重分布。 |
+| `adult` | `props` | `sex_toy_vibrator`, `camera_tripod_flash`, `bondage_rope_collar`, `ice_cubes` | `bondage_rope_collar: 4`<br>`rose_petals_candles: 4`<br>`sex_toy_vibrator: 4`<br>`flower_bouquet_petals: 2`<br>`ice_cubes: 2` | `propose_adjust_weight` | 精简脱敏不适条目，保留并优化强契合候选的梯度权重分布。 |
+| `adult` | `tattoo` | `lewd_womb_pubic`, `barcode_serial_number`, `tally_marks_inner_thigh`, `butterfly_lower_back` | `lewd_womb_pubic: 4`<br>`tally_marks_inner_thigh: 4`<br>`butterfly_lower_back: 2`<br>`rose_flower_hip: 2`<br>`underbust_mandala: 2` | `propose_adjust_weight` | 精简脱敏不适条目，保留并优化强契合候选的梯度权重分布。 |
+| `adult` | `liquids` | `pussy_juice`, `cum_splatter`, `body_oil_lube`, `saliva_drool` | `body_oil_lube: 4`<br>`cum_splatter: 4`<br>`pussy_juice: 4`<br>`saliva_drool: 2` | `propose_adjust_weight` | 保留基线候选集合，将基线均一化的 1.0 权重治理升级为强关联 4 / 适配 2 区分权重。 |
+| `adult` | `pose` | `teasing`, `kneeling`, `all_fours`, `lying` | `gestures_self_touch: 4`<br>`restraints_holds: 4`<br>`teasing: 4`<br>`all_fours: 2`<br>`kneeling: 2` | `propose_adjust_weight` | 精简脱敏不适条目，保留并优化强契合候选的梯度权重分布。 |
+| `adult` | `expression` | `emotion_seductive`, `emotion_pleasure`, `emotion_submissive` | `emotion_pleasure: 4`<br>`emotion_seductive: 4`<br>`emotion_submissive: 4`<br>`emotion_yearning: 4`<br>`emotion_blissful: 2`<br>`emotion_pain: 2`<br>`emotion_restrained: 2` | `propose_expand` | 在 baseline 候选基础上语义扩充高适配真实选择器，丰富情境抽样多样性，并按 4/2/1 实施差异化权重。 |
+| `adult` | `lighting` | `lighting_love_hotel_neon`, `lighting_cinematic_dark`, `lighting_voyeur_private` | `lighting_cinematic_dark: 4`<br>`lighting_love_hotel_neon: 4`<br>`lighting_voyeur_private: 4`<br>`prof_light_low_key: 4` | `propose_expand` | 在 baseline 候选基础上语义扩充高适配真实选择器，丰富情境抽样多样性，并按 4/2/1 实施差异化权重。 |
+| `adult` | `film` | `cinestill_800t`, `lomography_color`, `expired_film` | *none (中性抽样)* | `propose_adjust_weight` | 精简脱敏不适条目，保留并优化强契合候选的梯度权重分布。 |
+| `adult` | `shot_type` | `erotic_close_up`, `close_up`, `medium_close_up` | `erotic_close_up: 4`<br>`extreme_close_up: 4` | `propose_adjust_weight` | 精简脱敏不适条目，保留并优化强契合候选的梯度权重分布。 |
+| `adult` | `camera_angle` | `pov_first_person`, `between_legs_angle`, `high_angle`, `low_angle` | `between_legs_angle: 4`<br>`pov_first_person: 4` | `propose_adjust_weight` | 精简脱敏不适条目，保留并优化强契合候选的梯度权重分布。 |
+| `special` | `clothing` | `latex_catsuit`, `leather_corset`, `lingerie_lace` | `armored_dress: 4`<br>`cyberpunk_plugsuit: 4`<br>`cyberpunk_tactical_bodysuit: 4`<br>`slime_dress: 4`<br>`tactical_jumpsuit: 4`<br>`wedding_dress: 4`<br>`bunny_suit: 2`<br>`latex_catsuit: 2`<br>`tailcoat: 2`<br>`zentai_suit: 2` | `propose_adjust_weight` | 精简脱敏不适条目，保留并优化强契合候选的梯度权重分布。 |
+| `special` | `character` | `female_boss`, `kind_nurse`, `strict_teacher` | *none (中性抽样)* | `propose_adjust_weight` | 精简脱敏不适条目，保留并优化强契合候选的梯度权重分布。 |
+| `special` | `makeup` | `submissive_marked`, `sultry_smoky`, `ruined_crying`, `gothic_dark` | `gothic_dark: 2` | `propose_adjust_weight` | 精简脱敏不适条目，保留并优化强契合候选的梯度权重分布。 |
+| `special` | `hairstyle` | `hime_cut`, `long_straight_black`, `messy_bedhead` | `space_buns: 4`<br>`hair_pixie_side_swept: 2` | `propose_adjust_weight` | 精简脱敏不适条目，保留并优化强契合候选的梯度权重分布。 |
+| `special` | `jewelry` | `leather_choker`, `lace_blindfold`, `body_chain` | `cat_ears: 4`<br>`cloak: 4`<br>`hooded_cloak: 4`<br>`bunny_ears: 2`<br>`ribbon_bow: 2` | `propose_adjust_weight` | 精简脱敏不适条目，保留并优化强契合候选的梯度权重分布。 |
+| `special` | `props` | `bondage_rope_collar`, `camera_tripod_flash`, `sex_toy_vibrator` | `camera_tripod_flash: 4` | `propose_adjust_weight` | 精简脱敏不适条目，保留并优化强契合候选的梯度权重分布。 |
+| `special` | `tattoo` | `barcode_serial_number`, `snake_coiling`, `spine_vertical_script` | `barcode_serial_number: 4` | `propose_adjust_weight` | 精简脱敏不适条目，保留并优化强契合候选的梯度权重分布。 |
+| `special` | `liquids` | `saliva_drool`, `sweat_glistening`, `cum_splatter` | *none (中性抽样)* | `propose_adjust_weight` | 精简脱敏不适条目，保留并优化强契合候选的梯度权重分布。 |
+| `special` | `pose` | `standing`, `lying`, `kneeling`, `teasing` | `combat_action: 4`<br>`dynamic: 4` | `propose_adjust_weight` | 精简脱敏不适条目，保留并优化强契合候选的梯度权重分布。 |
+| `special` | `expression` | `emotion_detached`, `emotion_dazed`, `emotion_fear`, `emotion_contrast` | *none (中性抽样)* | `propose_adjust_weight` | 精简脱敏不适条目，保留并优化强契合候选的梯度权重分布。 |
+| `special` | `lighting` | `lighting_cinematic_dark`, `lighting_voyeur_private`, `lighting_love_hotel_neon` | `ext_aw_light_bioluminescent: 4`<br>`special_effects_00: 4`<br>`special_effects_01: 4`<br>`special_effects_02: 4`<br>`special_effects_03: 4`<br>`lighting_cinematic_dark: 2`<br>`lighting_love_hotel_neon: 2`<br>`lighting_voyeur_private: 2` | `propose_expand` | 在 baseline 候选基础上语义扩充高适配真实选择器，丰富情境抽样多样性，并按 4/2/1 实施差异化权重。 |
+| `special` | `film` | `kodak_tmax_400`, `kodak_trix_400`, `cinestill_800t`, `lomography_color` | `expired_film: 2` | `propose_adjust_weight` | 精简脱敏不适条目，保留并优化强契合候选的梯度权重分布。 |
+| `special` | `shot_type` | `medium_shot`, `full_body_shot`, `close_up` | *none (中性抽样)* | `propose_adjust_weight` | 精简脱敏不适条目，保留并优化强契合候选的梯度权重分布。 |
+| `special` | `camera_angle` | `dutch_angle`, `voyeur_peeping`, `overhead_birds_eye`, `pov_first_person` | *none (中性抽样)* | `propose_adjust_weight` | 精简脱敏不适条目，保留并优化强契合候选的梯度权重分布。 |
+| `generic` | `clothing` | `street_casual`, `knit_sweater`, `camisole_slip`, `silk_robe` | *none (中性抽样 $C(generic, s) = G_s$)* | `neutral` | 14 个 generic 单元统一明确为对槽位全部合法候选中性无偏置抽样，消除原先仅有少数等权候选导致的非预期偏置，保证与全局池 $G_s$ 严格自洽。 |
+| `generic` | `character` | `neighbor_girlfriend`, `married_housewife`, `jk_schoolgirl` | *none (中性抽样 $C(generic, s) = G_s$)* | `neutral` | 14 个 generic 单元统一明确为对槽位全部合法候选中性无偏置抽样，消除原先仅有少数等权候选导致的非预期偏置，保证与全局池 $G_s$ 严格自洽。 |
+| `generic` | `makeup` | `natural_pure`, `cute_peachy`, `mature_wife`, `pure_desire_white_peach` | *none (中性抽样 $C(generic, s) = G_s$)* | `neutral` | 14 个 generic 单元统一明确为对槽位全部合法候选中性无偏置抽样，消除原先仅有少数等权候选导致的非预期偏置，保证与全局池 $G_s$ 严格自洽。 |
+| `generic` | `hairstyle` | `long_straight_black`, `high_ponytail`, `low_ponytail`, `collarbone_lob` | *none (中性抽样 $C(generic, s) = G_s$)* | `neutral` | 14 个 generic 单元统一明确为对槽位全部合法候选中性无偏置抽样，消除原先仅有少数等权候选导致的非预期偏置，保证与全局池 $G_s$ 严格自洽。 |
+| `generic` | `jewelry` | `gold_collarbone_chain`, `ribbon_bow`, `pearl_necklace` | *none (中性抽样 $C(generic, s) = G_s$)* | `neutral` | 14 个 generic 单元统一明确为对槽位全部合法候选中性无偏置抽样，消除原先仅有少数等权候选导致的非预期偏置，保证与全局池 $G_s$ 严格自洽。 |
+| `generic` | `props` | `smartphone_recording`, `cute_cat_on_bed`, `pillow_clutching` | *none (中性抽样 $C(generic, s) = G_s$)* | `neutral` | 14 个 generic 单元统一明确为对槽位全部合法候选中性无偏置抽样，消除原先仅有少数等权候选导致的非预期偏置，保证与全局池 $G_s$ 严格自洽。 |
+| `generic` | `tattoo` | *none (neutral)* | *none (中性抽样 $C(generic, s) = G_s$)* | `neutral` | 14 个 generic 单元统一明确为对槽位全部合法候选中性无偏置抽样，消除原先仅有少数等权候选导致的非预期偏置，保证与全局池 $G_s$ 严格自洽。 |
+| `generic` | `liquids` | `none`, `sweat_glistening` | *none (中性抽样 $C(generic, s) = G_s$)* | `neutral` | 14 个 generic 单元统一明确为对槽位全部合法候选中性无偏置抽样，消除原先仅有少数等权候选导致的非预期偏置，保证与全局池 $G_s$ 严格自洽。 |
+| `generic` | `pose` | `standing`, `sitting`, `dynamic`, `lying` | *none (中性抽样 $C(generic, s) = G_s$)* | `neutral` | 14 个 generic 单元统一明确为对槽位全部合法候选中性无偏置抽样，消除原先仅有少数等权候选导致的非预期偏置，保证与全局池 $G_s$ 严格自洽。 |
+| `generic` | `expression` | `emotion_shy`, `emotion_playful`, `emotion_restrained` | *none (中性抽样 $C(generic, s) = G_s$)* | `neutral` | 14 个 generic 单元统一明确为对槽位全部合法候选中性无偏置抽样，消除原先仅有少数等权候选导致的非预期偏置，保证与全局池 $G_s$ 严格自洽。 |
+| `generic` | `lighting` | `lighting_japanese_fresh`, `lighting_backlit_hair`, `lighting_studio_commercial` | *none (中性抽样 $C(generic, s) = G_s$)* | `neutral` | 14 个 generic 单元统一明确为对槽位全部合法候选中性无偏置抽样，消除原先仅有少数等权候选导致的非预期偏置，保证与全局池 $G_s$ 严格自洽。 |
+| `generic` | `film` | `kodak_max_400`, `fujifilm_superia_400`, `kodak_portra_400` | *none (中性抽样 $C(generic, s) = G_s$)* | `neutral` | 14 个 generic 单元统一明确为对槽位全部合法候选中性无偏置抽样，消除原先仅有少数等权候选导致的非预期偏置，保证与全局池 $G_s$ 严格自洽。 |
+| `generic` | `shot_type` | `medium_shot`, `medium_close_up`, `full_body_shot` | *none (中性抽样 $C(generic, s) = G_s$)* | `neutral` | 14 个 generic 单元统一明确为对槽位全部合法候选中性无偏置抽样，消除原先仅有少数等权候选导致的非预期偏置，保证与全局池 $G_s$ 严格自洽。 |
+| `generic` | `camera_angle` | `eye_level`, `high_angle`, `over_the_shoulder` | *none (中性抽样 $C(generic, s) = G_s$)* | `neutral` | 14 个 generic 单元统一明确为对槽位全部合法候选中性无偏置抽样，消除原先仅有少数等权候选导致的非预期偏置，保证与全局池 $G_s$ 严格自洽。 |

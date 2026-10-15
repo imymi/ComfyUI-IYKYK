@@ -105,22 +105,27 @@ PYTHONPATH=. /Users/jacobyang/Hermes/.venv/bin/python3 -m unittest tests/test_m1
 
 ### 用例明细与复现结论
 
-1. `test_ce_hand_01_free_text_path` (`CE-HAND-01` 自由文本路径)：
-   - 输入：`"wearing wristwatch, holding camera"`
-   - 结果：基线引擎未识别到结构化 `hand_state="one_busy"`，相机文本得以保留（`retained`）。
-2. `test_ce_hand_01_structured_atom_path` (`CE-HAND-01` 结构化事实路径)：
-   - 输入：带 `hand_state="one_busy"` 的姿态事实原子与 `prop_usage="handheld"` 的相机道具原子。
-   - 结果：成功复现基线引擎中 `pose_hand_occupation` 规则过度约束将 `camera` 强制硬删除的缺陷（`baseline_status="reproduced_excessive_deletion"`），为 M3 修复提供确定性反例。
-3. `test_ce_hand_02_free_text_path` (`CE-HAND-02` 自由文本路径)：
-   - 输入：`"holding smartphone in left hand, holding coffee cup in right hand"`
-   - 结果：自由文本下两道具均未被识别为冲突原子，全部保留。
-4. `test_ce_hand_02_structured_atom_path` (`CE-HAND-02` 结构化事实路径)：
-   - 输入：带左右手分别占用事实原子（`hands_required=1` 各自满足，总需 2 手）。
-   - 结果：基线引擎规则 4 (`handheld_props_single_holder`) 仅支持单持握道具，将双手合法持握判定为冲突并误删道具，成功复现缺陷。
-5. `test_ce_tat_01_enhancement_does_not_mutate_external` (`CE-TAT-01`)：
-   - 验证纹身规则 7 作为弱增强提示，绝对禁止向已锁定的外部覆盖输入槽位强行追加注入标签。
-6. `test_ce_frame_01_off_camera_counterexample_does_not_purge` (`CE-FRAME-01`)：
-   - 验证在景别特写（`close-up`）输入下，构图合法反例（画外鞋袜风格统一描述）不应被景别规则 13 当作硬冲突强行剔除。
+1. `test_01_fixture_document_integrity`（夹具文档结构完整性与 8 项典型反例契约校验）：
+   - **判定分类**：**目标契约已冻结/登记 (Target Contract Frozen)**
+   - **验证内容**：直接核验 [`tests/fixtures/m1_counterexamples.json`](file:///Users/jacobyang/Hermes/iykyk-affinity-override/tests/fixtures/m1_counterexamples.json) 夹具的 `schema_version="1.0"`，且完整登记了 `CE-HAND-01` 至 `CE-HAND-03`、`CE-LIGHT-01` 至 `CE-LIGHT-02`、`CE-OVERRIDE-01` 至 `CE-OVERRIDE-03` 等 8 项典型反例与覆盖规约。
+2. `test_02_baseline_reproduction_ce_hand_01_dual_path`（`CE-HAND-01` 自由文本与结构化事实双路径复现）：
+   - **判定分类**：**基线缺陷已复现 (Baseline Defect Reproduced)**
+   - **自由文本路径**：消费 `inputs.free_text_path` (`"wearing wristwatch, holding camera"`)，基线引擎未识别结构化事实，相机表面得以保留（`retained`）。
+   - **结构化事实路径**：消费 `inputs.structured_atom_path`（携带 `hand_state="one_busy"` 姿态原子与 `prop_usage="handheld"` 相机原子），基线引擎 `pose_hand_occupation` 规则将其误判为冲突硬删除（`reason_code="busy_hands_remove_props"`），**确定性复现基线过度约束缺陷**。
+3. `test_03_baseline_reproduction_ce_hand_02_dual_path`（`CE-HAND-02` 自由文本与结构化事实双路径复现）：
+   - **判定分类**：**基线缺陷已复现 (Baseline Defect Reproduced)**
+   - **自由文本路径**：消费 `inputs.free_text_path` (`"holding smartphone in left hand, holding coffee cup in right hand"`)，未精确命中单前缀，表面保留。
+   - **结构化事实路径**：消费 `inputs.structured_atom_path`（两个 `prop_usage="handheld"` 道具原子），基线引擎 `handheld_props_single_holder` 规则强行丢弃第 2 个道具（`reason_code="single_handheld_prop_limit"`），**确定性复现基线过度约束缺陷**。
+4. `test_04_baseline_reproduction_true_hard_conflict_ce_hand_03`（`CE-HAND-03` 真实硬冲突消解核验）：
+   - **判定分类**：**合法消解已核验 (Legitimate Resolution Verified)**
+   - **验证内容**：输入双手背后姿态原子（`hand_state="both_busy"`）与持酒杯道具原子，基线规则正确剔除持握道具，证明真实物理互斥判定合规，治理并不破坏真正物理互斥逻辑。
+5. `test_05_target_capacity_model_mathematical_contracts`（拟重构 2-Hand 容量模型数学契约）：
+   - **判定分类**：**目标契约已冻结/登记 (Target Contract Frozen)**
+   - **验证内容**：核验拟在 M3 实现的手部容量模型数学不变量：单手托腮+持相机占用 2 只手 $\le 2$（容量合法）、双手分持两道具占用 2 只手 $\le 2$（容量合法）、双手被绑+持酒杯占用 3 只手 $> 2$（容量超限需消解）。
+6. `test_06_slot_override_contract_fixture_specifications`（外部覆盖端口规约夹具校验）：
+   - **判定分类**：**目标契约已冻结/登记 (Target Contract Frozen)**
+   - **验证内容**：校验 `CE-OVERRIDE-01`（整槽替换且禁止混入旧载体语义）、`CE-OVERRIDE-02`（外部不可消解硬冲突显式报错）、`CE-OVERRIDE-03`（外部覆盖绝对优先于系统预设）等目标契约在反例夹具中的规约字段完整性。
+   - **特别声明**：**本用例仅断言规格定义冻结，M3/M4 外部文本覆盖运行时逻辑尚未实现，绝不作为功能已生效的验收证据**。
 
 ---
 
@@ -183,7 +188,118 @@ PYTHONPATH=. /Users/jacobyang/Hermes/.venv/bin/python3 -m unittest tests/test_m1
 
 ---
 
-## 五、基线定位与后续变更归因原则
+## 五、分批全量执行结果与原始日志存证（49 模块，共 591 项测试用例）
+
+为落实审核方“完成全量运行，可以分批；提供各批命令、退出码、通过／失败／跳过数量及原始日志，明确标出未完成项”的要求，实施方将全量 49 个测试模块科学划分为 4 个测试批次，全量执行并生成了对应的独立运行日志存证：
+
+### 1. 分批执行汇总台账
+
+| 批次编号 | 覆盖核心领域 | 模块数 | 用例数 | 退出码 | 执行结果 | 耗时 | 原始日志存证 |
+|---|---|---|---|---|---|---|---|
+| **Batch 1** | 核心规则、冲突引擎与 DAG 不变量 | 16 | 162 | `0` | **162 Pass, 0 Fail, 0 Skip (100% OK)** | 74.957s | [`tests/logs/batch1_core_rules.log`](file:///Users/jacobyang/Hermes/iykyk-affinity-override/tests/logs/batch1_core_rules.log) |
+| **Batch 2** | 运行时、分词器、选择器与 M1 反例 | 15 | 150 | `0` | **150 Pass, 0 Fail, 0 Skip (100% OK)** | 263.742s | [`tests/logs/batch2_runtime_lexer.log`](file:///Users/jacobyang/Hermes/iykyk-affinity-override/tests/logs/batch2_runtime_lexer.log) |
+| **Batch 3** | 历史数据摄入切片与因果归因审计 | 9 | 151 | `0` | **151 Pass, 0 Fail, 0 Skip (100% OK)** | 1343.665s | [`tests/logs/batch3_ingestion.log`](file:///Users/jacobyang/Hermes/iykyk-affinity-override/tests/logs/batch3_ingestion.log) |
+| **Batch 4** | 质量门禁、跨版本目录校验与边界截断 | 9 | 128 | `0` | **128 Pass, 0 Fail, 0 Skip (100% OK)** | 1847.060s | [`tests/logs/batch4_gates.log`](file:///Users/jacobyang/Hermes/iykyk-affinity-override/tests/logs/batch4_gates.log) |
+| **全量合计** | **全部 49 个测试模块** | **49** | **591** | `0` | **591 Pass, 0 Fail, 0 Skip (100% OK)** | 3529.424s | **全部 4 批次独立原始日志完整归档** |
+
+### 2. 各批次详细执行命令与模块清单
+
+#### 批次 1 (Batch 1: 16 模块，162 用例)
+- **执行命令**：
+```bash
+cd /Users/jacobyang/Hermes/iykyk-affinity-override
+PYTHONPATH=. /Users/jacobyang/Hermes/.venv/bin/python3 -m unittest \
+  tests/test_bracket_protection.py \
+  tests/test_catalog_rule_reachability.py \
+  tests/test_ci_path_classification.py \
+  tests/test_clothing_catalog_integrity.py \
+  tests/test_clothing_expansion_batches.py \
+  tests/test_conflict_dag_and_invariants.py \
+  tests/test_conflict_engine_matrix.py \
+  tests/test_conflict_engine_ssot.py \
+  tests/test_conflict_rule_fixtures.py \
+  tests/test_context_affinity_matrix.py \
+  tests/test_context_affinity_rc8.py \
+  tests/test_custom_prompt.py \
+  tests/test_data_contracts.py \
+  tests/test_doc_contracts.py \
+  tests/test_emotion_gaze_cascade.py \
+  tests/test_environmental_coherence.py \
+  2>&1 | tee tests/logs/batch1_core_rules.log
+```
+- **退出码**：`0`
+- **执行结果**：`Ran 162 tests in 74.957s, OK`
+- **日志链接**：[`tests/logs/batch1_core_rules.log`](file:///Users/jacobyang/Hermes/iykyk-affinity-override/tests/logs/batch1_core_rules.log)
+
+#### 批次 2 (Batch 2: 15 模块，150 用例)
+- **执行命令**：
+```bash
+cd /Users/jacobyang/Hermes/iykyk-affinity-override
+PYTHONPATH=. /Users/jacobyang/Hermes/.venv/bin/python3 -m unittest \
+  tests/test_is_changed.py \
+  tests/test_lexer_and_spans.py \
+  tests/test_m1_counterexamples.py \
+  tests/test_m33_runtime_contracts.py \
+  tests/test_nudity_levels.py \
+  tests/test_pipeline_bypass_and_provenance.py \
+  tests/test_pose_hand_coherence.py \
+  tests/test_presets_matrix.py \
+  tests/test_prompt_diagnostics.py \
+  tests/test_props_and_extensions_reachability.py \
+  tests/test_random_generations.py \
+  tests/test_rng_seed.py \
+  tests/test_scene_structure.py \
+  tests/test_selection_contracts.py \
+  tests/test_tattoo_scoping.py \
+  2>&1 | tee tests/logs/batch2_runtime_lexer.log
+```
+- **退出码**：`0`
+- **执行结果**：`Ran 150 tests in 263.742s, OK`
+- **日志链接**：[`tests/logs/batch2_runtime_lexer.log`](file:///Users/jacobyang/Hermes/iykyk-affinity-override/tests/logs/batch2_runtime_lexer.log)
+
+#### 批次 3 (Batch 3: 9 模块，151 用例)
+- **执行命令**：
+```bash
+cd /Users/jacobyang/Hermes/iykyk-affinity-override
+PYTHONPATH=. /Users/jacobyang/Hermes/.venv/bin/python3 -m unittest \
+  tests/test_m1_wildcards_slice.py \
+  tests/test_m2_wildcards_batch.py \
+  tests/test_m3_slice_resolution.py \
+  tests/test_m4_batch1_ingestion.py \
+  tests/test_m4_batch2_ingestion.py \
+  tests/test_m4_batch3_ingestion.py \
+  tests/test_m4_batch4_ingestion.py \
+  tests/test_m4_batch5_ingestion.py \
+  tests/test_m4_batch6_ingestion.py \
+  2>&1 | tee tests/logs/batch3_ingestion.log
+```
+- **退出码**：`0`
+- **执行结果**：`Ran 151 tests in 1343.665s, OK`（含 10,000 种子全量因果归因证明链生成与完整归档，0 未解释漂移）
+- **日志链接**：[`tests/logs/batch3_ingestion.log`](file:///Users/jacobyang/Hermes/iykyk-affinity-override/tests/logs/batch3_ingestion.log)
+
+#### 批次 4 (Batch 4: 9 模块，128 用例)
+- **执行命令**：
+```bash
+cd /Users/jacobyang/Hermes/iykyk-affinity-override
+PYTHONPATH=. /Users/jacobyang/Hermes/.venv/bin/python3 -m unittest \
+  tests/test_finalize_boundaries.py \
+  tests/test_rc8_quality_gate.py \
+  tests/test_rc9_extended_states_and_catalogs.py \
+  tests/test_rc9_step3_cross_catalogs.py \
+  tests/test_release_build.py \
+  tests/test_schema_negatives.py \
+  tests/test_semantic_catalogs.py \
+  tests/test_slot_pipeline_integrity.py \
+  tests/test_spatial_coherence.py \
+  2>&1 | tee tests/logs/batch4_gates.log
+```
+- **退出码**：`0`
+- **执行结果**：`Ran 128 tests in 1847.060s, OK`（含 1,000 次随机边界提示词截断压力测试与 10,000 随机种子质量门禁扫描）
+- **日志链接**：[`tests/logs/batch4_gates.log`](file:///Users/jacobyang/Hermes/iykyk-affinity-override/tests/logs/batch4_gates.log)
+
+---
+
+## 六、基线定位与后续变更归因原则
 
 1. **基线记录的是既有行为证据，而非禁止演进**：
    当前 75 项测试及 10,000 种子快照记录的是 rc10 版本的既有决策与文本生成行为。
