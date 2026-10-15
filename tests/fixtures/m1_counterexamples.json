@@ -1,23 +1,67 @@
 {
   "schema_version": "1.0",
   "created_at": "2026-10-16",
-  "purpose": "M1 反例夹具定义与基线行为复现/新功能预期对照库 (M1-D5)",
+  "purpose": "M1 反例夹具定义与基线行为复现/新功能预期对照库 (M1-D5 修订版)",
   "counterexamples": [
     {
       "id": "CE-HAND-01",
       "category": "hand_capacity",
       "title": "单手占用与单手持物合法共存反例",
-      "description": "单手托腮姿势（占用 1 只手）+ 手持单反相机（占用 1 只手），总占用 <= 2，物理上完全可行，不得被过度约束删除",
+      "description": "单手托腮姿势（占用 1 只手）+ 手持单反相机（占用 1 只手），总手部占用 <= 2，物理上完全可行，不应被过度约束删除",
       "inputs": {
-        "pose": "sitting, hand on cheek, looking at viewer",
-        "props": "holding compact camera with other hand"
+        "free_text_path": {
+          "pose": "sitting, hand on cheek, looking at viewer",
+          "props": "holding compact camera with other hand"
+        },
+        "structured_atom_path": {
+          "pose_atom": {
+            "atom_id": "pose__hand_on_cheek__0_0",
+            "text": "sitting, hand on cheek",
+            "source_slot": "pose",
+            "tag_order": 0,
+            "span_order": 0,
+            "facts": {
+              "hand_state": "one_busy"
+            },
+            "origin": {
+              "entry_point": "generator",
+              "mode": "explicit",
+              "selector": "pose",
+              "selected_id": "hand_on_cheek"
+            }
+          },
+          "props_atom": {
+            "atom_id": "props__digital_camera_in_hand__1_0",
+            "text": "digital camera in hand",
+            "source_slot": "props",
+            "tag_order": 1,
+            "span_order": 0,
+            "facts": {
+              "prop_usage": "handheld",
+              "hands_required": 1
+            },
+            "origin": {
+              "entry_point": "generator",
+              "mode": "explicit",
+              "selector": "props",
+              "selected_id": "digital_camera_in_hand"
+            }
+          }
+        }
       },
-      "baseline_status": "reproduced_excessive_deletion",
+      "baseline_status": "free_text_coexists_structured_reproduced_excessive_deletion",
       "baseline_behavior": {
-        "rule_id": "pose_hand_occupation",
-        "action": "banned_props",
-        "result_props": "",
-        "notes": "当前 rc10 基线冲突引擎将 holding camera 判定为手部占用冲突并静默剔除"
+        "free_text_path": {
+          "result": "coexists_in_unmatched_free_text",
+          "notes": "自由文本路径未命中 both_busy 关键词库，表面共存"
+        },
+        "structured_atom_path": {
+          "rule_id": "pose_hand_occupation",
+          "action": "drop",
+          "reason_code": "busy_hands_remove_props",
+          "dropped_target": "props__digital_camera_in_hand__1_0",
+          "notes": "真实目录路径携带 hand_state='one_busy'，被 conflict_resolver:2744 强行当做双手占用，导致相机被过度误删"
+        }
       },
       "target_m3_behavior": {
         "rule_id": "pose_hand_occupation",
@@ -26,25 +70,70 @@
         "hands_consumed": 2,
         "action": "retained_both",
         "expected_retention_rate": 1.0,
-        "notes": "新手部容量模型计算 1 + 1 <= 2，判定合法共存，完全保留相机"
+        "notes": "新手部容量模型计算 1 + 1 <= 2，无论文本还是结构化均判定合法共存，完全保留相机"
       }
     },
     {
       "id": "CE-HAND-02",
       "category": "hand_capacity",
       "title": "双单手道具合法共存反例",
-      "description": "左手拿智能手机 + 右手拿咖啡纸杯，人体具备两只手，无双手姿势占用时完全合法共存",
+      "description": "手持智能手机录像 + 手持数码相机，在双手空闲时人体完全可以用两只手分别持握，不应被强制只留一个",
       "inputs": {
-        "pose": "standing naturally",
-        "prop_left": "holding smartphone in left hand",
-        "prop_right": "holding coffee cup in right hand"
+        "free_text_path": {
+          "pose": "standing naturally",
+          "prop_left": "holding smartphone in left hand",
+          "prop_right": "holding coffee cup in right hand"
+        },
+        "structured_atom_path": {
+          "prop1_atom": {
+            "atom_id": "props__smartphone_recording__0_0",
+            "text": "smartphone recording in hand",
+            "source_slot": "props",
+            "tag_order": 0,
+            "span_order": 0,
+            "facts": {
+              "prop_usage": "handheld",
+              "hands_required": 1
+            },
+            "origin": {
+              "entry_point": "generator",
+              "mode": "explicit",
+              "selector": "props",
+              "selected_id": "smartphone_recording"
+            }
+          },
+          "prop2_atom": {
+            "atom_id": "props__digital_camera_in_hand__1_0",
+            "text": "digital camera in hand",
+            "source_slot": "props",
+            "tag_order": 1,
+            "span_order": 0,
+            "facts": {
+              "prop_usage": "handheld",
+              "hands_required": 1
+            },
+            "origin": {
+              "entry_point": "generator",
+              "mode": "explicit",
+              "selector": "props",
+              "selected_id": "digital_camera_in_hand"
+            }
+          }
+        }
       },
-      "baseline_status": "reproduced_excessive_deletion",
+      "baseline_status": "free_text_coexists_structured_reproduced_excessive_deletion",
       "baseline_behavior": {
-        "rule_id": "handheld_props_single_holder",
-        "action": "keep_first_drop_second",
-        "result": "仅保留 smartphone，强制丢弃 coffee cup",
-        "notes": "当前 rc10 基线规则强制只允许单个手持道具"
+        "free_text_path": {
+          "result": "coexists_in_unmatched_free_text",
+          "notes": "自由文本因未精确命中 handheld_patterns 前缀未被拦截"
+        },
+        "structured_atom_path": {
+          "rule_id": "handheld_props_single_holder",
+          "action": "drop",
+          "reason_code": "single_handheld_prop_limit",
+          "dropped_target": "props__digital_camera_in_hand__1_0",
+          "notes": "结构化道具事实命中 single_holder 规则，第 2 个道具被强制丢弃"
+        }
       },
       "target_m3_behavior": {
         "rule_id": "handheld_props_single_holder",
@@ -59,7 +148,7 @@
       "id": "CE-HAND-03",
       "category": "hand_capacity",
       "title": "双手占用与手持道具真实物理硬冲突",
-      "description": "双手背在身后（双手占用 = 2）同时出现手持红酒杯（需求 = 1），物理容量 3 > 2，构成真实硬冲突",
+      "description": "双手背在身后（双手占用 = 2）同时出现手持红酒杯（需求 = 1），物理容量 3 > 2，构成真实物理硬冲突",
       "inputs": {
         "pose": "standing with hands tied behind back",
         "props": "holding wine glass"
@@ -82,7 +171,7 @@
       "id": "CE-LIGHT-01",
       "category": "lighting_coherence",
       "title": "室内空间与窗前日光合法共存反例",
-      "description": "教室内透过窗户射入的明媚阳光，属于合法真实物理光源，严禁按室内/日光互斥删除",
+      "description": "教室内透过大窗射入明媚午后阳光，属于合法真实物理光源，严禁按室内/日光互斥删除",
       "inputs": {
         "scene": "classroom interior, wooden desks",
         "lighting": "bright afternoon sunlight streaming through large windows"
@@ -99,7 +188,7 @@
       "id": "CE-LIGHT-02",
       "category": "lighting_coherence",
       "title": "夜间环境与混合人工光源合法共存反例",
-      "description": "夜间街头酒吧，同时存在彩色霓虹灯与吧台暖色钨丝灯，属于真实混合光源",
+      "description": "夜间街头酒吧，同时存在吧台暖色钨丝灯与背景彩色霓虹灯，属于真实混合光源",
       "inputs": {
         "scene": "night alley bar counter",
         "lighting": "warm tungsten overhead lamps, neon sign glow in background"
@@ -116,11 +205,12 @@
       "id": "CE-OVERRIDE-01",
       "category": "slot_override_clean_replacement",
       "title": "外部服装覆盖整槽替换与旧载体语义彻底清空",
-      "description": "预设原为白衬衫+解纽扣状态，用户通过 clothing_override 传入紧身连体衣；连体衣无纽扣载体，必须清空旧白衬衫及解纽扣状态",
+      "description": "预设原为白衬衫+解纽扣状态，用户通过 clothing_override 传入紧身乳胶连体衣；连体衣无纽扣载体，必须清空旧白衬衫及解纽扣状态",
       "inputs": {
         "preset_base": "white shirt, unbuttoned, collar open",
         "clothing_override": "black latex catsuit, glossy finish"
       },
+      "baseline_status": "target_feature_unimplemented_in_rc10",
       "contract_requirements": {
         "override_action": "full_slot_replacement",
         "mixing_allowed": false,
@@ -139,6 +229,7 @@
         "nudity_override": "completely nude, bare body",
         "clothing_override": "wearing thick down parka, winter boots, wool scarf"
       },
+      "baseline_status": "target_feature_unimplemented_in_rc10",
       "contract_requirements": {
         "error_type": "PromptValidationError",
         "silent_suppression_allowed": false,
@@ -155,6 +246,7 @@
         "system_pose": "hands behind back",
         "props_override": "holding vintage leica camera"
       },
+      "baseline_status": "target_feature_unimplemented_in_rc10",
       "contract_requirements": {
         "external_retained": true,
         "system_adjusted": true,
