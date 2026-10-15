@@ -1,0 +1,165 @@
+{
+  "schema_version": "1.0",
+  "created_at": "2026-10-16",
+  "purpose": "M1 反例夹具定义与基线行为复现/新功能预期对照库 (M1-D5)",
+  "counterexamples": [
+    {
+      "id": "CE-HAND-01",
+      "category": "hand_capacity",
+      "title": "单手占用与单手持物合法共存反例",
+      "description": "单手托腮姿势（占用 1 只手）+ 手持单反相机（占用 1 只手），总占用 <= 2，物理上完全可行，不得被过度约束删除",
+      "inputs": {
+        "pose": "sitting, hand on cheek, looking at viewer",
+        "props": "holding compact camera with other hand"
+      },
+      "baseline_status": "reproduced_excessive_deletion",
+      "baseline_behavior": {
+        "rule_id": "pose_hand_occupation",
+        "action": "banned_props",
+        "result_props": "",
+        "notes": "当前 rc10 基线冲突引擎将 holding camera 判定为手部占用冲突并静默剔除"
+      },
+      "target_m3_behavior": {
+        "rule_id": "pose_hand_occupation",
+        "capacity_model": "2-hand",
+        "hands_available": 2,
+        "hands_consumed": 2,
+        "action": "retained_both",
+        "expected_retention_rate": 1.0,
+        "notes": "新手部容量模型计算 1 + 1 <= 2，判定合法共存，完全保留相机"
+      }
+    },
+    {
+      "id": "CE-HAND-02",
+      "category": "hand_capacity",
+      "title": "双单手道具合法共存反例",
+      "description": "左手拿智能手机 + 右手拿咖啡纸杯，人体具备两只手，无双手姿势占用时完全合法共存",
+      "inputs": {
+        "pose": "standing naturally",
+        "prop_left": "holding smartphone in left hand",
+        "prop_right": "holding coffee cup in right hand"
+      },
+      "baseline_status": "reproduced_excessive_deletion",
+      "baseline_behavior": {
+        "rule_id": "handheld_props_single_holder",
+        "action": "keep_first_drop_second",
+        "result": "仅保留 smartphone，强制丢弃 coffee cup",
+        "notes": "当前 rc10 基线规则强制只允许单个手持道具"
+      },
+      "target_m3_behavior": {
+        "rule_id": "handheld_props_single_holder",
+        "capacity_model": "2-hand",
+        "hands_consumed": 2,
+        "action": "retained_both",
+        "expected_retention_rate": 1.0,
+        "notes": "两件道具各占 1 手，无双手姿势占用，新容量模型允许双持"
+      }
+    },
+    {
+      "id": "CE-HAND-03",
+      "category": "hand_capacity",
+      "title": "双手占用与手持道具真实物理硬冲突",
+      "description": "双手背在身后（双手占用 = 2）同时出现手持红酒杯（需求 = 1），物理容量 3 > 2，构成真实硬冲突",
+      "inputs": {
+        "pose": "standing with hands tied behind back",
+        "props": "holding wine glass"
+      },
+      "baseline_status": "reproduced_correct_deletion",
+      "baseline_behavior": {
+        "rule_id": "pose_hand_occupation",
+        "action": "banned_props",
+        "result": "删除 holding wine glass"
+      },
+      "target_m3_behavior": {
+        "rule_id": "pose_hand_occupation",
+        "classification": "hard_constraint",
+        "capacity_exceeded": true,
+        "action": "banned_props_or_external_precedence",
+        "notes": "系统生成时消除道具动作；若道具为外部覆盖，则优先保留外部道具并调整系统姿势"
+      }
+    },
+    {
+      "id": "CE-LIGHT-01",
+      "category": "lighting_coherence",
+      "title": "室内空间与窗前日光合法共存反例",
+      "description": "教室内透过窗户射入的明媚阳光，属于合法真实物理光源，严禁按室内/日光互斥删除",
+      "inputs": {
+        "scene": "classroom interior, wooden desks",
+        "lighting": "bright afternoon sunlight streaming through large windows"
+      },
+      "baseline_status": "reproduced_coexistence",
+      "target_m3_behavior": {
+        "rule_id": "environmental_lighting_coherence",
+        "classification": "legitimate_counterexample",
+        "action": "retained_both",
+        "notes": "空间事实为室内，但光源事实为窗光透射，判定合法豁免"
+      }
+    },
+    {
+      "id": "CE-LIGHT-02",
+      "category": "lighting_coherence",
+      "title": "夜间环境与混合人工光源合法共存反例",
+      "description": "夜间街头酒吧，同时存在彩色霓虹灯与吧台暖色钨丝灯，属于真实混合光源",
+      "inputs": {
+        "scene": "night alley bar counter",
+        "lighting": "warm tungsten overhead lamps, neon sign glow in background"
+      },
+      "baseline_status": "reproduced_coexistence",
+      "target_m3_behavior": {
+        "rule_id": "environmental_lighting_coherence",
+        "classification": "legitimate_counterexample",
+        "action": "retained_both",
+        "notes": "混合光源具备明确物理附着点，禁止按单一色温互斥处理"
+      }
+    },
+    {
+      "id": "CE-OVERRIDE-01",
+      "category": "slot_override_clean_replacement",
+      "title": "外部服装覆盖整槽替换与旧载体语义彻底清空",
+      "description": "预设原为白衬衫+解纽扣状态，用户通过 clothing_override 传入紧身连体衣；连体衣无纽扣载体，必须清空旧白衬衫及解纽扣状态",
+      "inputs": {
+        "preset_base": "white shirt, unbuttoned, collar open",
+        "clothing_override": "black latex catsuit, glossy finish"
+      },
+      "contract_requirements": {
+        "override_action": "full_slot_replacement",
+        "mixing_allowed": false,
+        "carrier_revalidation": true,
+        "expected_clothing_output": "black latex catsuit, glossy finish",
+        "forbidden_remnants": ["white shirt", "unbuttoned", "collar open"],
+        "notes": "外部覆盖发生在采样与冲突前，旧载体物理事实完全失效，状态因缺少 carrier 被消解"
+      }
+    },
+    {
+      "id": "CE-OVERRIDE-02",
+      "category": "slot_override_hard_conflict",
+      "title": "外部覆盖之间不可消解硬冲突显式报错",
+      "description": "用户同时在 nudity_override 指定全裸，在 clothing_override 指定穿着厚重冬装大衣，外部硬冲突必须显式报错",
+      "inputs": {
+        "nudity_override": "completely nude, bare body",
+        "clothing_override": "wearing thick down parka, winter boots, wool scarf"
+      },
+      "contract_requirements": {
+        "error_type": "PromptValidationError",
+        "silent_suppression_allowed": false,
+        "error_fields_required": ["slots", "texts", "rule_id"],
+        "notes": "外部输入之间不可妥协的硬约束冲突，系统必须拒绝猜测并显式提示用户"
+      }
+    },
+    {
+      "id": "CE-OVERRIDE-03",
+      "category": "slot_override_external_precedence",
+      "title": "外部指定道具优先于系统姿势削减",
+      "description": "用户外部传入手持相机，系统采样出背手姿势；发生冲突时必须优先保留外部相机，调整系统姿势",
+      "inputs": {
+        "system_pose": "hands behind back",
+        "props_override": "holding vintage leica camera"
+      },
+      "contract_requirements": {
+        "external_retained": true,
+        "system_adjusted": true,
+        "notes": "系统生成内容退让于用户显式外部覆盖"
+      }
+    }
+  ]
+}

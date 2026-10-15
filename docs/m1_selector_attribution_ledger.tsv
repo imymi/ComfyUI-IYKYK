@@ -1,0 +1,225 @@
+selector_id	slot	name_zh	current_contexts_count	review_state	proposed_disposition	assigned_context_weights	attribution_rationale
+qipao	clothing	旗袍 (Qipao/Cheongsam)	2	reviewed	assigned_contexts	traditional:4	东方传统与和风/汉服礼装，部分兼顾温泉浴场
+hanfu	clothing	汉服/古风 (Hanfu)	1	reviewed	assigned_contexts	traditional:4	东方传统与和风/汉服礼装，部分兼顾温泉浴场
+modern_chinese	clothing	新中式/改良国风	1	reviewed	intentional_global_only	none	无特定强情境绑定依据，有意仅保留在全局中性探索池 (15% 概率) 供自由探索
+kimono	clothing	和服 (Kimono)	3	reviewed	assigned_contexts	traditional:4	东方传统与和风/汉服礼装，部分兼顾温泉浴场
+yukata	clothing	浴衣 (Yukata)	2	reviewed	assigned_contexts	traditional:4,onsen_bath:4	东方传统与和风/汉服礼装，部分兼顾温泉浴场
+furisode	clothing	振袖 (Furisode)	1	reviewed	assigned_contexts	traditional:4	东方传统与和风/汉服礼装，部分兼顾温泉浴场
+jk_seifuku	clothing	水手服 (JK Sailor Suit)	2	reviewed	assigned_contexts	school:4,transit:2	校园/学生制服形制，强关联校园与通勤
+blazer_uniform	clothing	西装校服 (Blazer Uniform)	2	reviewed	assigned_contexts	school:4,transit:2	校园/学生制服形制，强关联校园与通勤
+gym_uniform	clothing	体育服/死库水 (Gym Bloomer / Sukumizu)	2	reviewed	assigned_contexts	school:4,transit:2	校园/学生制服形制，强关联校园与通勤
+hanbok	clothing	韩服 (Hanbok)	1	reviewed	assigned_contexts	traditional:4	东方传统与和风/汉服礼装，部分兼顾温泉浴场
+korean_school	clothing	韩系校服 (Korean Uniform)	1	reviewed	assigned_contexts	school:4,transit:2	校园/学生制服形制，强关联校园与通勤
+ol_suit	clothing	职场OL西装 (Office Lady Suit)	2	reviewed	assigned_contexts	office:4,transit:2	职场干练通勤套装
+nurse_uniform	clothing	护士服 (Nurse Uniform)	1	reviewed	assigned_contexts	medical:4	医护/医疗专属形制
+maid_dress	clothing	女仆装 (Maid Dress)	2	reviewed	assigned_contexts	dining:4,domestic:2	餐饮服务与家务围裙形制
+waitress_uniform	clothing	餐厅服务员/女仆咖啡	1	reviewed	assigned_contexts	dining:4,domestic:2	餐饮服务与家务围裙形制
+lingerie_lace	clothing	蕾丝情趣内衣 (Lace Lingerie)	5	reviewed	assigned_contexts	adult:4,domestic:2	私密内衣与贴身家居
+silk_robe	clothing	丝绸睡袍/晨袍 (Silk Robe)	2	reviewed	assigned_contexts	domestic:4	居家生活与休闲放松服装
+camisole_slip	clothing	吊带睡裙 (Camisole Slip)	2	reviewed	assigned_contexts	adult:4,domestic:2	私密内衣与贴身家居
+bikini_micro	clothing	微型比基尼 (Micro Bikini)	3	reviewed	assigned_contexts	outdoor:2,onsen_bath:2,adult:2	泳装，适配水域、温泉与私密泳池
+one_piece_swimsuit	clothing	高叉连体泳衣 (High-leg Swimsuit)	2	reviewed	assigned_contexts	office:4,transit:2	职场干练通勤套装
+latex_catsuit	clothing	乳胶紧身衣 (Latex Catsuit)	4	reviewed	assigned_contexts	office:4,transit:2	职场干练通勤套装
+leather_corset	clothing	皮革束腰/胸衣 (Leather Corset)	3	reviewed	assigned_contexts	bondage_sm:4,adult:2	束缚特种与特异质感服装
+bunny_suit	clothing	兔女郎装 (Bunny Girl Suit)	2	reviewed	assigned_contexts	office:4,transit:2	职场干练通勤套装
+cheerleader	clothing	啦啦队服 (Cheerleader)	1	reviewed	intentional_global_only	none	无特定强情境绑定依据，有意仅保留在全局中性探索池 (15% 概率) 供自由探索
+evening_dress	clothing	露背晚礼服 (Backless Evening Gown)	2	reviewed	assigned_contexts	nightlife:4,dining:2	晚宴、酒吧派对与高档餐饮社交
+street_casual	clothing	街头随性/日常T恤	6	reviewed	assigned_contexts	outdoor:2,transit:2,domestic:1	通用便服与街头日常穿搭
+party_club	clothing	夜店紧身包臀裙 (Club Mini Dress)	1	reviewed	assigned_contexts	nightlife:4,dining:2	晚宴、酒吧派对与高档餐饮社交
+knit_sweater	clothing	露背毛衣/童贞杀 (Knit Sweater)	4	reviewed	assigned_contexts	domestic:4	居家生活与休闲放松服装
+sweater_casual	clothing	休闲毛衣 (Casual Sweater)	0	reviewed	assigned_contexts	domestic:4	居家生活与休闲放松服装
+swimsuit_school	clothing	学校泳衣 (School Swimsuit)	0	reviewed	assigned_contexts	school:4,transit:2	校园/学生制服形制，强关联校园与通勤
+dungarees	clothing	工装背带裤 (Dungarees Overalls)	0	reviewed	intentional_global_only	none	无特定强情境绑定依据，有意仅保留在全局中性探索池 (15% 概率) 供自由探索
+combat_tactical	clothing	战斗服 (Combat Tactical Suit)	0	reviewed	assigned_contexts	special:4	幻想、特殊舞台与战术风格
+convenience_store	clothing	便利店工作服 (Convenience Store Uniform)	0	reviewed	intentional_global_only	none	无特定强情境绑定依据，有意仅保留在全局中性探索池 (15% 概率) 供自由探索
+crop_top	clothing	小可爱露腹短上衣 (Crop Top)	0	reviewed	intentional_global_only	none	无特定强情境绑定依据，有意仅保留在全局中性探索池 (15% 概率) 供自由探索
+fast_food_uniform	clothing	快餐制服 (Fast Food Uniform)	0	reviewed	intentional_global_only	none	无特定强情境绑定依据，有意仅保留在全局中性探索池 (15% 概率) 供自由探索
+fishnet_top	clothing	网纹衣 (Fishnet Top)	0	reviewed	intentional_global_only	none	无特定强情境绑定依据，有意仅保留在全局中性探索池 (15% 概率) 供自由探索
+hoodie	clothing	连帽衫 (Hoodie)	0	reviewed	assigned_contexts	domestic:4	居家生活与休闲放松服装
+knit_vest	clothing	V领针织背心 (Knit Vest)	0	reviewed	intentional_global_only	none	无特定强情境绑定依据，有意仅保留在全局中性探索池 (15% 概率) 供自由探索
+military_uniform	clothing	军装 (Military Uniform)	0	reviewed	assigned_contexts	special:4	幻想、特殊舞台与战术风格
+sailor_shirt	clothing	水手衬衫 (Sailor Shirt)	0	reviewed	assigned_contexts	school:4,transit:2	校园/学生制服形制，强关联校园与通勤
+shirts_blouses	clothing	高领衬衫 (Shirts & Blouses)	0	reviewed	intentional_global_only	none	无特定强情境绑定依据，有意仅保留在全局中性探索池 (15% 概率) 供自由探索
+sportswear_active	clothing	运动服 (Active Sportswear)	0	reviewed	intentional_global_only	none	无特定强情境绑定依据，有意仅保留在全局中性探索池 (15% 概率) 供自由探索
+strapless_top	clothing	抹胸 (Strapless Top)	0	reviewed	intentional_global_only	none	无特定强情境绑定依据，有意仅保留在全局中性探索池 (15% 概率) 供自由探索
+sweatshirt	clothing	圆领卫衣 (Sweatshirt)	0	reviewed	assigned_contexts	outdoor:2,transit:2,domestic:1	通用便服与街头日常穿搭
+t_shirt	clothing	T恤 (T-Shirt)	0	reviewed	intentional_global_only	none	无特定强情境绑定依据，有意仅保留在全局中性探索池 (15% 概率) 供自由探索
+tops_tanks	clothing	背心 (Tanks & Camisoles)	0	reviewed	intentional_global_only	none	无特定强情境绑定依据，有意仅保留在全局中性探索池 (15% 概率) 供自由探索
+volleyball_uniform	clothing	排球服 (Volleyball Uniform)	0	reviewed	intentional_global_only	none	无特定强情境绑定依据，有意仅保留在全局中性探索池 (15% 概率) 供自由探索
+black_leggings	clothing	黑色紧身裤 (Black Leggings)	0	reviewed	intentional_global_only	none	无特定强情境绑定依据，有意仅保留在全局中性探索池 (15% 概率) 供自由探索
+denim_shorts	clothing	牛仔短裤 (Denim Shorts)	0	reviewed	assigned_contexts	outdoor:2,transit:2,domestic:1	通用便服与街头日常穿搭
+hot_pants	clothing	热裤 (Hot Pants)	0	reviewed	assigned_contexts	outdoor:2,transit:2,domestic:1	通用便服与街头日常穿搭
+armored_skirt	clothing	披甲战裙 (Armored Skirt)	0	reviewed	assigned_contexts	outdoor:2,transit:2,domestic:1	通用便服与街头日常穿搭
+layered_skirt	clothing	多层蛋糕裙 (Layered Skirt)	0	reviewed	assigned_contexts	outdoor:2,transit:2,domestic:1	通用便服与街头日常穿搭
+leather_skirt	clothing	皮裙 (Leather Skirt)	0	reviewed	assigned_contexts	bondage_sm:4,adult:2	束缚特种与特异质感服装
+long_skirt	clothing	长裙 (Long Skirt)	0	reviewed	assigned_contexts	outdoor:2,transit:2,domestic:1	通用便服与街头日常穿搭
+microskirt	clothing	微型超短裙 (Microskirt)	0	reviewed	assigned_contexts	outdoor:2,transit:2,domestic:1	通用便服与街头日常穿搭
+miniskirt	clothing	迷你超短裙 (Miniskirt)	0	reviewed	assigned_contexts	outdoor:2,transit:2,domestic:1	通用便服与街头日常穿搭
+pencil_skirt	clothing	铅笔包臀裙 (Pencil Skirt)	0	reviewed	assigned_contexts	office:4,transit:2	职场干练通勤套装
+pettiskirt	clothing	蓬蓬衬裙 (Pettiskirt)	0	reviewed	assigned_contexts	outdoor:2,transit:2,domestic:1	通用便服与街头日常穿搭
+plaid_skirt	clothing	格子百褶裙 (Plaid Skirt)	0	reviewed	assigned_contexts	outdoor:2,transit:2,domestic:1	通用便服与街头日常穿搭
+pleated_skirt	clothing	经典百褶裙 (Pleated Skirt)	0	reviewed	assigned_contexts	outdoor:2,transit:2,domestic:1	通用便服与街头日常穿搭
+pumpkin_skirt	clothing	南瓜裙 (Pumpkin Skirt)	0	reviewed	assigned_contexts	outdoor:2,transit:2,domestic:1	通用便服与街头日常穿搭
+rain_skirt	clothing	分体雨裙 (Rain Skirt)	0	reviewed	assigned_contexts	outdoor:2,transit:2,domestic:1	通用便服与街头日常穿搭
+skirts_general	clothing	通用半身裙 (Skirts)	0	reviewed	assigned_contexts	outdoor:2,transit:2,domestic:1	通用便服与街头日常穿搭
+suspender_skirt	clothing	吊带裙 (Suspender Skirt)	0	reviewed	assigned_contexts	outdoor:2,transit:2,domestic:1	通用便服与街头日常穿搭
+tutu_skirt	clothing	芭蕾舞短裙 (Tutu Skirt)	0	reviewed	assigned_contexts	outdoor:2,transit:2,domestic:1	通用便服与街头日常穿搭
+waist_apron	clothing	半身腰围裙 (Waist Apron)	0	reviewed	assigned_contexts	dining:4,domestic:2	餐饮服务与家务围裙形制
+bikini_classic	clothing	经典比基尼 (Classic Bikini)	0	reviewed	assigned_contexts	outdoor:2,onsen_bath:2,adult:2	泳装，适配水域、温泉与私密泳池
+bikini_creative	clothing	创意奶牛比基尼 (Creative Cow Bikini)	0	reviewed	assigned_contexts	outdoor:2,onsen_bath:2,adult:2	泳装，适配水域、温泉与私密泳池
+bikini_strappy	clothing	绑带系绳比基尼 (Strappy String Bikini)	0	reviewed	assigned_contexts	outdoor:2,onsen_bath:2,adult:2	泳装，适配水域、温泉与私密泳池
+berserker_armor	clothing	狂战士铠甲 (Berserker Armor)	0	reviewed	assigned_contexts	special:4	幻想、特殊舞台与战术风格
+business_suit	clothing	职业西装 (Business Suit)	0	reviewed	assigned_contexts	office:4,transit:2	职场干练通勤套装
+denim_jacket	clothing	牛仔夹克 (Denim Jacket)	0	reviewed	assigned_contexts	outdoor:2,transit:2,domestic:1	通用便服与街头日常穿搭
+down_jacket	clothing	羽绒服 (Down Jacket)	0	reviewed	assigned_contexts	outdoor:2,transit:2,domestic:1	通用便服与街头日常穿搭
+duffel_coat	clothing	粗呢大衣 (Duffel Coat)	0	reviewed	intentional_global_only	none	无特定强情境绑定依据，有意仅保留在全局中性探索池 (15% 概率) 供自由探索
+firefighter_gear	clothing	消防防护服 (Firefighter Gear)	0	reviewed	intentional_global_only	none	无特定强情境绑定依据，有意仅保留在全局中性探索池 (15% 概率) 供自由探索
+knight_armor	clothing	骑士重铠甲 (Knight Armor)	0	reviewed	assigned_contexts	special:4	幻想、特殊舞台与战术风格
+lab_coat	clothing	实验白大褂 (Lab Coat)	0	reviewed	intentional_global_only	none	无特定强情境绑定依据，有意仅保留在全局中性探索池 (15% 概率) 供自由探索
+leather_jacket	clothing	机车皮衣 (Leather Jacket)	0	reviewed	assigned_contexts	bondage_sm:4,adult:2	束缚特种与特异质感服装
+mecha_exoskeleton	clothing	外骨骼机甲 (Mecha Exoskeleton)	0	reviewed	intentional_global_only	none	无特定强情境绑定依据，有意仅保留在全局中性探索池 (15% 概率) 供自由探索
+mecha_power_armor	clothing	动力装甲 (Power Armor)	0	reviewed	assigned_contexts	special:4	幻想、特殊舞台与战术风格
+military_overcoat	clothing	军大衣 (Military Overcoat)	0	reviewed	assigned_contexts	special:4	幻想、特殊舞台与战术风格
+outerwear_coat	clothing	通用风衣外套 (Outerwear Coat)	0	reviewed	intentional_global_only	none	无特定强情境绑定依据，有意仅保留在全局中性探索池 (15% 概率) 供自由探索
+outerwear_jacket	clothing	夹克外套 (Outerwear Jacket)	0	reviewed	assigned_contexts	outdoor:2,transit:2,domestic:1	通用便服与街头日常穿搭
+outerwear_overcoat	clothing	长款毛呢大衣 (Outerwear Overcoat)	0	reviewed	intentional_global_only	none	无特定强情境绑定依据，有意仅保留在全局中性探索池 (15% 概率) 供自由探索
+rainwear_coat	clothing	防雨风衣 (Rainwear Coat)	0	reviewed	intentional_global_only	none	无特定强情境绑定依据，有意仅保留在全局中性探索池 (15% 概率) 供自由探索
+safari_jacket	clothing	探险猎装夹克 (Safari Jacket)	0	reviewed	assigned_contexts	outdoor:2,transit:2,domestic:1	通用便服与街头日常穿搭
+soft_shell_jacket	clothing	户外软壳外套 (Soft Shell Jacket)	0	reviewed	assigned_contexts	outdoor:2,transit:2,domestic:1	通用便服与街头日常穿搭
+tactical_vest	clothing	战术防弹背心 (Tactical Vest)	0	reviewed	assigned_contexts	special:4	幻想、特殊舞台与战术风格
+tailcoat	clothing	宫廷燕尾服 (Tailcoat)	0	reviewed	intentional_global_only	none	无特定强情境绑定依据，有意仅保留在全局中性探索池 (15% 概率) 供自由探索
+trench_coat	clothing	战壕风衣 (Trench Coat)	0	reviewed	intentional_global_only	none	无特定强情境绑定依据，有意仅保留在全局中性探索池 (15% 概率) 供自由探索
+windbreaker	clothing	运动防风衣 (Windbreaker)	0	reviewed	intentional_global_only	none	无特定强情境绑定依据，有意仅保留在全局中性探索池 (15% 概率) 供自由探索
+winter_parka	clothing	防寒派克大衣 (Winter Parka)	0	reviewed	intentional_global_only	none	无特定强情境绑定依据，有意仅保留在全局中性探索池 (15% 概率) 供自由探索
+anime_cosplay	clothing	不知火舞 (Mai Shiranui Cosplay)	0	reviewed	assigned_contexts	special:4	幻想、特殊舞台与战术风格
+apron_dress	clothing	全身围裙 (Apron Dress)	0	reviewed	assigned_contexts	dining:4,domestic:2	餐饮服务与家务围裙形制
+armored_dress	clothing	铠装连衣裙 (Armored Dress)	0	reviewed	assigned_contexts	special:4	幻想、特殊舞台与战术风格
+bathrobe	clothing	浴袍 (Bathrobe)	0	reviewed	assigned_contexts	domestic:4	居家生活与休闲放松服装
+battle_robe	clothing	战袍 (Battle Robe)	0	reviewed	assigned_contexts	domestic:4	居家生活与休闲放松服装
+clerical_nun	clothing	修女服 (Nun Habit)	0	reviewed	intentional_global_only	none	无特定强情境绑定依据，有意仅保留在全局中性探索池 (15% 概率) 供自由探索
+clerical_priest	clothing	神父修生黑袍 (Priest Cassock)	0	reviewed	intentional_global_only	none	无特定强情境绑定依据，有意仅保留在全局中性探索池 (15% 概率) 供自由探索
+festive_costume	clothing	节日圣诞装 (Festive Santa Costume)	0	reviewed	intentional_global_only	none	无特定强情境绑定依据，有意仅保留在全局中性探索池 (15% 概率) 供自由探索
+frock_smock	clothing	工装罩衫 (Frock / Smock)	0	reviewed	intentional_global_only	none	无特定强情境绑定依据，有意仅保留在全局中性探索池 (15% 概率) 供自由探索
+greek_toga	clothing	古希腊托加/佩普洛斯 (Greek Toga / Peplos)	0	reviewed	intentional_global_only	none	无特定强情境绑定依据，有意仅保留在全局中性探索池 (15% 概率) 供自由探索
+hospital_gown	clothing	病号服 (Hospital Gown)	0	reviewed	intentional_global_only	none	无特定强情境绑定依据，有意仅保留在全局中性探索池 (15% 概率) 供自由探索
+leotard_bodysuit	clothing	连体紧身衣 (Leotard Bodysuit)	0	reviewed	assigned_contexts	office:4,transit:2	职场干练通勤套装
+racing_suit	clothing	赛车连体服 (Racing Suit)	0	reviewed	assigned_contexts	office:4,transit:2	职场干练通勤套装
+robe_general	clothing	休闲长袍 (Casual Robe)	0	reviewed	assigned_contexts	domestic:4	居家生活与休闲放松服装
+shinto_miko	clothing	神道巫女服 (Shinto Miko Attire)	0	reviewed	assigned_contexts	traditional:4	东方传统与和风/汉服礼装，部分兼顾温泉浴场
+slime_dress	clothing	史莱姆凝胶装 (Slime Dress)	0	reviewed	intentional_global_only	none	无特定强情境绑定依据，有意仅保留在全局中性探索池 (15% 概率) 供自由探索
+swimsuit_classic	clothing	经典连体泳装 (Classic One-Piece Swimsuit)	0	reviewed	assigned_contexts	office:4,transit:2	职场干练通勤套装
+swimsuit_competition	clothing	竞赛专业泳衣 (Competition Swimsuit)	0	reviewed	assigned_contexts	office:4,transit:2	职场干练通勤套装
+swimsuit_creative	clothing	中式改良死库水 (Chinese Style Sukumizu)	0	reviewed	assigned_contexts	office:4,transit:2	职场干练通勤套装
+taoist_robe	clothing	传统道袍 (Taoist Robe / Daopao)	0	reviewed	assigned_contexts	domestic:4	居家生活与休闲放松服装
+witch_robe	clothing	魔女法袍 (Witch Robe / Dress)	0	reviewed	assigned_contexts	domestic:4	居家生活与休闲放松服装
+wizard_robe	clothing	巫师贤者法袍 (Wizard Archmage Robe)	0	reviewed	assigned_contexts	domestic:4	居家生活与休闲放松服装
+zentai_suit	clothing	全身紧身连体衣 (Zentai Suit)	0	reviewed	assigned_contexts	office:4,transit:2	职场干练通勤套装
+chiffon_dress	clothing	雪纺连衣裙 (Chiffon Dress)	0	reviewed	intentional_global_only	none	无特定强情境绑定依据，有意仅保留在全局中性探索池 (15% 概率) 供自由探索
+cocktail_dress	clothing	鸡尾酒礼服裙 (Cocktail Dress)	0	reviewed	assigned_contexts	nightlife:4,dining:2	晚宴、酒吧派对与高档餐饮社交
+dirndl_dress	clothing	德式紧身胸衣连衣裙 (Dirndl Dress)	0	reviewed	intentional_global_only	none	无特定强情境绑定依据，有意仅保留在全局中性探索池 (15% 概率) 供自由探索
+dress_backless	clothing	大露背连身裙 (Backless Dress)	0	reviewed	intentional_global_only	none	无特定强情境绑定依据，有意仅保留在全局中性探索池 (15% 概率) 供自由探索
+dress_casual	clothing	休闲日常连身裙 (Casual Day Dress)	0	reviewed	assigned_contexts	outdoor:2,transit:2,domestic:1	通用便服与街头日常穿搭
+floral_dress_black	clothing	黑色碎花连衣裙 (Black Floral Dress)	0	reviewed	intentional_global_only	none	无特定强情境绑定依据，有意仅保留在全局中性探索池 (15% 概率) 供自由探索
+floral_dress_white	clothing	白色碎花连衣裙 (White Floral Dress)	0	reviewed	intentional_global_only	none	无特定强情境绑定依据，有意仅保留在全局中性探索池 (15% 概率) 供自由探索
+formal_gown	clothing	高定正式长礼服 (Formal Evening Gown)	0	reviewed	intentional_global_only	none	无特定强情境绑定依据，有意仅保留在全局中性探索池 (15% 概率) 供自由探索
+halter_dress	clothing	挂脖连身裙 (Halter Dress)	0	reviewed	intentional_global_only	none	无特定强情境绑定依据，有意仅保留在全局中性探索池 (15% 概率) 供自由探索
+lolita_fashion	clothing	经典古典洛丽塔洋装 (Classic Lolita Dress)	0	reviewed	intentional_global_only	none	无特定强情境绑定依据，有意仅保留在全局中性探索池 (15% 概率) 供自由探索
+lolita_gothic	clothing	哥特洛丽塔洋装 (Gothic Lolita Dress)	0	reviewed	assigned_contexts	special:4	幻想、特殊舞台与战术风格
+lolita_sweet	clothing	甜美洛丽塔洋装 (Sweet Lolita Dress)	0	reviewed	intentional_global_only	none	无特定强情境绑定依据，有意仅保留在全局中性探索池 (15% 概率) 供自由探索
+mahou_shoujo	clothing	魔法少女战装 (Magical Girl Costume)	0	reviewed	intentional_global_only	none	无特定强情境绑定依据，有意仅保留在全局中性探索池 (15% 概率) 供自由探索
+off_shoulder_dress	clothing	一字领露肩连衣裙 (Off-Shoulder Dress)	0	reviewed	intentional_global_only	none	无特定强情境绑定依据，有意仅保留在全局中性探索池 (15% 概率) 供自由探索
+pleated_dress	clothing	细褶风琴连衣裙 (Pleated Dress)	0	reviewed	intentional_global_only	none	无特定强情境绑定依据，有意仅保留在全局中性探索池 (15% 概率) 供自由探索
+sleeveless_dress	clothing	轻盈无袖连衣裙 (Sleeveless Dress)	0	reviewed	intentional_global_only	none	无特定强情境绑定依据，有意仅保留在全局中性探索池 (15% 概率) 供自由探索
+strapless_dress	clothing	抹胸无肩带礼服裙 (Strapless Dress)	0	reviewed	intentional_global_only	none	无特定强情境绑定依据，有意仅保留在全局中性探索池 (15% 概率) 供自由探索
+summer_sundress	clothing	清凉夏日吊带裙 (Summer Sundress)	0	reviewed	intentional_global_only	none	无特定强情境绑定依据，有意仅保留在全局中性探索池 (15% 概率) 供自由探索
+sundress_layered	clothing	黑吊带裙内搭白T恤叠穿 (Layered Sundress with T-Shirt)	0	reviewed	intentional_global_only	none	无特定强情境绑定依据，有意仅保留在全局中性探索池 (15% 概率) 供自由探索
+sweater_dress	clothing	软糯针织毛衣裙 (Sweater Dress)	0	reviewed	assigned_contexts	domestic:4	居家生活与休闲放松服装
+tulle_dress	clothing	仙气薄纱蓬蓬裙 (Tulle Dress)	0	reviewed	intentional_global_only	none	无特定强情境绑定依据，有意仅保留在全局中性探索池 (15% 概率) 供自由探索
+wedding_dress	clothing	纯白新娘婚纱 (White Bridal Wedding Dress)	0	reviewed	intentional_global_only	none	无特定强情境绑定依据，有意仅保留在全局中性探索池 (15% 概率) 供自由探索
+clothing_legwear_combo	clothing	腿饰鞋履穿搭组合 (Legwear and Footwear Combo)	0	reviewed	intentional_global_only	none	无特定强情境绑定依据，有意仅保留在全局中性探索池 (15% 概率) 供自由探索
+legwear_bare	clothing	光腿无袜状态 (Bare Legs)	0	reviewed	intentional_global_only	none	无特定强情境绑定依据，有意仅保留在全局中性探索池 (15% 概率) 供自由探索
+legwear_fishnet_pantyhose	clothing	连体渔网袜 (Fishnet Pantyhose)	0	reviewed	intentional_global_only	none	无特定强情境绑定依据，有意仅保留在全局中性探索池 (15% 概率) 供自由探索
+legwear_fishnet_thighhighs	clothing	渔网长筒袜 (Fishnet Thighhighs)	0	reviewed	intentional_global_only	none	无特定强情境绑定依据，有意仅保留在全局中性探索池 (15% 概率) 供自由探索
+bottom_jeans_casual	clothing	休闲牛仔裤 (Casual Jeans)	0	reviewed	assigned_contexts	outdoor:2,transit:2,domestic:1	通用便服与街头日常穿搭
+legwear_pantyhose	clothing	基础连裤袜 (Pantyhose)	0	reviewed	intentional_global_only	none	无特定强情境绑定依据，有意仅保留在全局中性探索池 (15% 概率) 供自由探索
+bottom_pantyhose_pants	clothing	连裤袜内搭长裤 (Pantyhose Under Pants)	0	reviewed	assigned_contexts	outdoor:2,transit:2,domestic:1	通用便服与街头日常穿搭
+bottom_shorts_casual	clothing	休闲短裤 (Casual Shorts)	0	reviewed	assigned_contexts	outdoor:2,transit:2,domestic:1	通用便服与街头日常穿搭
+legwear_thighhighs	clothing	基础长筒袜 (Thighhighs)	0	reviewed	intentional_global_only	none	无特定强情境绑定依据，有意仅保留在全局中性探索池 (15% 概率) 供自由探索
+footwear_boots	clothing	长靴靴子 (Boots)	0	reviewed	intentional_global_only	none	无特定强情境绑定依据，有意仅保留在全局中性探索池 (15% 概率) 供自由探索
+footwear_sneakers	clothing	运动休闲鞋 (Sneakers)	0	reviewed	intentional_global_only	none	无特定强情境绑定依据，有意仅保留在全局中性探索池 (15% 概率) 供自由探索
+cyberpunk_tactical_bodysuit	clothing	赛博战术功能紧身衣 (Cyberpunk Tactical Bodysuit)	0	reviewed	assigned_contexts	office:4,transit:2	职场干练通勤套装
+clothing_ensemble_combos	clothing	复合风格穿搭组合 (Clothing Ensemble Combos)	0	reviewed	intentional_global_only	none	无特定强情境绑定依据，有意仅保留在全局中性探索池 (15% 概率) 供自由探索
+tactical_jumpsuit	clothing	功能性战术连体服 (Tactical Jumpsuit)	0	reviewed	assigned_contexts	office:4,transit:2	职场干练通勤套装
+cyberpunk_plugsuit	clothing	赛博朋克防护连体服 (Cyberpunk Plugsuit)	0	reviewed	assigned_contexts	office:4,transit:2	职场干练通勤套装
+hosiery_legwear	clothing	袜类单品与腿部配搭 (Hosiery & Legwear)	0	reviewed	intentional_global_only	none	无特定强情境绑定依据，有意仅保留在全局中性探索池 (15% 概率) 供自由探索
+trousers_general	clothing	长裤皮裤与皮套裤 (Trousers & Chaps)	0	reviewed	intentional_global_only	none	无特定强情境绑定依据，有意仅保留在全局中性探索池 (15% 概率) 供自由探索
+bottoms_specialty	clothing	特色下装与比基尼底裤 (Specialty Bottoms)	0	reviewed	intentional_global_only	none	无特定强情境绑定依据，有意仅保留在全局中性探索池 (15% 概率) 供自由探索
+lingerie_panties	clothing	三角内裤与丁字底裤 (Lingerie Panties)	0	reviewed	assigned_contexts	adult:4,domestic:2	私密内衣与贴身家居
+denim_jeans	clothing	牛仔长裤与截短裤 (Denim Jeans)	0	reviewed	assigned_contexts	outdoor:2,transit:2,domestic:1	通用便服与街头日常穿搭
+ao_dai	clothing	奥黛传统长衫 (Ao Dai)	0	reviewed	intentional_global_only	none	无特定强情境绑定依据，有意仅保留在全局中性探索池 (15% 概率) 供自由探索
+uchikake	clothing	传统打挂和服外袍 (Uchikake)	0	reviewed	intentional_global_only	none	无特定强情境绑定依据，有意仅保留在全局中性探索池 (15% 概率) 供自由探索
+lehenga	clothing	印度列恒加礼服长裙 (Lehenga)	0	reviewed	intentional_global_only	none	无特定强情境绑定依据，有意仅保留在全局中性探索池 (15% 概率) 供自由探索
+changshan	clothing	传统长衫与中式袍服 (Changshan)	0	reviewed	intentional_global_only	none	无特定强情境绑定依据，有意仅保留在全局中性探索池 (15% 概率) 供自由探索
+traditional_eastern_gown	clothing	传统东方日装袍服 (Traditional Eastern Gown)	0	reviewed	intentional_global_only	none	无特定强情境绑定依据，有意仅保留在全局中性探索池 (15% 概率) 供自由探索
+sari	clothing	传统莎丽裹裙长袍 (Sari)	0	reviewed	intentional_global_only	none	无特定强情境绑定依据，有意仅保留在全局中性探索池 (15% 概率) 供自由探索
+tops_specialty	clothing	不规则剪裁特色上装 (Specialty Tops)	0	reviewed	intentional_global_only	none	无特定强情境绑定依据，有意仅保留在全局中性探索池 (15% 概率) 供自由探索
+lingerie_bra	clothing	文胸与胸衣内衣 (Lingerie Bra)	0	reviewed	assigned_contexts	adult:4,domestic:2	私密内衣与贴身家居
+professional_lighting_00	lighting		0	reviewed	intentional_global_only	none	通用标准影棚布光或中性特效，有意仅保留在全局探索池供自由抽样
+professional_lighting_01	lighting		0	reviewed	intentional_global_only	none	通用标准影棚布光或中性特效，有意仅保留在全局探索池供自由抽样
+professional_lighting_02	lighting		0	reviewed	intentional_global_only	none	通用标准影棚布光或中性特效，有意仅保留在全局探索池供自由抽样
+professional_lighting_03	lighting		0	reviewed	intentional_global_only	none	通用标准影棚布光或中性特效，有意仅保留在全局探索池供自由抽样
+professional_lighting_04	lighting		0	reviewed	intentional_global_only	none	通用标准影棚布光或中性特效，有意仅保留在全局探索池供自由抽样
+professional_lighting_05	lighting		0	reviewed	intentional_global_only	none	通用标准影棚布光或中性特效，有意仅保留在全局探索池供自由抽样
+professional_lighting_06	lighting		0	reviewed	intentional_global_only	none	通用标准影棚布光或中性特效，有意仅保留在全局探索池供自由抽样
+professional_lighting_07	lighting		0	reviewed	intentional_global_only	none	通用标准影棚布光或中性特效，有意仅保留在全局探索池供自由抽样
+professional_lighting_08	lighting		0	reviewed	intentional_global_only	none	通用标准影棚布光或中性特效，有意仅保留在全局探索池供自由抽样
+professional_lighting_09	lighting		0	reviewed	intentional_global_only	none	通用标准影棚布光或中性特效，有意仅保留在全局探索池供自由抽样
+professional_lighting_10	lighting		0	reviewed	intentional_global_only	none	通用标准影棚布光或中性特效，有意仅保留在全局探索池供自由抽样
+professional_lighting_11	lighting		0	reviewed	intentional_global_only	none	通用标准影棚布光或中性特效，有意仅保留在全局探索池供自由抽样
+professional_lighting_12	lighting	美颜补光灯/环形眼神光	0	reviewed	intentional_global_only	none	通用标准影棚布光或中性特效，有意仅保留在全局探索池供自由抽样
+professional_lighting_13	lighting	纱帘散射柔光	0	reviewed	intentional_global_only	none	通用标准影棚布光或中性特效，有意仅保留在全局探索池供自由抽样
+professional_lighting_14	lighting	树影斑驳日光	0	reviewed	intentional_global_only	none	通用标准影棚布光或中性特效，有意仅保留在全局探索池供自由抽样
+professional_lighting_15	lighting	落日金色侧光	0	reviewed	intentional_global_only	none	通用标准影棚布光或中性特效，有意仅保留在全局探索池供自由抽样
+professional_lighting_16	lighting	逆光透亮发丝	0	reviewed	intentional_global_only	none	通用标准影棚布光或中性特效，有意仅保留在全局探索池供自由抽样
+ext_aw_light_direct_flash	lighting		0	reviewed	intentional_global_only	none	通用标准影棚布光或中性特效，有意仅保留在全局探索池供自由抽样
+ext_aw_light_soft_bounced	lighting		0	reviewed	intentional_global_only	none	通用标准影棚布光或中性特效，有意仅保留在全局探索池供自由抽样
+prof_light_accent	lighting		0	reviewed	intentional_global_only	none	通用标准影棚布光或中性特效，有意仅保留在全局探索池供自由抽样
+prof_light_ambient	lighting		0	reviewed	intentional_global_only	none	通用标准影棚布光或中性特效，有意仅保留在全局探索池供自由抽样
+prof_light_clamshell	lighting		0	reviewed	intentional_global_only	none	通用标准影棚布光或中性特效，有意仅保留在全局探索池供自由抽样
+prof_light_fluorescent	lighting		0	reviewed	assigned_contexts	office:4,transit:2	办公楼荧光顶灯与室内漫射光
+prof_light_fresnel	lighting		0	reviewed	intentional_global_only	none	通用标准影棚布光或中性特效，有意仅保留在全局探索池供自由抽样
+prof_light_gelled	lighting		0	reviewed	intentional_global_only	none	通用标准影棚布光或中性特效，有意仅保留在全局探索池供自由抽样
+prof_light_high_key	lighting		0	reviewed	intentional_global_only	none	通用标准影棚布光或中性特效，有意仅保留在全局探索池供自由抽样
+prof_light_hmi	lighting		0	reviewed	intentional_global_only	none	通用标准影棚布光或中性特效，有意仅保留在全局探索池供自由抽样
+prof_light_led_panel	lighting		0	reviewed	intentional_global_only	none	通用标准影棚布光或中性特效，有意仅保留在全局探索池供自由抽样
+prof_light_painting	lighting		0	reviewed	intentional_global_only	none	通用标准影棚布光或中性特效，有意仅保留在全局探索池供自由抽样
+prof_light_low_key	lighting		0	reviewed	intentional_global_only	none	通用标准影棚布光或中性特效，有意仅保留在全局探索池供自由抽样
+prof_light_practical	lighting		0	reviewed	intentional_global_only	none	通用标准影棚布光或中性特效，有意仅保留在全局探索池供自由抽样
+prof_light_strobe	lighting		0	reviewed	assigned_contexts	nightlife:4,bondage_sm:2	俱乐部霓虹、酒吧弱光与暗调影调
+prof_light_three_point	lighting		0	reviewed	intentional_global_only	none	通用标准影棚布光或中性特效，有意仅保留在全局探索池供自由抽样
+prof_light_tungsten	lighting		0	reviewed	intentional_global_only	none	通用标准影棚布光或中性特效，有意仅保留在全局探索池供自由抽样
+cinematic_lighting_00	lighting		0	reviewed	assigned_contexts	nightlife:4,bondage_sm:2	俱乐部霓虹、酒吧弱光与暗调影调
+cinematic_lighting_01	lighting		0	reviewed	assigned_contexts	nightlife:4,bondage_sm:2	俱乐部霓虹、酒吧弱光与暗调影调
+cinematic_lighting_02	lighting		0	reviewed	assigned_contexts	nightlife:4,bondage_sm:2	俱乐部霓虹、酒吧弱光与暗调影调
+cinematic_lighting_03	lighting		0	reviewed	assigned_contexts	nightlife:4,bondage_sm:2	俱乐部霓虹、酒吧弱光与暗调影调
+ext_aw_light_warm_golden_hour	lighting		0	reviewed	assigned_contexts	outdoor:4	户外自然阳光与黄金时段天光
+ext_aw_light_candlelight	lighting		0	reviewed	assigned_contexts	traditional:4,dining:2	烛光油画古典色调与高档就餐暖光
+ext_aw_light_bioluminescent	lighting		0	reviewed	intentional_global_only	none	通用标准影棚布光或中性特效，有意仅保留在全局探索池供自由抽样
+special_effects_00	lighting		0	reviewed	intentional_global_only	none	通用标准影棚布光或中性特效，有意仅保留在全局探索池供自由抽样
+special_effects_01	lighting		0	reviewed	intentional_global_only	none	通用标准影棚布光或中性特效，有意仅保留在全局探索池供自由抽样
+special_effects_02	lighting		0	reviewed	intentional_global_only	none	通用标准影棚布光或中性特效，有意仅保留在全局探索池供自由抽样
+special_effects_03	lighting		0	reviewed	intentional_global_only	none	通用标准影棚布光或中性特效，有意仅保留在全局探索池供自由抽样
+erotic_lighting_00	lighting		0	reviewed	assigned_contexts	adult:4,bondage_sm:2	私密窥探感与感官弱光
+erotic_lighting_01	lighting		0	reviewed	assigned_contexts	adult:4,bondage_sm:2	私密窥探感与感官弱光
+erotic_lighting_02	lighting		0	reviewed	assigned_contexts	adult:4,bondage_sm:2	私密窥探感与感官弱光
+erotic_lighting_03	lighting		0	reviewed	assigned_contexts	adult:4,bondage_sm:2	私密窥探感与感官弱光
+lighting_oil_classical	lighting	油画古典	2	reviewed	assigned_contexts	traditional:4,dining:2	烛光油画古典色调与高档就餐暖光
+lighting_japanese_fresh	lighting	日系清新	9	reviewed	assigned_contexts	school:4,outdoor:2	自然清新日光与教室窗光
+lighting_backlit_hair	lighting	逆光发丝	8	reviewed	intentional_global_only	none	通用标准影棚布光或中性特效，有意仅保留在全局探索池供自由抽样
+lighting_cinematic_dark	lighting	电影暗调	5	reviewed	assigned_contexts	nightlife:4,bondage_sm:2	俱乐部霓虹、酒吧弱光与暗调影调
+lighting_love_hotel_neon	lighting	情人旅馆霓虹	4	reviewed	assigned_contexts	nightlife:4,bondage_sm:2	俱乐部霓虹、酒吧弱光与暗调影调
+lighting_onsen_intimate	lighting	温泉暧昧	1	reviewed	assigned_contexts	onsen_bath:4,traditional:2	水汽漫射与和风木质暖光
+lighting_bedroom_private	lighting	卧室私密	1	reviewed	assigned_contexts	domestic:4	居家卧室温馨灯光与晨窗光
+lighting_studio_commercial	lighting	影棚商业	5	reviewed	intentional_global_only	none	通用标准影棚布光或中性特效，有意仅保留在全局探索池供自由抽样
+lighting_voyeur_private	lighting	偷窥私密	4	reviewed	assigned_contexts	adult:4,bondage_sm:2	私密窥探感与感官弱光
+lighting_rain_wet	lighting	雨天湿润	3	reviewed	intentional_global_only	none	通用标准影棚布光或中性特效，有意仅保留在全局探索池供自由抽样
