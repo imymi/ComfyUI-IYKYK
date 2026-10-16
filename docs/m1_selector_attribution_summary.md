@@ -39,7 +39,7 @@
 
 2. **中性无偏置抽样规范**：
    - **generic 情境**：14 个槽位在 `generic` 情境下统一废除原先 4 候选的小集合限制，全部配置为 `mode="neutral"`，严格定义为 $C(generic, s) = G_s$。
-   - **规范情境 tattoo**：`school`, `office`, `medical`, `dining` 4 个槽位依据行业与教育规范，设计为 `mode="neutral"`，杜绝不合常理的纹身强行加权。
+   - **规范情境 tattoo**：`school`, `office`, `medical`, `dining` 4 个情境在 `tattoo` 槽位不额外赋予纹身类别亲和偏置，沿用合法全局候选分布；不新增禁用规则，不删除外部指定内容。
 
 ---
 

@@ -46,20 +46,64 @@
         "mode": "weighted",
         "candidates": [
           {
-            "id": "jk_seifuku",
-            "weight": 1.0
+            "id": "blazer_uniform",
+            "weight": 4.0
           },
           {
-            "id": "blazer_uniform",
-            "weight": 1.0
+            "id": "cheerleader",
+            "weight": 4.0
+          },
+          {
+            "id": "duffel_coat",
+            "weight": 4.0
           },
           {
             "id": "gym_uniform",
-            "weight": 1.0
+            "weight": 4.0
+          },
+          {
+            "id": "jk_seifuku",
+            "weight": 4.0
+          },
+          {
+            "id": "knit_vest",
+            "weight": 4.0
           },
           {
             "id": "korean_school",
-            "weight": 1.0
+            "weight": 4.0
+          },
+          {
+            "id": "plaid_skirt",
+            "weight": 4.0
+          },
+          {
+            "id": "pleated_skirt",
+            "weight": 4.0
+          },
+          {
+            "id": "sailor_shirt",
+            "weight": 4.0
+          },
+          {
+            "id": "swimsuit_school",
+            "weight": 4.0
+          },
+          {
+            "id": "volleyball_uniform",
+            "weight": 4.0
+          },
+          {
+            "id": "sportswear_active",
+            "weight": 2.0
+          },
+          {
+            "id": "street_casual",
+            "weight": 2.0
+          },
+          {
+            "id": "sundress_layered",
+            "weight": 2.0
           }
         ]
       },
@@ -68,11 +112,15 @@
         "candidates": [
           {
             "id": "jk_schoolgirl",
-            "weight": 1.0
+            "weight": 4.0
           },
           {
             "id": "strict_teacher",
-            "weight": 1.0
+            "weight": 4.0
+          },
+          {
+            "id": "neighbor_girlfriend",
+            "weight": 2.0
           }
         ]
       },
@@ -80,20 +128,24 @@
         "mode": "weighted",
         "candidates": [
           {
-            "id": "natural_pure",
-            "weight": 1.0
+            "id": "clear_water_bare",
+            "weight": 4.0
           },
           {
             "id": "cute_peachy",
-            "weight": 1.0
+            "weight": 4.0
+          },
+          {
+            "id": "natural_pure",
+            "weight": 4.0
           },
           {
             "id": "sweet_peach_milk",
-            "weight": 1.0
+            "weight": 4.0
           },
           {
-            "id": "clear_water_bare",
-            "weight": 1.0
+            "id": "pure_desire_white_peach",
+            "weight": 2.0
           }
         ]
       },
@@ -101,24 +153,48 @@
         "mode": "weighted",
         "candidates": [
           {
-            "id": "twin_tails",
-            "weight": 1.0
-          },
-          {
-            "id": "high_ponytail",
-            "weight": 1.0
-          },
-          {
-            "id": "long_straight_black",
-            "weight": 1.0
+            "id": "bob_cut",
+            "weight": 4.0
           },
           {
             "id": "braided_twins",
-            "weight": 1.0
+            "weight": 4.0
           },
           {
-            "id": "bob_cut",
-            "weight": 1.0
+            "id": "high_ponytail",
+            "weight": 4.0
+          },
+          {
+            "id": "long_straight_black",
+            "weight": 4.0
+          },
+          {
+            "id": "twin_tails",
+            "weight": 4.0
+          },
+          {
+            "id": "ext_aw_hair_bob_blunt_cut",
+            "weight": 2.0
+          },
+          {
+            "id": "ext_aw_hair_half_up_half_down",
+            "weight": 2.0
+          },
+          {
+            "id": "ext_aw_hair_long_parted_behind_ears",
+            "weight": 2.0
+          },
+          {
+            "id": "ext_aw_hair_single_back_braid",
+            "weight": 2.0
+          },
+          {
+            "id": "hair_pageboy",
+            "weight": 2.0
+          },
+          {
+            "id": "hime_cut",
+            "weight": 2.0
           }
         ]
       },
@@ -126,12 +202,28 @@
         "mode": "weighted",
         "candidates": [
           {
-            "id": "ribbon_bow",
-            "weight": 1.0
+            "id": "acc_bowtie",
+            "weight": 4.0
           },
           {
-            "id": "gold_collarbone_chain",
-            "weight": 1.0
+            "id": "acc_hairband",
+            "weight": 4.0
+          },
+          {
+            "id": "acc_hairclip",
+            "weight": 4.0
+          },
+          {
+            "id": "acc_necktie",
+            "weight": 4.0
+          },
+          {
+            "id": "neck_ribbon",
+            "weight": 4.0
+          },
+          {
+            "id": "ribbon_bow",
+            "weight": 4.0
           }
         ]
       },
@@ -140,19 +232,27 @@
         "candidates": [
           {
             "id": "glasses_reading",
-            "weight": 1.0
+            "weight": 4.0
           },
           {
             "id": "smartphone_recording",
-            "weight": 1.0
+            "weight": 4.0
           },
           {
-            "id": "sex_toy_vibrator",
-            "weight": 1.0
+            "id": "digital_camera_in_hand",
+            "weight": 2.0
           },
           {
-            "id": "plush_doll_teddy",
-            "weight": 1.0
+            "id": "digital_camera_record",
+            "weight": 2.0
+          },
+          {
+            "id": "fluffy_teddy_bear",
+            "weight": 2.0
+          },
+          {
+            "id": "fresh_flower_bouquet",
+            "weight": 2.0
           }
         ]
       },
@@ -164,11 +264,7 @@
         "candidates": [
           {
             "id": "sweat_glistening",
-            "weight": 1.0
-          },
-          {
-            "id": "none",
-            "weight": 1.0
+            "weight": 2.0
           }
         ]
       },
@@ -177,15 +273,15 @@
         "candidates": [
           {
             "id": "sitting",
-            "weight": 1.0
+            "weight": 4.0
           },
           {
             "id": "standing",
-            "weight": 1.0
+            "weight": 4.0
           },
           {
             "id": "dynamic",
-            "weight": 1.0
+            "weight": 2.0
           }
         ]
       },
@@ -193,16 +289,28 @@
         "mode": "weighted",
         "candidates": [
           {
-            "id": "emotion_shy",
-            "weight": 1.0
+            "id": "emotion_happy",
+            "weight": 4.0
           },
           {
             "id": "emotion_playful",
-            "weight": 1.0
+            "weight": 4.0
           },
           {
-            "id": "emotion_restrained",
-            "weight": 1.0
+            "id": "emotion_shy",
+            "weight": 4.0
+          },
+          {
+            "id": "emotion_amused",
+            "weight": 2.0
+          },
+          {
+            "id": "emotion_focused",
+            "weight": 2.0
+          },
+          {
+            "id": "emotion_proud",
+            "weight": 2.0
           }
         ]
       },
@@ -211,15 +319,31 @@
         "candidates": [
           {
             "id": "lighting_japanese_fresh",
-            "weight": 1.0
+            "weight": 4.0
+          },
+          {
+            "id": "prof_light_high_key",
+            "weight": 4.0
+          },
+          {
+            "id": "ext_aw_light_warm_golden_hour",
+            "weight": 2.0
           },
           {
             "id": "lighting_backlit_hair",
-            "weight": 1.0
+            "weight": 2.0
           },
           {
             "id": "lighting_studio_commercial",
-            "weight": 1.0
+            "weight": 2.0
+          },
+          {
+            "id": "professional_lighting_13",
+            "weight": 2.0
+          },
+          {
+            "id": "professional_lighting_16",
+            "weight": 2.0
           }
         ]
       },
@@ -228,15 +352,15 @@
         "candidates": [
           {
             "id": "fujifilm_superia_400",
-            "weight": 1.0
+            "weight": 4.0
           },
           {
             "id": "fujifilm_pro_400h",
-            "weight": 1.0
+            "weight": 2.0
           },
           {
-            "id": "kodak_portra_400",
-            "weight": 1.0
+            "id": "kodak_gold_200",
+            "weight": 2.0
           }
         ]
       },
@@ -244,16 +368,16 @@
         "mode": "weighted",
         "candidates": [
           {
+            "id": "full_body_shot",
+            "weight": 4.0
+          },
+          {
             "id": "medium_close_up",
-            "weight": 1.0
+            "weight": 4.0
           },
           {
             "id": "medium_shot",
-            "weight": 1.0
-          },
-          {
-            "id": "full_body_shot",
-            "weight": 1.0
+            "weight": 4.0
           }
         ]
       },
@@ -262,15 +386,15 @@
         "candidates": [
           {
             "id": "eye_level",
-            "weight": 1.0
+            "weight": 4.0
           },
           {
             "id": "high_angle",
-            "weight": 1.0
+            "weight": 4.0
           },
           {
-            "id": "over_the_shoulder",
-            "weight": 1.0
+            "id": "low_angle",
+            "weight": 2.0
           }
         ]
       }
@@ -280,20 +404,36 @@
         "mode": "weighted",
         "candidates": [
           {
+            "id": "business_suit",
+            "weight": 4.0
+          },
+          {
             "id": "ol_suit",
-            "weight": 1.0
+            "weight": 4.0
           },
           {
-            "id": "knit_sweater",
-            "weight": 1.0
+            "id": "outerwear_overcoat",
+            "weight": 4.0
           },
           {
-            "id": "evening_dress",
-            "weight": 1.0
+            "id": "pencil_skirt",
+            "weight": 4.0
+          },
+          {
+            "id": "trench_coat",
+            "weight": 4.0
+          },
+          {
+            "id": "blazer_uniform",
+            "weight": 2.0
+          },
+          {
+            "id": "knit_vest",
+            "weight": 2.0
           },
           {
             "id": "street_casual",
-            "weight": 1.0
+            "weight": 2.0
           }
         ]
       },
@@ -301,16 +441,16 @@
         "mode": "weighted",
         "candidates": [
           {
-            "id": "ol_subordinate",
-            "weight": 1.0
+            "id": "female_boss",
+            "weight": 4.0
           },
           {
-            "id": "female_boss",
-            "weight": 1.0
+            "id": "ol_subordinate",
+            "weight": 4.0
           },
           {
             "id": "strict_teacher",
-            "weight": 1.0
+            "weight": 2.0
           }
         ]
       },
@@ -318,20 +458,16 @@
         "mode": "weighted",
         "candidates": [
           {
-            "id": "mature_wife",
-            "weight": 1.0
-          },
-          {
-            "id": "sultry_smoky",
-            "weight": 1.0
+            "id": "asian_hybrid_contour",
+            "weight": 4.0
           },
           {
             "id": "natural_pure",
-            "weight": 1.0
+            "weight": 4.0
           },
           {
-            "id": "asian_hybrid_contour",
-            "weight": 1.0
+            "id": "mature_wife",
+            "weight": 2.0
           }
         ]
       },
@@ -339,20 +475,28 @@
         "mode": "weighted",
         "candidates": [
           {
-            "id": "low_ponytail",
-            "weight": 1.0
-          },
-          {
             "id": "collarbone_lob",
-            "weight": 1.0
+            "weight": 4.0
           },
           {
-            "id": "big_wavy_curls",
-            "weight": 1.0
+            "id": "ext_aw_hair_long_parted_behind_ears",
+            "weight": 4.0
           },
           {
-            "id": "messy_bun",
-            "weight": 1.0
+            "id": "hair_long_deep_side_part",
+            "weight": 4.0
+          },
+          {
+            "id": "low_ponytail",
+            "weight": 4.0
+          },
+          {
+            "id": "bob_cut",
+            "weight": 2.0
+          },
+          {
+            "id": "ext_aw_hair_bob_blunt_cut",
+            "weight": 2.0
           }
         ]
       },
@@ -360,16 +504,24 @@
         "mode": "weighted",
         "candidates": [
           {
+            "id": "acc_necktie",
+            "weight": 4.0
+          },
+          {
             "id": "pearl_necklace",
-            "weight": 1.0
+            "weight": 4.0
+          },
+          {
+            "id": "waist_belt",
+            "weight": 4.0
+          },
+          {
+            "id": "ext_aw_jewelry_pearl_drop_earrings",
+            "weight": 2.0
           },
           {
             "id": "gold_collarbone_chain",
-            "weight": 1.0
-          },
-          {
-            "id": "leather_choker",
-            "weight": 1.0
+            "weight": 2.0
           }
         ]
       },
@@ -377,20 +529,24 @@
         "mode": "weighted",
         "candidates": [
           {
-            "id": "glasses_reading",
-            "weight": 1.0
+            "id": "fashion_baguette_bag",
+            "weight": 4.0
           },
           {
-            "id": "wine_glass_bottle",
-            "weight": 1.0
+            "id": "glasses_reading",
+            "weight": 4.0
+          },
+          {
+            "id": "camera_tripod_flash",
+            "weight": 2.0
+          },
+          {
+            "id": "fashion_clutch_bag",
+            "weight": 2.0
           },
           {
             "id": "smartphone_recording",
-            "weight": 1.0
-          },
-          {
-            "id": "digital_camera_record",
-            "weight": 1.0
+            "weight": 2.0
           }
         ]
       },
@@ -402,11 +558,7 @@
         "candidates": [
           {
             "id": "sweat_glistening",
-            "weight": 1.0
-          },
-          {
-            "id": "none",
-            "weight": 1.0
+            "weight": 2.0
           }
         ]
       },
@@ -415,11 +567,11 @@
         "candidates": [
           {
             "id": "sitting",
-            "weight": 1.0
+            "weight": 4.0
           },
           {
             "id": "standing",
-            "weight": 1.0
+            "weight": 4.0
           }
         ]
       },
@@ -427,16 +579,16 @@
         "mode": "weighted",
         "candidates": [
           {
+            "id": "emotion_focused",
+            "weight": 4.0
+          },
+          {
+            "id": "emotion_proud",
+            "weight": 4.0
+          },
+          {
             "id": "emotion_restrained",
-            "weight": 1.0
-          },
-          {
-            "id": "emotion_detached",
-            "weight": 1.0
-          },
-          {
-            "id": "emotion_seductive",
-            "weight": 1.0
+            "weight": 2.0
           }
         ]
       },
@@ -445,15 +597,27 @@
         "candidates": [
           {
             "id": "lighting_studio_commercial",
-            "weight": 1.0
+            "weight": 4.0
+          },
+          {
+            "id": "prof_light_fluorescent",
+            "weight": 4.0
+          },
+          {
+            "id": "prof_light_led_panel",
+            "weight": 4.0
+          },
+          {
+            "id": "ext_aw_light_soft_bounced",
+            "weight": 2.0
           },
           {
             "id": "lighting_cinematic_dark",
-            "weight": 1.0
+            "weight": 2.0
           },
           {
             "id": "lighting_japanese_fresh",
-            "weight": 1.0
+            "weight": 2.0
           }
         ]
       },
@@ -461,16 +625,16 @@
         "mode": "weighted",
         "candidates": [
           {
-            "id": "fujifilm_classic_chrome",
-            "weight": 1.0
-          },
-          {
             "id": "kodak_portra_400",
-            "weight": 1.0
+            "weight": 4.0
           },
           {
-            "id": "cinestill_800t",
-            "weight": 1.0
+            "id": "fujifilm_provia_100f",
+            "weight": 2.0
+          },
+          {
+            "id": "kodak_max_400",
+            "weight": 2.0
           }
         ]
       },
@@ -478,16 +642,16 @@
         "mode": "weighted",
         "candidates": [
           {
-            "id": "medium_shot",
-            "weight": 1.0
+            "id": "full_body_shot",
+            "weight": 4.0
           },
           {
             "id": "medium_close_up",
-            "weight": 1.0
+            "weight": 4.0
           },
           {
-            "id": "medium_long_shot",
-            "weight": 1.0
+            "id": "medium_shot",
+            "weight": 4.0
           }
         ]
       },
@@ -496,15 +660,15 @@
         "candidates": [
           {
             "id": "eye_level",
-            "weight": 1.0
-          },
-          {
-            "id": "low_angle",
-            "weight": 1.0
+            "weight": 4.0
           },
           {
             "id": "over_the_shoulder",
-            "weight": 1.0
+            "weight": 4.0
+          },
+          {
+            "id": "low_angle",
+            "weight": 2.0
           }
         ]
       }
@@ -514,8 +678,24 @@
         "mode": "weighted",
         "candidates": [
           {
+            "id": "hospital_gown",
+            "weight": 4.0
+          },
+          {
+            "id": "lab_coat",
+            "weight": 4.0
+          },
+          {
             "id": "nurse_uniform",
-            "weight": 1.0
+            "weight": 4.0
+          },
+          {
+            "id": "camisole_slip",
+            "weight": 2.0
+          },
+          {
+            "id": "knit_sweater",
+            "weight": 2.0
           }
         ]
       },
@@ -524,7 +704,11 @@
         "candidates": [
           {
             "id": "kind_nurse",
-            "weight": 1.0
+            "weight": 4.0
+          },
+          {
+            "id": "ol_subordinate",
+            "weight": 2.0
           }
         ]
       },
@@ -532,16 +716,16 @@
         "mode": "weighted",
         "candidates": [
           {
+            "id": "clear_water_bare",
+            "weight": 4.0
+          },
+          {
             "id": "natural_pure",
-            "weight": 1.0
+            "weight": 4.0
           },
           {
             "id": "cute_peachy",
-            "weight": 1.0
-          },
-          {
-            "id": "clear_water_bare",
-            "weight": 1.0
+            "weight": 2.0
           }
         ]
       },
@@ -549,20 +733,20 @@
         "mode": "weighted",
         "candidates": [
           {
-            "id": "low_ponytail",
-            "weight": 1.0
-          },
-          {
             "id": "bob_cut",
-            "weight": 1.0
+            "weight": 4.0
           },
           {
-            "id": "twin_tails",
-            "weight": 1.0
+            "id": "low_ponytail",
+            "weight": 4.0
           },
           {
             "id": "messy_bun",
-            "weight": 1.0
+            "weight": 2.0
+          },
+          {
+            "id": "twin_tails",
+            "weight": 2.0
           }
         ]
       },
@@ -571,7 +755,7 @@
         "candidates": [
           {
             "id": "nurse_cap",
-            "weight": 1.0
+            "weight": 4.0
           }
         ]
       },
@@ -580,11 +764,11 @@
         "candidates": [
           {
             "id": "glasses_reading",
-            "weight": 1.0
+            "weight": 4.0
           },
           {
             "id": "smartphone_recording",
-            "weight": 1.0
+            "weight": 2.0
           }
         ]
       },
@@ -595,12 +779,12 @@
         "mode": "weighted",
         "candidates": [
           {
-            "id": "sweat_glistening",
-            "weight": 1.0
+            "id": "body_oil_lube",
+            "weight": 2.0
           },
           {
-            "id": "body_oil_lube",
-            "weight": 1.0
+            "id": "sweat_glistening",
+            "weight": 2.0
           }
         ]
       },
@@ -608,16 +792,16 @@
         "mode": "weighted",
         "candidates": [
           {
-            "id": "standing",
-            "weight": 1.0
+            "id": "lying",
+            "weight": 4.0
           },
           {
             "id": "sitting",
-            "weight": 1.0
+            "weight": 4.0
           },
           {
-            "id": "lying",
-            "weight": 1.0
+            "id": "standing",
+            "weight": 2.0
           }
         ]
       },
@@ -625,16 +809,16 @@
         "mode": "weighted",
         "candidates": [
           {
-            "id": "emotion_shy",
-            "weight": 1.0
-          },
-          {
             "id": "emotion_submissive",
-            "weight": 1.0
+            "weight": 4.0
           },
           {
             "id": "emotion_restrained",
-            "weight": 1.0
+            "weight": 2.0
+          },
+          {
+            "id": "emotion_shy",
+            "weight": 2.0
           }
         ]
       },
@@ -643,15 +827,27 @@
         "candidates": [
           {
             "id": "lighting_studio_commercial",
-            "weight": 1.0
+            "weight": 4.0
           },
           {
-            "id": "lighting_japanese_fresh",
-            "weight": 1.0
+            "id": "prof_light_fluorescent",
+            "weight": 4.0
+          },
+          {
+            "id": "prof_light_led_panel",
+            "weight": 4.0
           },
           {
             "id": "lighting_backlit_hair",
-            "weight": 1.0
+            "weight": 2.0
+          },
+          {
+            "id": "lighting_cinematic_dark",
+            "weight": 2.0
+          },
+          {
+            "id": "lighting_japanese_fresh",
+            "weight": 2.0
           }
         ]
       },
@@ -660,15 +856,15 @@
         "candidates": [
           {
             "id": "kodak_max_400",
-            "weight": 1.0
+            "weight": 4.0
           },
           {
             "id": "kodak_portra_400",
-            "weight": 1.0
+            "weight": 4.0
           },
           {
             "id": "fujifilm_pro_400h",
-            "weight": 1.0
+            "weight": 2.0
           }
         ]
       },
@@ -676,16 +872,16 @@
         "mode": "weighted",
         "candidates": [
           {
-            "id": "medium_shot",
-            "weight": 1.0
+            "id": "full_body_shot",
+            "weight": 4.0
           },
           {
             "id": "medium_close_up",
-            "weight": 1.0
+            "weight": 4.0
           },
           {
-            "id": "full_body_shot",
-            "weight": 1.0
+            "id": "medium_shot",
+            "weight": 4.0
           }
         ]
       },
@@ -694,11 +890,11 @@
         "candidates": [
           {
             "id": "eye_level",
-            "weight": 1.0
+            "weight": 4.0
           },
           {
             "id": "high_angle",
-            "weight": 1.0
+            "weight": 4.0
           }
         ]
       }
@@ -708,20 +904,28 @@
         "mode": "weighted",
         "candidates": [
           {
-            "id": "yukata",
-            "weight": 1.0
+            "id": "bathrobe",
+            "weight": 4.0
           },
           {
-            "id": "kimono",
-            "weight": 1.0
+            "id": "yukata",
+            "weight": 4.0
+          },
+          {
+            "id": "bikini_classic",
+            "weight": 2.0
           },
           {
             "id": "one_piece_swimsuit",
-            "weight": 1.0
+            "weight": 2.0
           },
           {
-            "id": "bikini_micro",
-            "weight": 1.0
+            "id": "silk_robe",
+            "weight": 2.0
+          },
+          {
+            "id": "swimsuit_classic",
+            "weight": 2.0
           }
         ]
       },
@@ -729,16 +933,16 @@
         "mode": "weighted",
         "candidates": [
           {
+            "id": "gravure_idol",
+            "weight": 2.0
+          },
+          {
             "id": "married_housewife",
-            "weight": 1.0
+            "weight": 2.0
           },
           {
             "id": "neighbor_girlfriend",
-            "weight": 1.0
-          },
-          {
-            "id": "gravure_idol",
-            "weight": 1.0
+            "weight": 2.0
           }
         ]
       },
@@ -746,20 +950,16 @@
         "mode": "weighted",
         "candidates": [
           {
-            "id": "wet_dewy",
-            "weight": 1.0
-          },
-          {
-            "id": "natural_pure",
-            "weight": 1.0
+            "id": "clear_water_bare",
+            "weight": 4.0
           },
           {
             "id": "climax_flush",
-            "weight": 1.0
+            "weight": 4.0
           },
           {
-            "id": "drunken_milky_youth",
-            "weight": 1.0
+            "id": "wet_dewy",
+            "weight": 4.0
           }
         ]
       },
@@ -768,15 +968,11 @@
         "candidates": [
           {
             "id": "wet_hair_face",
-            "weight": 1.0
+            "weight": 4.0
           },
           {
-            "id": "messy_bun",
-            "weight": 1.0
-          },
-          {
-            "id": "low_ponytail",
-            "weight": 1.0
+            "id": "hair_over_breast",
+            "weight": 2.0
           }
         ]
       },
@@ -784,16 +980,16 @@
         "mode": "weighted",
         "candidates": [
           {
+            "id": "ankle_bracelet",
+            "weight": 4.0
+          },
+          {
             "id": "gold_collarbone_chain",
-            "weight": 1.0
+            "weight": 2.0
           },
           {
             "id": "pearl_necklace",
-            "weight": 1.0
-          },
-          {
-            "id": "ankle_bracelet",
-            "weight": 1.0
+            "weight": 2.0
           }
         ]
       },
@@ -801,32 +997,30 @@
         "mode": "weighted",
         "candidates": [
           {
-            "id": "wine_glass_bottle",
-            "weight": 1.0
-          },
-          {
-            "id": "ice_cubes",
-            "weight": 1.0
-          },
-          {
             "id": "rose_petals_candles",
-            "weight": 1.0
+            "weight": 4.0
           }
         ]
       },
       "tattoo": {
-        "mode": "neutral"
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "rose_flower_hip",
+            "weight": 2.0
+          }
+        ]
       },
       "liquids": {
         "mode": "weighted",
         "candidates": [
           {
-            "id": "wet_water_drops",
-            "weight": 1.0
+            "id": "body_oil_lube",
+            "weight": 4.0
           },
           {
-            "id": "sweat_glistening",
-            "weight": 1.0
+            "id": "wet_water_drops",
+            "weight": 4.0
           }
         ]
       },
@@ -834,20 +1028,12 @@
         "mode": "weighted",
         "candidates": [
           {
-            "id": "sitting",
-            "weight": 1.0
-          },
-          {
-            "id": "standing",
-            "weight": 1.0
-          },
-          {
             "id": "lying",
-            "weight": 1.0
+            "weight": 4.0
           },
           {
-            "id": "kneeling",
-            "weight": 1.0
+            "id": "gestures_self_touch",
+            "weight": 2.0
           }
         ]
       },
@@ -855,16 +1041,20 @@
         "mode": "weighted",
         "candidates": [
           {
-            "id": "emotion_pleasure",
-            "weight": 1.0
+            "id": "emotion_blissful",
+            "weight": 4.0
           },
           {
-            "id": "emotion_shy",
-            "weight": 1.0
+            "id": "emotion_relaxed",
+            "weight": 4.0
           },
           {
             "id": "emotion_dazed",
-            "weight": 1.0
+            "weight": 2.0
+          },
+          {
+            "id": "emotion_pleasure",
+            "weight": 2.0
           }
         ]
       },
@@ -873,15 +1063,23 @@
         "candidates": [
           {
             "id": "lighting_onsen_intimate",
-            "weight": 1.0
-          },
-          {
-            "id": "lighting_backlit_hair",
-            "weight": 1.0
+            "weight": 4.0
           },
           {
             "id": "lighting_rain_wet",
-            "weight": 1.0
+            "weight": 4.0
+          },
+          {
+            "id": "erotic_lighting_02",
+            "weight": 2.0
+          },
+          {
+            "id": "lighting_backlit_hair",
+            "weight": 2.0
+          },
+          {
+            "id": "professional_lighting_14",
+            "weight": 2.0
           }
         ]
       },
@@ -890,15 +1088,15 @@
         "candidates": [
           {
             "id": "kodak_portra_400",
-            "weight": 1.0
+            "weight": 4.0
           },
           {
             "id": "fujifilm_pro_400h",
-            "weight": 1.0
+            "weight": 2.0
           },
           {
             "id": "kodak_gold_200",
-            "weight": 1.0
+            "weight": 2.0
           }
         ]
       },
@@ -906,16 +1104,16 @@
         "mode": "weighted",
         "candidates": [
           {
-            "id": "medium_shot",
-            "weight": 1.0
-          },
-          {
             "id": "full_body_shot",
-            "weight": 1.0
+            "weight": 4.0
           },
           {
             "id": "medium_close_up",
-            "weight": 1.0
+            "weight": 4.0
+          },
+          {
+            "id": "medium_shot",
+            "weight": 4.0
           }
         ]
       },
@@ -924,15 +1122,15 @@
         "candidates": [
           {
             "id": "eye_level",
-            "weight": 1.0
+            "weight": 4.0
           },
           {
             "id": "high_angle",
-            "weight": 1.0
+            "weight": 4.0
           },
           {
             "id": "overhead_birds_eye",
-            "weight": 1.0
+            "weight": 2.0
           }
         ]
       }
@@ -943,15 +1141,23 @@
         "candidates": [
           {
             "id": "latex_catsuit",
-            "weight": 1.0
+            "weight": 4.0
           },
           {
             "id": "leather_corset",
-            "weight": 1.0
+            "weight": 4.0
           },
           {
-            "id": "lingerie_lace",
-            "weight": 1.0
+            "id": "zentai_suit",
+            "weight": 4.0
+          },
+          {
+            "id": "lolita_gothic",
+            "weight": 2.0
+          },
+          {
+            "id": "maid_dress",
+            "weight": 2.0
           }
         ]
       },
@@ -959,16 +1165,16 @@
         "mode": "weighted",
         "candidates": [
           {
+            "id": "female_boss",
+            "weight": 2.0
+          },
+          {
             "id": "french_maid",
-            "weight": 1.0
+            "weight": 2.0
           },
           {
             "id": "ol_subordinate",
-            "weight": 1.0
-          },
-          {
-            "id": "female_boss",
-            "weight": 1.0
+            "weight": 2.0
           }
         ]
       },
@@ -976,20 +1182,20 @@
         "mode": "weighted",
         "candidates": [
           {
-            "id": "submissive_marked",
-            "weight": 1.0
-          },
-          {
-            "id": "ruined_crying",
-            "weight": 1.0
-          },
-          {
             "id": "climax_flush",
-            "weight": 1.0
+            "weight": 4.0
           },
           {
             "id": "gothic_dark",
-            "weight": 1.0
+            "weight": 4.0
+          },
+          {
+            "id": "ruined_crying",
+            "weight": 4.0
+          },
+          {
+            "id": "submissive_marked",
+            "weight": 4.0
           }
         ]
       },
@@ -997,16 +1203,16 @@
         "mode": "weighted",
         "candidates": [
           {
+            "id": "hair_in_mouth",
+            "weight": 4.0
+          },
+          {
             "id": "messy_bedhead",
-            "weight": 1.0
+            "weight": 4.0
           },
           {
             "id": "twin_tails",
-            "weight": 1.0
-          },
-          {
-            "id": "hair_in_mouth",
-            "weight": 1.0
+            "weight": 2.0
           }
         ]
       },
@@ -1014,20 +1220,20 @@
         "mode": "weighted",
         "candidates": [
           {
-            "id": "leather_choker",
-            "weight": 1.0
+            "id": "combo_necklace_choker",
+            "weight": 4.0
           },
           {
             "id": "lace_blindfold",
-            "weight": 1.0
+            "weight": 4.0
+          },
+          {
+            "id": "leather_choker",
+            "weight": 4.0
           },
           {
             "id": "nipple_rings",
-            "weight": 1.0
-          },
-          {
-            "id": "body_chain",
-            "weight": 1.0
+            "weight": 4.0
           }
         ]
       },
@@ -1036,15 +1242,11 @@
         "candidates": [
           {
             "id": "bondage_rope_collar",
-            "weight": 1.0
+            "weight": 4.0
           },
           {
             "id": "sex_toy_vibrator",
-            "weight": 1.0
-          },
-          {
-            "id": "ice_cubes",
-            "weight": 1.0
+            "weight": 4.0
           }
         ]
       },
@@ -1052,16 +1254,28 @@
         "mode": "weighted",
         "candidates": [
           {
-            "id": "lewd_womb_pubic",
-            "weight": 1.0
+            "id": "tally_marks_inner_thigh",
+            "weight": 4.0
           },
           {
             "id": "barcode_serial_number",
-            "weight": 1.0
+            "weight": 2.0
           },
           {
-            "id": "tally_marks_inner_thigh",
-            "weight": 1.0
+            "id": "japanese_irezumi_dragon",
+            "weight": 2.0
+          },
+          {
+            "id": "lewd_womb_pubic",
+            "weight": 2.0
+          },
+          {
+            "id": "snake_coiling",
+            "weight": 2.0
+          },
+          {
+            "id": "underbust_mandala",
+            "weight": 2.0
           }
         ]
       },
@@ -1070,19 +1284,23 @@
         "candidates": [
           {
             "id": "saliva_drool",
-            "weight": 1.0
-          },
-          {
-            "id": "sweat_glistening",
-            "weight": 1.0
-          },
-          {
-            "id": "cum_splatter",
-            "weight": 1.0
+            "weight": 4.0
           },
           {
             "id": "body_oil_lube",
-            "weight": 1.0
+            "weight": 2.0
+          },
+          {
+            "id": "cum_splatter",
+            "weight": 2.0
+          },
+          {
+            "id": "pussy_juice",
+            "weight": 2.0
+          },
+          {
+            "id": "sweat_glistening",
+            "weight": 2.0
           }
         ]
       },
@@ -1090,20 +1308,16 @@
         "mode": "weighted",
         "candidates": [
           {
-            "id": "kneeling",
-            "weight": 1.0
-          },
-          {
             "id": "all_fours",
-            "weight": 1.0
+            "weight": 4.0
           },
           {
-            "id": "lying",
-            "weight": 1.0
+            "id": "kneeling",
+            "weight": 4.0
           },
           {
-            "id": "teasing",
-            "weight": 1.0
+            "id": "restraints_holds",
+            "weight": 4.0
           }
         ]
       },
@@ -1111,16 +1325,24 @@
         "mode": "weighted",
         "candidates": [
           {
-            "id": "emotion_submissive",
-            "weight": 1.0
+            "id": "emotion_fear",
+            "weight": 4.0
           },
           {
             "id": "emotion_pain",
-            "weight": 1.0
+            "weight": 4.0
           },
           {
-            "id": "emotion_dazed",
-            "weight": 1.0
+            "id": "emotion_restrained",
+            "weight": 4.0
+          },
+          {
+            "id": "emotion_submissive",
+            "weight": 4.0
+          },
+          {
+            "id": "emotion_detached",
+            "weight": 2.0
           }
         ]
       },
@@ -1128,16 +1350,28 @@
         "mode": "weighted",
         "candidates": [
           {
+            "id": "cinematic_lighting_01",
+            "weight": 4.0
+          },
+          {
             "id": "lighting_cinematic_dark",
-            "weight": 1.0
+            "weight": 4.0
           },
           {
             "id": "lighting_voyeur_private",
-            "weight": 1.0
+            "weight": 4.0
+          },
+          {
+            "id": "prof_light_low_key",
+            "weight": 4.0
+          },
+          {
+            "id": "erotic_lighting_00",
+            "weight": 2.0
           },
           {
             "id": "lighting_love_hotel_neon",
-            "weight": 1.0
+            "weight": 2.0
           }
         ]
       },
@@ -1145,16 +1379,16 @@
         "mode": "weighted",
         "candidates": [
           {
-            "id": "cinestill_800t",
-            "weight": 1.0
+            "id": "ilford_hp5_plus",
+            "weight": 4.0
           },
           {
             "id": "kodak_trix_400",
-            "weight": 1.0
+            "weight": 4.0
           },
           {
-            "id": "ilford_hp5_plus",
-            "weight": 1.0
+            "id": "fujifilm_acros_100",
+            "weight": 2.0
           }
         ]
       },
@@ -1162,16 +1396,16 @@
         "mode": "weighted",
         "candidates": [
           {
-            "id": "medium_shot",
-            "weight": 1.0
+            "id": "erotic_close_up",
+            "weight": 4.0
           },
           {
             "id": "full_body_shot",
-            "weight": 1.0
+            "weight": 4.0
           },
           {
-            "id": "erotic_close_up",
-            "weight": 1.0
+            "id": "medium_shot",
+            "weight": 4.0
           }
         ]
       },
@@ -1180,19 +1414,19 @@
         "candidates": [
           {
             "id": "high_angle",
-            "weight": 1.0
-          },
-          {
-            "id": "low_angle",
-            "weight": 1.0
+            "weight": 4.0
           },
           {
             "id": "pov_first_person",
-            "weight": 1.0
+            "weight": 4.0
           },
           {
             "id": "dutch_angle",
-            "weight": 1.0
+            "weight": 2.0
+          },
+          {
+            "id": "low_angle",
+            "weight": 2.0
           }
         ]
       }
@@ -1202,32 +1436,84 @@
         "mode": "weighted",
         "candidates": [
           {
-            "id": "kimono",
-            "weight": 1.0
+            "id": "ao_dai",
+            "weight": 4.0
           },
           {
-            "id": "yukata",
-            "weight": 1.0
+            "id": "changshan",
+            "weight": 4.0
+          },
+          {
+            "id": "clerical_nun",
+            "weight": 4.0
+          },
+          {
+            "id": "clerical_priest",
+            "weight": 4.0
+          },
+          {
+            "id": "dirndl_dress",
+            "weight": 4.0
           },
           {
             "id": "furisode",
-            "weight": 1.0
+            "weight": 4.0
           },
           {
-            "id": "qipao",
-            "weight": 1.0
-          },
-          {
-            "id": "hanfu",
-            "weight": 1.0
-          },
-          {
-            "id": "modern_chinese",
-            "weight": 1.0
+            "id": "greek_toga",
+            "weight": 4.0
           },
           {
             "id": "hanbok",
-            "weight": 1.0
+            "weight": 4.0
+          },
+          {
+            "id": "hanfu",
+            "weight": 4.0
+          },
+          {
+            "id": "kimono",
+            "weight": 4.0
+          },
+          {
+            "id": "lehenga",
+            "weight": 4.0
+          },
+          {
+            "id": "modern_chinese",
+            "weight": 4.0
+          },
+          {
+            "id": "qipao",
+            "weight": 4.0
+          },
+          {
+            "id": "sari",
+            "weight": 4.0
+          },
+          {
+            "id": "shinto_miko",
+            "weight": 4.0
+          },
+          {
+            "id": "taoist_robe",
+            "weight": 4.0
+          },
+          {
+            "id": "traditional_eastern_gown",
+            "weight": 4.0
+          },
+          {
+            "id": "uchikake",
+            "weight": 4.0
+          },
+          {
+            "id": "yukata",
+            "weight": 4.0
+          },
+          {
+            "id": "festive_costume",
+            "weight": 2.0
           }
         ]
       },
@@ -1236,11 +1522,11 @@
         "candidates": [
           {
             "id": "married_housewife",
-            "weight": 1.0
+            "weight": 2.0
           },
           {
             "id": "neighbor_girlfriend",
-            "weight": 1.0
+            "weight": 2.0
           }
         ]
       },
@@ -1248,20 +1534,12 @@
         "mode": "weighted",
         "candidates": [
           {
-            "id": "vintage_retro",
-            "weight": 1.0
-          },
-          {
             "id": "chinese_vermilion",
-            "weight": 1.0
+            "weight": 4.0
           },
           {
-            "id": "natural_pure",
-            "weight": 1.0
-          },
-          {
-            "id": "mature_wife",
-            "weight": 1.0
+            "id": "vintage_retro",
+            "weight": 4.0
           }
         ]
       },
@@ -1269,20 +1547,32 @@
         "mode": "weighted",
         "candidates": [
           {
-            "id": "long_straight_black",
-            "weight": 1.0
+            "id": "ext_aw_hair_crown_braid_updo",
+            "weight": 4.0
+          },
+          {
+            "id": "ext_aw_hair_low_nape_chignon",
+            "weight": 4.0
           },
           {
             "id": "hime_cut",
-            "weight": 1.0
+            "weight": 4.0
           },
           {
-            "id": "low_ponytail",
-            "weight": 1.0
+            "id": "long_straight_black",
+            "weight": 4.0
           },
           {
-            "id": "braided_twins",
-            "weight": 1.0
+            "id": "ext_aw_hair_single_back_braid",
+            "weight": 2.0
+          },
+          {
+            "id": "ext_aw_hair_vintage_finger_waves",
+            "weight": 2.0
+          },
+          {
+            "id": "hair_pageboy",
+            "weight": 2.0
           }
         ]
       },
@@ -1290,16 +1580,12 @@
         "mode": "weighted",
         "candidates": [
           {
+            "id": "fur_shawl",
+            "weight": 2.0
+          },
+          {
             "id": "pearl_necklace",
-            "weight": 1.0
-          },
-          {
-            "id": "gold_collarbone_chain",
-            "weight": 1.0
-          },
-          {
-            "id": "ribbon_bow",
-            "weight": 1.0
+            "weight": 2.0
           }
         ]
       },
@@ -1307,16 +1593,20 @@
         "mode": "weighted",
         "candidates": [
           {
-            "id": "oriental_fan_umbrella",
-            "weight": 1.0
+            "id": "embroidered_round_fan",
+            "weight": 4.0
           },
           {
-            "id": "wine_glass_bottle",
-            "weight": 1.0
+            "id": "oil_paper_umbrella",
+            "weight": 4.0
+          },
+          {
+            "id": "oriental_fan_umbrella",
+            "weight": 4.0
           },
           {
             "id": "flower_bouquet_petals",
-            "weight": 1.0
+            "weight": 2.0
           }
         ]
       },
@@ -1324,12 +1614,16 @@
         "mode": "weighted",
         "candidates": [
           {
-            "id": "japanese_irezumi_dragon",
-            "weight": 1.0
+            "id": "cherry_blossom_shoulder",
+            "weight": 4.0
           },
           {
-            "id": "cherry_blossom_shoulder",
-            "weight": 1.0
+            "id": "japanese_irezumi_dragon",
+            "weight": 4.0
+          },
+          {
+            "id": "spine_vertical_script",
+            "weight": 2.0
           }
         ]
       },
@@ -1338,11 +1632,7 @@
         "candidates": [
           {
             "id": "sweat_glistening",
-            "weight": 1.0
-          },
-          {
-            "id": "none",
-            "weight": 1.0
+            "weight": 2.0
           }
         ]
       },
@@ -1351,15 +1641,7 @@
         "candidates": [
           {
             "id": "kneeling",
-            "weight": 1.0
-          },
-          {
-            "id": "sitting",
-            "weight": 1.0
-          },
-          {
-            "id": "standing",
-            "weight": 1.0
+            "weight": 4.0
           }
         ]
       },
@@ -1367,16 +1649,16 @@
         "mode": "weighted",
         "candidates": [
           {
-            "id": "emotion_shy",
-            "weight": 1.0
-          },
-          {
             "id": "emotion_restrained",
-            "weight": 1.0
+            "weight": 4.0
           },
           {
             "id": "emotion_seductive",
-            "weight": 1.0
+            "weight": 2.0
+          },
+          {
+            "id": "emotion_shy",
+            "weight": 2.0
           }
         ]
       },
@@ -1384,16 +1666,24 @@
         "mode": "weighted",
         "candidates": [
           {
+            "id": "ext_aw_light_candlelight",
+            "weight": 4.0
+          },
+          {
             "id": "lighting_oil_classical",
-            "weight": 1.0
+            "weight": 4.0
           },
           {
             "id": "lighting_backlit_hair",
-            "weight": 1.0
+            "weight": 2.0
           },
           {
             "id": "lighting_japanese_fresh",
-            "weight": 1.0
+            "weight": 2.0
+          },
+          {
+            "id": "professional_lighting_15",
+            "weight": 2.0
           }
         ]
       },
@@ -1402,15 +1692,19 @@
         "candidates": [
           {
             "id": "fujifilm_acros_100",
-            "weight": 1.0
+            "weight": 4.0
           },
           {
-            "id": "kodak_portra_400",
-            "weight": 1.0
+            "id": "fujifilm_provia_100f",
+            "weight": 2.0
           },
           {
-            "id": "kodak_gold_200",
-            "weight": 1.0
+            "id": "ilford_hp5_plus",
+            "weight": 2.0
+          },
+          {
+            "id": "kodak_trix_400",
+            "weight": 2.0
           }
         ]
       },
@@ -1418,16 +1712,16 @@
         "mode": "weighted",
         "candidates": [
           {
-            "id": "medium_shot",
-            "weight": 1.0
-          },
-          {
             "id": "full_body_shot",
-            "weight": 1.0
+            "weight": 4.0
           },
           {
             "id": "medium_close_up",
-            "weight": 1.0
+            "weight": 4.0
+          },
+          {
+            "id": "medium_shot",
+            "weight": 4.0
           }
         ]
       },
@@ -1436,15 +1730,15 @@
         "candidates": [
           {
             "id": "eye_level",
-            "weight": 1.0
+            "weight": 4.0
           },
           {
             "id": "high_angle",
-            "weight": 1.0
+            "weight": 4.0
           },
           {
             "id": "over_the_shoulder",
-            "weight": 1.0
+            "weight": 4.0
           }
         ]
       }
@@ -1455,23 +1749,43 @@
         "candidates": [
           {
             "id": "bunny_suit",
-            "weight": 1.0
+            "weight": 4.0
           },
           {
-            "id": "party_club",
-            "weight": 1.0
+            "id": "cocktail_dress",
+            "weight": 4.0
           },
           {
-            "id": "lingerie_lace",
-            "weight": 1.0
-          },
-          {
-            "id": "latex_catsuit",
-            "weight": 1.0
+            "id": "dress_backless",
+            "weight": 4.0
           },
           {
             "id": "evening_dress",
-            "weight": 1.0
+            "weight": 4.0
+          },
+          {
+            "id": "fishnet_top",
+            "weight": 4.0
+          },
+          {
+            "id": "leather_jacket",
+            "weight": 4.0
+          },
+          {
+            "id": "leather_skirt",
+            "weight": 4.0
+          },
+          {
+            "id": "off_shoulder_dress",
+            "weight": 4.0
+          },
+          {
+            "id": "party_club",
+            "weight": 4.0
+          },
+          {
+            "id": "formal_gown",
+            "weight": 2.0
           }
         ]
       },
@@ -1480,11 +1794,7 @@
         "candidates": [
           {
             "id": "hostess_cabaret",
-            "weight": 1.0
-          },
-          {
-            "id": "gravure_idol",
-            "weight": 1.0
+            "weight": 4.0
           }
         ]
       },
@@ -1492,20 +1802,20 @@
         "mode": "weighted",
         "candidates": [
           {
+            "id": "drunken_milky_youth",
+            "weight": 4.0
+          },
+          {
             "id": "sultry_smoky",
-            "weight": 1.0
+            "weight": 4.0
           },
           {
-            "id": "climax_flush",
-            "weight": 1.0
-          },
-          {
-            "id": "ruined_crying",
-            "weight": 1.0
+            "id": "asian_hybrid_contour",
+            "weight": 2.0
           },
           {
             "id": "gothic_dark",
-            "weight": 1.0
+            "weight": 2.0
           }
         ]
       },
@@ -1514,19 +1824,19 @@
         "candidates": [
           {
             "id": "big_wavy_curls",
-            "weight": 1.0
+            "weight": 4.0
           },
           {
-            "id": "twin_tails",
-            "weight": 1.0
+            "id": "ext_aw_hair_vintage_finger_waves",
+            "weight": 4.0
           },
           {
-            "id": "hime_cut",
-            "weight": 1.0
+            "id": "hair_1940s_waves",
+            "weight": 4.0
           },
           {
-            "id": "hair_in_mouth",
-            "weight": 1.0
+            "id": "hair_long_deep_side_part",
+            "weight": 2.0
           }
         ]
       },
@@ -1534,20 +1844,28 @@
         "mode": "weighted",
         "candidates": [
           {
-            "id": "leather_choker",
-            "weight": 1.0
-          },
-          {
-            "id": "body_chain",
-            "weight": 1.0
-          },
-          {
             "id": "bunny_ears",
-            "weight": 1.0
+            "weight": 4.0
+          },
+          {
+            "id": "fur_shawl",
+            "weight": 4.0
+          },
+          {
+            "id": "gold_collarbone_chain",
+            "weight": 4.0
           },
           {
             "id": "cat_ears",
-            "weight": 1.0
+            "weight": 2.0
+          },
+          {
+            "id": "combo_necklace_choker",
+            "weight": 2.0
+          },
+          {
+            "id": "ext_aw_jewelry_silver_hoop_earrings",
+            "weight": 2.0
           }
         ]
       },
@@ -1555,36 +1873,42 @@
         "mode": "weighted",
         "candidates": [
           {
-            "id": "wine_glass_bottle",
-            "weight": 1.0
+            "id": "fashion_clutch_bag",
+            "weight": 4.0
           },
           {
-            "id": "sex_toy_vibrator",
-            "weight": 1.0
+            "id": "wine_glass_bottle",
+            "weight": 4.0
           },
           {
             "id": "smartphone_recording",
-            "weight": 1.0
-          },
-          {
-            "id": "digital_camera_record",
-            "weight": 1.0
+            "weight": 2.0
           }
         ]
       },
       "tattoo": {
-        "mode": "neutral"
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "butterfly_lower_back",
+            "weight": 4.0
+          },
+          {
+            "id": "snake_coiling",
+            "weight": 2.0
+          }
+        ]
       },
       "liquids": {
         "mode": "weighted",
         "candidates": [
           {
-            "id": "sweat_glistening",
-            "weight": 1.0
+            "id": "saliva_drool",
+            "weight": 2.0
           },
           {
-            "id": "saliva_drool",
-            "weight": 1.0
+            "id": "sweat_glistening",
+            "weight": 2.0
           }
         ]
       },
@@ -1592,20 +1916,20 @@
         "mode": "weighted",
         "candidates": [
           {
-            "id": "standing",
-            "weight": 1.0
+            "id": "teasing",
+            "weight": 4.0
           },
           {
             "id": "dynamic",
-            "weight": 1.0
-          },
-          {
-            "id": "teasing",
-            "weight": 1.0
+            "weight": 2.0
           },
           {
             "id": "sitting",
-            "weight": 1.0
+            "weight": 2.0
+          },
+          {
+            "id": "standing",
+            "weight": 2.0
           }
         ]
       },
@@ -1614,15 +1938,19 @@
         "candidates": [
           {
             "id": "emotion_seductive",
-            "weight": 1.0
-          },
-          {
-            "id": "emotion_pleasure",
-            "weight": 1.0
+            "weight": 4.0
           },
           {
             "id": "emotion_playful",
-            "weight": 1.0
+            "weight": 2.0
+          },
+          {
+            "id": "emotion_pleasure",
+            "weight": 2.0
+          },
+          {
+            "id": "emotion_yearning",
+            "weight": 2.0
           }
         ]
       },
@@ -1630,16 +1958,48 @@
         "mode": "weighted",
         "candidates": [
           {
-            "id": "lighting_love_hotel_neon",
-            "weight": 1.0
+            "id": "cinematic_lighting_02",
+            "weight": 4.0
           },
           {
-            "id": "lighting_cinematic_dark",
-            "weight": 1.0
+            "id": "ext_aw_light_direct_flash",
+            "weight": 4.0
+          },
+          {
+            "id": "lighting_love_hotel_neon",
+            "weight": 4.0
+          },
+          {
+            "id": "prof_light_gelled",
+            "weight": 4.0
+          },
+          {
+            "id": "prof_light_tungsten",
+            "weight": 4.0
+          },
+          {
+            "id": "cinematic_lighting_00",
+            "weight": 2.0
+          },
+          {
+            "id": "cinematic_lighting_01",
+            "weight": 2.0
+          },
+          {
+            "id": "erotic_lighting_01",
+            "weight": 2.0
           },
           {
             "id": "lighting_backlit_hair",
-            "weight": 1.0
+            "weight": 2.0
+          },
+          {
+            "id": "lighting_cinematic_dark",
+            "weight": 2.0
+          },
+          {
+            "id": "professional_lighting_12",
+            "weight": 2.0
           }
         ]
       },
@@ -1648,15 +2008,23 @@
         "candidates": [
           {
             "id": "cinestill_800t",
-            "weight": 1.0
+            "weight": 4.0
           },
           {
             "id": "fujifilm_classic_negative",
-            "weight": 1.0
+            "weight": 4.0
+          },
+          {
+            "id": "expired_film",
+            "weight": 2.0
+          },
+          {
+            "id": "film_stock_polaroid",
+            "weight": 2.0
           },
           {
             "id": "lomography_color",
-            "weight": 1.0
+            "weight": 2.0
           }
         ]
       },
@@ -1664,16 +2032,16 @@
         "mode": "weighted",
         "candidates": [
           {
-            "id": "medium_shot",
-            "weight": 1.0
+            "id": "full_body_shot",
+            "weight": 4.0
           },
           {
-            "id": "full_body_shot",
-            "weight": 1.0
+            "id": "medium_shot",
+            "weight": 4.0
           },
           {
             "id": "medium_close_up",
-            "weight": 1.0
+            "weight": 2.0
           }
         ]
       },
@@ -1681,16 +2049,16 @@
         "mode": "weighted",
         "candidates": [
           {
-            "id": "low_angle",
-            "weight": 1.0
-          },
-          {
             "id": "dutch_angle",
-            "weight": 1.0
+            "weight": 4.0
           },
           {
             "id": "eye_level",
-            "weight": 1.0
+            "weight": 4.0
+          },
+          {
+            "id": "low_angle",
+            "weight": 4.0
           }
         ]
       }
@@ -1700,24 +2068,68 @@
         "mode": "weighted",
         "candidates": [
           {
-            "id": "silk_robe",
-            "weight": 1.0
-          },
-          {
             "id": "camisole_slip",
-            "weight": 1.0
+            "weight": 4.0
           },
           {
             "id": "knit_sweater",
-            "weight": 1.0
+            "weight": 4.0
           },
           {
-            "id": "street_casual",
-            "weight": 1.0
+            "id": "silk_robe",
+            "weight": 4.0
+          },
+          {
+            "id": "sweater_dress",
+            "weight": 4.0
+          },
+          {
+            "id": "apron_dress",
+            "weight": 2.0
+          },
+          {
+            "id": "bathrobe",
+            "weight": 2.0
+          },
+          {
+            "id": "floral_dress_white",
+            "weight": 2.0
+          },
+          {
+            "id": "hoodie",
+            "weight": 2.0
+          },
+          {
+            "id": "lingerie_bra",
+            "weight": 2.0
           },
           {
             "id": "lingerie_lace",
-            "weight": 1.0
+            "weight": 2.0
+          },
+          {
+            "id": "lingerie_panties",
+            "weight": 2.0
+          },
+          {
+            "id": "maid_dress",
+            "weight": 2.0
+          },
+          {
+            "id": "street_casual",
+            "weight": 2.0
+          },
+          {
+            "id": "summer_sundress",
+            "weight": 2.0
+          },
+          {
+            "id": "sweatshirt",
+            "weight": 2.0
+          },
+          {
+            "id": "waist_apron",
+            "weight": 2.0
           }
         ]
       },
@@ -1726,11 +2138,19 @@
         "candidates": [
           {
             "id": "married_housewife",
-            "weight": 1.0
+            "weight": 4.0
           },
           {
             "id": "neighbor_girlfriend",
-            "weight": 1.0
+            "weight": 4.0
+          },
+          {
+            "id": "french_maid",
+            "weight": 2.0
+          },
+          {
+            "id": "gravure_idol",
+            "weight": 2.0
           }
         ]
       },
@@ -1738,20 +2158,28 @@
         "mode": "weighted",
         "candidates": [
           {
+            "id": "clear_water_bare",
+            "weight": 4.0
+          },
+          {
             "id": "mature_wife",
-            "weight": 1.0
+            "weight": 4.0
           },
           {
             "id": "natural_pure",
-            "weight": 1.0
-          },
-          {
-            "id": "climax_flush",
-            "weight": 1.0
+            "weight": 4.0
           },
           {
             "id": "pure_desire_white_peach",
-            "weight": 1.0
+            "weight": 4.0
+          },
+          {
+            "id": "climax_flush",
+            "weight": 2.0
+          },
+          {
+            "id": "sweet_peach_milk",
+            "weight": 2.0
           }
         ]
       },
@@ -1759,20 +2187,28 @@
         "mode": "weighted",
         "candidates": [
           {
+            "id": "hair_over_breast",
+            "weight": 4.0
+          },
+          {
             "id": "messy_bedhead",
-            "weight": 1.0
+            "weight": 4.0
           },
           {
             "id": "messy_bun",
-            "weight": 1.0
+            "weight": 4.0
+          },
+          {
+            "id": "ext_aw_hair_half_up_half_down",
+            "weight": 2.0
+          },
+          {
+            "id": "ext_aw_hair_low_nape_chignon",
+            "weight": 2.0
           },
           {
             "id": "long_straight_black",
-            "weight": 1.0
-          },
-          {
-            "id": "hair_over_breast",
-            "weight": 1.0
+            "weight": 2.0
           }
         ]
       },
@@ -1780,16 +2216,36 @@
         "mode": "weighted",
         "candidates": [
           {
-            "id": "gold_collarbone_chain",
-            "weight": 1.0
+            "id": "acc_hairband",
+            "weight": 2.0
           },
           {
-            "id": "ribbon_bow",
-            "weight": 1.0
+            "id": "acc_hairclip",
+            "weight": 2.0
           },
           {
             "id": "ankle_bracelet",
-            "weight": 1.0
+            "weight": 2.0
+          },
+          {
+            "id": "cat_ears",
+            "weight": 2.0
+          },
+          {
+            "id": "gold_collarbone_chain",
+            "weight": 2.0
+          },
+          {
+            "id": "maid_headdress",
+            "weight": 2.0
+          },
+          {
+            "id": "neck_ribbon",
+            "weight": 2.0
+          },
+          {
+            "id": "ribbon_bow",
+            "weight": 2.0
           }
         ]
       },
@@ -1798,39 +2254,73 @@
         "candidates": [
           {
             "id": "cute_cat_on_bed",
-            "weight": 1.0
+            "weight": 4.0
           },
           {
-            "id": "pillow_clutching",
-            "weight": 1.0
+            "id": "fluffy_teddy_bear",
+            "weight": 4.0
           },
           {
             "id": "game_controller",
-            "weight": 1.0
+            "weight": 4.0
           },
           {
-            "id": "wine_glass_bottle",
-            "weight": 1.0
+            "id": "pillow_clutching",
+            "weight": 4.0
+          },
+          {
+            "id": "plush_doll_teddy",
+            "weight": 4.0
+          },
+          {
+            "id": "embroidered_round_fan",
+            "weight": 2.0
+          },
+          {
+            "id": "flower_bouquet_petals",
+            "weight": 2.0
+          },
+          {
+            "id": "fresh_flower_bouquet",
+            "weight": 2.0
+          },
+          {
+            "id": "glasses_reading",
+            "weight": 2.0
           },
           {
             "id": "rose_petals_candles",
-            "weight": 1.0
+            "weight": 2.0
+          },
+          {
+            "id": "wine_glass_bottle",
+            "weight": 2.0
           }
         ]
       },
       "tattoo": {
-        "mode": "neutral"
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "cute_heart_star",
+            "weight": 4.0
+          },
+          {
+            "id": "spine_vertical_script",
+            "weight": 2.0
+          }
+        ]
       },
       "liquids": {
         "mode": "weighted",
         "candidates": [
           {
-            "id": "sweat_glistening",
-            "weight": 1.0
+            "id": "saliva_drool",
+            "weight": 2.0
           },
           {
-            "id": "saliva_drool",
-            "weight": 1.0
+            "id": "sweat_glistening",
+            "weight": 2.0
           }
         ]
       },
@@ -1839,19 +2329,19 @@
         "candidates": [
           {
             "id": "lying",
-            "weight": 1.0
+            "weight": 4.0
           },
           {
             "id": "sitting",
-            "weight": 1.0
+            "weight": 4.0
           },
           {
             "id": "standing",
-            "weight": 1.0
+            "weight": 2.0
           },
           {
             "id": "teasing",
-            "weight": 1.0
+            "weight": 2.0
           }
         ]
       },
@@ -1859,16 +2349,36 @@
         "mode": "weighted",
         "candidates": [
           {
-            "id": "emotion_shy",
-            "weight": 1.0
+            "id": "emotion_relaxed",
+            "weight": 4.0
           },
           {
-            "id": "emotion_seductive",
-            "weight": 1.0
+            "id": "emotion_shy",
+            "weight": 4.0
+          },
+          {
+            "id": "emotion_blissful",
+            "weight": 2.0
           },
           {
             "id": "emotion_dazed",
-            "weight": 1.0
+            "weight": 2.0
+          },
+          {
+            "id": "emotion_happy",
+            "weight": 2.0
+          },
+          {
+            "id": "emotion_playful",
+            "weight": 2.0
+          },
+          {
+            "id": "emotion_seductive",
+            "weight": 2.0
+          },
+          {
+            "id": "emotion_tired",
+            "weight": 2.0
           }
         ]
       },
@@ -1876,16 +2386,40 @@
         "mode": "weighted",
         "candidates": [
           {
-            "id": "lighting_bedroom_private",
-            "weight": 1.0
+            "id": "ext_aw_light_soft_bounced",
+            "weight": 4.0
           },
           {
-            "id": "lighting_japanese_fresh",
-            "weight": 1.0
+            "id": "lighting_bedroom_private",
+            "weight": 4.0
+          },
+          {
+            "id": "prof_light_practical",
+            "weight": 4.0
+          },
+          {
+            "id": "professional_lighting_13",
+            "weight": 4.0
+          },
+          {
+            "id": "cinematic_lighting_03",
+            "weight": 2.0
+          },
+          {
+            "id": "erotic_lighting_03",
+            "weight": 2.0
           },
           {
             "id": "lighting_backlit_hair",
-            "weight": 1.0
+            "weight": 2.0
+          },
+          {
+            "id": "lighting_japanese_fresh",
+            "weight": 2.0
+          },
+          {
+            "id": "professional_lighting_12",
+            "weight": 2.0
           }
         ]
       },
@@ -1893,16 +2427,24 @@
         "mode": "weighted",
         "candidates": [
           {
-            "id": "kodak_portra_400",
-            "weight": 1.0
+            "id": "film_stock_polaroid",
+            "weight": 4.0
           },
           {
-            "id": "kodak_gold_200",
-            "weight": 1.0
+            "id": "expired_film",
+            "weight": 2.0
           },
           {
             "id": "fujifilm_pro_400h",
-            "weight": 1.0
+            "weight": 2.0
+          },
+          {
+            "id": "kodak_gold_200",
+            "weight": 2.0
+          },
+          {
+            "id": "kodak_portra_400",
+            "weight": 2.0
           }
         ]
       },
@@ -1911,15 +2453,15 @@
         "candidates": [
           {
             "id": "medium_close_up",
-            "weight": 1.0
+            "weight": 4.0
           },
           {
             "id": "medium_shot",
-            "weight": 1.0
+            "weight": 4.0
           },
           {
             "id": "full_body_shot",
-            "weight": 1.0
+            "weight": 2.0
           }
         ]
       },
@@ -1928,15 +2470,15 @@
         "candidates": [
           {
             "id": "eye_level",
-            "weight": 1.0
+            "weight": 4.0
           },
           {
             "id": "high_angle",
-            "weight": 1.0
+            "weight": 4.0
           },
           {
             "id": "over_the_shoulder",
-            "weight": 1.0
+            "weight": 2.0
           }
         ]
       }
@@ -1946,24 +2488,68 @@
         "mode": "weighted",
         "candidates": [
           {
-            "id": "jk_seifuku",
-            "weight": 1.0
+            "id": "convenience_store",
+            "weight": 4.0
+          },
+          {
+            "id": "denim_jacket",
+            "weight": 4.0
+          },
+          {
+            "id": "down_jacket",
+            "weight": 4.0
+          },
+          {
+            "id": "hoodie",
+            "weight": 4.0
+          },
+          {
+            "id": "trench_coat",
+            "weight": 4.0
           },
           {
             "id": "blazer_uniform",
-            "weight": 1.0
+            "weight": 2.0
           },
           {
-            "id": "ol_suit",
-            "weight": 1.0
+            "id": "business_suit",
+            "weight": 2.0
           },
           {
-            "id": "street_casual",
-            "weight": 1.0
+            "id": "jk_seifuku",
+            "weight": 2.0
           },
           {
             "id": "knit_sweater",
-            "weight": 1.0
+            "weight": 2.0
+          },
+          {
+            "id": "ol_suit",
+            "weight": 2.0
+          },
+          {
+            "id": "outerwear_overcoat",
+            "weight": 2.0
+          },
+          {
+            "id": "street_casual",
+            "weight": 2.0
+          },
+          {
+            "id": "sweater_dress",
+            "weight": 2.0
+          },
+          {
+            "id": "sweatshirt",
+            "weight": 2.0
+          },
+          {
+            "id": "windbreaker",
+            "weight": 2.0
+          },
+          {
+            "id": "winter_parka",
+            "weight": 2.0
           }
         ]
       },
@@ -1971,16 +2557,20 @@
         "mode": "weighted",
         "candidates": [
           {
-            "id": "jk_schoolgirl",
-            "weight": 1.0
+            "id": "female_boss",
+            "weight": 2.0
           },
           {
-            "id": "ol_subordinate",
-            "weight": 1.0
+            "id": "jk_schoolgirl",
+            "weight": 2.0
           },
           {
             "id": "neighbor_girlfriend",
-            "weight": 1.0
+            "weight": 2.0
+          },
+          {
+            "id": "ol_subordinate",
+            "weight": 2.0
           }
         ]
       },
@@ -1989,15 +2579,15 @@
         "candidates": [
           {
             "id": "natural_pure",
-            "weight": 1.0
-          },
-          {
-            "id": "cute_peachy",
-            "weight": 1.0
+            "weight": 4.0
           },
           {
             "id": "climax_flush",
-            "weight": 1.0
+            "weight": 2.0
+          },
+          {
+            "id": "cute_peachy",
+            "weight": 2.0
           }
         ]
       },
@@ -2006,19 +2596,19 @@
         "candidates": [
           {
             "id": "low_ponytail",
-            "weight": 1.0
-          },
-          {
-            "id": "high_ponytail",
-            "weight": 1.0
-          },
-          {
-            "id": "long_straight_black",
-            "weight": 1.0
+            "weight": 4.0
           },
           {
             "id": "collarbone_lob",
-            "weight": 1.0
+            "weight": 2.0
+          },
+          {
+            "id": "high_ponytail",
+            "weight": 2.0
+          },
+          {
+            "id": "long_straight_black",
+            "weight": 2.0
           }
         ]
       },
@@ -2026,12 +2616,28 @@
         "mode": "weighted",
         "candidates": [
           {
+            "id": "winter_scarf",
+            "weight": 4.0
+          },
+          {
+            "id": "ext_aw_jewelry_silver_hoop_earrings",
+            "weight": 2.0
+          },
+          {
             "id": "gold_collarbone_chain",
-            "weight": 1.0
+            "weight": 2.0
+          },
+          {
+            "id": "poncho",
+            "weight": 2.0
           },
           {
             "id": "ribbon_bow",
-            "weight": 1.0
+            "weight": 2.0
+          },
+          {
+            "id": "waist_belt",
+            "weight": 2.0
           }
         ]
       },
@@ -2039,28 +2645,42 @@
         "mode": "weighted",
         "candidates": [
           {
+            "id": "fashion_baguette_bag",
+            "weight": 4.0
+          },
+          {
             "id": "smartphone_recording",
-            "weight": 1.0
+            "weight": 4.0
+          },
+          {
+            "id": "digital_camera_in_hand",
+            "weight": 2.0
           },
           {
             "id": "glasses_reading",
-            "weight": 1.0
+            "weight": 2.0
           }
         ]
       },
       "tattoo": {
-        "mode": "neutral"
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "cute_heart_star",
+            "weight": 2.0
+          },
+          {
+            "id": "barcode_serial_number",
+            "weight": 1.0
+          }
+        ]
       },
       "liquids": {
         "mode": "weighted",
         "candidates": [
           {
             "id": "sweat_glistening",
-            "weight": 1.0
-          },
-          {
-            "id": "none",
-            "weight": 1.0
+            "weight": 2.0
           }
         ]
       },
@@ -2069,15 +2689,15 @@
         "candidates": [
           {
             "id": "standing",
-            "weight": 1.0
-          },
-          {
-            "id": "sitting",
-            "weight": 1.0
+            "weight": 4.0
           },
           {
             "id": "dynamic",
-            "weight": 1.0
+            "weight": 2.0
+          },
+          {
+            "id": "sitting",
+            "weight": 2.0
           }
         ]
       },
@@ -2086,15 +2706,23 @@
         "candidates": [
           {
             "id": "emotion_restrained",
-            "weight": 1.0
+            "weight": 4.0
           },
           {
-            "id": "emotion_shy",
-            "weight": 1.0
+            "id": "emotion_tired",
+            "weight": 4.0
+          },
+          {
+            "id": "emotion_dazed",
+            "weight": 2.0
           },
           {
             "id": "emotion_fear",
-            "weight": 1.0
+            "weight": 2.0
+          },
+          {
+            "id": "emotion_shy",
+            "weight": 2.0
           }
         ]
       },
@@ -2102,16 +2730,32 @@
         "mode": "weighted",
         "candidates": [
           {
-            "id": "lighting_voyeur_private",
-            "weight": 1.0
-          },
-          {
-            "id": "lighting_japanese_fresh",
-            "weight": 1.0
+            "id": "ext_aw_light_direct_flash",
+            "weight": 4.0
           },
           {
             "id": "lighting_rain_wet",
-            "weight": 1.0
+            "weight": 4.0
+          },
+          {
+            "id": "lighting_japanese_fresh",
+            "weight": 2.0
+          },
+          {
+            "id": "lighting_onsen_intimate",
+            "weight": 2.0
+          },
+          {
+            "id": "lighting_voyeur_private",
+            "weight": 2.0
+          },
+          {
+            "id": "prof_light_fluorescent",
+            "weight": 2.0
+          },
+          {
+            "id": "prof_light_led_panel",
+            "weight": 2.0
           }
         ]
       },
@@ -2120,15 +2764,19 @@
         "candidates": [
           {
             "id": "fujifilm_classic_chrome",
-            "weight": 1.0
+            "weight": 4.0
+          },
+          {
+            "id": "cinestill_800t",
+            "weight": 2.0
           },
           {
             "id": "fujifilm_superia_400",
-            "weight": 1.0
+            "weight": 2.0
           },
           {
             "id": "kodak_max_400",
-            "weight": 1.0
+            "weight": 2.0
           }
         ]
       },
@@ -2136,16 +2784,16 @@
         "mode": "weighted",
         "candidates": [
           {
-            "id": "medium_shot",
-            "weight": 1.0
+            "id": "full_body_shot",
+            "weight": 4.0
           },
           {
-            "id": "full_body_shot",
-            "weight": 1.0
+            "id": "medium_shot",
+            "weight": 4.0
           },
           {
             "id": "medium_close_up",
-            "weight": 1.0
+            "weight": 2.0
           }
         ]
       },
@@ -2154,15 +2802,15 @@
         "candidates": [
           {
             "id": "eye_level",
-            "weight": 1.0
+            "weight": 4.0
           },
           {
             "id": "voyeur_peeping",
-            "weight": 1.0
+            "weight": 4.0
           },
           {
             "id": "over_the_shoulder",
-            "weight": 1.0
+            "weight": 2.0
           }
         ]
       }
@@ -2172,24 +2820,132 @@
         "mode": "weighted",
         "candidates": [
           {
-            "id": "bikini_micro",
-            "weight": 1.0
+            "id": "bikini_classic",
+            "weight": 4.0
+          },
+          {
+            "id": "bikini_creative",
+            "weight": 4.0
+          },
+          {
+            "id": "down_jacket",
+            "weight": 4.0
+          },
+          {
+            "id": "floral_dress_white",
+            "weight": 4.0
           },
           {
             "id": "one_piece_swimsuit",
-            "weight": 1.0
+            "weight": 4.0
           },
           {
-            "id": "street_casual",
-            "weight": 1.0
+            "id": "racing_suit",
+            "weight": 4.0
           },
           {
-            "id": "gym_uniform",
-            "weight": 1.0
+            "id": "safari_jacket",
+            "weight": 4.0
+          },
+          {
+            "id": "soft_shell_jacket",
+            "weight": 4.0
+          },
+          {
+            "id": "sportswear_active",
+            "weight": 4.0
+          },
+          {
+            "id": "summer_sundress",
+            "weight": 4.0
+          },
+          {
+            "id": "sundress_layered",
+            "weight": 4.0
+          },
+          {
+            "id": "swimsuit_classic",
+            "weight": 4.0
+          },
+          {
+            "id": "swimsuit_competition",
+            "weight": 4.0
+          },
+          {
+            "id": "swimsuit_creative",
+            "weight": 4.0
+          },
+          {
+            "id": "windbreaker",
+            "weight": 4.0
+          },
+          {
+            "id": "winter_parka",
+            "weight": 4.0
+          },
+          {
+            "id": "bikini_micro",
+            "weight": 2.0
+          },
+          {
+            "id": "bikini_strappy",
+            "weight": 2.0
           },
           {
             "id": "cheerleader",
-            "weight": 1.0
+            "weight": 2.0
+          },
+          {
+            "id": "combat_tactical",
+            "weight": 2.0
+          },
+          {
+            "id": "denim_jacket",
+            "weight": 2.0
+          },
+          {
+            "id": "duffel_coat",
+            "weight": 2.0
+          },
+          {
+            "id": "gym_uniform",
+            "weight": 2.0
+          },
+          {
+            "id": "leather_jacket",
+            "weight": 2.0
+          },
+          {
+            "id": "military_overcoat",
+            "weight": 2.0
+          },
+          {
+            "id": "military_uniform",
+            "weight": 2.0
+          },
+          {
+            "id": "sailor_shirt",
+            "weight": 2.0
+          },
+          {
+            "id": "street_casual",
+            "weight": 2.0
+          },
+          {
+            "id": "swimsuit_school",
+            "weight": 2.0
+          },
+          {
+            "id": "tactical_jumpsuit",
+            "weight": 2.0
+          },
+          {
+            "id": "tactical_vest",
+            "weight": 2.0
+          },
+          {
+            "id": "volleyball_uniform",
+            "weight": 2.0
           }
         ]
       },
@@ -2198,11 +2954,11 @@
         "candidates": [
           {
             "id": "gravure_idol",
-            "weight": 1.0
+            "weight": 4.0
           },
           {
             "id": "neighbor_girlfriend",
-            "weight": 1.0
+            "weight": 4.0
           }
         ]
       },
@@ -2210,20 +2966,20 @@
         "mode": "weighted",
         "candidates": [
           {
-            "id": "natural_pure",
-            "weight": 1.0
-          },
-          {
             "id": "cute_peachy",
-            "weight": 1.0
+            "weight": 4.0
           },
           {
-            "id": "wet_dewy",
-            "weight": 1.0
+            "id": "natural_pure",
+            "weight": 4.0
           },
           {
             "id": "sun_kissed",
-            "weight": 1.0
+            "weight": 4.0
+          },
+          {
+            "id": "wet_dewy",
+            "weight": 2.0
           }
         ]
       },
@@ -2232,19 +2988,27 @@
         "candidates": [
           {
             "id": "high_ponytail",
-            "weight": 1.0
+            "weight": 4.0
           },
           {
-            "id": "twin_tails",
-            "weight": 1.0
+            "id": "braided_twins",
+            "weight": 2.0
           },
           {
-            "id": "space_buns",
-            "weight": 1.0
+            "id": "hair_pixie_side_swept",
+            "weight": 2.0
           },
           {
             "id": "messy_bun",
-            "weight": 1.0
+            "weight": 2.0
+          },
+          {
+            "id": "space_buns",
+            "weight": 2.0
+          },
+          {
+            "id": "twin_tails",
+            "weight": 2.0
           }
         ]
       },
@@ -2252,16 +3016,32 @@
         "mode": "weighted",
         "candidates": [
           {
-            "id": "ribbon_bow",
-            "weight": 1.0
+            "id": "ankle_bracelet",
+            "weight": 4.0
+          },
+          {
+            "id": "poncho",
+            "weight": 4.0
+          },
+          {
+            "id": "winter_scarf",
+            "weight": 4.0
+          },
+          {
+            "id": "body_chain",
+            "weight": 2.0
           },
           {
             "id": "gold_collarbone_chain",
-            "weight": 1.0
+            "weight": 2.0
           },
           {
-            "id": "ankle_bracelet",
-            "weight": 1.0
+            "id": "hooded_cloak",
+            "weight": 2.0
+          },
+          {
+            "id": "ribbon_bow",
+            "weight": 2.0
           }
         ]
       },
@@ -2269,36 +3049,58 @@
         "mode": "weighted",
         "candidates": [
           {
-            "id": "camera_tripod_flash",
-            "weight": 1.0
+            "id": "digital_camera_in_hand",
+            "weight": 4.0
           },
           {
-            "id": "oriental_fan_umbrella",
-            "weight": 1.0
+            "id": "digital_camera_record",
+            "weight": 4.0
           },
           {
             "id": "smartphone_recording",
-            "weight": 1.0
+            "weight": 4.0
+          },
+          {
+            "id": "camera_tripod_flash",
+            "weight": 2.0
           },
           {
             "id": "flower_bouquet_petals",
-            "weight": 1.0
+            "weight": 2.0
+          },
+          {
+            "id": "fresh_flower_bouquet",
+            "weight": 2.0
+          },
+          {
+            "id": "oil_paper_umbrella",
+            "weight": 2.0
+          },
+          {
+            "id": "oriental_fan_umbrella",
+            "weight": 2.0
           }
         ]
       },
       "tattoo": {
-        "mode": "neutral"
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "cherry_blossom_shoulder",
+            "weight": 2.0
+          }
+        ]
       },
       "liquids": {
         "mode": "weighted",
         "candidates": [
           {
-            "id": "wet_water_drops",
-            "weight": 1.0
+            "id": "sweat_glistening",
+            "weight": 4.0
           },
           {
-            "id": "sweat_glistening",
-            "weight": 1.0
+            "id": "wet_water_drops",
+            "weight": 2.0
           }
         ]
       },
@@ -2307,15 +3109,15 @@
         "candidates": [
           {
             "id": "dynamic",
-            "weight": 1.0
+            "weight": 4.0
           },
           {
             "id": "standing",
-            "weight": 1.0
+            "weight": 4.0
           },
           {
-            "id": "sitting",
-            "weight": 1.0
+            "id": "combat_action",
+            "weight": 2.0
           }
         ]
       },
@@ -2323,16 +3125,24 @@
         "mode": "weighted",
         "candidates": [
           {
-            "id": "emotion_playful",
-            "weight": 1.0
+            "id": "emotion_happy",
+            "weight": 4.0
           },
           {
-            "id": "emotion_shy",
-            "weight": 1.0
+            "id": "emotion_amused",
+            "weight": 2.0
+          },
+          {
+            "id": "emotion_playful",
+            "weight": 2.0
           },
           {
             "id": "emotion_seductive",
-            "weight": 1.0
+            "weight": 2.0
+          },
+          {
+            "id": "emotion_shy",
+            "weight": 2.0
           }
         ]
       },
@@ -2340,16 +3150,40 @@
         "mode": "weighted",
         "candidates": [
           {
+            "id": "ext_aw_light_warm_golden_hour",
+            "weight": 4.0
+          },
+          {
             "id": "lighting_japanese_fresh",
-            "weight": 1.0
+            "weight": 4.0
+          },
+          {
+            "id": "prof_light_high_key",
+            "weight": 4.0
+          },
+          {
+            "id": "professional_lighting_14",
+            "weight": 4.0
+          },
+          {
+            "id": "professional_lighting_15",
+            "weight": 4.0
+          },
+          {
+            "id": "cinematic_lighting_03",
+            "weight": 2.0
           },
           {
             "id": "lighting_backlit_hair",
-            "weight": 1.0
+            "weight": 2.0
           },
           {
             "id": "lighting_rain_wet",
-            "weight": 1.0
+            "weight": 2.0
+          },
+          {
+            "id": "professional_lighting_16",
+            "weight": 2.0
           }
         ]
       },
@@ -2357,16 +3191,32 @@
         "mode": "weighted",
         "candidates": [
           {
-            "id": "kodak_ektar_100",
-            "weight": 1.0
+            "id": "cinestill_50d",
+            "weight": 4.0
+          },
+          {
+            "id": "fujifilm_pro_400h",
+            "weight": 4.0
+          },
+          {
+            "id": "fujifilm_superia_400",
+            "weight": 4.0
           },
           {
             "id": "fujifilm_velvia_50",
-            "weight": 1.0
+            "weight": 4.0
           },
           {
-            "id": "cinestill_50d",
-            "weight": 1.0
+            "id": "kodak_ektar_100",
+            "weight": 4.0
+          },
+          {
+            "id": "kodak_gold_200",
+            "weight": 4.0
+          },
+          {
+            "id": "fujifilm_provia_100f",
+            "weight": 2.0
           }
         ]
       },
@@ -2375,15 +3225,15 @@
         "candidates": [
           {
             "id": "full_body_shot",
-            "weight": 1.0
+            "weight": 4.0
           },
           {
             "id": "medium_long_shot",
-            "weight": 1.0
+            "weight": 4.0
           },
           {
             "id": "medium_shot",
-            "weight": 1.0
+            "weight": 4.0
           }
         ]
       },
@@ -2391,16 +3241,20 @@
         "mode": "weighted",
         "candidates": [
           {
-            "id": "low_angle",
-            "weight": 1.0
+            "id": "eye_level",
+            "weight": 4.0
           },
           {
-            "id": "eye_level",
-            "weight": 1.0
+            "id": "low_angle",
+            "weight": 4.0
           },
           {
             "id": "high_angle",
-            "weight": 1.0
+            "weight": 2.0
+          },
+          {
+            "id": "worms_eye",
+            "weight": 2.0
           }
         ]
       }
@@ -2410,24 +3264,68 @@
         "mode": "weighted",
         "candidates": [
           {
+            "id": "apron_dress",
+            "weight": 4.0
+          },
+          {
+            "id": "cocktail_dress",
+            "weight": 4.0
+          },
+          {
+            "id": "evening_dress",
+            "weight": 4.0
+          },
+          {
+            "id": "fast_food_uniform",
+            "weight": 4.0
+          },
+          {
+            "id": "formal_gown",
+            "weight": 4.0
+          },
+          {
             "id": "maid_dress",
-            "weight": 1.0
+            "weight": 4.0
+          },
+          {
+            "id": "tailcoat",
+            "weight": 4.0
+          },
+          {
+            "id": "waist_apron",
+            "weight": 4.0
           },
           {
             "id": "waitress_uniform",
-            "weight": 1.0
+            "weight": 4.0
           },
           {
-            "id": "street_casual",
-            "weight": 1.0
+            "id": "convenience_store",
+            "weight": 2.0
+          },
+          {
+            "id": "dirndl_dress",
+            "weight": 2.0
+          },
+          {
+            "id": "modern_chinese",
+            "weight": 2.0
+          },
+          {
+            "id": "off_shoulder_dress",
+            "weight": 2.0
           },
           {
             "id": "qipao",
-            "weight": 1.0
+            "weight": 2.0
           },
           {
-            "id": "kimono",
-            "weight": 1.0
+            "id": "street_casual",
+            "weight": 2.0
+          },
+          {
+            "id": "wedding_dress",
+            "weight": 2.0
           }
         ]
       },
@@ -2436,19 +3334,19 @@
         "candidates": [
           {
             "id": "french_maid",
-            "weight": 1.0
-          },
-          {
-            "id": "neighbor_girlfriend",
-            "weight": 1.0
-          },
-          {
-            "id": "ol_subordinate",
-            "weight": 1.0
+            "weight": 4.0
           },
           {
             "id": "married_housewife",
-            "weight": 1.0
+            "weight": 2.0
+          },
+          {
+            "id": "neighbor_girlfriend",
+            "weight": 2.0
+          },
+          {
+            "id": "ol_subordinate",
+            "weight": 2.0
           }
         ]
       },
@@ -2457,19 +3355,31 @@
         "candidates": [
           {
             "id": "cute_peachy",
-            "weight": 1.0
-          },
-          {
-            "id": "natural_pure",
-            "weight": 1.0
+            "weight": 4.0
           },
           {
             "id": "mature_wife",
-            "weight": 1.0
+            "weight": 4.0
+          },
+          {
+            "id": "vintage_retro",
+            "weight": 4.0
+          },
+          {
+            "id": "chinese_vermilion",
+            "weight": 2.0
+          },
+          {
+            "id": "drunken_milky_youth",
+            "weight": 2.0
+          },
+          {
+            "id": "natural_pure",
+            "weight": 2.0
           },
           {
             "id": "sweet_peach_milk",
-            "weight": 1.0
+            "weight": 2.0
           }
         ]
       },
@@ -2477,20 +3387,32 @@
         "mode": "weighted",
         "candidates": [
           {
-            "id": "messy_bun",
-            "weight": 1.0
-          },
-          {
-            "id": "collarbone_lob",
-            "weight": 1.0
-          },
-          {
-            "id": "twin_tails",
-            "weight": 1.0
+            "id": "big_wavy_curls",
+            "weight": 2.0
           },
           {
             "id": "bob_cut",
-            "weight": 1.0
+            "weight": 2.0
+          },
+          {
+            "id": "collarbone_lob",
+            "weight": 2.0
+          },
+          {
+            "id": "ext_aw_hair_crown_braid_updo",
+            "weight": 2.0
+          },
+          {
+            "id": "hair_1940s_waves",
+            "weight": 2.0
+          },
+          {
+            "id": "messy_bun",
+            "weight": 2.0
+          },
+          {
+            "id": "twin_tails",
+            "weight": 2.0
           }
         ]
       },
@@ -2498,16 +3420,24 @@
         "mode": "weighted",
         "candidates": [
           {
+            "id": "ext_aw_jewelry_pearl_drop_earrings",
+            "weight": 4.0
+          },
+          {
             "id": "maid_headdress",
-            "weight": 1.0
+            "weight": 4.0
           },
           {
             "id": "pearl_necklace",
-            "weight": 1.0
+            "weight": 4.0
+          },
+          {
+            "id": "acc_bowtie",
+            "weight": 2.0
           },
           {
             "id": "gold_collarbone_chain",
-            "weight": 1.0
+            "weight": 2.0
           }
         ]
       },
@@ -2515,16 +3445,28 @@
         "mode": "weighted",
         "candidates": [
           {
+            "id": "fresh_flower_bouquet",
+            "weight": 4.0
+          },
+          {
+            "id": "ice_cubes",
+            "weight": 4.0
+          },
+          {
             "id": "wine_glass_bottle",
-            "weight": 1.0
+            "weight": 4.0
+          },
+          {
+            "id": "fashion_clutch_bag",
+            "weight": 2.0
           },
           {
             "id": "glasses_reading",
-            "weight": 1.0
+            "weight": 2.0
           },
           {
             "id": "smartphone_recording",
-            "weight": 1.0
+            "weight": 2.0
           }
         ]
       },
@@ -2535,12 +3477,8 @@
         "mode": "weighted",
         "candidates": [
           {
-            "id": "none",
-            "weight": 1.0
-          },
-          {
             "id": "sweat_glistening",
-            "weight": 1.0
+            "weight": 2.0
           }
         ]
       },
@@ -2549,15 +3487,15 @@
         "candidates": [
           {
             "id": "sitting",
-            "weight": 1.0
+            "weight": 4.0
           },
           {
             "id": "standing",
-            "weight": 1.0
+            "weight": 2.0
           },
           {
             "id": "teasing",
-            "weight": 1.0
+            "weight": 2.0
           }
         ]
       },
@@ -2565,16 +3503,20 @@
         "mode": "weighted",
         "candidates": [
           {
-            "id": "emotion_playful",
-            "weight": 1.0
+            "id": "emotion_amused",
+            "weight": 2.0
           },
           {
-            "id": "emotion_shy",
-            "weight": 1.0
+            "id": "emotion_playful",
+            "weight": 2.0
           },
           {
             "id": "emotion_seductive",
-            "weight": 1.0
+            "weight": 2.0
+          },
+          {
+            "id": "emotion_shy",
+            "weight": 2.0
           }
         ]
       },
@@ -2582,16 +3524,28 @@
         "mode": "weighted",
         "candidates": [
           {
-            "id": "lighting_japanese_fresh",
-            "weight": 1.0
+            "id": "ext_aw_light_candlelight",
+            "weight": 4.0
           },
           {
             "id": "lighting_oil_classical",
-            "weight": 1.0
+            "weight": 4.0
+          },
+          {
+            "id": "lighting_japanese_fresh",
+            "weight": 2.0
           },
           {
             "id": "lighting_studio_commercial",
-            "weight": 1.0
+            "weight": 2.0
+          },
+          {
+            "id": "prof_light_gelled",
+            "weight": 2.0
+          },
+          {
+            "id": "prof_light_tungsten",
+            "weight": 2.0
           }
         ]
       },
@@ -2599,16 +3553,16 @@
         "mode": "weighted",
         "candidates": [
           {
-            "id": "kodak_portra_400",
-            "weight": 1.0
+            "id": "fujifilm_classic_chrome",
+            "weight": 2.0
           },
           {
             "id": "kodak_gold_200",
-            "weight": 1.0
+            "weight": 2.0
           },
           {
-            "id": "fujifilm_classic_chrome",
-            "weight": 1.0
+            "id": "kodak_portra_400",
+            "weight": 2.0
           }
         ]
       },
@@ -2616,16 +3570,16 @@
         "mode": "weighted",
         "candidates": [
           {
-            "id": "medium_shot",
-            "weight": 1.0
+            "id": "medium_close_up",
+            "weight": 4.0
           },
           {
-            "id": "medium_close_up",
-            "weight": 1.0
+            "id": "medium_shot",
+            "weight": 4.0
           },
           {
             "id": "full_body_shot",
-            "weight": 1.0
+            "weight": 2.0
           }
         ]
       },
@@ -2634,15 +3588,15 @@
         "candidates": [
           {
             "id": "eye_level",
-            "weight": 1.0
+            "weight": 4.0
           },
           {
             "id": "over_the_shoulder",
-            "weight": 1.0
+            "weight": 4.0
           },
           {
             "id": "high_angle",
-            "weight": 1.0
+            "weight": 2.0
           }
         ]
       }
@@ -2652,28 +3606,76 @@
         "mode": "weighted",
         "candidates": [
           {
-            "id": "bunny_suit",
-            "weight": 1.0
+            "id": "bikini_micro",
+            "weight": 4.0
           },
           {
-            "id": "maid_dress",
-            "weight": 1.0
+            "id": "bikini_strappy",
+            "weight": 4.0
+          },
+          {
+            "id": "bunny_suit",
+            "weight": 4.0
           },
           {
             "id": "latex_catsuit",
-            "weight": 1.0
+            "weight": 4.0
           },
           {
             "id": "leather_corset",
-            "weight": 1.0
+            "weight": 4.0
           },
           {
-            "id": "bikini_micro",
-            "weight": 1.0
+            "id": "lingerie_bra",
+            "weight": 4.0
           },
           {
             "id": "lingerie_lace",
-            "weight": 1.0
+            "weight": 4.0
+          },
+          {
+            "id": "lingerie_panties",
+            "weight": 4.0
+          },
+          {
+            "id": "bikini_classic",
+            "weight": 2.0
+          },
+          {
+            "id": "bikini_creative",
+            "weight": 2.0
+          },
+          {
+            "id": "dress_backless",
+            "weight": 2.0
+          },
+          {
+            "id": "fishnet_top",
+            "weight": 2.0
+          },
+          {
+            "id": "maid_dress",
+            "weight": 2.0
+          },
+          {
+            "id": "one_piece_swimsuit",
+            "weight": 2.0
+          },
+          {
+            "id": "party_club",
+            "weight": 2.0
+          },
+          {
+            "id": "slime_dress",
+            "weight": 2.0
+          },
+          {
+            "id": "swimsuit_classic",
+            "weight": 2.0
+          },
+          {
+            "id": "swimsuit_creative",
+            "weight": 2.0
           }
         ]
       },
@@ -2681,16 +3683,16 @@
         "mode": "weighted",
         "candidates": [
           {
-            "id": "hostess_cabaret",
-            "weight": 1.0
+            "id": "gravure_idol",
+            "weight": 4.0
           },
           {
-            "id": "gravure_idol",
-            "weight": 1.0
+            "id": "hostess_cabaret",
+            "weight": 4.0
           },
           {
             "id": "french_maid",
-            "weight": 1.0
+            "weight": 2.0
           }
         ]
       },
@@ -2698,20 +3700,24 @@
         "mode": "weighted",
         "candidates": [
           {
-            "id": "sultry_smoky",
-            "weight": 1.0
+            "id": "climax_flush",
+            "weight": 4.0
           },
           {
-            "id": "climax_flush",
-            "weight": 1.0
+            "id": "pure_desire_white_peach",
+            "weight": 4.0
           },
           {
             "id": "ruined_crying",
-            "weight": 1.0
+            "weight": 4.0
           },
           {
             "id": "submissive_marked",
-            "weight": 1.0
+            "weight": 4.0
+          },
+          {
+            "id": "sultry_smoky",
+            "weight": 4.0
           }
         ]
       },
@@ -2719,20 +3725,24 @@
         "mode": "weighted",
         "candidates": [
           {
-            "id": "twin_tails",
-            "weight": 1.0
-          },
-          {
             "id": "big_wavy_curls",
-            "weight": 1.0
-          },
-          {
-            "id": "wet_hair_face",
-            "weight": 1.0
+            "weight": 4.0
           },
           {
             "id": "hair_in_mouth",
-            "weight": 1.0
+            "weight": 4.0
+          },
+          {
+            "id": "wet_hair_face",
+            "weight": 4.0
+          },
+          {
+            "id": "hair_over_breast",
+            "weight": 2.0
+          },
+          {
+            "id": "twin_tails",
+            "weight": 2.0
           }
         ]
       },
@@ -2740,32 +3750,32 @@
         "mode": "weighted",
         "candidates": [
           {
+            "id": "body_chain",
+            "weight": 4.0
+          },
+          {
             "id": "bunny_ears",
-            "weight": 1.0
-          },
-          {
-            "id": "cat_ears",
-            "weight": 1.0
-          },
-          {
-            "id": "maid_headdress",
-            "weight": 1.0
+            "weight": 4.0
           },
           {
             "id": "lace_blindfold",
-            "weight": 1.0
-          },
-          {
-            "id": "leather_choker",
-            "weight": 1.0
+            "weight": 4.0
           },
           {
             "id": "nipple_rings",
-            "weight": 1.0
+            "weight": 4.0
           },
           {
-            "id": "body_chain",
-            "weight": 1.0
+            "id": "cat_ears",
+            "weight": 2.0
+          },
+          {
+            "id": "leather_choker",
+            "weight": 2.0
+          },
+          {
+            "id": "maid_headdress",
+            "weight": 2.0
           }
         ]
       },
@@ -2773,20 +3783,28 @@
         "mode": "weighted",
         "candidates": [
           {
-            "id": "sex_toy_vibrator",
-            "weight": 1.0
-          },
-          {
-            "id": "camera_tripod_flash",
-            "weight": 1.0
-          },
-          {
             "id": "bondage_rope_collar",
-            "weight": 1.0
+            "weight": 4.0
           },
           {
             "id": "ice_cubes",
-            "weight": 1.0
+            "weight": 4.0
+          },
+          {
+            "id": "rose_petals_candles",
+            "weight": 4.0
+          },
+          {
+            "id": "sex_toy_vibrator",
+            "weight": 4.0
+          },
+          {
+            "id": "camera_tripod_flash",
+            "weight": 2.0
+          },
+          {
+            "id": "flower_bouquet_petals",
+            "weight": 2.0
           }
         ]
       },
@@ -2795,19 +3813,23 @@
         "candidates": [
           {
             "id": "lewd_womb_pubic",
-            "weight": 1.0
-          },
-          {
-            "id": "barcode_serial_number",
-            "weight": 1.0
+            "weight": 4.0
           },
           {
             "id": "tally_marks_inner_thigh",
-            "weight": 1.0
+            "weight": 4.0
           },
           {
             "id": "butterfly_lower_back",
-            "weight": 1.0
+            "weight": 2.0
+          },
+          {
+            "id": "rose_flower_hip",
+            "weight": 2.0
+          },
+          {
+            "id": "underbust_mandala",
+            "weight": 2.0
           }
         ]
       },
@@ -2815,20 +3837,20 @@
         "mode": "weighted",
         "candidates": [
           {
-            "id": "pussy_juice",
-            "weight": 1.0
+            "id": "body_oil_lube",
+            "weight": 4.0
           },
           {
             "id": "cum_splatter",
-            "weight": 1.0
+            "weight": 4.0
           },
           {
-            "id": "body_oil_lube",
-            "weight": 1.0
+            "id": "pussy_juice",
+            "weight": 4.0
           },
           {
             "id": "saliva_drool",
-            "weight": 1.0
+            "weight": 2.0
           }
         ]
       },
@@ -2836,20 +3858,28 @@
         "mode": "weighted",
         "candidates": [
           {
-            "id": "teasing",
-            "weight": 1.0
-          },
-          {
-            "id": "kneeling",
-            "weight": 1.0
-          },
-          {
             "id": "all_fours",
-            "weight": 1.0
+            "weight": 4.0
+          },
+          {
+            "id": "gestures_self_touch",
+            "weight": 4.0
           },
           {
             "id": "lying",
-            "weight": 1.0
+            "weight": 4.0
+          },
+          {
+            "id": "restraints_holds",
+            "weight": 4.0
+          },
+          {
+            "id": "teasing",
+            "weight": 4.0
+          },
+          {
+            "id": "kneeling",
+            "weight": 2.0
           }
         ]
       },
@@ -2857,16 +3887,28 @@
         "mode": "weighted",
         "candidates": [
           {
-            "id": "emotion_seductive",
-            "weight": 1.0
+            "id": "emotion_pleasure",
+            "weight": 4.0
           },
           {
-            "id": "emotion_pleasure",
-            "weight": 1.0
+            "id": "emotion_seductive",
+            "weight": 4.0
           },
           {
             "id": "emotion_submissive",
-            "weight": 1.0
+            "weight": 4.0
+          },
+          {
+            "id": "emotion_yearning",
+            "weight": 4.0
+          },
+          {
+            "id": "emotion_blissful",
+            "weight": 2.0
+          },
+          {
+            "id": "emotion_pain",
+            "weight": 2.0
           }
         ]
       },
@@ -2874,16 +3916,36 @@
         "mode": "weighted",
         "candidates": [
           {
-            "id": "lighting_love_hotel_neon",
-            "weight": 1.0
+            "id": "erotic_lighting_00",
+            "weight": 4.0
+          },
+          {
+            "id": "erotic_lighting_01",
+            "weight": 4.0
+          },
+          {
+            "id": "erotic_lighting_02",
+            "weight": 4.0
+          },
+          {
+            "id": "erotic_lighting_03",
+            "weight": 4.0
           },
           {
             "id": "lighting_cinematic_dark",
-            "weight": 1.0
+            "weight": 4.0
+          },
+          {
+            "id": "lighting_love_hotel_neon",
+            "weight": 4.0
           },
           {
             "id": "lighting_voyeur_private",
-            "weight": 1.0
+            "weight": 4.0
+          },
+          {
+            "id": "prof_light_low_key",
+            "weight": 4.0
           }
         ]
       },
@@ -2892,15 +3954,15 @@
         "candidates": [
           {
             "id": "cinestill_800t",
-            "weight": 1.0
-          },
-          {
-            "id": "lomography_color",
-            "weight": 1.0
+            "weight": 4.0
           },
           {
             "id": "expired_film",
-            "weight": 1.0
+            "weight": 4.0
+          },
+          {
+            "id": "lomography_color",
+            "weight": 4.0
           }
         ]
       },
@@ -2908,16 +3970,20 @@
         "mode": "weighted",
         "candidates": [
           {
-            "id": "erotic_close_up",
-            "weight": 1.0
+            "id": "close_up",
+            "weight": 4.0
           },
           {
-            "id": "close_up",
-            "weight": 1.0
+            "id": "erotic_close_up",
+            "weight": 4.0
+          },
+          {
+            "id": "extreme_close_up",
+            "weight": 2.0
           },
           {
             "id": "medium_close_up",
-            "weight": 1.0
+            "weight": 2.0
           }
         ]
       },
@@ -2925,20 +3991,20 @@
         "mode": "weighted",
         "candidates": [
           {
-            "id": "pov_first_person",
-            "weight": 1.0
+            "id": "between_legs_angle",
+            "weight": 4.0
           },
           {
-            "id": "between_legs_angle",
-            "weight": 1.0
+            "id": "pov_first_person",
+            "weight": 4.0
           },
           {
             "id": "high_angle",
-            "weight": 1.0
+            "weight": 2.0
           },
           {
             "id": "low_angle",
-            "weight": 1.0
+            "weight": 2.0
           }
         ]
       }
@@ -2948,16 +4014,136 @@
         "mode": "weighted",
         "candidates": [
           {
+            "id": "anime_cosplay",
+            "weight": 4.0
+          },
+          {
+            "id": "armored_dress",
+            "weight": 4.0
+          },
+          {
+            "id": "armored_skirt",
+            "weight": 4.0
+          },
+          {
+            "id": "battle_robe",
+            "weight": 4.0
+          },
+          {
+            "id": "berserker_armor",
+            "weight": 4.0
+          },
+          {
+            "id": "combat_tactical",
+            "weight": 4.0
+          },
+          {
+            "id": "cyberpunk_plugsuit",
+            "weight": 4.0
+          },
+          {
+            "id": "cyberpunk_tactical_bodysuit",
+            "weight": 4.0
+          },
+          {
+            "id": "festive_costume",
+            "weight": 4.0
+          },
+          {
+            "id": "firefighter_gear",
+            "weight": 4.0
+          },
+          {
+            "id": "knight_armor",
+            "weight": 4.0
+          },
+          {
+            "id": "lolita_fashion",
+            "weight": 4.0
+          },
+          {
+            "id": "lolita_gothic",
+            "weight": 4.0
+          },
+          {
+            "id": "lolita_sweet",
+            "weight": 4.0
+          },
+          {
+            "id": "mahou_shoujo",
+            "weight": 4.0
+          },
+          {
+            "id": "mecha_exoskeleton",
+            "weight": 4.0
+          },
+          {
+            "id": "mecha_power_armor",
+            "weight": 4.0
+          },
+          {
+            "id": "military_overcoat",
+            "weight": 4.0
+          },
+          {
+            "id": "military_uniform",
+            "weight": 4.0
+          },
+          {
+            "id": "slime_dress",
+            "weight": 4.0
+          },
+          {
+            "id": "tactical_jumpsuit",
+            "weight": 4.0
+          },
+          {
+            "id": "tactical_vest",
+            "weight": 4.0
+          },
+          {
+            "id": "wedding_dress",
+            "weight": 4.0
+          },
+          {
+            "id": "witch_robe",
+            "weight": 4.0
+          },
+          {
+            "id": "wizard_robe",
+            "weight": 4.0
+          },
+          {
+            "id": "clerical_nun",
+            "weight": 2.0
+          },
+          {
+            "id": "clerical_priest",
+            "weight": 2.0
+          },
+          {
+            "id": "greek_toga",
+            "weight": 2.0
+          },
+          {
             "id": "latex_catsuit",
-            "weight": 1.0
+            "weight": 2.0
           },
           {
             "id": "leather_corset",
-            "weight": 1.0
+            "weight": 2.0
           },
           {
-            "id": "lingerie_lace",
-            "weight": 1.0
+            "id": "racing_suit",
+            "weight": 2.0
+          },
+          {
+            "id": "tailcoat",
+            "weight": 2.0
+          },
+          {
+            "id": "zentai_suit",
+            "weight": 2.0
           }
         ]
       },
@@ -2966,11 +4152,11 @@
         "candidates": [
           {
             "id": "female_boss",
-            "weight": 1.0
+            "weight": 2.0
           },
           {
             "id": "kind_nurse",
-            "weight": 1.0
+            "weight": 2.0
           },
           {
             "id": "strict_teacher",
@@ -2982,20 +4168,20 @@
         "mode": "weighted",
         "candidates": [
           {
-            "id": "submissive_marked",
-            "weight": 1.0
+            "id": "gothic_dark",
+            "weight": 4.0
           },
           {
-            "id": "sultry_smoky",
-            "weight": 1.0
+            "id": "submissive_marked",
+            "weight": 4.0
           },
           {
             "id": "ruined_crying",
-            "weight": 1.0
+            "weight": 2.0
           },
           {
-            "id": "gothic_dark",
-            "weight": 1.0
+            "id": "sultry_smoky",
+            "weight": 2.0
           }
         ]
       },
@@ -3004,15 +4190,23 @@
         "candidates": [
           {
             "id": "hime_cut",
-            "weight": 1.0
+            "weight": 4.0
+          },
+          {
+            "id": "space_buns",
+            "weight": 4.0
+          },
+          {
+            "id": "hair_pixie_side_swept",
+            "weight": 2.0
           },
           {
             "id": "long_straight_black",
-            "weight": 1.0
+            "weight": 2.0
           },
           {
             "id": "messy_bedhead",
-            "weight": 1.0
+            "weight": 2.0
           }
         ]
       },
@@ -3020,16 +4214,36 @@
         "mode": "weighted",
         "candidates": [
           {
-            "id": "leather_choker",
-            "weight": 1.0
+            "id": "cat_ears",
+            "weight": 4.0
           },
           {
-            "id": "lace_blindfold",
-            "weight": 1.0
+            "id": "cloak",
+            "weight": 4.0
+          },
+          {
+            "id": "hooded_cloak",
+            "weight": 4.0
           },
           {
             "id": "body_chain",
-            "weight": 1.0
+            "weight": 2.0
+          },
+          {
+            "id": "bunny_ears",
+            "weight": 2.0
+          },
+          {
+            "id": "lace_blindfold",
+            "weight": 2.0
+          },
+          {
+            "id": "leather_choker",
+            "weight": 2.0
+          },
+          {
+            "id": "ribbon_bow",
+            "weight": 2.0
           }
         ]
       },
@@ -3038,15 +4252,15 @@
         "candidates": [
           {
             "id": "bondage_rope_collar",
-            "weight": 1.0
+            "weight": 4.0
           },
           {
             "id": "camera_tripod_flash",
-            "weight": 1.0
+            "weight": 4.0
           },
           {
             "id": "sex_toy_vibrator",
-            "weight": 1.0
+            "weight": 2.0
           }
         ]
       },
@@ -3055,15 +4269,15 @@
         "candidates": [
           {
             "id": "barcode_serial_number",
-            "weight": 1.0
+            "weight": 4.0
           },
           {
             "id": "snake_coiling",
-            "weight": 1.0
+            "weight": 4.0
           },
           {
             "id": "spine_vertical_script",
-            "weight": 1.0
+            "weight": 2.0
           }
         ]
       },
@@ -3071,16 +4285,16 @@
         "mode": "weighted",
         "candidates": [
           {
+            "id": "cum_splatter",
+            "weight": 2.0
+          },
+          {
             "id": "saliva_drool",
-            "weight": 1.0
+            "weight": 2.0
           },
           {
             "id": "sweat_glistening",
-            "weight": 1.0
-          },
-          {
-            "id": "cum_splatter",
-            "weight": 1.0
+            "weight": 2.0
           }
         ]
       },
@@ -3088,20 +4302,28 @@
         "mode": "weighted",
         "candidates": [
           {
-            "id": "standing",
-            "weight": 1.0
+            "id": "combat_action",
+            "weight": 4.0
           },
           {
-            "id": "lying",
-            "weight": 1.0
+            "id": "dynamic",
+            "weight": 4.0
           },
           {
             "id": "kneeling",
-            "weight": 1.0
+            "weight": 2.0
+          },
+          {
+            "id": "lying",
+            "weight": 2.0
+          },
+          {
+            "id": "standing",
+            "weight": 2.0
           },
           {
             "id": "teasing",
-            "weight": 1.0
+            "weight": 2.0
           }
         ]
       },
@@ -3109,20 +4331,20 @@
         "mode": "weighted",
         "candidates": [
           {
-            "id": "emotion_detached",
-            "weight": 1.0
+            "id": "emotion_contrast",
+            "weight": 4.0
           },
           {
-            "id": "emotion_dazed",
-            "weight": 1.0
+            "id": "emotion_detached",
+            "weight": 4.0
           },
           {
             "id": "emotion_fear",
-            "weight": 1.0
+            "weight": 4.0
           },
           {
-            "id": "emotion_contrast",
-            "weight": 1.0
+            "id": "emotion_dazed",
+            "weight": 2.0
           }
         ]
       },
@@ -3130,16 +4352,44 @@
         "mode": "weighted",
         "candidates": [
           {
-            "id": "lighting_cinematic_dark",
-            "weight": 1.0
+            "id": "ext_aw_light_bioluminescent",
+            "weight": 4.0
           },
           {
-            "id": "lighting_voyeur_private",
-            "weight": 1.0
+            "id": "lighting_cinematic_dark",
+            "weight": 4.0
           },
           {
             "id": "lighting_love_hotel_neon",
-            "weight": 1.0
+            "weight": 4.0
+          },
+          {
+            "id": "lighting_voyeur_private",
+            "weight": 4.0
+          },
+          {
+            "id": "special_effects_00",
+            "weight": 4.0
+          },
+          {
+            "id": "special_effects_01",
+            "weight": 4.0
+          },
+          {
+            "id": "special_effects_02",
+            "weight": 4.0
+          },
+          {
+            "id": "special_effects_03",
+            "weight": 4.0
+          },
+          {
+            "id": "cinematic_lighting_00",
+            "weight": 2.0
+          },
+          {
+            "id": "cinematic_lighting_02",
+            "weight": 2.0
           }
         ]
       },
@@ -3147,20 +4397,24 @@
         "mode": "weighted",
         "candidates": [
           {
-            "id": "kodak_tmax_400",
-            "weight": 1.0
-          },
-          {
-            "id": "kodak_trix_400",
-            "weight": 1.0
-          },
-          {
             "id": "cinestill_800t",
-            "weight": 1.0
+            "weight": 4.0
+          },
+          {
+            "id": "kodak_tmax_400",
+            "weight": 4.0
           },
           {
             "id": "lomography_color",
-            "weight": 1.0
+            "weight": 4.0
+          },
+          {
+            "id": "expired_film",
+            "weight": 2.0
+          },
+          {
+            "id": "kodak_trix_400",
+            "weight": 2.0
           }
         ]
       },
@@ -3168,16 +4422,20 @@
         "mode": "weighted",
         "candidates": [
           {
-            "id": "medium_shot",
-            "weight": 1.0
+            "id": "close_up",
+            "weight": 4.0
           },
           {
             "id": "full_body_shot",
-            "weight": 1.0
+            "weight": 4.0
           },
           {
-            "id": "close_up",
-            "weight": 1.0
+            "id": "medium_shot",
+            "weight": 4.0
+          },
+          {
+            "id": "extreme_close_up",
+            "weight": 2.0
           }
         ]
       },
@@ -3186,259 +4444,69 @@
         "candidates": [
           {
             "id": "dutch_angle",
-            "weight": 1.0
-          },
-          {
-            "id": "voyeur_peeping",
-            "weight": 1.0
+            "weight": 4.0
           },
           {
             "id": "overhead_birds_eye",
-            "weight": 1.0
+            "weight": 4.0
           },
           {
             "id": "pov_first_person",
-            "weight": 1.0
+            "weight": 4.0
+          },
+          {
+            "id": "voyeur_peeping",
+            "weight": 4.0
+          },
+          {
+            "id": "worms_eye",
+            "weight": 2.0
           }
         ]
       }
     },
     "generic": {
       "clothing": {
-        "mode": "weighted",
-        "candidates": [
-          {
-            "id": "street_casual",
-            "weight": 1.0
-          },
-          {
-            "id": "knit_sweater",
-            "weight": 1.0
-          },
-          {
-            "id": "camisole_slip",
-            "weight": 1.0
-          },
-          {
-            "id": "silk_robe",
-            "weight": 1.0
-          }
-        ]
+        "mode": "neutral"
       },
       "character": {
-        "mode": "weighted",
-        "candidates": [
-          {
-            "id": "neighbor_girlfriend",
-            "weight": 1.0
-          },
-          {
-            "id": "married_housewife",
-            "weight": 1.0
-          },
-          {
-            "id": "jk_schoolgirl",
-            "weight": 1.0
-          }
-        ]
+        "mode": "neutral"
       },
       "makeup": {
-        "mode": "weighted",
-        "candidates": [
-          {
-            "id": "natural_pure",
-            "weight": 1.0
-          },
-          {
-            "id": "cute_peachy",
-            "weight": 1.0
-          },
-          {
-            "id": "mature_wife",
-            "weight": 1.0
-          },
-          {
-            "id": "pure_desire_white_peach",
-            "weight": 1.0
-          }
-        ]
+        "mode": "neutral"
       },
       "hairstyle": {
-        "mode": "weighted",
-        "candidates": [
-          {
-            "id": "long_straight_black",
-            "weight": 1.0
-          },
-          {
-            "id": "high_ponytail",
-            "weight": 1.0
-          },
-          {
-            "id": "low_ponytail",
-            "weight": 1.0
-          },
-          {
-            "id": "collarbone_lob",
-            "weight": 1.0
-          }
-        ]
+        "mode": "neutral"
       },
       "jewelry": {
-        "mode": "weighted",
-        "candidates": [
-          {
-            "id": "gold_collarbone_chain",
-            "weight": 1.0
-          },
-          {
-            "id": "ribbon_bow",
-            "weight": 1.0
-          },
-          {
-            "id": "pearl_necklace",
-            "weight": 1.0
-          }
-        ]
+        "mode": "neutral"
       },
       "props": {
-        "mode": "weighted",
-        "candidates": [
-          {
-            "id": "smartphone_recording",
-            "weight": 1.0
-          },
-          {
-            "id": "cute_cat_on_bed",
-            "weight": 1.0
-          },
-          {
-            "id": "pillow_clutching",
-            "weight": 1.0
-          }
-        ]
+        "mode": "neutral"
       },
       "tattoo": {
         "mode": "neutral"
       },
       "liquids": {
-        "mode": "weighted",
-        "candidates": [
-          {
-            "id": "none",
-            "weight": 1.0
-          },
-          {
-            "id": "sweat_glistening",
-            "weight": 1.0
-          }
-        ]
+        "mode": "neutral"
       },
       "pose": {
-        "mode": "weighted",
-        "candidates": [
-          {
-            "id": "standing",
-            "weight": 1.0
-          },
-          {
-            "id": "sitting",
-            "weight": 1.0
-          },
-          {
-            "id": "dynamic",
-            "weight": 1.0
-          },
-          {
-            "id": "lying",
-            "weight": 1.0
-          }
-        ]
+        "mode": "neutral"
       },
       "expression": {
-        "mode": "weighted",
-        "candidates": [
-          {
-            "id": "emotion_shy",
-            "weight": 1.0
-          },
-          {
-            "id": "emotion_playful",
-            "weight": 1.0
-          },
-          {
-            "id": "emotion_restrained",
-            "weight": 1.0
-          }
-        ]
+        "mode": "neutral"
       },
       "lighting": {
-        "mode": "weighted",
-        "candidates": [
-          {
-            "id": "lighting_japanese_fresh",
-            "weight": 1.0
-          },
-          {
-            "id": "lighting_backlit_hair",
-            "weight": 1.0
-          },
-          {
-            "id": "lighting_studio_commercial",
-            "weight": 1.0
-          }
-        ]
+        "mode": "neutral"
       },
       "film": {
-        "mode": "weighted",
-        "candidates": [
-          {
-            "id": "kodak_max_400",
-            "weight": 1.0
-          },
-          {
-            "id": "fujifilm_superia_400",
-            "weight": 1.0
-          },
-          {
-            "id": "kodak_portra_400",
-            "weight": 1.0
-          }
-        ]
+        "mode": "neutral"
       },
       "shot_type": {
-        "mode": "weighted",
-        "candidates": [
-          {
-            "id": "medium_shot",
-            "weight": 1.0
-          },
-          {
-            "id": "medium_close_up",
-            "weight": 1.0
-          },
-          {
-            "id": "full_body_shot",
-            "weight": 1.0
-          }
-        ]
+        "mode": "neutral"
       },
       "camera_angle": {
-        "mode": "weighted",
-        "candidates": [
-          {
-            "id": "eye_level",
-            "weight": 1.0
-          },
-          {
-            "id": "high_angle",
-            "weight": 1.0
-          },
-          {
-            "id": "over_the_shoulder",
-            "weight": 1.0
-          }
-        ]
+        "mode": "neutral"
       }
     }
   }

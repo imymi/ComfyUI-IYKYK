@@ -426,17 +426,16 @@ def compute_slot_distribution(
             # 计算矩阵候选与当前已知合法集合 catalog_candidates 的交集
             valid_set = set(candidates_list)
             intersection = [c for c in cand_items if c["id"] in valid_set]
-
             if not intersection:
-                raise AffinityConfigurationError(
-                    f"Weighted cell [{ctx_id}][{slot_name}] candidate intersection with catalog pool is empty!"
-                )
-
-            cand_wt_sum = sum(c["weight"] for c in intersection)
-            for c in intersection:
-                c_id = c["id"]
-                c_p = c["weight"] / cand_wt_sum
-                affinity_dist[c_id] += alpha * c_p
+                # 运行时候选过滤（如已知硬冲突前置剔除）后若亲和候选交集为空，平滑回退至当前合法池上的全局中性分布 G_s
+                for cid in candidates_list:
+                    affinity_dist[cid] += alpha * g_dist[cid]
+            else:
+                cand_wt_sum = sum(c["weight"] for c in intersection)
+                for c in intersection:
+                    c_id = c["id"]
+                    c_p = c["weight"] / cand_wt_sum
+                    affinity_dist[c_id] += alpha * c_p
         else:
             raise AffinityConfigurationError(f"Unknown cell mode: {mode}")
 

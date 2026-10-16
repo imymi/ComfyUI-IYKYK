@@ -12,7 +12,7 @@
 
 | 处置类型 (Disposition) | 单元格数量 | 占比 | 核心语义说明 |
 |---|---|---|---|
-| `neutral` (中性无偏置抽样) | 18 | 9.2% | 14 个 `generic` 槽位统一执行 $C(generic, s) = G_s$ 中性抽样；4 个专业/教育规范槽位 (`school`/`office`/`medical`/`dining` x `tattoo`) 依行业规范设计为中性无偏置抽样 |
+| `neutral` (中性无偏置抽样) | 18 | 9.2% | 14 个 `generic` 槽位统一执行 $C(generic, s) = G_s$ 中性抽样；4 个情境 (`school`/`office`/`medical`/`dining` x `tattoo`) 不额外赋予纹身类别亲和偏置，沿用合法全局候选分布，不新增禁用规则，不删除外部指定内容 |
 | `propose_expand` (拟扩充候选) | 69 | 35.2% | 针对性扩充高适配度的真实目录选择器，打破服装仅覆盖 28 款、光影仅覆盖 10 款的局限，并升级为 4/2/1 梯度权重 |
 | `propose_adjust_weight` (拟调整权重) | 62 | 31.6% | 候选集合与基线严格一致，消除原矩阵全部候选权重均为 1.0 的均一化缺陷，确立“强关联 4、适配 2、弱关联 1”的区分度分布 |
 | `propose_prune_and_tune` (精简与重校候选) | 47 | 24.0% | 精简脱敏不适既有候选，保留核心高度契合条目并优化梯度权重分布 |
@@ -31,7 +31,7 @@
 | `school` | `hairstyle` | `twin_tails`, `high_ponytail`, `long_straight_black`, `braided_twins`, `bob_cut` | `bob_cut: 4`<br>`braided_twins: 4`<br>`high_ponytail: 4`<br>`long_straight_black: 4`<br>`twin_tails: 4`<br>`ext_aw_hair_bob_blunt_cut: 2`<br>`ext_aw_hair_half_up_half_down: 2`<br>`ext_aw_hair_long_parted_behind_ears: 2`<br>`ext_aw_hair_single_back_braid: 2`<br>`hair_pageboy: 2`<br>`hime_cut: 2` | `propose_expand` | 在基线候选集合基础上，语义扩充高适配度的真实已注册选择器，打破原有候选过窄局限，并升级为 4/2/1 梯度权重。 |
 | `school` | `jewelry` | `ribbon_bow`, `gold_collarbone_chain` | `acc_bowtie: 4`<br>`acc_hairband: 4`<br>`acc_hairclip: 4`<br>`acc_necktie: 4`<br>`neck_ribbon: 4`<br>`ribbon_bow: 4` | `propose_prune_and_tune` | 精简脱敏不适既有候选，保留核心高度契合条目并优化 4/2/1 梯度权重分布。 |
 | `school` | `props` | `glasses_reading`, `smartphone_recording`, `sex_toy_vibrator`, `plush_doll_teddy` | `glasses_reading: 4`<br>`smartphone_recording: 4`<br>`digital_camera_in_hand: 2`<br>`digital_camera_record: 2`<br>`fluffy_teddy_bear: 2`<br>`fresh_flower_bouquet: 2` | `propose_prune_and_tune` | 精简脱敏不适既有候选，保留核心高度契合条目并优化 4/2/1 梯度权重分布。 |
-| `school` | `tattoo` | *none (neutral)* | *none (规范情境中性无偏置)* | `neutral` | 校园情境严格遵循东亚及日本学生校规（学生严禁纹身），无特定纹身偏好，有意设定为中性抽样模式。 |
+| `school` | `tattoo` | *none (neutral)* | *none (规范情境中性无偏置)* | `neutral` | 该情境不额外赋予纹身类别亲和偏置，沿用合法全局候选分布；不新增禁用规则，不删除外部指定内容。 |
 | `school` | `liquids` | `sweat_glistening`, `none` | `sweat_glistening: 2` | `propose_prune_and_tune` | 精简脱敏不适既有候选，保留核心高度契合条目并优化 4/2/1 梯度权重分布。 |
 | `school` | `pose` | `sitting`, `standing`, `dynamic` | `sitting: 4`<br>`standing: 4`<br>`dynamic: 2` | `propose_adjust_weight` | 保留基线完全相同的候选集合，将基线均一化的 1.0 权重治理升级为强关联 4 / 适配 2 / 弱关联 1 区分度权重。 |
 | `school` | `expression` | `emotion_shy`, `emotion_playful`, `emotion_restrained` | `emotion_happy: 4`<br>`emotion_playful: 4`<br>`emotion_shy: 4`<br>`emotion_amused: 2`<br>`emotion_focused: 2`<br>`emotion_proud: 2` | `propose_prune_and_tune` | 精简脱敏不适既有候选，保留核心高度契合条目并优化 4/2/1 梯度权重分布。 |
@@ -45,7 +45,7 @@
 | `office` | `hairstyle` | `low_ponytail`, `collarbone_lob`, `big_wavy_curls`, `messy_bun` | `collarbone_lob: 4`<br>`ext_aw_hair_long_parted_behind_ears: 4`<br>`hair_long_deep_side_part: 4`<br>`low_ponytail: 4`<br>`bob_cut: 2`<br>`ext_aw_hair_bob_blunt_cut: 2` | `propose_prune_and_tune` | 精简脱敏不适既有候选，保留核心高度契合条目并优化 4/2/1 梯度权重分布。 |
 | `office` | `jewelry` | `pearl_necklace`, `gold_collarbone_chain`, `leather_choker` | `acc_necktie: 4`<br>`pearl_necklace: 4`<br>`waist_belt: 4`<br>`ext_aw_jewelry_pearl_drop_earrings: 2`<br>`gold_collarbone_chain: 2` | `propose_prune_and_tune` | 精简脱敏不适既有候选，保留核心高度契合条目并优化 4/2/1 梯度权重分布。 |
 | `office` | `props` | `glasses_reading`, `wine_glass_bottle`, `smartphone_recording`, `digital_camera_record` | `fashion_baguette_bag: 4`<br>`glasses_reading: 4`<br>`camera_tripod_flash: 2`<br>`fashion_clutch_bag: 2`<br>`smartphone_recording: 2` | `propose_prune_and_tune` | 精简脱敏不适既有候选，保留核心高度契合条目并优化 4/2/1 梯度权重分布。 |
-| `office` | `tattoo` | *none (neutral)* | *none (规范情境中性无偏置)* | `neutral` | 现代商务办公情境严格遵循职场白领着装规范（严禁外露刺青），无特定纹身偏好，有意设定为中性抽样模式。 |
+| `office` | `tattoo` | *none (neutral)* | *none (规范情境中性无偏置)* | `neutral` | 该情境不额外赋予纹身类别亲和偏置，沿用合法全局候选分布；不新增禁用规则，不删除外部指定内容。 |
 | `office` | `liquids` | `sweat_glistening`, `none` | `sweat_glistening: 2` | `propose_prune_and_tune` | 精简脱敏不适既有候选，保留核心高度契合条目并优化 4/2/1 梯度权重分布。 |
 | `office` | `pose` | `sitting`, `standing` | `sitting: 4`<br>`standing: 4` | `propose_adjust_weight` | 保留基线完全相同的候选集合，将基线均一化的 1.0 权重治理升级为强关联 4 / 适配 2 / 弱关联 1 区分度权重。 |
 | `office` | `expression` | `emotion_restrained`, `emotion_detached`, `emotion_seductive` | `emotion_focused: 4`<br>`emotion_proud: 4`<br>`emotion_restrained: 2` | `propose_prune_and_tune` | 精简脱敏不适既有候选，保留核心高度契合条目并优化 4/2/1 梯度权重分布。 |
@@ -59,7 +59,7 @@
 | `medical` | `hairstyle` | `low_ponytail`, `bob_cut`, `twin_tails`, `messy_bun` | `bob_cut: 4`<br>`low_ponytail: 4`<br>`messy_bun: 2`<br>`twin_tails: 2` | `propose_adjust_weight` | 保留基线完全相同的候选集合，将基线均一化的 1.0 权重治理升级为强关联 4 / 适配 2 / 弱关联 1 区分度权重。 |
 | `medical` | `jewelry` | `nurse_cap` | `nurse_cap: 4` | `propose_adjust_weight` | 保留基线完全相同的候选集合，将基线均一化的 1.0 权重治理升级为强关联 4 / 适配 2 / 弱关联 1 区分度权重。 |
 | `medical` | `props` | `glasses_reading`, `smartphone_recording` | `glasses_reading: 4`<br>`smartphone_recording: 2` | `propose_adjust_weight` | 保留基线完全相同的候选集合，将基线均一化的 1.0 权重治理升级为强关联 4 / 适配 2 / 弱关联 1 区分度权重。 |
-| `medical` | `tattoo` | *none (neutral)* | *none (规范情境中性无偏置)* | `neutral` | 临床医疗护理情境严格遵循医护专业着装与卫生规范（严禁外露刺青），无特定纹身偏好，有意设定为中性抽样模式。 |
+| `medical` | `tattoo` | *none (neutral)* | *none (规范情境中性无偏置)* | `neutral` | 该情境不额外赋予纹身类别亲和偏置，沿用合法全局候选分布；不新增禁用规则，不删除外部指定内容。 |
 | `medical` | `liquids` | `sweat_glistening`, `body_oil_lube` | `body_oil_lube: 2`<br>`sweat_glistening: 2` | `propose_adjust_weight` | 保留基线完全相同的候选集合，将基线均一化的 1.0 权重治理升级为强关联 4 / 适配 2 / 弱关联 1 区分度权重。 |
 | `medical` | `pose` | `standing`, `sitting`, `lying` | `lying: 4`<br>`sitting: 4`<br>`standing: 2` | `propose_adjust_weight` | 保留基线完全相同的候选集合，将基线均一化的 1.0 权重治理升级为强关联 4 / 适配 2 / 弱关联 1 区分度权重。 |
 | `medical` | `expression` | `emotion_shy`, `emotion_submissive`, `emotion_restrained` | `emotion_submissive: 4`<br>`emotion_restrained: 2`<br>`emotion_shy: 2` | `propose_adjust_weight` | 保留基线完全相同的候选集合，将基线均一化的 1.0 权重治理升级为强关联 4 / 适配 2 / 弱关联 1 区分度权重。 |
@@ -171,7 +171,7 @@
 | `dining` | `hairstyle` | `messy_bun`, `collarbone_lob`, `twin_tails`, `bob_cut` | `big_wavy_curls: 2`<br>`bob_cut: 2`<br>`collarbone_lob: 2`<br>`ext_aw_hair_crown_braid_updo: 2`<br>`hair_1940s_waves: 2`<br>`messy_bun: 2`<br>`twin_tails: 2` | `propose_expand` | 在基线候选集合基础上，语义扩充高适配度的真实已注册选择器，打破原有候选过窄局限，并升级为 4/2/1 梯度权重。 |
 | `dining` | `jewelry` | `maid_headdress`, `pearl_necklace`, `gold_collarbone_chain` | `ext_aw_jewelry_pearl_drop_earrings: 4`<br>`maid_headdress: 4`<br>`pearl_necklace: 4`<br>`acc_bowtie: 2`<br>`gold_collarbone_chain: 2` | `propose_expand` | 在基线候选集合基础上，语义扩充高适配度的真实已注册选择器，打破原有候选过窄局限，并升级为 4/2/1 梯度权重。 |
 | `dining` | `props` | `wine_glass_bottle`, `glasses_reading`, `smartphone_recording` | `fresh_flower_bouquet: 4`<br>`ice_cubes: 4`<br>`wine_glass_bottle: 4`<br>`fashion_clutch_bag: 2`<br>`glasses_reading: 2`<br>`smartphone_recording: 2` | `propose_expand` | 在基线候选集合基础上，语义扩充高适配度的真实已注册选择器，打破原有候选过窄局限，并升级为 4/2/1 梯度权重。 |
-| `dining` | `tattoo` | *none (neutral)* | *none (规范情境中性无偏置)* | `neutral` | 规范餐饮就餐情境遵循公共就餐礼仪与餐厅服务规范，无特定纹身倾向，有意设定为中性抽样模式。 |
+| `dining` | `tattoo` | *none (neutral)* | *none (规范情境中性无偏置)* | `neutral` | 该情境不额外赋予纹身类别亲和偏置，沿用合法全局候选分布；不新增禁用规则，不删除外部指定内容。 |
 | `dining` | `liquids` | `none`, `sweat_glistening` | `sweat_glistening: 2` | `propose_prune_and_tune` | 精简脱敏不适既有候选，保留核心高度契合条目并优化 4/2/1 梯度权重分布。 |
 | `dining` | `pose` | `sitting`, `standing`, `teasing` | `sitting: 4`<br>`standing: 2`<br>`teasing: 2` | `propose_adjust_weight` | 保留基线完全相同的候选集合，将基线均一化的 1.0 权重治理升级为强关联 4 / 适配 2 / 弱关联 1 区分度权重。 |
 | `dining` | `expression` | `emotion_playful`, `emotion_shy`, `emotion_seductive` | `emotion_amused: 2`<br>`emotion_playful: 2`<br>`emotion_seductive: 2`<br>`emotion_shy: 2` | `propose_expand` | 在基线候选集合基础上，语义扩充高适配度的真实已注册选择器，打破原有候选过窄局限，并升级为 4/2/1 梯度权重。 |

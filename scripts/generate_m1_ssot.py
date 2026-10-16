@@ -192,9 +192,14 @@ for ca in shot_doc.get("camera_angles", []):
 
 assert len(metadata) == 496, f"Expected 496 metadata entries, got {len(metadata)}"
 
-with open(DATA_DIR / "context_affinity.json", "r", encoding="utf-8") as f:
-    base_ca = json.load(f)
+# 基线矩阵优先读取基线快照 fixture（保证后续重新执行时对比基线不变），降级读取当前 context_affinity.json
+baseline_fixture = REPO_DIR / "tests" / "fixtures" / "baseline_context_affinity_rc10.json"
+if baseline_fixture.is_file():
+    base_ca = json.loads(baseline_fixture.read_text(encoding="utf-8"))
+else:
+    base_ca = json.loads((DATA_DIR / "context_affinity.json").read_text(encoding="utf-8"))
 base_matrix = base_ca["matrix"]
+
 
 # 2. 全量 496 条真实审校结果 (SSoT)
 REVIEWS: Dict[Tuple[str, str], Tuple[Dict[str, int], str]] = {}
@@ -619,7 +624,7 @@ assign("lighting", "cinematic_lighting_00", {'nightlife': 2, 'special': 2}, '经
 assign("lighting", "cinematic_lighting_01", {'bondage_sm': 4, 'nightlife': 2}, '黑色电影经典百叶窗深重百叶阴影，硬朗冷峻罪案风格光影，强绑定特种束缚与夜生活探案')
 assign("lighting", "cinematic_lighting_02", {'nightlife': 4, 'special': 2}, '大都市夜间赛博霓虹灯光交相辉映，雨夜地面积水倒影，强绑定酒吧街夜生活与科幻奇观')
 assign("lighting", "cinematic_lighting_03", {'outdoor': 2, 'domestic': 2}, '自然主义自然电影光，窗外自然散射日光与环境自适应光比，适配户外田园与温馨居家')
-assign("lighting", "professional_lighting_12", {'domestic': 2, 'nightlife': 2}, '美颜补光灯/环形眼神光 (Ring Beauty Light)，在瞳孔映出完整环形高光圈，保留于全局探索池')
+assign("lighting", "professional_lighting_12", {'domestic': 2, 'nightlife': 2}, '美颜补光灯/环形眼神光 (Ring Beauty Light / Catchlight)，在瞳孔映出完整环形高光圈，适配居家直播自拍与夜生活派对人像摄影')
 assign("lighting", "professional_lighting_13", {'domestic': 4, 'school': 2}, '薄纱窗帘散射柔光 (Diffused Sheer Curtain Light)，明媚阳光透过白纱窗柔化，强关联居家卧室与校园')
 assign("lighting", "professional_lighting_00", {}, '专业发丝光与轮廓光分离布光（Rim Light / Kicker），勾勒主体边缘线条，保留于全局探索池')
 assign("lighting", "professional_lighting_01", {}, '专业侧逆光布光（Back Side Light），将主体与深色背景清晰剥离，保留于全局探索池')
@@ -792,13 +797,7 @@ for ctx in ORDERED_CONTEXT_IDS:
             disp = "neutral"
             cells_disposition_counts["neutral"] += 1
             prop_str = "*none (规范情境中性无偏置)*"
-            rationale_map = {
-                "school": "校园情境严格遵循东亚及日本学生校规（学生严禁纹身），无特定纹身偏好，有意设定为中性抽样模式。",
-                "office": "现代商务办公情境严格遵循职场白领着装规范（严禁外露刺青），无特定纹身偏好，有意设定为中性抽样模式。",
-                "medical": "临床医疗护理情境严格遵循医护专业着装与卫生规范（严禁外露刺青），无特定纹身偏好，有意设定为中性抽样模式。",
-                "dining": "规范餐饮就餐情境遵循公共就餐礼仪与餐厅服务规范，无特定纹身倾向，有意设定为中性抽样模式。",
-            }
-            rationale = rationale_map[ctx]
+            rationale = "该情境不额外赋予纹身类别亲和偏置，沿用合法全局候选分布；不新增禁用规则，不删除外部指定内容。"
         else:
             assert len(prop_list) > 0, f"Unexpected empty candidate set for non-generic non-tattoo cell: ({ctx}, {slot})!"
             prop_str = "<br>".join(f"`{sid}: {wt}`" for sid, wt in prop_list)
@@ -842,7 +841,7 @@ audit_doc_content = f"""# ComfyUI-IYKYK M1 196 单元情境亲和矩阵完整审
 
 | 处置类型 (Disposition) | 单元格数量 | 占比 | 核心语义说明 |
 |---|---|---|---|
-| `neutral` (中性无偏置抽样) | {cells_disposition_counts['neutral']} | {cells_disposition_counts['neutral']/196*100:.1f}% | 14 个 `generic` 槽位统一执行 $C(generic, s) = G_s$ 中性抽样；4 个专业/教育规范槽位 (`school`/`office`/`medical`/`dining` x `tattoo`) 依行业规范设计为中性无偏置抽样 |
+| `neutral` (中性无偏置抽样) | {cells_disposition_counts['neutral']} | {cells_disposition_counts['neutral']/196*100:.1f}% | 14 个 `generic` 槽位统一执行 $C(generic, s) = G_s$ 中性抽样；4 个情境 (`school`/`office`/`medical`/`dining` x `tattoo`) 不额外赋予纹身类别亲和偏置，沿用合法全局候选分布，不新增禁用规则，不删除外部指定内容 |
 | `propose_expand` (拟扩充候选) | {cells_disposition_counts['propose_expand']} | {cells_disposition_counts['propose_expand']/196*100:.1f}% | 针对性扩充高适配度的真实目录选择器，打破服装仅覆盖 28 款、光影仅覆盖 10 款的局限，并升级为 4/2/1 梯度权重 |
 | `propose_adjust_weight` (拟调整权重) | {cells_disposition_counts['propose_adjust_weight']} | {cells_disposition_counts['propose_adjust_weight']/196*100:.1f}% | 候选集合与基线严格一致，消除原矩阵全部候选权重均为 1.0 的均一化缺陷，确立“强关联 4、适配 2、弱关联 1”的区分度分布 |
 | `propose_prune_and_tune` (精简与重校候选) | {cells_disposition_counts['propose_prune_and_tune']} | {cells_disposition_counts['propose_prune_and_tune']/196*100:.1f}% | 精简脱敏不适既有候选，保留核心高度契合条目并优化梯度权重分布 |
@@ -905,7 +904,7 @@ summary_doc_content = f"""# ComfyUI-IYKYK M1 选择器情境归属与全量台�
 
 2. **中性无偏置抽样规范**：
    - **generic 情境**：14 个槽位在 `generic` 情境下统一废除原先 4 候选的小集合限制，全部配置为 `mode="neutral"`，严格定义为 $C(generic, s) = G_s$。
-   - **规范情境 tattoo**：`school`, `office`, `medical`, `dining` 4 个槽位依据行业与教育规范，设计为 `mode="neutral"`，杜绝不合常理的纹身强行加权。
+   - **规范情境 tattoo**：`school`, `office`, `medical`, `dining` 4 个情境在 `tattoo` 槽位不额外赋予纹身类别亲和偏置，沿用合法全局候选分布；不新增禁用规则，不删除外部指定内容。
 
 ---
 
@@ -918,3 +917,39 @@ summary_doc_content = f"""# ComfyUI-IYKYK M1 选择器情境归属与全量台�
 
 summary_md_path.write_text(summary_doc_content, encoding="utf-8")
 print(f"Generated {summary_md_path.name} successfully.")
+
+# 7. 写入并校验运行时矩阵 data/context_affinity.json (M2 交付物)
+runtime_matrix_path = DATA_DIR / "context_affinity.json"
+runtime_doc = {
+    "schema_version": "1.0",
+    "contexts": list(ORDERED_CONTEXT_IDS),
+    "slots": list(ORDERED_SLOT_IDS),
+    "signal_weights": {
+        "scene": 1.0,
+        "theme": 0.6,
+    },
+    "mixture": {
+        "global": 0.15,
+        "affinity": 0.85,
+    },
+    "matrix": {},
+}
+
+for ctx in ORDERED_CONTEXT_IDS:
+    runtime_doc["matrix"][ctx] = {}
+    for slot in ORDERED_SLOT_IDS:
+        if ctx == "generic" or (slot == "tattoo" and ctx in ("school", "office", "medical", "dining")):
+            runtime_doc["matrix"][ctx][slot] = {"mode": "neutral"}
+        else:
+            cands = sorted(proposed_matrix[ctx][slot], key=lambda x: (-x[1], x[0]))
+            runtime_doc["matrix"][ctx][slot] = {
+                "mode": "weighted",
+                "candidates": [{"id": cid, "weight": float(wt)} for cid, wt in cands],
+            }
+
+runtime_matrix_path.write_text(
+    json.dumps(runtime_doc, indent=2, ensure_ascii=False) + "\n",
+    encoding="utf-8",
+)
+print(f"Generated {runtime_matrix_path.name} with 196 cells (18 neutral, 178 weighted).")
+

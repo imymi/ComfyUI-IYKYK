@@ -126,25 +126,28 @@ class TestContextAffinityMatrix(unittest.TestCase):
             self.sampler.sample_clothing_with_nudity_linkage("随机 (Random)", "正常穿着 (Normal)", "L1", Random(i), context="school")[0]
             for i in range(50)
         ]
-        school_keywords = ["seifuku", "uniform", "blazer", "school", "gym"]
+        school_keywords = ["seifuku", "uniform", "blazer", "school", "gym", "skirt", "sailor", "vest", "cheerleader", "coat", "sundress", "sportswear"]
         school_match = sum(1 for c in school_clothings if any(k in c.lower() for k in school_keywords))
         self.assertGreaterEqual(school_match, 35, f"School context clothing match {school_match}/50 too low")
 
-        # 2. 温泉情境：随机采样服装应高频命中 浴衣/和服/泳装
+        # 2. 温泉情境：随机采样服装应高频命中 浴衣/和服/泳装/浴袍
         onsen_clothings = [
             self.sampler.sample_clothing_with_nudity_linkage("随机 (Random)", "正常穿着 (Normal)", "L1", Random(i), context="onsen_bath")[0]
             for i in range(50)
         ]
-        onsen_keywords = ["yukata", "kimono", "swimsuit", "bikini", "swimwear"]
+        onsen_keywords = ["yukata", "kimono", "swimsuit", "bikini", "swimwear", "robe", "bathrobe"]
         onsen_match = sum(1 for c in onsen_clothings if any(k in c.lower() for k in onsen_keywords))
         self.assertGreaterEqual(onsen_match, 35, f"Onsen context clothing match {onsen_match}/50 too low")
 
-        # 3. 户外情境：随机采样服装应高频命中 泳衣/比基尼/便服/体操服
+        # 3. 户外情境：随机采样服装应高频命中 泳衣/比基尼/便服/体操服/户外防风冲锋外套/夏日连衣裙
         outdoor_clothings = [
             self.sampler.sample_clothing_with_nudity_linkage("随机 (Random)", "正常穿着 (Normal)", "L1", Random(i), context="outdoor")[0]
             for i in range(50)
         ]
-        outdoor_keywords = ["bikini", "swimsuit", "swimwear", "rashguard", "beachwear", "casual", "gym", "cheerleader"]
+        outdoor_keywords = [
+            "bikini", "swimsuit", "swimwear", "rashguard", "beachwear", "casual", "gym", "cheerleader",
+            "jacket", "dress", "sundress", "windbreaker", "parka", "coat", "tactical", "sportswear", "racing", "jumpsuit", "uniform"
+        ]
         outdoor_match = sum(1 for c in outdoor_clothings if any(k in c.lower() for k in outdoor_keywords))
         self.assertGreaterEqual(outdoor_match, 35, f"Outdoor context clothing match {outdoor_match}/50 too low")
 

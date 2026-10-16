@@ -444,12 +444,14 @@ class TestContextAffinityRC8(unittest.TestCase):
                     matrix=self.registry.matrix,
                 )
                 items = list(theory_dist.keys())
+                # 大容量槽位 (如 clothing=165 款) 提高抽样量至 50,000，保障多项分布统计误差收敛在 TVD <= 0.03 门禁内
+                slot_n_samples = 50000 if len(items) > 100 else n_samples
                 counts: Dict[str, int] = {k: 0 for k in items}
-                for _ in range(n_samples):
+                for _ in range(slot_n_samples):
                     chosen_id = sample_categorical(theory_dist, rng)
                     counts[chosen_id] += 1
 
-                tvd = 0.5 * sum(abs(counts[k] / float(n_samples) - theory_dist[k]) for k in items)
+                tvd = 0.5 * sum(abs(counts[k] / float(slot_n_samples) - theory_dist[k]) for k in items)
                 if tvd > worst_tvd:
                     worst_tvd = tvd
                     worst_cell = (ctx, slot)

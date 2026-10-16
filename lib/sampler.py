@@ -378,9 +378,14 @@ class DataSampler:
         rng: Random,
         profile: Optional[ContextProfile] = None,
         context: Optional[str] = None,
+        excluded_ids: Optional[Set[str]] = None,
     ) -> Optional[Dict[str, Any]]:
         if not candidates:
             return None
+        if excluded_ids:
+            candidates = [c for c in candidates if c.get("id") not in excluded_ids]
+            if not candidates:
+                return None
         cand_map = {c.get("id"): c for c in candidates if "id" in c}
         cand_ids = [c["id"] for c in candidates if "id" in c]
         if not cand_ids:

@@ -1,0 +1,3445 @@
+{
+  "schema_version": "1.0",
+  "contexts": [
+    "school",
+    "office",
+    "medical",
+    "onsen_bath",
+    "bondage_sm",
+    "traditional",
+    "nightlife",
+    "domestic",
+    "transit",
+    "outdoor",
+    "dining",
+    "adult",
+    "special",
+    "generic"
+  ],
+  "slots": [
+    "clothing",
+    "character",
+    "makeup",
+    "hairstyle",
+    "jewelry",
+    "props",
+    "tattoo",
+    "liquids",
+    "pose",
+    "expression",
+    "lighting",
+    "film",
+    "shot_type",
+    "camera_angle"
+  ],
+  "signal_weights": {
+    "scene": 1.0,
+    "theme": 0.6
+  },
+  "mixture": {
+    "global": 0.15,
+    "affinity": 0.85
+  },
+  "matrix": {
+    "school": {
+      "clothing": {
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "jk_seifuku",
+            "weight": 1.0
+          },
+          {
+            "id": "blazer_uniform",
+            "weight": 1.0
+          },
+          {
+            "id": "gym_uniform",
+            "weight": 1.0
+          },
+          {
+            "id": "korean_school",
+            "weight": 1.0
+          }
+        ]
+      },
+      "character": {
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "jk_schoolgirl",
+            "weight": 1.0
+          },
+          {
+            "id": "strict_teacher",
+            "weight": 1.0
+          }
+        ]
+      },
+      "makeup": {
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "natural_pure",
+            "weight": 1.0
+          },
+          {
+            "id": "cute_peachy",
+            "weight": 1.0
+          },
+          {
+            "id": "sweet_peach_milk",
+            "weight": 1.0
+          },
+          {
+            "id": "clear_water_bare",
+            "weight": 1.0
+          }
+        ]
+      },
+      "hairstyle": {
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "twin_tails",
+            "weight": 1.0
+          },
+          {
+            "id": "high_ponytail",
+            "weight": 1.0
+          },
+          {
+            "id": "long_straight_black",
+            "weight": 1.0
+          },
+          {
+            "id": "braided_twins",
+            "weight": 1.0
+          },
+          {
+            "id": "bob_cut",
+            "weight": 1.0
+          }
+        ]
+      },
+      "jewelry": {
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "ribbon_bow",
+            "weight": 1.0
+          },
+          {
+            "id": "gold_collarbone_chain",
+            "weight": 1.0
+          }
+        ]
+      },
+      "props": {
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "glasses_reading",
+            "weight": 1.0
+          },
+          {
+            "id": "smartphone_recording",
+            "weight": 1.0
+          },
+          {
+            "id": "sex_toy_vibrator",
+            "weight": 1.0
+          },
+          {
+            "id": "plush_doll_teddy",
+            "weight": 1.0
+          }
+        ]
+      },
+      "tattoo": {
+        "mode": "neutral"
+      },
+      "liquids": {
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "sweat_glistening",
+            "weight": 1.0
+          },
+          {
+            "id": "none",
+            "weight": 1.0
+          }
+        ]
+      },
+      "pose": {
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "sitting",
+            "weight": 1.0
+          },
+          {
+            "id": "standing",
+            "weight": 1.0
+          },
+          {
+            "id": "dynamic",
+            "weight": 1.0
+          }
+        ]
+      },
+      "expression": {
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "emotion_shy",
+            "weight": 1.0
+          },
+          {
+            "id": "emotion_playful",
+            "weight": 1.0
+          },
+          {
+            "id": "emotion_restrained",
+            "weight": 1.0
+          }
+        ]
+      },
+      "lighting": {
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "lighting_japanese_fresh",
+            "weight": 1.0
+          },
+          {
+            "id": "lighting_backlit_hair",
+            "weight": 1.0
+          },
+          {
+            "id": "lighting_studio_commercial",
+            "weight": 1.0
+          }
+        ]
+      },
+      "film": {
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "fujifilm_superia_400",
+            "weight": 1.0
+          },
+          {
+            "id": "fujifilm_pro_400h",
+            "weight": 1.0
+          },
+          {
+            "id": "kodak_portra_400",
+            "weight": 1.0
+          }
+        ]
+      },
+      "shot_type": {
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "medium_close_up",
+            "weight": 1.0
+          },
+          {
+            "id": "medium_shot",
+            "weight": 1.0
+          },
+          {
+            "id": "full_body_shot",
+            "weight": 1.0
+          }
+        ]
+      },
+      "camera_angle": {
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "eye_level",
+            "weight": 1.0
+          },
+          {
+            "id": "high_angle",
+            "weight": 1.0
+          },
+          {
+            "id": "over_the_shoulder",
+            "weight": 1.0
+          }
+        ]
+      }
+    },
+    "office": {
+      "clothing": {
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "ol_suit",
+            "weight": 1.0
+          },
+          {
+            "id": "knit_sweater",
+            "weight": 1.0
+          },
+          {
+            "id": "evening_dress",
+            "weight": 1.0
+          },
+          {
+            "id": "street_casual",
+            "weight": 1.0
+          }
+        ]
+      },
+      "character": {
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "ol_subordinate",
+            "weight": 1.0
+          },
+          {
+            "id": "female_boss",
+            "weight": 1.0
+          },
+          {
+            "id": "strict_teacher",
+            "weight": 1.0
+          }
+        ]
+      },
+      "makeup": {
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "mature_wife",
+            "weight": 1.0
+          },
+          {
+            "id": "sultry_smoky",
+            "weight": 1.0
+          },
+          {
+            "id": "natural_pure",
+            "weight": 1.0
+          },
+          {
+            "id": "asian_hybrid_contour",
+            "weight": 1.0
+          }
+        ]
+      },
+      "hairstyle": {
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "low_ponytail",
+            "weight": 1.0
+          },
+          {
+            "id": "collarbone_lob",
+            "weight": 1.0
+          },
+          {
+            "id": "big_wavy_curls",
+            "weight": 1.0
+          },
+          {
+            "id": "messy_bun",
+            "weight": 1.0
+          }
+        ]
+      },
+      "jewelry": {
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "pearl_necklace",
+            "weight": 1.0
+          },
+          {
+            "id": "gold_collarbone_chain",
+            "weight": 1.0
+          },
+          {
+            "id": "leather_choker",
+            "weight": 1.0
+          }
+        ]
+      },
+      "props": {
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "glasses_reading",
+            "weight": 1.0
+          },
+          {
+            "id": "wine_glass_bottle",
+            "weight": 1.0
+          },
+          {
+            "id": "smartphone_recording",
+            "weight": 1.0
+          },
+          {
+            "id": "digital_camera_record",
+            "weight": 1.0
+          }
+        ]
+      },
+      "tattoo": {
+        "mode": "neutral"
+      },
+      "liquids": {
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "sweat_glistening",
+            "weight": 1.0
+          },
+          {
+            "id": "none",
+            "weight": 1.0
+          }
+        ]
+      },
+      "pose": {
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "sitting",
+            "weight": 1.0
+          },
+          {
+            "id": "standing",
+            "weight": 1.0
+          }
+        ]
+      },
+      "expression": {
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "emotion_restrained",
+            "weight": 1.0
+          },
+          {
+            "id": "emotion_detached",
+            "weight": 1.0
+          },
+          {
+            "id": "emotion_seductive",
+            "weight": 1.0
+          }
+        ]
+      },
+      "lighting": {
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "lighting_studio_commercial",
+            "weight": 1.0
+          },
+          {
+            "id": "lighting_cinematic_dark",
+            "weight": 1.0
+          },
+          {
+            "id": "lighting_japanese_fresh",
+            "weight": 1.0
+          }
+        ]
+      },
+      "film": {
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "fujifilm_classic_chrome",
+            "weight": 1.0
+          },
+          {
+            "id": "kodak_portra_400",
+            "weight": 1.0
+          },
+          {
+            "id": "cinestill_800t",
+            "weight": 1.0
+          }
+        ]
+      },
+      "shot_type": {
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "medium_shot",
+            "weight": 1.0
+          },
+          {
+            "id": "medium_close_up",
+            "weight": 1.0
+          },
+          {
+            "id": "medium_long_shot",
+            "weight": 1.0
+          }
+        ]
+      },
+      "camera_angle": {
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "eye_level",
+            "weight": 1.0
+          },
+          {
+            "id": "low_angle",
+            "weight": 1.0
+          },
+          {
+            "id": "over_the_shoulder",
+            "weight": 1.0
+          }
+        ]
+      }
+    },
+    "medical": {
+      "clothing": {
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "nurse_uniform",
+            "weight": 1.0
+          }
+        ]
+      },
+      "character": {
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "kind_nurse",
+            "weight": 1.0
+          }
+        ]
+      },
+      "makeup": {
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "natural_pure",
+            "weight": 1.0
+          },
+          {
+            "id": "cute_peachy",
+            "weight": 1.0
+          },
+          {
+            "id": "clear_water_bare",
+            "weight": 1.0
+          }
+        ]
+      },
+      "hairstyle": {
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "low_ponytail",
+            "weight": 1.0
+          },
+          {
+            "id": "bob_cut",
+            "weight": 1.0
+          },
+          {
+            "id": "twin_tails",
+            "weight": 1.0
+          },
+          {
+            "id": "messy_bun",
+            "weight": 1.0
+          }
+        ]
+      },
+      "jewelry": {
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "nurse_cap",
+            "weight": 1.0
+          }
+        ]
+      },
+      "props": {
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "glasses_reading",
+            "weight": 1.0
+          },
+          {
+            "id": "smartphone_recording",
+            "weight": 1.0
+          }
+        ]
+      },
+      "tattoo": {
+        "mode": "neutral"
+      },
+      "liquids": {
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "sweat_glistening",
+            "weight": 1.0
+          },
+          {
+            "id": "body_oil_lube",
+            "weight": 1.0
+          }
+        ]
+      },
+      "pose": {
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "standing",
+            "weight": 1.0
+          },
+          {
+            "id": "sitting",
+            "weight": 1.0
+          },
+          {
+            "id": "lying",
+            "weight": 1.0
+          }
+        ]
+      },
+      "expression": {
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "emotion_shy",
+            "weight": 1.0
+          },
+          {
+            "id": "emotion_submissive",
+            "weight": 1.0
+          },
+          {
+            "id": "emotion_restrained",
+            "weight": 1.0
+          }
+        ]
+      },
+      "lighting": {
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "lighting_studio_commercial",
+            "weight": 1.0
+          },
+          {
+            "id": "lighting_japanese_fresh",
+            "weight": 1.0
+          },
+          {
+            "id": "lighting_backlit_hair",
+            "weight": 1.0
+          }
+        ]
+      },
+      "film": {
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "kodak_max_400",
+            "weight": 1.0
+          },
+          {
+            "id": "kodak_portra_400",
+            "weight": 1.0
+          },
+          {
+            "id": "fujifilm_pro_400h",
+            "weight": 1.0
+          }
+        ]
+      },
+      "shot_type": {
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "medium_shot",
+            "weight": 1.0
+          },
+          {
+            "id": "medium_close_up",
+            "weight": 1.0
+          },
+          {
+            "id": "full_body_shot",
+            "weight": 1.0
+          }
+        ]
+      },
+      "camera_angle": {
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "eye_level",
+            "weight": 1.0
+          },
+          {
+            "id": "high_angle",
+            "weight": 1.0
+          }
+        ]
+      }
+    },
+    "onsen_bath": {
+      "clothing": {
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "yukata",
+            "weight": 1.0
+          },
+          {
+            "id": "kimono",
+            "weight": 1.0
+          },
+          {
+            "id": "one_piece_swimsuit",
+            "weight": 1.0
+          },
+          {
+            "id": "bikini_micro",
+            "weight": 1.0
+          }
+        ]
+      },
+      "character": {
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "married_housewife",
+            "weight": 1.0
+          },
+          {
+            "id": "neighbor_girlfriend",
+            "weight": 1.0
+          },
+          {
+            "id": "gravure_idol",
+            "weight": 1.0
+          }
+        ]
+      },
+      "makeup": {
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "wet_dewy",
+            "weight": 1.0
+          },
+          {
+            "id": "natural_pure",
+            "weight": 1.0
+          },
+          {
+            "id": "climax_flush",
+            "weight": 1.0
+          },
+          {
+            "id": "drunken_milky_youth",
+            "weight": 1.0
+          }
+        ]
+      },
+      "hairstyle": {
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "wet_hair_face",
+            "weight": 1.0
+          },
+          {
+            "id": "messy_bun",
+            "weight": 1.0
+          },
+          {
+            "id": "low_ponytail",
+            "weight": 1.0
+          }
+        ]
+      },
+      "jewelry": {
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "gold_collarbone_chain",
+            "weight": 1.0
+          },
+          {
+            "id": "pearl_necklace",
+            "weight": 1.0
+          },
+          {
+            "id": "ankle_bracelet",
+            "weight": 1.0
+          }
+        ]
+      },
+      "props": {
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "wine_glass_bottle",
+            "weight": 1.0
+          },
+          {
+            "id": "ice_cubes",
+            "weight": 1.0
+          },
+          {
+            "id": "rose_petals_candles",
+            "weight": 1.0
+          }
+        ]
+      },
+      "tattoo": {
+        "mode": "neutral"
+      },
+      "liquids": {
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "wet_water_drops",
+            "weight": 1.0
+          },
+          {
+            "id": "sweat_glistening",
+            "weight": 1.0
+          }
+        ]
+      },
+      "pose": {
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "sitting",
+            "weight": 1.0
+          },
+          {
+            "id": "standing",
+            "weight": 1.0
+          },
+          {
+            "id": "lying",
+            "weight": 1.0
+          },
+          {
+            "id": "kneeling",
+            "weight": 1.0
+          }
+        ]
+      },
+      "expression": {
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "emotion_pleasure",
+            "weight": 1.0
+          },
+          {
+            "id": "emotion_shy",
+            "weight": 1.0
+          },
+          {
+            "id": "emotion_dazed",
+            "weight": 1.0
+          }
+        ]
+      },
+      "lighting": {
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "lighting_onsen_intimate",
+            "weight": 1.0
+          },
+          {
+            "id": "lighting_backlit_hair",
+            "weight": 1.0
+          },
+          {
+            "id": "lighting_rain_wet",
+            "weight": 1.0
+          }
+        ]
+      },
+      "film": {
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "kodak_portra_400",
+            "weight": 1.0
+          },
+          {
+            "id": "fujifilm_pro_400h",
+            "weight": 1.0
+          },
+          {
+            "id": "kodak_gold_200",
+            "weight": 1.0
+          }
+        ]
+      },
+      "shot_type": {
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "medium_shot",
+            "weight": 1.0
+          },
+          {
+            "id": "full_body_shot",
+            "weight": 1.0
+          },
+          {
+            "id": "medium_close_up",
+            "weight": 1.0
+          }
+        ]
+      },
+      "camera_angle": {
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "eye_level",
+            "weight": 1.0
+          },
+          {
+            "id": "high_angle",
+            "weight": 1.0
+          },
+          {
+            "id": "overhead_birds_eye",
+            "weight": 1.0
+          }
+        ]
+      }
+    },
+    "bondage_sm": {
+      "clothing": {
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "latex_catsuit",
+            "weight": 1.0
+          },
+          {
+            "id": "leather_corset",
+            "weight": 1.0
+          },
+          {
+            "id": "lingerie_lace",
+            "weight": 1.0
+          }
+        ]
+      },
+      "character": {
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "french_maid",
+            "weight": 1.0
+          },
+          {
+            "id": "ol_subordinate",
+            "weight": 1.0
+          },
+          {
+            "id": "female_boss",
+            "weight": 1.0
+          }
+        ]
+      },
+      "makeup": {
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "submissive_marked",
+            "weight": 1.0
+          },
+          {
+            "id": "ruined_crying",
+            "weight": 1.0
+          },
+          {
+            "id": "climax_flush",
+            "weight": 1.0
+          },
+          {
+            "id": "gothic_dark",
+            "weight": 1.0
+          }
+        ]
+      },
+      "hairstyle": {
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "messy_bedhead",
+            "weight": 1.0
+          },
+          {
+            "id": "twin_tails",
+            "weight": 1.0
+          },
+          {
+            "id": "hair_in_mouth",
+            "weight": 1.0
+          }
+        ]
+      },
+      "jewelry": {
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "leather_choker",
+            "weight": 1.0
+          },
+          {
+            "id": "lace_blindfold",
+            "weight": 1.0
+          },
+          {
+            "id": "nipple_rings",
+            "weight": 1.0
+          },
+          {
+            "id": "body_chain",
+            "weight": 1.0
+          }
+        ]
+      },
+      "props": {
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "bondage_rope_collar",
+            "weight": 1.0
+          },
+          {
+            "id": "sex_toy_vibrator",
+            "weight": 1.0
+          },
+          {
+            "id": "ice_cubes",
+            "weight": 1.0
+          }
+        ]
+      },
+      "tattoo": {
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "lewd_womb_pubic",
+            "weight": 1.0
+          },
+          {
+            "id": "barcode_serial_number",
+            "weight": 1.0
+          },
+          {
+            "id": "tally_marks_inner_thigh",
+            "weight": 1.0
+          }
+        ]
+      },
+      "liquids": {
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "saliva_drool",
+            "weight": 1.0
+          },
+          {
+            "id": "sweat_glistening",
+            "weight": 1.0
+          },
+          {
+            "id": "cum_splatter",
+            "weight": 1.0
+          },
+          {
+            "id": "body_oil_lube",
+            "weight": 1.0
+          }
+        ]
+      },
+      "pose": {
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "kneeling",
+            "weight": 1.0
+          },
+          {
+            "id": "all_fours",
+            "weight": 1.0
+          },
+          {
+            "id": "lying",
+            "weight": 1.0
+          },
+          {
+            "id": "teasing",
+            "weight": 1.0
+          }
+        ]
+      },
+      "expression": {
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "emotion_submissive",
+            "weight": 1.0
+          },
+          {
+            "id": "emotion_pain",
+            "weight": 1.0
+          },
+          {
+            "id": "emotion_dazed",
+            "weight": 1.0
+          }
+        ]
+      },
+      "lighting": {
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "lighting_cinematic_dark",
+            "weight": 1.0
+          },
+          {
+            "id": "lighting_voyeur_private",
+            "weight": 1.0
+          },
+          {
+            "id": "lighting_love_hotel_neon",
+            "weight": 1.0
+          }
+        ]
+      },
+      "film": {
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "cinestill_800t",
+            "weight": 1.0
+          },
+          {
+            "id": "kodak_trix_400",
+            "weight": 1.0
+          },
+          {
+            "id": "ilford_hp5_plus",
+            "weight": 1.0
+          }
+        ]
+      },
+      "shot_type": {
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "medium_shot",
+            "weight": 1.0
+          },
+          {
+            "id": "full_body_shot",
+            "weight": 1.0
+          },
+          {
+            "id": "erotic_close_up",
+            "weight": 1.0
+          }
+        ]
+      },
+      "camera_angle": {
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "high_angle",
+            "weight": 1.0
+          },
+          {
+            "id": "low_angle",
+            "weight": 1.0
+          },
+          {
+            "id": "pov_first_person",
+            "weight": 1.0
+          },
+          {
+            "id": "dutch_angle",
+            "weight": 1.0
+          }
+        ]
+      }
+    },
+    "traditional": {
+      "clothing": {
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "kimono",
+            "weight": 1.0
+          },
+          {
+            "id": "yukata",
+            "weight": 1.0
+          },
+          {
+            "id": "furisode",
+            "weight": 1.0
+          },
+          {
+            "id": "qipao",
+            "weight": 1.0
+          },
+          {
+            "id": "hanfu",
+            "weight": 1.0
+          },
+          {
+            "id": "modern_chinese",
+            "weight": 1.0
+          },
+          {
+            "id": "hanbok",
+            "weight": 1.0
+          }
+        ]
+      },
+      "character": {
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "married_housewife",
+            "weight": 1.0
+          },
+          {
+            "id": "neighbor_girlfriend",
+            "weight": 1.0
+          }
+        ]
+      },
+      "makeup": {
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "vintage_retro",
+            "weight": 1.0
+          },
+          {
+            "id": "chinese_vermilion",
+            "weight": 1.0
+          },
+          {
+            "id": "natural_pure",
+            "weight": 1.0
+          },
+          {
+            "id": "mature_wife",
+            "weight": 1.0
+          }
+        ]
+      },
+      "hairstyle": {
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "long_straight_black",
+            "weight": 1.0
+          },
+          {
+            "id": "hime_cut",
+            "weight": 1.0
+          },
+          {
+            "id": "low_ponytail",
+            "weight": 1.0
+          },
+          {
+            "id": "braided_twins",
+            "weight": 1.0
+          }
+        ]
+      },
+      "jewelry": {
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "pearl_necklace",
+            "weight": 1.0
+          },
+          {
+            "id": "gold_collarbone_chain",
+            "weight": 1.0
+          },
+          {
+            "id": "ribbon_bow",
+            "weight": 1.0
+          }
+        ]
+      },
+      "props": {
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "oriental_fan_umbrella",
+            "weight": 1.0
+          },
+          {
+            "id": "wine_glass_bottle",
+            "weight": 1.0
+          },
+          {
+            "id": "flower_bouquet_petals",
+            "weight": 1.0
+          }
+        ]
+      },
+      "tattoo": {
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "japanese_irezumi_dragon",
+            "weight": 1.0
+          },
+          {
+            "id": "cherry_blossom_shoulder",
+            "weight": 1.0
+          }
+        ]
+      },
+      "liquids": {
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "sweat_glistening",
+            "weight": 1.0
+          },
+          {
+            "id": "none",
+            "weight": 1.0
+          }
+        ]
+      },
+      "pose": {
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "kneeling",
+            "weight": 1.0
+          },
+          {
+            "id": "sitting",
+            "weight": 1.0
+          },
+          {
+            "id": "standing",
+            "weight": 1.0
+          }
+        ]
+      },
+      "expression": {
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "emotion_shy",
+            "weight": 1.0
+          },
+          {
+            "id": "emotion_restrained",
+            "weight": 1.0
+          },
+          {
+            "id": "emotion_seductive",
+            "weight": 1.0
+          }
+        ]
+      },
+      "lighting": {
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "lighting_oil_classical",
+            "weight": 1.0
+          },
+          {
+            "id": "lighting_backlit_hair",
+            "weight": 1.0
+          },
+          {
+            "id": "lighting_japanese_fresh",
+            "weight": 1.0
+          }
+        ]
+      },
+      "film": {
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "fujifilm_acros_100",
+            "weight": 1.0
+          },
+          {
+            "id": "kodak_portra_400",
+            "weight": 1.0
+          },
+          {
+            "id": "kodak_gold_200",
+            "weight": 1.0
+          }
+        ]
+      },
+      "shot_type": {
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "medium_shot",
+            "weight": 1.0
+          },
+          {
+            "id": "full_body_shot",
+            "weight": 1.0
+          },
+          {
+            "id": "medium_close_up",
+            "weight": 1.0
+          }
+        ]
+      },
+      "camera_angle": {
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "eye_level",
+            "weight": 1.0
+          },
+          {
+            "id": "high_angle",
+            "weight": 1.0
+          },
+          {
+            "id": "over_the_shoulder",
+            "weight": 1.0
+          }
+        ]
+      }
+    },
+    "nightlife": {
+      "clothing": {
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "bunny_suit",
+            "weight": 1.0
+          },
+          {
+            "id": "party_club",
+            "weight": 1.0
+          },
+          {
+            "id": "lingerie_lace",
+            "weight": 1.0
+          },
+          {
+            "id": "latex_catsuit",
+            "weight": 1.0
+          },
+          {
+            "id": "evening_dress",
+            "weight": 1.0
+          }
+        ]
+      },
+      "character": {
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "hostess_cabaret",
+            "weight": 1.0
+          },
+          {
+            "id": "gravure_idol",
+            "weight": 1.0
+          }
+        ]
+      },
+      "makeup": {
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "sultry_smoky",
+            "weight": 1.0
+          },
+          {
+            "id": "climax_flush",
+            "weight": 1.0
+          },
+          {
+            "id": "ruined_crying",
+            "weight": 1.0
+          },
+          {
+            "id": "gothic_dark",
+            "weight": 1.0
+          }
+        ]
+      },
+      "hairstyle": {
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "big_wavy_curls",
+            "weight": 1.0
+          },
+          {
+            "id": "twin_tails",
+            "weight": 1.0
+          },
+          {
+            "id": "hime_cut",
+            "weight": 1.0
+          },
+          {
+            "id": "hair_in_mouth",
+            "weight": 1.0
+          }
+        ]
+      },
+      "jewelry": {
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "leather_choker",
+            "weight": 1.0
+          },
+          {
+            "id": "body_chain",
+            "weight": 1.0
+          },
+          {
+            "id": "bunny_ears",
+            "weight": 1.0
+          },
+          {
+            "id": "cat_ears",
+            "weight": 1.0
+          }
+        ]
+      },
+      "props": {
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "wine_glass_bottle",
+            "weight": 1.0
+          },
+          {
+            "id": "sex_toy_vibrator",
+            "weight": 1.0
+          },
+          {
+            "id": "smartphone_recording",
+            "weight": 1.0
+          },
+          {
+            "id": "digital_camera_record",
+            "weight": 1.0
+          }
+        ]
+      },
+      "tattoo": {
+        "mode": "neutral"
+      },
+      "liquids": {
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "sweat_glistening",
+            "weight": 1.0
+          },
+          {
+            "id": "saliva_drool",
+            "weight": 1.0
+          }
+        ]
+      },
+      "pose": {
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "standing",
+            "weight": 1.0
+          },
+          {
+            "id": "dynamic",
+            "weight": 1.0
+          },
+          {
+            "id": "teasing",
+            "weight": 1.0
+          },
+          {
+            "id": "sitting",
+            "weight": 1.0
+          }
+        ]
+      },
+      "expression": {
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "emotion_seductive",
+            "weight": 1.0
+          },
+          {
+            "id": "emotion_pleasure",
+            "weight": 1.0
+          },
+          {
+            "id": "emotion_playful",
+            "weight": 1.0
+          }
+        ]
+      },
+      "lighting": {
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "lighting_love_hotel_neon",
+            "weight": 1.0
+          },
+          {
+            "id": "lighting_cinematic_dark",
+            "weight": 1.0
+          },
+          {
+            "id": "lighting_backlit_hair",
+            "weight": 1.0
+          }
+        ]
+      },
+      "film": {
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "cinestill_800t",
+            "weight": 1.0
+          },
+          {
+            "id": "fujifilm_classic_negative",
+            "weight": 1.0
+          },
+          {
+            "id": "lomography_color",
+            "weight": 1.0
+          }
+        ]
+      },
+      "shot_type": {
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "medium_shot",
+            "weight": 1.0
+          },
+          {
+            "id": "full_body_shot",
+            "weight": 1.0
+          },
+          {
+            "id": "medium_close_up",
+            "weight": 1.0
+          }
+        ]
+      },
+      "camera_angle": {
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "low_angle",
+            "weight": 1.0
+          },
+          {
+            "id": "dutch_angle",
+            "weight": 1.0
+          },
+          {
+            "id": "eye_level",
+            "weight": 1.0
+          }
+        ]
+      }
+    },
+    "domestic": {
+      "clothing": {
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "silk_robe",
+            "weight": 1.0
+          },
+          {
+            "id": "camisole_slip",
+            "weight": 1.0
+          },
+          {
+            "id": "knit_sweater",
+            "weight": 1.0
+          },
+          {
+            "id": "street_casual",
+            "weight": 1.0
+          },
+          {
+            "id": "lingerie_lace",
+            "weight": 1.0
+          }
+        ]
+      },
+      "character": {
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "married_housewife",
+            "weight": 1.0
+          },
+          {
+            "id": "neighbor_girlfriend",
+            "weight": 1.0
+          }
+        ]
+      },
+      "makeup": {
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "mature_wife",
+            "weight": 1.0
+          },
+          {
+            "id": "natural_pure",
+            "weight": 1.0
+          },
+          {
+            "id": "climax_flush",
+            "weight": 1.0
+          },
+          {
+            "id": "pure_desire_white_peach",
+            "weight": 1.0
+          }
+        ]
+      },
+      "hairstyle": {
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "messy_bedhead",
+            "weight": 1.0
+          },
+          {
+            "id": "messy_bun",
+            "weight": 1.0
+          },
+          {
+            "id": "long_straight_black",
+            "weight": 1.0
+          },
+          {
+            "id": "hair_over_breast",
+            "weight": 1.0
+          }
+        ]
+      },
+      "jewelry": {
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "gold_collarbone_chain",
+            "weight": 1.0
+          },
+          {
+            "id": "ribbon_bow",
+            "weight": 1.0
+          },
+          {
+            "id": "ankle_bracelet",
+            "weight": 1.0
+          }
+        ]
+      },
+      "props": {
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "cute_cat_on_bed",
+            "weight": 1.0
+          },
+          {
+            "id": "pillow_clutching",
+            "weight": 1.0
+          },
+          {
+            "id": "game_controller",
+            "weight": 1.0
+          },
+          {
+            "id": "wine_glass_bottle",
+            "weight": 1.0
+          },
+          {
+            "id": "rose_petals_candles",
+            "weight": 1.0
+          }
+        ]
+      },
+      "tattoo": {
+        "mode": "neutral"
+      },
+      "liquids": {
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "sweat_glistening",
+            "weight": 1.0
+          },
+          {
+            "id": "saliva_drool",
+            "weight": 1.0
+          }
+        ]
+      },
+      "pose": {
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "lying",
+            "weight": 1.0
+          },
+          {
+            "id": "sitting",
+            "weight": 1.0
+          },
+          {
+            "id": "standing",
+            "weight": 1.0
+          },
+          {
+            "id": "teasing",
+            "weight": 1.0
+          }
+        ]
+      },
+      "expression": {
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "emotion_shy",
+            "weight": 1.0
+          },
+          {
+            "id": "emotion_seductive",
+            "weight": 1.0
+          },
+          {
+            "id": "emotion_dazed",
+            "weight": 1.0
+          }
+        ]
+      },
+      "lighting": {
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "lighting_bedroom_private",
+            "weight": 1.0
+          },
+          {
+            "id": "lighting_japanese_fresh",
+            "weight": 1.0
+          },
+          {
+            "id": "lighting_backlit_hair",
+            "weight": 1.0
+          }
+        ]
+      },
+      "film": {
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "kodak_portra_400",
+            "weight": 1.0
+          },
+          {
+            "id": "kodak_gold_200",
+            "weight": 1.0
+          },
+          {
+            "id": "fujifilm_pro_400h",
+            "weight": 1.0
+          }
+        ]
+      },
+      "shot_type": {
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "medium_close_up",
+            "weight": 1.0
+          },
+          {
+            "id": "medium_shot",
+            "weight": 1.0
+          },
+          {
+            "id": "full_body_shot",
+            "weight": 1.0
+          }
+        ]
+      },
+      "camera_angle": {
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "eye_level",
+            "weight": 1.0
+          },
+          {
+            "id": "high_angle",
+            "weight": 1.0
+          },
+          {
+            "id": "over_the_shoulder",
+            "weight": 1.0
+          }
+        ]
+      }
+    },
+    "transit": {
+      "clothing": {
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "jk_seifuku",
+            "weight": 1.0
+          },
+          {
+            "id": "blazer_uniform",
+            "weight": 1.0
+          },
+          {
+            "id": "ol_suit",
+            "weight": 1.0
+          },
+          {
+            "id": "street_casual",
+            "weight": 1.0
+          },
+          {
+            "id": "knit_sweater",
+            "weight": 1.0
+          }
+        ]
+      },
+      "character": {
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "jk_schoolgirl",
+            "weight": 1.0
+          },
+          {
+            "id": "ol_subordinate",
+            "weight": 1.0
+          },
+          {
+            "id": "neighbor_girlfriend",
+            "weight": 1.0
+          }
+        ]
+      },
+      "makeup": {
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "natural_pure",
+            "weight": 1.0
+          },
+          {
+            "id": "cute_peachy",
+            "weight": 1.0
+          },
+          {
+            "id": "climax_flush",
+            "weight": 1.0
+          }
+        ]
+      },
+      "hairstyle": {
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "low_ponytail",
+            "weight": 1.0
+          },
+          {
+            "id": "high_ponytail",
+            "weight": 1.0
+          },
+          {
+            "id": "long_straight_black",
+            "weight": 1.0
+          },
+          {
+            "id": "collarbone_lob",
+            "weight": 1.0
+          }
+        ]
+      },
+      "jewelry": {
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "gold_collarbone_chain",
+            "weight": 1.0
+          },
+          {
+            "id": "ribbon_bow",
+            "weight": 1.0
+          }
+        ]
+      },
+      "props": {
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "smartphone_recording",
+            "weight": 1.0
+          },
+          {
+            "id": "glasses_reading",
+            "weight": 1.0
+          }
+        ]
+      },
+      "tattoo": {
+        "mode": "neutral"
+      },
+      "liquids": {
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "sweat_glistening",
+            "weight": 1.0
+          },
+          {
+            "id": "none",
+            "weight": 1.0
+          }
+        ]
+      },
+      "pose": {
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "standing",
+            "weight": 1.0
+          },
+          {
+            "id": "sitting",
+            "weight": 1.0
+          },
+          {
+            "id": "dynamic",
+            "weight": 1.0
+          }
+        ]
+      },
+      "expression": {
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "emotion_restrained",
+            "weight": 1.0
+          },
+          {
+            "id": "emotion_shy",
+            "weight": 1.0
+          },
+          {
+            "id": "emotion_fear",
+            "weight": 1.0
+          }
+        ]
+      },
+      "lighting": {
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "lighting_voyeur_private",
+            "weight": 1.0
+          },
+          {
+            "id": "lighting_japanese_fresh",
+            "weight": 1.0
+          },
+          {
+            "id": "lighting_rain_wet",
+            "weight": 1.0
+          }
+        ]
+      },
+      "film": {
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "fujifilm_classic_chrome",
+            "weight": 1.0
+          },
+          {
+            "id": "fujifilm_superia_400",
+            "weight": 1.0
+          },
+          {
+            "id": "kodak_max_400",
+            "weight": 1.0
+          }
+        ]
+      },
+      "shot_type": {
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "medium_shot",
+            "weight": 1.0
+          },
+          {
+            "id": "full_body_shot",
+            "weight": 1.0
+          },
+          {
+            "id": "medium_close_up",
+            "weight": 1.0
+          }
+        ]
+      },
+      "camera_angle": {
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "eye_level",
+            "weight": 1.0
+          },
+          {
+            "id": "voyeur_peeping",
+            "weight": 1.0
+          },
+          {
+            "id": "over_the_shoulder",
+            "weight": 1.0
+          }
+        ]
+      }
+    },
+    "outdoor": {
+      "clothing": {
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "bikini_micro",
+            "weight": 1.0
+          },
+          {
+            "id": "one_piece_swimsuit",
+            "weight": 1.0
+          },
+          {
+            "id": "street_casual",
+            "weight": 1.0
+          },
+          {
+            "id": "gym_uniform",
+            "weight": 1.0
+          },
+          {
+            "id": "cheerleader",
+            "weight": 1.0
+          }
+        ]
+      },
+      "character": {
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "gravure_idol",
+            "weight": 1.0
+          },
+          {
+            "id": "neighbor_girlfriend",
+            "weight": 1.0
+          }
+        ]
+      },
+      "makeup": {
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "natural_pure",
+            "weight": 1.0
+          },
+          {
+            "id": "cute_peachy",
+            "weight": 1.0
+          },
+          {
+            "id": "wet_dewy",
+            "weight": 1.0
+          },
+          {
+            "id": "sun_kissed",
+            "weight": 1.0
+          }
+        ]
+      },
+      "hairstyle": {
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "high_ponytail",
+            "weight": 1.0
+          },
+          {
+            "id": "twin_tails",
+            "weight": 1.0
+          },
+          {
+            "id": "space_buns",
+            "weight": 1.0
+          },
+          {
+            "id": "messy_bun",
+            "weight": 1.0
+          }
+        ]
+      },
+      "jewelry": {
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "ribbon_bow",
+            "weight": 1.0
+          },
+          {
+            "id": "gold_collarbone_chain",
+            "weight": 1.0
+          },
+          {
+            "id": "ankle_bracelet",
+            "weight": 1.0
+          }
+        ]
+      },
+      "props": {
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "camera_tripod_flash",
+            "weight": 1.0
+          },
+          {
+            "id": "oriental_fan_umbrella",
+            "weight": 1.0
+          },
+          {
+            "id": "smartphone_recording",
+            "weight": 1.0
+          },
+          {
+            "id": "flower_bouquet_petals",
+            "weight": 1.0
+          }
+        ]
+      },
+      "tattoo": {
+        "mode": "neutral"
+      },
+      "liquids": {
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "wet_water_drops",
+            "weight": 1.0
+          },
+          {
+            "id": "sweat_glistening",
+            "weight": 1.0
+          }
+        ]
+      },
+      "pose": {
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "dynamic",
+            "weight": 1.0
+          },
+          {
+            "id": "standing",
+            "weight": 1.0
+          },
+          {
+            "id": "sitting",
+            "weight": 1.0
+          }
+        ]
+      },
+      "expression": {
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "emotion_playful",
+            "weight": 1.0
+          },
+          {
+            "id": "emotion_shy",
+            "weight": 1.0
+          },
+          {
+            "id": "emotion_seductive",
+            "weight": 1.0
+          }
+        ]
+      },
+      "lighting": {
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "lighting_japanese_fresh",
+            "weight": 1.0
+          },
+          {
+            "id": "lighting_backlit_hair",
+            "weight": 1.0
+          },
+          {
+            "id": "lighting_rain_wet",
+            "weight": 1.0
+          }
+        ]
+      },
+      "film": {
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "kodak_ektar_100",
+            "weight": 1.0
+          },
+          {
+            "id": "fujifilm_velvia_50",
+            "weight": 1.0
+          },
+          {
+            "id": "cinestill_50d",
+            "weight": 1.0
+          }
+        ]
+      },
+      "shot_type": {
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "full_body_shot",
+            "weight": 1.0
+          },
+          {
+            "id": "medium_long_shot",
+            "weight": 1.0
+          },
+          {
+            "id": "medium_shot",
+            "weight": 1.0
+          }
+        ]
+      },
+      "camera_angle": {
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "low_angle",
+            "weight": 1.0
+          },
+          {
+            "id": "eye_level",
+            "weight": 1.0
+          },
+          {
+            "id": "high_angle",
+            "weight": 1.0
+          }
+        ]
+      }
+    },
+    "dining": {
+      "clothing": {
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "maid_dress",
+            "weight": 1.0
+          },
+          {
+            "id": "waitress_uniform",
+            "weight": 1.0
+          },
+          {
+            "id": "street_casual",
+            "weight": 1.0
+          },
+          {
+            "id": "qipao",
+            "weight": 1.0
+          },
+          {
+            "id": "kimono",
+            "weight": 1.0
+          }
+        ]
+      },
+      "character": {
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "french_maid",
+            "weight": 1.0
+          },
+          {
+            "id": "neighbor_girlfriend",
+            "weight": 1.0
+          },
+          {
+            "id": "ol_subordinate",
+            "weight": 1.0
+          },
+          {
+            "id": "married_housewife",
+            "weight": 1.0
+          }
+        ]
+      },
+      "makeup": {
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "cute_peachy",
+            "weight": 1.0
+          },
+          {
+            "id": "natural_pure",
+            "weight": 1.0
+          },
+          {
+            "id": "mature_wife",
+            "weight": 1.0
+          },
+          {
+            "id": "sweet_peach_milk",
+            "weight": 1.0
+          }
+        ]
+      },
+      "hairstyle": {
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "messy_bun",
+            "weight": 1.0
+          },
+          {
+            "id": "collarbone_lob",
+            "weight": 1.0
+          },
+          {
+            "id": "twin_tails",
+            "weight": 1.0
+          },
+          {
+            "id": "bob_cut",
+            "weight": 1.0
+          }
+        ]
+      },
+      "jewelry": {
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "maid_headdress",
+            "weight": 1.0
+          },
+          {
+            "id": "pearl_necklace",
+            "weight": 1.0
+          },
+          {
+            "id": "gold_collarbone_chain",
+            "weight": 1.0
+          }
+        ]
+      },
+      "props": {
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "wine_glass_bottle",
+            "weight": 1.0
+          },
+          {
+            "id": "glasses_reading",
+            "weight": 1.0
+          },
+          {
+            "id": "smartphone_recording",
+            "weight": 1.0
+          }
+        ]
+      },
+      "tattoo": {
+        "mode": "neutral"
+      },
+      "liquids": {
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "none",
+            "weight": 1.0
+          },
+          {
+            "id": "sweat_glistening",
+            "weight": 1.0
+          }
+        ]
+      },
+      "pose": {
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "sitting",
+            "weight": 1.0
+          },
+          {
+            "id": "standing",
+            "weight": 1.0
+          },
+          {
+            "id": "teasing",
+            "weight": 1.0
+          }
+        ]
+      },
+      "expression": {
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "emotion_playful",
+            "weight": 1.0
+          },
+          {
+            "id": "emotion_shy",
+            "weight": 1.0
+          },
+          {
+            "id": "emotion_seductive",
+            "weight": 1.0
+          }
+        ]
+      },
+      "lighting": {
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "lighting_japanese_fresh",
+            "weight": 1.0
+          },
+          {
+            "id": "lighting_oil_classical",
+            "weight": 1.0
+          },
+          {
+            "id": "lighting_studio_commercial",
+            "weight": 1.0
+          }
+        ]
+      },
+      "film": {
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "kodak_portra_400",
+            "weight": 1.0
+          },
+          {
+            "id": "kodak_gold_200",
+            "weight": 1.0
+          },
+          {
+            "id": "fujifilm_classic_chrome",
+            "weight": 1.0
+          }
+        ]
+      },
+      "shot_type": {
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "medium_shot",
+            "weight": 1.0
+          },
+          {
+            "id": "medium_close_up",
+            "weight": 1.0
+          },
+          {
+            "id": "full_body_shot",
+            "weight": 1.0
+          }
+        ]
+      },
+      "camera_angle": {
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "eye_level",
+            "weight": 1.0
+          },
+          {
+            "id": "over_the_shoulder",
+            "weight": 1.0
+          },
+          {
+            "id": "high_angle",
+            "weight": 1.0
+          }
+        ]
+      }
+    },
+    "adult": {
+      "clothing": {
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "bunny_suit",
+            "weight": 1.0
+          },
+          {
+            "id": "maid_dress",
+            "weight": 1.0
+          },
+          {
+            "id": "latex_catsuit",
+            "weight": 1.0
+          },
+          {
+            "id": "leather_corset",
+            "weight": 1.0
+          },
+          {
+            "id": "bikini_micro",
+            "weight": 1.0
+          },
+          {
+            "id": "lingerie_lace",
+            "weight": 1.0
+          }
+        ]
+      },
+      "character": {
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "hostess_cabaret",
+            "weight": 1.0
+          },
+          {
+            "id": "gravure_idol",
+            "weight": 1.0
+          },
+          {
+            "id": "french_maid",
+            "weight": 1.0
+          }
+        ]
+      },
+      "makeup": {
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "sultry_smoky",
+            "weight": 1.0
+          },
+          {
+            "id": "climax_flush",
+            "weight": 1.0
+          },
+          {
+            "id": "ruined_crying",
+            "weight": 1.0
+          },
+          {
+            "id": "submissive_marked",
+            "weight": 1.0
+          }
+        ]
+      },
+      "hairstyle": {
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "twin_tails",
+            "weight": 1.0
+          },
+          {
+            "id": "big_wavy_curls",
+            "weight": 1.0
+          },
+          {
+            "id": "wet_hair_face",
+            "weight": 1.0
+          },
+          {
+            "id": "hair_in_mouth",
+            "weight": 1.0
+          }
+        ]
+      },
+      "jewelry": {
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "bunny_ears",
+            "weight": 1.0
+          },
+          {
+            "id": "cat_ears",
+            "weight": 1.0
+          },
+          {
+            "id": "maid_headdress",
+            "weight": 1.0
+          },
+          {
+            "id": "lace_blindfold",
+            "weight": 1.0
+          },
+          {
+            "id": "leather_choker",
+            "weight": 1.0
+          },
+          {
+            "id": "nipple_rings",
+            "weight": 1.0
+          },
+          {
+            "id": "body_chain",
+            "weight": 1.0
+          }
+        ]
+      },
+      "props": {
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "sex_toy_vibrator",
+            "weight": 1.0
+          },
+          {
+            "id": "camera_tripod_flash",
+            "weight": 1.0
+          },
+          {
+            "id": "bondage_rope_collar",
+            "weight": 1.0
+          },
+          {
+            "id": "ice_cubes",
+            "weight": 1.0
+          }
+        ]
+      },
+      "tattoo": {
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "lewd_womb_pubic",
+            "weight": 1.0
+          },
+          {
+            "id": "barcode_serial_number",
+            "weight": 1.0
+          },
+          {
+            "id": "tally_marks_inner_thigh",
+            "weight": 1.0
+          },
+          {
+            "id": "butterfly_lower_back",
+            "weight": 1.0
+          }
+        ]
+      },
+      "liquids": {
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "pussy_juice",
+            "weight": 1.0
+          },
+          {
+            "id": "cum_splatter",
+            "weight": 1.0
+          },
+          {
+            "id": "body_oil_lube",
+            "weight": 1.0
+          },
+          {
+            "id": "saliva_drool",
+            "weight": 1.0
+          }
+        ]
+      },
+      "pose": {
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "teasing",
+            "weight": 1.0
+          },
+          {
+            "id": "kneeling",
+            "weight": 1.0
+          },
+          {
+            "id": "all_fours",
+            "weight": 1.0
+          },
+          {
+            "id": "lying",
+            "weight": 1.0
+          }
+        ]
+      },
+      "expression": {
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "emotion_seductive",
+            "weight": 1.0
+          },
+          {
+            "id": "emotion_pleasure",
+            "weight": 1.0
+          },
+          {
+            "id": "emotion_submissive",
+            "weight": 1.0
+          }
+        ]
+      },
+      "lighting": {
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "lighting_love_hotel_neon",
+            "weight": 1.0
+          },
+          {
+            "id": "lighting_cinematic_dark",
+            "weight": 1.0
+          },
+          {
+            "id": "lighting_voyeur_private",
+            "weight": 1.0
+          }
+        ]
+      },
+      "film": {
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "cinestill_800t",
+            "weight": 1.0
+          },
+          {
+            "id": "lomography_color",
+            "weight": 1.0
+          },
+          {
+            "id": "expired_film",
+            "weight": 1.0
+          }
+        ]
+      },
+      "shot_type": {
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "erotic_close_up",
+            "weight": 1.0
+          },
+          {
+            "id": "close_up",
+            "weight": 1.0
+          },
+          {
+            "id": "medium_close_up",
+            "weight": 1.0
+          }
+        ]
+      },
+      "camera_angle": {
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "pov_first_person",
+            "weight": 1.0
+          },
+          {
+            "id": "between_legs_angle",
+            "weight": 1.0
+          },
+          {
+            "id": "high_angle",
+            "weight": 1.0
+          },
+          {
+            "id": "low_angle",
+            "weight": 1.0
+          }
+        ]
+      }
+    },
+    "special": {
+      "clothing": {
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "latex_catsuit",
+            "weight": 1.0
+          },
+          {
+            "id": "leather_corset",
+            "weight": 1.0
+          },
+          {
+            "id": "lingerie_lace",
+            "weight": 1.0
+          }
+        ]
+      },
+      "character": {
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "female_boss",
+            "weight": 1.0
+          },
+          {
+            "id": "kind_nurse",
+            "weight": 1.0
+          },
+          {
+            "id": "strict_teacher",
+            "weight": 1.0
+          }
+        ]
+      },
+      "makeup": {
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "submissive_marked",
+            "weight": 1.0
+          },
+          {
+            "id": "sultry_smoky",
+            "weight": 1.0
+          },
+          {
+            "id": "ruined_crying",
+            "weight": 1.0
+          },
+          {
+            "id": "gothic_dark",
+            "weight": 1.0
+          }
+        ]
+      },
+      "hairstyle": {
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "hime_cut",
+            "weight": 1.0
+          },
+          {
+            "id": "long_straight_black",
+            "weight": 1.0
+          },
+          {
+            "id": "messy_bedhead",
+            "weight": 1.0
+          }
+        ]
+      },
+      "jewelry": {
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "leather_choker",
+            "weight": 1.0
+          },
+          {
+            "id": "lace_blindfold",
+            "weight": 1.0
+          },
+          {
+            "id": "body_chain",
+            "weight": 1.0
+          }
+        ]
+      },
+      "props": {
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "bondage_rope_collar",
+            "weight": 1.0
+          },
+          {
+            "id": "camera_tripod_flash",
+            "weight": 1.0
+          },
+          {
+            "id": "sex_toy_vibrator",
+            "weight": 1.0
+          }
+        ]
+      },
+      "tattoo": {
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "barcode_serial_number",
+            "weight": 1.0
+          },
+          {
+            "id": "snake_coiling",
+            "weight": 1.0
+          },
+          {
+            "id": "spine_vertical_script",
+            "weight": 1.0
+          }
+        ]
+      },
+      "liquids": {
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "saliva_drool",
+            "weight": 1.0
+          },
+          {
+            "id": "sweat_glistening",
+            "weight": 1.0
+          },
+          {
+            "id": "cum_splatter",
+            "weight": 1.0
+          }
+        ]
+      },
+      "pose": {
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "standing",
+            "weight": 1.0
+          },
+          {
+            "id": "lying",
+            "weight": 1.0
+          },
+          {
+            "id": "kneeling",
+            "weight": 1.0
+          },
+          {
+            "id": "teasing",
+            "weight": 1.0
+          }
+        ]
+      },
+      "expression": {
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "emotion_detached",
+            "weight": 1.0
+          },
+          {
+            "id": "emotion_dazed",
+            "weight": 1.0
+          },
+          {
+            "id": "emotion_fear",
+            "weight": 1.0
+          },
+          {
+            "id": "emotion_contrast",
+            "weight": 1.0
+          }
+        ]
+      },
+      "lighting": {
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "lighting_cinematic_dark",
+            "weight": 1.0
+          },
+          {
+            "id": "lighting_voyeur_private",
+            "weight": 1.0
+          },
+          {
+            "id": "lighting_love_hotel_neon",
+            "weight": 1.0
+          }
+        ]
+      },
+      "film": {
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "kodak_tmax_400",
+            "weight": 1.0
+          },
+          {
+            "id": "kodak_trix_400",
+            "weight": 1.0
+          },
+          {
+            "id": "cinestill_800t",
+            "weight": 1.0
+          },
+          {
+            "id": "lomography_color",
+            "weight": 1.0
+          }
+        ]
+      },
+      "shot_type": {
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "medium_shot",
+            "weight": 1.0
+          },
+          {
+            "id": "full_body_shot",
+            "weight": 1.0
+          },
+          {
+            "id": "close_up",
+            "weight": 1.0
+          }
+        ]
+      },
+      "camera_angle": {
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "dutch_angle",
+            "weight": 1.0
+          },
+          {
+            "id": "voyeur_peeping",
+            "weight": 1.0
+          },
+          {
+            "id": "overhead_birds_eye",
+            "weight": 1.0
+          },
+          {
+            "id": "pov_first_person",
+            "weight": 1.0
+          }
+        ]
+      }
+    },
+    "generic": {
+      "clothing": {
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "street_casual",
+            "weight": 1.0
+          },
+          {
+            "id": "knit_sweater",
+            "weight": 1.0
+          },
+          {
+            "id": "camisole_slip",
+            "weight": 1.0
+          },
+          {
+            "id": "silk_robe",
+            "weight": 1.0
+          }
+        ]
+      },
+      "character": {
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "neighbor_girlfriend",
+            "weight": 1.0
+          },
+          {
+            "id": "married_housewife",
+            "weight": 1.0
+          },
+          {
+            "id": "jk_schoolgirl",
+            "weight": 1.0
+          }
+        ]
+      },
+      "makeup": {
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "natural_pure",
+            "weight": 1.0
+          },
+          {
+            "id": "cute_peachy",
+            "weight": 1.0
+          },
+          {
+            "id": "mature_wife",
+            "weight": 1.0
+          },
+          {
+            "id": "pure_desire_white_peach",
+            "weight": 1.0
+          }
+        ]
+      },
+      "hairstyle": {
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "long_straight_black",
+            "weight": 1.0
+          },
+          {
+            "id": "high_ponytail",
+            "weight": 1.0
+          },
+          {
+            "id": "low_ponytail",
+            "weight": 1.0
+          },
+          {
+            "id": "collarbone_lob",
+            "weight": 1.0
+          }
+        ]
+      },
+      "jewelry": {
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "gold_collarbone_chain",
+            "weight": 1.0
+          },
+          {
+            "id": "ribbon_bow",
+            "weight": 1.0
+          },
+          {
+            "id": "pearl_necklace",
+            "weight": 1.0
+          }
+        ]
+      },
+      "props": {
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "smartphone_recording",
+            "weight": 1.0
+          },
+          {
+            "id": "cute_cat_on_bed",
+            "weight": 1.0
+          },
+          {
+            "id": "pillow_clutching",
+            "weight": 1.0
+          }
+        ]
+      },
+      "tattoo": {
+        "mode": "neutral"
+      },
+      "liquids": {
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "none",
+            "weight": 1.0
+          },
+          {
+            "id": "sweat_glistening",
+            "weight": 1.0
+          }
+        ]
+      },
+      "pose": {
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "standing",
+            "weight": 1.0
+          },
+          {
+            "id": "sitting",
+            "weight": 1.0
+          },
+          {
+            "id": "dynamic",
+            "weight": 1.0
+          },
+          {
+            "id": "lying",
+            "weight": 1.0
+          }
+        ]
+      },
+      "expression": {
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "emotion_shy",
+            "weight": 1.0
+          },
+          {
+            "id": "emotion_playful",
+            "weight": 1.0
+          },
+          {
+            "id": "emotion_restrained",
+            "weight": 1.0
+          }
+        ]
+      },
+      "lighting": {
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "lighting_japanese_fresh",
+            "weight": 1.0
+          },
+          {
+            "id": "lighting_backlit_hair",
+            "weight": 1.0
+          },
+          {
+            "id": "lighting_studio_commercial",
+            "weight": 1.0
+          }
+        ]
+      },
+      "film": {
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "kodak_max_400",
+            "weight": 1.0
+          },
+          {
+            "id": "fujifilm_superia_400",
+            "weight": 1.0
+          },
+          {
+            "id": "kodak_portra_400",
+            "weight": 1.0
+          }
+        ]
+      },
+      "shot_type": {
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "medium_shot",
+            "weight": 1.0
+          },
+          {
+            "id": "medium_close_up",
+            "weight": 1.0
+          },
+          {
+            "id": "full_body_shot",
+            "weight": 1.0
+          }
+        ]
+      },
+      "camera_angle": {
+        "mode": "weighted",
+        "candidates": [
+          {
+            "id": "eye_level",
+            "weight": 1.0
+          },
+          {
+            "id": "high_angle",
+            "weight": 1.0
+          },
+          {
+            "id": "over_the_shoulder",
+            "weight": 1.0
+          }
+        ]
+      }
+    }
+  }
+}

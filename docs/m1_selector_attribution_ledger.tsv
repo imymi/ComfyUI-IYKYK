@@ -416,7 +416,7 @@ professional_lighting_08	lighting	柔光箱 / 包围柔光（Soft Box / Beauty D
 professional_lighting_09	lighting	硬光 / 直射光（Hard Light）	0	reviewed	intentional_global_only	none	聚光直射硬光（Hard Light），边缘极其清晰明朗的高反差光影，保留于全局探索池
 professional_lighting_10	lighting	底光 / 恐怖光（Under Lighting / Uplighting）	0	reviewed	intentional_global_only	none	底部仰射特殊照明（Under Lighting），逆转常规重力光影规律的戏剧性光效，保留于全局探索池
 professional_lighting_11	lighting	剪影光（Silhouette Lighting）	0	reviewed	intentional_global_only	none	纯黑背景完美剪影光（Silhouette Lighting），仅勾勒曼妙人体外轮廓线，保留于全局探索池
-professional_lighting_12	lighting	美颜补光灯/环形眼神光	2	reviewed	assigned_contexts	domestic:2,nightlife:2	美颜补光灯/环形眼神光 (Ring Beauty Light)，在瞳孔映出完整环形高光圈，保留于全局探索池
+professional_lighting_12	lighting	美颜补光灯/环形眼神光	2	reviewed	assigned_contexts	domestic:2,nightlife:2	美颜补光灯/环形眼神光 (Ring Beauty Light / Catchlight)，在瞳孔映出完整环形高光圈，适配居家直播自拍与夜生活派对人像摄影
 professional_lighting_13	lighting	纱帘散射柔光	2	reviewed	assigned_contexts	domestic:4,school:2	薄纱窗帘散射柔光 (Diffused Sheer Curtain Light)，明媚阳光透过白纱窗柔化，强关联居家卧室与校园
 professional_lighting_14	lighting	树影斑驳日光	2	reviewed	assigned_contexts	onsen_bath:2,outdoor:4	树影斑驳日光 (Dappled Sunlight & Leaf Shadows)，林木枝叶透射碎金光斑，强绑定户外林间日照与露天温泉
 professional_lighting_15	lighting	落日金色侧光	2	reviewed	assigned_contexts	outdoor:4,traditional:2	落日余晖金色侧光 (Golden Hour Sunset Sidelight)，暖金低角度勾勒身形，强绑定户外傍晚落日与传统古建古寺
