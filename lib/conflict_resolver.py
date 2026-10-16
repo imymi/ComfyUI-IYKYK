@@ -2324,7 +2324,7 @@ class ConflictResolver:
         # 1. 废弃词无缝迁移 (仅 custom fallback)
         if tf.enabled and deprecated_tags:
             for a in index.get_all_active_ordered():
-                if not is_formal_atom(a) and a.can_modify_internal:
+                if not is_formal_atom(a) and a.can_modify_internal and not is_external_atom(a):
                     txt = a.text
                     replaced_any = False
                     for rep in deprecated_tags:
@@ -2615,7 +2615,7 @@ class ConflictResolver:
                         item_id = ((a.source_item_id or "") + " " + ((a.provenance.item_id or "") if a.provenance else "") + " " + ((a.origin.selected_id or "") if a.origin else "")).lower().replace("_", " ")
                         text_lower = a.text.lower()
                         banned_l1_pattern = re.compile(
-                            r"\b(upskirt|panties|bra|bare breasts|topless|pussy|nude|naked|undressed|crotch close-up|between legs angle|crotch level view|thong|g-string)\b"
+                            r"\b(upskirt|panties|bra|bare breasts|exposed breasts|topless|pussy|nude|naked|undressed|crotch close-up|between legs angle|crotch level view|thong|g-string|cleavage|underboob|sideboob)\b"
                         )
                         if (
                             "between legs angle" in item_id
@@ -2833,6 +2833,7 @@ class ConflictResolver:
         busy_fact_atoms = (
             index.get_active_by_fact("hand_state", "both_busy")
             + index.get_active_by_fact("hand_state", "one_busy")
+            + index.get_active_by_fact("hand_state", "restrained")
             + index.get_active_by_mutex_group("busy_hands")
         )
 
@@ -2852,57 +2853,88 @@ class ConflictResolver:
                 continue
             self._validate_formal_atom(a, rule_item.id)
             if is_formal_atom(a) or is_external_atom(a):
-                if a.facts and (a.facts.hand_state in ("both_busy", "one_busy") or "busy_hands" in a.facts.mutex_groups):
+                if a.facts and (a.facts.hand_state in ("both_busy", "one_busy", "restrained") or a.facts.hands_required > 0 or "busy_hands" in a.facts.mutex_groups):
                     busy_atoms.append(a)
             elif tf.enabled:
                 if any(t.matches(a.text) for t in all_busy_pose):
                     busy_atoms.append(a)
 
+        # 收集全部手持道具 (统一系统与外部路径)
+        detected_props: List[Tuple[PromptAtom, int, bool]] = []
+        seen_prop_ids = set()
+        for a in index.get_active_by_slot("props"):
+            if a in busy_atoms or not a.can_detect or not index.is_active(a) or a.atom_id in seen_prop_ids:
+                continue
+            self._validate_formal_atom(a, rule_item.id)
+            is_loser = False
+            is_fallback = False
+            if is_formal_atom(a) or is_external_atom(a):
+                if a.facts and (a.facts.hands_required > 0 or a.facts.prop_usage == "handheld"):
+                    is_loser = True
+            if not is_loser and tf.enabled:
+                if any(p.matches(a.text) for p in all_handheld):
+                    is_loser = True
+                    is_fallback = True
+            if is_loser:
+                seen_prop_ids.add(a.atom_id)
+                h_req = (a.facts.hands_required if (a.facts and a.facts.hands_required > 0) else 1)
+                detected_props.append((a, h_req, is_fallback))
+
         if busy_atoms:
             pose_winner = min(busy_atoms, key=lambda x: (x.tag_order, x.span_order))
             pose_hands = 2
-            if pose_winner.facts and pose_winner.facts.hand_state == "one_busy":
-                pose_hands = 1
-            for a in index.get_active_by_slot("props"):
-                if a in busy_atoms or not a.can_detect or not index.is_active(a):
+            if pose_winner.facts:
+                if pose_winner.facts.hand_state == "one_busy" or pose_winner.facts.hands_required == 1:
+                    pose_hands = 1
+                elif pose_winner.facts.hand_state in ("both_busy", "restrained") or pose_winner.facts.hands_required == 2:
+                    pose_hands = 2
+
+            ext_props = [p for p in detected_props if is_external_atom(p[0])]
+            total_ext_prop_hands = sum(p[1] for p in ext_props)
+            is_ext_pose = is_external_atom(pose_winner)
+
+            # 1. 外部道具间超容量检测 (3 > 2 Fail-Closed)
+            if total_ext_prop_hands > 2:
+                p1, p2 = ext_props[0][0], ext_props[1][0]
+                raise PromptValidationError(
+                    f"External override conflict under rule '{rule_item.id}': external props exceed total hand capacity of 2 ({total_ext_prop_hands} hands)",
+                    slots=(p1.source_slot, p2.source_slot),
+                    texts=(p1.text, p2.text),
+                    rule_id=rule_item.id,
+                )
+
+            # 2. 外部姿势 + 外部道具超容量检测 (1 + 2 > 2 Fail-Closed)
+            if is_ext_pose and (pose_hands + total_ext_prop_hands > 2):
+                first_prop = ext_props[0][0]
+                raise PromptValidationError(
+                    f"External override conflict under rule '{rule_item.id}': slot '{pose_winner.source_slot}' ('{pose_winner.text}') conflicts with slot '{first_prop.source_slot}' ('{first_prop.text}')",
+                    slots=(pose_winner.source_slot, first_prop.source_slot),
+                    texts=(pose_winner.text, first_prop.text),
+                    rule_id=rule_item.id,
+                )
+
+            # 3. 外部道具优先于系统姿势：外部道具使双手超容时，系统姿势被外部道具裁撤
+            if not is_ext_pose and ext_props and (pose_hands + total_ext_prop_hands > 2):
+                if pose_winner.can_delete_atom and index.is_active(pose_winner):
+                    index.drop(pose_winner.atom_id)
+                    ledger.record_drop(
+                        rule_item.id,
+                        rule_item.phase,
+                        "external_prop_overrides_pose",
+                        (ext_props[0][0].atom_id,),
+                        pose_winner,
+                    )
+                    pose_hands = 0
+
+            # 4. 系统道具容量核算 (双向统一：单手托腮1 + 相机1 = 2 <= 2 合法共存保留)
+            available_hands = 2 - pose_hands - total_ext_prop_hands
+            for a, h_req, is_fallback in detected_props:
+                if is_external_atom(a):
                     continue
-                self._validate_formal_atom(a, rule_item.id)
-                is_loser = False
-                is_fallback = False
-                if is_formal_atom(a) or is_external_atom(a):
-                    if a.facts and (a.facts.hands_required > 0 or a.facts.prop_usage == "handheld"):
-                        is_loser = True
-                if not is_loser and tf.enabled:
-                    if any(p.matches(a.text) for p in all_handheld):
-                        is_loser = True
-                        is_fallback = True
-
-                if is_loser:
-                    prop_hands = (a.facts.hands_required if (a.facts and a.facts.hands_required > 0) else 1)
-                    if (is_external_atom(a) or is_external_atom(pose_winner)) and (pose_hands + prop_hands <= 2):
-                        continue
-
-                    if is_external_atom(a) and is_external_atom(pose_winner):
-                        raise PromptValidationError(
-                            f"External override conflict under rule '{rule_item.id}': slot '{pose_winner.source_slot}' ('{pose_winner.text}') conflicts with slot '{a.source_slot}' ('{a.text}')",
-                            slots=(pose_winner.source_slot, a.source_slot),
-                            texts=(pose_winner.text, a.text),
-                            rule_id=rule_item.id,
-                        )
-                    if is_external_atom(a) and not is_external_atom(pose_winner):
-                        if pose_winner.can_delete_atom and index.is_active(pose_winner):
-                            index.drop(pose_winner.atom_id)
-                            ledger.record_drop(
-                                rule_item.id,
-                                rule_item.phase,
-                                "external_prop_overrides_pose",
-                                (a.atom_id,),
-                                pose_winner,
-                            )
-                        continue
-                    if is_external_atom(a):
-                        continue
-                    if not a.can_delete_atom:
+                if h_req <= available_hands:
+                    available_hands -= h_req
+                else:
+                    if not a.can_delete_atom or not index.is_active(a):
                         continue
                     if is_fallback:
                         self.text_fallback_hits += 1
@@ -2934,7 +2966,7 @@ class ConflictResolver:
 
         # 实际消费事实索引 (R2R3-P3-001)
         hh_fact_atoms = index.get_active_by_fact("prop_usage", "handheld")
-        detected_hh: List[Tuple[PromptAtom, bool]] = []
+        detected_hh: List[Tuple[PromptAtom, int, bool]] = []
         seen_ids = set()
 
         for a in hh_fact_atoms:
@@ -2942,7 +2974,8 @@ class ConflictResolver:
                 continue
             self._validate_formal_atom(a, rule_item.id)
             seen_ids.add(a.atom_id)
-            detected_hh.append((a, False))
+            h_req = (a.facts.hands_required if (a.facts and a.facts.hands_required > 0) else 1)
+            detected_hh.append((a, h_req, False))
 
         for a in index.get_active_by_slot("props"):
             if a.atom_id in seen_ids or not a.can_detect or not index.is_active(a):
@@ -2951,52 +2984,61 @@ class ConflictResolver:
             if is_formal_atom(a) or is_external_atom(a):
                 if a.facts and (a.facts.hands_required > 0 or a.facts.prop_usage == "handheld"):
                     seen_ids.add(a.atom_id)
-                    detected_hh.append((a, False))
+                    h_req = (a.facts.hands_required if (a.facts and a.facts.hands_required > 0) else 1)
+                    detected_hh.append((a, h_req, False))
             elif tf.enabled:
                 if any(hp.matches(a.text) for hp in handheld_patterns):
                     seen_ids.add(a.atom_id)
-                    detected_hh.append((a, True))
+                    h_req = (a.facts.hands_required if (a.facts and a.facts.hands_required > 0) else 1)
+                    detected_hh.append((a, h_req, True))
 
         if len(detected_hh) > 1:
             detected_hh.sort(key=lambda x: (x[0].tag_order, x[0].span_order))
-            winner_atom, _ = detected_hh[0]
-            for loser_atom, is_fallback in detected_hh[1:]:
-                if not loser_atom.can_delete_atom or not index.is_active(loser_atom):
-                    continue
-                if is_external_atom(winner_atom) and is_external_atom(loser_atom):
-                    req_winner = (winner_atom.facts.hands_required if (winner_atom.facts and winner_atom.facts.hands_required > 0) else 1)
-                    req_loser = (loser_atom.facts.hands_required if (loser_atom.facts and loser_atom.facts.hands_required > 0) else 1)
-                    if req_winner + req_loser <= 2:
-                        # 2手容量内合法共存：双持豁免 (CE-HAND-02)
-                        continue
-                    else:
-                        raise PromptValidationError(
-                            f"External override conflict under rule '{rule_item.id}': slot '{winner_atom.source_slot}' ('{winner_atom.text}') conflicts with slot '{loser_atom.source_slot}' ('{loser_atom.text}')",
-                            slots=(winner_atom.source_slot, loser_atom.source_slot),
-                            texts=(winner_atom.text, loser_atom.text),
-                            rule_id=rule_item.id,
-                        )
-                if is_external_atom(loser_atom) and not is_external_atom(winner_atom):
-                    if winner_atom.can_delete_atom and index.is_active(winner_atom):
-                        index.drop(winner_atom.atom_id)
-                        ledger.record_drop(
-                            rule_item.id,
-                            rule_item.phase,
-                            "single_handheld_prop_limit",
-                            (loser_atom.atom_id,),
-                            winner_atom,
-                        )
-                    continue
-                if is_fallback:
-                    self.text_fallback_hits += 1
-                index.drop(loser_atom.atom_id)
-                ledger.record_drop(
-                    rule_item.id,
-                    rule_item.phase,
-                    "single_handheld_prop_limit",
-                    (winner_atom.atom_id,),
-                    loser_atom,
+            ext_hh = [p for p in detected_hh if is_external_atom(p[0])]
+            total_ext_hands = sum(p[1] for p in ext_hh)
+            if total_ext_hands > 2:
+                p1, p2 = ext_hh[0][0], ext_hh[1][0]
+                raise PromptValidationError(
+                    f"External override conflict under rule '{rule_item.id}': external props exceed total hand capacity of 2 ({total_ext_hands} hands)",
+                    slots=(p1.source_slot, p2.source_slot),
+                    texts=(p1.text, p2.text),
+                    rule_id=rule_item.id,
                 )
+
+            if ext_hh:
+                # 外部道具存在时：外部道具优先，外部道具总容量已校验 <= 2，所有非外部（系统）手持道具均被丢弃
+                winner_atom = ext_hh[0][0]
+                for a, h_req, is_fallback in detected_hh:
+                    if is_external_atom(a):
+                        continue
+                    if not a.can_delete_atom or not index.is_active(a):
+                        continue
+                    if is_fallback:
+                        self.text_fallback_hits += 1
+                    index.drop(a.atom_id)
+                    ledger.record_drop(
+                        rule_item.id,
+                        rule_item.phase,
+                        "single_handheld_prop_limit",
+                        (winner_atom.atom_id,),
+                        a,
+                    )
+            else:
+                # 纯系统道具：单手持道具限制，仅保留首个胜出道具，其余全部丢弃
+                winner_atom = detected_hh[0][0]
+                for a, h_req, is_fallback in detected_hh[1:]:
+                    if not a.can_delete_atom or not index.is_active(a):
+                        continue
+                    if is_fallback:
+                        self.text_fallback_hits += 1
+                    index.drop(a.atom_id)
+                    ledger.record_drop(
+                        rule_item.id,
+                        rule_item.phase,
+                        "single_handheld_prop_limit",
+                        (winner_atom.atom_id,),
+                        a,
+                    )
 
         return index.get_all_active_ordered()
 
@@ -3332,7 +3374,7 @@ class ConflictResolver:
                     is_fallback = True
 
             if matched and replacements:
-                if not a.can_modify_internal:
+                if is_external_atom(a) or not a.can_modify_internal:
                     continue
                 rep_text = rng.choice(replacements)
                 new_facts = None
@@ -3424,7 +3466,7 @@ class ConflictResolver:
                             break
 
                 if is_loser:
-                    if not a.can_delete_atom:
+                    if not a.can_delete_atom or is_external_atom(a):
                         continue
                     if is_fallback:
                         self.text_fallback_hits += 1
@@ -4008,7 +4050,7 @@ class ConflictResolver:
 
         liquid_atoms = index.get_active_by_slot("liquids") + index.get_active_by_slot("liquid")
         for a in liquid_atoms:
-            if not index.is_active(a) or not a.can_detect:
+            if not index.is_active(a) or not a.can_detect or is_external_atom(a):
                 continue
             self._validate_formal_atom(a, rule_item.id, index=index)
 
@@ -4052,7 +4094,7 @@ class ConflictResolver:
 
         # 2. 对微量液体应用量词修饰
         for a in (index.get_active_by_slot("liquids") + index.get_active_by_slot("liquid")):
-            if not index.is_active(a) or not a.can_modify_internal:
+            if not index.is_active(a) or not a.can_modify_internal or is_external_atom(a):
                 continue
             if is_formal_atom(a):
                 if a.facts and not a.facts.liquid_amount:
@@ -4120,6 +4162,9 @@ class ConflictResolver:
             for a in tattoo_source_atoms
         )
         if has_tattoo and not already_injected:
+            if all(is_external_atom(a) for a in tattoo_source_atoms):
+                # 外部显式或自定义覆盖的纹身标签享受完整内容保护，绝不追加任何系统增强词
+                return index.get_all_active_ordered()
             fusion_text = rng.choice(fusion_tags)
             ref_atom = min(tattoo_source_atoms, key=lambda x: (x.tag_order, x.span_order))
             next_order = max((a.tag_order for a in index.get_all_active_ordered()), default=0) + 1
@@ -4180,7 +4225,7 @@ class ConflictResolver:
         protected_losers: List[PromptAtom] = []
 
         def _is_loser_protected(loser: PromptAtom) -> bool:
-            return not loser.can_delete_atom or loser.contains_blackbox or not loser.can_modify_internal
+            return not loser.can_delete_atom or loser.contains_blackbox or not loser.can_modify_internal or is_external_atom(loser)
 
 
         # 1. 空间环境：室内 vs 室外
@@ -4443,7 +4488,8 @@ class ConflictResolver:
         r7_banned = select_fallback_patterns(r7_tf, role="banned", group_id="material")
         sheer_atoms = [
             a for a in detectable
-            if not (a.source_slot == "clothing_extension" or (a.provenance and a.provenance.kind == "clothing_extension"))
+            if not is_external_atom(a)
+            and not (a.source_slot == "clothing_extension" or (a.provenance and a.provenance.kind == "clothing_extension"))
             and (a.source_slot in getattr(r7, "target_slots", ()) or a.source_slot in ("clothing", "clothing_state"))
             and not (a.provenance and a.provenance.rule_id == "material_penetration")
             and (

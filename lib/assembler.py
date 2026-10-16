@@ -12,6 +12,10 @@ from pathlib import Path
 from random import Random
 from typing import Any, Dict, Iterator, List, Optional, Sequence, Tuple
 
+import json
+import re
+from dataclasses import replace
+
 if __package__:
     from .atomizer import (
         PromptTag,
@@ -19,7 +23,7 @@ if __package__:
         deduplicate_tags_with_records,
         fragments_to_atoms,
     )
-    from .conflict_resolver import ConflictResolver
+    from .conflict_resolver import ConflictResolver, is_external_atom
     from .errors import PromptValidationError
     from .lexer import split_top_level_tags, validate_prompt_syntax
     from .models import (
@@ -41,7 +45,7 @@ else:
         deduplicate_tags_with_records,
         fragments_to_atoms,
     )
-    from lib.conflict_resolver import ConflictResolver
+    from lib.conflict_resolver import ConflictResolver, is_external_atom
     from lib.errors import PromptValidationError
     from lib.lexer import split_top_level_tags, validate_prompt_syntax
     from lib.models import (
@@ -58,6 +62,256 @@ else:
     from lib.slot_contract import ALLOWED_SLOTS, AUXILIARY_SLOT_ORDER, SLOT_ORDER, normalize_slot_mapping, normalize_slot_name
 
 MAX_PROMPT_WORDS = 250
+
+_CATALOG_TAG_TO_SLOT_CACHE: Dict[Path, Dict[str, str]] = {}
+_CATALOG_TEXT_TO_FACTS_CACHE: Dict[Path, Dict[str, SemanticFacts]] = {}
+
+PRESET_SLOT_PATTERNS = [
+    # quality
+    (re.compile(r'\b(masterpiece|best quality|ultra detailed|8k|photorealistic|highres|high resolution|cctv|security camera|amateur photo|low quality|timestamp overlay)\b', re.I), 'quality'),
+    # lighting & time of day
+    (re.compile(r'\b(light|lighting|shadow|shadows|glow|sunlight|moonlight|backlight|rim light|neon|candlelight|dim|bright|golden hour|blue hour|sunset|sunrise|night|chiaroscuro|volumetric|lens flare|bokeh|fluorescent|lamp|overcast|rays|ambient)\b', re.I), 'lighting'),
+    # shot_type / camera_angle
+    (re.compile(r'\b(shot|close-up|angle|view|depth of field|perspective|full body|cowboy shot|upper body|portrait|wide|dutch angle|profile|macro|focus|field of view|fisheye)\b', re.I), 'shot_type'),
+    # film
+    (re.compile(r'\b(film|kodak|fujifilm|polaroid|cinestill|ilford|grain|vintage|35mm|analog|monochrome|black and white|pastel)\b', re.I), 'film'),
+    # makeup / imperfections
+    (re.compile(r'\b(makeup|lipstick|eyeliner|eyeshadow|mascara|blush|foundation|lip gloss|freckles|mole|pores|skin texture)\b', re.I), 'makeup'),
+    # clothing / clothing_state / underwear / lingerie
+    (re.compile(r'\b(uniform|shirt|blouse|skirt|dress|suit|pants|shorts|jacket|coat|sweater|swimsuit|bikini|lingerie|bra|panties|underwear|stockings|socks|boots|shoes|heels|catsuit|latex|corset|robe|kimono|yukata|cheongsam|qipao|bodysuit|leotard|apron|maid|hoodie|cardigan|tank top|camisole|t-shirt|jeans|vest|collar|tie|bow|sash|belt|cape|gloves|cuffs|garter|thighhighs|unbuttoned|lifted|pulled down|partially|untied|disheveled|torn|see-through|translucent|serafuku|sleeves|cleavage|slip|strap|zipper|outfit|costume|clothes|fabric|silk|lace|cotton|denim|leather|slipping off shoulder|off-shoulder|bare shoulder|hiked up|undressing|open front)\b', re.I), 'clothing'),
+    # pose
+    (re.compile(r'\b(standing|sitting|lying|kneeling|squatting|bending|leaning|walking|running|pose|legs|arms|hands|crossed|spread|bent|arching|stretching|turned|overhead|bound|tied|hold|holding|touching|hand on|hands on|hands behind|crawling|spread legs|kicking feet|hugging knees|toes|entering|watching)\b', re.I), 'pose'),
+    # scene_theme & furniture & scenery
+    (re.compile(r'\b(classroom|desk|chair|bench|table|bed|sofa|couch|school|room|office|bedroom|bathroom|onsen|hot spring|pool|beach|street|alley|park|forest|hospital|clinic|library|kitchen|balcony|rooftop|subway|train|bus|station|hotel|bar|club|gym|temple|shrine|tatami|futon|garden|restaurant|cafe|car|elevator|hallway|corridor|staircase|back row|class in progress|chalkboard|blackboard|podium|window seat|empty room|counter|outdoors|indoors|scenery|background|interior|city|scenic|nature|dock|deck|shelves|shelf|fence|dormitory|bunk|curtain|atmosphere|corner|shower area|space|after class|dust particles)\b', re.I), 'scene_theme'),
+    # props
+    (re.compile(r'\b(phone|smartphone|camera|controller|glass|cup|bottle|pen|pencil|book|bag|umbrella|fan|doll|plush|pillow|towel|cigarette|gun|sword|instrument|toy)\b', re.I), 'props'),
+    # expression / emotion
+    (re.compile(r'\b(expression|smile|smiling|smirk|frown|pout|tears|crying|blushing|gaze|looking|face|bored|shy|embarrassed|pleasure|aroused|seductive|angry|surprised|neutral|eyes closed|half closed|wink|mouth|biting lip|lip)\b', re.I), 'expression'),
+    # hairstyle / character
+    (re.compile(r'\b(hair|ponytail|twintails|braid|bangs|bob cut|bun|curly|straight|blonde|brunette|black hair|girl|woman|mature|petite|curves|skin|eyes)\b', re.I), 'hairstyle'),
+    # nudity / liquids
+    (re.compile(r'\b(nude|naked|bare|exposed|nipple|nipples|breast|breasts|areola|areolae|pussy|vagina|penis|crotch|ass|buttocks|cleavage|shaved|pubic|wet|water|sweat|sweaty|drool|saliva|milk|lotion|oil|slime|cum|juice|liquid|dripping|splash)\b', re.I), 'nudity'),
+]
+
+
+def get_catalog_tag_cache(data_dir: Path) -> Tuple[Dict[str, str], Dict[str, SemanticFacts]]:
+    data_dir = Path(data_dir)
+    if data_dir in _CATALOG_TAG_TO_SLOT_CACHE and data_dir in _CATALOG_TEXT_TO_FACTS_CACHE:
+        return _CATALOG_TAG_TO_SLOT_CACHE[data_dir], _CATALOG_TEXT_TO_FACTS_CACHE[data_dir]
+
+    tag_map: Dict[str, str] = {}
+    facts_map: Dict[str, SemanticFacts] = {}
+
+    def register(text: str, slot: str, facts: Optional[SemanticFacts] = None):
+        if not text:
+            return
+        t = text.strip().lower()
+        if t and t not in tag_map:
+            tag_map[t] = slot
+        if t and facts and t not in facts_map:
+            facts_map[t] = facts
+
+    for q in [
+        "masterpiece", "best quality", "ultra detailed", "8k", "photorealistic",
+        "high resolution", "highres", "absurdres", "incredibly absurdres",
+        "cctv footage", "security camera", "low resolution", "grainy",
+        "phone camera", "selfie", "amateur photo", "slightly blurry",
+    ]:
+        register(q, "quality")
+
+    FILE_SLOT_MAP = [
+        ("clothing.json", "clothing"),
+        ("scenes.json", "scene_theme"),
+        ("themes.json", "scene_theme"),
+        ("lighting.json", "lighting"),
+        ("poses.json", "pose"),
+        ("shot_types.json", "shot_type"),
+        ("props.json", "props"),
+        ("expressions.json", "expression"),
+        ("makeup.json", "makeup"),
+        ("accessories.json", "jewelry"),
+        ("characters.json", "character"),
+        ("film_stocks.json", "film"),
+        ("imperfections.json", "imperfections"),
+        ("nudity_levels.json", "nudity"),
+        ("tattoos.json", "tattoo"),
+    ]
+
+    for fname, default_slot in FILE_SLOT_MAP:
+        p = data_dir / fname
+        if not p.exists():
+            continue
+        try:
+            d = json.loads(p.read_text(encoding="utf-8"))
+        except Exception:
+            continue
+
+        def walk(obj, cur_slot=default_slot):
+            if isinstance(obj, dict):
+                s = obj.get("slot", cur_slot)
+                raw_facts = obj.get("facts")
+                sem_facts = None
+                if isinstance(raw_facts, dict):
+                    try:
+                        sem_facts = SemanticFacts.from_dict(raw_facts)
+                    except Exception:
+                        pass
+                if "text" in obj and isinstance(obj["text"], str):
+                    register(obj["text"], s, sem_facts)
+                if "tag" in obj and isinstance(obj["tag"], str):
+                    register(obj["tag"], s, sem_facts)
+                if "tags" in obj and isinstance(obj["tags"], list):
+                    for item in obj["tags"]:
+                        if isinstance(item, str):
+                            register(item, s)
+                        elif isinstance(item, dict):
+                            item_slot = item.get("slot", s)
+                            item_f = None
+                            if isinstance(item.get("facts"), dict):
+                                try:
+                                    item_f = SemanticFacts.from_dict(item["facts"])
+                                except Exception:
+                                    pass
+                            register(item.get("tag") or item.get("text") or "", item_slot, item_f)
+                for k, v in obj.items():
+                    if k not in ("tags", "text", "tag", "facts"):
+                        walk(v, s)
+            elif isinstance(obj, list):
+                for v in obj:
+                    walk(v, cur_slot)
+
+        walk(d)
+
+    _CATALOG_TAG_TO_SLOT_CACHE[data_dir] = tag_map
+    _CATALOG_TEXT_TO_FACTS_CACHE[data_dir] = facts_map
+    return tag_map, facts_map
+
+
+def classify_preset_tag_and_facts(
+    text: str,
+    data_dir: Path,
+    target_slot: Optional[str] = None,
+) -> Tuple[str, SemanticFacts]:
+    """根据目录事实和语义正则将预设/配方片段映射至权威 18 槽位契约，并补齐必要事实字段。"""
+    t = text.strip().lower()
+    tag_map, facts_map = get_catalog_tag_cache(data_dir)
+
+    # 1. 确定槽位归属：若调用方已指定且已知则保留，否则优先按服装关键字与目录/模式映射
+    if target_slot and target_slot in ALLOWED_SLOTS:
+        slot = target_slot
+    elif any(w in t for w in ("skirt", "shirt", "blouse", "dress", "uniform", "panties", "bra", "underwear", "catsuit", "latex suit", "corset", "lingerie", "stockings", "socks", "heels", "shoes", "boots", "bikini", "swimsuit", "leotard", "bodysuit", "robe", "kimono", "yukata", "serafuku")):
+        slot = "clothing"
+    else:
+        slot = tag_map.get(t)
+        if not slot:
+            for pat, s in PRESET_SLOT_PATTERNS:
+                if pat.search(t):
+                    slot = s
+                    break
+        if not slot:
+            slot = "preset_core"
+
+    # 2. 查 facts_map 获得目录权威事实
+    facts = facts_map.get(t)
+    if facts is None:
+        facts = SemanticFacts(semantic_role="selector")
+    elif slot not in ("scene", "scene_theme", "theme"):
+        if facts.space_kind is not None or facts.venue_ids:
+            facts = replace(facts, space_kind=None, venue_ids=())
+
+    # 3. 按槽位补齐必要事实字段，避免 _validate_formal_atom Fail-Closed
+    if slot == "nudity":
+        if not facts.visible_regions:
+            if any(w in t for w in ("breast", "nipple", "areola", "topless", "bare chest", "cleavage", "midriff", "bare shoulder")):
+                facts = facts.merge(SemanticFacts(visible_regions=("upper_body",)))
+            elif any(w in t for w in ("pussy", "vagina", "crotch", "pubic", "ass", "buttocks", "bottomless")):
+                facts = facts.merge(SemanticFacts(visible_regions=("intimate_lower_body",)))
+            elif any(w in t for w in ("nude", "naked", "bare body", "fully naked")):
+                facts = facts.merge(SemanticFacts(visible_regions=("full_body",)))
+            else:
+                facts = facts.merge(SemanticFacts(visible_regions=("upper_body",)))
+    elif slot in ("clothing", "clothing_state", "clothing_extension", "underwear"):
+        if not facts.garment_topologies and not facts.garment_states:
+            if any(w in t for w in ("catsuit", "latex suit", "bodysuit", "swimsuit", "leotard", "one-piece", "robe", "kimono", "yukata", "dress", "uniform", "serafuku")):
+                facts = facts.merge(SemanticFacts(garment_topologies=("one_piece",), fabric_materials=("latex",) if "latex" in t else ()))
+            elif any(w in t for w in ("skirt", "pleated skirt", "mini skirt")):
+                facts = facts.merge(SemanticFacts(garment_topologies=("bottom_skirt",)))
+            elif any(w in t for w in ("pants", "shorts", "jeans", "trousers")):
+                facts = facts.merge(SemanticFacts(garment_topologies=("bottom_pants",)))
+            elif any(w in t for w in ("shirt", "blouse", "top", "jacket", "coat", "sweater", "hoodie")):
+                facts = facts.merge(SemanticFacts(garment_topologies=("top",)))
+            elif any(w in t for w in ("panties", "bra", "underwear", "lingerie", "no panties")):
+                facts = facts.merge(SemanticFacts(garment_topologies=("underwear",)))
+            else:
+                facts = facts.merge(SemanticFacts(garment_topologies=("top",)))
+    elif slot in ("scene_theme", "scene", "theme"):
+        if not facts.space_kind:
+            if any(w in t for w in ("outdoor", "park", "street", "beach", "forest", "onsen", "hot spring", "pool", "garden", "balcony", "rooftop", "alley")):
+                facts = facts.merge(SemanticFacts(space_kind="outdoor"))
+            elif any(w in t for w in ("indoor", "classroom", "bedroom", "bathroom", "office", "hotel", "kitchen", "library", "corridor", "hallway", "room")):
+                facts = facts.merge(SemanticFacts(space_kind="indoor"))
+        if not facts.time_of_day:
+            if any(w in t for w in ("night", "dark", "midnight")):
+                facts = facts.merge(SemanticFacts(time_of_day="night"))
+            elif any(w in t for w in ("sunset", "dusk", "evening", "golden hour")):
+                facts = facts.merge(SemanticFacts(time_of_day="dusk"))
+            elif any(w in t for w in ("dawn", "sunrise", "morning")):
+                facts = facts.merge(SemanticFacts(time_of_day="dawn"))
+            elif any(w in t for w in ("day", "afternoon", "noon")):
+                facts = facts.merge(SemanticFacts(time_of_day="day"))
+            else:
+                facts = facts.merge(SemanticFacts(time_of_day="unspecified"))
+    elif slot in ("lighting", "lighting_palette"):
+        if not facts.light_sources and not facts.time_of_day:
+            ls = ("studio",) if any(w in t for w in ("neon", "lamp", "fluorescent", "candlelight", "studio", "window side light", "soft classroom light")) else ("natural",)
+            facts = facts.merge(SemanticFacts(light_sources=ls, time_of_day="day"))
+    elif slot in ("pose", "poses"):
+        if not facts.hand_state:
+            if any(w in t for w in ("bound", "tied", "behind back", "hands on head")):
+                hs = "both_busy"
+            elif any(w in t for w in ("hand on", "touching", "holding", "biting")):
+                hs = "one_busy"
+            else:
+                hs = "free"
+            facts = facts.merge(SemanticFacts(hand_state=hs))
+    elif slot in ("props", "prop"):
+        if facts.hands_required == 0 and not facts.prop_usage:
+            hr = 2 if any(w in t for w in ("controller", "sword", "rifle")) else 1
+            facts = facts.merge(SemanticFacts(hands_required=hr, prop_usage="handheld"))
+    elif slot in ("shot_type", "shot"):
+        if not facts.visible_regions:
+            vr = ("upper_body",) if any(w in t for w in ("close-up", "portrait", "medium shot", "upper body")) else ("full_body",)
+            facts = facts.merge(SemanticFacts(visible_regions=vr))
+    elif slot in ("film", "film_stock"):
+        if not facts.color_modes:
+            cm = ("monochrome",) if any(w in t for w in ("monochrome", "black and white", "bw", "b&w")) else ("color",)
+            facts = facts.merge(SemanticFacts(color_modes=cm))
+    elif slot in ("expression", "expressions"):
+        if not facts.emotion and not facts.gaze:
+            gaze = "away" if any(w in t for w in ("window", "away", "side", "down", "up")) else "camera"
+            emo = "neutral"
+            for e in ("shy", "seductive", "pleasure", "submissive", "playful", "pain", "fear", "dazed", "happy", "relaxed", "tired"):
+                if e in t:
+                    emo = e
+                    break
+            facts = facts.merge(SemanticFacts(emotion=emo, gaze=gaze))
+    elif slot in ("liquids", "liquid"):
+        if not facts.liquid_kind:
+            facts = facts.merge(SemanticFacts(liquid_kind="water", liquid_amount="moderate"))
+    elif slot == "quality":
+        if not facts.quality_class:
+            facts = facts.merge(SemanticFacts(quality_class="standard", capture_device="professional"))
+    elif slot == "makeup":
+        if not facts.makeup_base and not facts.makeup_effects:
+            facts = facts.merge(SemanticFacts(makeup_base="natural"))
+
+    return slot, facts
+
+
+def classify_preset_tag(text: str, data_dir: Path) -> str:
+    """根据目录事实和语义正则将预设/配方片段映射至权威 18 槽位契约。"""
+    slot, _ = classify_preset_tag_and_facts(text, data_dir)
+    return slot
 
 
 def sanitize_prompt(prompt: str) -> str:
@@ -161,17 +415,29 @@ def assemble_result(
     deduped_tags, dropped_dedup_tags, dedup_records = deduplicate_tags_with_records(resolved_tags)
     deduplicated_atoms = [a for t in dropped_dedup_tags for a in t.atoms]
 
-    # 4. 严谨的词数原子预算管理 (硬约束)
+    # 4. 严谨的词数原子预算管理 (外部优先与 Fail-Closed 校验)
     accepted_atoms: List[PromptAtom] = []
     accepted_tag_texts: List[str] = []
     budget_filtered_atoms: List[PromptAtom] = []
     budget_filter_records: List[BudgetFilterRecord] = []
     current_word_count = 0
 
+    # 4.1 预先核算全部外部内容词数：外部自身超上限直接抛异常 Fail-Closed
+    ext_tags = [t for t in deduped_tags if any(is_external_atom(a) for a in t.atoms) and t.text]
+    total_ext_words = sum(len(t.text.split()) for t in ext_tags)
+    if total_ext_words > max_words:
+        raise PromptValidationError(
+            f"External overrides exceed maximum allowed budget of {max_words} words ({total_ext_words} words)"
+        )
+
+    remaining_ext_words = total_ext_words
+
     for tag in deduped_tags:
         tag_text = tag.text
         if not tag_text:
             continue
+
+        tag_is_ext = any(is_external_atom(a) for a in tag.atoms)
 
         # 若非系统 fallback 自动生成的 tag，逐 atom 检查是否有单个 atom 超过总上限
         if not is_fallback:
@@ -183,24 +449,32 @@ def assemble_result(
                     )
 
         tag_words = len(tag_text.split())
-        if current_word_count + tag_words <= max_words:
+        if tag_is_ext:
+            # 外部内容绝对优先保证装入（此前已断言 total_ext_words <= max_words）
             accepted_atoms.extend(tag.atoms)
             accepted_tag_texts.append(tag_text)
             current_word_count += tag_words
+            remaining_ext_words -= tag_words
         else:
-            # 原子 tag 无法完整装入：整块跳过并记录预算截断原子与详细记录 (R3-P1-002)
-            budget_filtered_atoms.extend(tag.atoms)
-            for a in tag.atoms:
-                budget_filter_records.append(
-                    BudgetFilterRecord(
-                        atom_id=a.atom_id,
-                        word_budget=max_words,
-                        used_words=current_word_count,
-                        candidate_words=tag_words,
-                        reason="word_budget_exceeded",
+            # 系统生成内容：需确保装入后剩余预算仍足够容纳所有后续外部内容
+            if current_word_count + tag_words + remaining_ext_words <= max_words:
+                accepted_atoms.extend(tag.atoms)
+                accepted_tag_texts.append(tag_text)
+                current_word_count += tag_words
+            else:
+                # 系统内容让位截断并记录详细记录 (R3-P1-002)
+                budget_filtered_atoms.extend(tag.atoms)
+                for a in tag.atoms:
+                    budget_filter_records.append(
+                        BudgetFilterRecord(
+                            atom_id=a.atom_id,
+                            word_budget=max_words,
+                            used_words=current_word_count,
+                            candidate_words=tag_words,
+                            reason="word_budget_exceeded",
+                        )
                     )
-                )
-            continue
+                continue
 
     sanitized = ", ".join(accepted_tag_texts)
 
@@ -363,6 +637,7 @@ def make_override_fragments(
     raw_val: Any,
     entry_point: str = "generator",
     catalog_facts: Optional[Dict[Tuple[str, str], SemanticFacts]] = None,
+    data_dir: Optional[Path] = None,
 ) -> List[PromptFragment]:
     """将外部覆盖原始值切分为合法的 PromptFragment 列表，并标记 mode="override" 与 source_mode="override"."""
     tag_texts: List[str] = []
@@ -382,36 +657,45 @@ def make_override_fragments(
         tag_texts = [t.strip() for t in split_top_level_tags(str(raw_val)) if t.strip()]
 
     new_frags: List[PromptFragment] = []
-    # 强制 entry_point 为 generator，以确保覆盖所有 20 个标准槽位 selector 合法性
-    frag_entry_point = "generator"
+    frag_entry_point = entry_point or "generator"
     for order, tag_text in enumerate(tag_texts):
         facts = SemanticFacts()
-        t_lower = tag_text.lower()
+        t_lower = tag_text.lower().strip()
         item_id = f"override_{slot_name}_{order:03d}"
 
+        # 优先从目录已知权威事实继承 (例如 holding game controller -> hands_required: 2)
+        if data_dir is not None:
+            _, facts_cache = get_catalog_tag_cache(Path(data_dir))
+            if t_lower in facts_cache:
+                facts = facts_cache[t_lower]
+
         if slot_name == "nudity":
-            if any(w in t_lower for w in ("completely nude", "bare body", "nude", "naked", "unclothed", "full nude")):
-                facts = SemanticFacts(visible_regions=("full_body",))
-                item_id = f"nudity_l5_override_{order:03d}"
-            elif any(w in t_lower for w in ("topless", "bare breasts", "exposed breasts")):
-                facts = SemanticFacts(visible_regions=("breasts", "topless"))
-                item_id = f"nudity_l4_override_{order:03d}"
-            elif any(w in t_lower for w in ("micro bikini", "sheer lingerie", "revealing panties")):
-                facts = SemanticFacts(visible_regions=("crotch", "buttocks"))
-                item_id = f"nudity_l3_override_{order:03d}"
+            if not facts.visible_regions:
+                if any(w in t_lower for w in ("completely nude", "bare body", "nude", "naked", "unclothed", "full nude")):
+                    facts = SemanticFacts(visible_regions=("full_body",))
+                    item_id = f"nudity_l5_override_{order:03d}"
+                elif any(w in t_lower for w in ("topless", "bare breasts", "exposed breasts")):
+                    facts = SemanticFacts(visible_regions=("breasts", "topless"))
+                    item_id = f"nudity_l4_override_{order:03d}"
+                elif any(w in t_lower for w in ("micro bikini", "sheer lingerie", "revealing panties")):
+                    facts = SemanticFacts(visible_regions=("crotch", "buttocks"))
+                    item_id = f"nudity_l3_override_{order:03d}"
         elif slot_name == "props":
-            if any(w in t_lower for w in ("holding", "in hand", "held", "carrying", "camera in hand")):
-                facts = SemanticFacts(prop_usage="handheld", hands_required=1)
+            if facts.hands_required == 0 and facts.prop_usage is None:
+                if any(w in t_lower for w in ("holding", "in hand", "held", "carrying", "camera in hand")):
+                    facts = SemanticFacts(prop_usage="handheld", hands_required=1)
         elif slot_name == "pose":
-            if any(w in t_lower for w in ("hands behind back", "hands tied", "arms above head", "tied behind back")):
-                facts = SemanticFacts(hand_state="both_busy")
-            elif any(w in t_lower for w in ("hand on cheek", "hand on hip")):
-                facts = SemanticFacts(hand_state="one_busy")
+            if facts.hand_state is None and facts.hands_required == 0:
+                if any(w in t_lower for w in ("hands behind back", "hands tied", "arms above head", "tied behind back")):
+                    facts = SemanticFacts(hand_state="both_busy")
+                elif any(w in t_lower for w in ("hand on cheek", "hand on hip")):
+                    facts = SemanticFacts(hand_state="one_busy")
         elif slot_name == "clothing":
-            if any(w in t_lower for w in ("catsuit", "latex suit", "bodysuit", "swimsuit", "leotard", "one-piece")):
-                facts = SemanticFacts(garment_topologies=("one_piece",), fabric_materials=("latex",) if "latex" in t_lower else ())
-            elif any(w in t_lower for w in ("parka", "down coat", "jacket", "coat", "winter boots", "scarf")):
-                facts = SemanticFacts(garment_topologies=("outerwear", "bottom_pants"))
+            if not facts.garment_topologies:
+                if any(w in t_lower for w in ("catsuit", "latex suit", "bodysuit", "swimsuit", "leotard", "one-piece")):
+                    facts = SemanticFacts(garment_topologies=("one_piece",), fabric_materials=("latex",) if "latex" in t_lower else ())
+                elif any(w in t_lower for w in ("parka", "down coat", "jacket", "coat", "winter boots", "scarf")):
+                    facts = SemanticFacts(garment_topologies=("outerwear", "bottom_pants"))
 
         frag = PromptFragment(
             text=tag_text,
@@ -443,11 +727,12 @@ def apply_slot_overrides(
     external_overrides: Optional[Dict[str, Any]],
     entry_point: str = "generator",
     catalog_facts: Optional[Dict[Tuple[str, str], SemanticFacts]] = None,
+    data_dir: Optional[Path] = None,
 ) -> Dict[str, List[Any]]:
     """落实 20 槽位外部覆盖契约 (M3 核心契约)：
     1. 非空覆盖整个槽位：外部指定非空内容时，替换该槽位全部系统/预设生成 tags，绝不混杂；
     2. 空白回退：外部输入为 None, "", "   " 或 [] 时，完全回退保留内部/预设生成内容；
-    3. 服装覆盖语义清空：当覆盖 clothing 槽位时，连带清空旧 clothing_state / clothing_extension / underwear 附属槽位；
+    3. 整槽清空联动：当覆盖 clothing / scene_theme 等槽位时，连带清空旧附属与别名槽位；
     4. 权威 Provenance 与来源追踪：标记 mode="override", kind="user_input", source_mode="override"。
     """
     if not external_overrides:
@@ -473,13 +758,43 @@ def apply_slot_overrides(
         # 非空覆盖整个槽位：清空旧内容
         res[norm_slot] = []
 
-        # 服装槽位整槽清空旧载体事实与状态 (CE-OVERRIDE-01)
+        # 槽位整槽清空旧载体事实与状态 (CE-OVERRIDE-01)
         if norm_slot == "clothing":
             for related in ("clothing_state", "clothing_extension", "underwear"):
                 if related in res:
                     res[related] = []
+        elif norm_slot == "scene_theme":
+            for related in ("scene", "theme"):
+                if related in res:
+                    res[related] = []
+        elif norm_slot == "lighting":
+            for related in ("lighting_palette",):
+                if related in res:
+                    res[related] = []
+        elif norm_slot == "pose":
+            for related in ("poses",):
+                if related in res:
+                    res[related] = []
+        elif norm_slot == "props":
+            for related in ("prop",):
+                if related in res:
+                    res[related] = []
+        elif norm_slot == "shot_type":
+            for related in ("shot",):
+                if related in res:
+                    res[related] = []
+        elif norm_slot == "camera_angle":
+            for related in ("camera", "angle"):
+                if related in res:
+                    res[related] = []
 
-        new_frags = make_override_fragments(norm_slot, raw_val, entry_point=entry_point, catalog_facts=catalog_facts)
+        new_frags = make_override_fragments(
+            norm_slot,
+            raw_val,
+            entry_point=entry_point,
+            catalog_facts=catalog_facts,
+            data_dir=data_dir,
+        )
         res[norm_slot] = new_frags
 
     return res
@@ -510,6 +825,7 @@ class PromptAssembler:
                 slot_fragments,
                 external_overrides,
                 catalog_facts=getattr(self.resolver, "canonical_catalog_facts", None),
+                data_dir=self.data_dir,
             )
         fragments = list(iter_normalized_slot_fragments(slot_fragments))
         return assemble_result(
@@ -613,8 +929,15 @@ class PromptAssembler:
                 text = f_data.get("text", "")
                 if text:
                     f_id = f_data.get("id", "")
-                    f_slot = f_data.get("slot", "preset_core")
-                    f_facts = SemanticFacts.from_dict(f_data.get("facts", {}))
+                    f_slot = f_data.get("slot")
+                    raw_facts = f_data.get("facts", {})
+                    f_facts = SemanticFacts.from_dict(raw_facts)
+                    if f_slot in (None, "", "preset_core"):
+                        f_slot, inferred_facts = classify_preset_tag_and_facts(text, Path(self.data_dir))
+                        f_facts = inferred_facts.merge(f_facts)
+                    elif f_slot in ALLOWED_SLOTS:
+                        _, inferred_facts = classify_preset_tag_and_facts(text, Path(self.data_dir), target_slot=f_slot)
+                        f_facts = inferred_facts.merge(f_facts)
                     fragments.append(
                         PromptFragment(
                             text=text,
@@ -637,10 +960,11 @@ class PromptAssembler:
             raw_preset_prompt = preset.get("positive", preset.get("prompt", ""))
             for t in split_top_level_tags(raw_preset_prompt):
                 if t:
+                    f_slot, f_facts = classify_preset_tag_and_facts(t, Path(self.data_dir))
                     fragments.append(
                         PromptFragment(
                             text=t,
-                            source_slot="preset_core",
+                            source_slot=f_slot,
                             source_item_id=preset_id,
                             order=order,
                             provenance=TagProvenance(
@@ -650,6 +974,7 @@ class PromptAssembler:
                                 parent_ids=(preset_id,),
                             ),
                             origin=preset_origin,
+                            facts=f_facts,
                         )
                     )
                     order += 1
@@ -672,8 +997,15 @@ class PromptAssembler:
                     text = f_data.get("text", "")
                     if text:
                         f_id = f_data.get("id", "")
-                        f_slot = f_data.get("slot", "style_recipe")
-                        f_facts = SemanticFacts.from_dict(f_data.get("facts", {}))
+                        f_slot = f_data.get("slot")
+                        raw_facts = f_data.get("facts", {})
+                        f_facts = SemanticFacts.from_dict(raw_facts)
+                        if f_slot in (None, "", "style_recipe", "preset_core"):
+                            f_slot, inferred_facts = classify_preset_tag_and_facts(text, Path(self.data_dir))
+                            f_facts = inferred_facts.merge(f_facts)
+                        elif f_slot in ALLOWED_SLOTS:
+                            _, inferred_facts = classify_preset_tag_and_facts(text, Path(self.data_dir), target_slot=f_slot)
+                            f_facts = inferred_facts.merge(f_facts)
                         fragments.append(
                             PromptFragment(
                                 text=text,
@@ -698,6 +1030,7 @@ class PromptAssembler:
                     if val:
                         for t in split_top_level_tags(str(val)):
                             if t:
+                                f_slot, f_facts = classify_preset_tag_and_facts(t, Path(self.data_dir))
                                 fragments.append(
                                     PromptFragment(
                                         text=t,
@@ -710,6 +1043,7 @@ class PromptAssembler:
                                             semantic_ids=(f"recipe:{recipe_id}",),
                                         ),
                                         origin=recipe_origin,
+                                        facts=f_facts,
                                     )
                                 )
                                 order += 1
@@ -783,7 +1117,27 @@ class PromptAssembler:
                 overridden_slots.add(ns)
                 if ns == "clothing":
                     overridden_slots.update(["clothing", "clothing_state", "clothing_extension", "underwear"])
-                new_override_frags.extend(make_override_fragments(ns, raw_v, entry_point=entry_point, catalog_facts=getattr(self.resolver, "canonical_catalog_facts", None)))
+                elif ns == "scene_theme":
+                    overridden_slots.update(["scene_theme", "scene", "theme"])
+                elif ns == "lighting":
+                    overridden_slots.update(["lighting", "lighting_palette"])
+                elif ns == "pose":
+                    overridden_slots.update(["pose", "poses"])
+                elif ns == "props":
+                    overridden_slots.update(["props", "prop"])
+                elif ns == "shot_type":
+                    overridden_slots.update(["shot_type", "shot"])
+                elif ns == "camera_angle":
+                    overridden_slots.update(["camera_angle", "camera", "angle"])
+                new_override_frags.extend(
+                    make_override_fragments(
+                        ns,
+                        raw_v,
+                        entry_point=entry_point,
+                        catalog_facts=getattr(self.resolver, "canonical_catalog_facts", None),
+                        data_dir=Path(self.data_dir),
+                    )
+                )
 
             if overridden_slots:
                 fragments = [f for f in fragments if f.source_slot not in overridden_slots]

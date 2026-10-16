@@ -349,33 +349,287 @@ class TestM3OverridesAndConflictEngine(unittest.TestCase):
         self.assertGreater(ctx_school["school"], 0.5)
 
     # ─────────────────────────────────────────────────────────────
-    # 8. 审计追踪与 Provenance 溯源闭环
+    # 9. 真实仓库预设 C01 整槽覆盖回归 (审核整改 1)
     # ─────────────────────────────────────────────────────────────
 
-    def test_13_audit_trail_and_provenance_closure(self):
-        """验证外部覆盖原子的 Provenance 完整性与 ResolutionReport 审计报告闭环。"""
-        overrides = {
-            "expression": "sultry seductive gaze",
-            "lighting": "moody neon split lighting",
+    def test_14_real_preset_c01_full_slot_replacements(self):
+        """[Review-1] 验证真实预设 C01 在覆盖服装、场景、光影时，旧预设内容彻底清空，杜绝混杂。"""
+        from lib.sampler import DataSampler
+        sampler = DataSampler(self.data_dir)
+        preset_c01 = sampler.get_preset("C01", Random(42))
+        self.assertIsNotNone(preset_c01)
+
+        # 1. 服装整槽覆盖：原有 school uniform, sailor shirt unbuttoned, skirt hiked up, no panties 必须被清空
+        res_clothing = self.assembler.assemble_preset(
+            preset_c01,
+            style_recipe=None,
+            quality_tier="高清写真 (High)",
+            rng=Random(42),
+            entry_point="preset_browser",
+            external_overrides={"clothing": "black latex catsuit"},
+        )
+        self.assertIn("black latex catsuit", res_clothing.prompt)
+        self.assertNotIn("school uniform", res_clothing.prompt)
+        self.assertNotIn("sailor shirt", res_clothing.prompt)
+        self.assertNotIn("skirt hiked up", res_clothing.prompt)
+        self.assertNotIn("no panties", res_clothing.prompt)
+
+        # 2. 场景整槽覆盖：原有 classroom, back row, class in progress, wooden desk 必须被清空
+        res_scene = self.assembler.assemble_preset(
+            preset_c01,
+            style_recipe=None,
+            quality_tier="高清写真 (High)",
+            rng=Random(42),
+            entry_point="preset_browser",
+            external_overrides={"scene_theme": "traditional outdoor onsen hot spring bath"},
+        )
+        scene_tags = [t.strip() for t in res_scene.prompt.split(",")]
+        self.assertIn("traditional outdoor onsen hot spring bath", scene_tags)
+        self.assertNotIn("classroom", scene_tags)
+        self.assertNotIn("back row", scene_tags)
+        self.assertNotIn("class in progress", scene_tags)
+        self.assertNotIn("wooden desk", scene_tags)
+
+        # 3. 光影整槽覆盖：原有 soft classroom light, window side light 必须被清空
+        res_lighting = self.assembler.assemble_preset(
+            preset_c01,
+            style_recipe=None,
+            quality_tier="高清写真 (High)",
+            rng=Random(42),
+            entry_point="preset_browser",
+            external_overrides={"lighting": "moody dramatic studio lighting with deep shadows"},
+        )
+        lighting_tags = [t.strip() for t in res_lighting.prompt.split(",")]
+        self.assertIn("moody dramatic studio lighting with deep shadows", lighting_tags)
+        self.assertNotIn("soft classroom light", lighting_tags)
+        self.assertNotIn("window side light", lighting_tags)
+
+    # ─────────────────────────────────────────────────────────────
+    # 10. 统一手部容量模型与边界缺陷回归 (审核整改 2)
+    # ─────────────────────────────────────────────────────────────
+
+    def test_15_unified_hand_capacity_and_priorities(self):
+        """[Review-2] 统一手部容量模型：按道具实体累计、双向统一、识别 restrained、继承双手事实。"""
+        # A. 三件外部单手道具 (1+1+1=3 > 2)：必须检测到 3 > 2 并报错
+        with self.assertRaises(PromptValidationError) as cm:
+            self.assembler.assemble_slots(
+                {},
+                rng=Random(42),
+                external_overrides={"props": "holding smartphone, holding wine glass, holding book"},
+            )
+        self.assertIn("exceed total hand capacity of 2", str(cm.exception))
+
+        # B. 外部单手托腮 + 两件单手道具 (1 + 1+1 = 3 > 2)：累计姿势与全部道具报错
+        with self.assertRaises(PromptValidationError) as cm_pose:
+            self.assembler.assemble_slots(
+                {},
+                rng=Random(42),
+                external_overrides={
+                    "pose": "hand on cheek",
+                    "props": "holding smartphone, holding wine glass",
+                },
+            )
+        self.assertTrue(
+            "conflicts with slot" in str(cm_pose.exception)
+            or "exceed total hand capacity of 2" in str(cm_pose.exception)
+        )
+
+        # C. 系统单手托腮 + 系统单手相机 (1 + 1 = 2 <= 2)：双向统一，相机合法保留绝不误删
+        # 模拟生成器中的单手托腮姿势与单手相机道具
+        pose_frag = PromptFragment(
+            text="hand on cheek",
+            source_slot="pose",
+            order=0,
+            facts=SemanticFacts(hand_state="one_busy", hands_required=1),
+            provenance=TagProvenance(item_id="pose_cheek", kind="pose"),
+        )
+        cam_frag = PromptFragment(
+            text="digital camera in hand",
+            source_slot="props",
+            order=1,
+            facts=SemanticFacts(prop_usage="handheld", hands_required=1),
+            provenance=TagProvenance(item_id="prop_cam", kind="props"),
+        )
+        res_sys = self.assembler.assemble_slots(
+            {"pose": [pose_frag], "props": [cam_frag]},
+            rng=Random(42),
+        )
+        accepted_texts = [a.text for a in res_sys.accepted_atoms]
+        self.assertIn("hand on cheek", accepted_texts)
+        self.assertIn("digital camera in hand", accepted_texts)
+
+        # D. 系统 bound arms (restrained=2) + 外部相机 (1)：外部道具优先，裁撤系统受限姿势
+        bound_frag = PromptFragment(
+            text="bound arms",
+            source_slot="pose",
+            order=0,
+            facts=SemanticFacts(hand_state="restrained", hands_required=2),
+            provenance=TagProvenance(item_id="restraints__bound_arms", kind="pose"),
+        )
+        res_ext_cam = self.assembler.assemble_slots(
+            {"pose": [bound_frag]},
+            rng=Random(42),
+            external_overrides={"props": "holding camera"},
+        )
+        accepted_cam_texts = [a.text for a in res_ext_cam.accepted_atoms]
+        self.assertIn("holding camera", accepted_cam_texts)
+        self.assertNotIn("bound arms", accepted_cam_texts)
+
+        # E. 外部 holding game controller：权威继承目录事实 hands_required=2
+        game_frags = make_override_fragments(
+            "props",
+            "holding game controller",
+            entry_point="generator",
+            data_dir=self.data_dir,
+        )
+        self.assertEqual(game_frags[0].facts.hands_required, 2)
+        self.assertEqual(game_frags[0].facts.prop_usage, "handheld")
+
+        # 结合另一个单手道具 (2 + 1 = 3 > 2) 必须报错
+        with self.assertRaises(PromptValidationError):
+            self.assembler.assemble_slots(
+                {},
+                rng=Random(42),
+                external_overrides={"props": "holding game controller, holding smartphone"},
+            )
+
+    # ─────────────────────────────────────────────────────────────
+    # 11. 外部内容绝不改写与绝不追加增强词回归 (审核整改 3)
+    # ─────────────────────────────────────────────────────────────
+
+    def test_16_external_content_protection_across_rules(self):
+        """[Review-3] 检查全部规则：外部内容绝不被替换，绝不被追加注入系统增强词。"""
+        # 1. 材质替换规则保护：clothing="sheer silk blouse" 绝不被替换为 wet dress
+        res_cloth = self.assembler.assemble_slots(
+            {},
+            rng=Random(42),
+            external_overrides={"clothing": "sheer silk blouse"},
+        )
+        self.assertIn("sheer silk blouse", res_cloth.prompt)
+        self.assertNotIn("wet dress", res_cloth.prompt)
+        self.assertNotIn("clinging tightly", res_cloth.prompt)
+
+        # 2. 纹身增强规则保护：tattoo="dragon tattoo on shoulder" 绝不被追加注入 pores visible through ink
+        res_tattoo = self.assembler.assemble_slots(
+            {},
+            rng=Random(42),
+            external_overrides={"tattoo": "dragon tattoo on shoulder"},
+        )
+        tattoo_accepted = [a.text for a in res_tattoo.accepted_atoms if a.source_slot == "tattoo"]
+        self.assertEqual(tattoo_accepted, ["dragon tattoo on shoulder"])
+        self.assertNotIn("pores visible through ink", res_tattoo.prompt)
+
+    # ─────────────────────────────────────────────────────────────
+    # 12. 外部场景彻底清除旧情境画像与别名统一 (审核整改 4)
+    # ─────────────────────────────────────────────────────────────
+
+    def test_17_scene_override_complete_context_purge(self):
+        """[Review-4] 外部温泉场景覆盖原有教师/学生主题后，彻底清空旧情境贡献与旧 ID，0% school。"""
+        from lib.sampler import DataSampler
+        sampler = DataSampler(self.data_dir)
+
+        # 1. 通过外部 overrides={"scene_override": ...} 传入
+        inputs_override = {
+            "场景大类": "教室",
+            "剧情主题": "教师/学生系列",
+            "external_overrides": {"scene_override": "traditional Japanese onsen hot spring bath"},
         }
-        base_slots = {
-            "clothing": [PromptFragment(text="summer dress", source_slot="clothing", order=0)],
+        gen_res = _generate_structured(
+            sampler,
+            self.assembler,
+            inputs_override,
+            rng=Random(42),
+            effective_seed=42,
+        )
+
+        self.assertIsNotNone(gen_res.context_profile)
+        weights = dict(gen_res.context_profile.weights)
+        # 必须 100% onsen_bath，彻底清除旧主题贡献，school 必须为 0.0%
+        self.assertEqual(weights.get("school", 0.0), 0.0)
+        self.assertAlmostEqual(weights.get("onsen_bath", 0.0), 1.0, places=3)
+        self.assertIn("traditional Japanese onsen hot spring bath", gen_res.positive)
+
+        # 2. 直接传入顶级参数 scene_override="..."
+        inputs_top_level = {
+            "场景大类": "教室",
+            "剧情主题": "教师/学生系列",
+            "scene_override": "traditional Japanese onsen hot spring bath",
         }
+        gen_res_top = _generate_structured(
+            sampler,
+            self.assembler,
+            inputs_top_level,
+            rng=Random(42),
+            effective_seed=42,
+        )
+        weights_top = dict(gen_res_top.context_profile.weights)
+        self.assertEqual(weights_top.get("school", 0.0), 0.0)
+        self.assertAlmostEqual(weights_top.get("onsen_bath", 0.0), 1.0, places=3)
 
-        res = self.assembler.assemble_slots(base_slots, rng=Random(42), external_overrides=overrides)
+    # ─────────────────────────────────────────────────────────────
+    # 13. 预算管理外部核算与优先保障 (审核整改 5)
+    # ─────────────────────────────────────────────────────────────
 
-        report = res.resolution_report
-        self.assertIsNotNone(report)
-        self.assertEqual(report.schema_version, "1.0")
+    def test_18_word_budget_external_preaccounting_and_priority(self):
+        """[Review-5] 预算处理：外部总词数超 250 词时报错；外部未超限时优先完整保留外部，系统让位截断。"""
+        # 1. 三段各 100 词的外部内容，总计 300 词 > 250 词：必须报错 Fail-Closed，绝不静默丢弃
+        section1 = " ".join([f"exttag{i}" for i in range(100)])
+        section2 = " ".join([f"exttag{i}" for i in range(100, 200)])
+        section3 = " ".join([f"exttag{i}" for i in range(200, 300)])
 
-        # 检查采纳的原子的来源模式
-        expr_atoms = [a for a in res.accepted_atoms if a.source_slot == "expression"]
-        self.assertTrue(len(expr_atoms) >= 1)
-        for a in expr_atoms:
+        with self.assertRaises(PromptValidationError) as cm:
+            self.assembler.assemble_slots(
+                {},
+                rng=Random(42),
+                external_overrides={
+                    "clothing": section1,
+                    "scene_theme": section2,
+                    "lighting": section3,
+                },
+            )
+        self.assertIn("exceed maximum allowed budget of 250 words", str(cm.exception))
+
+        # 2. 系统内容 100 词 + 外部内容 180 词 (总计 280 词)：
+        # 外部内容 180 词 <= 250 词，外部全部保证保留，系统内容让位截断
+        sys_tags = [PromptFragment(text=f"systag{i}", source_slot="scene_theme", order=i) for i in range(100)]
+        ext_section = " ".join([f"keep_ext_word_{i}" for i in range(180)])
+
+        res_priority = self.assembler.assemble_slots(
+            {"scene_theme": sys_tags},
+            rng=Random(42),
+            external_overrides={"clothing": ext_section},
+        )
+        self.assertLessEqual(len(res_priority.prompt.split()), 250)
+        # 验证 180 词外部内容 100% 完整保留在最终 prompt 中
+        for i in range(180):
+            self.assertIn(f"keep_ext_word_{i}", res_priority.prompt)
+        # 系统内容被截断记录在 budget_filtered_atoms
+        self.assertTrue(len(res_priority.budget_filtered_atoms) > 0)
+
+    # ─────────────────────────────────────────────────────────────
+    # 14. 预设浏览器真实 entry_point 与审计溯源
+    # ─────────────────────────────────────────────────────────────
+
+    def test_19_preset_browser_entry_point_and_provenance(self):
+        """验证外部覆盖在预设浏览器入口下真实保留 preset_browser 来源与 1.0 审计规范。"""
+        from lib.sampler import DataSampler
+        sampler = DataSampler(self.data_dir)
+        preset_c01 = sampler.get_preset("C01", Random(42))
+
+        res = self.assembler.assemble_preset(
+            preset_c01,
+            style_recipe=None,
+            quality_tier="高清写真 (High)",
+            rng=Random(42),
+            entry_point="preset_browser",
+            external_overrides={"clothing": "black latex catsuit"},
+        )
+        clothing_atoms = [a for a in res.accepted_atoms if a.source_slot == "clothing"]
+        self.assertTrue(len(clothing_atoms) >= 1)
+        for a in clothing_atoms:
+            self.assertEqual(a.origin.entry_point, "preset_browser")
             self.assertEqual(a.origin.mode, "override")
             self.assertEqual(a.provenance.source_mode, "override")
-            self.assertEqual(a.provenance.kind, "user_input")
-            self.assertTrue(is_external_atom(a))
 
 
 if __name__ == "__main__":

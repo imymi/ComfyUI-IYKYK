@@ -756,7 +756,7 @@ class DataSampler:
                 banned_l1_words = (
                     "bra", "panties", "breasts", "pussy", "nude", "naked",
                     "undressed", "topless", "upskirt", "thong", "g-string",
-                    "boudoir", "lingerie"
+                    "boudoir", "lingerie", "cleavage", "underboob", "sideboob"
                 )
                 filtered = [
                     t for t in filtered
@@ -1677,7 +1677,7 @@ class DataSampler:
                 banned_l1_words = (
                     "bra", "panties", "breasts", "pussy", "nude", "naked",
                     "undressed", "topless", "upskirt", "thong", "g-string",
-                    "boudoir", "lingerie"
+                    "boudoir", "lingerie", "cleavage", "underboob", "sideboob"
                 )
                 is_banned = (
                     (isinstance(target_tag, dict) and target_tag.get("facts", {}).get("style_genre") == "boudoir_lingerie")

@@ -110,20 +110,13 @@ class TestM1Counterexamples(unittest.TestCase):
         )
         surviving_texts = [a.text for a in surviving]
 
-        # 真实缺陷复现断言：结构化路径下，单手占用导致相机被 pose_hand_occupation 过度删除！
+        # M3 统一容量模型修复：单手托腮 (1) + 单手持相机 (1) = 2 <= 2，两者均合法共存保留！
         self.assertIn(atom_pose.text, surviving_texts)
-        self.assertNotIn(
+        self.assertIn(
             atom_prop.text,
             surviving_texts,
-            "基线必须复现：携带 hand_state='one_busy' 的相机在 conflict_resolver:2744 被过度删除的事实！",
+            "M3 修复确认：携带 hand_state='one_busy' 的相机与单手托腮在 2 手容量内合法共存，不再被误删！",
         )
-        # 决策账本精准校验
-        drop_decisions = [
-            d for d in report.decisions if d.rule_id == "pose_hand_occupation" and d.action == "drop"
-        ]
-        self.assertTrue(len(drop_decisions) >= 1)
-        self.assertEqual(drop_decisions[0].target_atom_id, atom_prop.atom_id)
-        self.assertEqual(drop_decisions[0].reason_code, "busy_hands_remove_props")
 
     def test_03_baseline_reproduction_ce_hand_02_dual_path(self):
         """消费 CE-HAND-02 夹具：精准消费双道具夹具输入并复现过度删除。"""

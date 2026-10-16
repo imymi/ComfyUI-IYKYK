@@ -21,17 +21,19 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, Sequence, Tuple
 
 if __package__:
-    from .lib.assembler import PromptAssembler, assemble_result, split_top_level_tags
+    from .lib.assembler import PromptAssembler, assemble_result, make_override_fragments, split_top_level_tags
     from .lib.context_affinity import compute_context_profile
     from .lib.models import GenerationResult, ORDERED_CONTEXT_IDS, PromptAtom, PromptFragment, SelectionOrigin, SemanticFacts, TagProvenance
     from .lib.rng import derive_substream_rng, recover_effective_seed
     from .lib.sampler import DataSampler, _is_none, get_selection_mode
+    from .lib.slot_contract import normalize_slot_name
 else:
-    from lib.assembler import PromptAssembler, assemble_result, split_top_level_tags
+    from lib.assembler import PromptAssembler, assemble_result, make_override_fragments, split_top_level_tags
     from lib.context_affinity import compute_context_profile
     from lib.models import GenerationResult, ORDERED_CONTEXT_IDS, PromptAtom, PromptFragment, SelectionOrigin, SemanticFacts, TagProvenance
     from lib.rng import derive_substream_rng, recover_effective_seed
     from lib.sampler import DataSampler, _is_none, get_selection_mode
+    from lib.slot_contract import normalize_slot_name
 
 DATA_DIR = Path(__file__).parent / "data"
 _sampler = DataSampler(DATA_DIR)
@@ -419,15 +421,17 @@ def _generate_structured(
 
     custom_fragments = _custom_prompt_fragments(inputs.get("自定义提示词", ""), entry_point)
 
-    # 提取外部覆盖字典
+    # 提取外部覆盖字典并预先统一规范化所有槽位别名
     external_overrides: Dict[str, Any] = {}
     if "external_overrides" in inputs and isinstance(inputs["external_overrides"], dict):
-        external_overrides.update(inputs["external_overrides"])
+        for k, v in inputs["external_overrides"].items():
+            if v is not None:
+                external_overrides[normalize_slot_name(k)] = v
     for k, v in inputs.items():
         if k.endswith("_override") and len(k) > 9:
             s_name = k[:-9].strip()
             if s_name and v is not None:
-                external_overrides[s_name] = v
+                external_overrides[normalize_slot_name(s_name)] = v
 
     # 1. 检查是否使用预设模板
     if not _is_none(预设模板):
@@ -491,13 +495,24 @@ def _generate_structured(
     context = primary_context if primary_context != "generic" else sampler.detect_context(场景大类, 剧情主题)
 
     # 外部场景覆盖情境自洽更新 (M3 契约):
-    ext_scene = external_overrides.get("scene_theme") or external_overrides.get("scene")
+    ext_scene = external_overrides.get("scene_theme")
     if ext_scene and isinstance(ext_scene, str) and ext_scene.strip():
         detected_ext_ctx = sampler.detect_context(ext_scene, "")
         if detected_ext_ctx and detected_ext_ctx in ORDERED_CONTEXT_IDS:
             scene_cids = (detected_ext_ctx,)
             primary_context = detected_ext_ctx
             context = detected_ext_ctx
+            # 彻底清除被替换的旧场景/主题贡献及来源 ID
+            theme_cids = ()
+            theme_item_id = None
+            scene_item_id = f"override_scene_{detected_ext_ctx}"
+            slots["scene_theme"] = make_override_fragments(
+                "scene_theme",
+                ext_scene,
+                entry_point=entry_point,
+                catalog_facts=getattr(assembler.resolver, "canonical_catalog_facts", None),
+                data_dir=assembler.data_dir,
+            )
 
     context_profile = compute_context_profile(scene_cids, theme_cids, scene_item_id, theme_item_id)
 
