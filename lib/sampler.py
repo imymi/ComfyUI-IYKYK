@@ -435,6 +435,52 @@ class DataSampler:
                         return facts.get("hand_state")
         return None
 
+    @classmethod
+    def _tag_has_skirt_carrier(cls, tag: Any, style_id: str) -> bool:
+        """判定单个标签（或 PromptAtom / SampledTag）是否包含或代表裙装形制载体。"""
+        if not tag:
+            return False
+        if isinstance(tag, dict):
+            facts = tag.get("facts", {})
+            topos = set(facts.get("garment_topologies") or [])
+            if "bottom_skirt" in topos:
+                return True
+            if "one_piece" in topos and style_id not in NON_SKIRT_ONE_PIECE:
+                return True
+            ens = facts.get("ensemble_pieces")
+            if isinstance(ens, dict):
+                bps = ens.get("bottom_pieces", [])
+                mgs = ens.get("main_garments", [])
+                if any(
+                    any(k in p.lower() for k in ("skirt", "dress", "kilt", "pleated", "tutu", "petticoat"))
+                    and not any(k in p.lower() for k in ("pants", "jeans", "shorts", "trousers", "slacks", "leggings"))
+                    for p in bps + mgs if isinstance(p, str)
+                ):
+                    return True
+                pbs = ens.get("piece_bindings", [])
+                if any(pb.get("garment_topology") == "bottom_skirt" for pb in pbs if isinstance(pb, dict)):
+                    return True
+            supp = set(facts.get("supported_modifiers") or [])
+            if "bottom_skirt" in supp:
+                return True
+            txt = tag.get("text", "").lower()
+        elif hasattr(tag, "facts"):
+            facts = getattr(tag, "facts", None)
+            topos = set(getattr(facts, "garment_topologies", ()) if facts else ())
+            if "bottom_skirt" in topos:
+                return True
+            if "one_piece" in topos and style_id not in NON_SKIRT_ONE_PIECE:
+                return True
+            txt = getattr(tag, "text", "").lower()
+        else:
+            txt = str(tag).lower()
+
+        if re.search(r"\b(?:skirt|pleated mini skirt|pencil skirt|chima|lehenga)\b", txt):
+            return True
+        if re.search(r"\b(?:dress|gown|nightgown|slip dress)\b", txt) and style_id not in NON_SKIRT_ONE_PIECE:
+            return True
+        return False
+
     def _is_clothing_skirt_compatible(self, cat: Dict[str, Any]) -> bool:
         """判定服装款式类别是否具备承载裙摆（掀裙）动作的形制载体。
         需满足：自身拓扑含 bottom_skirt、支持对应 modifier，或非排除名单的连体裙装 (one_piece)。
@@ -444,28 +490,8 @@ class DataSampler:
         if cid in NON_SKIRT_ONE_PIECE:
             return False
         for t in cat.get("tags", []):
-            if isinstance(t, dict):
-                facts = t.get("facts", {})
-                topos = set(facts.get("garment_topologies") or [])
-                if "bottom_skirt" in topos:
-                    return True
-                if "one_piece" in topos and cid not in NON_SKIRT_ONE_PIECE:
-                    return True
-                ens = facts.get("ensemble_pieces")
-                if isinstance(ens, dict):
-                    bps = ens.get("bottom_pieces", [])
-                    if any(
-                        any(k in bp.lower() for k in ("skirt", "dress", "pleated", "tutu", "petticoat", "kilt"))
-                        and not any(k in bp.lower() for k in ("pants", "jeans", "shorts", "trousers", "slacks", "leggings"))
-                        for bp in bps if isinstance(bp, str)
-                    ):
-                        return True
-                    pbs = ens.get("piece_bindings", [])
-                    if any(pb.get("garment_topology") == "bottom_skirt" for pb in pbs if isinstance(pb, dict)):
-                        return True
-                supp = set(facts.get("supported_modifiers") or [])
-                if "bottom_skirt" in supp:
-                    return True
+            if self._tag_has_skirt_carrier(t, cid):
+                return True
         return False
 
     def get_excluded_candidate_ids(
@@ -503,8 +529,8 @@ class DataSampler:
                 excluded.add("between_legs_angle")
 
         elif slot_name == "lighting":
-            if nudity_level_code == "L1":
-                excluded.update({"erotic_lighting_00", "erotic_lighting_01", "erotic_lighting_02", "erotic_lighting_03"})
+            # L1 级别下保留具有合法光影事实的预设 (如屏幕光、走廊漏光、冰箱光等)，由标签层执行具体内容过滤，不整类禁用
+            pass
 
         elif slot_name == "props":
             # 依据规则 9 (2-Hand Capacity Model)：严格依据姿势事实判断占用数
@@ -524,20 +550,39 @@ class DataSampler:
                 else:
                     hands_occupied = 0
 
-            # 当双手均被占用 (hands_occupied == 2) 时，排除手持道具 (需要手持的款式)
-            # 严格保留穿戴类 (fashion_baguette_bag, glasses_reading) 与环境类道具 (camera_tripod_flash, rose_petals_candles, cute_cat_on_bed, ice_cubes)
-            if hands_occupied >= 2:
-                excluded.update({
-                    "digital_camera_record",
-                    "oriental_fan_umbrella",
-                    "fashion_clutch_bag",
-                    "wine_glass_bottle",
-                    "smartphone_recording",
-                    "game_controller",
-                    "flower_bouquet_petals",
-                    "plush_doll_teddy",
-                    "pillow_clutching",
-                })
+            available_hands = max(0, 2 - hands_occupied)
+
+            # 按剩余手部容量筛选具体变体，仅在没有合法变体时排除类别 (杜绝误杀具有免手持变体的类别)
+            data = self._load("props")
+            for cat in data.get("categories", []):
+                cid = cat.get("id")
+                if not cid or cid == "none":
+                    continue
+                all_tags = []
+                if cat.get("tags"):
+                    all_tags.extend(cat["tags"])
+                if cat.get("items"):
+                    for it in cat["items"]:
+                        all_tags.extend(it.get("tags", []))
+
+                has_valid_variant = False
+                for t in all_tags:
+                    if not isinstance(t, dict):
+                        continue
+                    facts = t.get("facts", {})
+                    req = facts.get("hands_required", 0)
+                    usage = facts.get("prop_usage")
+                    if req > available_hands:
+                        continue
+                    if available_hands == 0 and usage == "handheld":
+                        continue
+                    if nudity_level_code == "L1" and cid in ("sex_toy_vibrator", "bondage_rope_collar"):
+                        continue
+                    has_valid_variant = True
+                    break
+
+                if not has_valid_variant:
+                    excluded.add(cid)
 
             if nudity_level_code == "L1":
                 excluded.update({"sex_toy_vibrator", "bondage_rope_collar"})
@@ -662,6 +707,7 @@ class DataSampler:
         chosen_style: Dict[str, Any],
         rng: Random,
         nudity_level_code: Optional[str] = None,
+        clothing_state: Optional[str] = None,
     ) -> List[Any]:
         """从服装款式中按两步契约受控选择单品款式及相容构件：
         第一步：先选且仅选 1 个独立款式（主款式/版型/变体）；
@@ -676,6 +722,7 @@ class DataSampler:
 
         # 1. 复合风格穿搭组合池严格单选 1 套完整穿搭 (杜绝拼接冲突长句与 L1 穿透)
         if c_id == "clothing_ensemble_combos" or chosen_style.get("is_ensemble"):
+            filtered = list(all_tags)
             if nudity_level_code == "L1":
                 banned_l1_words = (
                     "bra", "panties", "breasts", "pussy", "nude", "naked",
@@ -683,16 +730,19 @@ class DataSampler:
                     "boudoir", "lingerie"
                 )
                 filtered = [
-                    t for t in all_tags
+                    t for t in filtered
                     if not (
                         (isinstance(t, dict) and t.get("facts", {}).get("style_genre") == "boudoir_lingerie")
                         or any(bw in (t.get("text", "") if isinstance(t, dict) else str(t)).lower() for bw in banned_l1_words)
                     )
                 ]
-                if not filtered:
-                    return []
-                return [rng.choice(filtered)]
-            return [rng.choice(all_tags)]
+            if clothing_state and any(w in clothing_state.lower() for w in ("lifted", "掀起裙摆", "lifted_up", "lifted_skirt")):
+                skirt_filtered = [t for t in filtered if cls._tag_has_skirt_carrier(t, c_id)]
+                if skirt_filtered:
+                    filtered = skirt_filtered
+            if not filtered:
+                return []
+            return [rng.choice(filtered)]
 
         # 2. 独立单品款式池（例如 16 个新增独立单品大类）：各标签均为独立完整款式，严格单选 1 件
         if c_id in STANDALONE_CLOTHING_CATEGORIES or chosen_style.get("is_standalone_pieces"):
@@ -1603,7 +1653,9 @@ class DataSampler:
             else:
                 raw_style_tags = [target_tag]
         else:
-            raw_style_tags = self._select_clothing_style_tags(chosen_style, rng, nudity_level_code=nudity_level_code)
+            raw_style_tags = self._select_clothing_style_tags(
+                chosen_style, rng, nudity_level_code=nudity_level_code, clothing_state=state
+            )
         _, all_base_sampled = self._to_sampled_tags(
             raw_style_tags,
             c_id,
@@ -1743,6 +1795,13 @@ class DataSampler:
             else:
                 allowed_state_ids = set()
 
+            # 根据款式形制能力动态修剪随机状态候选，杜绝无开合结构款式抽中 unbuttoned，或无裙装款式抽中 lifted_up
+            has_skirt = any(self._tag_has_skirt_carrier(t, c_id) for t in base_tags_tuple) or self._is_clothing_skirt_compatible(chosen_style)
+            if not has_skirt:
+                allowed_state_ids.discard("lifted_up")
+            if c_id not in ALLOWED_BUTTON_STYLES:
+                allowed_state_ids.discard("unbuttoned")
+
             pool = [s for s in states if s.get("id") in allowed_state_ids] if allowed_state_ids else states
             chosen_state = self._pick_one(pool if pool else states, rng)
             state_id = chosen_state.get("id", "")
@@ -1756,10 +1815,24 @@ class DataSampler:
                 "clothing_state",
                 semantic_ids=(f"clothing:{c_id}", f"state:{state_id}", f"nudity:{nudity_level_code}")
             )
+            is_lifted_skirt = (
+                state_id in ("lifted_up", "lifted", "lifted_skirt")
+                or (state and any(w in state.lower() for w in ("lifted", "掀起裙摆", "lifted_up", "lifted_skirt")))
+            )
             if has_variant_metadata:
                 chosen_base = self._sample_controlled_base_clothing_tags(base_tags_tuple, rng)
             else:
-                chosen_base = self._pick(base_tags_tuple, rng, min(2, len(base_tags_tuple)))
+                if is_lifted_skirt:
+                    skirt_base = [t for t in base_tags_tuple if self._tag_has_skirt_carrier(t, c_id)]
+                    if skirt_base:
+                        picked_skirt = self._pick_one(skirt_base, rng)
+                        non_skirt = [t for t in base_tags_tuple if t != picked_skirt]
+                        other_pick = self._pick(non_skirt, rng, 1) if non_skirt and rng.random() < 0.5 else []
+                        chosen_base = [picked_skirt] + other_pick
+                    else:
+                        chosen_base = self._pick(base_tags_tuple, rng, min(2, len(base_tags_tuple)))
+                else:
+                    chosen_base = self._pick(base_tags_tuple, rng, min(2, len(base_tags_tuple)))
             base_tags_tuple = tuple(chosen_base)
 
         else:
@@ -1778,11 +1851,31 @@ class DataSampler:
                 "clothing_state",
                 semantic_ids=(f"clothing:{c_id}", f"state:{state_id}", f"nudity:{nudity_level_code}")
             )
+            is_lifted_skirt = (
+                state_id in ("lifted_up", "lifted", "lifted_skirt")
+                or (state and any(w in state.lower() for w in ("lifted", "掀起裙摆", "lifted_up", "lifted_skirt")))
+            )
             if has_variant_metadata:
                 chosen_base = self._sample_controlled_base_clothing_tags(base_tags_tuple, rng)
             else:
-                chosen_base = self._pick(base_tags_tuple, rng, min(2, len(base_tags_tuple)))
+                if is_lifted_skirt:
+                    skirt_base = [t for t in base_tags_tuple if self._tag_has_skirt_carrier(t, c_id)]
+                    if skirt_base:
+                        picked_skirt = self._pick_one(skirt_base, rng)
+                        non_skirt = [t for t in base_tags_tuple if t != picked_skirt]
+                        other_pick = self._pick(non_skirt, rng, 1) if non_skirt and rng.random() < 0.5 else []
+                        chosen_base = [picked_skirt] + other_pick
+                    else:
+                        chosen_base = self._pick(base_tags_tuple, rng, min(2, len(base_tags_tuple)))
+                else:
+                    chosen_base = self._pick(base_tags_tuple, rng, min(2, len(base_tags_tuple)))
             base_tags_tuple = tuple(chosen_base)
+
+        # 确保实际抽中的服装组合真正具备裙装载体；若无裙装载体，坚决不附带掀裙状态
+        if state_id in ("lifted_up", "lifted", "lifted_skirt"):
+            if not any(self._tag_has_skirt_carrier(t, c_id) for t in base_tags_tuple):
+                state_tags_list = ()
+                state_id = "normal"
 
         # 契约：Auto, Random, Explicit 在 L2/L3/L4 均通过数据驱动采样扩展库
         extension_sampled_tags: List[SampledTag] = []
@@ -1949,9 +2042,28 @@ class DataSampler:
         tags = list(chosen.get("tags", []))
         if nudity_level_code != "L1":
             tags.extend(chosen.get("erotic_tags", []))
+        else:
+            # L1 级别下按标签事实执行情色过滤，保留合法光影 (如屏幕光、走廊漏光、冰箱光等)
+            banned_l1_lighting = (
+                "nude", "naked", "cum", "breast", "breasts", "pussy",
+                "crotch", "buttocks", "red light district"
+            )
+            tags = [
+                t for t in tags
+                if not any(
+                    bw in (t.get("text", "") if isinstance(t, dict) else str(t)).lower()
+                    for bw in banned_l1_lighting
+                )
+            ]
 
         if target_tag:
-            selected = [target_tag]
+            if nudity_level_code == "L1" and any(
+                bw in (target_tag.get("text", "") if isinstance(target_tag, dict) else str(target_tag)).lower()
+                for bw in ("nude", "naked", "cum", "breast", "breasts", "pussy", "crotch", "buttocks", "red light district")
+            ):
+                selected = []
+            else:
+                selected = [target_tag]
         else:
             selector_tags = [
                 t for t in tags
@@ -2548,27 +2660,49 @@ class DataSampler:
             return None
 
         c_id = chosen.get("id", "prop_default")
+        hands_occupied = 0
+        if hand_state in ("both_busy", "restrained"):
+            hands_occupied = 2
+        elif hand_state == "one_busy":
+            hands_occupied = 1
+        elif hand_state in ("free", "unspecified"):
+            hands_occupied = 0
+        elif pose_id:
+            tag_hs = self._lookup_pose_hand_state(pose_id)
+            if tag_hs in ("both_busy", "restrained"):
+                hands_occupied = 2
+            elif tag_hs == "one_busy":
+                hands_occupied = 1
+        available_hands = max(0, 2 - hands_occupied)
+
         if chosen.get("items"):
             items = chosen["items"]
-            picked_item = self._pick_one(items, rng)
+            valid_items = [
+                it for it in items
+                if any(
+                    isinstance(t, dict) and t.get("facts", {}).get("hands_required", 0) <= available_hands
+                    and (available_hands > 0 or t.get("facts", {}).get("prop_usage") != "handheld")
+                    for t in it.get("tags", [])
+                )
+            ]
+            picked_item = self._pick_one(valid_items if valid_items else items, rng)
             item_id = picked_item.get("id", c_id)
             raw_tags = picked_item.get("tags", [])
         else:
             item_id = c_id
             raw_tags = chosen.get("tags", [])
 
-        # 若双手被占用，且该道具有环境/穿戴等免手持变体标签，优先选取免手持标签
-        is_hands_busy = (
-            hand_state in ("both_busy", "restrained")
-            or self._lookup_pose_hand_state(pose_id) in ("both_busy", "restrained")
-        )
-        if is_hands_busy and raw_tags:
-            hands_free_tags = [
+        # 依据剩余手部容量严格过滤变体标签，杜绝 1+2>2 或双手占用时输出手持标签
+        if raw_tags:
+            valid_tags = [
                 t for t in raw_tags
-                if isinstance(t, dict) and t.get("facts", {}).get("hands_required", 0) == 0 and t.get("facts", {}).get("prop_usage") != "handheld"
+                if isinstance(t, dict)
+                and t.get("facts", {}).get("hands_required", 0) <= available_hands
+                and (available_hands > 0 or t.get("facts", {}).get("prop_usage") != "handheld")
+                and not (nudity_level_code == "L1" and c_id in ("sex_toy_vibrator", "bondage_rope_collar"))
             ]
-            if hands_free_tags:
-                raw_tags = hands_free_tags
+            if valid_tags:
+                raw_tags = valid_tags
 
         selected = self._pick(raw_tags, rng, min(2, len(raw_tags))) if raw_tags else []
 

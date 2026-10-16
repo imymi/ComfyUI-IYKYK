@@ -281,7 +281,8 @@ NON_SKIRT_ONE_PIECE: Set[str] = {
     "latex_catsuit", "zentai_suit", "leotard_bodysuit", "mecha_power_armor",
     "mecha_exoskeleton", "racing_suit", "swimsuit_classic", "swimsuit_school",
     "swimsuit_competition", "swimsuit_creative", "one_piece_swimsuit", "dungarees",
-    "qipao", "anime_cosplay",
+    "qipao", "anime_cosplay", "gym_uniform", "cyberpunk_tactical_bodysuit",
+    "tactical_jumpsuit", "cyberpunk_plugsuit", "leather_corset", "bunny_suit", "ao_dai",
 }
 
 # 特定款式的产品业务规则：仅授权数据中明确具备拉链开襟联动事实的款式

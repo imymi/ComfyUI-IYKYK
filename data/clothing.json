@@ -1744,8 +1744,7 @@
           "facts": {
             "semantic_role": "selector",
             "garment_topologies": [
-              "bottom_skirt",
-              "top"
+              "one_piece"
             ]
           }
         },
@@ -1755,8 +1754,7 @@
           "facts": {
             "semantic_role": "selector",
             "garment_topologies": [
-              "bottom_skirt",
-              "top"
+              "one_piece"
             ]
           }
         },
@@ -1766,8 +1764,7 @@
           "facts": {
             "semantic_role": "selector",
             "garment_topologies": [
-              "bottom_skirt",
-              "top"
+              "one_piece"
             ]
           }
         },
@@ -1777,8 +1774,7 @@
           "facts": {
             "semantic_role": "selector",
             "garment_topologies": [
-              "bottom_skirt",
-              "top"
+              "one_piece"
             ]
           }
         },
@@ -1788,8 +1784,7 @@
           "facts": {
             "semantic_role": "selector",
             "garment_topologies": [
-              "bottom_skirt",
-              "top"
+              "one_piece"
             ]
           }
         },
@@ -1798,10 +1793,7 @@
           "text": "delicate gauze",
           "facts": {
             "semantic_role": "selector",
-            "garment_topologies": [
-              "bottom_skirt",
-              "top"
-            ]
+            "garment_topologies": []
           }
         }
       ]
@@ -1816,8 +1808,7 @@
           "facts": {
             "semantic_role": "selector",
             "garment_topologies": [
-              "bottom_skirt",
-              "top"
+              "one_piece"
             ]
           }
         },
@@ -1827,8 +1818,7 @@
           "facts": {
             "semantic_role": "selector",
             "garment_topologies": [
-              "bottom_skirt",
-              "top"
+              "one_piece"
             ]
           }
         },
@@ -1838,8 +1828,7 @@
           "facts": {
             "semantic_role": "selector",
             "garment_topologies": [
-              "bottom_skirt",
-              "top"
+              "one_piece"
             ]
           }
         },
@@ -1849,8 +1838,7 @@
           "facts": {
             "semantic_role": "selector",
             "garment_topologies": [
-              "bottom_skirt",
-              "top"
+              "one_piece"
             ]
           }
         },
@@ -1860,8 +1848,7 @@
           "facts": {
             "semantic_role": "selector",
             "garment_topologies": [
-              "bottom_skirt",
-              "top"
+              "one_piece"
             ]
           }
         }
@@ -4767,8 +4754,7 @@
           "facts": {
             "semantic_role": "selector",
             "garment_topologies": [
-              "bottom_skirt",
-              "top"
+              "one_piece"
             ]
           }
         },
@@ -4778,8 +4764,7 @@
           "facts": {
             "semantic_role": "selector",
             "garment_topologies": [
-              "bottom_skirt",
-              "top"
+              "one_piece"
             ]
           }
         },
@@ -4789,8 +4774,7 @@
           "facts": {
             "semantic_role": "selector",
             "garment_topologies": [
-              "bottom_skirt",
-              "top"
+              "one_piece"
             ]
           }
         },
@@ -4800,8 +4784,7 @@
           "facts": {
             "semantic_role": "selector",
             "garment_topologies": [
-              "bottom_skirt",
-              "top"
+              "one_piece"
             ]
           }
         },
@@ -5979,8 +5962,7 @@
           "facts": {
             "semantic_role": "selector",
             "garment_topologies": [
-              "bottom_skirt",
-              "top"
+              "ensemble_outfit"
             ]
           }
         },
@@ -5990,7 +5972,6 @@
           "facts": {
             "semantic_role": "selector",
             "garment_topologies": [
-              "bottom_skirt",
               "top"
             ]
           }
@@ -6001,8 +5982,7 @@
           "facts": {
             "semantic_role": "selector",
             "garment_topologies": [
-              "bottom_skirt",
-              "top"
+              "bottom_skirt"
             ]
           }
         },
@@ -6012,7 +5992,6 @@
           "facts": {
             "semantic_role": "selector",
             "garment_topologies": [
-              "bottom_skirt",
               "top"
             ]
           }
@@ -6023,8 +6002,7 @@
           "facts": {
             "semantic_role": "selector",
             "garment_topologies": [
-              "bottom_skirt",
-              "top"
+              "underwear"
             ]
           }
         },
@@ -6033,10 +6011,7 @@
           "text": "navy blue skirt",
           "facts": {
             "semantic_role": "selector",
-            "garment_topologies": [
-              "bottom_skirt",
-              "top"
-            ]
+            "garment_topologies": []
           }
         }
       ]
@@ -6051,8 +6026,7 @@
           "facts": {
             "semantic_role": "selector",
             "garment_topologies": [
-              "bottom_skirt",
-              "top"
+              "outerwear"
             ]
           }
         },
@@ -6062,8 +6036,7 @@
           "facts": {
             "semantic_role": "selector",
             "garment_topologies": [
-              "bottom_skirt",
-              "top"
+              "bottom_skirt"
             ]
           }
         },
@@ -6073,7 +6046,6 @@
           "facts": {
             "semantic_role": "selector",
             "garment_topologies": [
-              "bottom_skirt",
               "top"
             ]
           }
@@ -6084,7 +6056,6 @@
           "facts": {
             "semantic_role": "selector",
             "garment_topologies": [
-              "bottom_skirt",
               "top"
             ]
           }
@@ -6095,8 +6066,7 @@
           "facts": {
             "semantic_role": "selector",
             "garment_topologies": [
-              "bottom_skirt",
-              "top"
+              "underwear"
             ]
           }
         }
@@ -6112,8 +6082,7 @@
           "facts": {
             "semantic_role": "selector",
             "garment_topologies": [
-              "bottom_skirt",
-              "top"
+              "bottom_pants"
             ]
           }
         },
@@ -6123,7 +6092,6 @@
           "facts": {
             "semantic_role": "selector",
             "garment_topologies": [
-              "bottom_skirt",
               "top"
             ]
           }
@@ -6134,8 +6102,8 @@
           "facts": {
             "semantic_role": "selector",
             "garment_topologies": [
-              "bottom_skirt",
-              "top"
+              "top",
+              "bottom_pants"
             ]
           }
         },
@@ -6145,8 +6113,7 @@
           "facts": {
             "semantic_role": "selector",
             "garment_topologies": [
-              "bottom_skirt",
-              "top"
+              "one_piece"
             ]
           }
         },
@@ -6156,7 +6123,6 @@
           "facts": {
             "semantic_role": "selector",
             "garment_topologies": [
-              "bottom_skirt",
               "top"
             ]
           }
@@ -6173,8 +6139,7 @@
           "facts": {
             "semantic_role": "selector",
             "garment_topologies": [
-              "bottom_skirt",
-              "top"
+              "ensemble_outfit"
             ]
           }
         },
@@ -6184,7 +6149,6 @@
           "facts": {
             "semantic_role": "selector",
             "garment_topologies": [
-              "bottom_skirt",
               "top"
             ]
           }
@@ -6195,8 +6159,7 @@
           "facts": {
             "semantic_role": "selector",
             "garment_topologies": [
-              "bottom_skirt",
-              "top"
+              "bottom_skirt"
             ]
           }
         },
@@ -6206,8 +6169,7 @@
           "facts": {
             "semantic_role": "selector",
             "garment_topologies": [
-              "bottom_skirt",
-              "top"
+              "ensemble_outfit"
             ]
           }
         },
@@ -7222,8 +7184,7 @@
           "facts": {
             "semantic_role": "selector",
             "garment_topologies": [
-              "bottom_skirt",
-              "top"
+              "ensemble_outfit"
             ]
           }
         },
@@ -7233,8 +7194,7 @@
           "facts": {
             "semantic_role": "selector",
             "garment_topologies": [
-              "bottom_skirt",
-              "top"
+              "bottom_skirt"
             ]
           }
         },
@@ -7244,7 +7204,6 @@
           "facts": {
             "semantic_role": "selector",
             "garment_topologies": [
-              "bottom_skirt",
               "top"
             ]
           }
@@ -7255,8 +7214,7 @@
           "facts": {
             "semantic_role": "selector",
             "garment_topologies": [
-              "bottom_skirt",
-              "top"
+              "outerwear"
             ]
           }
         },
@@ -7266,7 +7224,6 @@
           "facts": {
             "semantic_role": "selector",
             "garment_topologies": [
-              "bottom_skirt",
               "top"
             ]
           }
@@ -7283,8 +7240,7 @@
           "facts": {
             "semantic_role": "selector",
             "garment_topologies": [
-              "bottom_skirt",
-              "top"
+              "outerwear"
             ]
           }
         },
@@ -7294,7 +7250,6 @@
           "facts": {
             "semantic_role": "selector",
             "garment_topologies": [
-              "bottom_skirt",
               "top"
             ]
           }
@@ -7305,8 +7260,7 @@
           "facts": {
             "semantic_role": "selector",
             "garment_topologies": [
-              "bottom_skirt",
-              "top"
+              "bottom_skirt"
             ]
           }
         },
@@ -7316,8 +7270,7 @@
           "facts": {
             "semantic_role": "selector",
             "garment_topologies": [
-              "bottom_skirt",
-              "top"
+              "underwear"
             ]
           }
         },
@@ -7326,10 +7279,7 @@
           "text": "high heels",
           "facts": {
             "semantic_role": "selector",
-            "garment_topologies": [
-              "bottom_skirt",
-              "top"
-            ]
+            "garment_topologies": []
           }
         },
         {
@@ -7338,8 +7288,7 @@
           "facts": {
             "semantic_role": "selector",
             "garment_topologies": [
-              "bottom_skirt",
-              "top"
+              "ensemble_outfit"
             ]
           }
         }
@@ -7355,8 +7304,7 @@
           "facts": {
             "semantic_role": "selector",
             "garment_topologies": [
-              "bottom_skirt",
-              "top"
+              "one_piece"
             ]
           }
         },
@@ -7365,10 +7313,7 @@
           "text": "nurse cap with red cross",
           "facts": {
             "semantic_role": "selector",
-            "garment_topologies": [
-              "bottom_skirt",
-              "top"
-            ]
+            "garment_topologies": []
           }
         },
         {
@@ -7377,8 +7322,7 @@
           "facts": {
             "semantic_role": "selector",
             "garment_topologies": [
-              "bottom_skirt",
-              "top"
+              "one_piece"
             ]
           }
         },
@@ -7388,8 +7332,7 @@
           "facts": {
             "semantic_role": "selector",
             "garment_topologies": [
-              "bottom_skirt",
-              "top"
+              "underwear"
             ]
           }
         },
@@ -7398,10 +7341,7 @@
           "text": "stethoscope around neck",
           "facts": {
             "semantic_role": "selector",
-            "garment_topologies": [
-              "bottom_skirt",
-              "top"
-            ]
+            "garment_topologies": []
           }
         }
       ]
@@ -7482,8 +7422,7 @@
           "facts": {
             "semantic_role": "selector",
             "garment_topologies": [
-              "bottom_skirt",
-              "top"
+              "ensemble_outfit"
             ]
           }
         },
@@ -7493,8 +7432,7 @@
           "facts": {
             "semantic_role": "selector",
             "garment_topologies": [
-              "bottom_skirt",
-              "top"
+              "bottom_skirt"
             ]
           }
         },
@@ -7504,7 +7442,6 @@
           "facts": {
             "semantic_role": "selector",
             "garment_topologies": [
-              "bottom_skirt",
               "top"
             ]
           }
@@ -7515,7 +7452,6 @@
           "facts": {
             "semantic_role": "selector",
             "garment_topologies": [
-              "bottom_skirt",
               "top"
             ]
           }
@@ -7526,8 +7462,7 @@
           "facts": {
             "semantic_role": "selector",
             "garment_topologies": [
-              "bottom_skirt",
-              "top"
+              "bottom_skirt"
             ]
           }
         }
@@ -7609,8 +7544,7 @@
           "facts": {
             "semantic_role": "selector",
             "garment_topologies": [
-              "bottom_skirt",
-              "top"
+              "one_piece"
             ]
           }
         },
@@ -7620,8 +7554,7 @@
           "facts": {
             "semantic_role": "selector",
             "garment_topologies": [
-              "bottom_skirt",
-              "top"
+              "one_piece"
             ]
           }
         },
@@ -7631,8 +7564,7 @@
           "facts": {
             "semantic_role": "selector",
             "garment_topologies": [
-              "bottom_skirt",
-              "top"
+              "one_piece"
             ]
           }
         },
@@ -7642,8 +7574,7 @@
           "facts": {
             "semantic_role": "selector",
             "garment_topologies": [
-              "bottom_skirt",
-              "top"
+              "one_piece"
             ]
           }
         },
@@ -7653,8 +7584,7 @@
           "facts": {
             "semantic_role": "selector",
             "garment_topologies": [
-              "bottom_skirt",
-              "top"
+              "one_piece"
             ]
           }
         }
@@ -7670,8 +7600,7 @@
           "facts": {
             "semantic_role": "selector",
             "garment_topologies": [
-              "bottom_skirt",
-              "top"
+              "one_piece"
             ]
           }
         },
@@ -7681,7 +7610,6 @@
           "facts": {
             "semantic_role": "selector",
             "garment_topologies": [
-              "bottom_skirt",
               "top"
             ]
           }
@@ -7692,8 +7620,7 @@
           "facts": {
             "semantic_role": "selector",
             "garment_topologies": [
-              "bottom_skirt",
-              "top"
+              "one_piece"
             ]
           }
         },
@@ -7703,8 +7630,7 @@
           "facts": {
             "semantic_role": "selector",
             "garment_topologies": [
-              "bottom_skirt",
-              "top"
+              "one_piece"
             ]
           }
         }
@@ -7822,8 +7748,7 @@
           "facts": {
             "semantic_role": "selector",
             "garment_topologies": [
-              "bottom_skirt",
-              "top"
+              "one_piece"
             ]
           }
         },
@@ -7833,8 +7758,7 @@
           "facts": {
             "semantic_role": "selector",
             "garment_topologies": [
-              "bottom_skirt",
-              "top"
+              "one_piece"
             ]
           }
         },
@@ -7844,8 +7768,7 @@
           "facts": {
             "semantic_role": "selector",
             "garment_topologies": [
-              "bottom_skirt",
-              "top"
+              "one_piece"
             ]
           }
         },
@@ -7855,8 +7778,7 @@
           "facts": {
             "semantic_role": "selector",
             "garment_topologies": [
-              "bottom_skirt",
-              "top"
+              "one_piece"
             ]
           }
         }
@@ -7872,7 +7794,6 @@
           "facts": {
             "semantic_role": "selector",
             "garment_topologies": [
-              "bottom_skirt",
               "top"
             ]
           }
@@ -7883,7 +7804,6 @@
           "facts": {
             "semantic_role": "selector",
             "garment_topologies": [
-              "bottom_skirt",
               "top"
             ]
           }
@@ -7894,7 +7814,6 @@
           "facts": {
             "semantic_role": "selector",
             "garment_topologies": [
-              "bottom_skirt",
               "top"
             ]
           }
@@ -7905,7 +7824,6 @@
           "facts": {
             "semantic_role": "selector",
             "garment_topologies": [
-              "bottom_skirt",
               "top"
             ]
           }
@@ -7916,7 +7834,6 @@
           "facts": {
             "semantic_role": "selector",
             "garment_topologies": [
-              "bottom_skirt",
               "top"
             ]
           }
@@ -8009,8 +7926,7 @@
           "facts": {
             "semantic_role": "selector",
             "garment_topologies": [
-              "bottom_skirt",
-              "top"
+              "one_piece"
             ]
           }
         },
@@ -8019,10 +7935,7 @@
           "text": "bunny ears headband",
           "facts": {
             "semantic_role": "selector",
-            "garment_topologies": [
-              "bottom_skirt",
-              "top"
-            ]
+            "garment_topologies": []
           }
         },
         {
@@ -8030,10 +7943,7 @@
           "text": "fluffy white tail",
           "facts": {
             "semantic_role": "selector",
-            "garment_topologies": [
-              "bottom_skirt",
-              "top"
-            ]
+            "garment_topologies": []
           }
         },
         {
@@ -8041,10 +7951,7 @@
           "text": "white collar and bow tie",
           "facts": {
             "semantic_role": "selector",
-            "garment_topologies": [
-              "bottom_skirt",
-              "top"
-            ]
+            "garment_topologies": []
           }
         },
         {
@@ -8053,8 +7960,7 @@
           "facts": {
             "semantic_role": "selector",
             "garment_topologies": [
-              "bottom_skirt",
-              "top"
+              "underwear"
             ]
           }
         }
@@ -8070,7 +7976,6 @@
           "facts": {
             "semantic_role": "selector",
             "garment_topologies": [
-              "bottom_skirt",
               "top"
             ]
           }
@@ -8081,8 +7986,7 @@
           "facts": {
             "semantic_role": "selector",
             "garment_topologies": [
-              "bottom_skirt",
-              "top"
+              "bottom_skirt"
             ]
           }
         },
@@ -8091,10 +7995,7 @@
           "text": "pompoms",
           "facts": {
             "semantic_role": "selector",
-            "garment_topologies": [
-              "bottom_skirt",
-              "top"
-            ]
+            "garment_topologies": []
           }
         },
         {
@@ -8103,8 +8004,7 @@
           "facts": {
             "semantic_role": "selector",
             "garment_topologies": [
-              "bottom_skirt",
-              "top"
+              "ensemble_outfit"
             ]
           }
         }
@@ -8166,7 +8066,6 @@
           "facts": {
             "semantic_role": "selector",
             "garment_topologies": [
-              "bottom_skirt",
               "top"
             ]
           }
@@ -8177,8 +8076,7 @@
           "facts": {
             "semantic_role": "selector",
             "garment_topologies": [
-              "bottom_skirt",
-              "top"
+              "bottom_pants"
             ]
           }
         },
@@ -8188,7 +8086,6 @@
           "facts": {
             "semantic_role": "selector",
             "garment_topologies": [
-              "bottom_skirt",
               "top"
             ]
           }
@@ -8199,7 +8096,6 @@
           "facts": {
             "semantic_role": "selector",
             "garment_topologies": [
-              "bottom_skirt",
               "top"
             ]
           }
@@ -8216,8 +8112,7 @@
           "facts": {
             "semantic_role": "selector",
             "garment_topologies": [
-              "bottom_skirt",
-              "top"
+              "one_piece"
             ]
           }
         },
@@ -8227,8 +8122,7 @@
           "facts": {
             "semantic_role": "selector",
             "garment_topologies": [
-              "bottom_skirt",
-              "top"
+              "one_piece"
             ]
           }
         },
@@ -8238,8 +8132,7 @@
           "facts": {
             "semantic_role": "selector",
             "garment_topologies": [
-              "bottom_skirt",
-              "top"
+              "one_piece"
             ]
           }
         },
@@ -8249,8 +8142,7 @@
           "facts": {
             "semantic_role": "selector",
             "garment_topologies": [
-              "bottom_skirt",
-              "top"
+              "one_piece"
             ]
           }
         }
@@ -8266,7 +8158,6 @@
           "facts": {
             "semantic_role": "selector",
             "garment_topologies": [
-              "bottom_skirt",
               "top"
             ]
           }
@@ -8277,7 +8168,6 @@
           "facts": {
             "semantic_role": "selector",
             "garment_topologies": [
-              "bottom_skirt",
               "top"
             ]
           }
@@ -8288,7 +8178,6 @@
           "facts": {
             "semantic_role": "selector",
             "garment_topologies": [
-              "bottom_skirt",
               "top"
             ]
           }
@@ -412840,8 +412729,7 @@
           "facts": {
             "semantic_role": "selector",
             "garment_topologies": [
-              "bottom_skirt",
-              "top"
+              "bottom_skirt"
             ],
             "fabric_materials": [],
             "pattern_textures": [
@@ -412864,8 +412752,7 @@
           "facts": {
             "semantic_role": "selector",
             "garment_topologies": [
-              "bottom_skirt",
-              "top"
+              "bottom_skirt"
             ],
             "fabric_materials": [
               "silk"
@@ -412888,8 +412775,7 @@
           "facts": {
             "semantic_role": "selector",
             "garment_topologies": [
-              "bottom_skirt",
-              "top"
+              "bottom_skirt"
             ],
             "fabric_materials": [
               "lace"
@@ -412910,8 +412796,7 @@
           "facts": {
             "semantic_role": "selector",
             "garment_topologies": [
-              "bottom_skirt",
-              "top"
+              "bottom_skirt"
             ],
             "fabric_materials": [],
             "pattern_textures": [],
@@ -412930,8 +412815,7 @@
           "facts": {
             "semantic_role": "selector",
             "garment_topologies": [
-              "bottom_skirt",
-              "top"
+              "bottom_skirt"
             ],
             "fabric_materials": [],
             "pattern_textures": [],
@@ -412950,8 +412834,7 @@
           "facts": {
             "semantic_role": "selector",
             "garment_topologies": [
-              "bottom_skirt",
-              "top"
+              "bottom_skirt"
             ],
             "fabric_materials": [
               "silk"
@@ -412972,8 +412855,7 @@
           "facts": {
             "semantic_role": "selector",
             "garment_topologies": [
-              "bottom_skirt",
-              "top"
+              "bottom_skirt"
             ],
             "fabric_materials": [
               "lace",
@@ -412995,8 +412877,7 @@
           "facts": {
             "semantic_role": "selector",
             "garment_topologies": [
-              "bottom_skirt",
-              "top"
+              "bottom_skirt"
             ],
             "fabric_materials": [
               "tulle"
@@ -413019,8 +412900,7 @@
           "facts": {
             "semantic_role": "selector",
             "garment_topologies": [
-              "bottom_skirt",
-              "top"
+              "bottom_skirt"
             ],
             "fabric_materials": [],
             "pattern_textures": [
@@ -413041,8 +412921,7 @@
           "facts": {
             "semantic_role": "selector",
             "garment_topologies": [
-              "bottom_skirt",
-              "top"
+              "bottom_skirt"
             ],
             "fabric_materials": [],
             "pattern_textures": [],
@@ -413061,8 +412940,7 @@
           "facts": {
             "semantic_role": "selector",
             "garment_topologies": [
-              "bottom_skirt",
-              "top"
+              "bottom_skirt"
             ],
             "fabric_materials": [
               "satin"
@@ -413083,8 +412961,7 @@
           "facts": {
             "semantic_role": "selector",
             "garment_topologies": [
-              "bottom_skirt",
-              "top"
+              "bottom_skirt"
             ],
             "fabric_materials": [],
             "pattern_textures": [
@@ -413105,8 +412982,7 @@
           "facts": {
             "semantic_role": "selector",
             "garment_topologies": [
-              "bottom_skirt",
-              "top"
+              "bottom_skirt"
             ],
             "fabric_materials": [
               "chiffon"
@@ -413127,8 +413003,7 @@
           "facts": {
             "semantic_role": "selector",
             "garment_topologies": [
-              "bottom_skirt",
-              "top"
+              "bottom_skirt"
             ],
             "fabric_materials": [],
             "pattern_textures": [],
@@ -413147,8 +413022,7 @@
           "facts": {
             "semantic_role": "selector",
             "garment_topologies": [
-              "bottom_skirt",
-              "top"
+              "bottom_skirt"
             ],
             "fabric_materials": [
               "silk"
@@ -413169,8 +413043,7 @@
           "facts": {
             "semantic_role": "selector",
             "garment_topologies": [
-              "bottom_skirt",
-              "top"
+              "bottom_skirt"
             ],
             "fabric_materials": [],
             "pattern_textures": [
@@ -413191,8 +413064,7 @@
           "facts": {
             "semantic_role": "selector",
             "garment_topologies": [
-              "bottom_skirt",
-              "top"
+              "bottom_skirt"
             ],
             "fabric_materials": [],
             "pattern_textures": [],
@@ -413211,8 +413083,7 @@
           "facts": {
             "semantic_role": "selector",
             "garment_topologies": [
-              "bottom_skirt",
-              "top"
+              "bottom_skirt"
             ],
             "fabric_materials": [
               "cotton"
@@ -413233,8 +413104,7 @@
           "facts": {
             "semantic_role": "selector",
             "garment_topologies": [
-              "bottom_skirt",
-              "top"
+              "bottom_skirt"
             ],
             "fabric_materials": [],
             "pattern_textures": [],
@@ -413253,8 +413123,7 @@
           "facts": {
             "semantic_role": "selector",
             "garment_topologies": [
-              "bottom_skirt",
-              "top"
+              "bottom_skirt"
             ],
             "fabric_materials": [
               "lace",
@@ -413276,8 +413145,7 @@
           "facts": {
             "semantic_role": "selector",
             "garment_topologies": [
-              "bottom_skirt",
-              "top"
+              "bottom_skirt"
             ],
             "fabric_materials": [
               "silk",
@@ -413299,8 +413167,7 @@
           "facts": {
             "semantic_role": "selector",
             "garment_topologies": [
-              "bottom_skirt",
-              "top"
+              "bottom_skirt"
             ],
             "fabric_materials": [
               "silk",
@@ -413322,8 +413189,7 @@
           "facts": {
             "semantic_role": "selector",
             "garment_topologies": [
-              "bottom_skirt",
-              "top"
+              "bottom_skirt"
             ],
             "fabric_materials": [
               "lace",
@@ -413345,8 +413211,7 @@
           "facts": {
             "semantic_role": "selector",
             "garment_topologies": [
-              "bottom_skirt",
-              "top"
+              "bottom_skirt"
             ],
             "fabric_materials": [],
             "pattern_textures": [],
@@ -413365,8 +413230,7 @@
           "facts": {
             "semantic_role": "selector",
             "garment_topologies": [
-              "bottom_skirt",
-              "top"
+              "bottom_skirt"
             ],
             "fabric_materials": [
               "cotton"
@@ -413389,8 +413253,7 @@
           "facts": {
             "semantic_role": "selector",
             "garment_topologies": [
-              "bottom_skirt",
-              "top"
+              "bottom_skirt"
             ],
             "fabric_materials": [
               "crepe"
@@ -413411,8 +413274,7 @@
           "facts": {
             "semantic_role": "selector",
             "garment_topologies": [
-              "bottom_skirt",
-              "top"
+              "bottom_skirt"
             ],
             "fabric_materials": [],
             "pattern_textures": [],
@@ -413431,8 +413293,7 @@
           "facts": {
             "semantic_role": "selector",
             "garment_topologies": [
-              "bottom_skirt",
-              "top"
+              "bottom_skirt"
             ],
             "fabric_materials": [],
             "pattern_textures": [],
@@ -413451,8 +413312,7 @@
           "facts": {
             "semantic_role": "selector",
             "garment_topologies": [
-              "bottom_skirt",
-              "top"
+              "bottom_skirt"
             ],
             "fabric_materials": [],
             "pattern_textures": [],
@@ -413471,8 +413331,7 @@
           "facts": {
             "semantic_role": "selector",
             "garment_topologies": [
-              "bottom_skirt",
-              "top"
+              "bottom_skirt"
             ],
             "fabric_materials": [],
             "pattern_textures": [
@@ -413493,8 +413352,7 @@
           "facts": {
             "semantic_role": "selector",
             "garment_topologies": [
-              "bottom_skirt",
-              "top"
+              "bottom_skirt"
             ],
             "fabric_materials": [],
             "pattern_textures": [
@@ -413515,8 +413373,7 @@
           "facts": {
             "semantic_role": "selector",
             "garment_topologies": [
-              "bottom_skirt",
-              "top"
+              "bottom_skirt"
             ],
             "fabric_materials": [
               "silk"
@@ -413537,8 +413394,7 @@
           "facts": {
             "semantic_role": "selector",
             "garment_topologies": [
-              "bottom_skirt",
-              "top"
+              "bottom_skirt"
             ],
             "fabric_materials": [
               "lace"
@@ -413559,8 +413415,7 @@
           "facts": {
             "semantic_role": "selector",
             "garment_topologies": [
-              "bottom_skirt",
-              "top"
+              "bottom_skirt"
             ],
             "fabric_materials": [
               "silk",
@@ -413582,8 +413437,7 @@
           "facts": {
             "semantic_role": "selector",
             "garment_topologies": [
-              "bottom_skirt",
-              "top"
+              "bottom_skirt"
             ],
             "fabric_materials": [],
             "pattern_textures": [],
@@ -413602,8 +413456,7 @@
           "facts": {
             "semantic_role": "selector",
             "garment_topologies": [
-              "bottom_skirt",
-              "top"
+              "bottom_skirt"
             ],
             "fabric_materials": [
               "damask",
@@ -413627,8 +413480,7 @@
           "facts": {
             "semantic_role": "selector",
             "garment_topologies": [
-              "bottom_skirt",
-              "top"
+              "bottom_skirt"
             ],
             "fabric_materials": [
               "chiffon"
@@ -413651,8 +413503,7 @@
           "facts": {
             "semantic_role": "selector",
             "garment_topologies": [
-              "bottom_skirt",
-              "top"
+              "bottom_skirt"
             ],
             "fabric_materials": [],
             "pattern_textures": [],
@@ -413671,8 +413522,7 @@
           "facts": {
             "semantic_role": "selector",
             "garment_topologies": [
-              "bottom_skirt",
-              "top"
+              "bottom_skirt"
             ],
             "fabric_materials": [
               "gauze"
@@ -413693,8 +413543,7 @@
           "facts": {
             "semantic_role": "selector",
             "garment_topologies": [
-              "bottom_skirt",
-              "top"
+              "bottom_skirt"
             ],
             "fabric_materials": [
               "lace",
