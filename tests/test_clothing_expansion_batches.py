@@ -985,6 +985,107 @@ class TestClothingExpansionBatches(unittest.TestCase):
         tags = split_top_level_tags(res.positive)
         self.assertIn(expected_tag, tags, f"Compound tag with internal comma was corrupted or split into {tags}")
 
+    def test_05f_garment_carrier_vs_accessory_details_lifted_skirt_isolation(self):
+        """专项核验终验阻断项：区分完整服装与附属细节，确保实际输出包含承载动作的服装。
+
+        测试场景：
+        1. 独立消解器核验：当只有腰带、袖子、刺绣、丝带等附属构件时，绝不能附带掀裙/掀袍动作；
+           必须以 action == 'drop' 且 reason_code == 'state_lacks_carrier' 剔除；
+        2. 正例对比核验：当同时存在真实承载服装（如 semi-transparent nightie）与腰带时，掀裙动作合法保留；
+        3. 端到端生成核验：自定义提示词输入纯配件细节（如 untied belt / wide sleeves）且指定掀裙状态时，
+           生成提示词中绝无 dress hitched up / skirt pulled up，且决策报告记录 drop；
+        4. 公共入口复现回归：sample_clothing_result("随机 (Random)", "lifted_up", "L3", Random(21))
+           返回的 base_tags 必须包含真实承载服装，绝无仅返回 untied belt 的情况；
+        5. 底层数据事实断言：直接断言 clothing.json 中 untied belt / sleeves / embroidery 等标签拓扑为空，
+           且 jk_seifuku 短袖衬衫拓扑为 top（非 underwear），百褶裙为 bottom_skirt。
+        """
+        from tests.fixtures.conflict_rule_fixtures import make_test_atom
+
+        # 1. 独立消解器核验：纯配件标签无法承载掀裙或连衣裙动作
+        accessory_cases = [
+            ("untied belt", "silk_robe"),
+            ("wide sleeves", "hanfu"),
+            ("furisode kimono sleeves", "furisode"),
+            ("ornate floral embroidery", "furisode"),
+            ("embroidered ribbons", "modern_chinese"),
+            ("high side slit", "evening_dress"),
+            ("deep V-neck", "evening_dress"),
+        ]
+        for acc_text, style_id in accessory_cases:
+            atoms_acc = [
+                make_test_atom(acc_text, source_slot="clothing", item_id=style_id, garment_topologies=[], garment_states=["worn"], tag_order=0),
+                make_test_atom("dress hitched up", source_slot="clothing_state", item_id="lifted_up", garment_topologies=["one_piece"], garment_states=["lifted"], tag_order=1),
+                make_test_atom("skirt pulled up revealing panties", source_slot="clothing_state", item_id="lifted_up", garment_topologies=["bottom_skirt"], garment_states=["lifted"], tag_order=2),
+            ]
+            resolved_atoms_acc, _, report_acc = self.resolver.resolve_atoms_with_full_report(atoms_acc)
+            dropped_acc = {d.before_text: d.reason_code for d in report_acc.decisions if d.action == "drop"}
+            self.assertEqual(
+                dropped_acc.get("dress hitched up"),
+                "state_lacks_carrier",
+                f"Isolated accessory '{acc_text}' must drop 'dress hitched up' with state_lacks_carrier",
+            )
+            self.assertEqual(
+                dropped_acc.get("skirt pulled up revealing panties"),
+                "state_lacks_carrier",
+                f"Isolated accessory '{acc_text}' must drop 'skirt pulled up revealing panties' with state_lacks_carrier",
+            )
+            resolved_texts = [a.text for a in resolved_atoms_acc]
+            self.assertNotIn("dress hitched up", resolved_texts)
+            self.assertNotIn("skirt pulled up revealing panties", resolved_texts)
+
+        # 2. 正例对比核验：真实裙装大件 + 配件时，掀裙动作合法保留
+        atoms_positive = [
+            make_test_atom("semi-transparent nightie", source_slot="clothing", item_id="silk_robe", garment_topologies=["one_piece"], garment_states=["worn"], tag_order=0),
+            make_test_atom("untied belt", source_slot="clothing", item_id="silk_robe", garment_topologies=[], garment_states=["worn"], tag_order=1),
+            make_test_atom("dress hitched up", source_slot="clothing_state", item_id="lifted_up", garment_topologies=["one_piece"], garment_states=["lifted"], tag_order=2),
+        ]
+        resolved_atoms_pos, _, report_pos = self.resolver.resolve_atoms_with_full_report(atoms_positive)
+        dropped_pos = {d.before_text: d.reason_code for d in report_pos.decisions if d.action == "drop"}
+        self.assertNotIn("dress hitched up", dropped_pos, "Complete nightie carrier must retain dress hitched up")
+        self.assertIn("dress hitched up", [a.text for a in resolved_atoms_pos])
+
+        # 3. 端到端生成核验：自定义纯配件提示词在掀裙状态下不泄漏动作
+        for custom_acc in ("untied belt", "wide sleeves", "furisode kimono sleeves"):
+            gen_res = self.generator.generate_structured(
+                场景预设="日常街道",
+                服装款式="无 (None)",
+                服装状态="裙摆掀起 (Skirt Lifted Up)",
+                自定义提示词=custom_acc,
+                裸露等级="L2 差分微露 (Partially Exposed)",
+                prompt_seed=42,
+            )
+            self.assertIn(custom_acc, gen_res.positive)
+            self.assertNotIn("dress hitched up", gen_res.positive)
+            self.assertNotIn("skirt pulled up revealing panties", gen_res.positive)
+            self.assertNotIn("skirt hiked up to waist", gen_res.positive)
+
+        # 4. 公共入口复现回归：sample_clothing_result 绝不输出只有腰带/细节而附带掀裙
+        res_r21 = self.sampler.sample_clothing_result("随机 (Random)", "lifted_up", "L3", Random(21))
+        base_r21 = [t.text for t in res_r21.base_tags]
+        self.assertNotEqual(base_r21, ["untied belt"], "Public entry reproduction case must not return isolated untied belt")
+        garment_words = ("dress", "skirt", "robe", "gown", "kimono", "yukata", "cheongsam", "qipao", "hanfu", "hanbok", "nightie", "nightgown", "bathrobe", "lehenga", "chima", "sari", "dirndl", "tunic", "frock", "smock", "toga", "cassock", "habit", "costume", "lolita", "tutu", "apron", "sailor")
+        self.assertTrue(
+            any(any(w in t.lower() for w in garment_words) for t in base_r21),
+            f"Public entry result base tags {base_r21} must contain a genuine garment carrier",
+        )
+
+        # 5. 底层数据事实直接断言：核验 clothing.json 中的事实标签拓扑
+        clothing_data = self.sampler._load("clothing")
+        tag_topo_map = {
+            t["id"]: t.get("facts", {}).get("garment_topologies", [])
+            for c in clothing_data.get("categories", [])
+            for t in c.get("tags", [])
+        }
+        self.assertEqual(tag_topo_map.get("silk_robe__tag_003"), [], "untied belt must have empty topologies")
+        self.assertEqual(tag_topo_map.get("hanfu__tag_002"), [], "wide sleeves must have empty topologies")
+        self.assertEqual(tag_topo_map.get("furisode__tag_001"), [], "furisode sleeves must have empty topologies")
+        self.assertEqual(tag_topo_map.get("furisode__tag_002"), [], "floral embroidery must have empty topologies")
+        self.assertEqual(tag_topo_map.get("modern_chinese__tag_003"), [], "embroidered ribbons must have empty topologies")
+        self.assertEqual(tag_topo_map.get("evening_dress__tag_001"), [], "high side slit must have empty topologies")
+        self.assertEqual(tag_topo_map.get("evening_dress__tag_003"), [], "deep V-neck must have empty topologies")
+        self.assertEqual(tag_topo_map.get("jk_seifuku__tag_004"), ["top"], "jk_seifuku white short sleeve shirt must be top, not underwear")
+        self.assertEqual(tag_topo_map.get("jk_seifuku__tag_005"), ["bottom_skirt"], "jk_seifuku navy blue skirt must be bottom_skirt")
+
     def test_06_end_to_end_generation_and_dag_provenance(self):
         """端到端验证 Batch 1 (16 款), Batch 2 (22 款), Batch 3 (23 款), Batch 4 (23 款), Batch 5 (22 款) 共 106 款新增款式在真实节点生成下的 Provenance DAG 完整性与零未消解冲突。"""
         from tests.test_rc8_quality_gate import _verify_provenance_dag
@@ -1196,8 +1297,14 @@ class TestClothingExpansionBatches(unittest.TestCase):
         serialized = json.dumps(records, sort_keys=True, ensure_ascii=False)
         digest = hashlib.sha256(serialized.encode("utf-8")).hexdigest()
 
-        # 1. 当前 rc10 全量数据摘要：Batch 6 引入存量 35 款结构化变体元数据与两步契约后的权威基线
-        rc10_expanded_digest = "fdfe272c54e7326a380c6c22b665a938b569301bba806f4ed9f15486c4939bb3"
+        # 1. 当前 rc10 全量数据摘要：在校准 24 处附属细节/配件拓扑（如 furisode 袖子、leather_corset 绑带等剔除误标的 bottom_skirt）后，
+        # 930 组输出中 928 组与原基线完全一致，仅 2 组发生合理修正：
+        # - furisode (L2, seed=2024, unbuttoned): 从含有错误裙装开合 ['front unbuttoned', 'skirt unbuttoned']
+        #   修正为和服合法开合 ['front unbuttoned', 'collar unbuttoned']；
+        # - leather_corset (L2, seed=2024, unbuttoned): 从含有错误裙装开合 ['collar unbuttoned', 'skirt unbuttoned']
+        #   修正为上衣合法开合 ['front unbuttoned', 'shirt open at chest']。
+        # 杜绝了无裙装款式因配件拓扑误判而附带裙装解扣/动作的问题。
+        rc10_expanded_digest = "4f8d2fc0186ddcdad9e252040565a9b3a3f05aa488467c79a9558d0926eb782d"
         self.assertEqual(
             digest,
             rc10_expanded_digest,

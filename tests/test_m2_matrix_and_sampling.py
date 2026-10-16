@@ -814,6 +814,104 @@ class TestM2MatrixAndSampling(unittest.TestCase):
                     self.assertEqual(atom.facts.hands_required, 0, f"Prop tag {atom.text} requires >0 hands under bound_arms!")
                     self.assertNotEqual(atom.facts.prop_usage, "handheld", f"Prop tag {atom.text} is handheld under bound_arms!")
 
+    def test_17_garment_carrier_vs_accessory_details_and_lifted_skirt_contract(self):
+        """[M2-17] 区分完整服装与附属细节（腰带/袖子/刺绣/丝带等），杜绝细节被误判为真实裙装载体：
+        1. 公共入口复现回归：sample_clothing_result("随机 (Random)", "lifted_up", "L3", Random(21))
+           返回基础服装绝非仅有 untied belt，且必须包含承载动作的完整服装；
+        2. 500 个种子大容量全量抽样验证：在 Auto/Random 及 lifted_up 状态下，各种子输出的基础服装
+           100% 具备合法裙装载体，绝无任何仅含腰带/袖子/刺绣等纯细节构件的情况；
+        3. 消解器与生成器端到端独立断言：只有腰带/袖子时绝对禁止附带掀裙，以 state_lacks_carrier 记录 drop；
+        4. 基础数据校准断言：直接断言 clothing.json 中 untied belt / sleeves / embroidery 拓扑为空，
+           jk_seifuku 短袖衬衫拓扑为 top（非 underwear），百褶裙为 bottom_skirt。
+        """
+        from nodes import IYKYKPromptGenerator
+        from tests.fixtures.conflict_rule_fixtures import make_test_atom
+
+        # 1. 公共入口复现用例断言
+        res_r21 = self.sampler.sample_clothing_result("随机 (Random)", "lifted_up", "L3", Random(21))
+        base_texts_r21 = [t.text for t in res_r21.base_tags]
+        self.assertNotEqual(base_texts_r21, ["untied belt"], "Public entry reproduction case must not return isolated untied belt!")
+        garment_words = (
+            "dress", "skirt", "robe", "gown", "kimono", "yukata", "cheongsam",
+            "qipao", "hanfu", "hanbok", "furisode", "uchikake", "nightie",
+            "nightgown", "bathrobe", "lehenga", "chima", "sari", "dirndl",
+            "tunic", "frock", "smock", "toga", "chiton", "cassock", "habit",
+            "costume", "lolita", "tutu", "apron", "sailor", "changshan",
+            "daopao", "sara", "santa", "clothes", "clothing", "attire",
+            "nun", "outfit", "shoujo", "slip", "camisole", "petticoat"
+        )
+        self.assertTrue(
+            any(any(w in t.lower() for w in garment_words) for t in base_texts_r21),
+            f"Public entry result base tags {base_texts_r21} must contain a genuine garment carrier!",
+        )
+
+        # 2. 500 个随机种子全量检查：杜绝无真实裙装载体输出
+        accessory_only_words = {"untied belt", "long swinging sleeves", "wide sleeves", "ornate floral embroidery", "golden obi sash", "embroidered ribbons"}
+        for seed in range(500):
+            rng = Random(seed)
+            res_lifted = self.sampler.sample_clothing_result("随机 (Random)", "lifted_up", "L3", rng)
+            base_texts = [t.text for t in res_lifted.base_tags]
+            self.assertTrue(len(base_texts) > 0, f"Seed {seed} returned empty base_tags under lifted_up!")
+            self.assertFalse(
+                all(t in accessory_only_words for t in base_texts),
+                f"Seed {seed} (style={res_lifted.style_id}) returned only accessories: {base_texts}!",
+            )
+            has_carrier = any(
+                any(gw in t.lower() for gw in garment_words)
+                for t in base_texts
+            )
+            self.assertTrue(
+                has_carrier,
+                f"Seed {seed} (style={res_lifted.style_id}) lacks a genuine garment carrier: {base_texts}!",
+            )
+
+        # 3. 独立消解器断言：仅有腰带/袖子时不能附带掀裙
+        from lib.conflict_resolver import ConflictResolver
+        resolver = ConflictResolver(DATA_DIR)
+        for acc_text in ("untied belt", "wide sleeves", "furisode kimono sleeves", "ornate floral embroidery"):
+            atoms = [
+                make_test_atom(acc_text, source_slot="clothing", item_id="test_acc", garment_topologies=[], garment_states=["worn"], tag_order=0),
+                make_test_atom("dress hitched up", source_slot="clothing_state", item_id="lifted_up", garment_topologies=["one_piece"], garment_states=["lifted"], tag_order=1),
+                make_test_atom("skirt pulled up revealing panties", source_slot="clothing_state", item_id="lifted_up", garment_topologies=["bottom_skirt"], garment_states=["lifted"], tag_order=2),
+            ]
+            resolved_atoms, resolved_texts, report = resolver.resolve_atoms_with_full_report(atoms)
+            dropped = {d.before_text: d.reason_code for d in report.decisions if d.action == "drop"}
+            self.assertEqual(dropped.get("dress hitched up"), "state_lacks_carrier", f"'{acc_text}' must drop dress hitched up")
+            self.assertEqual(dropped.get("skirt pulled up revealing panties"), "state_lacks_carrier", f"'{acc_text}' must drop skirt pulled up")
+            final_atom_texts = [a.text for a in resolved_atoms]
+            self.assertNotIn("dress hitched up", final_atom_texts)
+            self.assertNotIn("skirt pulled up revealing panties", final_atom_texts)
+
+        # 4. 端到端生成断言：输入纯配件提示词在掀裙状态下不泄漏掀裙动作
+        gen = IYKYKPromptGenerator()
+        gen_out = gen.generate_structured(
+            场景预设="日常街道",
+            服装款式="无 (None)",
+            服装状态="裙摆掀起 (Skirt Lifted Up)",
+            自定义提示词="untied belt",
+            裸露等级="L2 差分微露 (Partially Exposed)",
+            prompt_seed=42,
+        )
+        self.assertIn("untied belt", gen_out.positive)
+        self.assertNotIn("dress hitched up", gen_out.positive)
+        self.assertNotIn("skirt pulled up revealing panties", gen_out.positive)
+        self.assertNotIn("skirt hiked up to waist", gen_out.positive)
+
+        # 5. 基础数据校准断言：直接断言 clothing.json 中的事实标签拓扑
+        clothing_data = self.sampler._load("clothing")
+        tag_topo_map = {
+            t["id"]: t.get("facts", {}).get("garment_topologies", [])
+            for c in clothing_data.get("categories", [])
+            for t in c.get("tags", [])
+        }
+        self.assertEqual(tag_topo_map.get("silk_robe__tag_003"), [], "untied belt must have empty topologies")
+        self.assertEqual(tag_topo_map.get("hanfu__tag_002"), [], "wide sleeves must have empty topologies")
+        self.assertEqual(tag_topo_map.get("furisode__tag_001"), [], "furisode sleeves must have empty topologies")
+        self.assertEqual(tag_topo_map.get("furisode__tag_002"), [], "floral embroidery must have empty topologies")
+        self.assertEqual(tag_topo_map.get("modern_chinese__tag_003"), [], "embroidered ribbons must have empty topologies")
+        self.assertEqual(tag_topo_map.get("jk_seifuku__tag_004"), ["top"], "jk_seifuku white short sleeve shirt must be top, not underwear")
+        self.assertEqual(tag_topo_map.get("jk_seifuku__tag_005"), ["bottom_skirt"], "jk_seifuku navy blue skirt must be bottom_skirt")
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -303,6 +303,29 @@ RE_PANTS_ACTION = re.compile(r"\b(?:pants|jeans|shorts)\b", re.IGNORECASE)
 RE_SKIRT_ACTION = re.compile(r"\b(?:skirt)\b", re.IGNORECASE)
 
 
+def _is_accessory_or_detail(text: Optional[str]) -> bool:
+    """判定构件文本是否纯属附属配件/饰品/细节（如腰带、袖子、刺绣、领口等），杜绝其被误判为承载动作的完整服装。"""
+    if not text:
+        return False
+    t_low = text.lower()
+    garment_nouns = (
+        "dress", "skirt", "robe", "gown", "kimono", "yukata", "cheongsam",
+        "qipao", "hanfu", "hanbok", "nightgown", "bathrobe", "nightie",
+        "sundress", "kilt", "sarong", "lehenga", "chima", "shirt", "blouse",
+        "suit", "jacket", "coat", "corset", "vest", "top", "pants", "shorts",
+        "jeans", "swimsuit", "bikini", "uniform", "changshan", "daopao",
+        "uchikake", "sari", "dirndl", "furisode", "tunic", "slip", "caftan",
+        "abaya", "overalls", "dungarees"
+    )
+    if any(w in t_low for w in garment_nouns):
+        return False
+    return bool(re.search(
+        r"\b(?:untied belt|belts?|sash|obi|sleeves?|floral embroidery|embroidery|embroidered ribbons?|ribbons?|collars?|scarf|scarves|bow tie|necktie|ties?|cuffs?|headbands?|pompoms?|badges?|brooches?|harness|studs|push-up cups|tulle fabric|delicate gauze)\b",
+        t_low,
+        re.IGNORECASE,
+    ))
+
+
 class CapabilitySupport(Enum):
     """构件/服装物理开合能力判定三态契约：明确支持、明确不支持、未知。"""
     SUPPORTED = "supported"        # 明确支持
@@ -676,6 +699,7 @@ def is_garment_compatible_with_state(
             if RE_DRESS_ACTION.search(atom_text):
                 is_dress = any(
                     a.facts and "one_piece" in a.facts.garment_topologies and entity.selected_id not in NON_SKIRT_ONE_PIECE
+                    and not _is_accessory_or_detail(a.text)
                     for a in entity.member_atoms
                 )
                 if not is_dress:
@@ -686,9 +710,9 @@ def is_garment_compatible_with_state(
             if RE_SKIRT_ACTION.search(atom_text):
                 has_skirt = any(
                     a.facts and (
-                        "bottom_skirt" in a.facts.garment_topologies or
+                        ("bottom_skirt" in a.facts.garment_topologies and not _is_accessory_or_detail(a.text)) or
                         does_garment_support_modifier(a.facts, "bottom_skirt") or
-                        ("one_piece" in a.facts.garment_topologies and entity.selected_id not in NON_SKIRT_ONE_PIECE)
+                        ("one_piece" in a.facts.garment_topologies and entity.selected_id not in NON_SKIRT_ONE_PIECE and not _is_accessory_or_detail(a.text))
                     )
                     for a in entity.member_atoms
                 )
@@ -770,9 +794,9 @@ def is_garment_compatible_with_state(
             if RE_SKIRT_ACTION.search(atom_text):
                 has_skirt = any(
                     a.facts and (
-                        "bottom_skirt" in a.facts.garment_topologies or
+                        ("bottom_skirt" in a.facts.garment_topologies and not _is_accessory_or_detail(a.text)) or
                         does_garment_support_modifier(a.facts, "bottom_skirt") or
-                        ("one_piece" in a.facts.garment_topologies and entity.selected_id not in NON_SKIRT_ONE_PIECE)
+                        ("one_piece" in a.facts.garment_topologies and entity.selected_id not in NON_SKIRT_ONE_PIECE and not _is_accessory_or_detail(a.text))
                     )
                     for a in entity.member_atoms
                 )

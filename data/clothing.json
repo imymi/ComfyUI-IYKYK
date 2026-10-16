@@ -49,9 +49,7 @@
           "text": "mandarin collar",
           "facts": {
             "semantic_role": "selector",
-            "garment_topologies": [
-              "one_piece"
-            ]
+            "garment_topologies": []
           }
         },
         {
@@ -1763,9 +1761,7 @@
           "text": "wide sleeves",
           "facts": {
             "semantic_role": "selector",
-            "garment_topologies": [
-              "one_piece"
-            ]
+            "garment_topologies": []
           }
         },
         {
@@ -1773,9 +1769,7 @@
           "text": "tulle fabric",
           "facts": {
             "semantic_role": "selector",
-            "garment_topologies": [
-              "one_piece"
-            ]
+            "garment_topologies": []
           }
         },
         {
@@ -1783,9 +1777,7 @@
           "text": "embroidered ribbons",
           "facts": {
             "semantic_role": "selector",
-            "garment_topologies": [
-              "one_piece"
-            ]
+            "garment_topologies": []
           }
         },
         {
@@ -1827,9 +1819,7 @@
           "text": "hollow chest detail",
           "facts": {
             "semantic_role": "selector",
-            "garment_topologies": [
-              "one_piece"
-            ]
+            "garment_topologies": []
           }
         },
         {
@@ -1837,9 +1827,7 @@
           "text": "sheer sleeves",
           "facts": {
             "semantic_role": "selector",
-            "garment_topologies": [
-              "one_piece"
-            ]
+            "garment_topologies": []
           }
         },
         {
@@ -1847,9 +1835,7 @@
           "text": "modern Chinese style",
           "facts": {
             "semantic_role": "selector",
-            "garment_topologies": [
-              "one_piece"
-            ]
+            "garment_topologies": []
           }
         }
       ]
@@ -1873,9 +1859,7 @@
           "text": "patterned obi sash",
           "facts": {
             "semantic_role": "selector",
-            "garment_topologies": [
-              "one_piece"
-            ]
+            "garment_topologies": []
           }
         },
         {
@@ -1893,9 +1877,7 @@
           "text": "loose collar",
           "facts": {
             "semantic_role": "selector",
-            "garment_topologies": [
-              "one_piece"
-            ]
+            "garment_topologies": []
           }
         },
         {
@@ -1903,9 +1885,7 @@
           "text": "layered fabric",
           "facts": {
             "semantic_role": "selector",
-            "garment_topologies": [
-              "one_piece"
-            ]
+            "garment_topologies": []
           }
         },
         {
@@ -3690,9 +3670,7 @@
           "text": "untied obi sash",
           "facts": {
             "semantic_role": "selector",
-            "garment_topologies": [
-              "one_piece"
-            ]
+            "garment_topologies": []
           }
         },
         {
@@ -4763,9 +4741,7 @@
           "text": "long swinging sleeves",
           "facts": {
             "semantic_role": "selector",
-            "garment_topologies": [
-              "one_piece"
-            ]
+            "garment_topologies": []
           }
         },
         {
@@ -4773,9 +4749,7 @@
           "text": "ornate floral embroidery",
           "facts": {
             "semantic_role": "selector",
-            "garment_topologies": [
-              "one_piece"
-            ]
+            "garment_topologies": []
           }
         },
         {
@@ -4783,9 +4757,7 @@
           "text": "golden obi sash",
           "facts": {
             "semantic_role": "selector",
-            "garment_topologies": [
-              "one_piece"
-            ]
+            "garment_topologies": []
           }
         },
         {
@@ -5971,9 +5943,7 @@
           "text": "sailor collar",
           "facts": {
             "semantic_role": "selector",
-            "garment_topologies": [
-              "top"
-            ]
+            "garment_topologies": []
           }
         },
         {
@@ -5991,9 +5961,7 @@
           "text": "sailor scarf",
           "facts": {
             "semantic_role": "selector",
-            "garment_topologies": [
-              "top"
-            ]
+            "garment_topologies": []
           }
         },
         {
@@ -6002,7 +5970,7 @@
           "facts": {
             "semantic_role": "selector",
             "garment_topologies": [
-              "underwear"
+              "top"
             ]
           }
         },
@@ -6011,7 +5979,9 @@
           "text": "navy blue skirt",
           "facts": {
             "semantic_role": "selector",
-            "garment_topologies": []
+            "garment_topologies": [
+              "bottom_skirt"
+            ]
           }
         }
       ]
@@ -6055,9 +6025,7 @@
           "text": "school necktie",
           "facts": {
             "semantic_role": "selector",
-            "garment_topologies": [
-              "top"
-            ]
+            "garment_topologies": []
           }
         },
         {
@@ -6168,9 +6136,7 @@
           "text": "vivid colorful ribbons",
           "facts": {
             "semantic_role": "selector",
-            "garment_topologies": [
-              "ensemble_outfit"
-            ]
+            "garment_topologies": []
           }
         },
         {
@@ -7223,9 +7189,7 @@
           "text": "korean schoolgirl",
           "facts": {
             "semantic_role": "selector",
-            "garment_topologies": [
-              "top"
-            ]
+            "garment_topologies": []
           }
         }
       ]
@@ -7287,9 +7251,7 @@
           "text": "office badge",
           "facts": {
             "semantic_role": "selector",
-            "garment_topologies": [
-              "ensemble_outfit"
-            ]
+            "garment_topologies": []
           }
         }
       ]
@@ -7451,9 +7413,7 @@
           "text": "bow tie",
           "facts": {
             "semantic_role": "selector",
-            "garment_topologies": [
-              "top"
-            ]
+            "garment_topologies": []
           }
         },
         {
@@ -7573,9 +7533,7 @@
           "text": "untied belt",
           "facts": {
             "semantic_role": "selector",
-            "garment_topologies": [
-              "one_piece"
-            ]
+            "garment_topologies": []
           }
         },
         {
@@ -7803,9 +7761,7 @@
           "text": "laced up tight",
           "facts": {
             "semantic_role": "selector",
-            "garment_topologies": [
-              "top"
-            ]
+            "garment_topologies": []
           }
         },
         {
@@ -7813,9 +7769,7 @@
           "text": "strappy leather harness",
           "facts": {
             "semantic_role": "selector",
-            "garment_topologies": [
-              "top"
-            ]
+            "garment_topologies": []
           }
         },
         {
@@ -7823,9 +7777,7 @@
           "text": "buckles and studs",
           "facts": {
             "semantic_role": "selector",
-            "garment_topologies": [
-              "top"
-            ]
+            "garment_topologies": []
           }
         },
         {
@@ -7833,9 +7785,7 @@
           "text": "push-up cups",
           "facts": {
             "semantic_role": "selector",
-            "garment_topologies": [
-              "top"
-            ]
+            "garment_topologies": []
           }
         },
         {
@@ -8003,9 +7953,7 @@
           "text": "vivid team colors",
           "facts": {
             "semantic_role": "selector",
-            "garment_topologies": [
-              "ensemble_outfit"
-            ]
+            "garment_topologies": []
           }
         }
       ]
@@ -8029,9 +7977,7 @@
           "text": "high side slit",
           "facts": {
             "semantic_role": "selector",
-            "garment_topologies": [
-              "one_piece"
-            ]
+            "garment_topologies": []
           }
         },
         {
@@ -8049,9 +7995,7 @@
           "text": "deep V-neck",
           "facts": {
             "semantic_role": "selector",
-            "garment_topologies": [
-              "one_piece"
-            ]
+            "garment_topologies": []
           }
         }
       ]

@@ -436,17 +436,42 @@ class DataSampler:
         return None
 
     @classmethod
+    def _is_accessory_or_detail(cls, text: str) -> bool:
+        """判定构件文本是否纯属附属配件/饰品/细节（如腰带、袖子、刺绣、领口等），杜绝其被误判为承载动作的完整服装。"""
+        if not text:
+            return False
+        t_low = text.lower()
+        garment_nouns = (
+            "dress", "skirt", "robe", "gown", "kimono", "yukata", "cheongsam",
+            "qipao", "hanfu", "hanbok", "nightgown", "bathrobe", "nightie",
+            "sundress", "kilt", "sarong", "lehenga", "chima", "shirt", "blouse",
+            "suit", "jacket", "coat", "corset", "vest", "top", "pants", "shorts",
+            "jeans", "swimsuit", "bikini", "uniform", "changshan", "daopao",
+            "uchikake", "sari", "dirndl", "furisode", "tunic", "slip", "caftan",
+            "abaya", "overalls", "dungarees"
+        )
+        if any(w in t_low for w in garment_nouns):
+            return False
+        return bool(re.search(
+            r"\b(?:untied belt|belts?|sash|obi|sleeves?|floral embroidery|embroidery|embroidered ribbons?|ribbons?|collars?|scarf|scarves|bow tie|necktie|ties?|cuffs?|headbands?|pompoms?|badges?|brooches?|harness|studs|push-up cups|tulle fabric|delicate gauze)\b",
+            t_low,
+            re.IGNORECASE,
+        ))
+
+    @classmethod
     def _tag_has_skirt_carrier(cls, tag: Any, style_id: str) -> bool:
         """判定单个标签（或 PromptAtom / SampledTag）是否包含或代表裙装形制载体。"""
         if not tag:
             return False
+        txt = tag.get("text", "").lower() if isinstance(tag, dict) else (getattr(tag, "text", "").lower() if hasattr(tag, "text") else str(tag).lower())
+        if cls._is_accessory_or_detail(txt):
+            return False
+
+        topos = set()
+        facts = None
         if isinstance(tag, dict):
             facts = tag.get("facts", {})
             topos = set(facts.get("garment_topologies") or [])
-            if "bottom_skirt" in topos:
-                return True
-            if "one_piece" in topos and style_id not in NON_SKIRT_ONE_PIECE:
-                return True
             ens = facts.get("ensemble_pieces")
             if isinstance(ens, dict):
                 bps = ens.get("bottom_pieces", [])
@@ -463,21 +488,25 @@ class DataSampler:
             supp = set(facts.get("supported_modifiers") or [])
             if "bottom_skirt" in supp:
                 return True
-            txt = tag.get("text", "").lower()
         elif hasattr(tag, "facts"):
             facts = getattr(tag, "facts", None)
             topos = set(getattr(facts, "garment_topologies", ()) if facts else ())
+
+        if topos:
             if "bottom_skirt" in topos:
                 return True
             if "one_piece" in topos and style_id not in NON_SKIRT_ONE_PIECE:
                 return True
-            txt = getattr(tag, "text", "").lower()
-        else:
-            txt = str(tag).lower()
+            if "ensemble_outfit" in topos:
+                if re.search(r"\b(?:skirt|pleated mini skirt|pencil skirt|chima|lehenga)\b", txt):
+                    return True
+                if re.search(r"\b(?:dress|gown|nightgown|bathrobe|nightie|slip dress)\b", txt):
+                    return True
+            return False
 
         if re.search(r"\b(?:skirt|pleated mini skirt|pencil skirt|chima|lehenga)\b", txt):
             return True
-        if re.search(r"\b(?:dress|gown|nightgown|slip dress)\b", txt) and style_id not in NON_SKIRT_ONE_PIECE:
+        if re.search(r"\b(?:dress|gown|nightgown|bathrobe|nightie|slip dress)\b", txt) and style_id not in NON_SKIRT_ONE_PIECE:
             return True
         return False
 
@@ -769,6 +798,11 @@ class DataSampler:
                         silhouette_candidates.append(t)
                 else:
                     silhouette_candidates.append(t)
+
+            if clothing_state and any(w in clothing_state.lower() for w in ("lifted", "掀起裙摆", "lifted_up", "lifted_skirt")):
+                skirt_silhouettes = [t for t in silhouette_candidates if cls._tag_has_skirt_carrier(t, c_id)]
+                if skirt_silhouettes:
+                    silhouette_candidates = skirt_silhouettes
 
             if silhouette_candidates:
                 chosen_silhouette = rng.choice(silhouette_candidates)
@@ -1795,13 +1829,6 @@ class DataSampler:
             else:
                 allowed_state_ids = set()
 
-            # 根据款式形制能力动态修剪随机状态候选，杜绝无开合结构款式抽中 unbuttoned，或无裙装款式抽中 lifted_up
-            has_skirt = any(self._tag_has_skirt_carrier(t, c_id) for t in base_tags_tuple) or self._is_clothing_skirt_compatible(chosen_style)
-            if not has_skirt:
-                allowed_state_ids.discard("lifted_up")
-            if c_id not in ALLOWED_BUTTON_STYLES:
-                allowed_state_ids.discard("unbuttoned")
-
             pool = [s for s in states if s.get("id") in allowed_state_ids] if allowed_state_ids else states
             chosen_state = self._pick_one(pool if pool else states, rng)
             state_id = chosen_state.get("id", "")
@@ -1827,7 +1854,8 @@ class DataSampler:
                     if skirt_base:
                         picked_skirt = self._pick_one(skirt_base, rng)
                         non_skirt = [t for t in base_tags_tuple if t != picked_skirt]
-                        other_pick = self._pick(non_skirt, rng, 1) if non_skirt and rng.random() < 0.5 else []
+                        count = min(2, len(base_tags_tuple))
+                        other_pick = self._pick(non_skirt, rng, count - 1) if count > 1 and non_skirt else []
                         chosen_base = [picked_skirt] + other_pick
                     else:
                         chosen_base = self._pick(base_tags_tuple, rng, min(2, len(base_tags_tuple)))
@@ -1863,7 +1891,8 @@ class DataSampler:
                     if skirt_base:
                         picked_skirt = self._pick_one(skirt_base, rng)
                         non_skirt = [t for t in base_tags_tuple if t != picked_skirt]
-                        other_pick = self._pick(non_skirt, rng, 1) if non_skirt and rng.random() < 0.5 else []
+                        count = min(2, len(base_tags_tuple))
+                        other_pick = self._pick(non_skirt, rng, count - 1) if count > 1 and non_skirt else []
                         chosen_base = [picked_skirt] + other_pick
                     else:
                         chosen_base = self._pick(base_tags_tuple, rng, min(2, len(base_tags_tuple)))
@@ -1871,11 +1900,6 @@ class DataSampler:
                     chosen_base = self._pick(base_tags_tuple, rng, min(2, len(base_tags_tuple)))
             base_tags_tuple = tuple(chosen_base)
 
-        # 确保实际抽中的服装组合真正具备裙装载体；若无裙装载体，坚决不附带掀裙状态
-        if state_id in ("lifted_up", "lifted", "lifted_skirt"):
-            if not any(self._tag_has_skirt_carrier(t, c_id) for t in base_tags_tuple):
-                state_tags_list = ()
-                state_id = "normal"
 
         # 契约：Auto, Random, Explicit 在 L2/L3/L4 均通过数据驱动采样扩展库
         extension_sampled_tags: List[SampledTag] = []
