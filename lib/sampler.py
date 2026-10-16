@@ -19,7 +19,13 @@ from random import Random
 from typing import Any, Dict, List, Optional, Sequence, Set, Tuple
 
 if __package__:
-    from .conflict_resolver import GarmentCarrierEntity, is_garment_compatible_with_state
+    from .conflict_resolver import (
+        ALLOWED_BUTTON_STYLES,
+        ALLOWED_ZIPPER_STYLES,
+        NON_SKIRT_ONE_PIECE,
+        GarmentCarrierEntity,
+        is_garment_compatible_with_state,
+    )
     from .context_affinity import (
         ContextAffinityRegistry,
         compute_context_profile,
@@ -44,7 +50,13 @@ if __package__:
         ThemeSampleResult,
     )
 else:
-    from lib.conflict_resolver import GarmentCarrierEntity, is_garment_compatible_with_state
+    from lib.conflict_resolver import (
+        ALLOWED_BUTTON_STYLES,
+        ALLOWED_ZIPPER_STYLES,
+        NON_SKIRT_ONE_PIECE,
+        GarmentCarrierEntity,
+        is_garment_compatible_with_state,
+    )
     from lib.context_affinity import (
         ContextAffinityRegistry,
         compute_context_profile,
@@ -408,6 +420,91 @@ class DataSampler:
             return cand_map.get(chosen_id, self._pick_one(list(candidates), rng))
         else:
             return self._pick_one(list(candidates), rng)
+
+    def get_excluded_candidate_ids(
+        self,
+        slot_name: str,
+        nudity_level_code: Optional[str] = None,
+        shot_type_id: Optional[str] = None,
+        clothing_state: Optional[str] = None,
+        pose_id: Optional[str] = None,
+        hand_state: Optional[str] = None,
+        context: Optional[str] = None,
+    ) -> Set[str]:
+        """依据已知硬约束规则，在实际抽样前精确生成被排除的冲突候选 ID 集合。
+
+        已知硬约束规约：
+        1. camera_angle:
+           - L1 裸露等级下排除窥底/情色视角 (between_legs_angle)；
+           - 极特写/面部特写 (extreme_close_up, close_up) 下排除窥底/下肢视角 (between_legs_angle)；
+        2. clothing:
+           - 当指定为解扣状态时，排除无纽扣/拉链开合能力的连体衣/泳装/无开合结构款式；
+           - 当指定为掀裙状态时，排除连体非裙装 (NON_SKIRT_ONE_PIECE) 及裤装款式；
+           - L1 裸露等级下排除超微比基尼/裸体缎带/情趣束缚等极度暴露款式；
+        3. lighting:
+           - L1 裸露等级下排除情色光影 (erotic_lighting_00..03)；
+        4. pose:
+           - 极特写/面部特写 (extreme_close_up, close_up) 下依据规则 13 排除纯下半身体态 (all_fours, kneeling, limb_posture)；
+           - L1 裸露等级下排除高束缚/情调姿态 (restraints_holds)；
+        5. props:
+           - 依据规则 9，当手部被占用 (hand_state == 'both_busy' 或 pose_id in ('restraints_holds', 'combat_action')) 时，排除需要手持的道具；
+           - L1 裸露等级下排除成人情趣道具 (sex_toy_vibrator, bondage_rope_collar)。
+        """
+        excluded: Set[str] = set()
+
+        if slot_name == "camera_angle":
+            if nudity_level_code == "L1" or shot_type_id in ("extreme_close_up", "close_up"):
+                excluded.add("between_legs_angle")
+
+        elif slot_name == "lighting":
+            if nudity_level_code == "L1":
+                excluded.update({"erotic_lighting_00", "erotic_lighting_01", "erotic_lighting_02", "erotic_lighting_03"})
+
+        elif slot_name == "props":
+            if hand_state == "both_busy" or pose_id in ("restraints_holds", "combat_action"):
+                excluded.update({
+                    "wine_glass_bottle",
+                    "smartphone_recording",
+                    "digital_camera_record",
+                    "oriental_fan_umbrella",
+                    "game_controller",
+                    "sex_toy_vibrator",
+                    "fashion_clutch_bag",
+                    "fashion_baguette_bag",
+                    "flower_bouquet_petals",
+                    "plush_doll_teddy",
+                    "pillow_clutching",
+                })
+            if nudity_level_code == "L1":
+                excluded.update({"sex_toy_vibrator", "bondage_rope_collar"})
+
+        elif slot_name == "pose":
+            if shot_type_id in ("extreme_close_up", "close_up"):
+                excluded.update({"all_fours", "kneeling", "limb_posture"})
+            if nudity_level_code == "L1":
+                excluded.update({"restraints_holds"})
+
+        elif slot_name == "clothing":
+            if clothing_state:
+                st_low = clothing_state.lower()
+                if any(w in st_low for w in ("unbuttoned", "解开纽扣", "opened", "解扣")):
+                    data = self._load("clothing")
+                    for c in data.get("categories", []):
+                        cid = c.get("id")
+                        if cid and cid not in ALLOWED_BUTTON_STYLES:
+                            excluded.add(cid)
+                elif any(w in st_low for w in ("lifted", "掀起裙摆", "lifted_up", "lifted_skirt")):
+                    excluded.update(NON_SKIRT_ONE_PIECE)
+                    data = self._load("clothing")
+                    for c in data.get("categories", []):
+                        cid = c.get("id", "")
+                        if any(w in cid for w in ("pants", "shorts", "jeans", "trousers", "overalls", "catsuit")):
+                            excluded.add(cid)
+            if nudity_level_code == "L1":
+                excluded.update({"bikini_micro", "naked_ribbon", "bondage_harness", "sling_bikini"})
+
+        return excluded
+
 
     @staticmethod
     def _get_affinity_ids(context: Optional[str], slot_key: str) -> List[str]:
@@ -1205,6 +1302,7 @@ class DataSampler:
         rng: Random,
         context_profile: Optional[ContextProfile] = None,
         nudity_level_code: Optional[str] = None,
+        shot_type_id: Optional[str] = None,
     ) -> Optional[SampleResult]:
         if _is_none(angle):
             return None
@@ -1213,20 +1311,23 @@ class DataSampler:
         if not angles:
             return None
 
-        # L1 约束：在随机或自动模式下过滤情色/窥底特殊视角 (between_legs_angle)
-        if nudity_level_code == "L1" and (_is_random(angle) or _is_auto(angle)):
-            angles = [
-                a for a in angles
-                if a.get("id") != "between_legs_angle"
-                and not any(
-                    any(bw in (t.get("text", "") if isinstance(t, dict) else str(t)).lower() for bw in ("upskirt", "between legs", "crotch"))
-                    for t in a.get("tags", [])
-                )
-            ]
+        excluded_ids = self.get_excluded_candidate_ids(
+            "camera_angle",
+            nudity_level_code=nudity_level_code,
+            shot_type_id=shot_type_id,
+        )
 
         target_tag = None
         if _is_random(angle) or _is_auto(angle):
-            chosen = self._sample_from_candidates("camera_angle", angles, rng, profile=context_profile)
+            chosen = self._sample_from_candidates(
+                "camera_angle",
+                angles,
+                rng,
+                profile=context_profile,
+                excluded_ids=excluded_ids,
+            )
+            if not chosen:
+                return None
         else:
             chosen = _match_item(angles, angle, "camera_angles")
             if not chosen:
@@ -1255,8 +1356,19 @@ class DataSampler:
             sampled_tags=sampled,
         )
 
-    def sample_camera_angle(self, angle: str, rng: Random) -> List[str]:
-        res = self.sample_camera_angle_result(angle, rng)
+    def sample_camera_angle(
+        self,
+        angle: str,
+        rng: Random,
+        nudity_level_code: Optional[str] = None,
+        shot_type_id: Optional[str] = None,
+    ) -> List[str]:
+        res = self.sample_camera_angle_result(
+            angle,
+            rng,
+            nudity_level_code=nudity_level_code,
+            shot_type_id=shot_type_id,
+        )
         return list(res.tags) if res else []
 
     def sample_quality_result(self, quality_tier: str) -> Optional[SampleResult]:
@@ -1388,8 +1500,23 @@ class DataSampler:
         # 1. 确定服装款式对象
         style_mode = get_selection_mode(style)
         target_tag = None
-        if style_mode == SelectionMode.RANDOM:
-            chosen_style = self._sample_from_candidates("clothing", styles, rng, profile=context_profile, context=context)
+        if style_mode in (SelectionMode.RANDOM, SelectionMode.AUTO) or _is_random(style) or _is_auto(style):
+            excluded_ids = self.get_excluded_candidate_ids(
+                "clothing",
+                nudity_level_code=nudity_level_code,
+                clothing_state=state,
+                context=context,
+            )
+            chosen_style = self._sample_from_candidates(
+                "clothing",
+                styles,
+                rng,
+                profile=context_profile,
+                context=context,
+                excluded_ids=excluded_ids,
+            )
+            if not chosen_style:
+                return ClothingSampleResult(base_tags=(), nudity_level=nudity_level_code)
         else:
             chosen_style = _match_item(styles, style)
             if not chosen_style:
@@ -1720,95 +1847,28 @@ class DataSampler:
 
     # ─── 槽位 5: 光影氛围 ───
 
-    def sample_lighting_result(self, preset: str, rng: Random, nudity_level_code: Optional[str] = None, context_profile: Optional[ContextProfile] = None) -> Optional[SampleResult]:
-        if _is_none(preset):
-            return None
-        data = self._load("lighting")
-
-        if _is_auto(preset) or _is_random(preset):
-            combos = data.get("preset_combos", [])
-            if combos and hasattr(self, "affinity_registry"):
-                chosen_combo = self._sample_from_candidates("lighting", combos, rng, profile=context_profile)
-                if chosen_combo:
-                    chosen_id = chosen_combo.get("id", "lighting_combo")
-                    parts = []
-                    for k in ["main_light", "modifier_light", "atmosphere"]:
-                        v = chosen_combo.get(k, "")
-                        if v:
-                            parts.extend([t.strip() for t in v.split(",") if t.strip()])
-                    prov = TagProvenance(item_id=chosen_id, kind="lighting", semantic_ids=(f"lighting:{chosen_id}",), parent_ids=(chosen_id,))
-                    sampled_tags: List[SampledTag] = []
-                    for idx, t_text in enumerate(parts):
-                        sampled_tags.append(
-                            SampledTag(
-                                text=t_text,
-                                provenance=prov,
-                                id=f"{chosen_id}__tag_{idx:03d}",
-                                facts=SemanticFacts(semantic_role="selector"),
-                            )
-                        )
-                    return SampleResult(tags=tuple(parts), item_id=chosen_id, provenance=prov, sampled_tags=tuple(sampled_tags))
-
-            raw_result: List[Any] = []
-            chosen_id = "lighting_auto"
-            techniques = data.get("professional_lighting", [])
-            if techniques:
-                tech = self._pick_one(techniques, rng)
-                chosen_id = tech.get("id", chosen_id)
-                tags = list(tech.get("tags", []))
-                if nudity_level_code != "L1":
-                    tags.extend(tech.get("erotic_tags", []))
-                if tags:
-                    raw_result.extend(self._pick(tags, rng, min(2, len(tags))))
-
-            temps = data.get("color_temperature_table", [])
-            if temps:
-                temp = self._pick_one(temps, rng)
-                t_tags = self._flatten_tags(temp)
-                if t_tags:
-                    raw_result.append(t_tags[0])
-            prov = TagProvenance(item_id=chosen_id, kind="lighting", semantic_ids=(f"lighting:{chosen_id}",), parent_ids=(chosen_id,))
-            tags_str: List[str] = []
-            sampled_tags: List[SampledTag] = []
-            for idx, item in enumerate(raw_result):
-                if isinstance(item, dict):
-                    t_text = item.get("text", "")
-                    t_id = item.get("id", f"{chosen_id}__tag_{idx:03d}")
-                    t_facts = SemanticFacts.from_dict(item.get("facts", {}))
-                    if t_facts.semantic_role is None:
-                        t_facts = SemanticFacts.from_dict({**item.get("facts", {}), "semantic_role": "selector"})
-                else:
-                    t_text = str(item).strip()
-                    t_id = f"{chosen_id}__tag_{idx:03d}"
-                    t_facts = SemanticFacts(semantic_role="selector")
-                tags_str.append(t_text)
-                sampled_tags.append(
-                    SampledTag(
-                        text=t_text,
-                        provenance=TagProvenance(
-                            item_id=chosen_id,
-                            kind="lighting",
-                            parent_ids=(chosen_id,),
-                            semantic_ids=(f"lighting:{chosen_id}",),
-                        ),
-                        id=t_id,
-                        facts=t_facts,
-                    )
-                )
-            return SampleResult(tags=tuple(tags_str), item_id=chosen_id, provenance=prov, sampled_tags=tuple(sampled_tags))
-
-        # EXPLICIT
-        combos = data.get("preset_combos", [])
-        p = _match_item(combos, preset, "lighting_combos")
-        if p:
-            parts = []
+    def _format_lighting_sample_result(
+        self,
+        chosen: Dict[str, Any],
+        rng: Random,
+        nudity_level_code: Optional[str] = None,
+        target_tag: Optional[Any] = None,
+    ) -> SampleResult:
+        chosen_id = chosen.get("id", "lighting_preset")
+        # Combo presets have main_light / modifier_light / atmosphere
+        if any(k in chosen for k in ("main_light", "modifier_light", "atmosphere")):
+            parts: List[str] = []
             for k in ["main_light", "modifier_light", "atmosphere"]:
-                v = p.get(k, "")
+                v = chosen.get(k, "")
                 if v:
                     parts.extend([t.strip() for t in v.split(",") if t.strip()])
-            chosen_id = p.get("id", "lighting_combo")
-            prov = TagProvenance(item_id=chosen_id, kind="lighting", semantic_ids=(f"lighting:{chosen_id}",), parent_ids=(chosen_id,))
-            sampled_tags = [
+            prov = TagProvenance(
+                item_id=chosen_id,
+                kind="lighting",
+                semantic_ids=(f"lighting:{chosen_id}",),
+                parent_ids=(chosen_id,),
+            )
+            sampled_tags: List[SampledTag] = [
                 SampledTag(
                     text=t,
                     provenance=prov,
@@ -1817,85 +1877,161 @@ class DataSampler:
                 )
                 for idx, t in enumerate(parts)
             ]
-            return SampleResult(tags=tuple(parts), item_id=chosen_id, provenance=prov, sampled_tags=tuple(sampled_tags))
+            return SampleResult(
+                tags=tuple(parts),
+                item_id=chosen_id,
+                provenance=prov,
+                sampled_tags=tuple(sampled_tags),
+            )
 
-        all_other = []
-        for sec in ["professional_lighting", "cinematic_lighting", "special_effects", "erotic_lighting"]:
-            items = data.get(sec, [])
-            if isinstance(items, list):
-                all_other.extend(items)
+        # Single presets (professional, cinematic, special, erotic)
+        tags = list(chosen.get("tags", []))
+        if nudity_level_code != "L1":
+            tags.extend(chosen.get("erotic_tags", []))
 
-        item_match = _match_item(all_other, preset, "lighting_presets")
-        target_tag = None
-        if not item_match:
-            tag_match = _match_tag(all_other, preset)
-            if tag_match:
-                item_match, target_tag = tag_match
-
-        if item_match:
-            tags = list(item_match.get("tags", []))
-            if nudity_level_code != "L1":
-                tags.extend(item_match.get("erotic_tags", []))
-            chosen_id = item_match.get("id", "lighting_preset")
-            if target_tag:
-                selected = [target_tag]
+        if target_tag:
+            selected = [target_tag]
+        else:
+            selector_tags = [
+                t for t in tags
+                if (isinstance(t, dict) and (t.get("facts", {}).get("semantic_role") == "selector" or t.get("id", "").endswith("__tag_000")))
+            ]
+            other_tags = [t for t in tags if t not in selector_tags]
+            if selector_tags:
+                sel = self._pick_one(selector_tags, rng)
+                selected = [sel]
+                if other_tags and rng.random() < 0.5:
+                    selected.append(self._pick_one(other_tags, rng))
             else:
-                selector_tags = [t for t in tags if (isinstance(t, dict) and (t.get("facts", {}).get("semantic_role") == "selector" or t.get("id", "").endswith("__tag_000")))]
-                other_tags = [t for t in tags if t not in selector_tags]
-                if selector_tags:
-                    sel = self._pick_one(selector_tags, rng)
-                    selected = [sel]
-                    if other_tags and rng.random() < 0.5:
-                        selected.append(self._pick_one(other_tags, rng))
-                else:
-                    selected = self._pick(tags, rng, min(rng.randint(1, 2), len(tags))) if tags else []
-            prov = TagProvenance(item_id=chosen_id, kind="lighting", semantic_ids=(f"lighting:{chosen_id}",))
-            tags_str = []
-            sampled_tags = []
-            primary_tod = None
-            for item in selected:
-                if isinstance(item, dict):
-                    f = item.get("facts", {})
-                    if f.get("time_of_day"):
-                        primary_tod = f.get("time_of_day")
-                        break
-            for idx, item in enumerate(selected):
-                if isinstance(item, dict):
-                    t_text = item.get("text", "")
-                    t_id = item.get("id", f"{chosen_id}__tag_{idx:03d}")
-                    f_dict = dict(item.get("facts", {}))
-                    if f_dict.get("time_of_day") is None and primary_tod:
-                        f_dict["time_of_day"] = primary_tod
-                    t_facts = SemanticFacts.from_dict(f_dict)
-                else:
-                    t_text = str(item).strip()
-                    t_id = f"{chosen_id}__tag_{idx:03d}"
-                    t_facts = SemanticFacts(time_of_day=primary_tod)
-                tags_str.append(t_text)
-                sampled_tags.append(
-                    SampledTag(
-                        text=t_text,
-                        provenance=TagProvenance(
-                            item_id=chosen_id,
-                            kind="lighting",
-                            parent_ids=(chosen_id,),
-                            semantic_ids=(f"lighting:{chosen_id}",),
-                        ),
-                        id=t_id,
-                        facts=t_facts,
-                    )
+                selected = self._pick(tags, rng, min(rng.randint(1, 2), len(tags))) if tags else []
+
+        prov = TagProvenance(
+            item_id=chosen_id,
+            kind="lighting",
+            semantic_ids=(f"lighting:{chosen_id}",),
+            parent_ids=(chosen_id,),
+        )
+        tags_str: List[str] = []
+        sampled_tags_list: List[SampledTag] = []
+        primary_tod = None
+        for item in selected:
+            if isinstance(item, dict):
+                f = item.get("facts", {})
+                if f.get("time_of_day"):
+                    primary_tod = f.get("time_of_day")
+                    break
+
+        for idx, item in enumerate(selected):
+            if isinstance(item, dict):
+                t_text = item.get("text", "")
+                t_id = item.get("id", f"{chosen_id}__tag_{idx:03d}")
+                f_dict = dict(item.get("facts", {}))
+                if f_dict.get("time_of_day") is None and primary_tod:
+                    f_dict["time_of_day"] = primary_tod
+                t_facts = SemanticFacts.from_dict(f_dict)
+                if t_facts.semantic_role is None:
+                    t_facts = SemanticFacts.from_dict({**f_dict, "semantic_role": "selector"})
+            else:
+                t_text = str(item).strip()
+                t_id = f"{chosen_id}__tag_{idx:03d}"
+                t_facts = SemanticFacts(semantic_role="selector", time_of_day=primary_tod)
+            tags_str.append(t_text)
+            sampled_tags_list.append(
+                SampledTag(
+                    text=t_text,
+                    provenance=TagProvenance(
+                        item_id=chosen_id,
+                        kind="lighting",
+                        parent_ids=(chosen_id,),
+                        semantic_ids=(f"lighting:{chosen_id}",),
+                    ),
+                    id=t_id,
+                    facts=t_facts,
                 )
-            return SampleResult(tags=tuple(tags_str), item_id=chosen_id, provenance=prov, sampled_tags=tuple(sampled_tags))
+            )
+        return SampleResult(
+            tags=tuple(tags_str),
+            item_id=chosen_id,
+            provenance=prov,
+            sampled_tags=tuple(sampled_tags_list),
+        )
 
-        raise DataSelectionError(f"Unknown lighting preset: {preset!r}")
+    def sample_lighting_result(
+        self,
+        preset: str,
+        rng: Random,
+        nudity_level_code: Optional[str] = None,
+        context_profile: Optional[ContextProfile] = None,
+    ) -> Optional[SampleResult]:
+        if _is_none(preset):
+            return None
+        data = self._load("lighting")
+        combos = data.get("preset_combos", [])
+        prof = data.get("professional_lighting", [])
+        cine = data.get("cinematic_lighting", [])
+        spec = data.get("special_effects", [])
+        erot = data.get("erotic_lighting", [])
+        all_lighting_candidates = list(combos) + list(prof) + list(cine) + list(spec) + list(erot)
 
-    def sample_lighting(self, preset: str, rng: Random, nudity_level_code: Optional[str] = None) -> List[str]:
+        if not all_lighting_candidates:
+            return None
+
+        excluded_ids = self.get_excluded_candidate_ids(
+            "lighting",
+            nudity_level_code=nudity_level_code,
+        )
+
+        target_tag = None
+        if _is_auto(preset) or _is_random(preset):
+            chosen = self._sample_from_candidates(
+                "lighting",
+                all_lighting_candidates,
+                rng,
+                profile=context_profile,
+                excluded_ids=excluded_ids,
+            )
+            if not chosen:
+                return None
+        else:
+            # EXPLICIT
+            p = _match_item(combos, preset, "lighting_combos")
+            if p:
+                chosen = p
+            else:
+                all_other = list(prof) + list(cine) + list(spec) + list(erot)
+                item_match = _match_item(all_other, preset, "lighting_presets")
+                if not item_match:
+                    tag_match = _match_tag(all_other, preset)
+                    if tag_match:
+                        item_match, target_tag = tag_match
+                if item_match:
+                    chosen = item_match
+                else:
+                    raise DataSelectionError(f"Unknown lighting preset: {preset!r}")
+
+        return self._format_lighting_sample_result(
+            chosen, rng, nudity_level_code=nudity_level_code, target_tag=target_tag
+        )
+
+    def sample_lighting(
+        self,
+        preset: str,
+        rng: Random,
+        nudity_level_code: Optional[str] = None,
+    ) -> List[str]:
         res = self.sample_lighting_result(preset, rng, nudity_level_code)
         return list(res.tags) if res else []
 
     # ─── 槽位 6: 姿势动作 ───
 
-    def sample_pose_result(self, category: str, rng: Random, nudity_level_code: Optional[str] = None, context_profile: Optional[ContextProfile] = None) -> Optional[SampleResult]:
+    def sample_pose_result(
+        self,
+        category: str,
+        rng: Random,
+        nudity_level_code: Optional[str] = None,
+        context_profile: Optional[ContextProfile] = None,
+        shot_type_id: Optional[str] = None,
+    ) -> Optional[SampleResult]:
         if _is_none(category):
             return None
         data = self._load("poses")
@@ -1903,9 +2039,23 @@ class DataSampler:
         if not categories:
             return None
 
+        excluded_ids = self.get_excluded_candidate_ids(
+            "pose",
+            nudity_level_code=nudity_level_code,
+            shot_type_id=shot_type_id,
+        )
+
         target_tag = None
-        if _is_random(category):
-            cat = self._sample_from_candidates("pose", categories, rng, profile=context_profile)
+        if _is_random(category) or _is_auto(category):
+            cat = self._sample_from_candidates(
+                "pose",
+                categories,
+                rng,
+                profile=context_profile,
+                excluded_ids=excluded_ids,
+            )
+            if not cat:
+                return None
         else:
             cat = _match_item(categories, category, "poses")
             if not cat:
@@ -1983,8 +2133,19 @@ class DataSampler:
             )
         return SampleResult(tags=tuple(tags_str), item_id=cat_id, provenance=prov, sampled_tags=tuple(sampled_tags))
 
-    def sample_pose(self, category: str, rng: Random, nudity_level_code: Optional[str] = None) -> List[str]:
-        res = self.sample_pose_result(category, rng, nudity_level_code)
+    def sample_pose(
+        self,
+        category: str,
+        rng: Random,
+        nudity_level_code: Optional[str] = None,
+        shot_type_id: Optional[str] = None,
+    ) -> List[str]:
+        res = self.sample_pose_result(
+            category,
+            rng,
+            nudity_level_code=nudity_level_code,
+            shot_type_id=shot_type_id,
+        )
         return list(res.tags) if res else []
 
     # ─── 槽位 7: 表情眼神 ───
@@ -2281,7 +2442,16 @@ class DataSampler:
 
     # ─── 槽位 13: 道具宠物 ───
 
-    def sample_prop_result(self, prop_style: str, rng: Random, context: Optional[str] = None, context_profile: Optional[ContextProfile] = None) -> Optional[SampleResult]:
+    def sample_prop_result(
+        self,
+        prop_style: str,
+        rng: Random,
+        context: Optional[str] = None,
+        context_profile: Optional[ContextProfile] = None,
+        pose_id: Optional[str] = None,
+        hand_state: Optional[str] = None,
+        nudity_level_code: Optional[str] = None,
+    ) -> Optional[SampleResult]:
         if _is_none(prop_style):
             return None
         data = self._load("props")
@@ -2289,9 +2459,25 @@ class DataSampler:
         if not props:
             return None
 
-        if _is_random(prop_style):
+        if _is_random(prop_style) or _is_auto(prop_style):
             pool = [p for p in props if p.get("id") != "none"]
-            chosen = self._sample_from_candidates("props", pool, rng, profile=context_profile, context=context)
+            excluded_ids = self.get_excluded_candidate_ids(
+                "props",
+                nudity_level_code=nudity_level_code,
+                pose_id=pose_id,
+                hand_state=hand_state,
+                context=context,
+            )
+            chosen = self._sample_from_candidates(
+                "props",
+                pool,
+                rng,
+                profile=context_profile,
+                context=context,
+                excluded_ids=excluded_ids,
+            )
+            if not chosen:
+                return None
         else:
             chosen = _match_item(props, prop_style)
             if not chosen:
@@ -2316,8 +2502,23 @@ class DataSampler:
         prov = TagProvenance(item_id=item_id, kind="prop", semantic_ids=(f"prop:{item_id}",))
         return SampleResult(tags=tags_str, item_id=item_id, provenance=prov, sampled_tags=sampled)
 
-    def sample_prop(self, prop_style: str, rng: Random, context: Optional[str] = None) -> List[str]:
-        res = self.sample_prop_result(prop_style, rng, context)
+    def sample_prop(
+        self,
+        prop_style: str,
+        rng: Random,
+        context: Optional[str] = None,
+        pose_id: Optional[str] = None,
+        hand_state: Optional[str] = None,
+        nudity_level_code: Optional[str] = None,
+    ) -> List[str]:
+        res = self.sample_prop_result(
+            prop_style,
+            rng,
+            context=context,
+            pose_id=pose_id,
+            hand_state=hand_state,
+            nudity_level_code=nudity_level_code,
+        )
         return list(res.tags) if res else []
 
     # ─── 服装扩展梯度采样辅助方法 ───

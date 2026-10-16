@@ -118,37 +118,32 @@ class TestContextAffinityMatrix(unittest.TestCase):
             self.assertEqual(detected, expected_ctx, f"Failed for '{scene}' + '{theme}', got '{detected}' expected '{expected_ctx}'")
 
     def test_weighted_sampling_affinity_adherence(self):
-        """测试在不同情境下随机采样服装时，亲和候选集被高度优先命中"""
-        rng = Random(42)
-
-        # 1. 校园情境：随机采样服装应高频命中 JK/西装制服/体操服
-        school_clothings = [
-            self.sampler.sample_clothing_with_nudity_linkage("随机 (Random)", "正常穿着 (Normal)", "L1", Random(i), context="school")[0]
+        """测试在不同情境下随机采样服装时，亲和候选集被高度优先命中（断言真实 style_id 归属，杜绝关键字模糊匹配）"""
+        # 1. 校园情境：随机采样服装应高频命中亲和矩阵候选集
+        school_cands = set(CONTEXT_AFFINITY["school"]["clothing"])
+        school_results = [
+            self.sampler.sample_clothing_result("随机 (Random)", "正常穿着 (Normal)", "L1", Random(i), context="school")
             for i in range(50)
         ]
-        school_keywords = ["seifuku", "uniform", "blazer", "school", "gym", "skirt", "sailor", "vest", "cheerleader", "coat", "sundress", "sportswear"]
-        school_match = sum(1 for c in school_clothings if any(k in c.lower() for k in school_keywords))
+        school_match = sum(1 for res in school_results if res.style_id in school_cands)
         self.assertGreaterEqual(school_match, 35, f"School context clothing match {school_match}/50 too low")
 
-        # 2. 温泉情境：随机采样服装应高频命中 浴衣/和服/泳装/浴袍
-        onsen_clothings = [
-            self.sampler.sample_clothing_with_nudity_linkage("随机 (Random)", "正常穿着 (Normal)", "L1", Random(i), context="onsen_bath")[0]
+        # 2. 温泉情境：随机采样服装应高频命中亲和矩阵候选集
+        onsen_cands = set(CONTEXT_AFFINITY["onsen_bath"]["clothing"])
+        onsen_results = [
+            self.sampler.sample_clothing_result("随机 (Random)", "正常穿着 (Normal)", "L1", Random(i), context="onsen_bath")
             for i in range(50)
         ]
-        onsen_keywords = ["yukata", "kimono", "swimsuit", "bikini", "swimwear", "robe", "bathrobe"]
-        onsen_match = sum(1 for c in onsen_clothings if any(k in c.lower() for k in onsen_keywords))
+        onsen_match = sum(1 for res in onsen_results if res.style_id in onsen_cands)
         self.assertGreaterEqual(onsen_match, 35, f"Onsen context clothing match {onsen_match}/50 too low")
 
-        # 3. 户外情境：随机采样服装应高频命中 泳衣/比基尼/便服/体操服/户外防风冲锋外套/夏日连衣裙
-        outdoor_clothings = [
-            self.sampler.sample_clothing_with_nudity_linkage("随机 (Random)", "正常穿着 (Normal)", "L1", Random(i), context="outdoor")[0]
+        # 3. 户外情境：随机采样服装应高频命中亲和矩阵候选集
+        outdoor_cands = set(CONTEXT_AFFINITY["outdoor"]["clothing"])
+        outdoor_results = [
+            self.sampler.sample_clothing_result("随机 (Random)", "正常穿着 (Normal)", "L1", Random(i), context="outdoor")
             for i in range(50)
         ]
-        outdoor_keywords = [
-            "bikini", "swimsuit", "swimwear", "rashguard", "beachwear", "casual", "gym", "cheerleader",
-            "jacket", "dress", "sundress", "windbreaker", "parka", "coat", "tactical", "sportswear", "racing", "jumpsuit", "uniform"
-        ]
-        outdoor_match = sum(1 for c in outdoor_clothings if any(k in c.lower() for k in outdoor_keywords))
+        outdoor_match = sum(1 for res in outdoor_results if res.style_id in outdoor_cands)
         self.assertGreaterEqual(outdoor_match, 35, f"Outdoor context clothing match {outdoor_match}/50 too low")
 
 

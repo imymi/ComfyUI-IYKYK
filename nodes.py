@@ -489,9 +489,16 @@ def _generate_structured(
     rng_shot = derive_substream_rng(effective_seed, "selector:shot_type")
     shot_res = sampler.sample_shot_type_result(景别构图, rng_shot, context_profile=context_profile)
     slots["shot_type"] = _make_slot_fragments(shot_res, "shot_type", 景别构图, entry_point)
+    shot_type_id = shot_res.item_id if shot_res else None
 
     rng_angle = derive_substream_rng(effective_seed, "selector:camera_angle")
-    angle_res = sampler.sample_camera_angle_result(拍摄视角, rng_angle, context_profile=context_profile, nudity_level_code=lvl_code)
+    angle_res = sampler.sample_camera_angle_result(
+        拍摄视角,
+        rng_angle,
+        context_profile=context_profile,
+        nudity_level_code=lvl_code,
+        shot_type_id=shot_type_id,
+    )
     slots["camera_angle"] = _make_slot_fragments(angle_res, "camera_angle", 拍摄视角, entry_point)
 
     rng_clothing = derive_substream_rng(effective_seed, "selector:clothing")
@@ -502,12 +509,20 @@ def _generate_structured(
 
     # 槽位 5: 光影氛围
     rng_lighting = derive_substream_rng(effective_seed, "selector:lighting")
-    lighting_res = sampler.sample_lighting_result(光影预设, rng_lighting, nudity_level_code=lvl_code, context_profile=context_profile)
+    lighting_res = sampler.sample_lighting_result(
+        光影预设, rng_lighting, nudity_level_code=lvl_code, context_profile=context_profile
+    )
     slots["lighting"] = _make_slot_fragments(lighting_res, "lighting", 光影预设, entry_point)
 
     # 槽位 6: 姿势动作
     rng_pose = derive_substream_rng(effective_seed, "selector:pose")
-    pose_res = sampler.sample_pose_result(姿势动作, rng_pose, nudity_level_code=lvl_code, context_profile=context_profile)
+    pose_res = sampler.sample_pose_result(
+        姿势动作,
+        rng_pose,
+        nudity_level_code=lvl_code,
+        context_profile=context_profile,
+        shot_type_id=shot_type_id,
+    )
     slots["pose"] = _make_slot_fragments(pose_res, "pose", 姿势动作, entry_point)
 
     # 槽位 7: 表情眼神
@@ -545,8 +560,29 @@ def _generate_structured(
     slots["tattoo"] = _make_slot_fragments(tattoo_res, "tattoo", 纹身标记, entry_point)
 
     # 槽位 13: 道具物件
+    pose_id = pose_res.item_id if pose_res else None
+    hand_state = None
+    if pose_res and pose_res.sampled_tags:
+        for t in pose_res.sampled_tags:
+            hs = getattr(t.facts, "hand_state", None) if t.facts else None
+            if hs == "both_busy":
+                hand_state = "both_busy"
+                break
+            elif hs == "one_busy" and hand_state != "both_busy":
+                hand_state = "one_busy"
+            elif hs == "free" and not hand_state:
+                hand_state = "free"
+
     rng_prop = derive_substream_rng(effective_seed, "selector:props")
-    prop_res = sampler.sample_prop_result(道具物件, rng_prop, context=context, context_profile=context_profile)
+    prop_res = sampler.sample_prop_result(
+        道具物件,
+        rng_prop,
+        context=context,
+        context_profile=context_profile,
+        pose_id=pose_id,
+        hand_state=hand_state,
+        nudity_level_code=lvl_code,
+    )
     slots["props"] = _make_slot_fragments(prop_res, "props", 道具物件, entry_point)
 
     # 槽位 14: 人格角色

@@ -237,7 +237,7 @@ class TestM2MatrixAndSampling(unittest.TestCase):
 
     def test_07_weighted_sampling_monotonic_order_and_exact_formula(self):
         """[M2-07] weighted 单元严格满足公式 P(cid) = 0.15*G_s + 0.85*(w/sum(w))，且 P(w=4) > P(w=2) > P(w=1) > P(unlisted)。"""
-        # 选取包含 4, 2, 1 梯度的单元：outdoor x clothing
+        # 1. 真实矩阵 4.0 vs 2.0 vs unlisted 单元：outdoor x clothing
         cell = self.registry.matrix["outdoor"]["clothing"]
         self.assertEqual(cell["mode"], "weighted")
 
@@ -246,7 +246,6 @@ class TestM2MatrixAndSampling(unittest.TestCase):
         self.assertTrue(len(w4_ids) > 0)
         self.assertTrue(len(w2_ids) > 0)
 
-        # 模拟全量候选池包含矩阵内候选以及一个未列入矩阵的候选
         all_pool = [c["id"] for c in cell["candidates"]] + ["unlisted_outdoor_dress"]
         n_cands = len(all_pool)
         g_val = 1.0 / float(n_cands)
@@ -267,7 +266,6 @@ class TestM2MatrixAndSampling(unittest.TestCase):
             matrix=self.registry.matrix,
         )
 
-        # 验证单调概率排序: P(w=4) > P(w=2) > P(unlisted)
         p_w4 = dist[w4_ids[0]]
         p_w2 = dist[w2_ids[0]]
         p_unlisted = dist["unlisted_outdoor_dress"]
@@ -275,7 +273,6 @@ class TestM2MatrixAndSampling(unittest.TestCase):
         self.assertGreater(p_w4, p_w2, "Weight 4.0 probability must exceed weight 2.0")
         self.assertGreater(p_w2, p_unlisted, "Weight 2.0 probability must exceed unlisted (G_s only)")
 
-        # 验证精确数值公式
         expected_w4 = 0.15 * g_val + 0.85 * (4.0 / sum_w)
         expected_w2 = 0.15 * g_val + 0.85 * (2.0 / sum_w)
         expected_unlisted = 0.15 * g_val + 0.85 * 0.0
@@ -283,6 +280,78 @@ class TestM2MatrixAndSampling(unittest.TestCase):
         self.assertAlmostEqual(dist[w4_ids[0]], expected_w4, places=9)
         self.assertAlmostEqual(dist[w2_ids[0]], expected_w2, places=9)
         self.assertAlmostEqual(dist["unlisted_outdoor_dress"], expected_unlisted, places=9)
+
+        # 2. 真实矩阵含权重 1.0 单元：transit x tattoo
+        transit_cell = self.registry.matrix["transit"]["tattoo"]
+        t_w1_ids = [c["id"] for c in transit_cell["candidates"] if c["weight"] == 1.0]
+        t_w2_ids = [c["id"] for c in transit_cell["candidates"] if c["weight"] == 2.0]
+        self.assertTrue(len(t_w1_ids) > 0)
+        self.assertTrue(len(t_w2_ids) > 0)
+        t_pool = [c["id"] for c in transit_cell["candidates"]] + ["unlisted_tattoo"]
+        t_prof = ContextProfile(
+            weights=(("transit", 1.0),),
+            scene_item_id="dummy",
+            theme_id="dummy",
+            scene_context_ids=("transit",),
+            theme_context_ids=("transit",),
+        )
+        t_dist = compute_slot_distribution(
+            slot_name="tattoo",
+            profile=t_prof,
+            catalog_candidates=t_pool,
+            matrix=self.registry.matrix,
+        )
+        self.assertGreater(t_dist[t_w2_ids[0]], t_dist[t_w1_ids[0]], "Weight 2.0 must exceed weight 1.0 in transit tattoo")
+        self.assertGreater(t_dist[t_w1_ids[0]], t_dist["unlisted_tattoo"], "Weight 1.0 must exceed unlisted in transit tattoo")
+
+        t_sum_w = sum(c["weight"] for c in transit_cell["candidates"])
+        t_g = 1.0 / float(len(t_pool))
+        self.assertAlmostEqual(t_dist[t_w2_ids[0]], 0.15 * t_g + 0.85 * (2.0 / t_sum_w), places=9)
+        self.assertAlmostEqual(t_dist[t_w1_ids[0]], 0.15 * t_g + 0.85 * (1.0 / t_sum_w), places=9)
+        self.assertAlmostEqual(t_dist["unlisted_tattoo"], 0.15 * t_g, places=9)
+
+        # 3. 合成 4/2/1 全梯度单元精确公式断言: P(w=4) > P(w=2) > P(w=1) > P(unlisted)
+        synthetic_matrix = {
+            "special": {
+                "clothing": {
+                    "mode": "weighted",
+                    "candidates": [
+                        {"id": "cand_w4", "weight": 4.0},
+                        {"id": "cand_w2", "weight": 2.0},
+                        {"id": "cand_w1", "weight": 1.0},
+                    ]
+                }
+            }
+        }
+        synthetic_pool = ["cand_w4", "cand_w2", "cand_w1", "cand_unlisted"]
+        synthetic_prof = ContextProfile(
+            weights=(("special", 1.0),),
+            scene_item_id="dummy",
+            theme_id="dummy",
+            scene_context_ids=("special",),
+            theme_context_ids=("special",),
+        )
+        synth_dist = compute_slot_distribution(
+            slot_name="clothing",
+            profile=synthetic_prof,
+            catalog_candidates=synthetic_pool,
+            matrix=synthetic_matrix,
+        )
+        p_4 = synth_dist["cand_w4"]
+        p_2 = synth_dist["cand_w2"]
+        p_1 = synth_dist["cand_w1"]
+        p_un = synth_dist["cand_unlisted"]
+
+        self.assertGreater(p_4, p_2, "P(w=4) must strictly exceed P(w=2)")
+        self.assertGreater(p_2, p_1, "P(w=2) must strictly exceed P(w=1)")
+        self.assertGreater(p_1, p_un, "P(w=1) must strictly exceed P(unlisted)")
+
+        synth_sum_w = 4.0 + 2.0 + 1.0
+        synth_g = 1.0 / 4.0
+        self.assertAlmostEqual(p_4, 0.15 * synth_g + 0.85 * (4.0 / synth_sum_w), places=9)
+        self.assertAlmostEqual(p_2, 0.15 * synth_g + 0.85 * (2.0 / synth_sum_w), places=9)
+        self.assertAlmostEqual(p_1, 0.15 * synth_g + 0.85 * (1.0 / synth_sum_w), places=9)
+        self.assertAlmostEqual(p_un, 0.15 * synth_g + 0.85 * 0.0, places=9)
 
     # ─────────────────────────────────────────────────────────────────
     # 四、多情境信号精确合成 (Multi-Context Profile Blending)
@@ -459,6 +528,220 @@ class TestM2MatrixAndSampling(unittest.TestCase):
         self.assertEqual(res1.positive, res2.positive, "Identical seed must yield identical positive prompt")
         self.assertEqual(res1.negative, res2.negative, "Identical seed must yield identical negative prompt")
         self.assertEqual([a.text for a in res1.atoms], [a.text for a in res2.atoms], "Identical seed must yield identical atoms")
+
+    # ─────────────────────────────────────────────────────────────────
+    # 七、光影候选全域可达性与公共入口硬冲突预过滤 (Expanded Lighting & Pre-filtering)
+    # ─────────────────────────────────────────────────────────────────
+
+    def test_13_lighting_auto_random_reaches_all_59_items_and_sections(self):
+        """[M2-13] sample_lighting_result 在 auto/random 模式下打通全部 59 个光影候选项（覆盖 5 大分区），且 Provenance/Tag 结构完整。"""
+        lighting_data = self.sampler._load("lighting")
+        combos = lighting_data.get("preset_combos", [])
+        prof = lighting_data.get("professional_lighting", [])
+        cine = lighting_data.get("cinematic_lighting", [])
+        spec = lighting_data.get("special_effects", [])
+        erot = lighting_data.get("erotic_lighting", [])
+        all_59_ids = {x["id"] for x in (combos + prof + cine + spec + erot)}
+        self.assertEqual(len(all_59_ids), 59, "Lighting total IDs must be 59")
+
+        # 验证在大量采样中，各个分区的代表候选项均可被自动/随机抽样命中（非仅限于 preset_combos）
+        hit_ids = set()
+        for seed in range(300):
+            res = self.sampler.sample_lighting_result("随机 (Random)", Random(seed))
+            self.assertIsNotNone(res)
+            self.assertIn(res.item_id, all_59_ids)
+            self.assertEqual(res.provenance.kind, "lighting")
+            self.assertGreater(len(res.tags), 0)
+            self.assertGreater(len(res.sampled_tags), 0)
+            hit_ids.add(res.item_id)
+
+        # 验证 professional_lighting / cinematic_lighting / preset_combos 分区均有条目被命中
+        prof_ids = {x["id"] for x in prof}
+        cine_ids = {x["id"] for x in cine}
+        combo_ids = {x["id"] for x in combos}
+        self.assertTrue(len(hit_ids & prof_ids) > 0, "Professional lighting items must be reachable in random mode")
+        self.assertTrue(len(hit_ids & cine_ids) > 0, "Cinematic lighting items must be reachable in random mode")
+        self.assertTrue(len(hit_ids & combo_ids) > 0, "Preset combos must be reachable in random mode")
+
+        # 明确核验重点扩充候选：professional_lighting_14 (树影日光), professional_lighting_15 (落日侧光), ext_aw_light_warm_golden_hour
+        outdoor_prof = compute_context_profile(["outdoor"], [])
+        outdoor_hits = set()
+        for seed in range(150):
+            r = self.sampler.sample_lighting_result("随机 (Random)", Random(seed), context_profile=outdoor_prof)
+            if r:
+                outdoor_hits.add(r.item_id)
+        self.assertTrue(
+            "professional_lighting_14" in outdoor_hits or "professional_lighting_15" in outdoor_hits or "ext_aw_light_warm_golden_hour" in outdoor_hits,
+            "Key expanded lighting candidates must be reachable under affinity contexts"
+        )
+
+        # 验证显式/直接抽样对 single preset 与 combo preset 的格式一致性
+        res_prof = self.sampler.sample_lighting_result("professional_lighting_14", Random(42))
+        self.assertEqual(res_prof.item_id, "professional_lighting_14")
+        self.assertEqual(res_prof.provenance.item_id, "professional_lighting_14")
+        self.assertTrue(all(t.provenance.item_id == "professional_lighting_14" for t in res_prof.sampled_tags))
+
+        res_combo = self.sampler.sample_lighting_result("lighting_studio_commercial", Random(42))
+        self.assertEqual(res_combo.item_id, "lighting_studio_commercial")
+        self.assertEqual(res_combo.provenance.item_id, "lighting_studio_commercial")
+        self.assertTrue(all(t.provenance.item_id == "lighting_studio_commercial" for t in res_combo.sampled_tags))
+
+    def test_14_public_entry_point_hard_conflict_pre_filtering(self):
+        """[M2-14] 验证公共采样入口在采样前精确执行硬冲突预过滤。"""
+        # 1. 视角预过滤：L1 或 特写 (close_up) 下排除 between_legs_angle
+        for seed in range(50):
+            res_l1 = self.sampler.sample_camera_angle_result("随机 (Random)", Random(seed), nudity_level_code="L1")
+            self.assertIsNotNone(res_l1)
+            self.assertNotEqual(res_l1.item_id, "between_legs_angle")
+
+            res_cu = self.sampler.sample_camera_angle_result("随机 (Random)", Random(seed), shot_type_id="close_up")
+            self.assertIsNotNone(res_cu)
+            self.assertNotEqual(res_cu.item_id, "between_legs_angle")
+
+        # 2. 光影预过滤：L1 下排除情色光影 (erotic_lighting_00..03)
+        erotic_light_ids = {"erotic_lighting_00", "erotic_lighting_01", "erotic_lighting_02", "erotic_lighting_03"}
+        for seed in range(50):
+            res_lgt_l1 = self.sampler.sample_lighting_result("随机 (Random)", Random(seed), nudity_level_code="L1")
+            self.assertIsNotNone(res_lgt_l1)
+            self.assertNotIn(res_lgt_l1.item_id, erotic_light_ids)
+
+        # 3. 姿势预过滤：特写构图下排除下半身姿态 (all_fours, kneeling, limb_posture)；L1 下排除 restraints_holds
+        banned_cu_poses = {"all_fours", "kneeling", "limb_posture"}
+        for seed in range(50):
+            res_pose_cu = self.sampler.sample_pose_result("随机 (Random)", Random(seed), shot_type_id="close_up")
+            self.assertIsNotNone(res_pose_cu)
+            self.assertNotIn(res_pose_cu.item_id, banned_cu_poses)
+
+            res_pose_l1 = self.sampler.sample_pose_result("随机 (Random)", Random(seed), nudity_level_code="L1")
+            self.assertIsNotNone(res_pose_l1)
+            self.assertNotEqual(res_pose_l1.item_id, "restraints_holds")
+
+        # 4. 道具预过滤：双手占用 (hand_state='both_busy' 或 pose_id='restraints_holds') 下排除手持道具
+        handheld_prop_ids = {
+            "wine_glass_bottle", "smartphone_recording", "digital_camera_record",
+            "oriental_fan_umbrella", "game_controller", "sex_toy_vibrator",
+            "fashion_clutch_bag", "fashion_baguette_bag", "flower_bouquet_petals",
+            "plush_doll_teddy", "pillow_clutching",
+        }
+        sampled_prop_ids = set()
+        for seed in range(50):
+            res_prop_busy = self.sampler.sample_prop_result("随机 (Random)", Random(seed), hand_state="both_busy")
+            if res_prop_busy:
+                self.assertNotIn(res_prop_busy.item_id, handheld_prop_ids, f"Handheld prop {res_prop_busy.item_id} sampled when hands busy!")
+                sampled_prop_ids.add(res_prop_busy.item_id)
+        # 证明非手持道具（环境/接触类）仍可正常被采样抽取
+        self.assertTrue(len(sampled_prop_ids) > 0, "Non-handheld props must remain sampleable")
+
+        # 5. 服装预过滤：解扣状态下排除无开合结构款式；掀裙状态下排除连体衣与裤装
+        for seed in range(50):
+            res_c_unbuttoned = self.sampler.sample_clothing_result(
+                "随机 (Random)", "解开纽扣 (Unbuttoned)", "L3", Random(seed)
+            )
+            self.assertNotIn(res_c_unbuttoned.style_id, {"one_piece_swimsuit", "latex_catsuit", "sweater_casual"})
+
+            res_c_lifted = self.sampler.sample_clothing_result(
+                "随机 (Random)", "裙摆掀起 (Skirt Lifted Up)", "L3", Random(seed)
+            )
+            self.assertNotIn(res_c_lifted.style_id, {"one_piece_swimsuit", "denim_shorts", "latex_catsuit"})
+
+    def test_15_empty_legal_candidate_pool_graceful_handling(self):
+        """[M2-15] 验证当所有候选均被硬冲突排除（合法池为空）时，各公共入口干净返回 None/空结果，不抛未捕获异常。"""
+        rng = Random(42)
+
+        # 1. camera_angle：mock 全部排除
+        all_angle_ids = {a["id"] for a in self.sampler._load("shot_types").get("camera_angles", [])}
+        res_angle = self.sampler._sample_from_candidates("camera_angle", self.sampler._load("shot_types")["camera_angles"], rng, excluded_ids=all_angle_ids)
+        self.assertIsNone(res_angle)
+
+        # 2. lighting：mock 全部排除
+        all_lgt = self.sampler._load("lighting")
+        all_lgt_items = (
+            all_lgt.get("preset_combos", []) +
+            all_lgt.get("professional_lighting", []) +
+            all_lgt.get("cinematic_lighting", []) +
+            all_lgt.get("special_effects", []) +
+            all_lgt.get("erotic_lighting", [])
+        )
+        all_lgt_ids = {x["id"] for x in all_lgt_items}
+        res_lgt = self.sampler._sample_from_candidates("lighting", all_lgt_items, rng, excluded_ids=all_lgt_ids)
+        self.assertIsNone(res_lgt)
+
+        # 3. pose：mock 全部排除
+        all_poses = self.sampler._load("poses").get("pose_categories", [])
+        all_pose_ids = {p["id"] for p in all_poses}
+        res_pose = self.sampler._sample_from_candidates("pose", all_poses, rng, excluded_ids=all_pose_ids)
+        self.assertIsNone(res_pose)
+
+        # 4. props：mock 全部排除
+        all_props = [p for p in self.sampler._load("props").get("categories", []) if p.get("id") != "none"]
+        all_prop_ids = {p["id"] for p in all_props}
+        res_prop = self.sampler._sample_from_candidates("props", all_props, rng, excluded_ids=all_prop_ids)
+        self.assertIsNone(res_prop)
+
+        # 5. clothing：当全部类别被排除时，sample_clothing_result 干净返回空 ClothingSampleResult
+        all_cloth_styles = self.sampler._load("clothing").get("categories", [])
+        all_cloth_ids = {c["id"] for c in all_cloth_styles}
+        chosen = self.sampler._sample_from_candidates("clothing", all_cloth_styles, rng, excluded_ids=all_cloth_ids)
+        self.assertIsNone(chosen)
+
+        # 验证公共调用在空候选列表时无异常干净返回
+        empty_cloth_res = self.sampler.sample_clothing_result("无 (None)", "无 (None)", "L1", rng)
+        self.assertEqual(empty_cloth_res.base_tags, ())
+
+    def test_16_end_to_end_generator_pre_filtering_in_structured_generation(self):
+        """[M2-16] 验证在 IYKYKPromptGenerator 端到端生成中，硬冲突候选在抽样前被自动排除。"""
+        from nodes import IYKYKPromptGenerator
+
+        gen = IYKYKPromptGenerator()
+
+        # 1. L1 级别下端到端生成：验证视角绝非 between_legs_angle，光影绝非 erotic_lighting，姿势绝非 restraints_holds
+        for seed in range(20):
+            res_l1 = gen.generate_structured(
+                预设模板="无 (None)", 风格配方="无 (None)",
+                场景大类="教室", 剧情主题="教师/学生系列",
+                景别构图="自动 (Auto)", 拍摄视角="自动 (Auto)",
+                裸露等级="L1 包裹暗示 (Fully Clothed / Suggestive)", 服装款式="随机 (Random)",
+                服装状态="正常穿着 (Normal)", 发型发色="随机 (Random)",
+                饰品头饰="无 (None)", 妆容细节="无 (None)",
+                姿势动作="随机 (Random)", 情绪表情="随机 (Random)",
+                光影预设="自动 (Auto)", 胶片风格="无 (None)",
+                液体效果="无 (None)", 纹身标记="无 (None)",
+                道具物件="随机 (Random)", 角色设定="无 (None)",
+                真实微瑕="无 (None)", 画质等级="高清写真 (High)",
+                prompt_seed=seed,
+            )
+            active_origins = [s.selected_id for s in res_l1.selections]
+            self.assertNotIn("between_legs_angle", active_origins)
+            self.assertFalse(any(o and o.startswith("erotic_lighting") for o in active_origins))
+            self.assertNotIn("restraints_holds", active_origins)
+            self.assertNotIn("sex_toy_vibrator", active_origins)
+            self.assertNotIn("bondage_rope_collar", active_origins)
+
+        # 2. 姿态为约束体态 (restraints_holds) 时：道具物件在抽样前已排除手持道具
+        handheld_props = {
+            "wine_glass_bottle", "smartphone_recording", "digital_camera_record",
+            "oriental_fan_umbrella", "game_controller", "sex_toy_vibrator",
+            "fashion_clutch_bag", "fashion_baguette_bag", "flower_bouquet_petals",
+            "plush_doll_teddy", "pillow_clutching",
+        }
+        for seed in range(20):
+            res_restrained = gen.generate_structured(
+                预设模板="无 (None)", 风格配方="无 (None)",
+                场景大类="教室", 剧情主题="教师/学生系列",
+                景别构图="自动 (Auto)", 拍摄视角="自动 (Auto)",
+                裸露等级="L3 半裸诱惑 (Half Nude)", 服装款式="随机 (Random)",
+                服装状态="正常穿着 (Normal)", 发型发色="随机 (Random)",
+                饰品头饰="无 (None)", 妆容细节="无 (None)",
+                姿势动作="restraints_holds", 情绪表情="随机 (Random)",
+                光影预设="自动 (Auto)", 胶片风格="无 (None)",
+                液体效果="无 (None)", 纹身标记="无 (None)",
+                道具物件="随机 (Random)", 角色设定="无 (None)",
+                真实微瑕="无 (None)", 画质等级="高清写真 (High)",
+                prompt_seed=seed,
+            )
+            prop_origins = [s.selected_id for s in res_restrained.selections if s.selector == "props"]
+            for pid in prop_origins:
+                self.assertNotIn(pid, handheld_props, f"Handheld prop {pid} generated while pose is restraints_holds!")
 
 
 if __name__ == "__main__":
