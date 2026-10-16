@@ -71,26 +71,32 @@ PRESET_SLOT_PATTERNS = [
     (re.compile(r'\b(masterpiece|best quality|ultra detailed|8k|photorealistic|highres|high resolution|cctv|security camera|amateur photo|low quality|timestamp overlay)\b', re.I), 'quality'),
     # lighting & time of day
     (re.compile(r'\b(light|lighting|shadow|shadows|glow|sunlight|moonlight|backlight|rim light|neon|candlelight|dim|bright|golden hour|blue hour|sunset|sunrise|night|chiaroscuro|volumetric|lens flare|bokeh|fluorescent|lamp|overcast|rays|ambient)\b', re.I), 'lighting'),
-    # shot_type / camera_angle
-    (re.compile(r'\b(shot|close-up|angle|view|depth of field|perspective|full body|cowboy shot|upper body|portrait|wide|dutch angle|profile|macro|focus|field of view|fisheye)\b', re.I), 'shot_type'),
+    # tattoo
+    (re.compile(r'\b(tattoo|tattoos|tattooed|inked|ink on|fresh ink)\b', re.I), 'tattoo'),
+    # liquids
+    (re.compile(r'\b(sweat|sweaty|sweating|drool|saliva|milk|lotion|oil|slime|cum|semen|ejaculation|juice|liquid|liquids|dripping|splash|wet skin|glistening moisture)\b', re.I), 'liquids'),
+    # camera_angle
+    (re.compile(r'\b(angle|angles|perspective|eye level|voyeur angle|dutch angle|low angle|high angle|overhead|birds eye|worms eye|straight-on|tilted|view from|door crack view|peephole view|camera view|pov|point of view)\b', re.I), 'camera_angle'),
+    # shot_type
+    (re.compile(r'\b(shot|close-up|extreme close-up|medium shot|full body shot|cowboy shot|wide shot|macro|depth of field|field of view|fisheye|portrait shot|framing)\b', re.I), 'shot_type'),
     # film
     (re.compile(r'\b(film|kodak|fujifilm|polaroid|cinestill|ilford|grain|vintage|35mm|analog|monochrome|black and white|pastel)\b', re.I), 'film'),
     # makeup / imperfections
     (re.compile(r'\b(makeup|lipstick|eyeliner|eyeshadow|mascara|blush|foundation|lip gloss|freckles|mole|pores|skin texture)\b', re.I), 'makeup'),
     # clothing / clothing_state / underwear / lingerie
     (re.compile(r'\b(uniform|shirt|blouse|skirt|dress|suit|pants|shorts|jacket|coat|sweater|swimsuit|bikini|lingerie|bra|panties|underwear|stockings|socks|boots|shoes|heels|catsuit|latex|corset|robe|kimono|yukata|cheongsam|qipao|bodysuit|leotard|apron|maid|hoodie|cardigan|tank top|camisole|t-shirt|jeans|vest|collar|tie|bow|sash|belt|cape|gloves|cuffs|garter|thighhighs|unbuttoned|lifted|pulled down|partially|untied|disheveled|torn|see-through|translucent|serafuku|sleeves|cleavage|slip|strap|zipper|outfit|costume|clothes|fabric|silk|lace|cotton|denim|leather|slipping off shoulder|off-shoulder|bare shoulder|hiked up|undressing|open front)\b', re.I), 'clothing'),
+    # props (放在 pose 前面，保证 holding spatula 等道具持握归入 props)
+    (re.compile(r'\b(holding\s+(?:a\s+|an\s+)?(?!head|face|knees|legs|hair|chest|breasts|waist)\w+|prop|props|spatula|phone|smartphone|camera|controller|glass|cup|bottle|pen|pencil|book|bag|umbrella|fan|doll|plush|pillow|towel|cigarette|gun|sword|instrument|toy|dumbbell|mic|product)\b', re.I), 'props'),
     # pose
-    (re.compile(r'\b(standing|sitting|lying|kneeling|squatting|bending|leaning|walking|running|pose|legs|arms|hands|crossed|spread|bent|arching|stretching|turned|overhead|bound|tied|hold|holding|touching|hand on|hands on|hands behind|crawling|spread legs|kicking feet|hugging knees|toes|entering|watching)\b', re.I), 'pose'),
+    (re.compile(r'\b(standing|sitting|lying|kneeling|squatting|bending|leaning|walking|running|pose|legs|arms|hands|crossed|spread|bent|arching|stretching|turned|bound|tied|hold|holding|touching|hand on|hands on|hands behind|crawling|spread legs|kicking feet|hugging knees|toes|entering|watching)\b', re.I), 'pose'),
     # scene_theme & furniture & scenery
-    (re.compile(r'\b(classroom|desk|chair|bench|table|bed|sofa|couch|school|room|office|bedroom|bathroom|onsen|hot spring|pool|beach|street|alley|park|forest|hospital|clinic|library|kitchen|balcony|rooftop|subway|train|bus|station|hotel|bar|club|gym|temple|shrine|tatami|futon|garden|restaurant|cafe|car|elevator|hallway|corridor|staircase|back row|class in progress|chalkboard|blackboard|podium|window seat|empty room|counter|outdoors|indoors|scenery|background|interior|city|scenic|nature|dock|deck|shelves|shelf|fence|dormitory|bunk|curtain|atmosphere|corner|shower area|space|after class|dust particles)\b', re.I), 'scene_theme'),
-    # props
-    (re.compile(r'\b(phone|smartphone|camera|controller|glass|cup|bottle|pen|pencil|book|bag|umbrella|fan|doll|plush|pillow|towel|cigarette|gun|sword|instrument|toy)\b', re.I), 'props'),
+    (re.compile(r'\b(classroom|desk|chair|bench|table|bed|sofa|couch|school|room|office|bedroom|bathroom|onsen|hot spring|pool|beach|street|alley|park|forest|hospital|clinic|library|kitchen|balcony|rooftop|subway|train|bus|station|hotel|bar|club|gym|temple|shrine|tatami|futon|garden|restaurant|cafe|car|elevator|hallway|corridor|staircase|back row|class in progress|chalkboard|blackboard|podium|window seat|empty room|counter|outdoors|indoors|scenery|background|interior|city|scenic|nature|dock|deck|shelves|shelf|fence|dormitory|bunk|curtain|atmosphere|corner|shower area|space|after class|dust particles|studio)\b', re.I), 'scene_theme'),
     # expression / emotion
     (re.compile(r'\b(expression|smile|smiling|smirk|frown|pout|tears|crying|blushing|gaze|looking|face|bored|shy|embarrassed|pleasure|aroused|seductive|angry|surprised|neutral|eyes closed|half closed|wink|mouth|biting lip|lip)\b', re.I), 'expression'),
     # hairstyle / character
     (re.compile(r'\b(hair|ponytail|twintails|braid|bangs|bob cut|bun|curly|straight|blonde|brunette|black hair|girl|woman|mature|petite|curves|skin|eyes)\b', re.I), 'hairstyle'),
-    # nudity / liquids
-    (re.compile(r'\b(nude|naked|bare|exposed|nipple|nipples|breast|breasts|areola|areolae|pussy|vagina|penis|crotch|ass|buttocks|cleavage|shaved|pubic|wet|water|sweat|sweaty|drool|saliva|milk|lotion|oil|slime|cum|juice|liquid|dripping|splash)\b', re.I), 'nudity'),
+    # nudity (纯裸露部位与状态，体液分流至 liquids)
+    (re.compile(r'\b(nude|naked|bare|exposed|nipple|nipples|breast|breasts|areola|areolae|pussy|vagina|penis|crotch|ass|buttocks|cleavage|shaved|pubic|topless|bottomless|underboob|sideboob)\b', re.I), 'nudity'),
 ]
 
 
@@ -175,12 +181,19 @@ def get_catalog_tag_cache(data_dir: Path) -> Tuple[Dict[str, str], Dict[str, Sem
                             register(item.get("tag") or item.get("text") or "", item_slot, item_f)
                 for k, v in obj.items():
                     if k not in ("tags", "text", "tag", "facts"):
-                        walk(v, s)
+                        child_slot = "camera_angle" if k == "camera_angles" else ("shot_type" if k == "shot_types" else s)
+                        walk(v, child_slot)
             elif isinstance(obj, list):
                 for v in obj:
                     walk(v, cur_slot)
 
-        walk(d)
+        if fname == "shot_types.json" and isinstance(d, dict):
+            if "shot_types" in d:
+                walk(d["shot_types"], "shot_type")
+            if "camera_angles" in d:
+                walk(d["camera_angles"], "camera_angle")
+        else:
+            walk(d, default_slot)
 
     _CATALOG_TAG_TO_SLOT_CACHE[data_dir] = tag_map
     _CATALOG_TEXT_TO_FACTS_CACHE[data_dir] = facts_map
@@ -297,7 +310,13 @@ def classify_preset_tag_and_facts(
             facts = facts.merge(SemanticFacts(emotion=emo, gaze=gaze))
     elif slot in ("liquids", "liquid"):
         if not facts.liquid_kind:
-            facts = facts.merge(SemanticFacts(liquid_kind="water", liquid_amount="moderate"))
+            facts = facts.merge(SemanticFacts(liquid_kind="water", liquid_amount="normal"))
+    elif slot in ("tattoos", "tattoo"):
+        if not facts.visible_regions:
+            facts = facts.merge(SemanticFacts(visible_regions=("upper_body",)))
+    elif slot in ("camera_angle", "camera", "angle"):
+        if not facts.semantic_role:
+            facts = facts.merge(SemanticFacts(semantic_role="selector"))
     elif slot == "quality":
         if not facts.quality_class:
             facts = facts.merge(SemanticFacts(quality_class="standard", capture_device="professional"))
@@ -787,6 +806,29 @@ def apply_slot_overrides(
             for related in ("camera", "angle"):
                 if related in res:
                     res[related] = []
+        elif norm_slot == "tattoo":
+            for related in ("tattoos",):
+                if related in res:
+                    res[related] = []
+        elif norm_slot == "liquids":
+            for related in ("liquid",):
+                if related in res:
+                    res[related] = []
+        elif norm_slot in ("style_recipe", "recipe"):
+            for related in ("recipe",):
+                if related in res:
+                    res[related] = []
+            # 覆盖风格配方：从所有槽位中彻底清除来自原配方的全部内容
+            for k in list(res.keys()):
+                if isinstance(res[k], list):
+                    res[k] = [
+                        item for item in res[k]
+                        if not (
+                            (getattr(item, "origin", None) and getattr(item.origin, "mode", None) == "recipe")
+                            or (getattr(item, "provenance", None) and getattr(item.provenance, "kind", None) == "style_recipe")
+                            or (getattr(item, "origin", None) and getattr(item.origin, "selector", None) == "style_recipe")
+                        )
+                    ]
 
         new_frags = make_override_fragments(
             norm_slot,
@@ -818,12 +860,14 @@ class PromptAssembler:
         max_words: int = MAX_PROMPT_WORDS,
         context_profile: Optional[ContextProfile] = None,
         external_overrides: Optional[Dict[str, Any]] = None,
+        entry_point: str = "generator",
     ) -> AssemblyResult:
         """从各槽位片段字典执行装配，返回强类型 AssemblyResult。"""
         if external_overrides:
             slot_fragments = apply_slot_overrides(
                 slot_fragments,
                 external_overrides,
+                entry_point=entry_point,
                 catalog_facts=getattr(self.resolver, "canonical_catalog_facts", None),
                 data_dir=self.data_dir,
             )
@@ -1129,6 +1173,12 @@ class PromptAssembler:
                     overridden_slots.update(["shot_type", "shot"])
                 elif ns == "camera_angle":
                     overridden_slots.update(["camera_angle", "camera", "angle"])
+                elif ns == "tattoo":
+                    overridden_slots.update(["tattoo", "tattoos"])
+                elif ns == "liquids":
+                    overridden_slots.update(["liquids", "liquid"])
+                elif ns in ("style_recipe", "recipe"):
+                    overridden_slots.update(["style_recipe", "recipe"])
                 new_override_frags.extend(
                     make_override_fragments(
                         ns,
@@ -1140,7 +1190,18 @@ class PromptAssembler:
                 )
 
             if overridden_slots:
-                fragments = [f for f in fragments if f.source_slot not in overridden_slots]
+                purge_recipe = bool({"style_recipe", "recipe"}.intersection(overridden_slots))
+                fragments = [
+                    f for f in fragments
+                    if f.source_slot not in overridden_slots
+                    and not (
+                        purge_recipe and (
+                            (f.origin and f.origin.mode == "recipe")
+                            or (f.provenance and f.provenance.kind == "style_recipe")
+                            or (f.origin and f.origin.selector == "style_recipe")
+                        )
+                    )
+                ]
                 fragments.extend(new_override_frags)
 
         return assemble_result(fragments, self.data_dir, rng, max_words, resolver=self.resolver)

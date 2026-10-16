@@ -1266,6 +1266,44 @@ def compute_atoms_hash(atoms: Sequence[PromptAtom]) -> str:
         h.update(f"{a.atom_id}:{a.text}:{a.source_slot}:{a.tag_order}:{a.span_order}".encode("utf-8"))
     return h.hexdigest()
 
+KNOWN_PROP_KWS = (
+    "phone", "smartphone", "cellphone", "mobile",
+    "coffee", "cup", "mug", "glass", "bottle", "tea", "drink", "tumbler",
+    "camera", "dslr",
+    "spatula", "pan", "skillet", "knife", "fork", "spoon", "chopsticks",
+    "controller", "gamepad", "joystick",
+    "umbrella", "parasol",
+    "tray", "plate",
+    "sword", "blade", "katana", "dagger",
+    "fan", "folding fan",
+    "book", "notebook", "magazine",
+    "pen", "pencil", "brush",
+    "cigarette", "cigar", "vape",
+    "bag", "handbag", "purse", "tote", "clutch",
+    "flower", "bouquet", "rose",
+    "microphone", "mic",
+    "flashlight", "torch",
+    "pillow", "linen", "sheets",
+)
+
+
+def get_prop_entity_key(atom: PromptAtom) -> str:
+    sid = atom.source_item_id or ""
+    sel = (atom.origin.selected_id if atom.origin else "") or ""
+    pid = (atom.provenance.item_id if atom.provenance else "") or ""
+    txt = atom.text.lower().strip()
+    if sid and not sid.startswith("override_props_"):
+        return f"item:{sid}"
+    if sel and not sel.startswith("override_props_"):
+        return f"sel:{sel}"
+    if pid and not pid.startswith("override_props_"):
+        return f"pid:{pid}"
+    for kw in KNOWN_PROP_KWS:
+        if kw in txt:
+            return f"kw:{kw}"
+    clean = re.sub(r"\b(holding|held|in hand|carrying|held in hands?)\b", "", txt).strip()
+    return f"raw:{clean or txt}"
+
 
 class OneTimeIndex:
     """单次扫描构建的快速索引容器，支持规则共享高效查询与 tombstone 跟踪 (R2-P2-001, R2R2-P3-001)。"""
@@ -2362,9 +2400,25 @@ class ConflictResolver:
 
         active_cluster_names = list(dict.fromkeys(v[2] for v in active_venues))
         if len(active_cluster_names) > 1:
-            active_venues.sort(key=lambda x: (x[0], x[1]))
-            dominant_venue = active_venues[0][2]
-            dominant_atom = active_venues[0][3]
+            ext_venues = [v for v in active_venues if is_external_atom(v[3])]
+            ext_clusters = list(dict.fromkeys(v[2] for v in ext_venues))
+            if len(ext_clusters) > 1:
+                v1 = ext_venues[0][3]
+                v2 = next(v[3] for v in ext_venues if v[2] != ext_venues[0][2])
+                raise PromptValidationError(
+                    f"External override conflict under rule '{rule_item.id}': slot '{v1.source_slot}' ('{v1.text}') conflicts with slot '{v2.source_slot}' ('{v2.text}')",
+                    slots=(v1.source_slot, v2.source_slot),
+                    texts=(v1.text, v2.text),
+                    rule_id=rule_item.id,
+                )
+            if ext_clusters:
+                dominant_venue = ext_clusters[0]
+                dominant_atom = next(v[3] for v in ext_venues if v[2] == dominant_venue)
+            else:
+                active_venues.sort(key=lambda x: (x[0], x[1]))
+                dominant_venue = active_venues[0][2]
+                dominant_atom = active_venues[0][3]
+
             banned_venues = [v for v in active_cluster_names if v != dominant_venue]
             banned_tags_all: List[PatternSpec] = []
             for bv in banned_venues:
@@ -2380,10 +2434,14 @@ class ConflictResolver:
                     continue
                 is_loser = False
                 is_fallback = False
-                if is_formal_atom(a):
+                if is_formal_atom(a) or is_external_atom(a):
                     if a.facts and a.facts.venue_ids:
                         if any(bv in a.facts.venue_ids for bv in banned_venues):
                             is_loser = True
+                    elif tf.enabled:
+                        if any(bt.matches(a.text) for bt in banned_tags_all):
+                            is_loser = True
+                            is_fallback = True
                 elif tf.enabled:
                     if any(bt.matches(a.text) for bt in banned_tags_all):
                         is_loser = True
@@ -2414,11 +2472,16 @@ class ConflictResolver:
             if a.atom_id in seen_scene_ids or not a.can_detect or not index.is_active(a):
                 continue
             self._validate_formal_atom(a, rule_item.id)
-            if is_formal_atom(a):
+            if is_formal_atom(a) or is_external_atom(a):
                 if a.facts and a.facts.space_kind == "indoor":
                     indoor_atoms.append(a)
                 elif a.facts and a.facts.space_kind == "outdoor":
                     outdoor_atoms.append(a)
+                elif tf.enabled:
+                    if any(w.matches(a.text) for w in outdoor_exclusive):
+                        outdoor_atoms.append(a)
+                    elif any(w.matches(a.text) for w in indoor_exclusive) or any(any(vt.matches(a.text) for vt in vtags) for vtags in venue_clusters.values()):
+                        indoor_atoms.append(a)
             elif tf.enabled:
                 if any(w.matches(a.text) for w in outdoor_exclusive):
                     outdoor_atoms.append(a)
@@ -2428,15 +2491,34 @@ class ConflictResolver:
         if indoor_atoms and outdoor_atoms:
             first_in = min(indoor_atoms, key=lambda x: (x.tag_order, x.span_order))
             first_out = min(outdoor_atoms, key=lambda x: (x.tag_order, x.span_order))
+            in_is_ext = any(is_external_atom(a) for a in indoor_atoms)
+            out_is_ext = any(is_external_atom(a) for a in outdoor_atoms)
 
-            if (first_in.tag_order, first_in.span_order) <= (first_out.tag_order, first_out.span_order):
+            if in_is_ext and out_is_ext:
+                raise PromptValidationError(
+                    f"External override conflict under rule '{rule_item.id}': indoor environment ('{first_in.text}') conflicts with outdoor environment ('{first_out.text}')",
+                    slots=(first_in.source_slot, first_out.source_slot),
+                    texts=(first_in.text, first_out.text),
+                    rule_id=rule_item.id,
+                )
+
+            if in_is_ext and not out_is_ext:
                 winner = first_in
                 losers = outdoor_atoms
                 loser_exclusive_tags = outdoor_exclusive
-            else:
+            elif out_is_ext and not in_is_ext:
                 winner = first_out
                 losers = indoor_atoms
                 loser_exclusive_tags = indoor_exclusive
+            else:
+                if (first_in.tag_order, first_in.span_order) <= (first_out.tag_order, first_out.span_order):
+                    winner = first_in
+                    losers = outdoor_atoms
+                    loser_exclusive_tags = outdoor_exclusive
+                else:
+                    winner = first_out
+                    losers = indoor_atoms
+                    loser_exclusive_tags = indoor_exclusive
 
             for a in index.get_active_by_slot("scene"):
                 if not a.can_detect or not index.is_active(a):
@@ -2644,15 +2726,16 @@ class ConflictResolver:
                             rule_id=rule_item.id,
                         )
                     if is_external_atom(a) and not is_external_atom(nudity_winner):
-                        if nudity_winner.can_delete_atom and index.is_active(nudity_winner):
-                            index.drop(nudity_winner.atom_id)
-                            ledger.record_drop(
-                                rule_item.id,
-                                rule_item.phase,
-                                "clothing_removes_nudity",
-                                (a.atom_id,),
-                                nudity_winner,
-                            )
+                        for n_atom in nudity_atoms:
+                            if not is_external_atom(n_atom) and n_atom.can_delete_atom and index.is_active(n_atom):
+                                index.drop(n_atom.atom_id)
+                                ledger.record_drop(
+                                    rule_item.id,
+                                    rule_item.phase,
+                                    "clothing_removes_nudity",
+                                    (a.atom_id,),
+                                    n_atom,
+                                )
                         continue
                     if not a.can_delete_atom:
                         continue
@@ -2855,8 +2938,10 @@ class ConflictResolver:
             if is_formal_atom(a) or is_external_atom(a):
                 if a.facts and (a.facts.hand_state in ("both_busy", "one_busy", "restrained") or a.facts.hands_required > 0 or "busy_hands" in a.facts.mutex_groups):
                     busy_atoms.append(a)
+                elif any(w in a.text.lower() for w in ("bound", "tied", "behind back", "hands on head", "restrained")):
+                    busy_atoms.append(a)
             elif tf.enabled:
-                if any(t.matches(a.text) for t in all_busy_pose):
+                if any(t.matches(a.text) for t in all_busy_pose) or any(w in a.text.lower() for w in ("bound", "tied", "behind back", "hands on head", "restrained")):
                     busy_atoms.append(a)
 
         # 收集全部手持道具 (统一系统与外部路径)
@@ -2871,13 +2956,15 @@ class ConflictResolver:
             if is_formal_atom(a) or is_external_atom(a):
                 if a.facts and (a.facts.hands_required > 0 or a.facts.prop_usage == "handheld"):
                     is_loser = True
+                elif any(w in a.text.lower() for w in ("holding", "in hand", "held", "carrying", "phone", "cup", "camera", "controller", "spatula")):
+                    is_loser = True
             if not is_loser and tf.enabled:
                 if any(p.matches(a.text) for p in all_handheld):
                     is_loser = True
                     is_fallback = True
             if is_loser:
                 seen_prop_ids.add(a.atom_id)
-                h_req = (a.facts.hands_required if (a.facts and a.facts.hands_required > 0) else 1)
+                h_req = (a.facts.hands_required if (a.facts and a.facts.hands_required > 0) else (2 if any(w in a.text.lower() for w in ("controller", "two hands", "sword", "rifle")) else 1))
                 detected_props.append((a, h_req, is_fallback))
 
         if busy_atoms:
@@ -2888,6 +2975,12 @@ class ConflictResolver:
                     pose_hands = 1
                 elif pose_winner.facts.hand_state in ("both_busy", "restrained") or pose_winner.facts.hands_required == 2:
                     pose_hands = 2
+                elif any(w in pose_winner.text.lower() for w in ("cheek", "hip", "chin", "touching")):
+                    pose_hands = 1
+                else:
+                    pose_hands = 2
+            else:
+                pose_hands = 2 if any(w in pose_winner.text.lower() for w in ("bound", "tied", "behind back", "hands on head", "restrained")) else 1
 
             ext_props = [p for p in detected_props if is_external_atom(p[0])]
             total_ext_prop_hands = sum(p[1] for p in ext_props)
@@ -2964,9 +3057,46 @@ class ConflictResolver:
         tf_patterns = tf.patterns if (tf and tf.enabled) else ()
         handheld_patterns = select_fallback_patterns(tf_patterns, role="handheld", group_id="handheld")
 
-        # 实际消费事实索引 (R2R3-P3-001)
+        # 1. 检查姿势占用双手情况
+        busy_atoms = []
+        for a in (
+            index.get_active_by_fact("hand_state", "both_busy")
+            + index.get_active_by_fact("hand_state", "one_busy")
+            + index.get_active_by_fact("hand_state", "restrained")
+            + index.get_active_by_mutex_group("busy_hands")
+        ):
+            if a.can_detect and index.is_active(a):
+                busy_atoms.append(a)
+        for a in index.get_active_by_slot("pose"):
+            if a in busy_atoms or not a.can_detect or not index.is_active(a):
+                continue
+            if is_formal_atom(a) or is_external_atom(a):
+                if a.facts and (a.facts.hand_state in ("both_busy", "one_busy", "restrained") or a.facts.hands_required > 0):
+                    busy_atoms.append(a)
+                elif any(w in a.text.lower() for w in ("bound", "tied", "behind back", "hands on head", "restrained")):
+                    busy_atoms.append(a)
+
+        pose_hands = 0
+        is_ext_pose = False
+        pose_atom = None
+        if busy_atoms:
+            pose_atom = min(busy_atoms, key=lambda x: (x.tag_order, x.span_order))
+            is_ext_pose = is_external_atom(pose_atom)
+            if pose_atom.facts:
+                if pose_atom.facts.hand_state == "one_busy" or pose_atom.facts.hands_required == 1:
+                    pose_hands = 1
+                elif pose_atom.facts.hand_state in ("both_busy", "restrained") or pose_atom.facts.hands_required == 2:
+                    pose_hands = 2
+                elif any(w in pose_atom.text.lower() for w in ("cheek", "hip", "chin", "touching")):
+                    pose_hands = 1
+                else:
+                    pose_hands = 2
+            else:
+                pose_hands = 2 if any(w in pose_atom.text.lower() for w in ("bound", "tied", "behind back", "hands on head", "restrained")) else 1
+
+        # 2. 收集全部手持道具 (实际消费事实索引 R2R3-P3-001)
         hh_fact_atoms = index.get_active_by_fact("prop_usage", "handheld")
-        detected_hh: List[Tuple[PromptAtom, int, bool]] = []
+        hh_atoms: List[PromptAtom] = []
         seen_ids = set()
 
         for a in hh_fact_atoms:
@@ -2974,8 +3104,7 @@ class ConflictResolver:
                 continue
             self._validate_formal_atom(a, rule_item.id)
             seen_ids.add(a.atom_id)
-            h_req = (a.facts.hands_required if (a.facts and a.facts.hands_required > 0) else 1)
-            detected_hh.append((a, h_req, False))
+            hh_atoms.append(a)
 
         for a in index.get_active_by_slot("props"):
             if a.atom_id in seen_ids or not a.can_detect or not index.is_active(a):
@@ -2984,59 +3113,94 @@ class ConflictResolver:
             if is_formal_atom(a) or is_external_atom(a):
                 if a.facts and (a.facts.hands_required > 0 or a.facts.prop_usage == "handheld"):
                     seen_ids.add(a.atom_id)
-                    h_req = (a.facts.hands_required if (a.facts and a.facts.hands_required > 0) else 1)
-                    detected_hh.append((a, h_req, False))
+                    hh_atoms.append(a)
+                elif any(w in a.text.lower() for w in ("holding", "in hand", "held", "carrying", "phone", "cup", "camera", "controller", "spatula")):
+                    seen_ids.add(a.atom_id)
+                    hh_atoms.append(a)
             elif tf.enabled:
                 if any(hp.matches(a.text) for hp in handheld_patterns):
                     seen_ids.add(a.atom_id)
-                    h_req = (a.facts.hands_required if (a.facts and a.facts.hands_required > 0) else 1)
-                    detected_hh.append((a, h_req, True))
+                    hh_atoms.append(a)
 
-        if len(detected_hh) > 1:
-            detected_hh.sort(key=lambda x: (x[0].tag_order, x[0].span_order))
-            ext_hh = [p for p in detected_hh if is_external_atom(p[0])]
-            total_ext_hands = sum(p[1] for p in ext_hh)
-            if total_ext_hands > 2:
-                p1, p2 = ext_hh[0][0], ext_hh[1][0]
-                raise PromptValidationError(
-                    f"External override conflict under rule '{rule_item.id}': external props exceed total hand capacity of 2 ({total_ext_hands} hands)",
-                    slots=(p1.source_slot, p2.source_slot),
-                    texts=(p1.text, p2.text),
-                    rule_id=rule_item.id,
+        if not hh_atoms:
+            return index.get_all_active_ordered()
+
+        # 3. 按道具实体区分“同一道具的多个描述”与“多个独立道具”
+        entities: Dict[str, List[PromptAtom]] = {}
+        for a in hh_atoms:
+            ekey = get_prop_entity_key(a)
+            entities.setdefault(ekey, []).append(a)
+
+        class PropEntity:
+            def __init__(self, key: str, member_atoms: List[PromptAtom]):
+                self.key = key
+                self.atoms = member_atoms
+                self.is_external = any(is_external_atom(ma) for ma in member_atoms)
+                self.order = min((ma.tag_order, ma.span_order) for ma in member_atoms)
+                h = 1
+                for ma in member_atoms:
+                    if ma.facts and ma.facts.hands_required > 0:
+                        h = max(h, ma.facts.hands_required)
+                    elif any(w in ma.text.lower() for w in ("controller", "two hands", "both hands", "sword", "rifle", "tray")):
+                        h = max(h, 2)
+                self.hands_required = h
+
+        entity_list = [PropEntity(k, v) for k, v in entities.items()]
+        # 外部实体优先排序，同类按出现顺序排
+        entity_list.sort(key=lambda e: (0 if e.is_external else 1, e.order))
+
+        # 4. 外部道具间超容量检测与外部姿势冲突检测
+        ext_entities = [e for e in entity_list if e.is_external]
+        total_ext_hands = sum(e.hands_required for e in ext_entities)
+        if total_ext_hands > 2:
+            p1 = ext_entities[0].atoms[0]
+            p2 = ext_entities[1].atoms[0]
+            raise PromptValidationError(
+                f"External override conflict under rule '{rule_item.id}': external props exceed total hand capacity of 2 ({total_ext_hands} hands)",
+                slots=(p1.source_slot, p2.source_slot),
+                texts=(p1.text, p2.text),
+                rule_id=rule_item.id,
+            )
+
+        if is_ext_pose and (pose_hands + total_ext_hands > 2):
+            first_prop = ext_entities[0].atoms[0]
+            raise PromptValidationError(
+                f"External override conflict under rule '{rule_item.id}': slot '{pose_atom.source_slot}' ('{pose_atom.text}') conflicts with slot '{first_prop.source_slot}' ('{first_prop.text}')",
+                slots=(pose_atom.source_slot, first_prop.source_slot),
+                texts=(pose_atom.text, first_prop.text),
+                rule_id=rule_item.id,
+            )
+
+        # 外部道具优先于系统姿势：外部道具使双手超容时，系统姿势退让
+        if not is_ext_pose and ext_entities and (pose_hands + total_ext_hands > 2):
+            if pose_atom and pose_atom.can_delete_atom and index.is_active(pose_atom):
+                index.drop(pose_atom.atom_id)
+                ledger.record_drop(
+                    rule_item.id,
+                    rule_item.phase,
+                    "external_prop_overrides_pose",
+                    (ext_entities[0].atoms[0].atom_id,),
+                    pose_atom,
                 )
+                pose_hands = 0
 
-            if ext_hh:
-                # 外部道具存在时：外部道具优先，外部道具总容量已校验 <= 2，所有非外部（系统）手持道具均被丢弃
-                winner_atom = ext_hh[0][0]
-                for a, h_req, is_fallback in detected_hh:
-                    if is_external_atom(a):
-                        continue
-                    if not a.can_delete_atom or not index.is_active(a):
-                        continue
-                    if is_fallback:
-                        self.text_fallback_hits += 1
-                    index.drop(a.atom_id)
-                    ledger.record_drop(
-                        rule_item.id,
-                        rule_item.phase,
-                        "single_handheld_prop_limit",
-                        (winner_atom.atom_id,),
-                        a,
-                    )
+        # 5. 统一容量分配（系统、外部、混合来源共用 2 手模型；双手空闲时允许两件单手道具共存）
+        available_hands = max(0, 2 - pose_hands)
+        winner_atom = entity_list[0].atoms[0] if entity_list else None
+
+        for e in entity_list:
+            if e.hands_required <= available_hands:
+                available_hands -= e.hands_required
             else:
-                # 纯系统道具：单手持道具限制，仅保留首个胜出道具，其余全部丢弃
-                winner_atom = detected_hh[0][0]
-                for a, h_req, is_fallback in detected_hh[1:]:
+                for a in e.atoms:
                     if not a.can_delete_atom or not index.is_active(a):
                         continue
-                    if is_fallback:
-                        self.text_fallback_hits += 1
                     index.drop(a.atom_id)
                     ledger.record_drop(
                         rule_item.id,
                         rule_item.phase,
                         "single_handheld_prop_limit",
-                        (winner_atom.atom_id,),
+                        (winner_atom.atom_id,) if winner_atom else (),
                         a,
                     )
 
@@ -3147,6 +3311,24 @@ class ConflictResolver:
                             is_fallback = True
 
                     if is_loser:
+                        if is_external_atom(op_winner) and is_external_atom(a):
+                            raise PromptValidationError(
+                                f"External override conflict under rule '{rule_item.id}': one-piece clothing ('{op_winner.text}') conflicts with state ('{a.text}')",
+                                slots=(op_winner.source_slot, a.source_slot),
+                                texts=(op_winner.text, a.text),
+                                rule_id=rule_item.id,
+                            )
+                        if is_external_atom(a) and not is_external_atom(op_winner):
+                            if op_winner.can_delete_atom and index.is_active(op_winner):
+                                index.drop(op_winner.atom_id)
+                                ledger.record_drop(
+                                    rule_item.id,
+                                    rule_item.phase,
+                                    "external_state_overrides_one_piece",
+                                    (a.atom_id,),
+                                    op_winner,
+                                )
+                            continue
                         if not a.can_delete_atom:
                             continue
                         if is_fallback:
@@ -3199,6 +3381,24 @@ class ConflictResolver:
                                 is_fallback = True
 
                     if is_loser:
+                        if is_external_atom(pants_winner) and is_external_atom(a):
+                            raise PromptValidationError(
+                                f"External override conflict under rule '{rule_item.id}': pants ('{pants_winner.text}') conflicts with skirt state ('{a.text}')",
+                                slots=(pants_winner.source_slot, a.source_slot),
+                                texts=(pants_winner.text, a.text),
+                                rule_id=rule_item.id,
+                            )
+                        if is_external_atom(a) and not is_external_atom(pants_winner):
+                            if pants_winner.can_delete_atom and index.is_active(pants_winner):
+                                index.drop(pants_winner.atom_id)
+                                ledger.record_drop(
+                                    rule_item.id,
+                                    rule_item.phase,
+                                    "external_skirt_state_overrides_pants",
+                                    (a.atom_id,),
+                                    pants_winner,
+                                )
+                            continue
                         if not a.can_delete_atom:
                             continue
                         if is_fallback:
@@ -3496,42 +3696,69 @@ class ConflictResolver:
         tf_patterns = tf.patterns
         all_daylight = select_fallback_patterns(tf_patterns, role="trigger", group_id="daylight")
         all_night = select_fallback_patterns(tf_patterns, role="banned", group_id="daylight")
-        _night_atoms = index.get_active_by_fact("time_of_day", "night")
-        _day_atoms = index.get_active_by_fact("time_of_day", "day")
 
-        night_scene_atoms = []
-        for a in index.get_active_by_slots("scene", "scene_theme", "theme"):
+        night_atoms: List[PromptAtom] = []
+        for a in index.get_active_by_slots("scene", "scene_theme", "theme", "lighting", "lighting_palette"):
             if not a.can_detect or not index.is_active(a):
                 continue
             self._validate_formal_atom(a, rule_item.id)
+            is_night = False
             if is_formal_atom(a):
-                if a.facts and a.facts.time_of_day in ("night", "midnight", "late_night"):
-                    night_scene_atoms.append(a)
-            elif tf.enabled:
-                if any(nt.matches(a.text) for nt in all_night):
-                    night_scene_atoms.append(a)
+                if a.facts and (a.facts.time_of_day in ("night", "midnight", "late_night") or any(ls in ("night", "moonlight", "candlelight", "dim") for ls in a.facts.light_sources)):
+                    is_night = True
+            elif tf.enabled and any(nt.matches(a.text) for nt in all_night):
+                is_night = True
+            if is_night:
+                night_atoms.append(a)
 
-        if night_scene_atoms:
-            night_winner = min(night_scene_atoms, key=lambda x: (x.tag_order, x.span_order))
-            for a in index.get_active_by_slots("lighting", "lighting_palette"):
-                if a in night_scene_atoms or not a.can_detect or not index.is_active(a):
-                    continue
-                self._validate_formal_atom(a, rule_item.id)
-                is_loser = False
-                is_fallback = False
-                if is_formal_atom(a):
-                    if a.facts and (a.facts.time_of_day in ("morning", "noon", "afternoon", "day") or any(ls in ("sunlight", "daylight", "direct_sun") for ls in a.facts.light_sources)):
-                        is_loser = True
-                elif tf.enabled:
-                    if any(dt.matches(a.text) for dt in all_daylight):
-                        is_loser = True
-                        is_fallback = True
+        daylight_atoms: List[PromptAtom] = []
+        for a in index.get_active_by_slots("scene", "scene_theme", "theme", "lighting", "lighting_palette"):
+            if not a.can_detect or not index.is_active(a) or a in night_atoms:
+                continue
+            self._validate_formal_atom(a, rule_item.id)
+            is_day = False
+            if is_formal_atom(a):
+                if a.facts and (a.facts.time_of_day in ("morning", "noon", "afternoon", "day") or any(ls in ("sunlight", "daylight", "direct_sun", "natural") for ls in a.facts.light_sources)):
+                    is_day = True
+            elif tf.enabled and any(dt.matches(a.text) for dt in all_daylight):
+                is_day = True
+            if is_day:
+                daylight_atoms.append(a)
 
-                if is_loser:
-                    if not a.can_delete_atom:
+        if night_atoms and daylight_atoms:
+            ext_night = [a for a in night_atoms if is_external_atom(a)]
+            ext_day = [a for a in daylight_atoms if is_external_atom(a)]
+
+            if ext_night and ext_day:
+                n1 = ext_night[0]
+                d1 = ext_day[0]
+                raise PromptValidationError(
+                    f"External override conflict under rule '{rule_item.id}': night environment ('{n1.text}') conflicts with daylight environment ('{d1.text}')",
+                    slots=(n1.source_slot, d1.source_slot),
+                    texts=(n1.text, d1.text),
+                    rule_id=rule_item.id,
+                )
+
+            if ext_day and not ext_night:
+                # 外部日照优先：系统夜景退让
+                day_winner = ext_day[0]
+                for a in night_atoms:
+                    if not a.can_delete_atom or not index.is_active(a):
                         continue
-                    if is_fallback:
-                        self.text_fallback_hits += 1
+                    index.drop(a.atom_id)
+                    ledger.record_drop(
+                        rule_item.id,
+                        rule_item.phase,
+                        "daylight_removes_night",
+                        (day_winner.atom_id,),
+                        a,
+                    )
+            elif ext_night and not ext_day:
+                # 外部夜景优先：系统日间光影退让
+                night_winner = ext_night[0]
+                for a in daylight_atoms:
+                    if not a.can_delete_atom or not index.is_active(a):
+                        continue
                     index.drop(a.atom_id)
                     ledger.record_drop(
                         rule_item.id,
@@ -3540,48 +3767,37 @@ class ConflictResolver:
                         (night_winner.atom_id,),
                         a,
                     )
-        else:
-            daylight_atoms = []
-            for a in index.get_active_by_slots("scene", "scene_theme", "theme", "lighting", "lighting_palette"):
-                if not a.can_detect or not index.is_active(a):
-                    continue
-                self._validate_formal_atom(a, rule_item.id)
-                if is_formal_atom(a):
-                    if a.facts and (a.facts.time_of_day in ("morning", "noon", "afternoon", "day") or any(ls in ("sunlight", "daylight", "direct_sun") for ls in a.facts.light_sources)):
-                        daylight_atoms.append(a)
-                elif tf.enabled:
-                    if any(dt.matches(a.text) for dt in all_daylight):
-                        daylight_atoms.append(a)
-
-            if daylight_atoms:
-                daylight_winner = min(daylight_atoms, key=lambda x: (x.tag_order, x.span_order))
-                for a in index.get_active_by_slots("lighting", "lighting_palette"):
-                    if a in daylight_atoms or not a.can_detect or not index.is_active(a):
-                        continue
-                    self._validate_formal_atom(a, rule_item.id)
-                    is_loser = False
-                    is_fallback = False
-                    if is_formal_atom(a):
-                        if a.facts and a.facts.time_of_day in ("night", "midnight", "late_night"):
-                            is_loser = True
-                    elif tf.enabled:
-                        if any(nt.matches(a.text) for nt in all_night):
-                            is_loser = True
-                            is_fallback = True
-
-                    if is_loser:
-                        if not a.can_delete_atom:
-                            continue
-                        if is_fallback:
-                            self.text_fallback_hits += 1
-                        index.drop(a.atom_id)
-                        ledger.record_drop(
-                            rule_item.id,
-                            rule_item.phase,
-                            "daylight_removes_night",
-                            (daylight_winner.atom_id,),
-                            a,
-                        )
+            else:
+                # 均为系统生成：按场景决定光影；若无场景主夜景，则日间光影清除偶发夜景元素
+                scene_nights = [a for a in night_atoms if a.source_slot in ("scene", "scene_theme", "theme")]
+                if scene_nights:
+                    night_winner = min(scene_nights, key=lambda x: (x.tag_order, x.span_order))
+                    for a in daylight_atoms:
+                        if a.source_slot in ("lighting", "lighting_palette"):
+                            if not a.can_delete_atom or not index.is_active(a):
+                                continue
+                            index.drop(a.atom_id)
+                            ledger.record_drop(
+                                rule_item.id,
+                                rule_item.phase,
+                                "night_scene_removes_daylight",
+                                (night_winner.atom_id,),
+                                a,
+                            )
+                else:
+                    daylight_winner = min(daylight_atoms, key=lambda x: (x.tag_order, x.span_order))
+                    for a in night_atoms:
+                        if a.source_slot in ("lighting", "lighting_palette"):
+                            if not a.can_delete_atom or not index.is_active(a):
+                                continue
+                            index.drop(a.atom_id)
+                            ledger.record_drop(
+                                rule_item.id,
+                                rule_item.phase,
+                                "daylight_removes_night",
+                                (daylight_winner.atom_id,),
+                                a,
+                            )
 
         return index.get_all_active_ordered()
 
@@ -3619,17 +3835,18 @@ class ConflictResolver:
             if is_camera_hardware_atom(a):
                 continue
             self._validate_formal_atom(a, rule_item.id)
-            if is_formal_atom(a):
-                if a.facts and "monochrome" in a.facts.color_modes:
-                    seen_mono_ids.add(a.atom_id)
-                    mono_atoms.append(a)
-            elif tf.enabled:
-                if any(t.matches(a.text) for t in monochrome_triggers):
-                    seen_mono_ids.add(a.atom_id)
-                    mono_atoms.append(a)
+            is_mono = False
+            if a.facts and "monochrome" in a.facts.color_modes:
+                is_mono = True
+            elif tf.enabled and any(t.matches(a.text) for t in monochrome_triggers):
+                is_mono = True
+            if is_mono:
+                seen_mono_ids.add(a.atom_id)
+                mono_atoms.append(a)
 
         if mono_atoms:
             mono_winner = min(mono_atoms, key=lambda x: (x.tag_order, x.span_order))
+            chroma_atoms = []
             for a in index.get_active_by_slots("lighting", "lighting_palette", "film", "film_stock"):
                 if a in mono_atoms or not a.can_detect or not index.is_active(a):
                     continue
@@ -3638,27 +3855,57 @@ class ConflictResolver:
                 self._validate_formal_atom(a, rule_item.id)
                 is_loser = False
                 is_fallback = False
-                if is_formal_atom(a):
-                    if a.facts and any(c in a.facts.color_modes for c in ("color", "high_saturation", "neon")):
-                        is_loser = True
-                elif tf.enabled:
-                    if any(b.matches(a.text) for b in banned_chroma):
-                        is_loser = True
-                        is_fallback = True
+                if a.facts and any(c in a.facts.color_modes for c in ("color", "high_saturation", "neon")):
+                    is_loser = True
+                elif tf.enabled and any(b.matches(a.text) for b in banned_chroma):
+                    is_loser = True
+                    is_fallback = True
 
                 if is_loser:
-                    if not a.can_delete_atom:
-                        continue
-                    if is_fallback:
-                        self.text_fallback_hits += 1
-                    index.drop(a.atom_id)
-                    ledger.record_drop(
-                        rule_item.id,
-                        rule_item.phase,
-                        "monochrome_film_removes_chroma",
-                        (mono_winner.atom_id,),
-                        a,
+                    chroma_atoms.append((a, is_fallback))
+
+            if chroma_atoms:
+                ext_mono = [a for a in mono_atoms if is_external_atom(a)]
+                ext_chroma = [a for a, _ in chroma_atoms if is_external_atom(a)]
+
+                if ext_mono and ext_chroma:
+                    m1 = ext_mono[0]
+                    c1 = ext_chroma[0]
+                    raise PromptValidationError(
+                        f"External override conflict under rule '{rule_item.id}': monochrome film ('{m1.text}') conflicts with high chroma color ('{c1.text}')",
+                        slots=(m1.source_slot, c1.source_slot),
+                        texts=(m1.text, c1.text),
+                        rule_id=rule_item.id,
                     )
+
+                if ext_chroma and not ext_mono:
+                    # 外部色彩优先：系统黑白胶片退让
+                    for ma in mono_atoms:
+                        if not ma.can_delete_atom or not index.is_active(ma):
+                            continue
+                        index.drop(ma.atom_id)
+                        ledger.record_drop(
+                            rule_item.id,
+                            rule_item.phase,
+                            "chroma_removes_monochrome_film",
+                            (ext_chroma[0].atom_id,),
+                            ma,
+                        )
+                else:
+                    # 黑白胜出（外部黑白胜过系统色彩，或系统黑白胜过系统色彩）
+                    for a, is_fallback in chroma_atoms:
+                        if not a.can_delete_atom or not index.is_active(a):
+                            continue
+                        if is_fallback:
+                            self.text_fallback_hits += 1
+                        index.drop(a.atom_id)
+                        ledger.record_drop(
+                            rule_item.id,
+                            rule_item.phase,
+                            "monochrome_film_removes_chroma",
+                            (mono_winner.atom_id,),
+                            a,
+                        )
 
         return index.get_all_active_ordered()
 
@@ -3695,9 +3942,12 @@ class ConflictResolver:
             if not a.can_detect or not index.is_active(a):
                 continue
             self._validate_formal_atom(a, rule_item.id)
-            if is_formal_atom(a):
+            if is_formal_atom(a) or is_external_atom(a):
                 if a.facts and a.facts.makeup_base in ("bare", "clean", "natural"):
                     clean_atoms.append(a)
+                elif tf.enabled:
+                    if any(t.matches(a.text) for t in no_makeup_triggers):
+                        clean_atoms.append(a)
             elif tf.enabled:
                 if any(t.matches(a.text) for t in no_makeup_triggers):
                     clean_atoms.append(a)
@@ -3709,9 +3959,13 @@ class ConflictResolver:
                     continue
                 is_loser = False
                 is_fallback = False
-                if is_formal_atom(a):
+                if is_formal_atom(a) or is_external_atom(a):
                     if a.facts and any(e in a.facts.makeup_effects for e in ("heavy", "smudged", "runny", "smeared")):
                         is_loser = True
+                    elif tf.enabled:
+                        if any(b.matches(a.text) for b in banned_makeup_smudge):
+                            is_loser = True
+                            is_fallback = True
                 elif tf.enabled:
                     if any(b.matches(a.text) for b in banned_makeup_smudge):
                         is_loser = True
@@ -3719,6 +3973,9 @@ class ConflictResolver:
 
                 if is_loser:
                     if not a.can_delete_atom:
+                        continue
+                    if is_external_atom(a):
+                        # 软偏好：外部显式输入或自定义覆盖的妆容细节 100% 原样保留，绝不因偏好删除用户输入
                         continue
                     if is_fallback:
                         self.text_fallback_hits += 1
@@ -3793,6 +4050,24 @@ class ConflictResolver:
                             is_fallback = True
 
                     if is_loser:
+                        if is_external_atom(ang_winner) and is_external_atom(a):
+                            raise PromptValidationError(
+                                f"External override conflict under rule '{rule_item.id}': camera angle ('{ang_winner.text}') conflicts with gaze direction ('{a.text}')",
+                                slots=(ang_winner.source_slot, a.source_slot),
+                                texts=(ang_winner.text, a.text),
+                                rule_id=rule_item.id,
+                            )
+                        if is_external_atom(a) and not is_external_atom(ang_winner):
+                            if ang_winner.can_delete_atom and index.is_active(ang_winner):
+                                index.drop(ang_winner.atom_id)
+                                ledger.record_drop(
+                                    rule_item.id,
+                                    rule_item.phase,
+                                    "external_gaze_overrides_camera_angle",
+                                    (a.atom_id,),
+                                    ang_winner,
+                                )
+                            continue
                         if not a.can_delete_atom:
                             continue
                         if is_fallback:
@@ -3857,6 +4132,24 @@ class ConflictResolver:
                         is_fallback = True
 
                 if is_loser:
+                    if is_external_atom(occ_winner) and is_external_atom(a):
+                        raise PromptValidationError(
+                            f"External override conflict under rule '{rule_item.id}': eye occlusion ('{occ_winner.text}') conflicts with gaze direction ('{a.text}')",
+                            slots=(occ_winner.source_slot, a.source_slot),
+                            texts=(occ_winner.text, a.text),
+                            rule_id=rule_item.id,
+                        )
+                    if is_external_atom(a) and not is_external_atom(occ_winner):
+                        if occ_winner.can_delete_atom and index.is_active(occ_winner):
+                            index.drop(occ_winner.atom_id)
+                            ledger.record_drop(
+                                rule_item.id,
+                                rule_item.phase,
+                                "external_gaze_overrides_eye_occlusion",
+                                (a.atom_id,),
+                                occ_winner,
+                            )
+                        continue
                     if not a.can_delete_atom:
                         continue
                     if is_fallback:
@@ -3930,7 +4223,7 @@ class ConflictResolver:
                             is_fallback = True
 
                     if is_loser:
-                        if not a.can_delete_atom:
+                        if not a.can_delete_atom or is_external_atom(a):
                             continue
                         if is_fallback:
                             self.text_fallback_hits += 1
@@ -3972,11 +4265,30 @@ class ConflictResolver:
             self._validate_formal_atom(a, rule_item.id)
 
         # 结构化事实消解：同一 slot 出现相互矛盾的 gaze 方向，保留首个
-        formal_gazes = [a for a in expression_atoms if a.can_detect and index.is_active(a) and is_formal_atom(a) and a.facts and a.facts.gaze]
+        formal_gazes = [a for a in expression_atoms if a.can_detect and index.is_active(a) and (is_formal_atom(a) or is_external_atom(a)) and a.facts and a.facts.gaze]
         if len(formal_gazes) > 1:
             first_gaze = formal_gazes[0]
             for later_gaze in formal_gazes[1:]:
                 if later_gaze.facts.gaze != first_gaze.facts.gaze:
+                    if is_external_atom(first_gaze) and is_external_atom(later_gaze):
+                        raise PromptValidationError(
+                            f"External override conflict under rule '{rule_item.id}': slot '{first_gaze.source_slot}' ('{first_gaze.text}') conflicts with slot '{later_gaze.source_slot}' ('{later_gaze.text}')",
+                            slots=(first_gaze.source_slot, later_gaze.source_slot),
+                            texts=(first_gaze.text, later_gaze.text),
+                            rule_id=rule_item.id,
+                        )
+                    if is_external_atom(later_gaze) and not is_external_atom(first_gaze):
+                        if first_gaze.can_delete_atom and index.is_active(first_gaze):
+                            index.drop(first_gaze.atom_id)
+                            ledger.record_drop(
+                                rule_item.id,
+                                rule_item.phase,
+                                "external_gaze_overrides_gaze",
+                                (later_gaze.atom_id,),
+                                first_gaze,
+                            )
+                        first_gaze = later_gaze
+                        continue
                     if not later_gaze.can_delete_atom or not index.is_active(later_gaze):
                         continue
                     index.drop(later_gaze.atom_id)
@@ -3996,12 +4308,28 @@ class ConflictResolver:
                 if m1 and m2:
                     m1.sort(key=lambda x: (x.tag_order, x.span_order))
                     m2.sort(key=lambda x: (x.tag_order, x.span_order))
-                    if (m1[0].tag_order, m1[0].span_order) <= (m2[0].tag_order, m2[0].span_order):
+                    m1_ext = any(is_external_atom(a) for a in m1)
+                    m2_ext = any(is_external_atom(a) for a in m2)
+                    if m1_ext and m2_ext:
+                        raise PromptValidationError(
+                            f"External override conflict under rule '{rule_item.id}': slot '{m1[0].source_slot}' ('{m1[0].text}') conflicts with slot '{m2[0].source_slot}' ('{m2[0].text}')",
+                            slots=(m1[0].source_slot, m2[0].source_slot),
+                            texts=(m1[0].text, m2[0].text),
+                            rule_id=rule_item.id,
+                        )
+                    if m1_ext and not m2_ext:
                         winner = m1[0]
                         losers = m2
-                    else:
+                    elif m2_ext and not m1_ext:
                         winner = m2[0]
                         losers = m1
+                    else:
+                        if (m1[0].tag_order, m1[0].span_order) <= (m2[0].tag_order, m2[0].span_order):
+                            winner = m1[0]
+                            losers = m2
+                        else:
+                            winner = m2[0]
+                            losers = m1
 
                     for loser in losers:
                         if not loser.can_delete_atom or not index.is_active(loser):
@@ -4277,9 +4605,13 @@ class ConflictResolver:
                 clothing_atoms = [a for a in clothing_atoms if a.atom_id != first_nude.atom_id]
                 if clothing_atoms:
                     first_cloth = min(clothing_atoms, key=lambda x: (x.tag_order, x.span_order))
-                    conflicts.append(("residual_nudity_clothing_conflict", "nudity_clothing_conflicts", "nudity_removes_clothing", first_nude.atom_id, first_cloth.atom_id))
-                    if _is_loser_protected(first_cloth):
-                        protected_losers.append(first_cloth)
+                    if is_external_atom(first_cloth) and not is_external_atom(first_nude):
+                        winner, loser = first_cloth, first_nude
+                    else:
+                        winner, loser = first_nude, first_cloth
+                    conflicts.append(("residual_nudity_clothing_conflict", "nudity_clothing_conflicts", "nudity_removes_clothing", winner.atom_id, loser.atom_id))
+                    if _is_loser_protected(loser):
+                        protected_losers.append(loser)
 
         for gid in get_fallback_group_ids(r2_tf, role="trigger"):
             c_trig = select_fallback_patterns(r2_tf, role="trigger", group_id=gid)
@@ -4305,9 +4637,13 @@ class ConflictResolver:
                 first_trig = min(trig_atoms, key=lambda x: (x.tag_order, x.span_order))
                 first_ban = min(ban_atoms, key=lambda x: (x.tag_order, x.span_order))
                 if first_trig.atom_id != first_ban.atom_id:
-                    conflicts.append(("residual_nudity_underwear_conflict", "nudity_clothing_conflicts", "nudity_removes_underwear", first_trig.atom_id, first_ban.atom_id))
-                    if _is_loser_protected(first_ban):
-                        protected_losers.append(first_ban)
+                    if is_external_atom(first_ban) and not is_external_atom(first_trig):
+                        winner, loser = first_ban, first_trig
+                    else:
+                        winner, loser = first_trig, first_ban
+                    conflicts.append(("residual_nudity_underwear_conflict", "nudity_clothing_conflicts", "nudity_removes_underwear", winner.atom_id, loser.atom_id))
+                    if _is_loser_protected(loser):
+                        protected_losers.append(loser)
                     break
 
         # 3. 景别 vs 下半身
@@ -4365,9 +4701,13 @@ class ConflictResolver:
             first_busy = min(busy_atoms, key=lambda x: (x.tag_order, x.span_order))
             first_prop = min(prop_atoms, key=lambda x: (x.tag_order, x.span_order))
             if first_busy.atom_id != first_prop.atom_id:
-                conflicts.append(("residual_hand_occupation_conflict", "pose_hand_occupation", "busy_hands_remove_props", first_busy.atom_id, first_prop.atom_id))
-                if _is_loser_protected(first_prop):
-                    protected_losers.append(first_prop)
+                if is_external_atom(first_prop) and not is_external_atom(first_busy):
+                    winner, loser = first_prop, first_busy
+                else:
+                    winner, loser = first_busy, first_prop
+                conflicts.append(("residual_hand_occupation_conflict", "pose_hand_occupation", "busy_hands_remove_props", winner.atom_id, loser.atom_id))
+                if _is_loser_protected(loser):
+                    protected_losers.append(loser)
 
         # 5. 单持道具上限
         r5_tf = rule_tf_map["handheld_props_single_holder"]
@@ -4377,17 +4717,51 @@ class ConflictResolver:
             if ((is_formal_atom(a) or is_external_atom(a)) and a.source_slot == "props" and a.facts and (a.facts.hands_required > 0 or a.facts.prop_usage == "handheld"))
             or (not is_formal_atom(a) and any(hp.matches(a.text) for hp in r5_pats))
         ]
-        if len(hh_atoms) > 1:
-            hh_atoms.sort(key=lambda x: (x.tag_order, x.span_order))
-            first_hh = hh_atoms[0]
-            second_hh = hh_atoms[1]
-            req_1 = (first_hh.facts.hands_required if (first_hh.facts and first_hh.facts.hands_required > 0) else 1)
-            req_2 = (second_hh.facts.hands_required if (second_hh.facts and second_hh.facts.hands_required > 0) else 1)
-            is_dual_hold_legal = (is_external_atom(first_hh) and is_external_atom(second_hh) and (req_1 + req_2 <= 2))
-            if not is_dual_hold_legal:
-                conflicts.append(("residual_single_handheld_prop_conflict", "handheld_props_single_holder", "single_handheld_prop_limit", first_hh.atom_id, second_hh.atom_id))
-                if _is_loser_protected(second_hh):
-                    protected_losers.append(second_hh)
+        if hh_atoms:
+            entity_map: Dict[str, List[PromptAtom]] = {}
+            for a in hh_atoms:
+                ekey = get_prop_entity_key(a)
+                entity_map.setdefault(ekey, []).append(a)
+
+            entity_reqs = []
+            for ekey, e_atoms in entity_map.items():
+                h = 1
+                for ea in e_atoms:
+                    if ea.facts and ea.facts.hands_required > 0:
+                        h = max(h, ea.facts.hands_required)
+                    elif any(w in ea.text.lower() for w in ("controller", "two hands", "both hands", "sword", "rifle", "tray")):
+                        h = max(h, 2)
+                first_ea = min(e_atoms, key=lambda x: (x.tag_order, x.span_order))
+                entity_reqs.append((first_ea, h, any(is_external_atom(ea) for ea in e_atoms)))
+
+            entity_reqs.sort(key=lambda x: (0 if x[2] else 1, x[0].tag_order, x[0].span_order))
+            total_prop_hands = sum(h for _, h, _ in entity_reqs)
+
+            pose_hands = 0
+            if busy_atoms:
+                first_busy = min(busy_atoms, key=lambda x: (x.tag_order, x.span_order))
+                if first_busy.facts:
+                    if first_busy.facts.hand_state == "one_busy" or first_busy.facts.hands_required == 1:
+                        pose_hands = 1
+                    elif first_busy.facts.hand_state in ("both_busy", "restrained") or first_busy.facts.hands_required == 2:
+                        pose_hands = 2
+                    elif any(w in first_busy.text.lower() for w in ("cheek", "hip", "chin", "touching")):
+                        pose_hands = 1
+                    else:
+                        pose_hands = 2
+                else:
+                    pose_hands = 2 if any(w in first_busy.text.lower() for w in ("bound", "tied", "behind back", "hands on head", "restrained")) else 1
+
+            if len(entity_reqs) > 1 and (total_prop_hands + pose_hands > 2):
+                first_hh = entity_reqs[0][0]
+                second_hh = entity_reqs[1][0]
+                if is_external_atom(second_hh) and not is_external_atom(first_hh):
+                    winner, loser = second_hh, first_hh
+                else:
+                    winner, loser = first_hh, second_hh
+                conflicts.append(("residual_single_handheld_prop_conflict", "handheld_props_single_holder", "single_handheld_prop_limit", winner.atom_id, loser.atom_id))
+                if _is_loser_protected(loser):
+                    protected_losers.append(loser)
 
         # 6. 连体衣结构状态
         r6_tf = rule_tf_map["clothing_style_state_coherence"]
@@ -4614,9 +4988,11 @@ class ConflictResolver:
             first_bare = min(bare_atoms, key=lambda x: (x.tag_order, x.span_order))
             first_heavy = min(heavy_atoms, key=lambda x: (x.tag_order, x.span_order))
             if first_bare.atom_id != first_heavy.atom_id:
-                conflicts.append(("residual_makeup_details_conflict", "makeup_details_coherence", "clean_base_removes_heavy_makeup", first_bare.atom_id, first_heavy.atom_id))
-                if _is_loser_protected(first_heavy):
-                    protected_losers.append(first_heavy)
+                # 软偏好：当包含外部输入时，允许共存，不属于不可消解的硬冲突
+                if not (is_external_atom(first_bare) or is_external_atom(first_heavy)):
+                    conflicts.append(("residual_makeup_details_conflict", "makeup_details_coherence", "clean_base_removes_heavy_makeup", first_bare.atom_id, first_heavy.atom_id))
+                    if _is_loser_protected(first_heavy):
+                        protected_losers.append(first_heavy)
 
         # 12. 视线几何
         r12_tf = rule_tf_map["gaze_angle_geometry"]

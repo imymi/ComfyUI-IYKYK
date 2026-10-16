@@ -146,19 +146,17 @@ class TestM1Counterexamples(unittest.TestCase):
         )
         surviving_texts = [a.text for a in surviving]
 
-        # 真实缺陷复现断言：第 1 个道具保留，第 2 个道具被 handheld_props_single_holder 规则强制丢弃
+        # M3 统一容量模型修复：双手空闲时两件独立单手道具 (1 + 1 = 2 <= 2) 均合法共存保留！
         self.assertIn(atom_p1.text, surviving_texts)
-        self.assertNotIn(
+        self.assertIn(
             atom_p2.text,
             surviving_texts,
-            "基线必须复现：双手持道具时第 2 个道具被 handheld_props_single_holder 规则强制丢弃的事实！",
+            "M3 修复确认：双手空闲时两个独立单手道具在 2 手容量内合法共存，不再被单件限制误删！",
         )
         drop_decisions = [
             d for d in report.decisions if d.rule_id == "handheld_props_single_holder" and d.action == "drop"
         ]
-        self.assertTrue(len(drop_decisions) >= 1)
-        self.assertEqual(drop_decisions[0].target_atom_id, atom_p2.atom_id)
-        self.assertEqual(drop_decisions[0].reason_code, "single_handheld_prop_limit")
+        self.assertEqual(len(drop_decisions), 0)
 
     def test_04_baseline_reproduction_true_hard_conflict_ce_hand_03(self):
         """消费 CE-HAND-03 夹具：真实双手背后硬冲突下道具被正确消解。"""

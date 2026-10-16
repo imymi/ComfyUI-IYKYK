@@ -496,16 +496,24 @@ def _generate_structured(
 
     # 外部场景覆盖情境自洽更新 (M3 契约):
     ext_scene = external_overrides.get("scene_theme")
-    if ext_scene and isinstance(ext_scene, str) and ext_scene.strip():
-        detected_ext_ctx = sampler.detect_context(ext_scene, "")
-        if detected_ext_ctx and detected_ext_ctx in ORDERED_CONTEXT_IDS:
-            scene_cids = (detected_ext_ctx,)
-            primary_context = detected_ext_ctx
-            context = detected_ext_ctx
+    if ext_scene:
+        if isinstance(ext_scene, (list, tuple)):
+            ext_scene_str = ", ".join(str(getattr(x, "text", x)) for x in ext_scene if str(getattr(x, "text", x)).strip())
+        elif isinstance(ext_scene, str):
+            ext_scene_str = ext_scene.strip()
+        else:
+            ext_scene_str = str(ext_scene).strip()
+
+        if ext_scene_str:
+            detected_ext_ctx = sampler.detect_context(ext_scene_str, "")
+            ctx_val = detected_ext_ctx if (detected_ext_ctx and detected_ext_ctx in ORDERED_CONTEXT_IDS) else "generic"
+            scene_cids = (ctx_val,)
+            primary_context = ctx_val
+            context = ctx_val
             # 彻底清除被替换的旧场景/主题贡献及来源 ID
             theme_cids = ()
             theme_item_id = None
-            scene_item_id = f"override_scene_{detected_ext_ctx}"
+            scene_item_id = f"override_scene_{ctx_val}"
             slots["scene_theme"] = make_override_fragments(
                 "scene_theme",
                 ext_scene,
@@ -702,6 +710,7 @@ def _generate_structured(
         rng=rng,
         context_profile=context_profile,
         external_overrides=external_overrides,
+        entry_point=entry_point,
     )
     negative_prompt = sampler.get_negative_prompt()
 

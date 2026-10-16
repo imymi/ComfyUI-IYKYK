@@ -2724,3 +2724,25 @@ class AssemblyResult:
     budget_filtered_atoms: Tuple[PromptAtom, ...] = ()
     deduplication_records: Tuple[DeduplicationRecord, ...] = ()
     budget_filter_records: Tuple[BudgetFilterRecord, ...] = ()
+
+
+def is_external_atom(a: Any) -> bool:
+    """判断给定原子或标签是否属于用户显式外部覆盖输入 (M3 外部覆盖契约)。"""
+    if a is None:
+        return False
+    orig = getattr(a, "origin", None)
+    if orig is not None:
+        if getattr(orig, "mode", None) == "override":
+            return True
+        if getattr(orig, "entry_point", None) == "override":
+            return True
+    prov = getattr(a, "provenance", None)
+    if prov is not None:
+        if getattr(prov, "kind", None) in ("override", "external_override", "slot_override"):
+            return True
+        if getattr(prov, "source_mode", None) == "override":
+            return True
+        for sid in getattr(prov, "semantic_ids", ()):
+            if sid.startswith("slot_override:") or sid.startswith("override:"):
+                return True
+    return False

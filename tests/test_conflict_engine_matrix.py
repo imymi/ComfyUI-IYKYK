@@ -122,17 +122,18 @@ class TestConflictEngineMatrix(unittest.TestCase):
         self.assertNotIn("skirt slit revealing", txt_pants)
         self.assertNotIn("pleated skirt floating", txt_pants)
 
-    # ─── Rule 17: 多手持道具唯一性消解 ───
+    # ─── Rule 17: 多手持道具容量消解 ───
     def test_rule17_multiple_handheld_props_keep_first_only(self):
-        """测试同时出现多个手持道具时，只保留首个主手持动作，消除多肢体异常"""
+        """测试同时出现多个手持道具时，基于 2 手容量模型保留前两个主手持动作，消除多肢体异常"""
         frags = [
             PromptFragment(text="holding black compact digital camera", source_slot="props", order=1),
             PromptFragment(text="holding folding fan in hand", source_slot="props", order=2),
             PromptFragment(text="holding wine glass in hand", source_slot="props", order=3),
         ]
         resolved = self.resolver.resolve_fragments(frags, Random(42))
-        self.assertEqual(len(resolved), 1)
+        self.assertEqual(len(resolved), 2)
         self.assertIn("holding black compact digital camera", resolved[0].text)
+        self.assertIn("holding folding fan in hand", resolved[1].text)
 
     # ─── 综合多规则交叉级联消解测试 ───
     def test_cross_slot_full_cascade_15_slots(self):

@@ -631,6 +631,214 @@ class TestM3OverridesAndConflictEngine(unittest.TestCase):
             self.assertEqual(a.origin.mode, "override")
             self.assertEqual(a.provenance.source_mode, "override")
 
+    # ─────────────────────────────────────────────────────────────
+    # 15. 真实预设全槽位整槽覆盖与配方整体清除 (审核阻断 1)
+    # ─────────────────────────────────────────────────────────────
+
+    def test_20_real_presets_whole_slot_purges(self):
+        """[Audit-1] 真实预设全槽位整槽覆盖验证：C02/X03/F01/H06 覆盖对应槽位后无旧内容残留。"""
+        from lib.sampler import DataSampler
+        sampler = DataSampler(self.data_dir)
+
+        # 1. C02 覆盖 camera_angle: 清除 eye level side angle, voyeur angle from adjacent aisle
+        p_c02 = sampler.get_preset("C02", Random(42))
+        res_c02 = self.assembler.assemble_preset(
+            p_c02, None, "高清写真 (High)", rng=Random(42), external_overrides={"camera_angle": "low angle"}
+        )
+        self.assertNotIn("eye level side angle", res_c02.prompt)
+        self.assertNotIn("voyeur angle from adjacent aisle", res_c02.prompt)
+        self.assertIn("low angle", res_c02.prompt)
+
+        # 2. X03 覆盖 tattoo: 清除 new tattoo on hip bone, getting tattooed on hip
+        p_x03 = sampler.get_preset("X03", Random(42))
+        res_x03 = self.assembler.assemble_preset(
+            p_x03, None, "高清写真 (High)", rng=Random(42), external_overrides={"tattoo": "small butterfly tattoo"}
+        )
+        self.assertNotIn("new tattoo on hip bone", res_x03.prompt)
+        self.assertNotIn("getting tattooed on hip", res_x03.prompt)
+        self.assertIn("small butterfly tattoo", res_x03.prompt)
+
+        # 3. F01 覆盖 liquids: 清除 sweat on forehead, sweat dripping down spine
+        p_f01 = sampler.get_preset("F01", Random(42))
+        res_f01 = self.assembler.assemble_preset(
+            p_f01, None, "高清写真 (High)", rng=Random(42), external_overrides={"liquids": "splashes of water"}
+        )
+        self.assertNotIn("sweat on forehead", res_f01.prompt)
+        self.assertNotIn("sweat dripping down spine", res_f01.prompt)
+        self.assertIn("splashes of water", res_f01.prompt)
+
+        # 4. H06 覆盖 props: 清除 holding spatula
+        p_h06 = sampler.get_preset("H06", Random(42))
+        res_h06 = self.assembler.assemble_preset(
+            p_h06, None, "高清写真 (High)", rng=Random(42), external_overrides={"props": "holding coffee cup"}
+        )
+        self.assertNotIn("holding spatula", res_h06.prompt)
+        self.assertIn("holding coffee cup", res_h06.prompt)
+
+    def test_21_style_recipe_purge_across_slots(self):
+        """[Audit-1] 覆盖 style_recipe 后，原配方拆分到光影、姿势、细节各槽位的片段必须整体彻底清除。"""
+        from lib.sampler import DataSampler
+        sampler = DataSampler(self.data_dir)
+        recipe = sampler.get_style_recipe("recipe_av_cover", Random(42))
+        p_c01 = sampler.get_preset("C01", Random(42))
+
+        # 未覆盖时，包含配方的光影与姿势
+        res_with = self.assembler.assemble_preset(p_c01, recipe, "高清写真 (High)", rng=Random(42))
+        self.assertIn("ring light", res_with.prompt)
+        self.assertIn("soft studio lighting", res_with.prompt)
+
+        # 覆盖 style_recipe 后，配方各槽位片段整体清除，仅保留新配方
+        res_override = self.assembler.assemble_preset(
+            p_c01, recipe, "高清写真 (High)", rng=Random(42),
+            external_overrides={"style_recipe": "cinematic teal and orange, dramatic rim light"}
+        )
+        self.assertNotIn("ring light", res_override.prompt)
+        self.assertNotIn("soft studio lighting", res_override.prompt)
+        self.assertNotIn("standing S-curve pose", res_override.prompt)
+        self.assertNotIn("gravure idol makeup", res_override.prompt)
+        self.assertNotIn("tack-sharp focus on eyes", res_override.prompt)
+        self.assertIn("cinematic teal and orange", res_override.prompt)
+        self.assertIn("dramatic rim light", res_override.prompt)
+
+    # ─────────────────────────────────────────────────────────────
+    # 16. 全规则外部保护与冲突策略统一 (审核阻断 2)
+    # ─────────────────────────────────────────────────────────────
+
+    def test_22_external_protection_all_rule_counterexamples(self):
+        """[Audit-2] 外部保护统一策略验证：系统退让、外部硬冲突明确报错、软偏好保留外部内容。"""
+        # A. 系统 deep dark night + 外部 natural daylight -> 系统退让，外部保留
+        res_a = self.assembler.assemble_slots(
+            {"scene_theme": [PromptFragment(text="deep dark night", source_slot="scene_theme", order=0)]},
+            rng=Random(42),
+            external_overrides={"lighting": "natural daylight"},
+        )
+        self.assertIn("natural daylight", res_a.prompt)
+        self.assertNotIn("deep dark night", res_a.prompt)
+
+        # B. 外部 deep dark night + 外部 natural daylight -> Fail-Closed PromptValidationError
+        with self.assertRaises(PromptValidationError) as cm_b:
+            self.assembler.assemble_slots(
+                {},
+                rng=Random(42),
+                external_overrides={"scene_theme": "deep dark night", "lighting": "natural daylight"},
+            )
+        self.assertEqual(cm_b.exception.rule_id, "environmental_lighting_coherence")
+
+        # C. 外部 classic monochrome + 外部 magenta and cyan -> Fail-Closed PromptValidationError
+        with self.assertRaises(PromptValidationError) as cm_c:
+            self.assembler.assemble_slots(
+                {},
+                rng=Random(42),
+                external_overrides={"film": "classic monochrome", "lighting": "magenta and cyan"},
+            )
+        self.assertEqual(cm_c.exception.rule_id, "monochrome_film_chroma_coherence")
+
+        # D. 外部 natural makeup, smudged eyeliner -> 软偏好不得删除外部内容，全部保留
+        res_d = self.assembler.assemble_slots(
+            {},
+            rng=Random(42),
+            external_overrides={"makeup": "natural makeup, smudged eyeliner"},
+        )
+        self.assertIn("natural makeup", res_d.prompt)
+        self.assertIn("smudged eyeliner", res_d.prompt)
+
+    # ─────────────────────────────────────────────────────────────
+    # 17. 纯系统道具统一容量核算与实体区分 (审核阻断 3)
+    # ─────────────────────────────────────────────────────────────
+
+    def test_23_pure_system_props_hand_capacity_and_entities(self):
+        """[Audit-3] 纯系统道具与统一容量核算：双手空闲时两件单手道具 (1+1=2) 均合法保留；区分实体与同道具多描述。"""
+        # 1. 双手空闲，纯系统手机 + 咖啡杯各需一只手 -> 均保留 (1+1=2 <= 2)
+        res_props = self.assembler.assemble_slots(
+            {"props": [
+                PromptFragment(text="holding phone", source_slot="props", order=0),
+                PromptFragment(text="holding coffee cup", source_slot="props", order=1),
+            ]},
+            rng=Random(42),
+        )
+        self.assertIn("holding phone", res_props.prompt)
+        self.assertIn("holding coffee cup", res_props.prompt)
+
+        # 2. 系统 bound arms (restrained=2) + 外部相机 (1) -> 系统姿势退让，外部相机保留
+        res_bound = self.assembler.assemble_slots(
+            {"pose": [PromptFragment(text="bound arms", source_slot="pose", order=0)]},
+            rng=Random(42),
+            external_overrides={"props": "holding camera"},
+        )
+        self.assertIn("holding camera", res_bound.prompt)
+        self.assertNotIn("bound arms", res_bound.prompt)
+
+        # 3. 外部 bound arms + 外部相机 -> 外部硬冲突报错
+        with self.assertRaises(PromptValidationError) as cm_bound:
+            self.assembler.assemble_slots(
+                {},
+                rng=Random(42),
+                external_overrides={"pose": "bound arms", "props": "holding camera"},
+            )
+        self.assertEqual(cm_bound.exception.rule_id, "pose_hand_occupation")
+
+    # ─────────────────────────────────────────────────────────────
+    # 18. 去重保留外部优先级与预算核算 (审核阻断 4)
+    # ─────────────────────────────────────────────────────────────
+
+    def test_24_deduplication_preserves_external_priority_and_budget(self):
+        """[Audit-4] 去重时必须保留外部优先级与来源，绝不因去重丢失外部预算保证。"""
+        # 系统内容 200 词普通文本 + 60 词文本 B，外部覆盖传入同样的 60 词文本 B
+        sys_common = [PromptFragment(text=f"systag{i}", source_slot="scene_theme", order=i) for i in range(200)]
+        text_b_tags = [PromptFragment(text=f"text_b_word_{i}", source_slot="scene_theme", order=200 + i) for i in range(60)]
+        ext_text_b = " ".join(f"text_b_word_{i}" for i in range(60))
+
+        res = self.assembler.assemble_slots(
+            {"scene_theme": sys_common + text_b_tags},
+            rng=Random(42),
+            external_overrides={"clothing": ext_text_b},
+        )
+        self.assertLessEqual(len(res.prompt.split()), 250)
+        # 外部文本 B 的全部 60 个词 100% 完整保留在最终结果中
+        for i in range(60):
+            self.assertIn(f"text_b_word_{i}", res.prompt)
+
+    # ─────────────────────────────────────────────────────────────
+    # 19. 非空列表形式场景覆盖与诊断版本规范 (收口契约)
+    # ─────────────────────────────────────────────────────────────
+
+    def test_25_list_format_scene_override_context_purge(self):
+        """[Contract-1] 非空列表形式的场景覆盖必须彻底清除旧情境，0% school。"""
+        from lib.sampler import DataSampler
+        sampler = DataSampler(self.data_dir)
+        inputs_list = {
+            "场景大类": "教室",
+            "剧情主题": "教师/学生系列",
+            "external_overrides": {"scene_override": ["traditional Japanese onsen hot spring bath"]},
+        }
+        gen_res = _generate_structured(
+            sampler,
+            self.assembler,
+            inputs_list,
+            rng=Random(42),
+            effective_seed=42,
+        )
+        weights = dict(gen_res.context_profile.weights)
+        self.assertEqual(weights.get("school", 0.0), 0.0)
+        self.assertAlmostEqual(weights.get("onsen_bath", 0.0), 1.0, places=3)
+        self.assertIn("traditional Japanese onsen hot spring bath", gen_res.positive)
+
+    def test_26_diagnostics_entry_point_and_schema_version(self):
+        """[Contract-2] 诊断版本必须严格保持 1.0，entry_point 真实记录 diagnostics。"""
+        import json
+        from nodes import IYKYKPromptDiagnostics
+        diag_node = IYKYKPromptDiagnostics()
+        res, audit_json = diag_node.diagnose_structured(
+            场景大类="教室",
+            external_overrides={"clothing": "black latex catsuit"},
+        )
+        d = json.loads(audit_json)
+        self.assertEqual(d.get("schema_version"), "1.0")
+        override_selections = [s for s in d.get("selections", []) if s.get("mode") == "override"]
+        self.assertTrue(len(override_selections) >= 1)
+        for s in override_selections:
+            self.assertEqual(s.get("entry_point"), "diagnostics")
+
 
 if __name__ == "__main__":
     unittest.main()

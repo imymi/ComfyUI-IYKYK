@@ -411,16 +411,30 @@ class TestM1SamplesPipelineAndRules(unittest.TestCase):
             facts=SemanticFacts.from_dict(wine_tag["facts"]),
         )
 
-        resolved, rules, rep = self.resolver.resolve_atoms_with_full_report([atom_clutch, atom_wine])
+        # M3 统一容量模型：双手空闲时两件独立单手道具 (1 + 1 = 2 <= 2) 均合法共存保留
+        # 当加入第 3 个单手道具超出手部容量 (3 > 2) 时，规则 handheld_props_single_holder 精准消解超容道具
+        atom_phone = PromptAtom(
+            atom_id="atom_phone_3",
+            text="holding smartphone recording in hand",
+            source_slot="props",
+            tag_order=3,
+            span_order=0,
+            span_type=SpanType.PLAIN,
+            origin=origin,
+            facts=SemanticFacts(prop_usage="handheld", hands_required=1),
+        )
+
+        resolved, rules, rep = self.resolver.resolve_atoms_with_full_report([atom_clutch, atom_wine, atom_phone])
         resolved_texts = [a.text for a in resolved]
 
         self.assertIn("elegant clutch bag held in hand", resolved_texts)
-        self.assertNotIn("stemware with red wine", resolved_texts)
+        self.assertIn("stemware with red wine", resolved_texts)
+        self.assertNotIn("holding smartphone recording in hand", resolved_texts)
         self.assertIn("handheld_props_single_holder", rules)
         self.assertTrue(
             any(
                 d.rule_id == "handheld_props_single_holder"
-                and d.target_atom_id == "atom_wine_2"
+                and d.target_atom_id == "atom_phone_3"
                 and d.reason_code == "single_handheld_prop_limit"
                 for d in rep.decisions
             )

@@ -22,6 +22,7 @@ if __package__:
         SemanticFacts,
         TagProvenance,
         VALID_SOURCE_MODES,
+        is_external_atom,
     )
 else:
     from lib.errors import PromptValidationError
@@ -34,6 +35,7 @@ else:
         SemanticFacts,
         TagProvenance,
         VALID_SOURCE_MODES,
+        is_external_atom,
     )
 
 
@@ -292,19 +294,43 @@ def deduplicate_tags_with_records(
             seen_plain_texts[norm_text] = t
             result.append(t)
         else:
-            dropped.append(t)
-            retained_tag = seen_plain_texts[norm_text]
-            retained_atom_id = retained_tag.atoms[0].atom_id if retained_tag.atoms else ""
-            retained_text = retained_tag.text
-            for a in t.atoms:
-                records.append(
-                    DeduplicationRecord(
-                        atom_id=a.atom_id,
-                        retained_atom_id=retained_atom_id,
-                        retained_tag_text=retained_text,
-                        basis="normalized_exact_tag_duplicate",
+            prev_tag = seen_plain_texts[norm_text]
+            t_is_ext = any(is_external_atom(a) for a in t.atoms)
+            prev_is_ext = any(is_external_atom(a) for a in prev_tag.atoms)
+            if t_is_ext and not prev_is_ext:
+                # 外部覆盖优先级高于系统生成：用外部 tag 替换原先保留的系统 tag，并将系统 tag 移入 dropped
+                try:
+                    idx = result.index(prev_tag)
+                    result[idx] = t
+                except ValueError:
+                    result.append(t)
+                seen_plain_texts[norm_text] = t
+                dropped.append(prev_tag)
+                retained_atom_id = t.atoms[0].atom_id if t.atoms else ""
+                retained_text = t.text
+                for a in prev_tag.atoms:
+                    records.append(
+                        DeduplicationRecord(
+                            atom_id=a.atom_id,
+                            retained_atom_id=retained_atom_id,
+                            retained_tag_text=retained_text,
+                            basis="normalized_exact_tag_duplicate",
+                        )
                     )
-                )
+            else:
+                dropped.append(t)
+                retained_tag = prev_tag
+                retained_atom_id = retained_tag.atoms[0].atom_id if retained_tag.atoms else ""
+                retained_text = retained_tag.text
+                for a in t.atoms:
+                    records.append(
+                        DeduplicationRecord(
+                            atom_id=a.atom_id,
+                            retained_atom_id=retained_atom_id,
+                            retained_tag_text=retained_text,
+                            basis="normalized_exact_tag_duplicate",
+                        )
+                    )
 
     return result, dropped, records
 
