@@ -1299,11 +1299,18 @@ class TestClothingExpansionBatches(unittest.TestCase):
 
         # 1. 当前 rc10 全量数据摘要：在校准 24 处附属细节/配件拓扑（如 furisode 袖子、leather_corset 绑带等剔除误标的 bottom_skirt）后，
         # 930 组输出中 928 组与原基线完全一致，仅 2 组发生合理修正：
-        # - furisode (L2, seed=2024, unbuttoned): 从含有错误裙装开合 ['front unbuttoned', 'skirt unbuttoned']
-        #   修正为和服合法开合 ['front unbuttoned', 'collar unbuttoned']；
-        # - leather_corset (L2, seed=2024, unbuttoned): 从含有错误裙装开合 ['collar unbuttoned', 'skirt unbuttoned']
-        #   修正为上衣合法开合 ['front unbuttoned', 'shirt open at chest']。
-        # 杜绝了无裙装款式因配件拓扑误判而附带裙装解扣/动作的问题。
+        # - furisode (L2, seed=2024, unbuttoned):
+        #   * 状态标签：从含有错误裙装开合 ['front unbuttoned', 'skirt unbuttoned']
+        #     修正为和服合法开合 ['front unbuttoned', 'collar unbuttoned']；
+        #   * 扩展标签：由 'semi-translucent fabric creating hazy skin contours' 变为 'high side slit to upper thigh exposing long bare leg'；
+        #   * 后续随机数状态：rng_next 发生相应位移。
+        # - leather_corset (L2, seed=2024, unbuttoned):
+        #   * 状态标签：从含有错误裙装开合 ['collar unbuttoned', 'skirt unbuttoned']
+        #     修正为上衣合法开合 ['front unbuttoned', 'shirt open at chest']；
+        #   * 扩展标签：由 'high side slit to upper thigh exposing long bare leg' 变为 'semi-translucent fabric creating hazy skin contours'；
+        #   * 后续随机数状态：rng_next 发生相应位移。
+        # 上述两组输出的扩展标签在“半透明面料”与“高开衩”之间发生互换，连锁引起 rng_next 变化，
+        # 完整消除了无裙装款式因配件拓扑误判而附带裙装解扣/动作的问题。
         rc10_expanded_digest = "4f8d2fc0186ddcdad9e252040565a9b3a3f05aa488467c79a9558d0926eb782d"
         self.assertEqual(
             digest,
