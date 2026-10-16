@@ -18,7 +18,7 @@ from random import Random
 from typing import Any, Dict, FrozenSet, List, Optional, Sequence, Set, Tuple
 
 if __package__:
-    from .errors import QuarantineLeakageError, RuleConfigurationError, UnresolvedConflictError
+    from .errors import PromptValidationError, QuarantineLeakageError, RuleConfigurationError, UnresolvedConflictError
     from .models import (
         CANONICAL_SELECTORS_BY_ENTRY_POINT,
         FORMAL_ORIGIN_MODES,
@@ -49,7 +49,7 @@ if __package__:
     )
     from .slot_contract import SLOT_ALIASES, normalize_slot_name
 else:
-    from lib.errors import QuarantineLeakageError, RuleConfigurationError, UnresolvedConflictError
+    from lib.errors import PromptValidationError, QuarantineLeakageError, RuleConfigurationError, UnresolvedConflictError
     from lib.models import (
         CANONICAL_SELECTORS_BY_ENTRY_POINT,
         FORMAL_ORIGIN_MODES,
@@ -1156,6 +1156,31 @@ def is_formal_atom(a: PromptAtom) -> bool:
     return False
 
 
+def is_external_atom(a: Any) -> bool:
+    """判断给定原子是否属于用户显式外部覆盖输入 (M3 外部覆盖契约)。"""
+    if a is None:
+        return False
+    orig = getattr(a, "origin", None)
+    if orig is not None:
+        if getattr(orig, "mode", None) == "override":
+            return True
+        if getattr(orig, "entry_point", None) == "override":
+            return True
+    prov = getattr(a, "provenance", None)
+    if prov is not None:
+        if getattr(prov, "kind", None) in ("override", "external_override", "slot_override"):
+            return True
+        if getattr(prov, "source_mode", None) == "override":
+            return True
+        for sid in getattr(prov, "semantic_ids", ()):
+            if sid.startswith("slot_override:") or sid == "override":
+                return True
+    slot = str(getattr(a, "source_slot", ""))
+    if slot.endswith("_override"):
+        return True
+    return False
+
+
 def is_camera_hardware_atom(a: Any) -> bool:
     """判断给定原子是否属于相机硬件套机/机身/光学器材（而非感光胶片/相纸乳剂）。
 
@@ -1404,7 +1429,9 @@ class OneTimeIndex:
 
 
 ALLOWED_RUNTIME_REASON_CODES: Mapping[str, Tuple[str, ...]] = {
-    "spatial_environmental_mutual_exclusion": ("spatial_pose_support_incompatible",),
+    "spatial_environmental_mutual_exclusion": ("spatial_pose_support_incompatible", "external_spatial_precedence"),
+    "pose_hand_occupation": ("external_prop_overrides_pose", "busy_hands_remove_props"),
+    "nudity_clothing_conflicts": ("clothing_removes_nudity",),
 }
 
 
@@ -2516,7 +2543,7 @@ class ConflictResolver:
                 continue
             self._validate_formal_atom(a, rule_item.id)
             matched_lvl = None
-            if is_formal_atom(a):
+            if is_formal_atom(a) or is_external_atom(a):
                 raw_id = (((a.provenance.item_id if a.provenance else "") or "") + " " + (a.source_item_id or "") + " " + ((a.origin.selected_id if a.origin else "") or "")).upper()
                 for lvl in ("L6", "L5", "L4", "L3", "L2", "L1"):
                     if lvl in raw_id:
@@ -2557,7 +2584,7 @@ class ConflictResolver:
 
                 if dominant_lvl in ("L6", "L5"):
                     # 全裸与极致全裸：禁止一切常规穿着
-                    if is_formal_atom(a):
+                    if is_formal_atom(a) or is_external_atom(a):
                         if a.facts and (a.facts.garment_topologies or a.facts.garment_states):
                             should_drop = True
                         elif a.source_slot in ("clothing", "clothing_state", "clothing_extension", "underwear"):
@@ -2568,7 +2595,7 @@ class ConflictResolver:
                             is_fallback = True
                 elif dominant_lvl == "L4":
                     # 微型覆盖/比基尼：禁止外穿大衣/整套长裙，但不删轻量内衣
-                    if is_formal_atom(a):
+                    if is_formal_atom(a) or is_external_atom(a):
                         if a.facts and any(t in a.facts.garment_topologies for t in ("suit", "coat", "jacket", "hoodie", "one_piece", "pants", "blazer", "sweater")):
                             should_drop = True
                     elif tf.enabled:
@@ -2576,7 +2603,7 @@ class ConflictResolver:
                             should_drop = True
                             is_fallback = True
                 elif dominant_lvl == "L3":
-                    if is_formal_atom(a):
+                    if is_formal_atom(a) or is_external_atom(a):
                         if a.facts and any(r in a.facts.visible_regions for r in ("crotch", "buttocks", "intimate_lower_body")):
                             should_drop = True
                     elif tf.enabled:
@@ -2599,7 +2626,7 @@ class ConflictResolver:
                             or bool(banned_l1_pattern.search(text_lower))
                         ):
                             should_drop = True
-                    elif is_formal_atom(a):
+                    elif is_formal_atom(a) or is_external_atom(a):
                         if a.facts and any(r in a.facts.visible_regions for r in ("intimate_lower_body",)):
                             should_drop = True
                     elif tf.enabled:
@@ -2609,6 +2636,24 @@ class ConflictResolver:
                             is_fallback = True
 
                 if should_drop:
+                    if is_external_atom(nudity_winner) and is_external_atom(a):
+                        raise PromptValidationError(
+                            f"External override conflict under rule '{rule_item.id}': slot '{nudity_winner.source_slot}' ('{nudity_winner.text}') conflicts with slot '{a.source_slot}' ('{a.text}')",
+                            slots=(nudity_winner.source_slot, a.source_slot),
+                            texts=(nudity_winner.text, a.text),
+                            rule_id=rule_item.id,
+                        )
+                    if is_external_atom(a) and not is_external_atom(nudity_winner):
+                        if nudity_winner.can_delete_atom and index.is_active(nudity_winner):
+                            index.drop(nudity_winner.atom_id)
+                            ledger.record_drop(
+                                rule_item.id,
+                                rule_item.phase,
+                                "clothing_removes_nudity",
+                                (a.atom_id,),
+                                nudity_winner,
+                            )
+                        continue
                     if not a.can_delete_atom:
                         continue
                     if is_fallback:
@@ -2639,7 +2684,7 @@ class ConflictResolver:
                 for a in index.get_all_active_ordered():
                     if not a.can_detect or not index.is_active(a):
                         continue
-                    if is_formal_atom(a):
+                    if is_formal_atom(a) or is_external_atom(a):
                         is_nude_slot = a.source_slot == "nudity" or (a.origin and a.origin.selector == "nudity") or (a.provenance and a.provenance.kind == "nudity")
                         if a.facts and (any(r in a.facts.visible_regions for r in ("crotch", "breasts", "buttocks", "pubic")) or ("full_body" in a.facts.visible_regions and is_nude_slot)):
                             trig_atoms.append(a)
@@ -2654,8 +2699,8 @@ class ConflictResolver:
                             continue
                         is_banned = False
                         is_fallback = False
-                        if is_formal_atom(a):
-                            if a.facts and any(t in a.facts.garment_topologies for t in ("panties", "bra", "underwear", "suit", "blouse", "dress")):
+                        if is_formal_atom(a) or is_external_atom(a):
+                            if a.facts and any(t in a.facts.garment_topologies for t in ("panties", "bra", "underwear", "suit", "blouse", "dress", "outerwear", "bottom_pants", "bottom_skirt")):
                                 is_banned = True
                         elif tf.enabled:
                             if any(b.matches(a.text) for b in bans):
@@ -2663,6 +2708,24 @@ class ConflictResolver:
                                 is_fallback = True
 
                         if is_banned:
+                            if is_external_atom(first_trig) and is_external_atom(a):
+                                raise PromptValidationError(
+                                    f"External override conflict under rule '{rule_item.id}': slot '{first_trig.source_slot}' ('{first_trig.text}') conflicts with slot '{a.source_slot}' ('{a.text}')",
+                                    slots=(first_trig.source_slot, a.source_slot),
+                                    texts=(first_trig.text, a.text),
+                                    rule_id=rule_item.id,
+                                )
+                            if is_external_atom(a) and not is_external_atom(first_trig):
+                                if first_trig.can_delete_atom and index.is_active(first_trig):
+                                    index.drop(first_trig.atom_id)
+                                    ledger.record_drop(
+                                        rule_item.id,
+                                        rule_item.phase,
+                                        "clothing_removes_nudity",
+                                        (a.atom_id,),
+                                        first_trig,
+                                    )
+                                continue
                             if not a.can_delete_atom:
                                 continue
                             if is_fallback:
@@ -2736,6 +2799,9 @@ class ConflictResolver:
                 if is_loser:
                     if not a.can_delete_atom:
                         continue
+                    if is_external_atom(a):
+                        # 软偏好保护：外部显式输入或自定义覆盖的下半身/鞋袜标签 100% 原样保留，绝不因构图软偏好删除用户输入
+                        continue
                     if is_fallback:
                         self.text_fallback_hits += 1
                     index.drop(a.atom_id)
@@ -2785,8 +2851,8 @@ class ConflictResolver:
             if not a.can_detect or not index.is_active(a):
                 continue
             self._validate_formal_atom(a, rule_item.id)
-            if is_formal_atom(a):
-                if a.facts and a.facts.hand_state == "both_busy":
+            if is_formal_atom(a) or is_external_atom(a):
+                if a.facts and (a.facts.hand_state in ("both_busy", "one_busy") or "busy_hands" in a.facts.mutex_groups):
                     busy_atoms.append(a)
             elif tf.enabled:
                 if any(t.matches(a.text) for t in all_busy_pose):
@@ -2794,21 +2860,48 @@ class ConflictResolver:
 
         if busy_atoms:
             pose_winner = min(busy_atoms, key=lambda x: (x.tag_order, x.span_order))
+            pose_hands = 2
+            if pose_winner.facts and pose_winner.facts.hand_state == "one_busy":
+                pose_hands = 1
             for a in index.get_active_by_slot("props"):
                 if a in busy_atoms or not a.can_detect or not index.is_active(a):
                     continue
                 self._validate_formal_atom(a, rule_item.id)
                 is_loser = False
                 is_fallback = False
-                if is_formal_atom(a):
+                if is_formal_atom(a) or is_external_atom(a):
                     if a.facts and (a.facts.hands_required > 0 or a.facts.prop_usage == "handheld"):
                         is_loser = True
-                elif tf.enabled:
+                if not is_loser and tf.enabled:
                     if any(p.matches(a.text) for p in all_handheld):
                         is_loser = True
                         is_fallback = True
 
                 if is_loser:
+                    prop_hands = (a.facts.hands_required if (a.facts and a.facts.hands_required > 0) else 1)
+                    if (is_external_atom(a) or is_external_atom(pose_winner)) and (pose_hands + prop_hands <= 2):
+                        continue
+
+                    if is_external_atom(a) and is_external_atom(pose_winner):
+                        raise PromptValidationError(
+                            f"External override conflict under rule '{rule_item.id}': slot '{pose_winner.source_slot}' ('{pose_winner.text}') conflicts with slot '{a.source_slot}' ('{a.text}')",
+                            slots=(pose_winner.source_slot, a.source_slot),
+                            texts=(pose_winner.text, a.text),
+                            rule_id=rule_item.id,
+                        )
+                    if is_external_atom(a) and not is_external_atom(pose_winner):
+                        if pose_winner.can_delete_atom and index.is_active(pose_winner):
+                            index.drop(pose_winner.atom_id)
+                            ledger.record_drop(
+                                rule_item.id,
+                                rule_item.phase,
+                                "external_prop_overrides_pose",
+                                (a.atom_id,),
+                                pose_winner,
+                            )
+                        continue
+                    if is_external_atom(a):
+                        continue
                     if not a.can_delete_atom:
                         continue
                     if is_fallback:
@@ -2855,7 +2948,7 @@ class ConflictResolver:
             if a.atom_id in seen_ids or not a.can_detect or not index.is_active(a):
                 continue
             self._validate_formal_atom(a, rule_item.id)
-            if is_formal_atom(a):
+            if is_formal_atom(a) or is_external_atom(a):
                 if a.facts and (a.facts.hands_required > 0 or a.facts.prop_usage == "handheld"):
                     seen_ids.add(a.atom_id)
                     detected_hh.append((a, False))
@@ -2869,6 +2962,30 @@ class ConflictResolver:
             winner_atom, _ = detected_hh[0]
             for loser_atom, is_fallback in detected_hh[1:]:
                 if not loser_atom.can_delete_atom or not index.is_active(loser_atom):
+                    continue
+                if is_external_atom(winner_atom) and is_external_atom(loser_atom):
+                    req_winner = (winner_atom.facts.hands_required if (winner_atom.facts and winner_atom.facts.hands_required > 0) else 1)
+                    req_loser = (loser_atom.facts.hands_required if (loser_atom.facts and loser_atom.facts.hands_required > 0) else 1)
+                    if req_winner + req_loser <= 2:
+                        # 2手容量内合法共存：双持豁免 (CE-HAND-02)
+                        continue
+                    else:
+                        raise PromptValidationError(
+                            f"External override conflict under rule '{rule_item.id}': slot '{winner_atom.source_slot}' ('{winner_atom.text}') conflicts with slot '{loser_atom.source_slot}' ('{loser_atom.text}')",
+                            slots=(winner_atom.source_slot, loser_atom.source_slot),
+                            texts=(winner_atom.text, loser_atom.text),
+                            rule_id=rule_item.id,
+                        )
+                if is_external_atom(loser_atom) and not is_external_atom(winner_atom):
+                    if winner_atom.can_delete_atom and index.is_active(winner_atom):
+                        index.drop(winner_atom.atom_id)
+                        ledger.record_drop(
+                            rule_item.id,
+                            rule_item.phase,
+                            "single_handheld_prop_limit",
+                            (loser_atom.atom_id,),
+                            winner_atom,
+                        )
                     continue
                 if is_fallback:
                     self.text_fallback_hits += 1
@@ -4180,9 +4297,10 @@ class ConflictResolver:
             first_cu = min(cu_atoms, key=lambda x: (x.tag_order, x.span_order))
             first_lb = min(lb_atoms, key=lambda x: (x.tag_order, x.span_order))
             if first_cu.atom_id != first_lb.atom_id:
-                conflicts.append(("residual_framing_lower_body_conflict", "framing_lower_body_coherence", "close_up_removes_lower_body", first_cu.atom_id, first_lb.atom_id))
-                if _is_loser_protected(first_lb):
-                    protected_losers.append(first_lb)
+                if not is_external_atom(first_lb):
+                    conflicts.append(("residual_framing_lower_body_conflict", "framing_lower_body_coherence", "close_up_removes_lower_body", first_cu.atom_id, first_lb.atom_id))
+                    if _is_loser_protected(first_lb):
+                        protected_losers.append(first_lb)
 
         # 4. 姿态双手占用 vs 手持道具
         r4_tf = rule_tf_map["pose_hand_occupation"]
@@ -4190,12 +4308,12 @@ class ConflictResolver:
         r4_hh_pats = select_fallback_patterns(r4_tf, role="handheld", group_id="pose_hand")
         busy_atoms = [
             a for a in detectable
-            if (is_formal_atom(a) and a.facts and a.facts.hand_state == "both_busy")
+            if ((is_formal_atom(a) or is_external_atom(a)) and a.facts and a.facts.hand_state == "both_busy")
             or (not is_formal_atom(a) and any(t.matches(a.text) for t in r4_busy_pats))
         ]
         prop_atoms = [
             a for a in detectable
-            if (is_formal_atom(a) and a.source_slot == "props" and a.facts and (a.facts.hands_required > 0 or a.facts.prop_usage == "handheld"))
+            if ((is_formal_atom(a) or is_external_atom(a)) and a.source_slot == "props" and a.facts and (a.facts.hands_required > 0 or a.facts.prop_usage == "handheld"))
             or (not is_formal_atom(a) and any(p.matches(a.text) for p in r4_hh_pats))
         ]
         if busy_atoms and prop_atoms:
@@ -4211,16 +4329,20 @@ class ConflictResolver:
         r5_pats = select_fallback_patterns(r5_tf, role="handheld", group_id="handheld")
         hh_atoms = [
             a for a in detectable
-            if (is_formal_atom(a) and a.source_slot == "props" and a.facts and (a.facts.hands_required > 0 or a.facts.prop_usage == "handheld"))
+            if ((is_formal_atom(a) or is_external_atom(a)) and a.source_slot == "props" and a.facts and (a.facts.hands_required > 0 or a.facts.prop_usage == "handheld"))
             or (not is_formal_atom(a) and any(hp.matches(a.text) for hp in r5_pats))
         ]
         if len(hh_atoms) > 1:
             hh_atoms.sort(key=lambda x: (x.tag_order, x.span_order))
             first_hh = hh_atoms[0]
             second_hh = hh_atoms[1]
-            conflicts.append(("residual_single_handheld_prop_conflict", "handheld_props_single_holder", "single_handheld_prop_limit", first_hh.atom_id, second_hh.atom_id))
-            if _is_loser_protected(second_hh):
-                protected_losers.append(second_hh)
+            req_1 = (first_hh.facts.hands_required if (first_hh.facts and first_hh.facts.hands_required > 0) else 1)
+            req_2 = (second_hh.facts.hands_required if (second_hh.facts and second_hh.facts.hands_required > 0) else 1)
+            is_dual_hold_legal = (is_external_atom(first_hh) and is_external_atom(second_hh) and (req_1 + req_2 <= 2))
+            if not is_dual_hold_legal:
+                conflicts.append(("residual_single_handheld_prop_conflict", "handheld_props_single_holder", "single_handheld_prop_limit", first_hh.atom_id, second_hh.atom_id))
+                if _is_loser_protected(second_hh):
+                    protected_losers.append(second_hh)
 
         # 6. 连体衣结构状态
         r6_tf = rule_tf_map["clothing_style_state_coherence"]

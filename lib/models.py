@@ -2077,10 +2077,10 @@ class SemanticFacts:
 
 
 VALID_ENTRY_POINTS: Tuple[str, ...] = ("generator", "preset_browser", "custom_combiner", "diagnostics")
-VALID_SELECTION_MODES: Tuple[str, ...] = ("none", "random", "auto", "explicit", "preset", "recipe", "custom", "resolver")
+VALID_SELECTION_MODES: Tuple[str, ...] = ("none", "random", "auto", "explicit", "preset", "recipe", "custom", "override", "resolver")
 FORMAL_ORIGIN_MODES: Tuple[str, ...] = ("random", "auto", "explicit", "preset", "recipe")
 VALID_SOURCE_MODES: Tuple[str, ...] = (
-    "none", "random", "auto", "explicit", "preset", "recipe", "custom", "user_input"
+    "none", "random", "auto", "explicit", "preset", "recipe", "custom", "override", "user_input"
 )
 
 CANONICAL_SLOT_SELECTORS: Tuple[str, ...] = (

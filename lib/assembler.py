@@ -33,7 +33,7 @@ if __package__:
         SemanticFacts,
         TagProvenance,
     )
-    from .slot_contract import AUXILIARY_SLOT_ORDER, SLOT_ORDER, normalize_slot_mapping
+    from .slot_contract import ALLOWED_SLOTS, AUXILIARY_SLOT_ORDER, SLOT_ORDER, normalize_slot_mapping, normalize_slot_name
 else:
     from lib.atomizer import (
         PromptTag,
@@ -55,7 +55,7 @@ else:
         SemanticFacts,
         TagProvenance,
     )
-    from lib.slot_contract import AUXILIARY_SLOT_ORDER, SLOT_ORDER, normalize_slot_mapping
+    from lib.slot_contract import ALLOWED_SLOTS, AUXILIARY_SLOT_ORDER, SLOT_ORDER, normalize_slot_mapping, normalize_slot_name
 
 MAX_PROMPT_WORDS = 250
 
@@ -358,6 +358,133 @@ def iter_normalized_slot_fragments(
                         )
 
 
+def make_override_fragments(
+    slot_name: str,
+    raw_val: Any,
+    entry_point: str = "generator",
+    catalog_facts: Optional[Dict[Tuple[str, str], SemanticFacts]] = None,
+) -> List[PromptFragment]:
+    """将外部覆盖原始值切分为合法的 PromptFragment 列表，并标记 mode="override" 与 source_mode="override"."""
+    tag_texts: List[str] = []
+    if isinstance(raw_val, str):
+        tag_texts = [t.strip() for t in split_top_level_tags(raw_val) if t.strip()]
+    elif isinstance(raw_val, (list, tuple)):
+        for item in raw_val:
+            if isinstance(item, str):
+                for sub in split_top_level_tags(item):
+                    if sub.strip():
+                        tag_texts.append(sub.strip())
+            elif hasattr(item, "text"):
+                tag_texts.append(str(item.text).strip())
+            else:
+                tag_texts.append(str(item).strip())
+    else:
+        tag_texts = [t.strip() for t in split_top_level_tags(str(raw_val)) if t.strip()]
+
+    new_frags: List[PromptFragment] = []
+    # 强制 entry_point 为 generator，以确保覆盖所有 20 个标准槽位 selector 合法性
+    frag_entry_point = "generator"
+    for order, tag_text in enumerate(tag_texts):
+        facts = SemanticFacts()
+        t_lower = tag_text.lower()
+        item_id = f"override_{slot_name}_{order:03d}"
+
+        if slot_name == "nudity":
+            if any(w in t_lower for w in ("completely nude", "bare body", "nude", "naked", "unclothed", "full nude")):
+                facts = SemanticFacts(visible_regions=("full_body",))
+                item_id = f"nudity_l5_override_{order:03d}"
+            elif any(w in t_lower for w in ("topless", "bare breasts", "exposed breasts")):
+                facts = SemanticFacts(visible_regions=("breasts", "topless"))
+                item_id = f"nudity_l4_override_{order:03d}"
+            elif any(w in t_lower for w in ("micro bikini", "sheer lingerie", "revealing panties")):
+                facts = SemanticFacts(visible_regions=("crotch", "buttocks"))
+                item_id = f"nudity_l3_override_{order:03d}"
+        elif slot_name == "props":
+            if any(w in t_lower for w in ("holding", "in hand", "held", "carrying", "camera in hand")):
+                facts = SemanticFacts(prop_usage="handheld", hands_required=1)
+        elif slot_name == "pose":
+            if any(w in t_lower for w in ("hands behind back", "hands tied", "arms above head", "tied behind back")):
+                facts = SemanticFacts(hand_state="both_busy")
+            elif any(w in t_lower for w in ("hand on cheek", "hand on hip")):
+                facts = SemanticFacts(hand_state="one_busy")
+        elif slot_name == "clothing":
+            if any(w in t_lower for w in ("catsuit", "latex suit", "bodysuit", "swimsuit", "leotard", "one-piece")):
+                facts = SemanticFacts(garment_topologies=("one_piece",), fabric_materials=("latex",) if "latex" in t_lower else ())
+            elif any(w in t_lower for w in ("parka", "down coat", "jacket", "coat", "winter boots", "scarf")):
+                facts = SemanticFacts(garment_topologies=("outerwear", "bottom_pants"))
+
+        frag = PromptFragment(
+            text=tag_text,
+            source_slot=slot_name,
+            source_item_id=item_id,
+            order=order,
+            provenance=TagProvenance(
+                item_id=item_id,
+                kind="user_input",
+                semantic_ids=(f"slot_override:{slot_name}",),
+                source_mode="override",
+            ),
+            id=item_id,
+            facts=facts,
+            origin=SelectionOrigin(
+                entry_point=frag_entry_point,
+                mode="override",
+                selector=slot_name,
+                selected_id=item_id,
+                raw_value=str(raw_val),
+            ),
+        )
+        new_frags.append(frag)
+    return new_frags
+
+
+def apply_slot_overrides(
+    slot_fragments: Dict[str, Any],
+    external_overrides: Optional[Dict[str, Any]],
+    entry_point: str = "generator",
+    catalog_facts: Optional[Dict[Tuple[str, str], SemanticFacts]] = None,
+) -> Dict[str, List[Any]]:
+    """落实 20 槽位外部覆盖契约 (M3 核心契约)：
+    1. 非空覆盖整个槽位：外部指定非空内容时，替换该槽位全部系统/预设生成 tags，绝不混杂；
+    2. 空白回退：外部输入为 None, "", "   " 或 [] 时，完全回退保留内部/预设生成内容；
+    3. 服装覆盖语义清空：当覆盖 clothing 槽位时，连带清空旧 clothing_state / clothing_extension / underwear 附属槽位；
+    4. 权威 Provenance 与来源追踪：标记 mode="override", kind="user_input", source_mode="override"。
+    """
+    if not external_overrides:
+        return {k: list(v) if isinstance(v, list) else v for k, v in slot_fragments.items()}
+
+    res: Dict[str, List[Any]] = {k: list(v) if isinstance(v, list) else v for k, v in slot_fragments.items()}
+
+    for raw_slot, raw_val in external_overrides.items():
+        if raw_val is None:
+            continue
+        if isinstance(raw_val, str) and not raw_val.strip():
+            continue
+        if isinstance(raw_val, (list, tuple)) and (len(raw_val) == 0 or all(isinstance(x, str) and not x.strip() for x in raw_val)):
+            continue
+
+        norm_slot = normalize_slot_name(raw_slot)
+        if norm_slot not in ALLOWED_SLOTS:
+            raise PromptValidationError(
+                f"Unknown slot '{raw_slot}' (normalized: '{norm_slot}') in external overrides. Allowed slots: {sorted(ALLOWED_SLOTS)}",
+                slots=(raw_slot,),
+            )
+
+        # 非空覆盖整个槽位：清空旧内容
+        res[norm_slot] = []
+
+        # 服装槽位整槽清空旧载体事实与状态 (CE-OVERRIDE-01)
+        if norm_slot == "clothing":
+            for related in ("clothing_state", "clothing_extension", "underwear"):
+                if related in res:
+                    res[related] = []
+
+        new_frags = make_override_fragments(norm_slot, raw_val, entry_point=entry_point, catalog_facts=catalog_facts)
+        res[norm_slot] = new_frags
+
+    return res
+
+
 class PromptAssembler:
     """18 槽位流水线组装器。"""
 
@@ -375,8 +502,15 @@ class PromptAssembler:
         rng: Optional[Random] = None,
         max_words: int = MAX_PROMPT_WORDS,
         context_profile: Optional[ContextProfile] = None,
+        external_overrides: Optional[Dict[str, Any]] = None,
     ) -> AssemblyResult:
         """从各槽位片段字典执行装配，返回强类型 AssemblyResult。"""
+        if external_overrides:
+            slot_fragments = apply_slot_overrides(
+                slot_fragments,
+                external_overrides,
+                catalog_facts=getattr(self.resolver, "canonical_catalog_facts", None),
+            )
         fragments = list(iter_normalized_slot_fragments(slot_fragments))
         return assemble_result(
             fragments,
@@ -453,6 +587,7 @@ class PromptAssembler:
         preset_raw_value: Optional[str] = None,
         recipe_raw_value: Optional[str] = None,
         extra_fragments: Sequence[PromptFragment] = (),
+        external_overrides: Optional[Dict[str, Any]] = None,
     ) -> AssemblyResult:
         """预设模板与风格配方统一装配接口，返回包含 source_atoms 的不可变 AssemblyResult。"""
         if rng is None:
@@ -626,7 +761,34 @@ class PromptAssembler:
             )
             order += 1
 
-        fragments.extend(extra_fragments)
+        if extra_fragments:
+            fragments.extend(extra_fragments)
+
+        if external_overrides:
+            overridden_slots: Set[str] = set()
+            new_override_frags: List[PromptFragment] = []
+            for raw_s, raw_v in external_overrides.items():
+                if raw_v is None:
+                    continue
+                if isinstance(raw_v, str) and not raw_v.strip():
+                    continue
+                if isinstance(raw_v, (list, tuple)) and (len(raw_v) == 0 or all(isinstance(x, str) and not x.strip() for x in raw_v)):
+                    continue
+                ns = normalize_slot_name(raw_s)
+                if ns not in ALLOWED_SLOTS:
+                    raise PromptValidationError(
+                        f"Unknown slot '{raw_s}' in external overrides. Allowed slots: {sorted(ALLOWED_SLOTS)}",
+                        slots=(raw_s,),
+                    )
+                overridden_slots.add(ns)
+                if ns == "clothing":
+                    overridden_slots.update(["clothing", "clothing_state", "clothing_extension", "underwear"])
+                new_override_frags.extend(make_override_fragments(ns, raw_v, entry_point=entry_point, catalog_facts=getattr(self.resolver, "canonical_catalog_facts", None)))
+
+            if overridden_slots:
+                fragments = [f for f in fragments if f.source_slot not in overridden_slots]
+                fragments.extend(new_override_frags)
+
         return assemble_result(fragments, self.data_dir, rng, max_words, resolver=self.resolver)
 
     def assemble_preset_result(

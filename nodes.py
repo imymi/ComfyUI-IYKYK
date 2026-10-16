@@ -23,13 +23,13 @@ from typing import Any, Dict, List, Optional, Sequence, Tuple
 if __package__:
     from .lib.assembler import PromptAssembler, assemble_result, split_top_level_tags
     from .lib.context_affinity import compute_context_profile
-    from .lib.models import GenerationResult, PromptAtom, PromptFragment, SelectionOrigin, SemanticFacts, TagProvenance
+    from .lib.models import GenerationResult, ORDERED_CONTEXT_IDS, PromptAtom, PromptFragment, SelectionOrigin, SemanticFacts, TagProvenance
     from .lib.rng import derive_substream_rng, recover_effective_seed
     from .lib.sampler import DataSampler, _is_none, get_selection_mode
 else:
     from lib.assembler import PromptAssembler, assemble_result, split_top_level_tags
     from lib.context_affinity import compute_context_profile
-    from lib.models import GenerationResult, PromptAtom, PromptFragment, SelectionOrigin, SemanticFacts, TagProvenance
+    from lib.models import GenerationResult, ORDERED_CONTEXT_IDS, PromptAtom, PromptFragment, SelectionOrigin, SemanticFacts, TagProvenance
     from lib.rng import derive_substream_rng, recover_effective_seed
     from lib.sampler import DataSampler, _is_none, get_selection_mode
 
@@ -419,6 +419,16 @@ def _generate_structured(
 
     custom_fragments = _custom_prompt_fragments(inputs.get("自定义提示词", ""), entry_point)
 
+    # 提取外部覆盖字典
+    external_overrides: Dict[str, Any] = {}
+    if "external_overrides" in inputs and isinstance(inputs["external_overrides"], dict):
+        external_overrides.update(inputs["external_overrides"])
+    for k, v in inputs.items():
+        if k.endswith("_override") and len(k) > 9:
+            s_name = k[:-9].strip()
+            if s_name and v is not None:
+                external_overrides[s_name] = v
+
     # 1. 检查是否使用预设模板
     if not _is_none(预设模板):
         rng_preset = derive_substream_rng(effective_seed, "selector:preset_core")
@@ -435,6 +445,7 @@ def _generate_structured(
                 extra_fragments=custom_fragments,
                 preset_raw_value=预设模板,
                 recipe_raw_value=风格配方 if not _is_none(风格配方) else None,
+                external_overrides=external_overrides,
             )
             neg = sampler.get_negative_prompt()
             desc = f"【预设模板】{preset.get('id', '')} {preset.get('name_zh', '')}"
@@ -475,10 +486,20 @@ def _generate_structured(
     theme_cids = theme_res.context_ids if (theme_res and hasattr(theme_res, "context_ids")) else ()
     scene_item_id = getattr(scene_res, "item_id", None)
     theme_item_id = getattr(theme_res, "theme_id", getattr(theme_res, "item_id", None))
-    context_profile = compute_context_profile(scene_cids, theme_cids, scene_item_id, theme_item_id)
 
     primary_context = scene_res.context_ids[0] if (scene_res and scene_res.context_ids) else "generic"
     context = primary_context if primary_context != "generic" else sampler.detect_context(场景大类, 剧情主题)
+
+    # 外部场景覆盖情境自洽更新 (M3 契约):
+    ext_scene = external_overrides.get("scene_theme") or external_overrides.get("scene")
+    if ext_scene and isinstance(ext_scene, str) and ext_scene.strip():
+        detected_ext_ctx = sampler.detect_context(ext_scene, "")
+        if detected_ext_ctx and detected_ext_ctx in ORDERED_CONTEXT_IDS:
+            scene_cids = (detected_ext_ctx,)
+            primary_context = detected_ext_ctx
+            context = detected_ext_ctx
+
+    context_profile = compute_context_profile(scene_cids, theme_cids, scene_item_id, theme_item_id)
 
     # 槽位 3 & 4: 裸露等级与服装穿脱联动 (优先解析裸露等级以约束视角与服装)
     rng_nudity = derive_substream_rng(effective_seed, "selector:nudity")
@@ -661,7 +682,12 @@ def _generate_structured(
         slots["custom"] = custom_fragments
 
     # 4. 组装、冲突消解与统一 Finalize
-    assembly_res = assembler.assemble_slots(slots, rng=rng, context_profile=context_profile)
+    assembly_res = assembler.assemble_slots(
+        slots,
+        rng=rng,
+        context_profile=context_profile,
+        external_overrides=external_overrides,
+    )
     negative_prompt = sampler.get_negative_prompt()
 
     # 5. 生成中文概要

@@ -9,7 +9,19 @@ from typing import Any, Optional, Tuple
 
 class PromptValidationError(Exception):
     """提示词装配与预算管理异常。"""
-    pass
+
+    def __init__(
+        self,
+        message: str = "",
+        slots: Sequence[str] = (),
+        texts: Sequence[str] = (),
+        rule_id: Optional[str] = None,
+    ):
+        super().__init__(message)
+        self.slots: Tuple[str, ...] = tuple(slots)
+        self.texts: Tuple[str, ...] = tuple(texts)
+        self.rule_id: Optional[str] = rule_id
+
 
 
 class PromptSyntaxError(PromptValidationError):

@@ -59,8 +59,10 @@ ALLOWED_SLOTS: Set[str] = set(SLOT_ORDER) | set(AUXILIARY_SLOT_ORDER)
 
 
 def normalize_slot_name(name: str) -> str:
-    """规范化槽位名称，映射历史别名。"""
+    """规范化槽位名称，映射历史别名与 _override 后缀。"""
     s = str(name).strip().lower()
+    if s.endswith("_override") and len(s) > 9:
+        s = s[:-9].strip()
     return SLOT_ALIASES.get(s, s)
 
 
