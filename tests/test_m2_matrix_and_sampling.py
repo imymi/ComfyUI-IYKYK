@@ -18,6 +18,7 @@ import unittest
 from pathlib import Path
 from random import Random
 from typing import Any, Dict, List, Set
+from unittest.mock import patch
 
 from lib.context_affinity import (
     ORDERED_SLOT_IDS,
@@ -587,16 +588,12 @@ class TestM2MatrixAndSampling(unittest.TestCase):
         self.assertTrue(all(t.provenance.item_id == "lighting_studio_commercial" for t in res_combo.sampled_tags))
 
     def test_14_public_entry_point_hard_conflict_pre_filtering(self):
-        """[M2-14] 验证公共采样入口在采样前精确执行硬冲突预过滤。"""
-        # 1. 视角预过滤：L1 或 特写 (close_up) 下排除 between_legs_angle
+        """[M2-14] 验证公共采样入口在采样前精确执行硬冲突预过滤（物理硬约束），并保留构图偏好与穿戴/空闲合法空间。"""
+        # 1. 视角预过滤：L1 下排除 between_legs_angle
         for seed in range(50):
             res_l1 = self.sampler.sample_camera_angle_result("随机 (Random)", Random(seed), nudity_level_code="L1")
             self.assertIsNotNone(res_l1)
             self.assertNotEqual(res_l1.item_id, "between_legs_angle")
-
-            res_cu = self.sampler.sample_camera_angle_result("随机 (Random)", Random(seed), shot_type_id="close_up")
-            self.assertIsNotNone(res_cu)
-            self.assertNotEqual(res_cu.item_id, "between_legs_angle")
 
         # 2. 光影预过滤：L1 下排除情色光影 (erotic_lighting_00..03)
         erotic_light_ids = {"erotic_lighting_00", "erotic_lighting_01", "erotic_lighting_02", "erotic_lighting_03"}
@@ -605,55 +602,99 @@ class TestM2MatrixAndSampling(unittest.TestCase):
             self.assertIsNotNone(res_lgt_l1)
             self.assertNotIn(res_lgt_l1.item_id, erotic_light_ids)
 
-        # 3. 姿势预过滤：特写构图下排除下半身姿态 (all_fours, kneeling, limb_posture)；L1 下排除 restraints_holds
-        banned_cu_poses = {"all_fours", "kneeling", "limb_posture"}
-        for seed in range(50):
-            res_pose_cu = self.sampler.sample_pose_result("随机 (Random)", Random(seed), shot_type_id="close_up")
-            self.assertIsNotNone(res_pose_cu)
-            self.assertNotIn(res_pose_cu.item_id, banned_cu_poses)
+        # 3. 姿势与景别软偏好 (规则 13 治理契约)：
+        # 特写构图下画外体态具有电影叙事合法性，绝不硬排除 kneeling, all_fours, limb_posture
+        excluded_cu_poses = self.sampler.get_excluded_candidate_ids("pose", shot_type_id="close_up")
+        self.assertNotIn("kneeling", excluded_cu_poses, "Kneeling must not be hard-excluded under close_up")
+        self.assertNotIn("all_fours", excluded_cu_poses, "All fours must not be hard-excluded under close_up")
+        self.assertNotIn("limb_posture", excluded_cu_poses, "Limb posture must not be hard-excluded under close_up")
 
-            res_pose_l1 = self.sampler.sample_pose_result("随机 (Random)", Random(seed), nudity_level_code="L1")
-            self.assertIsNotNone(res_pose_l1)
-            self.assertNotEqual(res_pose_l1.item_id, "restraints_holds")
+        # 正向反例 3.1：特写构图下抽样跪姿，公共入口合法返回
+        res_kneel = self.sampler.sample_pose_result("kneeling", Random(42), shot_type_id="close_up")
+        self.assertIsNotNone(res_kneel)
+        self.assertEqual(res_kneel.item_id, "kneeling")
 
-        # 4. 道具预过滤：双手占用 (hand_state='both_busy' 或 pose_id='restraints_holds') 下排除手持道具
-        handheld_prop_ids = {
+        # 4. 道具手部占用物理硬约束 (规则 9)：
+        # 当双手被占用 (hand_state='both_busy') 时，排除手持道具 (需用手持握者)
+        strictly_handheld_props = {
             "wine_glass_bottle", "smartphone_recording", "digital_camera_record",
-            "oriental_fan_umbrella", "game_controller", "sex_toy_vibrator",
-            "fashion_clutch_bag", "fashion_baguette_bag", "flower_bouquet_petals",
-            "plush_doll_teddy", "pillow_clutching",
+            "oriental_fan_umbrella", "game_controller", "fashion_clutch_bag",
+            "flower_bouquet_petals", "plush_doll_teddy", "pillow_clutching",
         }
         sampled_prop_ids = set()
         for seed in range(50):
             res_prop_busy = self.sampler.sample_prop_result("随机 (Random)", Random(seed), hand_state="both_busy")
             if res_prop_busy:
-                self.assertNotIn(res_prop_busy.item_id, handheld_prop_ids, f"Handheld prop {res_prop_busy.item_id} sampled when hands busy!")
+                self.assertNotIn(res_prop_busy.item_id, strictly_handheld_props, f"Handheld prop {res_prop_busy.item_id} sampled when hands busy!")
                 sampled_prop_ids.add(res_prop_busy.item_id)
-        # 证明非手持道具（环境/接触类）仍可正常被采样抽取
+        # 证明非手持道具（穿戴/环境/接触类）仍可正常被采样抽取
         self.assertTrue(len(sampled_prop_ids) > 0, "Non-handheld props must remain sampleable")
 
-        # 5. 服装预过滤：解扣状态下排除无开合结构款式；掀裙状态下排除连体衣与裤装
+        # 正向反例 4.1：fashion_baguette_bag (法棍包) 为 worn (hands_required=0)，双手被占用时绝不排除！
+        excluded_busy_props = self.sampler.get_excluded_candidate_ids("props", hand_state="both_busy")
+        self.assertNotIn("fashion_baguette_bag", excluded_busy_props, "Baguette bag (worn, hands=0) must not be excluded when hands are busy")
+        res_baguette = self.sampler.sample_prop_result("fashion_baguette_bag", Random(42), hand_state="both_busy")
+        self.assertIsNotNone(res_baguette)
+        self.assertEqual(res_baguette.item_id, "fashion_baguette_bag")
+
+        # 正向反例 4.2：combat__fighting_stance (格斗站姿) 事实 hand_state='free'，占用 0 手，必须允许手持道具
+        excluded_combat = self.sampler.get_excluded_candidate_ids("props", pose_id="combat__fighting_stance")
+        self.assertNotIn("wine_glass_bottle", excluded_combat, "Wine glass must not be excluded with fighting stance")
+        self.assertNotIn("digital_camera_record", excluded_combat, "Camera must not be excluded with fighting stance")
+        res_combat_prop = self.sampler.sample_prop_result("wine_glass_bottle", Random(42), pose_id="combat__fighting_stance")
+        self.assertIsNotNone(res_combat_prop)
+        self.assertEqual(res_combat_prop.item_id, "wine_glass_bottle")
+
+        # 正向反例 4.3：restraints__bound_legs (双腿受限) 事实 hand_state='free'，占用 0 手，必须允许手持道具
+        excluded_legs = self.sampler.get_excluded_candidate_ids("props", pose_id="restraints__bound_legs")
+        self.assertNotIn("wine_glass_bottle", excluded_legs, "Wine glass must not be excluded when only legs are bound")
+        self.assertNotIn("digital_camera_record", excluded_legs, "Camera must not be excluded when only legs are bound")
+        res_legs_prop = self.sampler.sample_prop_result("digital_camera_record", Random(42), pose_id="restraints__bound_legs")
+        self.assertIsNotNone(res_legs_prop)
+        self.assertIn(res_legs_prop.item_id, ("digital_camera_record", "digital_camera_in_hand"))
+
+        # 正向反例 4.4：单手占用 (hand_state='one_busy') 时，依据 Rule 9.2 容量模型，单手道具 (1+1=2) 完全合法
+        excluded_one = self.sampler.get_excluded_candidate_ids("props", hand_state="one_busy")
+        self.assertNotIn("digital_camera_record", excluded_one, "Single-hand camera must be allowed when one hand is busy (1+1<=2)")
+        self.assertNotIn("wine_glass_bottle", excluded_one, "Single-hand wine glass must be allowed when one hand is busy (1+1<=2)")
+
+        # 5. 服装形制载体物理预过滤：
+        # 解扣状态下排除无开合结构款式；掀裙状态下必须核验款式具备裙装形制载体
         for seed in range(50):
             res_c_unbuttoned = self.sampler.sample_clothing_result(
                 "随机 (Random)", "解开纽扣 (Unbuttoned)", "L3", Random(seed)
             )
             self.assertNotIn(res_c_unbuttoned.style_id, {"one_piece_swimsuit", "latex_catsuit", "sweater_casual"})
 
+        # 负向反例 5.1：hosiery_legwear (袜类/丝袜, 拓扑 underwear) 与 sailor_shirt (上衣, 拓扑 top) 无裙摆载体，掀裙状态下严格排除
+        excluded_lifted = self.sampler.get_excluded_candidate_ids("clothing", clothing_state="lifted_up")
+        self.assertIn("hosiery_legwear", excluded_lifted, "hosiery_legwear lacks skirt carrier and must be excluded under lifted_up")
+        self.assertIn("sailor_shirt", excluded_lifted, "sailor_shirt lacks skirt carrier and must be excluded under lifted_up")
+        self.assertIn("denim_shorts", excluded_lifted, "denim_shorts lacks skirt carrier and must be excluded under lifted_up")
+        self.assertIn("one_piece_swimsuit", excluded_lifted, "one_piece_swimsuit in NON_SKIRT_ONE_PIECE must be excluded under lifted_up")
+
+        # 正向反例 5.2：jk_seifuku, summer_sundress, pleated_skirt 具备裙装载体，绝不排除
+        self.assertNotIn("jk_seifuku", excluded_lifted, "jk_seifuku possesses skirt carrier and must remain legal")
+        self.assertNotIn("summer_sundress", excluded_lifted, "summer_sundress possesses skirt carrier and must remain legal")
+        self.assertNotIn("pleated_skirt", excluded_lifted, "pleated_skirt possesses skirt carrier and must remain legal")
+
+        for seed in range(50):
             res_c_lifted = self.sampler.sample_clothing_result(
                 "随机 (Random)", "裙摆掀起 (Skirt Lifted Up)", "L3", Random(seed)
             )
-            self.assertNotIn(res_c_lifted.style_id, {"one_piece_swimsuit", "denim_shorts", "latex_catsuit"})
+            self.assertNotIn(res_c_lifted.style_id, {"one_piece_swimsuit", "denim_shorts", "latex_catsuit", "hosiery_legwear", "sailor_shirt"})
 
     def test_15_empty_legal_candidate_pool_graceful_handling(self):
         """[M2-15] 验证当所有候选均被硬冲突排除（合法池为空）时，各公共入口干净返回 None/空结果，不抛未捕获异常。"""
         rng = Random(42)
 
-        # 1. camera_angle：mock 全部排除
+        # 1. camera_angle：公共入口 sample_camera_angle_result 在全量排除时干净返回 None
         all_angle_ids = {a["id"] for a in self.sampler._load("shot_types").get("camera_angles", [])}
-        res_angle = self.sampler._sample_from_candidates("camera_angle", self.sampler._load("shot_types")["camera_angles"], rng, excluded_ids=all_angle_ids)
-        self.assertIsNone(res_angle)
+        with patch.object(self.sampler, "get_excluded_candidate_ids", return_value=all_angle_ids):
+            res_angle = self.sampler.sample_camera_angle_result("随机 (Random)", rng)
+            self.assertIsNone(res_angle, "sample_camera_angle_result must return None when pool is fully excluded")
 
-        # 2. lighting：mock 全部排除
+        # 2. lighting：公共入口 sample_lighting_result 在全量排除时干净返回 None
         all_lgt = self.sampler._load("lighting")
         all_lgt_items = (
             all_lgt.get("preset_combos", []) +
@@ -663,28 +704,33 @@ class TestM2MatrixAndSampling(unittest.TestCase):
             all_lgt.get("erotic_lighting", [])
         )
         all_lgt_ids = {x["id"] for x in all_lgt_items}
-        res_lgt = self.sampler._sample_from_candidates("lighting", all_lgt_items, rng, excluded_ids=all_lgt_ids)
-        self.assertIsNone(res_lgt)
+        with patch.object(self.sampler, "get_excluded_candidate_ids", return_value=all_lgt_ids):
+            res_lgt = self.sampler.sample_lighting_result("随机 (Random)", rng)
+            self.assertIsNone(res_lgt, "sample_lighting_result must return None when pool is fully excluded")
 
-        # 3. pose：mock 全部排除
+        # 3. pose：公共入口 sample_pose_result 在全量排除时干净返回 None
         all_poses = self.sampler._load("poses").get("pose_categories", [])
         all_pose_ids = {p["id"] for p in all_poses}
-        res_pose = self.sampler._sample_from_candidates("pose", all_poses, rng, excluded_ids=all_pose_ids)
-        self.assertIsNone(res_pose)
+        with patch.object(self.sampler, "get_excluded_candidate_ids", return_value=all_pose_ids):
+            res_pose = self.sampler.sample_pose_result("随机 (Random)", rng)
+            self.assertIsNone(res_pose, "sample_pose_result must return None when pool is fully excluded")
 
-        # 4. props：mock 全部排除
+        # 4. props：公共入口 sample_prop_result 在全量排除时干净返回 None
         all_props = [p for p in self.sampler._load("props").get("categories", []) if p.get("id") != "none"]
         all_prop_ids = {p["id"] for p in all_props}
-        res_prop = self.sampler._sample_from_candidates("props", all_props, rng, excluded_ids=all_prop_ids)
-        self.assertIsNone(res_prop)
+        with patch.object(self.sampler, "get_excluded_candidate_ids", return_value=all_prop_ids):
+            res_prop = self.sampler.sample_prop_result("随机 (Random)", rng)
+            self.assertIsNone(res_prop, "sample_prop_result must return None when pool is fully excluded")
 
-        # 5. clothing：当全部类别被排除时，sample_clothing_result 干净返回空 ClothingSampleResult
+        # 5. clothing：公共入口 sample_clothing_result 在全量排除时干净返回空 ClothingSampleResult
         all_cloth_styles = self.sampler._load("clothing").get("categories", [])
         all_cloth_ids = {c["id"] for c in all_cloth_styles}
-        chosen = self.sampler._sample_from_candidates("clothing", all_cloth_styles, rng, excluded_ids=all_cloth_ids)
-        self.assertIsNone(chosen)
+        with patch.object(self.sampler, "get_excluded_candidate_ids", return_value=all_cloth_ids):
+            res_cloth = self.sampler.sample_clothing_result("随机 (Random)", "正常穿着 (Normal)", "L1", rng)
+            self.assertEqual(res_cloth.base_tags, (), "sample_clothing_result must return empty base_tags when fully excluded")
+            self.assertFalse(res_cloth.style_id, "style_id must be empty when fully excluded")
 
-        # 验证公共调用在空候选列表时无异常干净返回
+        # 验证公共调用在显式指定无款式时干净返回
         empty_cloth_res = self.sampler.sample_clothing_result("无 (None)", "无 (None)", "L1", rng)
         self.assertEqual(empty_cloth_res.base_tags, ())
 
@@ -694,7 +740,7 @@ class TestM2MatrixAndSampling(unittest.TestCase):
 
         gen = IYKYKPromptGenerator()
 
-        # 1. L1 级别下端到端生成：验证视角绝非 between_legs_angle，光影绝非 erotic_lighting，姿势绝非 restraints_holds
+        # 1. L1 级别下端到端生成：验证视角绝非 between_legs_angle，光影绝非 erotic_lighting，道具绝非成人情趣
         for seed in range(20):
             res_l1 = gen.generate_structured(
                 预设模板="无 (None)", 风格配方="无 (None)",
@@ -713,16 +759,14 @@ class TestM2MatrixAndSampling(unittest.TestCase):
             active_origins = [s.selected_id for s in res_l1.selections]
             self.assertNotIn("between_legs_angle", active_origins)
             self.assertFalse(any(o and o.startswith("erotic_lighting") for o in active_origins))
-            self.assertNotIn("restraints_holds", active_origins)
             self.assertNotIn("sex_toy_vibrator", active_origins)
             self.assertNotIn("bondage_rope_collar", active_origins)
 
-        # 2. 姿态为约束体态 (restraints_holds) 时：道具物件在抽样前已排除手持道具
+        # 2. 姿态为双手约束体态 (restraints__bound_arms) 时：道具物件在抽样前已排除手持道具
         handheld_props = {
             "wine_glass_bottle", "smartphone_recording", "digital_camera_record",
-            "oriental_fan_umbrella", "game_controller", "sex_toy_vibrator",
-            "fashion_clutch_bag", "fashion_baguette_bag", "flower_bouquet_petals",
-            "plush_doll_teddy", "pillow_clutching",
+            "oriental_fan_umbrella", "game_controller", "fashion_clutch_bag",
+            "flower_bouquet_petals", "plush_doll_teddy", "pillow_clutching",
         }
         for seed in range(20):
             res_restrained = gen.generate_structured(
@@ -732,7 +776,7 @@ class TestM2MatrixAndSampling(unittest.TestCase):
                 裸露等级="L3 半裸诱惑 (Half Nude)", 服装款式="随机 (Random)",
                 服装状态="正常穿着 (Normal)", 发型发色="随机 (Random)",
                 饰品头饰="无 (None)", 妆容细节="无 (None)",
-                姿势动作="restraints_holds", 情绪表情="随机 (Random)",
+                姿势动作="restraints__bound_arms", 情绪表情="随机 (Random)",
                 光影预设="自动 (Auto)", 胶片风格="无 (None)",
                 液体效果="无 (None)", 纹身标记="无 (None)",
                 道具物件="随机 (Random)", 角色设定="无 (None)",
@@ -741,7 +785,7 @@ class TestM2MatrixAndSampling(unittest.TestCase):
             )
             prop_origins = [s.selected_id for s in res_restrained.selections if s.selector == "props"]
             for pid in prop_origins:
-                self.assertNotIn(pid, handheld_props, f"Handheld prop {pid} generated while pose is restraints_holds!")
+                self.assertNotIn(pid, handheld_props, f"Handheld prop {pid} generated while pose is restraints__bound_arms!")
 
 
 if __name__ == "__main__":

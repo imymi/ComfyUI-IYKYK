@@ -421,6 +421,53 @@ class DataSampler:
         else:
             return self._pick_one(list(candidates), rng)
 
+    def _lookup_pose_hand_state(self, pose_id: Optional[str]) -> Optional[str]:
+        """查询姿势标签的事实 hand_state。若传入的是大类 ID 或未知，返回 None。"""
+        if not pose_id:
+            return None
+        p_low = pose_id.lower().strip()
+        data = self._load("poses")
+        for cat in data.get("pose_categories", []):
+            for sub in cat.get("subcategories", []):
+                for t in sub.get("tags", []):
+                    if isinstance(t, dict) and t.get("id", "").lower() == p_low:
+                        facts = t.get("facts", {})
+                        return facts.get("hand_state")
+        return None
+
+    def _is_clothing_skirt_compatible(self, cat: Dict[str, Any]) -> bool:
+        """判定服装款式类别是否具备承载裙摆（掀裙）动作的形制载体。
+        需满足：自身拓扑含 bottom_skirt、支持对应 modifier，或非排除名单的连体裙装 (one_piece)。
+        杜绝仅凭类别名称关键词粗暴漏判。
+        """
+        cid = cat.get("id", "")
+        if cid in NON_SKIRT_ONE_PIECE:
+            return False
+        for t in cat.get("tags", []):
+            if isinstance(t, dict):
+                facts = t.get("facts", {})
+                topos = set(facts.get("garment_topologies") or [])
+                if "bottom_skirt" in topos:
+                    return True
+                if "one_piece" in topos and cid not in NON_SKIRT_ONE_PIECE:
+                    return True
+                ens = facts.get("ensemble_pieces")
+                if isinstance(ens, dict):
+                    bps = ens.get("bottom_pieces", [])
+                    if any(
+                        any(k in bp.lower() for k in ("skirt", "dress", "pleated", "tutu", "petticoat", "kilt"))
+                        and not any(k in bp.lower() for k in ("pants", "jeans", "shorts", "trousers", "slacks", "leggings"))
+                        for bp in bps if isinstance(bp, str)
+                    ):
+                        return True
+                    pbs = ens.get("piece_bindings", [])
+                    if any(pb.get("garment_topology") == "bottom_skirt" for pb in pbs if isinstance(pb, dict)):
+                        return True
+                supp = set(facts.get("supported_modifiers") or [])
+                if "bottom_skirt" in supp:
+                    return True
+        return False
+
     def get_excluded_candidate_ids(
         self,
         slot_name: str,
@@ -436,24 +483,23 @@ class DataSampler:
         已知硬约束规约：
         1. camera_angle:
            - L1 裸露等级下排除窥底/情色视角 (between_legs_angle)；
-           - 极特写/面部特写 (extreme_close_up, close_up) 下排除窥底/下肢视角 (between_legs_angle)；
         2. clothing:
            - 当指定为解扣状态时，排除无纽扣/拉链开合能力的连体衣/泳装/无开合结构款式；
-           - 当指定为掀裙状态时，排除连体非裙装 (NON_SKIRT_ONE_PIECE) 及裤装款式；
+           - 当指定为掀裙状态时，核验款式具备裙装载体（自身拓扑含 bottom_skirt、支持对应 modifier，或非排除名单的连体裙装），排除无裙摆款式（如袜类、上衣、裤装、非裙连体衣等）；
            - L1 裸露等级下排除超微比基尼/裸体缎带/情趣束缚等极度暴露款式；
         3. lighting:
            - L1 裸露等级下排除情色光影 (erotic_lighting_00..03)；
         4. pose:
-           - 极特写/面部特写 (extreme_close_up, close_up) 下依据规则 13 排除纯下半身体态 (all_fours, kneeling, limb_posture)；
-           - L1 裸露等级下排除高束缚/情调姿态 (restraints_holds)；
+           - 构图景别属于软偏好 (规则 13)，画外体态具有电影叙事合法性，绝不硬排除 all_fours, kneeling, limb_posture；
+           - L1 裸露等级下按标签事实执行内容过滤（杜绝整类误杀非情色动作）；
         5. props:
-           - 依据规则 9，当手部被占用 (hand_state == 'both_busy' 或 pose_id in ('restraints_holds', 'combat_action')) 时，排除需要手持的道具；
+           - 依据规则 9 (2-Hand Capacity Model)，严格依据姿势事实判断占用数；双手均被占用时排除需要手持的款式，严格保留穿戴类 (fashion_baguette_bag, glasses_reading) 与环境类道具；
            - L1 裸露等级下排除成人情趣道具 (sex_toy_vibrator, bondage_rope_collar)。
         """
         excluded: Set[str] = set()
 
         if slot_name == "camera_angle":
-            if nudity_level_code == "L1" or shot_type_id in ("extreme_close_up", "close_up"):
+            if nudity_level_code == "L1":
                 excluded.add("between_legs_angle")
 
         elif slot_name == "lighting":
@@ -461,28 +507,44 @@ class DataSampler:
                 excluded.update({"erotic_lighting_00", "erotic_lighting_01", "erotic_lighting_02", "erotic_lighting_03"})
 
         elif slot_name == "props":
-            if hand_state == "both_busy" or pose_id in ("restraints_holds", "combat_action"):
+            # 依据规则 9 (2-Hand Capacity Model)：严格依据姿势事实判断占用数
+            hands_occupied = 0
+            if hand_state in ("both_busy", "restrained"):
+                hands_occupied = 2
+            elif hand_state == "one_busy":
+                hands_occupied = 1
+            elif hand_state in ("free", "unspecified"):
+                hands_occupied = 0
+            elif pose_id:
+                tag_hs = self._lookup_pose_hand_state(pose_id)
+                if tag_hs in ("both_busy", "restrained"):
+                    hands_occupied = 2
+                elif tag_hs == "one_busy":
+                    hands_occupied = 1
+                else:
+                    hands_occupied = 0
+
+            # 当双手均被占用 (hands_occupied == 2) 时，排除手持道具 (需要手持的款式)
+            # 严格保留穿戴类 (fashion_baguette_bag, glasses_reading) 与环境类道具 (camera_tripod_flash, rose_petals_candles, cute_cat_on_bed, ice_cubes)
+            if hands_occupied >= 2:
                 excluded.update({
-                    "wine_glass_bottle",
-                    "smartphone_recording",
                     "digital_camera_record",
                     "oriental_fan_umbrella",
-                    "game_controller",
-                    "sex_toy_vibrator",
                     "fashion_clutch_bag",
-                    "fashion_baguette_bag",
+                    "wine_glass_bottle",
+                    "smartphone_recording",
+                    "game_controller",
                     "flower_bouquet_petals",
                     "plush_doll_teddy",
                     "pillow_clutching",
                 })
+
             if nudity_level_code == "L1":
                 excluded.update({"sex_toy_vibrator", "bondage_rope_collar"})
 
         elif slot_name == "pose":
-            if shot_type_id in ("extreme_close_up", "close_up"):
-                excluded.update({"all_fours", "kneeling", "limb_posture"})
-            if nudity_level_code == "L1":
-                excluded.update({"restraints_holds"})
+            # 景别构图属于软偏好 (规则 13)，不硬排除姿势动作；L1 级别下按标签事实执行内容过滤
+            pass
 
         elif slot_name == "clothing":
             if clothing_state:
@@ -494,11 +556,10 @@ class DataSampler:
                         if cid and cid not in ALLOWED_BUTTON_STYLES:
                             excluded.add(cid)
                 elif any(w in st_low for w in ("lifted", "掀起裙摆", "lifted_up", "lifted_skirt")):
-                    excluded.update(NON_SKIRT_ONE_PIECE)
                     data = self._load("clothing")
                     for c in data.get("categories", []):
                         cid = c.get("id", "")
-                        if any(w in cid for w in ("pants", "shorts", "jeans", "trousers", "overalls", "catsuit")):
+                        if cid and not self._is_clothing_skirt_compatible(c):
                             excluded.add(cid)
             if nudity_level_code == "L1":
                 excluded.update({"bikini_micro", "naked_ribbon", "bondage_harness", "sling_bikini"})
@@ -2492,11 +2553,24 @@ class DataSampler:
             picked_item = self._pick_one(items, rng)
             item_id = picked_item.get("id", c_id)
             raw_tags = picked_item.get("tags", [])
-            selected = self._pick(raw_tags, rng, min(2, len(raw_tags))) if raw_tags else []
         else:
             item_id = c_id
             raw_tags = chosen.get("tags", [])
-            selected = self._pick(raw_tags, rng, min(2, len(raw_tags))) if raw_tags else []
+
+        # 若双手被占用，且该道具有环境/穿戴等免手持变体标签，优先选取免手持标签
+        is_hands_busy = (
+            hand_state in ("both_busy", "restrained")
+            or self._lookup_pose_hand_state(pose_id) in ("both_busy", "restrained")
+        )
+        if is_hands_busy and raw_tags:
+            hands_free_tags = [
+                t for t in raw_tags
+                if isinstance(t, dict) and t.get("facts", {}).get("hands_required", 0) == 0 and t.get("facts", {}).get("prop_usage") != "handheld"
+            ]
+            if hands_free_tags:
+                raw_tags = hands_free_tags
+
+        selected = self._pick(raw_tags, rng, min(2, len(raw_tags))) if raw_tags else []
 
         tags_str, sampled = self._to_sampled_tags(selected, item_id, "prop")
         prov = TagProvenance(item_id=item_id, kind="prop", semantic_ids=(f"prop:{item_id}",))

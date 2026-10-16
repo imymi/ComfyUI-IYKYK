@@ -565,7 +565,7 @@ def _generate_structured(
     if pose_res and pose_res.sampled_tags:
         for t in pose_res.sampled_tags:
             hs = getattr(t.facts, "hand_state", None) if t.facts else None
-            if hs == "both_busy":
+            if hs in ("both_busy", "restrained"):
                 hand_state = "both_busy"
                 break
             elif hs == "one_busy" and hand_state != "both_busy":
