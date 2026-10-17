@@ -1,0 +1,79 @@
+{
+  "version": "1.0.0",
+  "description": "Serialized ComfyUI workflow JSON fixtures for legacy backward compatibility and modern override port execution testing.",
+  "nodes": {
+    "legacy_custom_slot_combiner": {
+      "id": 1,
+      "type": "IYKYKCustomSlotCombiner",
+      "inputs": {
+        "prompt_seed": 42,
+        "场景主题": "cozy library interior",
+        "景别视角": "cowboy shot",
+        "服装款式": "oversized knitted wool sweater",
+        "画质修饰": "best quality, masterpiece"
+      }
+    },
+    "legacy_preset_browser": {
+      "id": 2,
+      "type": "IYKYKPresetBrowser",
+      "inputs": {
+        "prompt_seed": 123,
+        "预设模板": "C01",
+        "风格配方": "无 (None)",
+        "画质等级": "高清写真 (High)",
+        "自定义提示词": ""
+      }
+    },
+    "legacy_prompt_generator": {
+      "id": 3,
+      "type": "IYKYKPromptGenerator",
+      "inputs": {
+        "prompt_seed": 777,
+        "预设模板": "无 (None)",
+        "风格配方": "无 (None)",
+        "场景大类": "随机 (Random)",
+        "剧情主题": "随机 (Random)",
+        "景别构图": "自动 (Auto)",
+        "拍摄视角": "自动 (Auto)",
+        "裸露等级": "随机 (Random)",
+        "服装款式": "旗袍 (Qipao/Cheongsam)",
+        "服装状态": "自动联动裸露等级 (Auto Link Nudity)",
+        "发型发色": "随机 (Random)",
+        "饰品头饰": "无 (None)",
+        "妆容细节": "无 (None)",
+        "姿势动作": "随机 (Random)",
+        "情绪表情": "随机 (Random)",
+        "光影预设": "自动 (Auto)",
+        "胶片风格": "无 (None)",
+        "液体效果": "无 (None)",
+        "纹身标记": "无 (None)",
+        "道具物件": "无 (None)",
+        "角色设定": "无 (None)",
+        "真实微瑕": "无 (None)",
+        "画质等级": "高清写真 (High)"
+      }
+    },
+    "modern_combiner_with_overrides": {
+      "id": 4,
+      "type": "IYKYKCustomSlotCombiner",
+      "inputs": {
+        "prompt_seed": 999,
+        "场景主题": "urban street",
+        "服装款式": "red dress",
+        "clothing_override": "cyberpunk trench coat",
+        "tattoo_override": "dragon tattoo",
+        "props_override": "holding neon umbrella"
+      }
+    },
+    "modern_generator_with_overrides": {
+      "id": 5,
+      "type": "IYKYKPromptGenerator",
+      "inputs": {
+        "prompt_seed": 888,
+        "服装款式": "旗袍 (Qipao/Cheongsam)",
+        "clothing_override": "silk evening dress",
+        "props_override": "holding wine glass"
+      }
+    }
+  }
+}

@@ -21,6 +21,7 @@ from nodes import (
     IYKYKPresetBrowser,
     IYKYKPromptDiagnostics,
     IYKYKPromptGenerator,
+    NODE_CLASS_MAPPINGS,
     SLOT_OVERRIDE_OPTIONAL_INPUTS,
 )
 
@@ -61,6 +62,7 @@ class TestM4SlotWiringAndLegacyWorkflows(unittest.TestCase):
                 )
                 port_type, port_cfg = optional[port_name]
                 self.assertEqual(port_type, "STRING")
+                self.assertTrue(port_cfg.get("forceInput"), f"{port_name} should have forceInput=True")
                 self.assertTrue(port_cfg.get("multiline"), f"{port_name} should be multiline")
                 self.assertEqual(port_cfg.get("default"), "", f"{port_name} default should be empty string")
                 self.assertIn("tooltip", port_cfg, f"{port_name} should have informative tooltip")
@@ -380,5 +382,297 @@ class TestM4SlotWiringAndLegacyWorkflows(unittest.TestCase):
             self.generator.generate(clothing_override=massive_text)
 
 
+    # ═══════════════════════════════════════════════════════════════════════
+    # 门禁 7: 自定义拼装器覆盖修复与四反例闭环 (M4 阻断消除)
+    # ═══════════════════════════════════════════════════════════════════════
+
+    def test_16_combiner_base_and_override_coexistence(self):
+        """反例 1: 旧基础输入与 override 输入并存时，外部覆盖替换基础槽位且绝不报重复别名冲突。"""
+        res = self.combiner.combine_structured(
+            prompt_seed=42,
+            服装款式="red dress",
+            clothing_override="blue suit",
+        )
+        # 1. 外部值替换旧服装
+        self.assertIn("blue suit", res.positive.lower())
+        self.assertNotIn("red dress", res.positive.lower())
+
+        # 2. 外部值原子来源严格标记为 mode="override"
+        override_atoms = [
+            a for a in res.atoms
+            if a.origin and a.origin.mode == "override" and a.source_slot == "clothing"
+        ]
+        self.assertTrue(len(override_atoms) > 0, "clothing atom must have origin.mode='override'")
+        self.assertIn("blue suit", [a.text.lower() for a in override_atoms])
+
+        # 3. 槽位数统计正确 (clothing 仅算 1 个激活槽位)
+        self.assertEqual(res.description, "已成功拼装 1 个自定义槽位")
+
+    def test_17_combiner_tattoo_override_protected_from_dermal_fusion(self):
+        """反例 2: tattoo_override 属于外部输入，享受完整内容保护，绝不追加 Rule 17 增强词。"""
+        res = self.combiner.combine_structured(
+            prompt_seed=42,
+            tattoo_override="small butterfly tattoo",
+        )
+        self.assertIn("small butterfly tattoo", res.positive.lower())
+        self.assertNotIn("pores visible through ink", res.positive.lower())
+        # 验证原子标记为 mode="override"
+        tattoo_atoms = [a for a in res.atoms if a.source_slot == "tattoo"]
+        self.assertTrue(all(a.origin and a.origin.mode == "override" for a in tattoo_atoms))
+
+    def test_18_combiner_external_pose_and_external_props_hard_conflict(self):
+        """反例 3: 外部双手束缚姿势与外部手持道具并存时，明确抛出 PromptValidationError 报告硬冲突。"""
+        with self.assertRaises(PromptValidationError) as ctx:
+            self.combiner.combine_structured(
+                prompt_seed=42,
+                pose_override="hands tied behind back",
+                props_override="holding camera",
+            )
+        err_msg = str(ctx.exception)
+        self.assertIn("External override conflict", err_msg)
+        self.assertIn("pose_hand_occupation", err_msg)
+
+    def test_19_combiner_excessive_external_word_budget_fail_closed(self):
+        """反例 4: custom_override 自身包含 260 词时，严格 Fail-Closed 抛出 PromptValidationError。"""
+        massive_text = "tag " * 260
+        with self.assertRaises(PromptValidationError) as ctx:
+            self.combiner.combine_structured(
+                prompt_seed=42,
+                custom_override=massive_text,
+            )
+        self.assertIn("External overrides exceed maximum allowed budget of 250 words", str(ctx.exception))
+
+    # ═══════════════════════════════════════════════════════════════════════
+    # 门禁 8: 四节点跨节点覆盖契约全量断言 (5 核心支柱)
+    # ═══════════════════════════════════════════════════════════════════════
+
+    def test_20_all_four_nodes_adhere_to_override_contract_pillars(self):
+        """断言四大节点均严格落实五大覆盖契约支柱：
+        1. 基础与覆盖共存替换；
+        2. 空白外部覆盖完全回退内部/预设基线；
+        3. 外部纹身内容免受增强注入；
+        4. 外部姿势与道具超容量显式报硬冲突；
+        5. 外部超 250 词自身超限 Fail-Closed 抛错；
+        6. 所有生效的外部覆盖原子严格携带 mode='override'。
+        """
+        massive_text = "word " * 260
+
+        # --- 1. IYKYKPromptGenerator ---
+        # 1.1 共存替换
+        res_g = self.generator.generate_structured(
+            prompt_seed=123,
+            服装款式="旗袍 (Qipao/Cheongsam)",
+            clothing_override="blue denim overalls",
+        )
+        self.assertIn("blue denim overalls", res_g.positive)
+        self.assertNotIn("qipao", res_g.positive.lower())
+        overrides_g = [a for a in res_g.atoms if a.origin and a.origin.mode == "override"]
+        self.assertTrue(len(overrides_g) > 0)
+        self.assertIn("blue denim overalls", [a.text for a in overrides_g])
+
+        # 1.2 空白回退
+        res_g_blank = self.generator.generate_structured(
+            prompt_seed=123,
+            服装款式="旗袍 (Qipao/Cheongsam)",
+            clothing_override="",
+        )
+        res_g_none = self.generator.generate_structured(
+            prompt_seed=123,
+            服装款式="旗袍 (Qipao/Cheongsam)",
+        )
+        self.assertEqual(res_g_blank.positive, res_g_none.positive)
+
+        # 1.3 纹身免受 Rule 17 增强
+        res_g_tat = self.generator.generate_structured(
+            prompt_seed=123,
+            tattoo_override="dragon tattoo on arm",
+        )
+        self.assertIn("dragon tattoo on arm", res_g_tat.positive)
+        self.assertNotIn("pores visible through ink", res_g_tat.positive)
+
+        # 1.4 外部硬冲突
+        with self.assertRaises(PromptValidationError):
+            self.generator.generate_structured(
+                prompt_seed=123,
+                pose_override="hands tied behind back",
+                props_override="holding camera",
+            )
+
+        # 1.5 250 词超限
+        with self.assertRaises(PromptValidationError):
+            self.generator.generate_structured(
+                prompt_seed=123,
+                custom_override=massive_text,
+            )
+
+        # --- 2. IYKYKPresetBrowser ---
+        # 2.1 共存替换
+        res_b = self.browser.browse_structured(
+            "C01",
+            "无 (None)",
+            "高清写真 (High)",
+            prompt_seed=123,
+            clothing_override="futuristic silver spacesuit",
+        )
+        self.assertIn("futuristic silver spacesuit", res_b.positive)
+        overrides_b = [a for a in res_b.atoms if a.origin and a.origin.mode == "override"]
+        self.assertTrue(len(overrides_b) > 0)
+
+        # 2.2 空白回退
+        res_b_blank = self.browser.browse_structured(
+            "C01", "无 (None)", "高清写真 (High)", prompt_seed=123, clothing_override=""
+        )
+        res_b_none = self.browser.browse_structured(
+            "C01", "无 (None)", "高清写真 (High)", prompt_seed=123
+        )
+        self.assertEqual(res_b_blank.positive, res_b_none.positive)
+
+        # 2.3 纹身免增强
+        res_b_tat = self.browser.browse_structured(
+            "C01", "无 (None)", "高清写真 (High)", prompt_seed=123, tattoo_override="geometric pattern tattoo"
+        )
+        self.assertIn("geometric pattern tattoo", res_b_tat.positive)
+        self.assertNotIn("pores visible through ink", res_b_tat.positive)
+
+        # 2.4 外部硬冲突
+        with self.assertRaises(PromptValidationError):
+            self.browser.browse_structured(
+                "C01",
+                "无 (None)",
+                "高清写真 (High)",
+                prompt_seed=123,
+                pose_override="hands tied behind back",
+                props_override="holding camera",
+            )
+
+        # 2.5 250 词超限
+        with self.assertRaises(PromptValidationError):
+            self.browser.browse_structured(
+                "C01", "无 (None)", "高清写真 (High)", prompt_seed=123, custom_override=massive_text
+            )
+
+        # --- 3. IYKYKPromptDiagnostics ---
+        # 3.1 诊断节点审计记录 mode='override'
+        res_d, audit_d_str = self.diagnostics.diagnose_structured(
+            prompt_seed=123,
+            服装款式="旗袍 (Qipao/Cheongsam)",
+            clothing_override="crimson velvet gown",
+        )
+        self.assertIn("crimson velvet gown", res_d.positive)
+        audit_d = json.loads(audit_d_str)
+        override_sels = [s for s in audit_d["selections"] if s.get("mode") == "override"]
+        self.assertTrue(len(override_sels) > 0)
+        self.assertIn("clothing", {s.get("selector") for s in override_sels})
+
+        # 3.2 诊断节点外部硬冲突抛错
+        with self.assertRaises(PromptValidationError):
+            self.diagnostics.diagnose_structured(
+                prompt_seed=123,
+                pose_override="hands tied behind back",
+                props_override="holding camera",
+            )
+
+        # 3.3 诊断节点 250 词超限抛错
+        with self.assertRaises(PromptValidationError):
+            self.diagnostics.diagnose_structured(
+                prompt_seed=123,
+                custom_override=massive_text,
+            )
+
+    # ═══════════════════════════════════════════════════════════════════════
+    # 门禁 9: ComfyUI 工作流 JSON 反序列化加载与真实执行验证
+    # ═══════════════════════════════════════════════════════════════════════
+
+    def test_21_deserialized_workflow_json_loading_and_execution(self):
+        """断言加载并反序列化真实 ComfyUI 工作流 JSON 文件，四大节点均能正确解析并执行。"""
+        workflow_fixture_path = Path(__file__).parent / "fixtures" / "legacy_comfyui_workflows.json"
+        self.assertTrue(workflow_fixture_path.exists(), f"Workflow fixture missing: {workflow_fixture_path}")
+
+        workflow_data = json.loads(workflow_fixture_path.read_text(encoding="utf-8"))
+        nodes = workflow_data.get("nodes", {})
+        self.assertTrue(len(nodes) >= 5, "Fixture must define at least 5 node execution scenarios")
+
+        executed_count = 0
+        for node_key, node_spec in nodes.items():
+            class_type = node_spec["type"]
+            inputs = dict(node_spec["inputs"])
+
+            self.assertIn(class_type, NODE_CLASS_MAPPINGS, f"Unknown node class: {class_type}")
+            node_cls = NODE_CLASS_MAPPINGS[class_type]
+            node_instance = node_cls()
+
+            func_name = getattr(node_instance, "FUNCTION")
+            self.assertTrue(hasattr(node_instance, func_name))
+            func = getattr(node_instance, func_name)
+
+            # 真实模拟 ComfyUI 引擎执行：调用 FUNCTION 并传入反序列化后的 inputs kwargs
+            output = func(**inputs)
+            self.assertIsInstance(output, tuple)
+            self.assertTrue(len(output) >= 3)
+            positive_prompt, negative_prompt, desc = output[0], output[1], output[2]
+
+            self.assertTrue(positive_prompt, f"Node {node_key} produced empty positive prompt")
+            self.assertTrue(negative_prompt, f"Node {node_key} produced empty negative prompt")
+            self.assertTrue(desc, f"Node {node_key} produced empty description")
+
+            # 针对特定测试用例的语义断言
+            if node_key == "legacy_custom_slot_combiner":
+                self.assertIn("cozy library interior", positive_prompt)
+                self.assertIn("knitted wool sweater", positive_prompt)
+                self.assertIn("best quality", positive_prompt)
+                self.assertEqual(desc, "已成功拼装 4 个自定义槽位")
+            elif node_key == "modern_combiner_with_overrides":
+                self.assertIn("cyberpunk trench coat", positive_prompt)
+                self.assertNotIn("red dress", positive_prompt)
+                self.assertIn("dragon tattoo", positive_prompt)
+                self.assertIn("neon umbrella", positive_prompt)
+            elif node_key == "modern_generator_with_overrides":
+                self.assertIn("silk evening dress", positive_prompt)
+                self.assertIn("wine glass", positive_prompt)
+
+            executed_count += 1
+
+        self.assertEqual(executed_count, len(nodes))
+
+    def test_22_workflow_state_saving_and_reloading_determinism(self):
+        """断言工作流状态导出为 JSON 字符串、保存后再重新加载执行，结果严格保持 100% 确定性。"""
+        original_inputs = {
+            "prompt_seed": 54321,
+            "场景主题": "cozy tea house in rain",
+            "服装款式": "linen shirt",
+            "clothing_override": "traditional silk hanfu",
+            "props_override": "holding bamboo umbrella",
+            "画质修饰": "best quality, masterpiece",
+        }
+
+        # 1. 模拟保存工作流为 JSON 字符串
+        serialized_workflow = json.dumps({
+            "type": "IYKYKCustomSlotCombiner",
+            "inputs": original_inputs,
+        })
+
+        # 2. 模拟从磁盘或网络加载 JSON 字符串
+        deserialized = json.loads(serialized_workflow)
+        node_cls = NODE_CLASS_MAPPINGS[deserialized["type"]]
+        node = node_cls()
+
+        # 3. 首次执行
+        run1 = node.combine(**deserialized["inputs"])
+
+        # 4. 再次反序列化并执行
+        deserialized2 = json.loads(serialized_workflow)
+        node2 = NODE_CLASS_MAPPINGS[deserialized2["type"]]()
+        run2 = node2.combine(**deserialized2["inputs"])
+
+        # 断言两次反序列化执行结果完全确定性一致
+        self.assertEqual(run1[0], run2[0])
+        self.assertEqual(run1[1], run2[1])
+        self.assertEqual(run1[2], run2[2])
+        self.assertIn("traditional silk hanfu", run1[0])
+        self.assertIn("bamboo umbrella", run1[0])
+        self.assertNotIn("linen shirt", run1[0])
+
+
 if __name__ == "__main__":
     unittest.main()
+

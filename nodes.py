@@ -96,6 +96,7 @@ SLOT_OVERRIDE_OPTIONAL_INPUTS: Dict[str, Tuple[str, Dict[str, Any]]] = {
     f"{slot}_override": (
         "STRING",
         {
+            "forceInput": True,
             "multiline": True,
             "default": "",
             "tooltip": SLOT_OVERRIDE_TOOLTIPS.get(
@@ -108,6 +109,8 @@ SLOT_OVERRIDE_OPTIONAL_INPUTS: Dict[str, Tuple[str, Dict[str, Any]]] = {
 
 _FRAMEWORK_RESERVED_KEYS = {
     "prompt_seed",
+    "随机种子",
+    "seed",
     "自定义提示词",
     "control_after_generate",
     "node_id",
@@ -116,6 +119,7 @@ _FRAMEWORK_RESERVED_KEYS = {
     "预设模板",
     "风格配方",
     "场景大类",
+    "场景预设",
     "剧情主题",
     "景别构图",
     "拍摄视角",
@@ -513,8 +517,12 @@ def _generate_structured(
         effective_seed = getattr(rng, "_effective_seed", None)
         if effective_seed is None:
             effective_seed = recover_effective_seed(rng)
-        if effective_seed is None and "prompt_seed" in inputs and inputs["prompt_seed"] != -1:
-            effective_seed = int(inputs["prompt_seed"])
+        if effective_seed is None:
+            raw_seed = inputs.get("prompt_seed")
+            if raw_seed is None or raw_seed == -1:
+                raw_seed = inputs.get("随机种子", inputs.get("seed", -1))
+            if raw_seed is not None and raw_seed != -1:
+                effective_seed = int(raw_seed)
         if effective_seed is None:
             effective_seed = rng.getrandbits(32)
 
@@ -1260,37 +1268,60 @@ class IYKYKCustomSlotCombiner:
     def combine_structured(self, prompt_seed: int = -1, **kwargs) -> GenerationResult:
         rng, effective_seed = _get_rng(prompt_seed)
 
-        candidate_inputs: Dict[str, Any] = {}
+        # 1. 划分输入：框架保留键、外部覆盖键、基础自定义槽位键
+        base_inputs: Dict[str, Any] = {}
+        raw_override_inputs: Dict[str, Any] = {}
+
+        ext_dict = kwargs.get("external_overrides")
+        if ext_dict is not None:
+            if not isinstance(ext_dict, dict):
+                raise PromptValidationError(
+                    f"external_overrides must be a dict if provided, got {type(ext_dict).__name__}"
+                )
+            for k, v in ext_dict.items():
+                raw_override_inputs[k] = v
+
         for k, v in kwargs.items():
-            if k in ("prompt_seed", "control_after_generate", "node_id", "extra_pnginfo", "dynprompt"):
+            if k in ("prompt_seed", "control_after_generate", "node_id", "extra_pnginfo", "dynprompt", "external_overrides"):
                 continue
-            candidate_inputs[k] = v
+            if k.endswith("_override"):
+                raw_override_inputs[k] = v
+            else:
+                base_inputs[k] = v
 
         # 处理画质默认值与显式 quality 覆盖的共存：
-        # 若提供了显式画质覆盖 (quality, quality_override, 画质等级 等非空)，
+        # 若在 override 或 base 中提供了显式画质覆盖 (quality, quality_override, 画质等级 等非空)，
         # 且 "画质修饰" 仍为其静态默认值 "best quality, masterpiece"，则自动让位于显式覆盖
         has_explicit_quality = False
         for q_key in ("quality", "quality_override", "画质等级", "画质等级_override"):
-            if candidate_inputs.get(q_key) and str(candidate_inputs[q_key]).strip():
+            val = kwargs.get(q_key)
+            if val is not None and str(val).strip():
                 has_explicit_quality = True
                 break
-        if has_explicit_quality and candidate_inputs.get("画质修饰") == "best quality, masterpiece":
-            del candidate_inputs["画质修饰"]
+        if not has_explicit_quality and ext_dict and isinstance(ext_dict, dict):
+            for q_key in ("quality", "quality_override", "画质等级", "画质等级_override"):
+                val = ext_dict.get(q_key)
+                if val is not None and str(val).strip():
+                    has_explicit_quality = True
+                    break
+        if has_explicit_quality and base_inputs.get("画质修饰") == "best quality, masterpiece":
+            del base_inputs["画质修饰"]
 
-        # 执行规范化与 Fail-Closed 冲突检测
-        normalized_slots = normalize_slot_mapping(candidate_inputs)
+        # 2. 分别执行规范化与 Fail-Closed 校验
+        normalized_base = normalize_slot_mapping(base_inputs)
+        clean_overrides = _extract_external_overrides(raw_override_inputs)
 
-        fragments: List[PromptFragment] = []
+        # 3. 构建基础自定义槽位片段 (标记 mode="custom")
+        slot_fragments: Dict[str, List[PromptFragment]] = {}
         order = 0
-        active_count = 0
 
         for slot_name in (*SLOT_ORDER, *AUXILIARY_SLOT_ORDER):
-            if slot_name in normalized_slots:
-                val = normalized_slots[slot_name]
+            if slot_name in normalized_base:
+                val = normalized_base[slot_name]
                 if val is not None and str(val).strip():
-                    active_count += 1
                     slot_raw_val = str(val)
                     tags = split_top_level_tags(slot_raw_val.strip())
+                    frags: List[PromptFragment] = []
                     for t in tags:
                         _, f_facts = classify_preset_tag_and_facts(t, DATA_DIR, target_slot=slot_name)
                         slot_origin = SelectionOrigin(
@@ -1299,7 +1330,7 @@ class IYKYKCustomSlotCombiner:
                             selector=slot_name,
                             raw_value=slot_raw_val,
                         )
-                        fragments.append(
+                        frags.append(
                             PromptFragment(
                                 text=t,
                                 source_slot=slot_name,
@@ -1314,10 +1345,28 @@ class IYKYKCustomSlotCombiner:
                             )
                         )
                         order += 1
+                    if frags:
+                        slot_fragments[slot_name] = frags
 
-        assembly_res = assemble_result(fragments, DATA_DIR, rng=rng)
+        # 4. 复用 M3 标准 assemble_slots 执行覆盖与消解装配
+        assembly_res = _assembler.assemble_slots(
+            slot_fragments,
+            rng=rng,
+            external_overrides=clean_overrides,
+            entry_point="custom_combiner",
+        )
+
         negative_prompt = _sampler.get_negative_prompt()
-        desc = f"已成功拼装 {active_count} 个自定义槽位"
+
+        # 计算激活槽位数：基础有效槽位与外部有效覆盖槽位的并集
+        active_slots = set()
+        for slot, val in normalized_base.items():
+            if val is not None and str(val).strip():
+                active_slots.add(slot)
+        for slot, val in clean_overrides.items():
+            if val is not None and str(val).strip():
+                active_slots.add(slot)
+        desc = f"已成功拼装 {len(active_slots)} 个自定义槽位"
         selections = _extract_ordered_selections(assembly_res.source_atoms)
 
         return GenerationResult(
