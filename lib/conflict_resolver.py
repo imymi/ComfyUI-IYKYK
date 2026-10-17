@@ -1270,11 +1270,19 @@ def is_fragment_id(id_str: str) -> bool:
 
 
 def extract_explicit_prop_entity_id(atom: PromptAtom) -> Optional[str]:
-    """提取显式道具实体 ID（严格区分容器 ID 与行号片段 ID，跨来源统一有效）。"""
+    """提取显式道具实体 ID。
+    规范字段 (entity_id) 与旧字段兼容判断严格分离：
+    1. 规范字段：若存在显式 entity_id，直接作为实体身份，不凭容器/片段前缀推翻；
+    2. 旧字段兼容：针对 target_id、provenance.item_id、source_item_id 等历史字段，
+       执行容器 ID (preset_*/recipe_*) 与片段行号 (frag_*) 过滤，避免将容器或片段误认作实体。
+    """
+    # 1. 规范字段：直接作为身份
     if getattr(atom, "entity_id", None):
         eid = str(atom.entity_id).strip()
-        if eid and not is_container_id(eid) and not is_fragment_id(eid) and not eid.startswith("override_"):
+        if eid:
             return eid
+
+    # 2. 旧字段兼容判断（需过滤容器与片段行号）
     if atom.target_id and not is_container_id(atom.target_id) and not is_fragment_id(atom.target_id) and not atom.target_id.startswith("override_"):
         return atom.target_id.strip()
     if atom.provenance and atom.provenance.item_id:

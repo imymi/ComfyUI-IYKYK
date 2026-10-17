@@ -1292,6 +1292,126 @@ class TestM3OverridesAndConflictEngine(unittest.TestCase):
         self.assertIn("holding smartphone in left hand", res_r_same.prompt)
         self.assertIn("smartphone screen illuminated", res_r_same.prompt)
 
+    def test_37_entity_id_naming_variants_and_h03_regression(self):
+        """M3 阻断回归验证：
+        1. 合法 entity_id 命名变体（phone_01、recipe_phone、frag_phone、custom_prop）
+           在预设与配方中均直接作为实体身份生效，不被 is_container_id / is_fragment_id 推翻；
+           配合单手占用姿势时，同一实体的多条描述完整保留，不被误删。
+        2. 真实预设 H03 实际数据回归：
+           - 严格 Schema 校验通过；
+           - 装配后 27 个片段完整保留（0 项误删）；
+           - smartphone photo、front camera quality 绝不作为手持道具误占手部容量；
+           - phone camera 归入 quality，other hand tracing inner thigh 归入 pose。
+        """
+        import jsonschema
+        import json
+        from pathlib import Path
+        from lib.sampler import DataSampler
+
+        presets_schema = json.loads(Path("schemas/presets.schema.json").read_text(encoding="utf-8"))
+        recipes_schema = json.loads(Path("schemas/style_recipes.schema.json").read_text(encoding="utf-8"))
+
+        origin_p = {
+            "entry_point": "preset_browser",
+            "mode": "preset",
+            "selector": "preset_core",
+            "selected_id": "C02",
+            "raw_value": "test",
+            "parent_ids": ["C02"],
+        }
+        origin_r = {
+            "entry_point": "style_recipe_selector",
+            "mode": "recipe",
+            "selector": "style_recipe",
+            "selected_id": "recipe_test",
+            "raw_value": "test",
+            "parent_ids": ["recipe_test"],
+        }
+        pose_facts = {"semantic_role": "selector", "hands_required": 1}
+        prop_facts = {"semantic_role": "selector", "hands_required": 1}
+        recipe_base_fields = {
+            "exposure_mode": "natural",
+            "lighting_palette": "warm",
+            "pose_direction": "dynamic",
+            "makeup_direction": "clean",
+            "expression_gaze": "camera",
+            "focus_detail": "sharp",
+        }
+
+        # ─── 1. 合法 entity_id 命名变体测试（跨预设与配方） ───
+        legal_eids = ["phone_01", "recipe_phone", "frag_phone", "custom_prop"]
+        for eid in legal_eids:
+            # 1.1 预设路径
+            preset_case = {
+                "id": "C02",
+                "name_zh": f"实体ID测试_{eid}",
+                "style_zh": "写真",
+                "category": "test",
+                "positive": "hand on cheek, holding smartphone in left hand, smartphone screen illuminated",
+                "description_zh": "测试",
+                "fragments": [
+                    {"id": "c02__frag_000", "slot": "pose", "text": "hand on cheek", "facts": pose_facts, "origin": origin_p},
+                    {"id": "c02__frag_001", "slot": "props", "text": "holding smartphone in left hand", "entity_id": eid, "facts": prop_facts, "origin": origin_p},
+                    {"id": "c02__frag_002", "slot": "props", "text": "smartphone screen illuminated", "entity_id": eid, "facts": prop_facts, "origin": origin_p},
+                ],
+            }
+            jsonschema.validate(instance={"presets": [preset_case]}, schema=presets_schema)
+            res_p = self.assembler.assemble_preset(preset_case, None, "高清写真 (High)", rng=Random(42))
+            self.assertIn("hand on cheek", res_p.prompt, f"预设 eid={eid} 姿态丢失")
+            self.assertIn("holding smartphone in left hand", res_p.prompt, f"预设 eid={eid} 道具主描述丢失")
+            self.assertIn("smartphone screen illuminated", res_p.prompt, f"预设 eid={eid} 道具状态描述被误删（命名规则推翻了合法 entity_id）")
+
+            # 1.2 配方路径
+            recipe_case = {
+                "id": f"rec_{eid}",
+                "style_name": f"test_rec_{eid}",
+                "name_zh": f"配方实体ID测试_{eid}",
+                "style_recipe": "hand on cheek, holding smartphone in left hand, smartphone screen illuminated",
+                **recipe_base_fields,
+                "fragments": [
+                    {"id": "rec__frag_000", "slot": "pose", "text": "hand on cheek", "facts": pose_facts, "origin": origin_r},
+                    {"id": "rec__frag_001", "slot": "props", "text": "holding smartphone in left hand", "entity_id": eid, "facts": prop_facts, "origin": origin_r},
+                    {"id": "rec__frag_002", "slot": "props", "text": "smartphone screen illuminated", "entity_id": eid, "facts": prop_facts, "origin": origin_r},
+                ],
+            }
+            jsonschema.validate(instance={"recipes": [recipe_case]}, schema=recipes_schema)
+            res_r = self.assembler.assemble_preset({"id": "C01", "positive": "classroom"}, recipe_case, "高清写真 (High)", rng=Random(42))
+            self.assertIn("hand on cheek", res_r.prompt, f"配方 eid={eid} 姿态丢失")
+            self.assertIn("holding smartphone in left hand", res_r.prompt, f"配方 eid={eid} 道具主描述丢失")
+            self.assertIn("smartphone screen illuminated", res_r.prompt, f"配方 eid={eid} 道具状态描述被误删（命名规则推翻了合法 entity_id）")
+
+        # ─── 2. 真实预设 H03 实际数据回归 ───
+        sampler = DataSampler(self.data_dir)
+        p_h03 = sampler.get_preset("H03", Random(42))
+        self.assertIsNotNone(p_h03, "未能加载真实预设 H03")
+
+        # 2.1 生产级数据 Schema 校验
+        jsonschema.validate(instance={"presets": [p_h03]}, schema=presets_schema)
+
+        # 2.2 装配预设 H03
+        res_h03 = self.assembler.assemble_preset(p_h03, None, "高清写真 (High)", rng=Random(42))
+
+        # 2.3 关键片段必须保留（包括画质、拍摄方式、单手持机、姿势、屏幕光等）
+        expected_fragments = [
+            "smartphone photo",
+            "front camera quality",
+            "one hand holding phone",
+            "phone camera",
+            "other hand tracing inner thigh",
+            "phone screen glow",
+            "natural lighting from phone screen",
+            "webcam angle",
+            "casual snapshot",
+        ]
+        for frag in expected_fragments:
+            self.assertIn(frag, res_h03.prompt, f"真实预设 H03 中 '{frag}' 丢失")
+
+        # 2.4 H03 的 27 个片段完整保留（0 项误删）
+        all_frag_texts = [f["text"] for f in p_h03["fragments"]]
+        self.assertEqual(len(all_frag_texts), 27)
+        missing_frags = [t for t in all_frag_texts if t not in res_h03.prompt]
+        self.assertEqual(missing_frags, [], f"真实预设 H03 片段被误删: {missing_frags}")
+
 
 if __name__ == "__main__":
     unittest.main()

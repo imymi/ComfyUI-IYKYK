@@ -6630,7 +6630,7 @@
         },
         {
           "id": "h03__frag_003",
-          "slot": "preset_core",
+          "slot": "quality",
           "text": "phone camera",
           "facts": {
             "semantic_role": "selector"
@@ -6864,7 +6864,8 @@
         },
         {
           "id": "h03__frag_016",
-          "slot": "preset_core",
+          "slot": "props",
+          "entity_id": "prop_smartphone",
           "text": "one hand holding phone",
           "facts": {
             "semantic_role": "selector"
@@ -6882,7 +6883,7 @@
         },
         {
           "id": "h03__frag_017",
-          "slot": "preset_core",
+          "slot": "pose",
           "text": "other hand tracing inner thigh",
           "facts": {
             "semantic_role": "selector"
@@ -6918,7 +6919,7 @@
         },
         {
           "id": "h03__frag_019",
-          "slot": "preset_core",
+          "slot": "lighting",
           "text": "phone screen glow",
           "facts": {
             "semantic_role": "selector"
@@ -6972,7 +6973,7 @@
         },
         {
           "id": "h03__frag_022",
-          "slot": "preset_core",
+          "slot": "quality",
           "text": "smartphone photo",
           "facts": {
             "semantic_role": "selector"
@@ -7026,7 +7027,7 @@
         },
         {
           "id": "h03__frag_025",
-          "slot": "preset_core",
+          "slot": "lighting",
           "text": "natural lighting from phone screen",
           "facts": {
             "semantic_role": "selector"
@@ -7044,7 +7045,7 @@
         },
         {
           "id": "h03__frag_026",
-          "slot": "preset_core",
+          "slot": "quality",
           "text": "front camera quality",
           "facts": {
             "semantic_role": "selector"
