@@ -65,32 +65,33 @@ MAX_PROMPT_WORDS = 250
 
 _CATALOG_TAG_TO_SLOT_CACHE: Dict[Path, Dict[str, str]] = {}
 _CATALOG_TEXT_TO_FACTS_CACHE: Dict[Path, Dict[str, SemanticFacts]] = {}
+_RESOLVER_CACHE: Dict[str, ConflictResolver] = {}
 
 PRESET_SLOT_PATTERNS = [
     # quality
-    (re.compile(r'\b(masterpiece|best quality|ultra detailed|8k|photorealistic|highres|high resolution|cctv|security camera|amateur photo|low quality|timestamp overlay)\b', re.I), 'quality'),
+    (re.compile(r'\b(masterpiece|best quality|ultra detailed|8k|photorealistic|highres|high resolution|cctv|security camera|amateur photo|low quality|grainy|timestamp overlay)\b', re.I), 'quality'),
     # lighting & time of day
     (re.compile(r'\b(light|lighting|shadow|shadows|glow|sunlight|moonlight|backlight|rim light|neon|candlelight|dim|bright|golden hour|blue hour|sunset|sunrise|night|chiaroscuro|volumetric|lens flare|bokeh|fluorescent|lamp|overcast|rays|ambient)\b', re.I), 'lighting'),
-    # tattoo
-    (re.compile(r'\b(tattoo|tattoos|tattooed|inked|ink on|fresh ink)\b', re.I), 'tattoo'),
+    # tattoo (严格排除 tattoo studio, parlor 等场景场所词与家具器材词)
+    (re.compile(r'\b(tattoo|tattoos|tattooed|inked|ink on|fresh ink)\b(?!\s+(?:studio|parlor|parlour|shop|salon|chair|artist|machine|needle))', re.I), 'tattoo'),
     # liquids
     (re.compile(r'\b(sweat|sweaty|sweating|drool|saliva|milk|lotion|oil|slime|cum|semen|ejaculation|juice|liquid|liquids|dripping|splash|wet skin|glistening moisture)\b', re.I), 'liquids'),
-    # camera_angle
-    (re.compile(r'\b(angle|angles|perspective|eye level|voyeur angle|dutch angle|low angle|high angle|overhead|birds eye|worms eye|straight-on|tilted|view from|door crack view|peephole view|camera view|pov|point of view)\b', re.I), 'camera_angle'),
+    # camera_angle (支持各类偷窥视角、窥视角度与门缝镜头)
+    (re.compile(r'\b(angle|angles|perspective|eye level|voyeur angle|dutch angle|low angle|high angle|overhead|birds eye|worms eye|straight-on|tilted|view from|door crack view|peephole view|hidden camera feel|hidden camera angle|angle from adjacent aisle|camera view|pov|point of view)\b', re.I), 'camera_angle'),
     # shot_type
     (re.compile(r'\b(shot|close-up|extreme close-up|medium shot|full body shot|cowboy shot|wide shot|macro|depth of field|field of view|fisheye|portrait shot|framing)\b', re.I), 'shot_type'),
     # film
-    (re.compile(r'\b(film|kodak|fujifilm|polaroid|cinestill|ilford|grain|vintage|35mm|analog|monochrome|black and white|pastel)\b', re.I), 'film'),
+    (re.compile(r'\b(film|kodak|fujifilm|polaroid|cinestill|ilford|grain|vintage|35mm|analog|monochrome|black and white|pastel|accurate colors|warm accurate colors)\b', re.I), 'film'),
     # makeup / imperfections
     (re.compile(r'\b(makeup|lipstick|eyeliner|eyeshadow|mascara|blush|foundation|lip gloss|freckles|mole|pores|skin texture)\b', re.I), 'makeup'),
-    # clothing / clothing_state / underwear / lingerie
-    (re.compile(r'\b(uniform|shirt|blouse|skirt|dress|suit|pants|shorts|jacket|coat|sweater|swimsuit|bikini|lingerie|bra|panties|underwear|stockings|socks|boots|shoes|heels|catsuit|latex|corset|robe|kimono|yukata|cheongsam|qipao|bodysuit|leotard|apron|maid|hoodie|cardigan|tank top|camisole|t-shirt|jeans|vest|collar|tie|bow|sash|belt|cape|gloves|cuffs|garter|thighhighs|unbuttoned|lifted|pulled down|partially|untied|disheveled|torn|see-through|translucent|serafuku|sleeves|cleavage|slip|strap|zipper|outfit|costume|clothes|fabric|silk|lace|cotton|denim|leather|slipping off shoulder|off-shoulder|bare shoulder|hiked up|undressing|open front)\b', re.I), 'clothing'),
-    # props (放在 pose 前面，保证 holding spatula 等道具持握归入 props)
-    (re.compile(r'\b(holding\s+(?:a\s+|an\s+)?(?!head|face|knees|legs|hair|chest|breasts|waist)\w+|prop|props|spatula|phone|smartphone|camera|controller|glass|cup|bottle|pen|pencil|book|bag|umbrella|fan|doll|plush|pillow|towel|cigarette|gun|sword|instrument|toy|dumbbell|mic|product)\b', re.I), 'props'),
+    # clothing / clothing_state / underwear / lingerie (排除皮椅、沙发等家具皮革)
+    (re.compile(r'\b(uniform|shirt|blouse|skirt|dress|suit|pants|shorts|jacket|coat|sweater|swimsuit|bikini|lingerie|bra|panties|underwear|stockings|socks|boots|shoes|heels|catsuit|latex|corset|robe|kimono|yukata|cheongsam|qipao|bodysuit|leotard|apron|maid|hoodie|cardigan|tank top|camisole|t-shirt|jeans|vest|collar|tie|bow|sash|belt|cape|gloves|cuffs|garter|thighhighs|unbuttoned|lifted|pulled down|partially|untied|disheveled|torn|see-through|translucent|serafuku|sleeves|cleavage|slip|strap|zipper|outfit|costume|clothes|fabric|silk|lace|cotton|denim|leather(?!\s+(?:chair|couch|sofa|bench|seat|car|interior|furniture|stool|armchair))|slipping off shoulder|off-shoulder|bare shoulder|hiked up|undressing|open front)\b', re.I), 'clothing'),
+    # props (放在 pose 前面，排除 security camera, hidden camera 等视角词)
+    (re.compile(r'\b(holding\s+(?:a\s+|an\s+)?(?!head|face|knees|legs|hair|chest|breasts|waist)\w+|prop|props|spatula|phone|smartphone|(?<!hidden\s)(?<!security\s)(?<!cctv\s)camera|controller|glass|cup|bottle|pen|pencil|book|bag|umbrella|fan|doll|plush|pillow|towel|cigarette|gun|sword|instrument|toy|dumbbell|mic|product|needle)\b', re.I), 'props'),
     # pose
     (re.compile(r'\b(standing|sitting|lying|kneeling|squatting|bending|leaning|walking|running|pose|legs|arms|hands|crossed|spread|bent|arching|stretching|turned|bound|tied|hold|holding|touching|hand on|hands on|hands behind|crawling|spread legs|kicking feet|hugging knees|toes|entering|watching)\b', re.I), 'pose'),
     # scene_theme & furniture & scenery
-    (re.compile(r'\b(classroom|desk|chair|bench|table|bed|sofa|couch|school|room|office|bedroom|bathroom|onsen|hot spring|pool|beach|street|alley|park|forest|hospital|clinic|library|kitchen|balcony|rooftop|subway|train|bus|station|hotel|bar|club|gym|temple|shrine|tatami|futon|garden|restaurant|cafe|car|elevator|hallway|corridor|staircase|back row|class in progress|chalkboard|blackboard|podium|window seat|empty room|counter|outdoors|indoors|scenery|background|interior|city|scenic|nature|dock|deck|shelves|shelf|fence|dormitory|bunk|curtain|atmosphere|corner|shower area|space|after class|dust particles|studio)\b', re.I), 'scene_theme'),
+    (re.compile(r'\b(classroom|desk|chair|bench|table|bed|sofa|couch|school|room|office|bedroom|bathroom|onsen|hot spring|pool|beach|street|alley|park|forest|hospital|clinic|library|kitchen|balcony|rooftop|subway|train|bus|station|hotel|bar|club|gym|temple|shrine|tatami|futon|garden|restaurant|cafe|car|elevator|hallway|corridor|staircase|back row|class in progress|chalkboard|blackboard|podium|window seat|empty room|counter|outdoors|indoors|scenery|background|interior|city|scenic|nature|dock|deck|shelves|shelf|fence|dormitory|bunk|curtain|atmosphere|corner|shower area|space|after class|dust particles|studio|parlor|parlour|salon|shop|environment|sterile environment)\b', re.I), 'scene_theme'),
     # expression / emotion
     (re.compile(r'\b(expression|smile|smiling|smirk|frown|pout|tears|crying|blushing|gaze|looking|face|bored|shy|embarrassed|pleasure|aroused|seductive|angry|surprised|neutral|eyes closed|half closed|wink|mouth|biting lip|lip)\b', re.I), 'expression'),
     # hairstyle / character
@@ -127,11 +128,11 @@ def get_catalog_tag_cache(data_dir: Path) -> Tuple[Dict[str, str], Dict[str, Sem
 
     FILE_SLOT_MAP = [
         ("clothing.json", "clothing"),
+        ("shot_types.json", "shot_type"),
         ("scenes.json", "scene_theme"),
         ("themes.json", "scene_theme"),
         ("lighting.json", "lighting"),
         ("poses.json", "pose"),
-        ("shot_types.json", "shot_type"),
         ("props.json", "props"),
         ("expressions.json", "expression"),
         ("makeup.json", "makeup"),
@@ -212,6 +213,8 @@ def classify_preset_tag_and_facts(
     # 1. 确定槽位归属：若调用方已指定且已知则保留，否则优先按服装关键字与目录/模式映射
     if target_slot and target_slot in ALLOWED_SLOTS:
         slot = target_slot
+    elif any(w in t for w in ("chair", "desk", "table", "bench", "sofa", "couch", "stool", "armchair", "studio", "parlor", "parlour", "salon", "shop")) and not any(w in t for w in ("skirt", "shirt", "blouse", "dress", "uniform", "panties", "bra", "underwear", "catsuit", "latex suit", "corset", "lingerie", "stockings", "socks", "heels", "shoes", "boots", "bikini", "swimsuit", "leotard", "bodysuit", "robe", "kimono", "yukata", "serafuku")):
+        slot = "scene_theme"
     elif any(w in t for w in ("skirt", "shirt", "blouse", "dress", "uniform", "panties", "bra", "underwear", "catsuit", "latex suit", "corset", "lingerie", "stockings", "socks", "heels", "shoes", "boots", "bikini", "swimsuit", "leotard", "bodysuit", "robe", "kimono", "yukata", "serafuku")):
         slot = "clothing"
     else:
@@ -424,7 +427,10 @@ def assemble_result(
 
     # 2. 结构化冲突消解 (支持外部注入复用 Resolver，避免重复加载大型规则配置)
     if resolver is None:
-        resolver = ConflictResolver(data_dir)
+        cache_key = str(Path(data_dir).resolve())
+        if cache_key not in _RESOLVER_CACHE:
+            _RESOLVER_CACHE[cache_key] = ConflictResolver(Path(data_dir))
+        resolver = _RESOLVER_CACHE[cache_key]
     resolved_atoms, rules_applied, resolution_report = resolver.resolve_atoms_with_full_report(
         raw_atoms, rng, context_profile
     )
@@ -829,6 +835,39 @@ def apply_slot_overrides(
                             or (getattr(item, "origin", None) and getattr(item.origin, "selector", None) == "style_recipe")
                         )
                     ]
+
+        # 若存在 preset_core，清洗属于被覆盖槽位的旧预设内容
+        if "preset_core" in res and isinstance(res["preset_core"], list):
+            target_purged_slots = {norm_slot}
+            if norm_slot == "clothing":
+                target_purged_slots.update(["clothing", "clothing_state", "clothing_extension", "underwear"])
+            elif norm_slot == "scene_theme":
+                target_purged_slots.update(["scene_theme", "scene", "theme"])
+            elif norm_slot == "lighting":
+                target_purged_slots.update(["lighting", "lighting_palette"])
+            elif norm_slot == "pose":
+                target_purged_slots.update(["pose", "poses"])
+            elif norm_slot == "props":
+                target_purged_slots.update(["props", "prop"])
+            elif norm_slot == "shot_type":
+                target_purged_slots.update(["shot_type", "shot"])
+            elif norm_slot == "camera_angle":
+                target_purged_slots.update(["camera_angle", "camera", "angle"])
+            elif norm_slot == "tattoo":
+                target_purged_slots.update(["tattoo", "tattoos"])
+            elif norm_slot == "liquids":
+                target_purged_slots.update(["liquids", "liquid"])
+            cleaned_core = []
+            for item in res["preset_core"]:
+                item_text = getattr(item, "text", str(item))
+                item_slot = getattr(item, "source_slot", "")
+                if data_dir is not None and (not item_slot or item_slot in ("preset_core", norm_slot)):
+                    cls_slot, _ = classify_preset_tag_and_facts(item_text, Path(data_dir))
+                else:
+                    cls_slot = item_slot
+                if cls_slot not in target_purged_slots and item_slot not in target_purged_slots:
+                    cleaned_core.append(item)
+            res["preset_core"] = cleaned_core
 
         new_frags = make_override_fragments(
             norm_slot,

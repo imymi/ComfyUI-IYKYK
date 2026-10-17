@@ -840,5 +840,104 @@ class TestM3OverridesAndConflictEngine(unittest.TestCase):
             self.assertEqual(s.get("entry_point"), "diagnostics")
 
 
+    # ─────────────────────────────────────────────────────────────
+    # 20. 审计反馈专项阻断反例门禁 (Audit Round 2 Counterexamples)
+    # ─────────────────────────────────────────────────────────────
+
+    def test_27_c09_camera_angle_override_purges_angle_and_retains_other_slots(self):
+        """[Audit-R2-1] 真实预设 C09 覆盖 camera_angle='low angle'：旧角度彻底清除，其他槽位完整保留。"""
+        from lib.sampler import DataSampler
+        sampler = DataSampler(self.data_dir)
+        gen_res = _generate_structured(
+            sampler,
+            self.assembler,
+            {"预设模板": "C09", "external_overrides": {"camera_angle": "low angle"}},
+            rng=Random(42),
+            effective_seed=42,
+        )
+        prompt = gen_res.positive
+        # 1. 目标槽新内容写入
+        self.assertIn("low angle", prompt)
+        # 2. 目标槽旧内容彻底清除 (voyeur angle, door crack view, peephole view, hidden camera feel)
+        for purged in ("voyeur angle", "door crack view", "peephole view", "hidden camera feel"):
+            self.assertNotIn(purged, prompt, f"Old camera angle '{purged}' leaked after override!")
+        # 3. 其他槽位完整保留 (场景、浴室、蒸汽、中景、CCTV、胶片杂质)
+        for kept in ("school locker room", "shower area", "steam", "medium shot", "CCTV footage", "grainy"):
+            self.assertIn(kept, prompt, f"Unrelated slot tag '{kept}' was incorrectly dropped!")
+
+    def test_28_x03_tattoo_override_purges_tattoo_and_retains_scene_and_furniture(self):
+        """[Audit-R2-1] 真实预设 X03 覆盖 tattoo：目标槽旧纹身清除，场景词与家具完整保留。"""
+        from lib.sampler import DataSampler
+        sampler = DataSampler(self.data_dir)
+        gen_res = _generate_structured(
+            sampler,
+            self.assembler,
+            {"预设模板": "X03", "external_overrides": {"tattoo": "custom geometric tattoo"}},
+            rng=Random(42),
+            effective_seed=42,
+        )
+        prompt = gen_res.positive
+        # 1. 目标槽新内容写入
+        self.assertIn("custom geometric tattoo", prompt)
+        # 2. 目标槽旧纹身清除 (new tattoo on hip bone, getting tattooed on hip, fresh ink)
+        for purged in ("new tattoo on hip bone", "getting tattooed on hip", "fresh ink"):
+            self.assertNotIn(purged, prompt, f"Old tattoo tag '{purged}' leaked after override!")
+        # 3. 场景与家具 slot 完整保留 (tattoo studio 不得被误当作纹身删除，black leather chair 必须保留)
+        for kept in ("tattoo studio", "black leather chair", "ring light", "Kodak Portra 400", "sterile environment"):
+            self.assertIn(kept, prompt, f"Scene/furniture tag '{kept}' was incorrectly dropped!")
+
+    def test_29_exact_identical_60_word_deduplication_protects_external_budget(self):
+        """[Audit-R2-2] 统一 is_external_atom 识别，完全相同的 60 词文本在去重与预算截断下外部 100% 保留。"""
+        # 系统 200 词 + 带内部 linkage 标记的相同 60 词 + 外部相同 60 词
+        sys_200 = [PromptFragment(text=f"sys_text_word_{i}", source_slot="scene_theme", order=i) for i in range(200)]
+        identical_60_words = " ".join(f"exact_shared_atom_{i}" for i in range(60))
+        sys_linkage = PromptFragment(
+            text=identical_60_words,
+            source_slot="clothing",
+            order=250,
+            origin=SelectionOrigin(mode="preset", selector="clothing", parent_ids=["override:linkage"]),
+        )
+
+        res = self.assembler.assemble_slots(
+            {"scene_theme": sys_200, "clothing": [sys_linkage]},
+            rng=Random(42),
+            external_overrides={"clothing": identical_60_words},
+        )
+        # 总预算截断在 250 词内
+        self.assertLessEqual(len(res.prompt.split()), 250)
+        # 外部相同文本 60 词因享有最高外部优先级，全量完整保留
+        for i in range(60):
+            self.assertIn(f"exact_shared_atom_{i}", res.prompt, f"External atom exact_shared_atom_{i} was lost!")
+
+    def test_30_distinct_prop_entities_with_hand_affinity_prevent_spurious_keyword_collapsing(self):
+        """[Audit-R2-3] 手部实体归一化：左右手同类道具不被关键词折叠，超容 3 道具坚决 Fail-Closed。"""
+        # 外部输入：左手手机 + 右手手机 + 咖啡杯 (1 + 1 + 1 = 3 > 2)
+        with self.assertRaises(PromptValidationError) as cm:
+            self.assembler.assemble_slots(
+                {},
+                rng=Random(42),
+                external_overrides={
+                    "props": "smartphone in left hand, smartphone in right hand, coffee cup"
+                },
+            )
+        self.assertEqual(cm.exception.rule_id, "handheld_props_single_holder")
+
+    def test_31_multi_description_same_prop_entity_retained_with_one_busy_pose(self):
+        """[Audit-R2-3] 同一道具实体的多个描述在单手占用姿势下均被保留 (1+1=2 <= 2)。"""
+        res = self.assembler.assemble_slots(
+            {
+                "pose": [PromptFragment(text="hand on cheek", source_slot="pose", order=0)],
+                "props": [
+                    PromptFragment(text="holding smartphone", source_slot="props", order=1),
+                    PromptFragment(text="smartphone in hand", source_slot="props", order=2),
+                ],
+            },
+            rng=Random(42),
+        )
+        self.assertIn("hand on cheek", res.prompt)
+        self.assertIn("holding smartphone", res.prompt)
+        self.assertIn("smartphone in hand", res.prompt)
+
+
 if __name__ == "__main__":
     unittest.main()

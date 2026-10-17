@@ -1037,19 +1037,20 @@ class TestConflictEngineSSOT(unittest.TestCase):
         from lib.rule_contract import HandheldPropsRuleSpec, RuleItem, TextFallbackSpec
         injected_pattern_a = PatternSpec(pattern="custom_exclusive_gizmo_a", match_mode="phrase")
         injected_pattern_b = PatternSpec(pattern="custom_exclusive_gizmo_b", match_mode="phrase")
+        injected_pattern_c = PatternSpec(pattern="custom_exclusive_gizmo_c", match_mode="phrase")
         injected_spec = HandheldPropsRuleSpec(
             id="handheld_props_single_holder",
             description="test injection",
             priority=210,
             phase="physical",
             depends_on=("pose_hand_occupation",),
-            handheld_patterns=(injected_pattern_a, injected_pattern_b),
+            handheld_patterns=(injected_pattern_a, injected_pattern_b, injected_pattern_c),
             reason_codes=("single_handheld_prop_limit",),
             text_fallback=TextFallbackSpec(
                 strategy="custom",
                 enabled=True,
                 target_slots=("props",),
-                patterns=(injected_pattern_a, injected_pattern_b),
+                patterns=(injected_pattern_a, injected_pattern_b, injected_pattern_c),
             ),
         )
         injected_rule_item = RuleItem(
@@ -1079,19 +1080,27 @@ class TestConflictEngineSSOT(unittest.TestCase):
             origin=SelectionOrigin(mode="custom", selector="props"),
             facts=SemanticFacts(),
         )
+        prop_c = PromptAtom(
+            atom_id="atom_prop_c",
+            text="custom_exclusive_gizmo_c",
+            span_type=SpanType.PLAIN,
+            source_slot="props",
+            origin=SelectionOrigin(mode="custom", selector="props"),
+            facts=SemanticFacts(),
+        )
 
         from lib.conflict_resolver import OneTimeIndex, DecisionLedger
-        test_index = OneTimeIndex([prop_a, prop_b])
+        test_index = OneTimeIndex([prop_a, prop_b, prop_c])
         test_ledger = DecisionLedger(self.resolver.registry)
         res_atoms = self.resolver._resolve_handheld_props_single_holder_atoms(
-            [prop_a, prop_b],
+            [prop_a, prop_b, prop_c],
             injected_rule_item,
             test_ledger,
             Random(42),
             test_index,
             None,
         )
-        self.assertEqual(len(res_atoms), 1, "Injected RuleItem fallback patterns should have resolved conflict to 1 atom")
+        self.assertEqual(len(res_atoms), 2, "Injected RuleItem fallback patterns should have resolved conflict to 2 atoms")
         self.assertEqual(len(test_ledger.decisions), 1, "Injected RuleItem fallback patterns should have produced 1 decision")
 
     def test_r2r3_p1_001_fallback_exclusively_consumes_rule_item_text_fallback(self):
@@ -1107,6 +1116,7 @@ class TestConflictEngineSSOT(unittest.TestCase):
 
         p_a = PatternSpec(pattern="exclusive_gizmo_alpha", match_mode="phrase")
         p_b = PatternSpec(pattern="exclusive_gizmo_beta", match_mode="phrase")
+        p_c = PatternSpec(pattern="exclusive_gizmo_gamma", match_mode="phrase")
 
         atom_a = PromptAtom(
             atom_id="atom_gizmo_a",
@@ -1119,6 +1129,14 @@ class TestConflictEngineSSOT(unittest.TestCase):
         atom_b = PromptAtom(
             atom_id="atom_gizmo_b",
             text="exclusive_gizmo_beta",
+            span_type=SpanType.PLAIN,
+            source_slot="props",
+            origin=SelectionOrigin(mode="custom", selector="props"),
+            facts=SemanticFacts(),
+        )
+        atom_c = PromptAtom(
+            atom_id="atom_gizmo_c",
+            text="exclusive_gizmo_gamma",
             span_type=SpanType.PLAIN,
             source_slot="props",
             origin=SelectionOrigin(mode="custom", selector="props"),
@@ -1138,7 +1156,7 @@ class TestConflictEngineSSOT(unittest.TestCase):
                 strategy="custom",
                 enabled=True,
                 target_slots=("props",),
-                patterns=(p_a, p_b),  # 唯一事实源！
+                patterns=(p_a, p_b, p_c),  # 唯一事实源！
             ),
         )
         rule_item_pos = RuleItem(
@@ -1152,17 +1170,17 @@ class TestConflictEngineSSOT(unittest.TestCase):
             text_fallback=rule_spec_pos.text_fallback,
         )
 
-        idx_pos = OneTimeIndex([atom_a, atom_b])
+        idx_pos = OneTimeIndex([atom_a, atom_b, atom_c])
         ledger_pos = DecisionLedger(self.resolver.registry)
         res_pos = self.resolver._resolve_handheld_props_single_holder_atoms(
-            [atom_a, atom_b],
+            [atom_a, atom_b, atom_c],
             rule_item_pos,
             ledger_pos,
             Random(42),
             idx_pos,
             None,
         )
-        self.assertEqual(len(res_pos), 1, "Empty handler patterns + valid text_fallback.patterns must resolve conflict to 1 atom")
+        self.assertEqual(len(res_pos), 2, "Empty handler patterns + valid text_fallback.patterns must resolve conflict to 2 atoms under 2-hand model")
         self.assertEqual(len(ledger_pos.decisions), 1, "Must produce 1 drop decision")
 
         # 2. 专属集合有词，但 text_fallback.patterns 为空 -> 绝不命中 (Fail-Closed)
@@ -1172,7 +1190,7 @@ class TestConflictEngineSSOT(unittest.TestCase):
             priority=210,
             phase="physical",
             depends_on=("pose_hand_occupation",),
-            handheld_patterns=(p_a, p_b),  # 专属集合有词
+            handheld_patterns=(p_a, p_b, p_c),  # 专属集合有词
             reason_codes=("single_handheld_prop_limit",),
             text_fallback=TextFallbackSpec(
                 strategy="custom",
@@ -1192,17 +1210,17 @@ class TestConflictEngineSSOT(unittest.TestCase):
             text_fallback=rule_spec_neg.text_fallback,
         )
 
-        idx_neg = OneTimeIndex([atom_a, atom_b])
+        idx_neg = OneTimeIndex([atom_a, atom_b, atom_c])
         ledger_neg = DecisionLedger(self.resolver.registry)
         res_neg = self.resolver._resolve_handheld_props_single_holder_atoms(
-            [atom_a, atom_b],
+            [atom_a, atom_b, atom_c],
             rule_item_neg,
             ledger_neg,
             Random(42),
             idx_neg,
             None,
         )
-        self.assertEqual(len(res_neg), 2, "Valid handler patterns + empty text_fallback.patterns must NOT resolve conflict")
+        self.assertEqual(len(res_neg), 3, "Valid handler patterns + empty text_fallback.patterns must NOT resolve conflict")
         self.assertEqual(len(ledger_neg.decisions), 0, "Must produce 0 decisions")
 
     def test_r2r3_p3_001_fact_and_mutex_index_integration_and_tombstone(self):
@@ -1270,6 +1288,7 @@ class TestConflictEngineSSOT(unittest.TestCase):
         p_legacy = PatternSpec(pattern="unrelated_legacy_gadget", match_mode="phrase", role="handheld")
         p_decl_a = PatternSpec(pattern="declared_gadget_a", match_mode="phrase", role="handheld")
         p_decl_b = PatternSpec(pattern="declared_gadget_b", match_mode="phrase", role="handheld")
+        p_decl_c = PatternSpec(pattern="declared_gadget_c", match_mode="phrase", role="handheld")
 
         rule_spec = HandheldPropsRuleSpec(
             id="handheld_props_single_holder",
@@ -1283,7 +1302,7 @@ class TestConflictEngineSSOT(unittest.TestCase):
                 strategy="custom",
                 enabled=True,
                 target_slots=("props",),
-                patterns=(p_decl_a, p_decl_b),  # 声明性 fallback pattern
+                patterns=(p_decl_a, p_decl_b, p_decl_c),  # 声明性 fallback pattern
             ),
         )
         rule_item = RuleItem(
@@ -1313,20 +1332,28 @@ class TestConflictEngineSSOT(unittest.TestCase):
             origin=SelectionOrigin(mode="custom", selector="props"),
             facts=SemanticFacts(),
         )
+        atom_c = PromptAtom(
+            atom_id="atom_gadget_c",
+            text="declared_gadget_c",
+            span_type=SpanType.PLAIN,
+            source_slot="props",
+            origin=SelectionOrigin(mode="custom", selector="props"),
+            facts=SemanticFacts(),
+        )
 
-        idx = OneTimeIndex([atom_a, atom_b])
+        idx = OneTimeIndex([atom_a, atom_b, atom_c])
         ledger = DecisionLedger(self.resolver.registry)
         res = self.resolver._resolve_handheld_props_single_holder_atoms(
-            [atom_a, atom_b],
+            [atom_a, atom_b, atom_c],
             rule_item,
             ledger,
             Random(42),
             idx,
             None,
         )
-        self.assertEqual(len(res), 1, "Non-intersecting handler patterns MUST NOT mask declared text_fallback patterns")
+        self.assertEqual(len(res), 2, "Non-intersecting handler patterns MUST NOT mask declared text_fallback patterns")
         self.assertEqual(len(ledger.decisions), 1, "Must resolve conflict and produce 1 decision")
-        self.assertEqual(ledger.decisions[0].target_atom_id, "atom_gadget_b")
+        self.assertEqual(ledger.decisions[0].target_atom_id, "atom_gadget_c")
 
     def test_r2r4_p1_001_empty_declaration_prevents_old_handler_patterns_from_triggering(self):
         """反例验证 R2R4-P1-001 (2): text_fallback 声明为空时，旧 handler pattern 绝不得触发 (Fail-Closed)。"""
@@ -1522,14 +1549,17 @@ class TestConflictEngineSSOT(unittest.TestCase):
                 "pos_patterns": (
                     PatternSpec("sentinel_prop_a", "phrase", role="handheld", group_id="handheld"),
                     PatternSpec("sentinel_prop_b", "phrase", role="handheld", group_id="handheld"),
+                    PatternSpec("sentinel_prop_c", "phrase", role="handheld", group_id="handheld"),
                 ),
                 "pos_atoms": [
                     PromptAtom(atom_id="a0", text="sentinel_prop_a", span_type=SpanType.PLAIN, source_slot="props", origin=None, facts=SemanticFacts(), tag_order=0, span_order=0),
                     PromptAtom(atom_id="a1", text="sentinel_prop_b", span_type=SpanType.PLAIN, source_slot="props", origin=None, facts=SemanticFacts(), tag_order=1, span_order=1),
+                    PromptAtom(atom_id="a2", text="sentinel_prop_c", span_type=SpanType.PLAIN, source_slot="props", origin=None, facts=SemanticFacts(), tag_order=2, span_order=2),
                 ],
                 "neg_atoms": [
                     PromptAtom(atom_id="a0", text="holding smartphone", span_type=SpanType.PLAIN, source_slot="props", origin=None, facts=SemanticFacts(), tag_order=0, span_order=0),
                     PromptAtom(atom_id="a1", text="holding camera", span_type=SpanType.PLAIN, source_slot="props", origin=None, facts=SemanticFacts(), tag_order=1, span_order=1),
+                    PromptAtom(atom_id="a2", text="holding wine glass", span_type=SpanType.PLAIN, source_slot="props", origin=None, facts=SemanticFacts(), tag_order=2, span_order=2),
                 ],
             },
             "clothing_style_state_coherence": {

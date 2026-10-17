@@ -34,6 +34,7 @@ if __package__:
         SpanType,
         TagProvenance,
         UNSPECIFIED,
+        is_external_atom,
     )
     from .rng import derive_substream_rng, recover_effective_seed
     from .rule_contract import (
@@ -65,6 +66,7 @@ else:
         SpanType,
         TagProvenance,
         UNSPECIFIED,
+        is_external_atom,
     )
     from lib.rng import derive_substream_rng, recover_effective_seed
     from lib.rule_contract import (
@@ -1156,31 +1158,6 @@ def is_formal_atom(a: PromptAtom) -> bool:
     return False
 
 
-def is_external_atom(a: Any) -> bool:
-    """判断给定原子是否属于用户显式外部覆盖输入 (M3 外部覆盖契约)。"""
-    if a is None:
-        return False
-    orig = getattr(a, "origin", None)
-    if orig is not None:
-        if getattr(orig, "mode", None) == "override":
-            return True
-        if getattr(orig, "entry_point", None) == "override":
-            return True
-    prov = getattr(a, "provenance", None)
-    if prov is not None:
-        if getattr(prov, "kind", None) in ("override", "external_override", "slot_override"):
-            return True
-        if getattr(prov, "source_mode", None) == "override":
-            return True
-        for sid in getattr(prov, "semantic_ids", ()):
-            if sid.startswith("slot_override:") or sid == "override":
-                return True
-    slot = str(getattr(a, "source_slot", ""))
-    if slot.endswith("_override"):
-        return True
-    return False
-
-
 def is_camera_hardware_atom(a: Any) -> bool:
     """判断给定原子是否属于相机硬件套机/机身/光学器材（而非感光胶片/相纸乳剂）。
 
@@ -1288,21 +1265,64 @@ KNOWN_PROP_KWS = (
 
 
 def get_prop_entity_key(atom: PromptAtom) -> str:
-    sid = atom.source_item_id or ""
+    """提取道具实体聚合键。
+    契约规则：
+    1. 道具类别相同不能直接视为同一实体；
+    2. 正式来源 (catalog/preset/recipe) 共享相同 item_id / selected_id 归为同一实体；
+    3. 外部覆盖 (override) 的各个独立项具有独立的 source_item_id (override_props_000, 001)，保留独立实体资格；
+    4. 明确区分不同持握手 ("left hand" vs "right hand" / "another" / "other")；
+    5. 无标识的同一道具多描述通过 shared item_id 聚合。
+    """
+    sid = getattr(atom, "source_item_id", "") or ""
     sel = (atom.origin.selected_id if atom.origin else "") or ""
     pid = (atom.provenance.item_id if atom.provenance else "") or ""
     txt = atom.text.lower().strip()
-    if sid and not sid.startswith("override_props_"):
-        return f"item:{sid}"
-    if sel and not sel.startswith("override_props_"):
-        return f"sel:{sel}"
-    if pid and not pid.startswith("override_props_"):
-        return f"pid:{pid}"
+
+    hand_aff = ""
+    if re.search(r"\b(left hand|in left hand|left arm|with left)\b", txt):
+        hand_aff = "@left"
+    elif re.search(r"\b(right hand|in right hand|right arm|with right)\b", txt):
+        hand_aff = "@right"
+    elif re.search(r"\b(other hand|another hand|other arm|second hand)\b", txt):
+        hand_aff = "@other"
+
+    if sid:
+        return f"item:{sid}{hand_aff}"
+    if sel:
+        return f"sel:{sel}{hand_aff}"
+    if pid:
+        return f"pid:{pid}{hand_aff}"
     for kw in KNOWN_PROP_KWS:
         if kw in txt:
-            return f"kw:{kw}"
+            return f"kw:{kw}{hand_aff}"
     clean = re.sub(r"\b(holding|held|in hand|carrying|held in hands?)\b", "", txt).strip()
-    return f"raw:{clean or txt}"
+    return f"raw:{clean or txt}{hand_aff}"
+
+
+class PropEntity:
+    def __init__(self, key: str, member_atoms: List[PromptAtom]):
+        self.key = key
+        self.atoms = member_atoms
+        self.is_external = any(is_external_atom(ma) for ma in member_atoms)
+        self.order = min((ma.tag_order, ma.span_order) for ma in member_atoms)
+        h = 1
+        for ma in member_atoms:
+            if ma.facts and ma.facts.hands_required > 0:
+                h = max(h, ma.facts.hands_required)
+            elif any(w in ma.text.lower() for w in ("controller", "two hands", "both hands", "sword", "rifle", "tray")):
+                h = max(h, 2)
+        self.hands_required = h
+
+
+def build_prop_entities(prop_atoms: Sequence[PromptAtom]) -> List[PropEntity]:
+    """按道具实体聚合 PromptAtom，区分'同一道具的多个描述'与'多个独立道具'。"""
+    entities: Dict[str, List[PromptAtom]] = {}
+    for a in prop_atoms:
+        ekey = get_prop_entity_key(a)
+        entities.setdefault(ekey, []).append(a)
+    entity_list = [PropEntity(k, v) for k, v in entities.items()]
+    entity_list.sort(key=lambda e: (0 if e.is_external else 1, e.order))
+    return entity_list
 
 
 class OneTimeIndex:
@@ -2982,13 +3002,17 @@ class ConflictResolver:
             else:
                 pose_hands = 2 if any(w in pose_winner.text.lower() for w in ("bound", "tied", "behind back", "hands on head", "restrained")) else 1
 
-            ext_props = [p for p in detected_props if is_external_atom(p[0])]
-            total_ext_prop_hands = sum(p[1] for p in ext_props)
+            # 统一按道具实体聚合
+            detected_prop_atoms = [p[0] for p in detected_props]
+            prop_entities = build_prop_entities(detected_prop_atoms)
+            ext_entities = [e for e in prop_entities if e.is_external]
+            total_ext_prop_hands = sum(e.hands_required for e in ext_entities)
             is_ext_pose = is_external_atom(pose_winner)
 
             # 1. 外部道具间超容量检测 (3 > 2 Fail-Closed)
             if total_ext_prop_hands > 2:
-                p1, p2 = ext_props[0][0], ext_props[1][0]
+                p1 = ext_entities[0].atoms[0]
+                p2 = ext_entities[1].atoms[0]
                 raise PromptValidationError(
                     f"External override conflict under rule '{rule_item.id}': external props exceed total hand capacity of 2 ({total_ext_prop_hands} hands)",
                     slots=(p1.source_slot, p2.source_slot),
@@ -2998,7 +3022,7 @@ class ConflictResolver:
 
             # 2. 外部姿势 + 外部道具超容量检测 (1 + 2 > 2 Fail-Closed)
             if is_ext_pose and (pose_hands + total_ext_prop_hands > 2):
-                first_prop = ext_props[0][0]
+                first_prop = ext_entities[0].atoms[0]
                 raise PromptValidationError(
                     f"External override conflict under rule '{rule_item.id}': slot '{pose_winner.source_slot}' ('{pose_winner.text}') conflicts with slot '{first_prop.source_slot}' ('{first_prop.text}')",
                     slots=(pose_winner.source_slot, first_prop.source_slot),
@@ -3007,38 +3031,39 @@ class ConflictResolver:
                 )
 
             # 3. 外部道具优先于系统姿势：外部道具使双手超容时，系统姿势被外部道具裁撤
-            if not is_ext_pose and ext_props and (pose_hands + total_ext_prop_hands > 2):
+            if not is_ext_pose and ext_entities and (pose_hands + total_ext_prop_hands > 2):
                 if pose_winner.can_delete_atom and index.is_active(pose_winner):
                     index.drop(pose_winner.atom_id)
                     ledger.record_drop(
                         rule_item.id,
                         rule_item.phase,
                         "external_prop_overrides_pose",
-                        (ext_props[0][0].atom_id,),
+                        (ext_entities[0].atoms[0].atom_id,),
                         pose_winner,
                     )
                     pose_hands = 0
 
-            # 4. 系统道具容量核算 (双向统一：单手托腮1 + 相机1 = 2 <= 2 合法共存保留)
+            # 4. 系统道具容量核算 (按实体分配容量！同一实体的多个描述整体保留)
             available_hands = 2 - pose_hands - total_ext_prop_hands
-            for a, h_req, is_fallback in detected_props:
-                if is_external_atom(a):
+            for e in prop_entities:
+                if e.is_external:
                     continue
-                if h_req <= available_hands:
-                    available_hands -= h_req
+                if e.hands_required <= available_hands:
+                    available_hands -= e.hands_required
                 else:
-                    if not a.can_delete_atom or not index.is_active(a):
-                        continue
-                    if is_fallback:
-                        self.text_fallback_hits += 1
-                    index.drop(a.atom_id)
-                    ledger.record_drop(
-                        rule_item.id,
-                        rule_item.phase,
-                        "busy_hands_remove_props",
-                        (pose_winner.atom_id,),
-                        a,
-                    )
+                    for a in e.atoms:
+                        if not a.can_delete_atom or not index.is_active(a):
+                            continue
+                        if tf.enabled and any(p.matches(a.text) for p in all_handheld):
+                            self.text_fallback_hits += 1
+                        index.drop(a.atom_id)
+                        ledger.record_drop(
+                            rule_item.id,
+                            rule_item.phase,
+                            "busy_hands_remove_props",
+                            (pose_winner.atom_id,),
+                            a,
+                        )
 
         return index.get_all_active_ordered()
 
@@ -3126,28 +3151,7 @@ class ConflictResolver:
             return index.get_all_active_ordered()
 
         # 3. 按道具实体区分“同一道具的多个描述”与“多个独立道具”
-        entities: Dict[str, List[PromptAtom]] = {}
-        for a in hh_atoms:
-            ekey = get_prop_entity_key(a)
-            entities.setdefault(ekey, []).append(a)
-
-        class PropEntity:
-            def __init__(self, key: str, member_atoms: List[PromptAtom]):
-                self.key = key
-                self.atoms = member_atoms
-                self.is_external = any(is_external_atom(ma) for ma in member_atoms)
-                self.order = min((ma.tag_order, ma.span_order) for ma in member_atoms)
-                h = 1
-                for ma in member_atoms:
-                    if ma.facts and ma.facts.hands_required > 0:
-                        h = max(h, ma.facts.hands_required)
-                    elif any(w in ma.text.lower() for w in ("controller", "two hands", "both hands", "sword", "rifle", "tray")):
-                        h = max(h, 2)
-                self.hands_required = h
-
-        entity_list = [PropEntity(k, v) for k, v in entities.items()]
-        # 外部实体优先排序，同类按出现顺序排
-        entity_list.sort(key=lambda e: (0 if e.is_external else 1, e.order))
+        entity_list = build_prop_entities(hh_atoms)
 
         # 4. 外部道具间超容量检测与外部姿势冲突检测
         ext_entities = [e for e in entity_list if e.is_external]
@@ -3195,6 +3199,8 @@ class ConflictResolver:
                 for a in e.atoms:
                     if not a.can_delete_atom or not index.is_active(a):
                         continue
+                    if tf and tf.enabled and any(hp.matches(a.text) for hp in handheld_patterns):
+                        self.text_fallback_hits += 1
                     index.drop(a.atom_id)
                     ledger.record_drop(
                         rule_item.id,
@@ -3745,6 +3751,8 @@ class ConflictResolver:
                 for a in night_atoms:
                     if not a.can_delete_atom or not index.is_active(a):
                         continue
+                    if tf.enabled and any(nt.matches(a.text) for nt in all_night):
+                        self.text_fallback_hits += 1
                     index.drop(a.atom_id)
                     ledger.record_drop(
                         rule_item.id,
@@ -3759,6 +3767,8 @@ class ConflictResolver:
                 for a in daylight_atoms:
                     if not a.can_delete_atom or not index.is_active(a):
                         continue
+                    if tf.enabled and any(dt.matches(a.text) for dt in all_daylight):
+                        self.text_fallback_hits += 1
                     index.drop(a.atom_id)
                     ledger.record_drop(
                         rule_item.id,
@@ -3776,6 +3786,8 @@ class ConflictResolver:
                         if a.source_slot in ("lighting", "lighting_palette"):
                             if not a.can_delete_atom or not index.is_active(a):
                                 continue
+                            if tf.enabled and any(dt.matches(a.text) for dt in all_daylight):
+                                self.text_fallback_hits += 1
                             index.drop(a.atom_id)
                             ledger.record_drop(
                                 rule_item.id,
@@ -3790,6 +3802,8 @@ class ConflictResolver:
                         if a.source_slot in ("lighting", "lighting_palette"):
                             if not a.can_delete_atom or not index.is_active(a):
                                 continue
+                            if tf.enabled and any(nt.matches(a.text) for nt in all_night):
+                                self.text_fallback_hits += 1
                             index.drop(a.atom_id)
                             ledger.record_drop(
                                 rule_item.id,
@@ -4718,24 +4732,8 @@ class ConflictResolver:
             or (not is_formal_atom(a) and any(hp.matches(a.text) for hp in r5_pats))
         ]
         if hh_atoms:
-            entity_map: Dict[str, List[PromptAtom]] = {}
-            for a in hh_atoms:
-                ekey = get_prop_entity_key(a)
-                entity_map.setdefault(ekey, []).append(a)
-
-            entity_reqs = []
-            for ekey, e_atoms in entity_map.items():
-                h = 1
-                for ea in e_atoms:
-                    if ea.facts and ea.facts.hands_required > 0:
-                        h = max(h, ea.facts.hands_required)
-                    elif any(w in ea.text.lower() for w in ("controller", "two hands", "both hands", "sword", "rifle", "tray")):
-                        h = max(h, 2)
-                first_ea = min(e_atoms, key=lambda x: (x.tag_order, x.span_order))
-                entity_reqs.append((first_ea, h, any(is_external_atom(ea) for ea in e_atoms)))
-
-            entity_reqs.sort(key=lambda x: (0 if x[2] else 1, x[0].tag_order, x[0].span_order))
-            total_prop_hands = sum(h for _, h, _ in entity_reqs)
+            prop_entities = build_prop_entities(hh_atoms)
+            total_prop_hands = sum(e.hands_required for e in prop_entities)
 
             pose_hands = 0
             if busy_atoms:
@@ -4752,9 +4750,9 @@ class ConflictResolver:
                 else:
                     pose_hands = 2 if any(w in first_busy.text.lower() for w in ("bound", "tied", "behind back", "hands on head", "restrained")) else 1
 
-            if len(entity_reqs) > 1 and (total_prop_hands + pose_hands > 2):
-                first_hh = entity_reqs[0][0]
-                second_hh = entity_reqs[1][0]
+            if len(prop_entities) > 1 and (total_prop_hands + pose_hands > 2):
+                first_hh = prop_entities[0].atoms[0]
+                second_hh = prop_entities[1].atoms[0]
                 if is_external_atom(second_hh) and not is_external_atom(first_hh):
                     winner, loser = second_hh, first_hh
                 else:

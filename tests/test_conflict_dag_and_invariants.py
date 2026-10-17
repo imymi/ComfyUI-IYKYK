@@ -199,6 +199,7 @@ def build_d2_custom_fixtures() -> Dict[str, List[PromptAtom]]:
         "handheld_props_single_holder": [
             make_atom("holding smartphone", "props", idx=0, origin_mode="custom"),
             make_atom("holding camera", "props", idx=1, origin_mode="custom"),
+            make_atom("holding wine glass", "props", idx=2, origin_mode="custom"),
         ],
         "clothing_style_state_coherence": [
             make_atom("school swimsuit (sukumizu)", "clothing", idx=0, origin_mode="custom"),
@@ -606,11 +607,15 @@ class TestConflictDAGAndInvariants(unittest.TestCase):
         atoms = [
             make_atom("holding smartphone", "props", SpanType.PLAIN, idx=0),
             make_atom("holding camera", "props", SpanType.PLAIN, idx=1),
+            make_atom("holding wine glass", "props", SpanType.PLAIN, idx=2),
         ]
         resolved = self.resolver.resolve_atoms(atoms, Random(42))
         texts = [a.text for a in resolved]
         holding_tags = [t for t in texts if "holding" in t]
-        self.assertEqual(len(holding_tags), 1)
+        self.assertEqual(len(holding_tags), 2)
+        self.assertIn("holding smartphone", texts)
+        self.assertIn("holding camera", texts)
+        self.assertNotIn("holding wine glass", texts)
 
     def test_22_auth_10_blindfold_drops_gaze_direction(self):
         """权威关系 10: 遮眼饰品抑制视线动作 (accessory_occlusion_gaze_coherence)。"""
@@ -685,8 +690,8 @@ class TestConflictDAGAndInvariants(unittest.TestCase):
                 make_atom("holding umbrella", "props", idx=1, origin_mode="preset", facts=SemanticFacts(hands_required=1, prop_usage="handheld")),
             ],
             "handheld_props_single_holder": [
-                make_atom("holding drink", "props", idx=0, origin_mode="preset", facts=SemanticFacts(hands_required=1, prop_usage="handheld")),
-                make_atom("holding fan", "props", idx=1, origin_mode="preset", facts=SemanticFacts(hands_required=1, prop_usage="handheld")),
+                make_atom("holding game controller", "props", idx=0, origin_mode="preset", facts=SemanticFacts(hands_required=2, prop_usage="handheld")),
+                make_atom("holding drink", "props", idx=1, origin_mode="preset", facts=SemanticFacts(hands_required=1, prop_usage="handheld")),
             ],
             "clothing_style_state_coherence": [
                 make_atom("one-piece dress", "clothing", idx=0, origin_mode="preset", facts=SemanticFacts(garment_topologies=("one_piece",))),
@@ -889,7 +894,7 @@ class TestConflictDAGAndInvariants(unittest.TestCase):
                 "atoms": [
                     make_cascade_custom_atom("hands clasped in prayer", "pose", 0),
                     make_cascade_custom_atom("holding smartphone", "props", 1),
-                    make_cascade_custom_atom("holding umbrella", "props", 2),
+                    make_cascade_atom("holding umbrella", "props", 2, mode="custom", facts=SemanticFacts(hands_required=2)),
                     make_cascade_custom_atom("holding bouquet", "props", 3),
                 ],
                 "intermediate_ids": ["atom_000", "atom_002", "atom_003"],

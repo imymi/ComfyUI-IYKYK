@@ -2743,6 +2743,12 @@ def is_external_atom(a: Any) -> bool:
         if getattr(prov, "source_mode", None) == "override":
             return True
         for sid in getattr(prov, "semantic_ids", ()):
-            if sid.startswith("slot_override:") or sid.startswith("override:"):
+            # 严格排除内部采样器生成的联动标记 override:linkage
+            if sid == "override:linkage":
+                continue
+            if sid == "override" or sid.startswith("slot_override:") or sid.startswith("override_slot:") or sid.startswith("external_override:"):
                 return True
+    slot = str(getattr(a, "source_slot", ""))
+    if slot.endswith("_override"):
+        return True
     return False
