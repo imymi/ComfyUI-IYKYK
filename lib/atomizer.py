@@ -134,7 +134,7 @@ def fragments_to_atoms(
             f_ctx = f.context_ids
             f_ex = f.exclusive_group
             f_prov = f.provenance
-            f_facts = getattr(f, "facts", SemanticFacts())
+            f_facts = getattr(f, "facts", None) or SemanticFacts()
             f_origin = getattr(f, "origin", None)
             f_id = getattr(f, "id", "")
             f_target_id = getattr(f, "target_id", None)

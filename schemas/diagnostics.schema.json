@@ -1,18 +1,67 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "title": "IYKYKPromptDiagnosticsAudit",
-  "description": "ComfyUI-IYKYK 诊断节点审计报告 JSON 契约 (Draft-7, 8 大顶层字段, 全对象 Fail-Closed)",
+  "description": "ComfyUI-IYKYK 诊断节点审计报告 JSON 契约 2.0 (Draft-7, 11 大顶层字段, 全对象 Fail-Closed)",
   "type": "object",
   "additionalProperties": false,
-  "required": [
-    "schema_version",
-    "effective_seed",
-    "context_profile",
-    "selections",
-    "decisions",
-    "rules_applied",
-    "unresolved_conflicts",
-    "counts"
+  "if": {
+    "properties": {
+      "schema_version": {
+        "const": "1.0"
+      }
+    }
+  },
+  "then": {
+    "required": [
+      "schema_version",
+      "effective_seed",
+      "context_profile",
+      "selections",
+      "decisions",
+      "rules_applied",
+      "unresolved_conflicts",
+      "counts"
+    ]
+  },
+  "else": {
+    "required": [
+      "schema_version",
+      "status",
+      "effective_seed",
+      "context_profile",
+      "selections",
+      "overrides",
+      "decisions",
+      "rules_applied",
+      "unresolved_conflicts",
+      "counts",
+      "error_info"
+    ]
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "const": "error"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "error_info": {
+            "$ref": "#/definitions/error_info_entry"
+          }
+        }
+      },
+      "else": {
+        "properties": {
+          "error_info": {
+            "type": "null"
+          }
+        }
+      }
+    }
   ],
   "definitions": {
     "context_id": {
@@ -55,6 +104,272 @@
         "liquid_restrictions",
         "tattoo_dermal_fusion"
       ]
+    },
+    "override_entry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "canonical_slot",
+        "status",
+        "source_port",
+        "raw_input",
+        "blank_fallback_reason",
+        "replaced_target_ids",
+        "replaced_texts",
+        "injected_atom_ids"
+      ],
+      "properties": {
+        "canonical_slot": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string",
+          "enum": ["applied", "fallback_blank", "not_provided"]
+        },
+        "source_port": {
+          "type": ["string", "null"]
+        },
+        "raw_input": {},
+        "blank_fallback_reason": {
+          "type": ["string", "null"],
+          "enum": ["omitted", "empty_string", "whitespace_only", "empty_list", null]
+        },
+        "replaced_target_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "replaced_texts": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "injected_atom_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "sampling_rationale": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "active_contexts",
+        "candidate_filter",
+        "distribution",
+        "fallback",
+        "final_selection"
+      ],
+      "properties": {
+        "active_contexts": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "candidate_filter": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "total_candidates",
+            "excluded_hard_conflicts",
+            "passed_candidates"
+          ],
+          "properties": {
+            "total_candidates": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "excluded_hard_conflicts": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "passed_candidates": {
+              "type": "integer",
+              "minimum": 0
+            }
+          }
+        },
+        "distribution": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "number",
+            "minimum": 0.0
+          }
+        },
+        "fallback": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "used",
+            "reason"
+          ],
+          "properties": {
+            "used": {
+              "type": "boolean"
+            },
+            "reason": {
+              "type": ["string", "null"]
+            }
+          }
+        },
+        "final_selection": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "selected_id",
+            "mode"
+          ],
+          "properties": {
+            "selected_id": {
+              "type": ["string", "null"]
+            },
+            "mode": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "prop_demand_entry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "entity_id",
+        "hands_required",
+        "hand_state"
+      ],
+      "properties": {
+        "entity_id": {
+          "type": "string"
+        },
+        "hands_required": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "hand_state": {
+          "type": "string"
+        }
+      }
+    },
+    "prop_capacity_trace": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "capacity_limit",
+        "total_hands_demanded",
+        "entity_demands"
+      ],
+      "properties": {
+        "capacity_limit": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "total_hands_demanded": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "entity_demands": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/prop_demand_entry"
+          }
+        }
+      }
+    },
+    "fact_trace": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "rule_id",
+        "phase",
+        "priority",
+        "winner_objects",
+        "target_objects"
+      ],
+      "properties": {
+        "rule_id": {
+          "type": "string"
+        },
+        "phase": {
+          "type": "string"
+        },
+        "priority": {
+          "type": "integer"
+        },
+        "winner_objects": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "target_objects": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "prop_capacity": {
+          "$ref": "#/definitions/prop_capacity_trace"
+        }
+      }
+    },
+    "error_info_entry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "category",
+        "error_code",
+        "message",
+        "slots",
+        "texts",
+        "rule_id",
+        "details"
+      ],
+      "properties": {
+        "category": {
+          "type": "string",
+          "enum": [
+            "external_override_hard_conflict",
+            "invalid_input_type",
+            "external_budget_exceeded",
+            "slot_alias_collision",
+            "unresolved_hard_conflict",
+            "syntax_error",
+            "generic_error"
+          ]
+        },
+        "error_code": {
+          "type": "string"
+        },
+        "message": {
+          "type": "string"
+        },
+        "slots": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "texts": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "rule_id": {
+          "type": ["string", "null"]
+        },
+        "details": {
+          "type": "object"
+        }
+      }
     },
     "atom_entry": {
       "type": "object",
@@ -214,7 +529,7 @@
         },
         "mode": {
           "type": "string",
-          "enum": ["none", "random", "auto", "explicit", "preset", "recipe", "custom", "resolver"]
+          "enum": ["none", "random", "auto", "explicit", "preset", "recipe", "custom", "override", "resolver"]
         },
         "parent_ids": {
           "type": "array",
@@ -230,6 +545,12 @@
         },
         "raw_value": {
           "type": ["string", "null"]
+        },
+        "sampling_rationale": {
+          "oneOf": [
+            { "type": "null" },
+            { "$ref": "#/definitions/sampling_rationale" }
+          ]
         },
         "selected_id": {
           "type": ["string", "null"]
@@ -277,6 +598,12 @@
         "decision_id": {
           "type": "string",
           "minLength": 1
+        },
+        "fact_trace": {
+          "oneOf": [
+            { "type": "null" },
+            { "$ref": "#/definitions/fact_trace" }
+          ]
         },
         "parent_source_ids": {
           "type": "array",
@@ -348,6 +675,12 @@
         "decision_id": {
           "type": "string",
           "minLength": 1
+        },
+        "fact_trace": {
+          "oneOf": [
+            { "type": "null" },
+            { "$ref": "#/definitions/fact_trace" }
+          ]
         },
         "parent_source_ids": {
           "type": "array",
@@ -421,6 +754,12 @@
         "decision_id": {
           "type": "string",
           "minLength": 1
+        },
+        "fact_trace": {
+          "oneOf": [
+            { "type": "null" },
+            { "$ref": "#/definitions/fact_trace" }
+          ]
         },
         "parent_source_ids": {
           "type": "array",
@@ -646,7 +985,11 @@
   "properties": {
     "schema_version": {
       "type": "string",
-      "const": "1.0"
+      "enum": ["1.0", "2.0"]
+    },
+    "status": {
+      "type": "string",
+      "enum": ["success", "error"]
     },
     "effective_seed": {
       "type": "integer"
@@ -665,6 +1008,12 @@
       "type": "array",
       "items": {
         "$ref": "#/definitions/selection_entry"
+      }
+    },
+    "overrides": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/override_entry"
       }
     },
     "decisions": {
@@ -690,6 +1039,16 @@
     },
     "counts": {
       "$ref": "#/definitions/counts_entry"
+    },
+    "error_info": {
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "$ref": "#/definitions/error_info_entry"
+        }
+      ]
     }
   }
 }

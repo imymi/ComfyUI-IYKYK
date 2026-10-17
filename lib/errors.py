@@ -4,7 +4,37 @@ errors.py — 统一异常体系定义
 """
 from __future__ import annotations
 
-from typing import Any, Optional, Tuple
+import json
+from typing import Any, Dict, Optional, Sequence, Tuple
+
+
+CATEGORY_EXTERNAL_OVERRIDE_CONFLICT = "external_override_hard_conflict"
+CATEGORY_INVALID_INPUT_TYPE = "invalid_input_type"
+CATEGORY_EXTERNAL_BUDGET_EXCEEDED = "external_budget_exceeded"
+CATEGORY_SLOT_ALIAS_COLLISION = "slot_alias_collision"
+CATEGORY_UNRESOLVED_HARD_CONFLICT = "unresolved_hard_conflict"
+CATEGORY_SYNTAX_ERROR = "syntax_error"
+CATEGORY_GENERIC_ERROR = "generic_error"
+
+
+DEFAULT_20_OVERRIDES: Tuple[Dict[str, Any], ...] = tuple(
+    {
+        "blank_fallback_reason": "omitted",
+        "canonical_slot": slot,
+        "injected_atom_ids": [],
+        "raw_input": None,
+        "replaced_target_ids": [],
+        "replaced_texts": [],
+        "source_port": None,
+        "status": "not_provided",
+    }
+    for slot in (
+        "scene_theme", "shot_type", "camera_angle", "character", "nudity",
+        "clothing", "lighting", "pose", "expression", "makeup", "hairstyle",
+        "jewelry", "imperfections", "tattoo", "props", "liquids", "film",
+        "quality", "style_recipe", "custom"
+    )
+)
 
 
 class PromptValidationError(Exception):
@@ -16,11 +46,77 @@ class PromptValidationError(Exception):
         slots: Sequence[str] = (),
         texts: Sequence[str] = (),
         rule_id: Optional[str] = None,
+        category: Optional[str] = None,
+        error_code: Optional[str] = None,
+        details: Optional[Dict[str, Any]] = None,
     ):
         super().__init__(message)
+        self.message = str(message)
         self.slots: Tuple[str, ...] = tuple(slots)
         self.texts: Tuple[str, ...] = tuple(texts)
         self.rule_id: Optional[str] = rule_id
+
+        inferred = category or error_code or self._infer_category(self.message, rule_id)
+        self.category: str = inferred
+        self.error_code: str = inferred
+        self.details: Dict[str, Any] = dict(details or {})
+
+    @staticmethod
+    def _infer_category(message: str, rule_id: Optional[str]) -> str:
+        msg_low = message.lower()
+        if "external override conflict" in msg_low or rule_id is not None:
+            return CATEGORY_EXTERNAL_OVERRIDE_CONFLICT
+        if ("word count" in msg_low and "exceeds" in msg_low) or ("250" in msg_low and "budget" in msg_low):
+            return CATEGORY_EXTERNAL_BUDGET_EXCEEDED
+        if "conflicting slot aliases" in msg_low or "multiple conflicting" in msg_low:
+            return CATEGORY_SLOT_ALIAS_COLLISION
+        if "none" in msg_low or "type none" in msg_low or "invalid" in msg_low or "expected str" in msg_low or "disallowed" in msg_low:
+            return CATEGORY_INVALID_INPUT_TYPE
+        return CATEGORY_GENERIC_ERROR
+
+    def to_diagnostics_dict(self, effective_seed: int = 0) -> Dict[str, Any]:
+        """构建符合 schemas/diagnostics.schema.json 契约的结构化错误报告字典。"""
+        return {
+            "context_profile": {},
+            "counts": {
+                "accepted_atoms": 0,
+                "budget_filtered": 0,
+                "deduplicated": 0,
+                "dropped": 0,
+                "injected": 0,
+                "produced": 0,
+                "replaced": 0,
+                "source_atoms": 0,
+            },
+            "decisions": [],
+            "effective_seed": int(effective_seed),
+            "error_info": {
+                "category": self.category,
+                "details": self.details,
+                "error_code": self.error_code,
+                "message": self.message,
+                "rule_id": self.rule_id,
+                "slots": list(self.slots),
+                "texts": list(self.texts),
+            },
+            "overrides": [dict(o) for o in DEFAULT_20_OVERRIDES],
+            "rules_applied": [],
+            "schema_version": "2.0",
+            "selections": [],
+            "status": "error",
+            "unresolved_conflicts": [],
+        }
+
+    def to_diagnostics_json(self, effective_seed: int = 0) -> str:
+        """确定性序列化为紧凑 UTF-8 错误审计报告 JSON 字符串。"""
+        d = self.to_diagnostics_dict(effective_seed)
+        return json.dumps(
+            d,
+            ensure_ascii=False,
+            sort_keys=True,
+            separators=(",", ":"),
+            allow_nan=False,
+        )
 
 
 
@@ -65,10 +161,55 @@ class UnresolvedConflictError(RuntimeError):
         report: Optional[Any] = None,
     ):
         full_msg = message or f"Unresolved conflict (reason={reason})"
-        super().__init__(full_msg)
         self.reason = reason
         self.unresolved_conflicts = tuple(unresolved_conflicts)
         self.report = report
+        self.category = CATEGORY_UNRESOLVED_HARD_CONFLICT
+        self.error_code = str(reason or CATEGORY_UNRESOLVED_HARD_CONFLICT)
+
+    def to_diagnostics_dict(self, effective_seed: int = 0) -> Dict[str, Any]:
+        """构建符合 schemas/diagnostics.schema.json 契约的结构化错误报告字典。"""
+        unres = [list(c) if isinstance(c, (list, tuple)) else c for c in self.unresolved_conflicts]
+        return {
+            "context_profile": {},
+            "counts": {
+                "accepted_atoms": 0,
+                "budget_filtered": 0,
+                "deduplicated": 0,
+                "dropped": 0,
+                "injected": 0,
+                "produced": 0,
+                "replaced": 0,
+                "source_atoms": 0,
+            },
+            "decisions": [],
+            "effective_seed": int(effective_seed),
+            "error_info": {
+                "category": self.category,
+                "details": {"reason": self.reason},
+                "error_code": self.error_code,
+                "message": str(self),
+                "rule_id": None,
+                "slots": [],
+                "texts": [],
+            },
+            "overrides": [dict(o) for o in DEFAULT_20_OVERRIDES],
+            "rules_applied": [],
+            "schema_version": "2.0",
+            "selections": [],
+            "status": "error",
+            "unresolved_conflicts": unres,
+        }
+
+    def to_diagnostics_json(self, effective_seed: int = 0) -> str:
+        d = self.to_diagnostics_dict(effective_seed)
+        return json.dumps(
+            d,
+            ensure_ascii=False,
+            sort_keys=True,
+            separators=(",", ":"),
+            allow_nan=False,
+        )
 
 
 class UnresolvedEnsembleRelationError(RuntimeError):

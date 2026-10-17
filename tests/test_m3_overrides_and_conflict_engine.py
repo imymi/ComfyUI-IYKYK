@@ -833,7 +833,7 @@ class TestM3OverridesAndConflictEngine(unittest.TestCase):
             external_overrides={"clothing": "black latex catsuit"},
         )
         d = json.loads(audit_json)
-        self.assertEqual(d.get("schema_version"), "1.0")
+        self.assertEqual(d.get("schema_version"), "2.0")
         override_selections = [s for s in d.get("selections", []) if s.get("mode") == "override"]
         self.assertTrue(len(override_selections) >= 1)
         for s in override_selections:

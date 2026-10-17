@@ -183,19 +183,25 @@ class TestPromptDiagnostics(unittest.TestCase):
         top_keys = list(obj.keys())
         self.assertEqual(top_keys, sorted(top_keys), "Top-level keys not sorted")
 
-        # 4. 8 个顶层字段
+        # 4. 11 个顶层字段 (Schema 2.0)
         expected_keys = [
             "context_profile",
             "counts",
             "decisions",
             "effective_seed",
+            "error_info",
+            "overrides",
             "rules_applied",
             "schema_version",
             "selections",
+            "status",
             "unresolved_conflicts",
         ]
         self.assertEqual(top_keys, expected_keys)
-        self.assertEqual(obj["schema_version"], "1.0")
+        self.assertEqual(obj["schema_version"], "2.0")
+        self.assertEqual(obj["status"], "success")
+        self.assertIsNone(obj["error_info"])
+        self.assertEqual(len(obj["overrides"]), 20)
         self.assertEqual(obj["effective_seed"], 42)
 
         # 5. 无时间戳、内存地址、UUID、临时路径
@@ -304,7 +310,7 @@ class TestPromptDiagnostics(unittest.TestCase):
 
         # 变异 3: 非法 schema_version
         m3 = copy.deepcopy(base)
-        m3["schema_version"] = "2.0"
+        m3["schema_version"] = "999.0"
         self.assertTrue(any("schema_version" in str(e) for e in self.validator.iter_errors(m3)))
 
         # 变异 4: 负数计数
@@ -975,6 +981,212 @@ print(audit)
             expected_positive=result.positive,
             trusted_inputs={"场景主题": raw_value},
         )
+
+    # ──────────────────────────────────────────────────────────────────────────
+    # M5-1 & M5-2 诊断 2.0 与全槽位回归专项测试
+    # ──────────────────────────────────────────────────────────────────────────
+
+    def test_27_m5_1_sampling_rationale_tracing(self):
+        """M5-1 诊断 2.0 深度验证：为什么选中它 (Sampling Rationale 溯源追踪)。"""
+        res, audit_str = self.diagnostics.diagnose_structured(prompt_seed=42)
+        audit = json.loads(audit_str)
+        self.assertEqual(audit["status"], "success")
+        self.assertIsNone(audit["error_info"])
+        self.assertIn("selections", audit)
+
+        rationales = [s["sampling_rationale"] for s in audit["selections"] if s.get("sampling_rationale")]
+        self.assertGreater(len(rationales), 5, "Expected multiple sampling rationales across sampled slots")
+        for rat in rationales:
+            self.assertIn("active_contexts", rat)
+            self.assertIsInstance(rat["active_contexts"], list)
+
+            self.assertIn("candidate_filter", rat)
+            cf = rat["candidate_filter"]
+            self.assertIn("total_candidates", cf)
+            self.assertIn("excluded_hard_conflicts", cf)
+            self.assertIn("passed_candidates", cf)
+            self.assertGreaterEqual(cf["total_candidates"], cf["passed_candidates"])
+            self.assertGreaterEqual(cf["passed_candidates"], 0)
+            self.assertIsInstance(cf["excluded_hard_conflicts"], list)
+
+            self.assertIn("distribution", rat)
+            self.assertIsInstance(rat["distribution"], dict)
+
+            self.assertIn("fallback", rat)
+            fb = rat["fallback"]
+            self.assertIn("used", fb)
+            self.assertIsInstance(fb["used"], bool)
+            self.assertIn("reason", fb)
+
+            self.assertIn("final_selection", rat)
+            fs = rat["final_selection"]
+            self.assertIn("selected_id", fs)
+            self.assertIn("mode", fs)
+
+        self._validate_audit(audit, expected_positive=res.positive)
+
+    def test_28_m5_1_override_attribution_20_slots(self):
+        """M5-1 诊断 2.0 深度验证：为什么覆盖它 (全量 20 槽位归因与状态断言)。"""
+        from lib.slot_contract import SLOT_ORDER, AUXILIARY_SLOT_ORDER
+        all_20 = tuple(SLOT_ORDER) + tuple(AUXILIARY_SLOT_ORDER)
+
+        res, audit_str = self.diagnostics.diagnose_structured(
+            clothing_override="blue business suit",
+            scene_override="   ",
+            prompt_seed=100,
+        )
+        audit = json.loads(audit_str)
+        self.assertEqual(len(audit["overrides"]), 20)
+
+        overrides_by_slot = {o["canonical_slot"]: o for o in audit["overrides"]}
+        for s in all_20:
+            self.assertIn(s, overrides_by_slot)
+
+        # 1. 成功生效的覆盖 (applied)
+        cloth = overrides_by_slot["clothing"]
+        self.assertEqual(cloth["status"], "applied")
+        self.assertEqual(cloth["source_port"], "clothing")
+        self.assertEqual(cloth["raw_input"], "blue business suit")
+        self.assertIsNone(cloth["blank_fallback_reason"])
+        self.assertGreater(len(cloth["injected_atom_ids"]), 0)
+        self.assertIn("blue business suit", res.positive)
+
+        # 2. 空白字符回退 (fallback_blank with whitespace_only)
+        scene = overrides_by_slot["scene_theme"]
+        self.assertEqual(scene["status"], "fallback_blank")
+        self.assertEqual(scene["source_port"], "scene_theme")
+        self.assertEqual(scene["blank_fallback_reason"], "whitespace_only")
+        self.assertEqual(len(scene["injected_atom_ids"]), 0)
+
+        # 3. 未连接端口 (not_provided with omitted)
+        pose = overrides_by_slot["pose"]
+        self.assertEqual(pose["status"], "not_provided")
+        self.assertIsNone(pose["source_port"])
+        self.assertIsNone(pose["raw_input"])
+        self.assertEqual(pose["blank_fallback_reason"], "omitted")
+        self.assertEqual(len(pose["injected_atom_ids"]), 0)
+
+    def test_29_m5_1_fact_trace_and_prop_capacity(self):
+        """M5-1 诊断 2.0 深度验证：为什么保留或删除它 (消解决策事实溯源与道具容量追踪)。"""
+        res, audit_str = self.diagnostics.diagnose_structured(
+            预设模板="H03",
+            props_override="holding smartphone, holding coffee cup",
+            prompt_seed=42,
+        )
+        audit = json.loads(audit_str)
+        decisions = audit.get("decisions", [])
+        self.assertGreater(len(decisions), 0, "Expected resolution decisions recorded")
+
+        traces = [d["fact_trace"] for d in decisions if d.get("fact_trace")]
+        self.assertGreater(len(traces), 0, "Expected decisions to contain fact_trace")
+
+        prop_traces = [t["prop_capacity"] for t in traces if t.get("prop_capacity")]
+        self.assertGreater(len(prop_traces), 0, "Expected prop_capacity trace in busy hand resolution")
+
+        for pc in prop_traces:
+            self.assertEqual(pc["capacity_limit"], 2)
+            self.assertGreaterEqual(pc["total_hands_demanded"], 2)
+            self.assertIsInstance(pc["entity_demands"], list)
+            for ed in pc["entity_demands"]:
+                self.assertIn("entity_id", ed)
+                self.assertIn("hands_required", ed)
+                self.assertIn("hand_state", ed)
+                self.assertIn(ed["hand_state"], ("free", "one_busy", "both_busy", "restrained"))
+
+    def test_30_m5_1_error_diagnostics_and_schema_validation(self):
+        """M5-1 诊断 2.0 深度验证：为什么报错 (标准错误分类、error_info 与 Draft-7 Schema 门禁)。"""
+        res, err_audit_str = self.diagnostics.diagnose_structured(
+            pose_override="arms bound behind back",
+            props_override="holding smartphone",
+            prompt_seed=42,
+            raise_on_error=False,
+        )
+        self.assertIsNone(res)
+        self.assertIsInstance(err_audit_str, str)
+        err_audit = json.loads(err_audit_str)
+
+        self.validator.validate(err_audit)
+
+        expected_keys = [
+            "context_profile", "counts", "decisions", "effective_seed",
+            "error_info", "overrides", "rules_applied", "schema_version",
+            "selections", "status", "unresolved_conflicts",
+        ]
+        self.assertEqual(list(err_audit.keys()), expected_keys)
+        self.assertEqual(err_audit["status"], "error")
+        self.assertEqual(err_audit["schema_version"], "2.0")
+
+        err_info = err_audit["error_info"]
+        self.assertIsNotNone(err_info)
+        self.assertIn("category", err_info)
+        self.assertIn("error_code", err_info)
+        self.assertIn("message", err_info)
+        self.assertIn("slots", err_info)
+        self.assertIn("texts", err_info)
+        self.assertIn("details", err_info)
+        self.assertIn(err_info["category"], (
+            "external_override_hard_conflict",
+            "invalid_input_type",
+            "external_budget_exceeded",
+            "slot_alias_collision",
+            "unresolved_hard_conflict",
+            "syntax_error",
+            "generic_error",
+        ))
+
+        self.assertEqual(len(err_audit["overrides"]), 20)
+
+    def test_31_m5_2_four_nodes_x_20_slots_override_matrix(self):
+        """M5-2 覆盖与组合回归：四大节点 × 20 槽位外部覆盖矩阵行为契约。"""
+        from lib.slot_contract import SLOT_ORDER, AUXILIARY_SLOT_ORDER
+        all_20 = tuple(SLOT_ORDER) + tuple(AUXILIARY_SLOT_ORDER)
+
+        # 1. 主生成器 (PromptGeneratorStructured)
+        gen = IYKYKPromptGenerator()
+        for slot in all_20[:5]:
+            kw = {f"{slot}_override": f"custom_{slot}_unique_val"}
+            pos, _, _ = gen.generate(prompt_seed=42, **kw)
+            self.assertIn(f"custom_{slot}_unique_val", pos)
+
+        # 2. 预设浏览器 (PromptBrowserStructured)
+        browser = IYKYKPresetBrowser()
+        b_res = browser.browse_structured(
+            预设模板="C01",
+            风格配方="无 (None)",
+            画质等级="高清写真 (High)",
+            clothing_override="futuristic cybernetic jacket",
+            prompt_seed=42,
+        )
+        self.assertIn("futuristic cybernetic jacket", b_res.positive)
+        self.assertEqual(len(b_res.overrides), 20)
+        cloth_rec = next(o for o in b_res.overrides if o.canonical_slot == "clothing")
+        self.assertEqual(cloth_rec.status, "applied")
+
+        # 3. 自定义拼装器 (PromptCombinerStructured)
+        combiner = IYKYKCustomSlotCombiner()
+        c_res = combiner.combine_structured(
+            服装款式="traditional kimono",
+            clothing_override="modern business suit",
+            prompt_seed=42,
+        )
+        self.assertIn("modern business suit", c_res.positive)
+        self.assertNotIn("traditional kimono", c_res.positive)
+        self.assertEqual(len(c_res.overrides), 20)
+        c_cloth = next(o for o in c_res.overrides if o.canonical_slot == "clothing")
+        self.assertEqual(c_cloth.status, "applied")
+        self.assertEqual(c_cloth.source_port, "clothing")
+
+        # 4. 诊断节点 (PromptDiagnostics)
+        d_res, d_json_str = self.diagnostics.diagnose_structured(
+            lighting_override="neon cyberpunk backlighting",
+            prompt_seed=42,
+        )
+        self.assertIn("neon cyberpunk backlighting", d_res.positive)
+        d_audit = json.loads(d_json_str)
+        self.assertEqual(len(d_audit["overrides"]), 20)
+        light_rec = next(o for o in d_audit["overrides"] if o["canonical_slot"] == "lighting")
+        self.assertEqual(light_rec["status"], "applied")
+        self.assertEqual(light_rec["source_port"], "lighting")
 
 
 if __name__ == "__main__":

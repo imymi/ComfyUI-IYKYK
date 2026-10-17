@@ -30,6 +30,7 @@ if __package__:
         AssemblyResult,
         BudgetFilterRecord,
         ContextProfile,
+        OverrideRecord,
         PromptAtom,
         PromptFragment,
         SampledTag,
@@ -52,6 +53,7 @@ else:
         AssemblyResult,
         BudgetFilterRecord,
         ContextProfile,
+        OverrideRecord,
         PromptAtom,
         PromptFragment,
         SampledTag,
@@ -62,6 +64,44 @@ else:
     from lib.slot_contract import ALLOWED_SLOTS, AUXILIARY_SLOT_ORDER, SLOT_ORDER, normalize_slot_mapping, normalize_slot_name
 
 MAX_PROMPT_WORDS = 250
+
+CANONICAL_20_SLOTS: Tuple[str, ...] = (*SLOT_ORDER, *AUXILIARY_SLOT_ORDER)
+
+
+def _inspect_blank_input(raw_val: Any) -> Tuple[bool, Optional[str]]:
+    """检查输入是否为空白，并返回 (is_blank, blank_reason)."""
+    if raw_val is None:
+        return True, "omitted"
+    if isinstance(raw_val, str):
+        if len(raw_val) == 0:
+            return True, "empty_string"
+        if not raw_val.strip():
+            return True, "whitespace_only"
+        return False, None
+    if isinstance(raw_val, (list, tuple)):
+        if len(raw_val) == 0:
+            return True, "empty_list"
+        if all(isinstance(x, str) and not x.strip() for x in raw_val):
+            return True, "empty_list"
+        return False, None
+    return False, None
+
+
+def build_default_canonical_override_records() -> Tuple[OverrideRecord, ...]:
+    """生成 20 规范槽位默认全未提供 (not_provided) 记录。"""
+    return tuple(
+        OverrideRecord(
+            canonical_slot=slot,
+            status="not_provided",
+            source_port=None,
+            raw_input=None,
+            blank_fallback_reason="omitted",
+            replaced_target_ids=(),
+            replaced_texts=(),
+            injected_atom_ids=(),
+        )
+        for slot in CANONICAL_20_SLOTS
+    )
 
 _CATALOG_TAG_TO_SLOT_CACHE: Dict[Path, Dict[str, str]] = {}
 _CATALOG_TEXT_TO_FACTS_CACHE: Dict[Path, Dict[str, SemanticFacts]] = {}
@@ -359,6 +399,7 @@ def assemble_result(
     max_words: int = MAX_PROMPT_WORDS,
     resolver: Optional[ConflictResolver] = None,
     context_profile: Optional[ContextProfile] = None,
+    overrides: Sequence[OverrideRecord] = (),
 ) -> AssemblyResult:
     """核心统一入口：执行原子化、冲突消解、去重与截断，返回强类型不可变 AssemblyResult。"""
     if isinstance(max_words, bool) or not isinstance(max_words, int) or max_words < 0:
@@ -423,6 +464,7 @@ def assemble_result(
             rules_applied=(),
             budget_filtered_atoms=source_atoms,
             budget_filter_records=budget_records,
+            overrides=tuple(overrides) if overrides else build_default_canonical_override_records(),
         )
 
     # 2. 结构化冲突消解 (支持外部注入复用 Resolver，避免重复加载大型规则配置)
@@ -523,6 +565,7 @@ def assemble_result(
         budget_filtered_atoms=tuple(budget_filtered_atoms),
         deduplication_records=tuple(dedup_records),
         budget_filter_records=tuple(budget_filter_records),
+        overrides=tuple(overrides) if overrides else build_default_canonical_override_records(),
     )
 
 
@@ -741,6 +784,23 @@ def make_override_fragments(
                 selector=slot_name,
                 selected_id=item_id,
                 raw_value=str(raw_val),
+                sampling_rationale={
+                    "active_contexts": [],
+                    "candidate_filter": {
+                        "total_candidates": 1,
+                        "excluded_hard_conflicts": [],
+                        "passed_candidates": 1,
+                    },
+                    "distribution": {},
+                    "fallback": {
+                        "used": False,
+                        "reason": None,
+                    },
+                    "final_selection": {
+                        "selected_id": item_id,
+                        "mode": "override",
+                    },
+                },
             ),
         )
         new_frags.append(frag)
@@ -753,7 +813,8 @@ def apply_slot_overrides(
     entry_point: str = "generator",
     catalog_facts: Optional[Dict[Tuple[str, str], SemanticFacts]] = None,
     data_dir: Optional[Path] = None,
-) -> Dict[str, List[Any]]:
+    return_records: bool = False,
+) -> Dict[str, List[Any]] | Tuple[Dict[str, List[Any]], Tuple[OverrideRecord, ...]]:
     """落实 20 槽位外部覆盖契约 (M3 核心契约)：
     1. 非空覆盖整个槽位：外部指定非空内容时，替换该槽位全部系统/预设生成 tags，绝不混杂；
     2. 空白回退：外部输入为 None, "", "   " 或 [] 时，完全回退保留内部/预设生成内容；
@@ -761,18 +822,15 @@ def apply_slot_overrides(
     4. 权威 Provenance 与来源追踪：标记 mode="override", kind="user_input", source_mode="override"。
     """
     if not external_overrides:
-        return {k: list(v) if isinstance(v, list) else v for k, v in slot_fragments.items()}
+        res = {k: list(v) if isinstance(v, list) else v for k, v in slot_fragments.items()}
+        if return_records:
+            return res, build_default_canonical_override_records()
+        return res
 
     res: Dict[str, List[Any]] = {k: list(v) if isinstance(v, list) else v for k, v in slot_fragments.items()}
+    applied_records: Dict[str, OverrideRecord] = {}
 
     for raw_slot, raw_val in external_overrides.items():
-        if raw_val is None:
-            continue
-        if isinstance(raw_val, str) and not raw_val.strip():
-            continue
-        if isinstance(raw_val, (list, tuple)) and (len(raw_val) == 0 or all(isinstance(x, str) and not x.strip() for x in raw_val)):
-            continue
-
         norm_slot = normalize_slot_name(raw_slot)
         if norm_slot not in ALLOWED_SLOTS:
             raise PromptValidationError(
@@ -780,61 +838,94 @@ def apply_slot_overrides(
                 slots=(raw_slot,),
             )
 
+        is_blank, blank_reason = _inspect_blank_input(raw_val)
+        if is_blank:
+            applied_records[norm_slot] = OverrideRecord(
+                canonical_slot=norm_slot,
+                status="fallback_blank",
+                source_port=raw_slot,
+                raw_input=raw_val,
+                blank_fallback_reason=blank_reason,
+                replaced_target_ids=(),
+                replaced_texts=(),
+                injected_atom_ids=(),
+            )
+            continue
+
+        replaced_items: List[Any] = []
+        if norm_slot in res and isinstance(res[norm_slot], list):
+            replaced_items.extend(res[norm_slot])
+
         # 非空覆盖整个槽位：清空旧内容
         res[norm_slot] = []
 
         # 槽位整槽清空旧载体事实与状态 (CE-OVERRIDE-01)
         if norm_slot == "clothing":
             for related in ("clothing_state", "clothing_extension", "underwear"):
-                if related in res:
+                if related in res and isinstance(res[related], list):
+                    replaced_items.extend(res[related])
                     res[related] = []
         elif norm_slot == "scene_theme":
             for related in ("scene", "theme"):
-                if related in res:
+                if related in res and isinstance(res[related], list):
+                    replaced_items.extend(res[related])
                     res[related] = []
         elif norm_slot == "lighting":
             for related in ("lighting_palette",):
-                if related in res:
+                if related in res and isinstance(res[related], list):
+                    replaced_items.extend(res[related])
                     res[related] = []
         elif norm_slot == "pose":
             for related in ("poses",):
-                if related in res:
+                if related in res and isinstance(res[related], list):
+                    replaced_items.extend(res[related])
                     res[related] = []
         elif norm_slot == "props":
             for related in ("prop",):
-                if related in res:
+                if related in res and isinstance(res[related], list):
+                    replaced_items.extend(res[related])
                     res[related] = []
         elif norm_slot == "shot_type":
             for related in ("shot",):
-                if related in res:
+                if related in res and isinstance(res[related], list):
+                    replaced_items.extend(res[related])
                     res[related] = []
         elif norm_slot == "camera_angle":
             for related in ("camera", "angle"):
-                if related in res:
+                if related in res and isinstance(res[related], list):
+                    replaced_items.extend(res[related])
                     res[related] = []
         elif norm_slot == "tattoo":
             for related in ("tattoos",):
-                if related in res:
+                if related in res and isinstance(res[related], list):
+                    replaced_items.extend(res[related])
                     res[related] = []
         elif norm_slot == "liquids":
             for related in ("liquid",):
-                if related in res:
+                if related in res and isinstance(res[related], list):
+                    replaced_items.extend(res[related])
                     res[related] = []
         elif norm_slot in ("style_recipe", "recipe"):
             for related in ("recipe",):
-                if related in res:
+                if related in res and isinstance(res[related], list):
+                    replaced_items.extend(res[related])
                     res[related] = []
             # 覆盖风格配方：从所有槽位中彻底清除来自原配方的全部内容
             for k in list(res.keys()):
                 if isinstance(res[k], list):
-                    res[k] = [
-                        item for item in res[k]
-                        if not (
+                    purged_from_k = []
+                    kept_in_k = []
+                    for item in res[k]:
+                        if (
                             (getattr(item, "origin", None) and getattr(item.origin, "mode", None) == "recipe")
                             or (getattr(item, "provenance", None) and getattr(item.provenance, "kind", None) == "style_recipe")
                             or (getattr(item, "origin", None) and getattr(item.origin, "selector", None) == "style_recipe")
-                        )
-                    ]
+                        ):
+                            purged_from_k.append(item)
+                        else:
+                            kept_in_k.append(item)
+                    replaced_items.extend(purged_from_k)
+                    res[k] = kept_in_k
 
         # 若存在 preset_core，清洗属于被覆盖槽位的旧预设内容
         if "preset_core" in res and isinstance(res["preset_core"], list):
@@ -865,9 +956,22 @@ def apply_slot_overrides(
                     cls_slot, _ = classify_preset_tag_and_facts(item_text, Path(data_dir))
                 else:
                     cls_slot = item_slot
-                if cls_slot not in target_purged_slots and item_slot not in target_purged_slots:
+                if cls_slot in target_purged_slots or item_slot in target_purged_slots:
+                    replaced_items.append(item)
+                else:
                     cleaned_core.append(item)
             res["preset_core"] = cleaned_core
+
+        replaced_ids = tuple(
+            str(getattr(it, "id", None) or getattr(it, "source_item_id", None) or (it.atom_id if hasattr(it, "atom_id") else str(it)))
+            for it in replaced_items
+            if (getattr(it, "id", None) or getattr(it, "source_item_id", None) or hasattr(it, "atom_id"))
+        )
+        replaced_texts = tuple(
+            str(getattr(it, "text", it))
+            for it in replaced_items
+            if str(getattr(it, "text", it)).strip()
+        )
 
         new_frags = make_override_fragments(
             norm_slot,
@@ -877,7 +981,39 @@ def apply_slot_overrides(
             data_dir=data_dir,
         )
         res[norm_slot] = new_frags
+        injected_ids = tuple(str(f.id) for f in new_frags if getattr(f, "id", None))
 
+        applied_records[norm_slot] = OverrideRecord(
+            canonical_slot=norm_slot,
+            status="applied",
+            source_port=raw_slot,
+            raw_input=raw_val,
+            blank_fallback_reason=None,
+            replaced_target_ids=replaced_ids,
+            replaced_texts=replaced_texts,
+            injected_atom_ids=injected_ids,
+        )
+
+    canonical_records = []
+    for s in CANONICAL_20_SLOTS:
+        if s in applied_records:
+            canonical_records.append(applied_records[s])
+        else:
+            canonical_records.append(
+                OverrideRecord(
+                    canonical_slot=s,
+                    status="not_provided",
+                    source_port=None,
+                    raw_input=None,
+                    blank_fallback_reason="omitted",
+                    replaced_target_ids=(),
+                    replaced_texts=(),
+                    injected_atom_ids=(),
+                )
+            )
+
+    if return_records:
+        return res, tuple(canonical_records)
     return res
 
 
@@ -902,14 +1038,18 @@ class PromptAssembler:
         entry_point: str = "generator",
     ) -> AssemblyResult:
         """从各槽位片段字典执行装配，返回强类型 AssemblyResult。"""
+        override_records: Tuple[OverrideRecord, ...] = ()
         if external_overrides:
-            slot_fragments = apply_slot_overrides(
+            slot_fragments, override_records = apply_slot_overrides(
                 slot_fragments,
                 external_overrides,
                 entry_point=entry_point,
                 catalog_facts=getattr(self.resolver, "canonical_catalog_facts", None),
                 data_dir=self.data_dir,
+                return_records=True,
             )
+        else:
+            override_records = build_default_canonical_override_records()
         fragments = list(iter_normalized_slot_fragments(slot_fragments))
         return assemble_result(
             fragments,
@@ -918,6 +1058,7 @@ class PromptAssembler:
             max_words,
             resolver=self.resolver,
             context_profile=context_profile,
+            overrides=override_records,
         )
 
     def assemble_result_with_sources(
@@ -1191,51 +1332,90 @@ class PromptAssembler:
         if extra_fragments:
             fragments.extend(extra_fragments)
 
+        override_records: Tuple[OverrideRecord, ...] = ()
         if external_overrides:
+            applied_records: Dict[str, OverrideRecord] = {}
             overridden_slots: Set[str] = set()
             new_override_frags: List[PromptFragment] = []
             for raw_s, raw_v in external_overrides.items():
-                if raw_v is None:
-                    continue
-                if isinstance(raw_v, str) and not raw_v.strip():
-                    continue
-                if isinstance(raw_v, (list, tuple)) and (len(raw_v) == 0 or all(isinstance(x, str) and not x.strip() for x in raw_v)):
-                    continue
                 ns = normalize_slot_name(raw_s)
                 if ns not in ALLOWED_SLOTS:
                     raise PromptValidationError(
                         f"Unknown slot '{raw_s}' in external overrides. Allowed slots: {sorted(ALLOWED_SLOTS)}",
                         slots=(raw_s,),
                     )
-                overridden_slots.add(ns)
-                if ns == "clothing":
-                    overridden_slots.update(["clothing", "clothing_state", "clothing_extension", "underwear"])
-                elif ns == "scene_theme":
-                    overridden_slots.update(["scene_theme", "scene", "theme"])
-                elif ns == "lighting":
-                    overridden_slots.update(["lighting", "lighting_palette"])
-                elif ns == "pose":
-                    overridden_slots.update(["pose", "poses"])
-                elif ns == "props":
-                    overridden_slots.update(["props", "prop"])
-                elif ns == "shot_type":
-                    overridden_slots.update(["shot_type", "shot"])
-                elif ns == "camera_angle":
-                    overridden_slots.update(["camera_angle", "camera", "angle"])
-                elif ns == "tattoo":
-                    overridden_slots.update(["tattoo", "tattoos"])
-                elif ns == "liquids":
-                    overridden_slots.update(["liquids", "liquid"])
-                elif ns in ("style_recipe", "recipe"):
-                    overridden_slots.update(["style_recipe", "recipe"])
-                new_override_frags.extend(
-                    make_override_fragments(
-                        ns,
-                        raw_v,
-                        entry_point=entry_point,
-                        catalog_facts=getattr(self.resolver, "canonical_catalog_facts", None),
-                        data_dir=Path(self.data_dir),
+                is_blank, blank_reason = _inspect_blank_input(raw_v)
+                if is_blank:
+                    applied_records[ns] = OverrideRecord(
+                        canonical_slot=ns,
+                        status="fallback_blank",
+                        source_port=raw_s,
+                        raw_input=raw_v,
+                        blank_fallback_reason=blank_reason,
+                        replaced_target_ids=(),
+                        replaced_texts=(),
+                        injected_atom_ids=(),
                     )
+                    continue
+
+                overridden_slots.add(ns)
+                target_purged_slots = {ns}
+                if ns == "clothing":
+                    target_purged_slots.update(["clothing", "clothing_state", "clothing_extension", "underwear"])
+                elif ns == "scene_theme":
+                    target_purged_slots.update(["scene_theme", "scene", "theme"])
+                elif ns == "lighting":
+                    target_purged_slots.update(["lighting", "lighting_palette"])
+                elif ns == "pose":
+                    target_purged_slots.update(["pose", "poses"])
+                elif ns == "props":
+                    target_purged_slots.update(["props", "prop"])
+                elif ns == "shot_type":
+                    target_purged_slots.update(["shot_type", "shot"])
+                elif ns == "camera_angle":
+                    target_purged_slots.update(["camera_angle", "camera", "angle"])
+                elif ns == "tattoo":
+                    target_purged_slots.update(["tattoo", "tattoos"])
+                elif ns == "liquids":
+                    target_purged_slots.update(["liquids", "liquid"])
+                elif ns in ("style_recipe", "recipe"):
+                    target_purged_slots.update(["style_recipe", "recipe"])
+                overridden_slots.update(target_purged_slots)
+
+                purge_recipe = bool({"style_recipe", "recipe"}.intersection(target_purged_slots))
+                replaced_frags = [
+                    f for f in fragments
+                    if f.source_slot in target_purged_slots
+                    or (
+                        purge_recipe and (
+                            (f.origin and f.origin.mode == "recipe")
+                            or (f.provenance and f.provenance.kind == "style_recipe")
+                            or (f.origin and f.origin.selector == "style_recipe")
+                        )
+                    )
+                ]
+                replaced_ids = tuple(str(f.id) for f in replaced_frags if getattr(f, "id", None))
+                replaced_texts = tuple(str(f.text) for f in replaced_frags if getattr(f, "text", None))
+
+                frags_for_slot = make_override_fragments(
+                    ns,
+                    raw_v,
+                    entry_point=entry_point,
+                    catalog_facts=getattr(self.resolver, "canonical_catalog_facts", None),
+                    data_dir=Path(self.data_dir),
+                )
+                new_override_frags.extend(frags_for_slot)
+                injected_ids = tuple(str(f.id) for f in frags_for_slot if getattr(f, "id", None))
+
+                applied_records[ns] = OverrideRecord(
+                    canonical_slot=ns,
+                    status="applied",
+                    source_port=raw_s,
+                    raw_input=raw_v,
+                    blank_fallback_reason=None,
+                    replaced_target_ids=replaced_ids,
+                    replaced_texts=replaced_texts,
+                    injected_atom_ids=injected_ids,
                 )
 
             if overridden_slots:
@@ -1253,7 +1433,35 @@ class PromptAssembler:
                 ]
                 fragments.extend(new_override_frags)
 
-        return assemble_result(fragments, self.data_dir, rng, max_words, resolver=self.resolver)
+            canonical_records = []
+            for s in CANONICAL_20_SLOTS:
+                if s in applied_records:
+                    canonical_records.append(applied_records[s])
+                else:
+                    canonical_records.append(
+                        OverrideRecord(
+                            canonical_slot=s,
+                            status="not_provided",
+                            source_port=None,
+                            raw_input=None,
+                            blank_fallback_reason="omitted",
+                            replaced_target_ids=(),
+                            replaced_texts=(),
+                            injected_atom_ids=(),
+                        )
+                    )
+            override_records = tuple(canonical_records)
+        else:
+            override_records = build_default_canonical_override_records()
+
+        return assemble_result(
+            fragments,
+            self.data_dir,
+            rng,
+            max_words,
+            resolver=self.resolver,
+            overrides=override_records,
+        )
 
     def assemble_preset_result(
         self,

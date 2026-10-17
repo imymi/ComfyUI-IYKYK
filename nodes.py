@@ -174,19 +174,7 @@ def _extract_external_overrides(inputs: Dict[str, Any]) -> Dict[str, Any]:
 
     # 3. 校验并归一化全部候选覆盖输入 (Fail-Closed)
     normalized = normalize_slot_mapping(candidate_overrides)
-
-    # 4. 过滤出实际具有非空内容的有效覆盖
-    clean_overrides: Dict[str, Any] = {}
-    for slot_name, val in normalized.items():
-        if val is None:
-            continue
-        if isinstance(val, str) and not val.strip():
-            continue
-        if isinstance(val, (list, tuple)) and (len(val) == 0 or all(isinstance(x, str) and not x.strip() for x in val)):
-            continue
-        clean_overrides[slot_name] = val
-
-    return clean_overrides
+    return normalized
 
 
 def _extract_ordered_selections(atoms: Sequence[PromptAtom]) -> Tuple[SelectionOrigin, ...]:
@@ -233,6 +221,7 @@ def _make_slot_fragments(
         or getattr(res, "item_id", None)
     )
     actual_selector = selector if selector is not None else slot_name
+    slot_rationale = getattr(res, "sampling_rationale", None)
     slot_origin = SelectionOrigin(
         entry_point=entry_point,
         mode=mode,
@@ -240,6 +229,7 @@ def _make_slot_fragments(
         selected_id=item_id,
         raw_value=user_input_val,
         parent_ids=(item_id,) if item_id else (),
+        sampling_rationale=slot_rationale,
     )
     frags: List[PromptFragment] = []
 
@@ -257,6 +247,7 @@ def _make_slot_fragments(
                 selected_id=tag_item_id,
                 raw_value=user_input_val,
                 parent_ids=(tag_item_id,) if tag_item_id else (),
+                sampling_rationale=slot_rationale,
             )
             frags.append(
                 PromptFragment(
@@ -360,6 +351,7 @@ def _make_clothing_fragments(
         selected_id=style_id,
         raw_value=clothing_style_val,
         parent_ids=(style_id,) if style_id else (),
+        sampling_rationale=getattr(res, "sampling_rationale", None),
     )
 
     state_mode = get_selection_mode(clothing_state_val)
@@ -592,6 +584,7 @@ def _generate_structured(
                 budget_filtered_atoms=assembly_res.budget_filtered_atoms,
                 deduplication_records=assembly_res.deduplication_records,
                 budget_filter_records=assembly_res.budget_filter_records,
+                overrides=assembly_res.overrides,
             )
 
     # 2. 采样各槽位
@@ -870,6 +863,7 @@ def _generate_structured(
         budget_filtered_atoms=assembly_res.budget_filtered_atoms,
         deduplication_records=assembly_res.deduplication_records,
         budget_filter_records=assembly_res.budget_filter_records,
+        overrides=assembly_res.overrides,
     )
 
 
@@ -1189,6 +1183,7 @@ class IYKYKPresetBrowser:
             budget_filtered_atoms=assembly_res.budget_filtered_atoms,
             deduplication_records=assembly_res.deduplication_records,
             budget_filter_records=assembly_res.budget_filter_records,
+            overrides=assembly_res.overrides,
         )
 
     def browse(
@@ -1339,7 +1334,7 @@ class IYKYKCustomSlotCombiner:
                                     semantic_ids=(f"slot:{slot_name}",),
                                 ),
                                 origin=slot_origin,
-                                facts=None,
+                                facts=SemanticFacts(),
                             )
                         )
                         order += 1
@@ -1382,6 +1377,7 @@ class IYKYKCustomSlotCombiner:
             budget_filtered_atoms=assembly_res.budget_filtered_atoms,
             deduplication_records=assembly_res.deduplication_records,
             budget_filter_records=assembly_res.budget_filter_records,
+            overrides=assembly_res.overrides,
         )
 
     def combine(self, prompt_seed: int = -1, **kwargs) -> Tuple[str, str, str]:
@@ -1512,6 +1508,7 @@ def format_diagnostics_dict(res: GenerationResult) -> Dict[str, Any]:
                 for a in produced_atoms_for_s
             ],
             "raw_value": s.raw_value,
+            "sampling_rationale": s.sampling_rationale,
             "selected_id": s.selected_id,
             "selector": s.selector,
             "source_atoms": [
@@ -1520,7 +1517,7 @@ def format_diagnostics_dict(res: GenerationResult) -> Dict[str, Any]:
             ],
         })
 
-    # 3. decisions (完整输出冻结模型的 12 个字段)
+    # 3. decisions (完整输出冻结模型的 13 个字段，包含 fact_trace)
     decisions_list = []
     if rep and rep.decisions:
         for d in rep.decisions:
@@ -1529,6 +1526,7 @@ def format_diagnostics_dict(res: GenerationResult) -> Dict[str, Any]:
                 "after_text": d.after_text,
                 "before_text": d.before_text,
                 "decision_id": d.decision_id,
+                "fact_trace": d.fact_trace,
                 "parent_source_ids": list(d.parent_source_ids),
                 "phase": d.phase,
                 "produced_atom_ids": list(d.produced_atom_ids),
@@ -1560,17 +1558,133 @@ def format_diagnostics_dict(res: GenerationResult) -> Dict[str, Any]:
         "source_atoms": len(all_source_atoms),
     }
 
+    # 7. overrides (20 规范槽位覆盖溯源)
+    overrides_list = []
+    if res.overrides:
+        for o in res.overrides:
+            overrides_list.append({
+                "blank_fallback_reason": o.blank_fallback_reason,
+                "canonical_slot": o.canonical_slot,
+                "injected_atom_ids": list(o.injected_atom_ids),
+                "raw_input": o.raw_input,
+                "replaced_target_ids": list(o.replaced_target_ids),
+                "replaced_texts": list(o.replaced_texts),
+                "source_port": o.source_port,
+                "status": o.status,
+            })
+    else:
+        for slot in (*SLOT_ORDER, *AUXILIARY_SLOT_ORDER):
+            overrides_list.append({
+                "blank_fallback_reason": "omitted",
+                "canonical_slot": slot,
+                "injected_atom_ids": [],
+                "raw_input": None,
+                "replaced_target_ids": [],
+                "replaced_texts": [],
+                "source_port": None,
+                "status": "not_provided",
+            })
+
     audit_dict = {
         "context_profile": cp_dict,
         "counts": counts_dict,
         "decisions": decisions_list,
         "effective_seed": int(res.effective_seed if res.effective_seed is not None else 0),
+        "error_info": None,
+        "overrides": overrides_list,
         "rules_applied": rules_applied_list,
-        "schema_version": "1.0",
+        "schema_version": "2.0",
         "selections": selections_list,
+        "status": "success",
         "unresolved_conflicts": unresolved_list,
     }
     return audit_dict
+
+
+def format_diagnostics_error_dict(
+    err: Exception,
+    effective_seed: int = 0,
+    overrides: Optional[Sequence[Any]] = None,
+) -> Dict[str, Any]:
+    """构建符合 schemas/diagnostics.schema.json 契约的错误状态审计报告字典 (2.0 契约)。"""
+    if hasattr(err, "to_diagnostics_dict"):
+        return err.to_diagnostics_dict(effective_seed)
+
+    overrides_list = []
+    if overrides:
+        for o in overrides:
+            if isinstance(o, dict):
+                overrides_list.append(o)
+            elif hasattr(o, "canonical_slot"):
+                overrides_list.append({
+                    "blank_fallback_reason": o.blank_fallback_reason,
+                    "canonical_slot": o.canonical_slot,
+                    "injected_atom_ids": list(o.injected_atom_ids),
+                    "raw_input": o.raw_input,
+                    "replaced_target_ids": list(o.replaced_target_ids),
+                    "replaced_texts": list(o.replaced_texts),
+                    "source_port": o.source_port,
+                    "status": o.status,
+                })
+    else:
+        for slot in (*SLOT_ORDER, *AUXILIARY_SLOT_ORDER):
+            overrides_list.append({
+                "blank_fallback_reason": "omitted",
+                "canonical_slot": slot,
+                "injected_atom_ids": [],
+                "raw_input": None,
+                "replaced_target_ids": [],
+                "replaced_texts": [],
+                "source_port": None,
+                "status": "not_provided",
+            })
+
+    return {
+        "context_profile": {},
+        "counts": {
+            "accepted_atoms": 0,
+            "budget_filtered": 0,
+            "deduplicated": 0,
+            "dropped": 0,
+            "injected": 0,
+            "produced": 0,
+            "replaced": 0,
+            "source_atoms": 0,
+        },
+        "decisions": [],
+        "effective_seed": int(effective_seed),
+        "error_info": {
+            "category": getattr(err, "category", "generic_error"),
+            "details": getattr(err, "details", {}),
+            "error_code": getattr(err, "error_code", type(err).__name__),
+            "message": str(err),
+            "rule_id": getattr(err, "rule_id", None),
+            "slots": list(getattr(err, "slots", ())),
+            "texts": list(getattr(err, "texts", ())),
+        },
+        "overrides": overrides_list,
+        "rules_applied": [],
+        "schema_version": "2.0",
+        "selections": [],
+        "status": "error",
+        "unresolved_conflicts": [],
+    }
+
+
+def format_diagnostics_error_json(
+    err: Exception,
+    effective_seed: int = 0,
+    overrides: Optional[Sequence[Any]] = None,
+) -> str:
+    """确定性序列化为紧凑 UTF-8 错误审计报告 JSON 字符串。"""
+    d = format_diagnostics_error_dict(err, effective_seed, overrides)
+    return json.dumps(
+        d,
+        ensure_ascii=False,
+        sort_keys=True,
+        separators=(",", ":"),
+        allow_nan=False,
+    )
 
 
 def format_diagnostics_json(res: GenerationResult) -> str:
@@ -1635,8 +1749,9 @@ class IYKYKPromptDiagnostics:
         真实微瑕: str = "无 (None)",
         画质等级: str = "高清写真 (High)",
         prompt_seed: int = -1,
+        raise_on_error: bool = True,
         **kwargs: Any,
-    ) -> Tuple[GenerationResult, str]:
+    ) -> Tuple[Optional[GenerationResult], str]:
         rng, effective_seed = _get_rng(prompt_seed)
         inputs = {
             "预设模板": 预设模板,
@@ -1663,6 +1778,22 @@ class IYKYKPromptDiagnostics:
             "画质等级": 画质等级,
         }
         inputs.update(kwargs)
+        if not raise_on_error:
+            try:
+                res = _generate_structured(
+                    sampler=_sampler,
+                    assembler=_assembler,
+                    inputs=inputs,
+                    rng=rng,
+                    entry_point="diagnostics",
+                    effective_seed=effective_seed,
+                )
+                audit_json = format_diagnostics_json(res)
+                return res, audit_json
+            except Exception as err:
+                audit_json = format_diagnostics_error_json(err, effective_seed)
+                return None, audit_json
+
         res = _generate_structured(
             sampler=_sampler,
             assembler=_assembler,

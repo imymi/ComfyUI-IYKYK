@@ -2142,14 +2142,28 @@ def _normalize_ordered_str_tuple(val: Any, field_name: str) -> Tuple[str, ...]:
 
 
 @dataclass(frozen=True)
+class OverrideRecord:
+    """外部覆盖审计记录 (诊断 2.0 契约)。"""
+    canonical_slot: str
+    status: str  # applied | fallback_blank | not_provided
+    source_port: Optional[str] = None
+    raw_input: Optional[Any] = None
+    blank_fallback_reason: Optional[str] = None  # omitted | empty_string | whitespace_only | empty_list
+    replaced_target_ids: Tuple[str, ...] = ()
+    replaced_texts: Tuple[str, ...] = ()
+    injected_atom_ids: Tuple[str, ...] = ()
+
+
+@dataclass(frozen=True)
 class SelectionOrigin:
     """选择项来源追踪模型 (rc8 核心数据模型)。"""
     entry_point: str = "generator"  # generator | preset_browser | custom_combiner | diagnostics
-    mode: str = "random"           # none | random | auto | explicit | preset | recipe | custom | resolver
+    mode: str = "random"           # none | random | auto | explicit | preset | recipe | custom | override | resolver
     selector: str = ""             # 规范槽位名或 preset/recipe 字段名
     selected_id: Optional[str] = None
     raw_value: Optional[str] = None
     parent_ids: Tuple[str, ...] = ()
+    sampling_rationale: Optional[Dict[str, Any]] = field(default=None, compare=False, hash=False)
 
     def __post_init__(self) -> None:
         if not isinstance(self.entry_point, str) or isinstance(self.entry_point, bool):
@@ -2202,6 +2216,7 @@ class SelectionOrigin:
             selected_id=d.get("selected_id"),
             raw_value=d.get("raw_value"),
             parent_ids=p_tuple,
+            sampling_rationale=d.get("sampling_rationale"),
         )
         return inst
 
@@ -2298,6 +2313,7 @@ class ResolutionDecision:
     before_text: Optional[str] = None
     after_text: Optional[str] = None
     parent_source_ids: Tuple[str, ...] = ()
+    fact_trace: Optional[Dict[str, Any]] = field(default=None, compare=False, hash=False)
 
     def __post_init__(self) -> None:
         for s_fld in ("decision_id", "rule_id", "phase", "reason_code"):
@@ -2561,6 +2577,7 @@ class SampleResult:
     exclusive_group: Optional[str] = None
     provenance: TagProvenance = field(default_factory=TagProvenance)
     sampled_tags: Tuple[SampledTag, ...] = ()
+    sampling_rationale: Optional[Dict[str, Any]] = None
 
 
 @dataclass(frozen=True)
@@ -2572,6 +2589,7 @@ class ThemeSampleResult:
     theme_id: str
     provenance: TagProvenance = field(default_factory=TagProvenance)
     context_ids: Tuple[str, ...] = ()
+    sampling_rationale: Optional[Dict[str, Any]] = None
 
     @property
     def sampled_tags(self) -> Tuple[SampledTag, ...]:
@@ -2593,6 +2611,7 @@ class ClothingSampleResult:
     style_id: str = ""
     state_id: Optional[str] = None
     nudity_level: str = "L1"
+    sampling_rationale: Optional[Dict[str, Any]] = None
 
     @property
     def all_tags(self) -> Tuple[SampledTag, ...]:
@@ -2699,6 +2718,7 @@ class GenerationResult:
     budget_filtered_atoms: Tuple[PromptAtom, ...] = ()
     deduplication_records: Tuple[DeduplicationRecord, ...] = ()
     budget_filter_records: Tuple[BudgetFilterRecord, ...] = ()
+    overrides: Tuple[OverrideRecord, ...] = ()
 
 
 @dataclass(frozen=True)
@@ -2714,7 +2734,8 @@ class AssemblyResult:
     - deduplicated_atoms：因保序去重被剔除的原子序列；
     - budget_filtered_atoms：因词数上限预算超限被截断的原子序列；
     - deduplication_records：去重过滤具体记录 (R3-P1-002)；
-    - budget_filter_records：预算过滤具体记录 (R3-P1-002)。
+    - budget_filter_records：预算过滤具体记录 (R3-P1-002)；
+    - overrides：外部覆盖审计记录 (诊断 2.0 契约)。
     """
     prompt: str
     accepted_atoms: Tuple[PromptAtom, ...] = ()
@@ -2726,6 +2747,7 @@ class AssemblyResult:
     budget_filtered_atoms: Tuple[PromptAtom, ...] = ()
     deduplication_records: Tuple[DeduplicationRecord, ...] = ()
     budget_filter_records: Tuple[BudgetFilterRecord, ...] = ()
+    overrides: Tuple[OverrideRecord, ...] = ()
 
 
 def is_external_atom(a: Any) -> bool:

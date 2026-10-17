@@ -383,6 +383,32 @@ class DataSampler:
                             return (item, t)
         return None
 
+    def _pop_sampling_rationale(
+        self,
+        default_item_id: Optional[str] = None,
+        default_mode: str = "explicit",
+        active_contexts: Sequence[str] = (),
+    ) -> Dict[str, Any]:
+        """弹出最近一次采样依据，若不存在则为显式/默认选择构建合法的 Rationale 字典。"""
+        if getattr(self, "_last_sampling_rationale", None) is not None:
+            rat = self._last_sampling_rationale
+            self._last_sampling_rationale = None
+            return rat
+        return {
+            "active_contexts": list(active_contexts),
+            "candidate_filter": {
+                "total_candidates": 1 if default_item_id else 0,
+                "excluded_hard_conflicts": [],
+                "passed_candidates": 1 if default_item_id else 0,
+            },
+            "distribution": {default_item_id: 1.0} if default_item_id else {},
+            "fallback": {"used": False, "reason": None},
+            "final_selection": {
+                "selected_id": default_item_id,
+                "mode": default_mode,
+            },
+        }
+
     def _sample_from_candidates(
         self,
         slot_name: str,
@@ -392,22 +418,66 @@ class DataSampler:
         context: Optional[str] = None,
         excluded_ids: Optional[Set[str]] = None,
     ) -> Optional[Dict[str, Any]]:
+        total_candidates = len(candidates)
+        excluded_list = sorted(list(excluded_ids)) if excluded_ids else []
         if not candidates:
+            self._last_sampling_rationale = {
+                "active_contexts": [],
+                "candidate_filter": {
+                    "total_candidates": 0,
+                    "excluded_hard_conflicts": [],
+                    "passed_candidates": 0,
+                },
+                "distribution": {},
+                "fallback": {"used": True, "reason": "empty_candidates"},
+                "final_selection": {"selected_id": None, "mode": "none"},
+            }
             return None
         if excluded_ids:
             candidates = [c for c in candidates if c.get("id") not in excluded_ids]
             if not candidates:
+                self._last_sampling_rationale = {
+                    "active_contexts": [],
+                    "candidate_filter": {
+                        "total_candidates": total_candidates,
+                        "excluded_hard_conflicts": excluded_list,
+                        "passed_candidates": 0,
+                    },
+                    "distribution": {},
+                    "fallback": {"used": True, "reason": "all_candidates_excluded_by_hard_conflicts"},
+                    "final_selection": {"selected_id": None, "mode": "none"},
+                }
                 return None
+
+        passed_candidates = len(candidates)
         cand_map = {c.get("id"): c for c in candidates if "id" in c}
         cand_ids = [c["id"] for c in candidates if "id" in c]
-        if not cand_ids:
-            return self._pick_one(list(candidates), rng)
 
         if profile is None:
             if context:
                 profile = compute_context_profile([context], [])
             else:
                 profile = compute_context_profile([], [])
+
+        active_contexts = list(profile.scene_context_ids) + list(profile.theme_context_ids)
+
+        if not cand_ids:
+            chosen = self._pick_one(list(candidates), rng)
+            self._last_sampling_rationale = {
+                "active_contexts": active_contexts,
+                "candidate_filter": {
+                    "total_candidates": total_candidates,
+                    "excluded_hard_conflicts": excluded_list,
+                    "passed_candidates": passed_candidates,
+                },
+                "distribution": {},
+                "fallback": {"used": False, "reason": None},
+                "final_selection": {
+                    "selected_id": chosen.get("id") if chosen else None,
+                    "mode": "uniform_random",
+                },
+            }
+            return chosen
 
         if hasattr(self, "affinity_registry") and slot_name in self.affinity_registry.matrix.get("generic", {}):
             dist = compute_slot_distribution(
@@ -417,9 +487,49 @@ class DataSampler:
                 self.affinity_registry.matrix,
             )
             chosen_id = sample_categorical(dist, rng)
-            return cand_map.get(chosen_id, self._pick_one(list(candidates), rng))
+            fallback_used = False
+            fallback_reason = None
+            if chosen_id in cand_map:
+                chosen = cand_map[chosen_id]
+            else:
+                chosen = self._pick_one(list(candidates), rng)
+                fallback_used = True
+                fallback_reason = "categorical_sample_not_in_candidates"
+
+            self._last_sampling_rationale = {
+                "active_contexts": active_contexts,
+                "candidate_filter": {
+                    "total_candidates": total_candidates,
+                    "excluded_hard_conflicts": excluded_list,
+                    "passed_candidates": passed_candidates,
+                },
+                "distribution": {k: round(v, 6) for k, v in dist.items()},
+                "fallback": {"used": fallback_used, "reason": fallback_reason},
+                "final_selection": {
+                    "selected_id": chosen.get("id") if chosen else chosen_id,
+                    "mode": "affinity_sampling",
+                },
+            }
+            return chosen
         else:
-            return self._pick_one(list(candidates), rng)
+            uniform_prob = round(1.0 / len(cand_ids), 6)
+            dist = {cid: uniform_prob for cid in cand_ids}
+            chosen = self._pick_one(list(candidates), rng)
+            self._last_sampling_rationale = {
+                "active_contexts": active_contexts,
+                "candidate_filter": {
+                    "total_candidates": total_candidates,
+                    "excluded_hard_conflicts": excluded_list,
+                    "passed_candidates": passed_candidates,
+                },
+                "distribution": dist,
+                "fallback": {"used": False, "reason": None},
+                "final_selection": {
+                    "selected_id": chosen.get("id") if chosen else None,
+                    "mode": "uniform_random",
+                },
+            }
+            return chosen
 
     def _lookup_pose_hand_state(self, pose_id: Optional[str]) -> Optional[str]:
         """查询姿势标签的事实 hand_state。若传入的是大类 ID 或未知，返回 None。"""
@@ -453,7 +563,7 @@ class DataSampler:
         if any(w in t_low for w in garment_nouns):
             return False
         return bool(re.search(
-            r"\b(?:untied belt|belts?|sash|obi|sleeves?|floral embroidery|embroidery|embroidered ribbons?|ribbons?|collars?|scarf|scarves|bow tie|necktie|ties?|cuffs?|headbands?|pompoms?|badges?|brooches?|harness|studs|push-up cups|tulle fabric|delicate gauze)\b",
+            r"\b(?:untied belt|belts?|sash|obi|sleeves?|floral embroidery|embroidery|embroidered ribbons?|ribbons?|collars?|scarf|scarves|bow tie|necktie|ties?|cuffs?|headbands?|pompoms?|badges?|brooches?|harness|studs|push-up cups|tulle fabric|delicate gauze|fabrics?|details?)\b",
             t_low,
             re.IGNORECASE,
         ))
@@ -1327,6 +1437,7 @@ class DataSampler:
             exclusive_group=chosen.get("exclusive_group"),
             provenance=prov,
             sampled_tags=tuple(sampled_tags),
+            sampling_rationale=self._pop_sampling_rationale(c_id, "random" if _is_random(category) else "explicit", active_contexts=ctx_ids),
         )
 
     def sample_scene(self, category: str, rng: Random) -> List[str]:
@@ -1388,6 +1499,7 @@ class DataSampler:
             theme_id=t_id,
             provenance=prov,
             context_ids=ctx_ids,
+            sampling_rationale=self._pop_sampling_rationale(t_id, "random" if _is_random(theme) else "explicit", active_contexts=ctx_ids),
         )
 
     def sample_theme(self, theme: str, rng: Random) -> List[str]:
@@ -1435,6 +1547,7 @@ class DataSampler:
             item_id=item_id,
             provenance=prov,
             sampled_tags=sampled,
+            sampling_rationale=self._pop_sampling_rationale(item_id, "random" if _is_random(shot_type) or _is_auto(shot_type) else "explicit"),
         )
 
     def sample_shot_type(self, shot_type: str, rng: Random) -> List[str]:
@@ -1499,6 +1612,7 @@ class DataSampler:
             item_id=item_id,
             provenance=prov,
             sampled_tags=sampled,
+            sampling_rationale=self._pop_sampling_rationale(item_id, "random" if _is_random(angle) or _is_auto(angle) else "explicit"),
         )
 
     def sample_camera_angle(
@@ -1563,6 +1677,7 @@ class DataSampler:
             item_id=item_id,
             provenance=prov,
             sampled_tags=sampled,
+            sampling_rationale=self._pop_sampling_rationale(item_id, "explicit"),
         )
 
     def sample_quality_tags(self, quality_tier: str) -> List[str]:
@@ -1608,7 +1723,13 @@ class DataSampler:
             kind="nudity",
             semantic_ids=(f"nudity:{lvl_code}",),
         )
-        return SampleResult(tags=tags_str, item_id=item_id, provenance=prov, sampled_tags=sampled), lvl_code
+        return SampleResult(
+            tags=tags_str,
+            item_id=item_id,
+            provenance=prov,
+            sampled_tags=sampled,
+            sampling_rationale=self._pop_sampling_rationale(item_id, "random" if _is_random(level) else "explicit"),
+        ), lvl_code
 
     def sample_nudity(self, level: str | int, rng: Random) -> Tuple[List[str], str]:
         """返回 (采样tags, 标准等级代码比如L1/L2/L3/L4/L5/L6)"""
@@ -1635,12 +1756,14 @@ class DataSampler:
         - Explicit: 指定状态，L2/L3/L4 接入 24 档数据驱动扩展。
         """
         if _is_none(style):
-            return ClothingSampleResult(base_tags=(), nudity_level=nudity_level_code)
+            rat_none = self._pop_sampling_rationale(None, "none")
+            return ClothingSampleResult(base_tags=(), nudity_level=nudity_level_code, sampling_rationale=rat_none)
 
         data = self._load("clothing")
         styles = data.get("categories", [])
         if not styles:
-            return ClothingSampleResult(base_tags=(), nudity_level=nudity_level_code)
+            rat_empty = self._pop_sampling_rationale(None, "none")
+            return ClothingSampleResult(base_tags=(), nudity_level=nudity_level_code, sampling_rationale=rat_empty)
 
         # 1. 确定服装款式对象
         style_mode = get_selection_mode(style)
@@ -1661,7 +1784,8 @@ class DataSampler:
                 excluded_ids=excluded_ids,
             )
             if not chosen_style:
-                return ClothingSampleResult(base_tags=(), nudity_level=nudity_level_code)
+                rat_fallback = self._pop_sampling_rationale(None, "none")
+                return ClothingSampleResult(base_tags=(), nudity_level=nudity_level_code, sampling_rationale=rat_fallback)
         else:
             chosen_style = _match_item(styles, style)
             if not chosen_style:
@@ -1672,6 +1796,7 @@ class DataSampler:
                 raise DataSelectionError(f"Unknown clothing style: {style!r}")
 
         c_id = chosen_style.get("id", "")
+        style_rat = self._pop_sampling_rationale(c_id, "random" if _is_random(style) or _is_auto(style) else "explicit")
         if target_tag:
             if nudity_level_code == "L1":
                 banned_l1_words = (
@@ -1714,7 +1839,8 @@ class DataSampler:
                 extension_tags=(),
                 style_id=c_id,
                 state_id=None,
-                nudity_level=nudity_level_code
+                nudity_level=nudity_level_code,
+                sampling_rationale=style_rat,
             )
 
         linkages = data.get("clothing_nudity_linkage", {})
@@ -1741,7 +1867,8 @@ class DataSampler:
                     extension_tags=(),
                     style_id=c_id,
                     state_id="linkage_override",
-                    nudity_level=nudity_level_code
+                    nudity_level=nudity_level_code,
+                    sampling_rationale=style_rat,
                 )
             else:
                 gen_tags = linkage_data.get("general_tags", [])
@@ -1765,7 +1892,8 @@ class DataSampler:
                     extension_tags=(),
                     style_id=c_id,
                     state_id="linkage_general",
-                    nudity_level=nudity_level_code
+                    nudity_level=nudity_level_code,
+                    sampling_rationale=style_rat,
                 )
 
         if state_mode == SelectionMode.AUTO:
@@ -1788,7 +1916,8 @@ class DataSampler:
                     extension_tags=(),
                     style_id=c_id,
                     state_id="linkage_general",
-                    nudity_level=nudity_level_code
+                    nudity_level=nudity_level_code,
+                    sampling_rationale=style_rat,
                 )
 
             else:
@@ -1913,7 +2042,8 @@ class DataSampler:
             extension_tags=tuple(extension_sampled_tags),
             style_id=c_id,
             state_id=state_id,
-            nudity_level=nudity_level_code
+            nudity_level=nudity_level_code,
+            sampling_rationale=style_rat,
         )
 
     def sample_clothing_with_nudity_linkage(
@@ -2031,6 +2161,7 @@ class DataSampler:
         rng: Random,
         nudity_level_code: Optional[str] = None,
         target_tag: Optional[Any] = None,
+        preset: str = "随机 (Random)",
     ) -> SampleResult:
         chosen_id = chosen.get("id", "lighting_preset")
         # Combo presets have main_light / modifier_light / atmosphere
@@ -2060,6 +2191,7 @@ class DataSampler:
                 item_id=chosen_id,
                 provenance=prov,
                 sampled_tags=tuple(sampled_tags),
+                sampling_rationale=self._pop_sampling_rationale(chosen_id, "random" if _is_random(preset) or _is_auto(preset) else "explicit"),
             )
 
         # Single presets (professional, cinematic, special, erotic)
@@ -2151,6 +2283,7 @@ class DataSampler:
             item_id=chosen_id,
             provenance=prov,
             sampled_tags=tuple(sampled_tags_list),
+            sampling_rationale=self._pop_sampling_rationale(chosen_id, "random" if _is_random(preset) or _is_auto(preset) else "explicit"),
         )
 
     def sample_lighting_result(
@@ -2207,7 +2340,7 @@ class DataSampler:
                     raise DataSelectionError(f"Unknown lighting preset: {preset!r}")
 
         return self._format_lighting_sample_result(
-            chosen, rng, nudity_level_code=nudity_level_code, target_tag=target_tag
+            chosen, rng, nudity_level_code=nudity_level_code, target_tag=target_tag, preset=preset
         )
 
     def sample_lighting(
@@ -2328,7 +2461,13 @@ class DataSampler:
                     facts=t_facts,
                 )
             )
-        return SampleResult(tags=tuple(tags_str), item_id=cat_id, provenance=prov, sampled_tags=tuple(sampled_tags))
+        return SampleResult(
+            tags=tuple(tags_str),
+            item_id=cat_id,
+            provenance=prov,
+            sampled_tags=tuple(sampled_tags),
+            sampling_rationale=self._pop_sampling_rationale(cat_id, "random" if _is_random(category) else "explicit"),
+        )
 
     def sample_pose(
         self,
@@ -2375,7 +2514,13 @@ class DataSampler:
         cat_id = cat.get("id", "expression_default")
         tags_str, sampled = self._to_sampled_tags(selected, cat_id, "expression")
         prov = TagProvenance(item_id=cat_id, kind="expression", semantic_ids=(f"expression:{cat_id}",))
-        return SampleResult(tags=tags_str, item_id=cat_id, provenance=prov, sampled_tags=sampled)
+        return SampleResult(
+            tags=tags_str,
+            item_id=cat_id,
+            provenance=prov,
+            sampled_tags=sampled,
+            sampling_rationale=self._pop_sampling_rationale(cat_id, "random" if _is_random(mood) else "explicit"),
+        )
 
     def sample_expression(self, mood: str, rng: Random) -> List[str]:
         res = self.sample_expression_result(mood, rng)
@@ -2444,6 +2589,7 @@ class DataSampler:
             item_id=c_id,
             provenance=prov,
             sampled_tags=sampled,
+            sampling_rationale=self._pop_sampling_rationale(c_id, "random" if _is_random(stock) else "explicit"),
         )
 
     def sample_film(self, stock: str, rng: Random) -> List[str]:
@@ -2476,7 +2622,13 @@ class DataSampler:
         c_id = chosen.get("id", "makeup_default")
         tags_str, sampled = self._to_sampled_tags(selected, c_id, "makeup")
         prov = TagProvenance(item_id=c_id, kind="makeup", semantic_ids=(f"makeup:{c_id}",))
-        return SampleResult(tags=tags_str, item_id=c_id, provenance=prov, sampled_tags=sampled)
+        return SampleResult(
+            tags=tags_str,
+            item_id=c_id,
+            provenance=prov,
+            sampled_tags=sampled,
+            sampling_rationale=self._pop_sampling_rationale(c_id, "random" if _is_random(makeup_style) else "explicit"),
+        )
 
     def sample_makeup(self, makeup_style: str, rng: Random, context: Optional[str] = None) -> List[str]:
         res = self.sample_makeup_result(makeup_style, rng, context)
@@ -2512,7 +2664,13 @@ class DataSampler:
         c_id = chosen.get("id", "hairstyle_default")
         tags_str, sampled = self._to_sampled_tags(selected, c_id, "hairstyle", rng=rng)
         prov = TagProvenance(item_id=c_id, kind="hairstyle", semantic_ids=(f"hairstyle:{c_id}",))
-        return SampleResult(tags=tags_str, item_id=c_id, provenance=prov, sampled_tags=sampled)
+        return SampleResult(
+            tags=tags_str,
+            item_id=c_id,
+            provenance=prov,
+            sampled_tags=sampled,
+            sampling_rationale=self._pop_sampling_rationale(c_id, "random" if _is_random(hairstyle) else "explicit"),
+        )
 
     def sample_hairstyle(self, hairstyle: str, rng: Random, context: Optional[str] = None) -> List[str]:
         res = self.sample_hairstyle_result(hairstyle, rng, context)
@@ -2560,6 +2718,7 @@ class DataSampler:
             item_id=c_id,
             provenance=prov,
             sampled_tags=sampled,
+            sampling_rationale=self._pop_sampling_rationale(c_id, "random" if _is_random(jewelry_style) else "explicit"),
         )
 
     def sample_jewelry(self, jewelry_style: str, rng: Random, context: Optional[str] = None) -> List[str]:
@@ -2588,7 +2747,13 @@ class DataSampler:
         c_id = chosen.get("id", "imperfection_default")
         tags_str, sampled = self._to_sampled_tags(selected, c_id, "imperfections")
         prov = TagProvenance(item_id=c_id, kind="imperfections", semantic_ids=(f"imperfection:{c_id}",))
-        return SampleResult(tags=tags_str, item_id=c_id, provenance=prov, sampled_tags=sampled)
+        return SampleResult(
+            tags=tags_str,
+            item_id=c_id,
+            provenance=prov,
+            sampled_tags=sampled,
+            sampling_rationale=self._pop_sampling_rationale(c_id, "random" if _is_random(imp_type) else "explicit"),
+        )
 
     def sample_imperfections(self, imp_type: str, rng: Random) -> List[str]:
         res = self.sample_imperfections_result(imp_type, rng)
@@ -2631,6 +2796,7 @@ class DataSampler:
             item_id=c_id,
             provenance=prov,
             sampled_tags=sampled,
+            sampling_rationale=self._pop_sampling_rationale(c_id, "random" if _is_random(tattoo_style) else "explicit"),
         )
 
     def sample_tattoo(self, tattoo_style: str, rng: Random, context: Optional[str] = None) -> List[str]:
@@ -2732,7 +2898,13 @@ class DataSampler:
 
         tags_str, sampled = self._to_sampled_tags(selected, item_id, "prop")
         prov = TagProvenance(item_id=item_id, kind="prop", semantic_ids=(f"prop:{item_id}",))
-        return SampleResult(tags=tags_str, item_id=item_id, provenance=prov, sampled_tags=sampled)
+        return SampleResult(
+            tags=tags_str,
+            item_id=item_id,
+            provenance=prov,
+            sampled_tags=sampled,
+            sampling_rationale=self._pop_sampling_rationale(item_id, "random" if _is_random(prop_style) else "explicit"),
+        )
 
     def sample_prop(
         self,
@@ -2787,7 +2959,13 @@ class DataSampler:
         selected = raw_tags[:2] if raw_tags else []
         tags_str, sampled = self._to_sampled_tags(selected, c_id, "clothing_extension")
         prov = TagProvenance(item_id=c_id, kind="clothing_extension", semantic_ids=(f"extension:{c_id}",))
-        return SampleResult(tags=tags_str, item_id=c_id, provenance=prov, sampled_tags=sampled)
+        return SampleResult(
+            tags=tags_str,
+            item_id=c_id,
+            provenance=prov,
+            sampled_tags=sampled,
+            sampling_rationale=self._pop_sampling_rationale(c_id, "random" if _is_random(tier) else "explicit"),
+        )
 
     def sample_sfw_exposure(self, tier: str, rng: Random) -> List[str]:
         res = self.sample_sfw_exposure_result(tier, rng)
@@ -2813,7 +2991,13 @@ class DataSampler:
         selected = raw_tags[:2] if raw_tags else []
         tags_str, sampled = self._to_sampled_tags(selected, c_id, "clothing_extension")
         prov = TagProvenance(item_id=c_id, kind="clothing_extension", semantic_ids=(f"extension:{c_id}",))
-        return SampleResult(tags=tags_str, item_id=c_id, provenance=prov, sampled_tags=sampled)
+        return SampleResult(
+            tags=tags_str,
+            item_id=c_id,
+            provenance=prov,
+            sampled_tags=sampled,
+            sampling_rationale=self._pop_sampling_rationale(c_id, "random" if _is_random(tier) else "explicit"),
+        )
 
     def sample_cloth_transparency(self, tier: str, rng: Random) -> List[str]:
         res = self.sample_cloth_transparency_result(tier, rng)
@@ -2839,7 +3023,13 @@ class DataSampler:
         selected = self._pick(raw_tags, rng, min(2, len(raw_tags))) if raw_tags else []
         tags_str, sampled = self._to_sampled_tags(selected, c_id, "clothing_extension")
         prov = TagProvenance(item_id=c_id, kind="clothing_extension", semantic_ids=(f"extension:{c_id}",))
-        return SampleResult(tags=tags_str, item_id=c_id, provenance=prov, sampled_tags=sampled)
+        return SampleResult(
+            tags=tags_str,
+            item_id=c_id,
+            provenance=prov,
+            sampled_tags=sampled,
+            sampling_rationale=self._pop_sampling_rationale(c_id, "random" if _is_random(cat) else "explicit"),
+        )
 
     def sample_lingerie_wardrobe(self, cat: str, rng: Random) -> List[str]:
         res = self.sample_lingerie_wardrobe_result(cat, rng)
@@ -2871,7 +3061,13 @@ class DataSampler:
         c_id = chosen.get("id", "character_default")
         tags_str, sampled = self._to_sampled_tags(selected, c_id, "character")
         prov = TagProvenance(item_id=c_id, kind="character", semantic_ids=(f"character:{c_id}",))
-        return SampleResult(tags=tags_str, item_id=c_id, provenance=prov, sampled_tags=sampled)
+        return SampleResult(
+            tags=tags_str,
+            item_id=c_id,
+            provenance=prov,
+            sampled_tags=sampled,
+            sampling_rationale=self._pop_sampling_rationale(c_id, "random" if _is_random(character_role) else "explicit"),
+        )
 
     def sample_character(self, character_role: str, rng: Random, context: Optional[str] = None) -> List[str]:
         res = self.sample_character_result(character_role, rng, context)
@@ -2905,7 +3101,13 @@ class DataSampler:
         c_id = chosen.get("id", "liquid_default")
         tags_str, sampled = self._to_sampled_tags(selected, c_id, "liquid")
         prov = TagProvenance(item_id=c_id, kind="liquid", semantic_ids=(f"liquid:{c_id}",))
-        return SampleResult(tags=tags_str, item_id=c_id, provenance=prov, sampled_tags=sampled)
+        return SampleResult(
+            tags=tags_str,
+            item_id=c_id,
+            provenance=prov,
+            sampled_tags=sampled,
+            sampling_rationale=self._pop_sampling_rationale(c_id, "random" if _is_random(liquid_effect) else "explicit"),
+        )
 
     def sample_liquid(self, liquid_effect: str, rng: Random, context: Optional[str] = None) -> List[str]:
         res = self.sample_liquid_result(liquid_effect, rng, context)

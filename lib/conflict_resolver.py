@@ -1334,6 +1334,7 @@ def get_prop_entity_key(atom: PromptAtom) -> str:
 class PropEntity:
     def __init__(self, key: str, member_atoms: List[PromptAtom]):
         self.key = key
+        self.entity_id = key
         self.atoms = member_atoms
         self.is_external = any(is_external_atom(ma) for ma in member_atoms)
         self.order = min((ma.tag_order, ma.span_order) for ma in member_atoms)
@@ -1550,11 +1551,27 @@ class DecisionLedger:
         winner_atom_ids: Sequence[str],
         target_atom: PromptAtom,
         parent_source_ids: Sequence[str] = (),
+        fact_trace: Optional[Dict[str, Any]] = None,
     ) -> ResolutionDecision:
         self._validate_reason_code(rule_id, reason_code)
         seq = self._seq
         self._seq += 1
         p_ids = tuple(parent_source_ids or target_atom.provenance.parent_ids)
+        if fact_trace is None:
+            priority = 0
+            if self._registry:
+                try:
+                    rule_item = self._registry.get_rule_item(rule_id)
+                    priority = rule_item.priority
+                except Exception:
+                    priority = 0
+            fact_trace = {
+                "rule_id": rule_id,
+                "phase": phase,
+                "priority": priority,
+                "winner_objects": list(winner_atom_ids),
+                "target_objects": [target_atom.atom_id] if target_atom else [],
+            }
         dec = ResolutionDecision(
             decision_id=f"dec_{seq:04d}_{rule_id}_drop",
             sequence=seq,
@@ -1568,6 +1585,7 @@ class DecisionLedger:
             before_text=target_atom.text,
             after_text=None,
             parent_source_ids=p_ids,
+            fact_trace=fact_trace,
         )
         self.decisions.append(dec)
         return dec
@@ -1581,6 +1599,7 @@ class DecisionLedger:
         target_atom: PromptAtom,
         produced_atoms: Sequence[PromptAtom],
         parent_source_ids: Sequence[str] = (),
+        fact_trace: Optional[Dict[str, Any]] = None,
     ) -> ResolutionDecision:
         self._validate_reason_code(rule_id, reason_code)
         seq = self._seq
@@ -1589,6 +1608,21 @@ class DecisionLedger:
         produced_ids = tuple(a.atom_id for a in produced_atoms)
         after_text = ", ".join(a.text for a in produced_atoms)
         p_ids = tuple(parent_source_ids) if parent_source_ids else ((target_atom.atom_id,) + tuple(p for p in target_atom.provenance.parent_ids if p != target_atom.atom_id))
+        if fact_trace is None:
+            priority = 0
+            if self._registry:
+                try:
+                    rule_item = self._registry.get_rule_item(rule_id)
+                    priority = rule_item.priority
+                except Exception:
+                    priority = 0
+            fact_trace = {
+                "rule_id": rule_id,
+                "phase": phase,
+                "priority": priority,
+                "winner_objects": list(winner_atom_ids),
+                "target_objects": [target_atom.atom_id] if target_atom else [],
+            }
         dec = ResolutionDecision(
             decision_id=f"dec_{seq:04d}_{rule_id}_replace",
             sequence=seq,
@@ -1602,6 +1636,7 @@ class DecisionLedger:
             before_text=target_atom.text,
             after_text=after_text,
             parent_source_ids=p_ids,
+            fact_trace=fact_trace,
         )
         self.decisions.append(dec)
         return dec
@@ -1614,6 +1649,7 @@ class DecisionLedger:
         winner_atom_ids: Sequence[str],
         produced_atoms: Sequence[PromptAtom],
         parent_source_ids: Sequence[str] = (),
+        fact_trace: Optional[Dict[str, Any]] = None,
     ) -> ResolutionDecision:
         self._validate_reason_code(rule_id, reason_code)
         seq = self._seq
@@ -1621,6 +1657,21 @@ class DecisionLedger:
         self.produced_atoms.extend(produced_atoms)
         produced_ids = tuple(a.atom_id for a in produced_atoms)
         after_text = ", ".join(a.text for a in produced_atoms)
+        if fact_trace is None:
+            priority = 0
+            if self._registry:
+                try:
+                    rule_item = self._registry.get_rule_item(rule_id)
+                    priority = rule_item.priority
+                except Exception:
+                    priority = 0
+            fact_trace = {
+                "rule_id": rule_id,
+                "phase": phase,
+                "priority": priority,
+                "winner_objects": list(winner_atom_ids),
+                "target_objects": [],
+            }
         dec = ResolutionDecision(
             decision_id=f"dec_{seq:04d}_{rule_id}_inject",
             sequence=seq,
@@ -1634,6 +1685,7 @@ class DecisionLedger:
             before_text=None,
             after_text=after_text,
             parent_source_ids=tuple(parent_source_ids),
+            fact_trace=fact_trace,
         )
         self.decisions.append(dec)
         return dec
@@ -3066,12 +3118,38 @@ class ConflictResolver:
             if not is_ext_pose and ext_entities and (pose_hands + total_ext_prop_hands > 2):
                 if pose_winner.can_delete_atom and index.is_active(pose_winner):
                     index.drop(pose_winner.atom_id)
+                    ft = {
+                        "rule_id": rule_item.id,
+                        "phase": rule_item.phase,
+                        "priority": rule_item.priority,
+                        "winner_objects": [ext_entities[0].atoms[0].atom_id],
+                        "target_objects": [pose_winner.atom_id],
+                        "prop_capacity": {
+                            "capacity_limit": 2,
+                            "total_hands_demanded": pose_hands + total_ext_prop_hands,
+                            "entity_demands": [
+                                {
+                                    "entity_id": str(e.entity_id),
+                                    "hands_required": int(e.hands_required),
+                                    "hand_state": "one_busy" if e.hands_required == 1 else ("both_busy" if e.hands_required >= 2 else "free"),
+                                }
+                                for e in ext_entities
+                            ] + [
+                                {
+                                    "entity_id": str(pose_winner.atom_id),
+                                    "hands_required": int(pose_hands),
+                                    "hand_state": "both_busy" if pose_hands >= 2 else ("one_busy" if pose_hands == 1 else "free"),
+                                }
+                            ],
+                        },
+                    }
                     ledger.record_drop(
                         rule_item.id,
                         rule_item.phase,
                         "external_prop_overrides_pose",
                         (ext_entities[0].atoms[0].atom_id,),
                         pose_winner,
+                        fact_trace=ft,
                     )
                     pose_hands = 0
 
@@ -3089,12 +3167,32 @@ class ConflictResolver:
                         if tf.enabled and any(p.matches(a.text) for p in all_handheld):
                             self.text_fallback_hits += 1
                         index.drop(a.atom_id)
+                        ft = {
+                            "rule_id": rule_item.id,
+                            "phase": rule_item.phase,
+                            "priority": rule_item.priority,
+                            "winner_objects": [pose_winner.atom_id],
+                            "target_objects": [a.atom_id],
+                            "prop_capacity": {
+                                "capacity_limit": 2,
+                                "total_hands_demanded": pose_hands + total_ext_prop_hands + sum(ent.hands_required for ent in prop_entities if not ent.is_external),
+                                "entity_demands": [
+                                    {
+                                        "entity_id": str(ent.entity_id),
+                                        "hands_required": int(ent.hands_required),
+                                        "hand_state": "one_busy" if ent.hands_required == 1 else ("both_busy" if ent.hands_required >= 2 else "free"),
+                                    }
+                                    for ent in prop_entities
+                                ],
+                            },
+                        }
                         ledger.record_drop(
                             rule_item.id,
                             rule_item.phase,
                             "busy_hands_remove_props",
                             (pose_winner.atom_id,),
                             a,
+                            fact_trace=ft,
                         )
 
         return index.get_all_active_ordered()
@@ -3211,12 +3309,33 @@ class ConflictResolver:
         if not is_ext_pose and ext_entities and (pose_hands + total_ext_hands > 2):
             if pose_atom and pose_atom.can_delete_atom and index.is_active(pose_atom):
                 index.drop(pose_atom.atom_id)
+                winner_id = ext_entities[0].atoms[0].atom_id
+                ft_pose = {
+                    "rule_id": rule_item.id,
+                    "phase": rule_item.phase,
+                    "priority": rule_item.priority,
+                    "winner_objects": [winner_id],
+                    "target_objects": [pose_atom.atom_id],
+                    "prop_capacity": {
+                        "capacity_limit": 2,
+                        "total_hands_demanded": int(pose_hands + sum(ent.hands_required for ent in entity_list)),
+                        "entity_demands": [
+                            {
+                                "entity_id": str(ent.entity_id),
+                                "hands_required": int(ent.hands_required),
+                                "hand_state": "one_busy" if ent.hands_required == 1 else ("both_busy" if ent.hands_required >= 2 else "free"),
+                            }
+                            for ent in entity_list
+                        ],
+                    },
+                }
                 ledger.record_drop(
                     rule_item.id,
                     rule_item.phase,
                     "external_prop_overrides_pose",
-                    (ext_entities[0].atoms[0].atom_id,),
+                    (winner_id,),
                     pose_atom,
+                    fact_trace=ft_pose,
                 )
                 pose_hands = 0
 
@@ -3234,12 +3353,32 @@ class ConflictResolver:
                     if tf and tf.enabled and any(hp.matches(a.text) for hp in handheld_patterns):
                         self.text_fallback_hits += 1
                     index.drop(a.atom_id)
+                    ft_prop = {
+                        "rule_id": rule_item.id,
+                        "phase": rule_item.phase,
+                        "priority": rule_item.priority,
+                        "winner_objects": [winner_atom.atom_id] if winner_atom else [],
+                        "target_objects": [a.atom_id],
+                        "prop_capacity": {
+                            "capacity_limit": 2,
+                            "total_hands_demanded": int(pose_hands + sum(ent.hands_required for ent in entity_list)),
+                            "entity_demands": [
+                                {
+                                    "entity_id": str(ent.entity_id),
+                                    "hands_required": int(ent.hands_required),
+                                    "hand_state": "one_busy" if ent.hands_required == 1 else ("both_busy" if ent.hands_required >= 2 else "free"),
+                                }
+                                for ent in entity_list
+                            ],
+                        },
+                    }
                     ledger.record_drop(
                         rule_item.id,
                         rule_item.phase,
                         "single_handheld_prop_limit",
                         (winner_atom.atom_id,) if winner_atom else (),
                         a,
+                        fact_trace=ft_prop,
                     )
 
         return index.get_all_active_ordered()

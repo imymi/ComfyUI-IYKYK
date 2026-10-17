@@ -28,7 +28,7 @@ except ImportError:
 
 _COMPILED_VALIDATORS: Dict[int, Any] = {}
 
-EXPECTED_TOP_LEVEL_KEYS = {
+EXPECTED_TOP_LEVEL_KEYS_V1 = {
     "schema_version",
     "effective_seed",
     "context_profile",
@@ -37,6 +37,33 @@ EXPECTED_TOP_LEVEL_KEYS = {
     "rules_applied",
     "unresolved_conflicts",
     "counts",
+}
+
+EXPECTED_TOP_LEVEL_KEYS_V2 = {
+    "schema_version",
+    "status",
+    "effective_seed",
+    "context_profile",
+    "selections",
+    "overrides",
+    "decisions",
+    "rules_applied",
+    "unresolved_conflicts",
+    "counts",
+    "error_info",
+}
+
+EXPECTED_TOP_LEVEL_KEYS = EXPECTED_TOP_LEVEL_KEYS_V2
+
+EXPECTED_OVERRIDE_KEYS = {
+    "canonical_slot",
+    "status",
+    "source_port",
+    "raw_input",
+    "blank_fallback_reason",
+    "replaced_target_ids",
+    "replaced_texts",
+    "injected_atom_ids",
 }
 
 EXPECTED_COUNT_KEYS = {
@@ -174,21 +201,62 @@ def validate_audit_json_oracle(
     else:
         raise AssertionError(f"audit_data must be str or dict, got {type(audit_data).__name__}")
 
-    # 1. 顶层键严格 8 个，无多余、无缺失
+    # 1. 顶层键强校验 (支持 1.0 与 2.0 两种 Schema 版本)
+    version = audit.get("schema_version")
+    if version == "1.0":
+        expected_top = EXPECTED_TOP_LEVEL_KEYS_V1
+    elif version == "2.0":
+        expected_top = EXPECTED_TOP_LEVEL_KEYS_V2
+    else:
+        raise AssertionError(f"schema_version must be '1.0' or '2.0', got {version!r}")
+
     actual_keys = set(audit.keys())
-    if actual_keys != EXPECTED_TOP_LEVEL_KEYS:
-        missing = EXPECTED_TOP_LEVEL_KEYS - actual_keys
-        extra = actual_keys - EXPECTED_TOP_LEVEL_KEYS
+    if actual_keys != expected_top:
+        missing = expected_top - actual_keys
+        extra = actual_keys - expected_top
         raise AssertionError(
             f"Top-level keys mismatch: missing={sorted(missing)}, extra={sorted(extra)}"
         )
 
-    if audit.get("schema_version") != "1.0":
-        raise AssertionError(f"schema_version must be '1.0', got {audit.get('schema_version')!r}")
-
     eff_seed = audit.get("effective_seed")
     if not isinstance(eff_seed, int) or isinstance(eff_seed, bool) or eff_seed < 0:
         raise AssertionError(f"effective_seed must be non-negative int, got {eff_seed!r}")
+
+    # 1.1 2.0 状态与覆盖校验
+    if version == "2.0":
+        status = audit.get("status")
+        if status not in ("success", "error"):
+            raise AssertionError(f"status must be 'success' or 'error', got {status!r}")
+        if status == "success":
+            if audit.get("error_info") is not None:
+                raise AssertionError(f"Successful report must have error_info=null, got {audit.get('error_info')!r}")
+        elif status == "error":
+            err_info = audit.get("error_info")
+            if not isinstance(err_info, dict):
+                raise AssertionError(f"Error report must have error_info dict, got {err_info!r}")
+            for k in ("category", "error_code", "message", "slots", "texts", "rule_id", "details"):
+                if k not in err_info:
+                    raise AssertionError(f"error_info missing required key {k!r}")
+
+        overrides = audit.get("overrides", [])
+        if not isinstance(overrides, list):
+            raise AssertionError(f"overrides must be list, got {type(overrides).__name__}")
+        if status == "success":
+            if len(overrides) != 20:
+                raise AssertionError(f"overrides must have exactly 20 entries, got {len(overrides)}")
+            seen_override_slots = set()
+            for o in overrides:
+                if not isinstance(o, dict):
+                    raise AssertionError(f"override entry must be dict, got {type(o).__name__}")
+                o_keys = set(o.keys())
+                if o_keys != EXPECTED_OVERRIDE_KEYS:
+                    raise AssertionError(f"override entry keys mismatch: missing={EXPECTED_OVERRIDE_KEYS - o_keys}, extra={o_keys - EXPECTED_OVERRIDE_KEYS}")
+                slot = o["canonical_slot"]
+                if slot in seen_override_slots:
+                    raise AssertionError(f"duplicate canonical_slot in overrides: {slot}")
+                seen_override_slots.add(slot)
+                if o["status"] not in ("applied", "fallback_blank", "not_provided"):
+                    raise AssertionError(f"invalid override status: {o['status']}")
 
     # 2. Draft-7 Schema 校验 (Fail-Closed: 若传了 schema_doc 则必须具备 jsonschema 并且校验通过)
     if schema_doc is not None:
@@ -216,9 +284,10 @@ def validate_audit_json_oracle(
 
     for s_idx, sel in enumerate(selections):
         sel_keys = set(sel.keys())
-        if sel_keys != EXPECTED_SELECTION_KEYS:
-            missing_sel = EXPECTED_SELECTION_KEYS - sel_keys
-            extra_sel = sel_keys - EXPECTED_SELECTION_KEYS
+        expected_sel_keys = EXPECTED_SELECTION_KEYS if version == "1.0" else (EXPECTED_SELECTION_KEYS | {"sampling_rationale"})
+        if sel_keys != expected_sel_keys and sel_keys != EXPECTED_SELECTION_KEYS:
+            missing_sel = expected_sel_keys - sel_keys
+            extra_sel = sel_keys - expected_sel_keys
             raise AssertionError(
                 f"Selection[{s_idx}] keys mismatch: missing={sorted(missing_sel)}, extra={sorted(extra_sel)}"
             )
