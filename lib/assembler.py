@@ -91,7 +91,7 @@ PRESET_SLOT_PATTERNS = [
     # pose
     (re.compile(r'\b(standing|sitting|lying|kneeling|squatting|bending|leaning|walking|running|pose|legs|arms|hands|crossed|spread|bent|arching|stretching|turned|bound|tied|hold|holding|touching|hand on|hands on|hands behind|crawling|spread legs|kicking feet|hugging knees|toes|entering|watching)\b', re.I), 'pose'),
     # scene_theme & furniture & scenery
-    (re.compile(r'\b(classroom|desk|chair|bench|table|bed|sofa|couch|school|room|office|bedroom|bathroom|onsen|hot spring|pool|beach|street|alley|park|forest|hospital|clinic|library|kitchen|balcony|rooftop|subway|train|bus|station|hotel|bar|club|gym|temple|shrine|tatami|futon|garden|restaurant|cafe|car|elevator|hallway|corridor|staircase|back row|class in progress|chalkboard|blackboard|podium|window seat|empty room|counter|outdoors|indoors|scenery|background|interior|city|scenic|nature|dock|deck|shelves|shelf|fence|dormitory|bunk|curtain|atmosphere|corner|shower area|space|after class|dust particles|studio|parlor|parlour|salon|shop|environment|sterile environment)\b', re.I), 'scene_theme'),
+    (re.compile(r'\b(classroom|desk|chair|bench|table|bed|sofa|couch|school|room|office|bedroom|bathroom|onsen|hot spring|pool|beach|street|alley|park|forest|hospital|clinic|library|bookstore|kitchen|balcony|rooftop|subway|train|bus|station|hotel|bar|club|gym|temple|shrine|tatami|futon|garden|restaurant|cafe|car|elevator|hallway|corridor|staircase|back row|class in progress|chalkboard|blackboard|podium|window seat|empty room|counter|outdoors|indoors|scenery|background|interior|city|scenic|nature|dock|deck|shelves|shelf|fence|dormitory|bunk|curtain|atmosphere|corner|shower area|steam|space|after class|dust particles|studio|parlor|parlour|salon|shop|environment|sterile environment)\b', re.I), 'scene_theme'),
     # expression / emotion
     (re.compile(r'\b(expression|smile|smiling|smirk|frown|pout|tears|crying|blushing|gaze|looking|face|bored|shy|embarrassed|pleasure|aroused|seductive|angry|surprised|neutral|eyes closed|half closed|wink|mouth|biting lip|lip)\b', re.I), 'expression'),
     # hairstyle / character
@@ -210,20 +210,17 @@ def classify_preset_tag_and_facts(
     t = text.strip().lower()
     tag_map, facts_map = get_catalog_tag_cache(data_dir)
 
-    # 1. 确定槽位归属：若调用方已指定且已知则保留，否则优先按服装关键字与目录/模式映射
+    # 1. 确定槽位归属：若调用方已指定且已知则保留，否则优先以语义模式匹配确定槽位主体，再回退至目录权威映射
     if target_slot and target_slot in ALLOWED_SLOTS:
         slot = target_slot
-    elif any(w in t for w in ("chair", "desk", "table", "bench", "sofa", "couch", "stool", "armchair", "studio", "parlor", "parlour", "salon", "shop")) and not any(w in t for w in ("skirt", "shirt", "blouse", "dress", "uniform", "panties", "bra", "underwear", "catsuit", "latex suit", "corset", "lingerie", "stockings", "socks", "heels", "shoes", "boots", "bikini", "swimsuit", "leotard", "bodysuit", "robe", "kimono", "yukata", "serafuku")):
-        slot = "scene_theme"
-    elif any(w in t for w in ("skirt", "shirt", "blouse", "dress", "uniform", "panties", "bra", "underwear", "catsuit", "latex suit", "corset", "lingerie", "stockings", "socks", "heels", "shoes", "boots", "bikini", "swimsuit", "leotard", "bodysuit", "robe", "kimono", "yukata", "serafuku")):
-        slot = "clothing"
     else:
-        slot = tag_map.get(t)
+        slot = None
+        for pat, s in PRESET_SLOT_PATTERNS:
+            if pat.search(t):
+                slot = s
+                break
         if not slot:
-            for pat, s in PRESET_SLOT_PATTERNS:
-                if pat.search(t):
-                    slot = s
-                    break
+            slot = tag_map.get(t)
         if not slot:
             slot = "preset_core"
 

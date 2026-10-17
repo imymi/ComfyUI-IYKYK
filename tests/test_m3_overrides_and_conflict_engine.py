@@ -888,24 +888,30 @@ class TestM3OverridesAndConflictEngine(unittest.TestCase):
 
     def test_29_exact_identical_60_word_deduplication_protects_external_budget(self):
         """[Audit-R2-2] 统一 is_external_atom 识别，完全相同的 60 词文本在去重与预算截断下外部 100% 保留。"""
-        # 系统 200 词 + 带内部 linkage 标记的相同 60 词 + 外部相同 60 词
+        # 系统 200 词 (scene_theme) + 带内部 linkage 标记的相同 60 词 (custom, 非覆盖槽位) + 外部相同 60 词 (clothing)
         sys_200 = [PromptFragment(text=f"sys_text_word_{i}", source_slot="scene_theme", order=i) for i in range(200)]
         identical_60_words = " ".join(f"exact_shared_atom_{i}" for i in range(60))
         sys_linkage = PromptFragment(
             text=identical_60_words,
-            source_slot="clothing",
+            source_slot="custom",
             order=250,
-            origin=SelectionOrigin(mode="preset", selector="clothing", parent_ids=["override:linkage"]),
+            provenance=TagProvenance(item_id="linkage_item", semantic_ids=("override:linkage",)),
+            origin=SelectionOrigin(mode="preset", selector="custom", parent_ids=["override:linkage"]),
         )
 
         res = self.assembler.assemble_slots(
-            {"scene_theme": sys_200, "clothing": [sys_linkage]},
+            {"scene_theme": sys_200, "custom": [sys_linkage]},
             rng=Random(42),
             external_overrides={"clothing": identical_60_words},
         )
+        words = res.prompt.split()
         # 总预算截断在 250 词内
-        self.assertLessEqual(len(res.prompt.split()), 250)
-        # 外部相同文本 60 词因享有最高外部优先级，全量完整保留
+        self.assertEqual(len(words), 250)
+        # 外部相同文本 60 词因享有最高外部优先级，在去重中替换内部标签并在预算截断中 100% 完整保留
+        ext_count = sum(1 for w in words if w.startswith("exact_shared_atom_"))
+        sys_count = sum(1 for w in words if w.startswith("sys_text_word_"))
+        self.assertEqual(ext_count, 60, f"Expected 60 external atoms, but found {ext_count}")
+        self.assertEqual(sys_count, 190, f"Expected 190 system atoms, but found {sys_count}")
         for i in range(60):
             self.assertIn(f"exact_shared_atom_{i}", res.prompt, f"External atom exact_shared_atom_{i} was lost!")
 
@@ -938,6 +944,84 @@ class TestM3OverridesAndConflictEngine(unittest.TestCase):
         self.assertIn("holding smartphone", res.prompt)
         self.assertIn("smartphone in hand", res.prompt)
 
+    def test_32_c02_pose_override_purges_sitting_on_chair_and_keeps_scene(self):
+        """[Audit-R3-1] 真实预设 C02 语义主体归属：覆盖 pose 清除 sitting on chair 并保留场景，覆盖 scene_theme 则反之。"""
+        from lib.sampler import DataSampler
+        sampler = DataSampler(self.data_dir)
+
+        # 1. 覆盖 pose: sitting on chair 必须清除，场景词 (library, study desk) 完整保留
+        gen1 = _generate_structured(
+            sampler,
+            self.assembler,
+            {"预设模板": "C02", "external_overrides": {"pose": "standing upright"}},
+            rng=Random(42),
+            effective_seed=42,
+        )
+        prompt1 = gen1.positive
+        self.assertIn("standing upright", prompt1)
+        self.assertNotIn("sitting on chair", prompt1, "'sitting on chair' leaked after pose override!")
+        self.assertIn("library", prompt1, "'library' was erroneously dropped when overriding pose!")
+        self.assertIn("study desk", prompt1, "'study desk' was erroneously dropped when overriding pose!")
+
+        # 2. 覆盖 scene_theme: sitting on chair 必须保留，场景词 (library, study desk) 彻底清除
+        gen2 = _generate_structured(
+            sampler,
+            self.assembler,
+            {"预设模板": "C02", "external_overrides": {"scene_theme": "modern bookstore"}},
+            rng=Random(42),
+            effective_seed=42,
+        )
+        prompt2 = gen2.positive
+        self.assertIn("modern bookstore", prompt2)
+        self.assertIn("sitting on chair", prompt2, "'sitting on chair' was erroneously dropped when overriding scene_theme!")
+        self.assertNotIn("library", prompt2, "'library' leaked after scene_theme override!")
+        self.assertNotIn("study desk", prompt2, "'study desk' leaked after scene_theme override!")
+
+    def test_33_preset_three_props_overload_resolution(self):
+        """[Audit-R3-2] 同一预设内 3 个独立道具片段 (手机、咖啡杯、相机) 识别为 3 个实体并消解超容量。"""
+        preset_with_3_props = {
+            "id": "C02",
+            "fragments": [
+                {"id": "c02__frag_001", "slot": "props", "text": "holding smartphone"},
+                {"id": "c02__frag_002", "slot": "props", "text": "holding coffee cup"},
+                {"id": "c02__frag_003", "slot": "props", "text": "holding camera"},
+            ],
+        }
+        res = self.assembler.assemble_preset(preset_with_3_props, None, "高清写真 (High)", rng=Random(42))
+        prompt = res.prompt
+        retained = [p for p in ("holding smartphone", "holding coffee cup", "holding camera") if p in prompt]
+        self.assertEqual(len(retained), 2, f"Expected 2 props retained (1 dropped due to 2 hands capacity), got {len(retained)}: {retained}")
+        self.assertIn("handheld_props_single_holder", res.rules_applied)
+
+    def test_34_same_explicit_id_phone_with_hand_description_coexists_with_pose(self):
+        """[Audit-R3-2] 同一明确 ID 道具的多条描述 (含手部方位) 不被割裂拆分，配合单手姿势完整保留 (1+1=2 <= 2)。"""
+        res = self.assembler.assemble_slots(
+            {
+                "pose": [PromptFragment(text="hand on cheek", source_slot="pose", order=0)],
+                "props": [
+                    PromptFragment(
+                        text="holding smartphone in left hand",
+                        source_slot="props",
+                        source_item_id="prop_smartphone_01",
+                        order=1,
+                        provenance=TagProvenance(item_id="prop_smartphone_01"),
+                    ),
+                    PromptFragment(
+                        text="smartphone screen illuminated",
+                        source_slot="props",
+                        source_item_id="prop_smartphone_01",
+                        order=2,
+                        provenance=TagProvenance(item_id="prop_smartphone_01"),
+                    ),
+                ],
+            },
+            rng=Random(42),
+        )
+        self.assertIn("hand on cheek", res.prompt)
+        self.assertIn("holding smartphone in left hand", res.prompt)
+        self.assertIn("smartphone screen illuminated", res.prompt)
+
 
 if __name__ == "__main__":
     unittest.main()
+

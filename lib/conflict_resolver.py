@@ -1264,20 +1264,98 @@ KNOWN_PROP_KWS = (
 )
 
 
+def extract_prop_category(txt: str) -> str:
+    """提取道具的核心类别名词，对近义词归一化，支持同一大类实体归并与不同大类区分。"""
+    t = txt.lower().strip()
+    for kw in KNOWN_PROP_KWS:
+        if re.search(r"\b" + re.escape(kw) + r"\b", t):
+            if kw in ("phone", "smartphone", "cellphone", "mobile"):
+                return "phone"
+            if kw in ("coffee", "cup", "mug", "glass", "bottle", "tea", "drink", "tumbler"):
+                return "cup"
+            if kw in ("camera", "dslr"):
+                return "camera"
+            if kw in ("controller", "gamepad", "joystick"):
+                return "controller"
+            if kw in ("umbrella", "parasol"):
+                return "umbrella"
+            if kw in ("sword", "blade", "katana", "dagger"):
+                return "sword"
+            if kw in ("fan", "folding fan"):
+                return "fan"
+            if kw in ("book", "notebook", "magazine"):
+                return "book"
+            if kw in ("pen", "pencil", "brush"):
+                return "pen"
+            if kw in ("bag", "handbag", "purse", "tote", "clutch"):
+                return "bag"
+            if kw in ("flower", "bouquet", "rose"):
+                return "flower"
+            if kw in ("microphone", "mic"):
+                return "mic"
+            if kw in ("flashlight", "torch"):
+                return "flashlight"
+            return kw
+    clean = re.sub(r"\b(holding|held|in hand|carrying|held in hands?|a|an|the)\b", "", t).strip()
+    words = clean.split()
+    return words[0] if words else t
+
+
 def get_prop_entity_key(atom: PromptAtom) -> str:
     """提取道具实体聚合键。
     契约规则：
-    1. 道具类别相同不能直接视为同一实体；
-    2. 正式来源 (catalog/preset/recipe) 共享相同 item_id / selected_id 归为同一实体；
-    3. 外部覆盖 (override) 的各个独立项具有独立的 source_item_id (override_props_000, 001)，保留独立实体资格；
-    4. 明确区分不同持握手 ("left hand" vs "right hand" / "another" / "other")；
-    5. 无标识的同一道具多描述通过 shared item_id 聚合。
+    1. 预设来源 ID (如 C01, C02, X03) 是容器场景 ID，不等于道具实体 ID；预设内的多个独立道具按各自实体类型独立核算；
+    2. 已有明确单项道具身份的实体 (如 catalog item_id 或 explicit prop ID)，左右手描述不应将其拆散为不同实体；
+    3. 外部覆盖独立标签 (override_props_xxx) 保持独立实体资格；
+    4. 无明确 ID 的自由文本：同类型道具若明确处于不同持握手 (@left vs @right)，识别为两个独立实体。
     """
+    txt = atom.text.lower().strip()
     sid = getattr(atom, "source_item_id", "") or ""
     sel = (atom.origin.selected_id if atom.origin else "") or ""
     pid = (atom.provenance.item_id if atom.provenance else "") or ""
-    txt = atom.text.lower().strip()
 
+    # 1. 检查是否为预设容器来源 (预设来源 ID 不等于道具实体 ID)
+    is_preset = False
+    preset_id = ""
+    if atom.origin and atom.origin.mode == "preset":
+        is_preset = True
+        preset_id = atom.origin.selected_id or "preset"
+    elif atom.provenance and atom.provenance.kind == "preset":
+        is_preset = True
+        preset_id = (atom.provenance.parent_ids[0] if atom.provenance.parent_ids else atom.provenance.item_id) or "preset"
+    elif bool(re.match(r"^[A-Z]\d{2}$", sid)) or sid.startswith("preset_"):
+        is_preset = True
+        preset_id = sid
+
+    if is_preset:
+        cat = extract_prop_category(txt)
+        hand_aff = ""
+        if re.search(r"\b(left hand|in left hand|left arm|with left)\b", txt):
+            hand_aff = "@left"
+        elif re.search(r"\b(right hand|in right hand|right arm|with right)\b", txt):
+            hand_aff = "@right"
+        return f"preset:{preset_id}:{cat}{hand_aff}"
+
+    # 2. 检查是否有明确的单项道具实体 ID (左右手描述不应直接拆开已有明确身份的同一实体)
+    explicit_id = ""
+    if atom.provenance and atom.provenance.item_id and not atom.provenance.item_id.startswith("override_"):
+        explicit_id = atom.provenance.item_id
+    elif sid and not sid.startswith("override_"):
+        explicit_id = sid
+    elif sel and not sel.startswith("override_"):
+        explicit_id = sel
+
+    if explicit_id:
+        return f"item:{explicit_id}"
+
+    # 3. 外部覆盖独立标签 (各含 override_props_xxx)
+    if sid.startswith("override_"):
+        return f"ext:{sid}"
+    if pid.startswith("override_"):
+        return f"ext:{pid}"
+
+    # 4. 无明确 ID 的自由文本：按类别和方位区分
+    cat = extract_prop_category(txt)
     hand_aff = ""
     if re.search(r"\b(left hand|in left hand|left arm|with left)\b", txt):
         hand_aff = "@left"
@@ -1285,18 +1363,7 @@ def get_prop_entity_key(atom: PromptAtom) -> str:
         hand_aff = "@right"
     elif re.search(r"\b(other hand|another hand|other arm|second hand)\b", txt):
         hand_aff = "@other"
-
-    if sid:
-        return f"item:{sid}{hand_aff}"
-    if sel:
-        return f"sel:{sel}{hand_aff}"
-    if pid:
-        return f"pid:{pid}{hand_aff}"
-    for kw in KNOWN_PROP_KWS:
-        if kw in txt:
-            return f"kw:{kw}{hand_aff}"
-    clean = re.sub(r"\b(holding|held|in hand|carrying|held in hands?)\b", "", txt).strip()
-    return f"raw:{clean or txt}{hand_aff}"
+    return f"kw:{cat}{hand_aff}"
 
 
 class PropEntity:
