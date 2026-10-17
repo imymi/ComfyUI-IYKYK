@@ -1264,38 +1264,88 @@ KNOWN_PROP_KWS = (
 )
 
 
-def extract_prop_category(txt: str) -> str:
-    """提取道具的核心类别名词，对近义词归一化，支持同一大类实体归并与不同大类区分。"""
+def is_container_id(id_str: str) -> bool:
+    """判断给定标识是否为预设/配方容器 ID，而非单项道具实体 ID。"""
+    if not id_str or not isinstance(id_str, str):
+        return False
+    s = id_str.strip()
+    if s in ("preset_core", "preset_custom", "style_recipe", "recipe", "props", "prop", "unknown"):
+        return True
+    if re.match(r"^[A-Z]\d{2}$", s):
+        return True
+    if s.startswith("preset_") or s.startswith("recipe_"):
+        return True
+    return False
+
+
+def is_fragment_id(id_str: str) -> bool:
+    """判断给定标识是否为数据文件内的片段行号标识，而非共享道具实体 ID。"""
+    if not id_str or not isinstance(id_str, str):
+        return False
+    s = id_str.strip()
+    if re.match(r"^[a-z]\d{2}__frag_\d+$", s, re.I):
+        return True
+    if s.startswith("frag_") or s.startswith("atom_"):
+        return True
+    return False
+
+
+def extract_explicit_prop_entity_id(atom: PromptAtom) -> Optional[str]:
+    """提取显式道具实体 ID（区分容器 ID 与行号片段 ID，跨来源统一有效）。"""
+    if atom.target_id and not is_container_id(atom.target_id) and not is_fragment_id(atom.target_id) and not atom.target_id.startswith("override_"):
+        return atom.target_id.strip()
+    if atom.provenance and atom.provenance.item_id:
+        pid = atom.provenance.item_id.strip()
+        if not is_container_id(pid) and not is_fragment_id(pid) and not pid.startswith("override_"):
+            return pid
+    if atom.source_item_id:
+        sid = atom.source_item_id.strip()
+        if not is_container_id(sid) and not is_fragment_id(sid) and not sid.startswith("override_"):
+            return sid
+    if atom.origin and atom.origin.selector == "props" and atom.origin.selected_id:
+        sel = atom.origin.selected_id.strip()
+        if not is_container_id(sel) and not is_fragment_id(sel) and not sel.startswith("override_"):
+            return sel
+    return None
+
+
+def extract_prop_object_key(txt: str) -> str:
+    """提取道具的具体指称对象，严禁粗粒度合并不同大类（水瓶 bottle 与咖啡杯 cup 严格区分独立核算）。"""
     t = txt.lower().strip()
-    for kw in KNOWN_PROP_KWS:
-        if re.search(r"\b" + re.escape(kw) + r"\b", t):
-            if kw in ("phone", "smartphone", "cellphone", "mobile"):
-                return "phone"
-            if kw in ("coffee", "cup", "mug", "glass", "bottle", "tea", "drink", "tumbler"):
-                return "cup"
-            if kw in ("camera", "dslr"):
-                return "camera"
-            if kw in ("controller", "gamepad", "joystick"):
-                return "controller"
-            if kw in ("umbrella", "parasol"):
-                return "umbrella"
-            if kw in ("sword", "blade", "katana", "dagger"):
-                return "sword"
-            if kw in ("fan", "folding fan"):
-                return "fan"
-            if kw in ("book", "notebook", "magazine"):
-                return "book"
-            if kw in ("pen", "pencil", "brush"):
-                return "pen"
-            if kw in ("bag", "handbag", "purse", "tote", "clutch"):
-                return "bag"
-            if kw in ("flower", "bouquet", "rose"):
-                return "flower"
-            if kw in ("microphone", "mic"):
-                return "mic"
-            if kw in ("flashlight", "torch"):
-                return "flashlight"
-            return kw
+    if re.search(r"\b(water bottle|bottle|flask|thermos|canteen)\b", t):
+        return "bottle"
+    if re.search(r"\b(coffee cup|coffee mug|coffee)\b", t):
+        return "coffee_cup"
+    if re.search(r"\b(tea cup|tea mug|teacup)\b", t):
+        return "tea_cup"
+    if re.search(r"\b(wine glass|champagne glass|cocktail glass|glass)\b", t):
+        return "glass"
+    if re.search(r"\b(cup|mug|tumbler)\b", t):
+        return "cup"
+    if re.search(r"\b(smartphone|cellphone|mobile|phone)\b", t):
+        return "phone"
+    if re.search(r"\b(camera|dslr)\b", t):
+        return "camera"
+    if re.search(r"\b(game controller|gamepad|controller|joystick)\b", t):
+        return "controller"
+    if re.search(r"\b(spatula|skillet|pan)\b", t):
+        return "spatula"
+    if re.search(r"\b(sword|blade|katana|dagger)\b", t):
+        return "sword"
+    if re.search(r"\b(umbrella|parasol)\b", t):
+        return "umbrella"
+    if re.search(r"\b(folding fan|round fan|fan)\b", t):
+        return "fan"
+    if re.search(r"\b(book|notebook|magazine)\b", t):
+        return "book"
+    if re.search(r"\b(pen|pencil|brush)\b", t):
+        return "pen"
+    if re.search(r"\b(bouquet|flower|rose)\b", t):
+        return "flower"
+    if re.search(r"\b(microphone|mic)\b", t):
+        return "mic"
+    if re.search(r"\b(bag|handbag|purse|tote|clutch)\b", t):
+        return "bag"
     clean = re.sub(r"\b(holding|held|in hand|carrying|held in hands?|a|an|the)\b", "", t).strip()
     words = clean.split()
     return words[0] if words else t
@@ -1303,59 +1353,28 @@ def extract_prop_category(txt: str) -> str:
 
 def get_prop_entity_key(atom: PromptAtom) -> str:
     """提取道具实体聚合键。
-    契约规则：
-    1. 预设来源 ID (如 C01, C02, X03) 是容器场景 ID，不等于道具实体 ID；预设内的多个独立道具按各自实体类型独立核算；
-    2. 已有明确单项道具身份的实体 (如 catalog item_id 或 explicit prop ID)，左右手描述不应将其拆散为不同实体；
+    权威契约规则：
+    1. 区分容器 ID、片段 ID 与道具实体 ID；
+    2. 显式道具实体 ID (如 item_id) 具有最高且跨来源 (preset/recipe/catalog/override) 完全一致的权威性，同一实体 ID 的多条描述绝不被方位或状态割裂；
     3. 外部覆盖独立标签 (override_props_xxx) 保持独立实体资格；
-    4. 无明确 ID 的自由文本：同类型道具若明确处于不同持握手 (@left vs @right)，识别为两个独立实体。
+    4. 自由文本或无实体 ID 片段：按道具具体对象（bottle 与 cup 严格区分）和持握方位（@left vs @right）确定实体身份。
     """
-    txt = atom.text.lower().strip()
-    sid = getattr(atom, "source_item_id", "") or ""
-    sel = (atom.origin.selected_id if atom.origin else "") or ""
-    pid = (atom.provenance.item_id if atom.provenance else "") or ""
-
-    # 1. 检查是否为预设容器来源 (预设来源 ID 不等于道具实体 ID)
-    is_preset = False
-    preset_id = ""
-    if atom.origin and atom.origin.mode == "preset":
-        is_preset = True
-        preset_id = atom.origin.selected_id or "preset"
-    elif atom.provenance and atom.provenance.kind == "preset":
-        is_preset = True
-        preset_id = (atom.provenance.parent_ids[0] if atom.provenance.parent_ids else atom.provenance.item_id) or "preset"
-    elif bool(re.match(r"^[A-Z]\d{2}$", sid)) or sid.startswith("preset_"):
-        is_preset = True
-        preset_id = sid
-
-    if is_preset:
-        cat = extract_prop_category(txt)
-        hand_aff = ""
-        if re.search(r"\b(left hand|in left hand|left arm|with left)\b", txt):
-            hand_aff = "@left"
-        elif re.search(r"\b(right hand|in right hand|right arm|with right)\b", txt):
-            hand_aff = "@right"
-        return f"preset:{preset_id}:{cat}{hand_aff}"
-
-    # 2. 检查是否有明确的单项道具实体 ID (左右手描述不应直接拆开已有明确身份的同一实体)
-    explicit_id = ""
-    if atom.provenance and atom.provenance.item_id and not atom.provenance.item_id.startswith("override_"):
-        explicit_id = atom.provenance.item_id
-    elif sid and not sid.startswith("override_"):
-        explicit_id = sid
-    elif sel and not sel.startswith("override_"):
-        explicit_id = sel
-
+    # 1. 显式道具实体 ID 优先跨来源统一生效（预设、配方、目录、外部均同等遵循）
+    explicit_id = extract_explicit_prop_entity_id(atom)
     if explicit_id:
         return f"item:{explicit_id}"
 
-    # 3. 外部覆盖独立标签 (各含 override_props_xxx)
+    # 2. 外部覆盖独立标签 (各含 override_props_xxx)
+    sid = getattr(atom, "source_item_id", "") or ""
+    pid = (atom.provenance.item_id if atom.provenance else "") or ""
     if sid.startswith("override_"):
         return f"ext:{sid}"
     if pid.startswith("override_"):
         return f"ext:{pid}"
 
-    # 4. 无明确 ID 的自由文本：按类别和方位区分
-    cat = extract_prop_category(txt)
+    # 3. 自由文本或无明确 ID 片段：提取指称对象与持握方位
+    txt = atom.text.lower().strip()
+    obj = extract_prop_object_key(txt)
     hand_aff = ""
     if re.search(r"\b(left hand|in left hand|left arm|with left)\b", txt):
         hand_aff = "@left"
@@ -1363,7 +1382,17 @@ def get_prop_entity_key(atom: PromptAtom) -> str:
         hand_aff = "@right"
     elif re.search(r"\b(other hand|another hand|other arm|second hand)\b", txt):
         hand_aff = "@other"
-    return f"kw:{cat}{hand_aff}"
+
+    # 若属于特定容器，使用容器前缀隔离，避免不同容器之间无 ID 道具偶合
+    container_prefix = ""
+    if atom.provenance and atom.provenance.parent_ids:
+        container_prefix = f"cont:{atom.provenance.parent_ids[0]}:"
+    elif atom.origin and is_container_id(atom.origin.selected_id):
+        container_prefix = f"cont:{atom.origin.selected_id}:"
+    elif is_container_id(sid):
+        container_prefix = f"cont:{sid}:"
+
+    return f"{container_prefix}obj:{obj}{hand_aff}"
 
 
 class PropEntity:

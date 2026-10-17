@@ -978,50 +978,172 @@ class TestM3OverridesAndConflictEngine(unittest.TestCase):
         self.assertNotIn("study desk", prompt2, "'study desk' leaked after scene_theme override!")
 
     def test_33_preset_three_props_overload_resolution(self):
-        """[Audit-R3-2] 同一预设内 3 个独立道具片段 (手机、咖啡杯、相机) 识别为 3 个实体并消解超容量。"""
+        """[Audit-R4-1] 同一预设内 3 个独立道具 (水瓶、咖啡杯、相机) 识别为 3 个独立实体并消解双手超容量。"""
         preset_with_3_props = {
             "id": "C02",
             "fragments": [
-                {"id": "c02__frag_001", "slot": "props", "text": "holding smartphone"},
+                {"id": "c02__frag_001", "slot": "props", "text": "holding water bottle"},
                 {"id": "c02__frag_002", "slot": "props", "text": "holding coffee cup"},
                 {"id": "c02__frag_003", "slot": "props", "text": "holding camera"},
             ],
         }
         res = self.assembler.assemble_preset(preset_with_3_props, None, "高清写真 (High)", rng=Random(42))
         prompt = res.prompt
-        retained = [p for p in ("holding smartphone", "holding coffee cup", "holding camera") if p in prompt]
-        self.assertEqual(len(retained), 2, f"Expected 2 props retained (1 dropped due to 2 hands capacity), got {len(retained)}: {retained}")
+        retained = [p for p in ("holding water bottle", "holding coffee cup", "holding camera") if p in prompt]
+        self.assertEqual(
+            len(retained), 2,
+            f"Expected 2 props retained (water bottle & coffee cup independent, camera dropped due to 2 hands limit), got {len(retained)}: {retained}"
+        )
+        self.assertIn("holding water bottle", prompt)
+        self.assertIn("holding coffee cup", prompt)
+        self.assertNotIn("holding camera", prompt)
         self.assertIn("handheld_props_single_holder", res.rules_applied)
 
-    def test_34_same_explicit_id_phone_with_hand_description_coexists_with_pose(self):
-        """[Audit-R3-2] 同一明确 ID 道具的多条描述 (含手部方位) 不被割裂拆分，配合单手姿势完整保留 (1+1=2 <= 2)。"""
-        res = self.assembler.assemble_slots(
-            {
-                "pose": [PromptFragment(text="hand on cheek", source_slot="pose", order=0)],
-                "props": [
-                    PromptFragment(
-                        text="holding smartphone in left hand",
-                        source_slot="props",
-                        source_item_id="prop_smartphone_01",
-                        order=1,
-                        provenance=TagProvenance(item_id="prop_smartphone_01"),
-                    ),
-                    PromptFragment(
-                        text="smartphone screen illuminated",
-                        source_slot="props",
-                        source_item_id="prop_smartphone_01",
-                        order=2,
-                        provenance=TagProvenance(item_id="prop_smartphone_01"),
-                    ),
-                ],
-            },
-            rng=Random(42),
-        )
-        self.assertIn("hand on cheek", res.prompt)
-        self.assertIn("holding smartphone in left hand", res.prompt)
-        self.assertIn("smartphone screen illuminated", res.prompt)
+    def test_34_preset_same_explicit_id_phone_with_hand_description_coexists_with_pose(self):
+        """[Audit-R4-2] 预设来源同一明确 ID 手机的多条描述 (含左手方位与屏幕状态) 不被割裂，配合单手姿势完整保留 (1+1=2 <= 2)。"""
+        preset_phone = {
+            "id": "C02",
+            "fragments": [
+                {"id": "c02__frag_000", "slot": "pose", "text": "hand on cheek"},
+                {"id": "c02__frag_001", "slot": "props", "text": "holding smartphone in left hand", "item_id": "prop_smartphone_01"},
+                {"id": "c02__frag_002", "slot": "props", "text": "smartphone screen illuminated", "item_id": "prop_smartphone_01"},
+            ],
+        }
+        res = self.assembler.assemble_preset(preset_phone, None, "高清写真 (High)", rng=Random(42))
+        prompt = res.prompt
+        self.assertIn("hand on cheek", prompt)
+        self.assertIn("holding smartphone in left hand", prompt)
+        self.assertIn("smartphone screen illuminated", prompt, "Screen illumination was erroneously dropped!")
+
+    def test_35_prop_entity_matrix_multi_description_and_different_entities_across_sources(self):
+        """[Audit-R4-3] 全面覆盖“同一实体多描述”与“不同实体同类别”在预设、配方、目录及外部输入 4 种路径下的行为。"""
+        # 1. 预设路径 (Preset)
+        # 1.1 不同实体同类别 (左手手机 + 右手手机 + 咖啡杯)：识别为 3 实体，容量消解保留 2 件
+        p_preset_diff = {
+            "id": "C02",
+            "fragments": [
+                {"id": "c02__frag_001", "slot": "props", "text": "smartphone in left hand"},
+                {"id": "c02__frag_002", "slot": "props", "text": "smartphone in right hand"},
+                {"id": "c02__frag_003", "slot": "props", "text": "holding coffee cup"},
+            ],
+        }
+        r_preset_diff = self.assembler.assemble_preset(p_preset_diff, None, "高清写真 (High)", rng=Random(42))
+        ret_preset_diff = [p for p in ("smartphone in left hand", "smartphone in right hand", "holding coffee cup") if p in r_preset_diff.prompt]
+        self.assertEqual(len(ret_preset_diff), 2)
+        self.assertIn("handheld_props_single_holder", r_preset_diff.rules_applied)
+
+        # 2. 配方路径 (Recipe)
+        # 2.1 同一实体多描述：配方内明确 ID 手机多描述 + 1 手姿态完整保留
+        p_recipe_same = {
+            "id": "recipe_test_same",
+            "fragments": [
+                {"id": "rec__frag_000", "slot": "pose", "text": "hand on cheek"},
+                {"id": "rec__frag_001", "slot": "props", "text": "holding smartphone in left hand", "item_id": "prop_smartphone_01"},
+                {"id": "rec__frag_002", "slot": "props", "text": "smartphone screen illuminated", "item_id": "prop_smartphone_01"},
+            ],
+        }
+        r_recipe_same = self.assembler.assemble_preset({"id": "C01", "positive": "classroom"}, p_recipe_same, "高清写真 (High)", rng=Random(42))
+        self.assertIn("hand on cheek", r_recipe_same.prompt)
+        self.assertIn("holding smartphone in left hand", r_recipe_same.prompt)
+        self.assertIn("smartphone screen illuminated", r_recipe_same.prompt)
+
+        # 2.2 不同实体同类别：配方内左右手同类道具 + 相机 (3 实体超容消解)
+        p_recipe_diff = {
+            "id": "recipe_test_diff",
+            "fragments": [
+                {"id": "rec__frag_001", "slot": "props", "text": "holding smartphone in left hand"},
+                {"id": "rec__frag_002", "slot": "props", "text": "holding smartphone in right hand"},
+                {"id": "rec__frag_003", "slot": "props", "text": "holding camera"},
+            ],
+        }
+        r_recipe_diff = self.assembler.assemble_preset({"id": "C01", "positive": "classroom"}, p_recipe_diff, "高清写真 (High)", rng=Random(42))
+        ret_recipe_diff = [p for p in ("holding smartphone in left hand", "holding smartphone in right hand", "holding camera") if p in r_recipe_diff.prompt]
+        self.assertEqual(len(ret_recipe_diff), 2)
+        self.assertIn("handheld_props_single_holder", r_recipe_diff.rules_applied)
+
+        # 3. 目录路径 (Catalog)
+        # 3.1 同一实体多描述：目录同一 item_id 多描述在单手占用姿势下均被保留
+        f_cat_same = {
+            "pose": [PromptFragment(text="hand on cheek", source_slot="pose", order=0)],
+            "props": [
+                PromptFragment(
+                    text="holding digital camera in hands",
+                    source_slot="props",
+                    source_item_id="digital_camera_in_hand",
+                    order=1,
+                    provenance=TagProvenance(item_id="digital_camera_in_hand", source_mode="explicit"),
+                    facts=SemanticFacts(prop_usage="handheld", hands_required=1, explicit_fields=("prop_usage", "hands_required")),
+                ),
+                PromptFragment(
+                    text="camera flash firing brightly",
+                    source_slot="props",
+                    source_item_id="digital_camera_in_hand",
+                    order=2,
+                    provenance=TagProvenance(item_id="digital_camera_in_hand", source_mode="explicit"),
+                    facts=SemanticFacts(prop_usage="handheld", hands_required=1, explicit_fields=("prop_usage", "hands_required")),
+                ),
+            ],
+        }
+        r_cat_same = self.assembler.assemble_slots(f_cat_same, rng=Random(42))
+        self.assertIn("hand on cheek", r_cat_same.prompt)
+        self.assertIn("holding digital camera in hands", r_cat_same.prompt)
+        self.assertIn("camera flash firing brightly", r_cat_same.prompt)
+
+        # 3.2 不同实体同类别：不同 catalog item_id 的同类道具独立占用
+        f_cat_diff = {
+            "props": [
+                PromptFragment(
+                    text="holding smartphone in left hand",
+                    source_slot="props",
+                    source_item_id="prop_phone_01",
+                    order=1,
+                    provenance=TagProvenance(item_id="prop_phone_01", source_mode="explicit"),
+                    facts=SemanticFacts(prop_usage="handheld", hands_required=1, explicit_fields=("prop_usage", "hands_required")),
+                ),
+                PromptFragment(
+                    text="holding smartphone in right hand",
+                    source_slot="props",
+                    source_item_id="prop_phone_02",
+                    order=2,
+                    provenance=TagProvenance(item_id="prop_phone_02", source_mode="explicit"),
+                    facts=SemanticFacts(prop_usage="handheld", hands_required=1, explicit_fields=("prop_usage", "hands_required")),
+                ),
+                PromptFragment(
+                    text="holding coffee cup",
+                    source_slot="props",
+                    source_item_id="prop_cup_01",
+                    order=3,
+                    provenance=TagProvenance(item_id="prop_cup_01", source_mode="explicit"),
+                    facts=SemanticFacts(prop_usage="handheld", hands_required=1, explicit_fields=("prop_usage", "hands_required")),
+                ),
+            ],
+        }
+        r_cat_diff = self.assembler.assemble_slots(f_cat_diff, rng=Random(42))
+        ret_cat_diff = [p for p in ("holding smartphone in left hand", "holding smartphone in right hand", "holding coffee cup") if p in r_cat_diff.prompt]
+        self.assertEqual(len(ret_cat_diff), 2)
+        self.assertIn("handheld_props_single_holder", r_cat_diff.rules_applied)
+
+        # 4. 外部输入路径 (External Overrides)
+        # 4.1 不同实体同类别：左手手机 + 右手手机 + 咖啡杯 (3 > 2 显式报错 Fail-Closed)
+        with self.assertRaises(PromptValidationError) as cm1:
+            self.assembler.assemble_slots(
+                {},
+                rng=Random(42),
+                external_overrides={"props": "smartphone in left hand, smartphone in right hand, coffee cup"},
+            )
+        self.assertEqual(cm1.exception.rule_id, "handheld_props_single_holder")
+
+        # 4.2 不同实体不同类别：水瓶 + 咖啡杯 + 相机 (3 > 2 显式报错 Fail-Closed)
+        with self.assertRaises(PromptValidationError) as cm2:
+            self.assembler.assemble_slots(
+                {},
+                rng=Random(42),
+                external_overrides={"props": "holding water bottle, holding coffee cup, holding camera"},
+            )
+        self.assertEqual(cm2.exception.rule_id, "handheld_props_single_holder")
 
 
 if __name__ == "__main__":
     unittest.main()
+
 

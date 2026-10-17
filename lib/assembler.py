@@ -1009,6 +1009,7 @@ class PromptAssembler:
                 text = f_data.get("text", "")
                 if text:
                     f_id = f_data.get("id", "")
+                    f_item_id = f_data.get("item_id") or f_data.get("prop_id") or f_data.get("entity_id")
                     f_slot = f_data.get("slot")
                     raw_facts = f_data.get("facts", {})
                     f_facts = SemanticFacts.from_dict(raw_facts)
@@ -1018,14 +1019,16 @@ class PromptAssembler:
                     elif f_slot in ALLOWED_SLOTS:
                         _, inferred_facts = classify_preset_tag_and_facts(text, Path(self.data_dir), target_slot=f_slot)
                         f_facts = inferred_facts.merge(f_facts)
+                    sid = f_item_id if f_item_id else preset_id
+                    pid = f_item_id if f_item_id else (f_id or preset_id)
                     fragments.append(
                         PromptFragment(
                             text=text,
                             source_slot=f_slot,
-                            source_item_id=preset_id,
+                            source_item_id=sid,
                             order=order,
                             provenance=TagProvenance(
-                                item_id=f_id or preset_id,
+                                item_id=pid,
                                 kind="preset",
                                 semantic_ids=(f"preset:{preset_id}",),
                                 parent_ids=(preset_id,),
@@ -1033,6 +1036,7 @@ class PromptAssembler:
                             id=f_id,
                             facts=f_facts,
                             origin=preset_origin,
+                            target_id=f_item_id,
                         )
                     )
                     order += 1
@@ -1077,6 +1081,7 @@ class PromptAssembler:
                     text = f_data.get("text", "")
                     if text:
                         f_id = f_data.get("id", "")
+                        f_item_id = f_data.get("item_id") or f_data.get("prop_id") or f_data.get("entity_id")
                         f_slot = f_data.get("slot")
                         raw_facts = f_data.get("facts", {})
                         f_facts = SemanticFacts.from_dict(raw_facts)
@@ -1086,14 +1091,16 @@ class PromptAssembler:
                         elif f_slot in ALLOWED_SLOTS:
                             _, inferred_facts = classify_preset_tag_and_facts(text, Path(self.data_dir), target_slot=f_slot)
                             f_facts = inferred_facts.merge(f_facts)
+                        sid = f_item_id if f_item_id else recipe_id
+                        pid = f_item_id if f_item_id else (f_id or recipe_id)
                         fragments.append(
                             PromptFragment(
                                 text=text,
                                 source_slot=f_slot,
-                                source_item_id=recipe_id,
+                                source_item_id=sid,
                                 order=order,
                                 provenance=TagProvenance(
-                                    item_id=f_id or recipe_id,
+                                    item_id=pid,
                                     kind="style_recipe",
                                     semantic_ids=(f"recipe:{recipe_id}",),
                                     parent_ids=(recipe_id,),
@@ -1101,6 +1108,7 @@ class PromptAssembler:
                                 id=f_id,
                                 facts=f_facts,
                                 origin=recipe_origin,
+                                target_id=f_item_id,
                             )
                         )
                         order += 1
