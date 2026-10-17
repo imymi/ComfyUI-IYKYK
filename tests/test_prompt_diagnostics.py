@@ -1137,56 +1137,182 @@ print(audit)
         self.assertEqual(len(err_audit["overrides"]), 20)
 
     def test_31_m5_2_four_nodes_x_20_slots_override_matrix(self):
-        """M5-2 覆盖与组合回归：四大节点 × 20 槽位外部覆盖矩阵行为契约。"""
+        """M5-2 覆盖与组合回归：四大节点 × 20 槽位外部覆盖全矩阵行为契约 (80 组完整验证)。"""
         from lib.slot_contract import SLOT_ORDER, AUXILIARY_SLOT_ORDER
         all_20 = tuple(SLOT_ORDER) + tuple(AUXILIARY_SLOT_ORDER)
 
-        # 1. 主生成器 (PromptGeneratorStructured)
         gen = IYKYKPromptGenerator()
-        for slot in all_20[:5]:
-            kw = {f"{slot}_override": f"custom_{slot}_unique_val"}
-            pos, _, _ = gen.generate(prompt_seed=42, **kw)
-            self.assertIn(f"custom_{slot}_unique_val", pos)
+        browser = IYKYKPresetBrowser()
+        combiner = IYKYKCustomSlotCombiner()
+        diag = self.diagnostics
 
-        # 2. 预设浏览器 (PromptBrowserStructured)
+        for slot in all_20:
+            val = f"distinct_{slot}_override_val"
+            kw = {f"{slot}_override": val}
+
+            # 1. 主生成器
+            g_res = gen.generate_structured(prompt_seed=42, **kw)
+            self.assertIn(val, g_res.positive, f"Generator positive missing {slot} override")
+            self.assertEqual(len(g_res.overrides), 20)
+            g_rec = next(o for o in g_res.overrides if o.canonical_slot == slot)
+            self.assertEqual(g_rec.status, "applied")
+            self.assertEqual(g_rec.raw_input, val)
+            self.assertTrue(len(g_rec.injected_atom_ids) > 0)
+            for aid in g_rec.injected_atom_ids:
+                self.assertTrue(aid.startswith("atom_"))
+                self.assertTrue(any(a.atom_id == aid for a in g_res.atoms))
+
+            # 2. 预设浏览器
+            b_res = browser.browse_structured(
+                预设模板="C01",
+                风格配方="无 (None)",
+                画质等级="高清写真 (High)",
+                prompt_seed=42,
+                **kw,
+            )
+            self.assertIn(val, b_res.positive, f"PresetBrowser positive missing {slot} override")
+            self.assertEqual(len(b_res.overrides), 20)
+            b_rec = next(o for o in b_res.overrides if o.canonical_slot == slot)
+            self.assertEqual(b_rec.status, "applied")
+            self.assertEqual(b_rec.raw_input, val)
+            for aid in b_rec.injected_atom_ids:
+                self.assertTrue(aid.startswith("atom_"))
+
+            # 3. 自定义槽位拼装器
+            c_res = combiner.combine_structured(prompt_seed=42, **kw)
+            self.assertIn(val, c_res.positive, f"Combiner positive missing {slot} override")
+            self.assertEqual(len(c_res.overrides), 20)
+            c_rec = next(o for o in c_res.overrides if o.canonical_slot == slot)
+            self.assertEqual(c_rec.status, "applied")
+            self.assertEqual(c_rec.raw_input, val)
+            for aid in c_rec.injected_atom_ids:
+                self.assertTrue(aid.startswith("atom_"))
+
+            # 4. 诊断节点
+            d_res, d_audit_str = diag.diagnose_structured(prompt_seed=42, **kw)
+            self.assertIn(val, d_res.positive, f"Diagnostics positive missing {slot} override")
+            d_audit = json.loads(d_audit_str)
+            self.assertEqual(len(d_audit["overrides"]), 20)
+            d_rec = next(o for o in d_audit["overrides"] if o["canonical_slot"] == slot)
+            self.assertEqual(d_rec["status"], "applied")
+            self.assertEqual(d_rec["raw_input"], val)
+            for aid in d_rec["injected_atom_ids"]:
+                self.assertTrue(aid.startswith("atom_"))
+
+    def test_32_m5_2_override_blank_fallback_and_none_rejection(self):
+        """外部输入空白字符正常回退并记录原因；显式 None 严格报错。"""
+        gen = IYKYKPromptGenerator()
+
+        # 空白字符串与纯空格回退
+        res_empty = gen.generate_structured(prompt_seed=42, clothing_override="")
+        rec_empty = next(o for o in res_empty.overrides if o.canonical_slot == "clothing")
+        self.assertEqual(rec_empty.status, "fallback_blank")
+        self.assertEqual(rec_empty.blank_fallback_reason, "empty_string")
+        self.assertTrue(len(res_empty.positive) > 0)
+
+        res_space = gen.generate_structured(prompt_seed=42, pose_override="   ")
+        rec_space = next(o for o in res_space.overrides if o.canonical_slot == "pose")
+        self.assertEqual(rec_space.status, "fallback_blank")
+        self.assertEqual(rec_space.blank_fallback_reason, "whitespace_only")
+
+        # 显式 None 严格拦截抛错
+        from lib.errors import PromptValidationError
+        with self.assertRaises(PromptValidationError):
+            gen.generate_structured(prompt_seed=42, clothing_override=None)
+
+    def test_33_m5_2_override_chinese_aliases_consistency(self):
+        """验证四节点中文别名覆盖字典一致生效。"""
         browser = IYKYKPresetBrowser()
         b_res = browser.browse_structured(
             预设模板="C01",
             风格配方="无 (None)",
             画质等级="高清写真 (High)",
-            clothing_override="futuristic cybernetic jacket",
+            external_overrides={"服装款式": "royal velvet cloak"},
             prompt_seed=42,
         )
-        self.assertIn("futuristic cybernetic jacket", b_res.positive)
-        self.assertEqual(len(b_res.overrides), 20)
-        cloth_rec = next(o for o in b_res.overrides if o.canonical_slot == "clothing")
-        self.assertEqual(cloth_rec.status, "applied")
+        self.assertIn("royal velvet cloak", b_res.positive)
+        rec = next(o for o in b_res.overrides if o.canonical_slot == "clothing")
+        self.assertEqual(rec.status, "applied")
 
-        # 3. 自定义拼装器 (PromptCombinerStructured)
         combiner = IYKYKCustomSlotCombiner()
         c_res = combiner.combine_structured(
-            服装款式="traditional kimono",
-            clothing_override="modern business suit",
+            服装款式="old dress",
+            external_overrides={"服装款式": "cyber punk trenchcoat"},
             prompt_seed=42,
         )
-        self.assertIn("modern business suit", c_res.positive)
-        self.assertNotIn("traditional kimono", c_res.positive)
-        self.assertEqual(len(c_res.overrides), 20)
-        c_cloth = next(o for o in c_res.overrides if o.canonical_slot == "clothing")
-        self.assertEqual(c_cloth.status, "applied")
-        self.assertEqual(c_cloth.source_port, "clothing")
+        self.assertIn("cyber punk trenchcoat", c_res.positive)
+        self.assertNotIn("old dress", c_res.positive)
+        c_rec = next(o for o in c_res.overrides if o.canonical_slot == "clothing")
+        self.assertEqual(c_rec.status, "applied")
 
-        # 4. 诊断节点 (PromptDiagnostics)
-        d_res, d_json_str = self.diagnostics.diagnose_structured(
-            lighting_override="neon cyberpunk backlighting",
+    def test_34_m5_2_structured_prompt_fragment_override_serialization(self):
+        """验证结构化 PromptFragment 覆盖输入无损序列化，杜绝 json.dumps 崩溃。"""
+        from lib.models import PromptFragment
+        frag = PromptFragment(text="bespoke linen vest", source_slot="clothing", id="frag_cloth_007")
+        d_res, audit_str = self.diagnostics.diagnose_structured(
+            clothing_override=frag,
             prompt_seed=42,
+            raise_on_error=True,
         )
-        self.assertIn("neon cyberpunk backlighting", d_res.positive)
-        d_audit = json.loads(d_json_str)
-        self.assertEqual(len(d_audit["overrides"]), 20)
-        light_rec = next(o for o in d_audit["overrides"] if o["canonical_slot"] == "lighting")
-        self.assertEqual(light_rec["status"], "applied")
-        self.assertEqual(light_rec["source_port"], "lighting")
+        self.assertIn("bespoke linen vest", d_res.positive)
+        audit = json.loads(audit_str)
+        rec = next(o for o in audit["overrides"] if o["canonical_slot"] == "clothing")
+        self.assertEqual(rec["status"], "applied")
+        self.assertIsInstance(rec["raw_input"], dict)
+        self.assertEqual(rec["raw_input"]["text"], "bespoke linen vest")
+        self.assertEqual(rec["raw_input"]["id"], "frag_cloth_007")
+
+        if HAS_JSONSCHEMA:
+            self.validator.validate(audit)
+
+    def test_35_m5_2_conflicting_overrides_error_diagnostics(self):
+        """验证外部覆盖硬冲突时，错误诊断报告如实保留真实输入并标记 failed_conflict。"""
+        res, audit_str = self.diagnostics.diagnose_structured(
+            pose_override="arms bound behind back",
+            props_override="holding smartphone",
+            prompt_seed=42,
+            raise_on_error=False,
+        )
+        self.assertIsNone(res)
+        audit = json.loads(audit_str)
+        self.assertEqual(audit["status"], "error")
+
+        pose_ov = next(o for o in audit["overrides"] if o["canonical_slot"] == "pose")
+        props_ov = next(o for o in audit["overrides"] if o["canonical_slot"] == "props")
+        other_ov = next(o for o in audit["overrides"] if o["canonical_slot"] == "clothing")
+
+        self.assertEqual(pose_ov["status"], "failed_conflict")
+        self.assertEqual(pose_ov["raw_input"], "arms bound behind back")
+        self.assertEqual(props_ov["status"], "failed_conflict")
+        self.assertEqual(props_ov["raw_input"], "holding smartphone")
+        self.assertEqual(other_ov["status"], "not_provided")
+        self.assertIsNone(other_ov["raw_input"])
+
+        if HAS_JSONSCHEMA:
+            self.validator.validate(audit)
+
+    def test_36_m5_1_sampling_rationale_pool_truthfulness(self):
+        """验证随机场景采样真实依据：total_candidates 与 passed_candidates 真实反映候选池规模。"""
+        from lib.sampler import DataSampler
+        sampler = DataSampler(REPO_DIR / "data")
+        res = sampler.sample_scene_result("随机 (Random)", Random(42))
+        self.assertIsNotNone(res)
+        rat = res.sampling_rationale
+        self.assertIsNotNone(rat)
+        self.assertEqual(rat["candidate_filter"]["total_candidates"], 234)
+        self.assertEqual(rat["candidate_filter"]["passed_candidates"], 234)
+        self.assertEqual(len(rat["distribution"]), 234)
+        self.assertEqual(rat["final_selection"]["mode"], "uniform_random")
+
+        # 验证场景覆盖替换前真实捕获旧场景
+        res_ov = self.diagnostics.diagnose_structured(
+            scene_theme_override="high school biology classroom",
+            prompt_seed=42,
+        )[0]
+        sc_ov = next(o for o in res_ov.overrides if o.canonical_slot == "scene_theme")
+        self.assertEqual(sc_ov.status, "applied")
+        self.assertNotIn("high school biology classroom", sc_ov.replaced_texts)
+        self.assertTrue(len(sc_ov.replaced_texts) > 0)
 
 
 if __name__ == "__main__":

@@ -24,7 +24,7 @@ if __package__:
         fragments_to_atoms,
     )
     from .conflict_resolver import ConflictResolver, is_external_atom
-    from .errors import PromptValidationError
+    from .errors import PromptValidationError, UnresolvedConflictError
     from .lexer import split_top_level_tags, validate_prompt_syntax
     from .models import (
         AssemblyResult,
@@ -47,7 +47,7 @@ else:
         fragments_to_atoms,
     )
     from lib.conflict_resolver import ConflictResolver, is_external_atom
-    from lib.errors import PromptValidationError
+    from lib.errors import PromptValidationError, UnresolvedConflictError
     from lib.lexer import split_top_level_tags, validate_prompt_syntax
     from lib.models import (
         AssemblyResult,
@@ -446,6 +446,39 @@ def assemble_result(
 
     source_atoms = tuple(raw_atoms)
 
+    # 将外部覆盖记录中的注入 ID 映射为真实的 authoritative atom_id
+    if overrides:
+        updated_overrides = []
+        for o in overrides:
+            if o.status == "applied":
+                matched_atom_ids = tuple(
+                    a.atom_id for a in raw_atoms
+                    if a.origin and a.origin.mode == "override" and a.source_slot == o.canonical_slot
+                )
+                if not matched_atom_ids:
+                    matched_atom_ids = tuple(
+                        a.atom_id for a in raw_atoms
+                        if a.origin and a.origin.mode == "override" and (
+                            a.source_slot == o.canonical_slot
+                            or (a.provenance and o.canonical_slot in a.provenance.semantic_ids)
+                        )
+                    )
+                updated_overrides.append(
+                    OverrideRecord(
+                        canonical_slot=o.canonical_slot,
+                        status=o.status,
+                        source_port=o.source_port,
+                        raw_input=o.raw_input,
+                        blank_fallback_reason=o.blank_fallback_reason,
+                        replaced_target_ids=o.replaced_target_ids,
+                        replaced_texts=o.replaced_texts,
+                        injected_atom_ids=matched_atom_ids if matched_atom_ids else o.injected_atom_ids,
+                    )
+                )
+            else:
+                updated_overrides.append(o)
+        overrides = tuple(updated_overrides)
+
     if max_words == 0:
         budget_records = tuple(
             BudgetFilterRecord(
@@ -473,9 +506,13 @@ def assemble_result(
         if cache_key not in _RESOLVER_CACHE:
             _RESOLVER_CACHE[cache_key] = ConflictResolver(Path(data_dir))
         resolver = _RESOLVER_CACHE[cache_key]
-    resolved_atoms, rules_applied, resolution_report = resolver.resolve_atoms_with_full_report(
-        raw_atoms, rng, context_profile
-    )
+    try:
+        resolved_atoms, rules_applied, resolution_report = resolver.resolve_atoms_with_full_report(
+            raw_atoms, rng, context_profile
+        )
+    except (UnresolvedConflictError, PromptValidationError) as e:
+        e.overrides = tuple(overrides)
+        raise
 
     # 3. 按 tag_order 汇聚为 PromptTag，并执行完整 Tag 级保序去重
     resolved_tags = atoms_to_tags(resolved_atoms)

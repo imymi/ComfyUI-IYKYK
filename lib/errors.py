@@ -74,8 +74,24 @@ class PromptValidationError(Exception):
             return CATEGORY_INVALID_INPUT_TYPE
         return CATEGORY_GENERIC_ERROR
 
-    def to_diagnostics_dict(self, effective_seed: int = 0) -> Dict[str, Any]:
+    def to_diagnostics_dict(self, effective_seed: int = 0, overrides: Optional[Sequence[Any]] = None) -> Dict[str, Any]:
         """构建符合 schemas/diagnostics.schema.json 契约的结构化错误报告字典。"""
+        overrides_seq = overrides if overrides is not None else DEFAULT_20_OVERRIDES
+        overrides_list = []
+        for o in overrides_seq:
+            if isinstance(o, dict):
+                overrides_list.append(dict(o))
+            elif hasattr(o, "canonical_slot"):
+                overrides_list.append({
+                    "blank_fallback_reason": o.blank_fallback_reason,
+                    "canonical_slot": o.canonical_slot,
+                    "injected_atom_ids": list(o.injected_atom_ids),
+                    "raw_input": getattr(o, "raw_input", None),
+                    "replaced_target_ids": list(o.replaced_target_ids),
+                    "replaced_texts": list(o.replaced_texts),
+                    "source_port": o.source_port,
+                    "status": o.status,
+                })
         return {
             "context_profile": {},
             "counts": {
@@ -99,7 +115,7 @@ class PromptValidationError(Exception):
                 "slots": list(self.slots),
                 "texts": list(self.texts),
             },
-            "overrides": [dict(o) for o in DEFAULT_20_OVERRIDES],
+            "overrides": overrides_list,
             "rules_applied": [],
             "schema_version": "2.0",
             "selections": [],
@@ -107,9 +123,9 @@ class PromptValidationError(Exception):
             "unresolved_conflicts": [],
         }
 
-    def to_diagnostics_json(self, effective_seed: int = 0) -> str:
+    def to_diagnostics_json(self, effective_seed: int = 0, overrides: Optional[Sequence[Any]] = None) -> str:
         """确定性序列化为紧凑 UTF-8 错误审计报告 JSON 字符串。"""
-        d = self.to_diagnostics_dict(effective_seed)
+        d = self.to_diagnostics_dict(effective_seed, overrides=overrides)
         return json.dumps(
             d,
             ensure_ascii=False,
@@ -159,17 +175,36 @@ class UnresolvedConflictError(RuntimeError):
         reason: Optional[str] = None,
         unresolved_conflicts: Tuple[Any, ...] = (),
         report: Optional[Any] = None,
+        overrides: Optional[Sequence[Any]] = None,
     ):
         full_msg = message or f"Unresolved conflict (reason={reason})"
+        super().__init__(full_msg)
         self.reason = reason
         self.unresolved_conflicts = tuple(unresolved_conflicts)
         self.report = report
+        self.overrides = tuple(overrides) if overrides else ()
         self.category = CATEGORY_UNRESOLVED_HARD_CONFLICT
         self.error_code = str(reason or CATEGORY_UNRESOLVED_HARD_CONFLICT)
 
-    def to_diagnostics_dict(self, effective_seed: int = 0) -> Dict[str, Any]:
+    def to_diagnostics_dict(self, effective_seed: int = 0, overrides: Optional[Sequence[Any]] = None) -> Dict[str, Any]:
         """构建符合 schemas/diagnostics.schema.json 契约的结构化错误报告字典。"""
         unres = [list(c) if isinstance(c, (list, tuple)) else c for c in self.unresolved_conflicts]
+        overrides_seq = overrides if overrides is not None else (self.overrides or DEFAULT_20_OVERRIDES)
+        overrides_list = []
+        for o in overrides_seq:
+            if isinstance(o, dict):
+                overrides_list.append(dict(o))
+            elif hasattr(o, "canonical_slot"):
+                overrides_list.append({
+                    "blank_fallback_reason": o.blank_fallback_reason,
+                    "canonical_slot": o.canonical_slot,
+                    "injected_atom_ids": list(o.injected_atom_ids),
+                    "raw_input": o.raw_input,
+                    "replaced_target_ids": list(o.replaced_target_ids),
+                    "replaced_texts": list(o.replaced_texts),
+                    "source_port": o.source_port,
+                    "status": o.status,
+                })
         return {
             "context_profile": {},
             "counts": {
@@ -193,7 +228,7 @@ class UnresolvedConflictError(RuntimeError):
                 "slots": [],
                 "texts": [],
             },
-            "overrides": [dict(o) for o in DEFAULT_20_OVERRIDES],
+            "overrides": overrides_list,
             "rules_applied": [],
             "schema_version": "2.0",
             "selections": [],

@@ -124,7 +124,13 @@
         },
         "status": {
           "type": "string",
-          "enum": ["applied", "fallback_blank", "not_provided"]
+          "enum": [
+            "applied",
+            "fallback_blank",
+            "not_provided",
+            "failed_conflict",
+            "failed_validation"
+          ]
         },
         "source_port": {
           "type": ["string", "null"]

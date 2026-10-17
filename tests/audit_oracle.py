@@ -241,22 +241,26 @@ def validate_audit_json_oracle(
         overrides = audit.get("overrides", [])
         if not isinstance(overrides, list):
             raise AssertionError(f"overrides must be list, got {type(overrides).__name__}")
-        if status == "success":
-            if len(overrides) != 20:
-                raise AssertionError(f"overrides must have exactly 20 entries, got {len(overrides)}")
-            seen_override_slots = set()
-            for o in overrides:
-                if not isinstance(o, dict):
-                    raise AssertionError(f"override entry must be dict, got {type(o).__name__}")
-                o_keys = set(o.keys())
-                if o_keys != EXPECTED_OVERRIDE_KEYS:
-                    raise AssertionError(f"override entry keys mismatch: missing={EXPECTED_OVERRIDE_KEYS - o_keys}, extra={o_keys - EXPECTED_OVERRIDE_KEYS}")
-                slot = o["canonical_slot"]
-                if slot in seen_override_slots:
-                    raise AssertionError(f"duplicate canonical_slot in overrides: {slot}")
-                seen_override_slots.add(slot)
-                if o["status"] not in ("applied", "fallback_blank", "not_provided"):
-                    raise AssertionError(f"invalid override status: {o['status']}")
+        if len(overrides) != 20:
+            raise AssertionError(f"overrides must have exactly 20 entries, got {len(overrides)}")
+        seen_override_slots = set()
+        expected_statuses = {"applied", "fallback_blank", "not_provided", "failed_conflict", "failed_validation"}
+        for o in overrides:
+            if not isinstance(o, dict):
+                raise AssertionError(f"override entry must be dict, got {type(o).__name__}")
+            o_keys = set(o.keys())
+            if o_keys != EXPECTED_OVERRIDE_KEYS:
+                raise AssertionError(f"override entry keys mismatch: missing={EXPECTED_OVERRIDE_KEYS - o_keys}, extra={o_keys - EXPECTED_OVERRIDE_KEYS}")
+            slot = o["canonical_slot"]
+            if slot in seen_override_slots:
+                raise AssertionError(f"duplicate canonical_slot in overrides: {slot}")
+            seen_override_slots.add(slot)
+            if o["status"] not in expected_statuses:
+                raise AssertionError(f"invalid override status: {o['status']}")
+            if o["status"] == "applied":
+                for aid in o["injected_atom_ids"]:
+                    if not str(aid).startswith("atom_"):
+                        raise AssertionError(f"injected_atom_id must start with 'atom_', got {aid!r}")
 
     # 2. Draft-7 Schema 校验 (Fail-Closed: 若传了 schema_doc 则必须具备 jsonschema 并且校验通过)
     if schema_doc is not None:

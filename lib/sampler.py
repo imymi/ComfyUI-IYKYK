@@ -383,6 +383,35 @@ class DataSampler:
                             return (item, t)
         return None
 
+    def _record_pool_sampling_rationale(
+        self,
+        chosen: Optional[Dict[str, Any]],
+        pool: Sequence[Dict[str, Any]],
+        mode: str = "uniform_random",
+        active_contexts: Sequence[str] = (),
+        excluded_ids: Optional[Sequence[str]] = None,
+    ) -> None:
+        """从候选池真实规模与候选集合采集并记录采样依据，杜绝事后虚拟默认值。"""
+        cand_ids = [it.get("id") for it in pool if isinstance(it, dict) and it.get("id")]
+        n_cands = len(cand_ids)
+        prob = round(1.0 / n_cands, 6) if n_cands > 0 else 0.0
+        dist = {cid: prob for cid in cand_ids}
+        excl = sorted(list(excluded_ids)) if excluded_ids else []
+        self._last_sampling_rationale = {
+            "active_contexts": list(active_contexts),
+            "candidate_filter": {
+                "total_candidates": n_cands,
+                "excluded_hard_conflicts": excl,
+                "passed_candidates": n_cands,
+            },
+            "distribution": dist,
+            "fallback": {"used": False, "reason": None},
+            "final_selection": {
+                "selected_id": chosen.get("id") if isinstance(chosen, dict) else None,
+                "mode": mode,
+            },
+        }
+
     def _pop_sampling_rationale(
         self,
         default_item_id: Optional[str] = None,
@@ -487,12 +516,14 @@ class DataSampler:
                 self.affinity_registry.matrix,
             )
             chosen_id = sample_categorical(dist, rng)
+            # 严格保留 baseline 随机数消费顺序 (cand_map.get 预求值语义)
+            fallback_pick = self._pick_one(list(candidates), rng)
             fallback_used = False
             fallback_reason = None
             if chosen_id in cand_map:
                 chosen = cand_map[chosen_id]
             else:
-                chosen = self._pick_one(list(candidates), rng)
+                chosen = fallback_pick
                 fallback_used = True
                 fallback_reason = "categorical_sample_not_in_candidates"
 
@@ -1353,14 +1384,28 @@ class DataSampler:
 
         target_tag = None
         if _is_random(category):
-            chosen = self._pick_one(self._all_scene_items, rng)
+            pool = self._all_scene_items
+            chosen = self._pick_one(pool, rng)
             if not chosen:
                 return None
+            self._record_pool_sampling_rationale(
+                chosen,
+                pool,
+                mode="uniform_random",
+                active_contexts=chosen.get("context_ids", ()),
+            )
         elif category in getattr(self, "_scene_groups_by_category", {}):
             pool = self._scene_groups_by_category[category]
-            chosen = self._pick_one(pool if pool else self._all_scene_items, rng)
+            active_pool = pool if pool else self._all_scene_items
+            chosen = self._pick_one(active_pool, rng)
             if not chosen:
                 return None
+            self._record_pool_sampling_rationale(
+                chosen,
+                active_pool,
+                mode="uniform_random",
+                active_contexts=chosen.get("context_ids", ()),
+            )
         else:
             # EXPLICIT: exact match by label, id, or alias (zero substring collision)
             chosen = self._scene_by_label.get(category) or self._scene_by_id.get(category) or self._scene_by_alias.get(category)
@@ -1456,6 +1501,12 @@ class DataSampler:
 
         if _is_random(theme):
             t = self._pick_one(themes, rng)
+            self._record_pool_sampling_rationale(
+                t,
+                themes,
+                mode="uniform_random",
+                active_contexts=t.get("context_ids", ()),
+            )
         else:
             idx = self._get_catalog_index("themes", themes)
             t = idx.get(theme)
@@ -1697,6 +1748,11 @@ class DataSampler:
 
         if _is_random(level):
             lvl = self._pick_one(levels, rng)
+            self._record_pool_sampling_rationale(
+                lvl,
+                levels,
+                mode="uniform_random",
+            )
         else:
             lvl = _match_item(levels, str(level), "nudity_levels")
             if not lvl:
@@ -2737,6 +2793,11 @@ class DataSampler:
 
         if _is_random(imp_type):
             chosen = self._pick_one(categories, rng)
+            self._record_pool_sampling_rationale(
+                chosen,
+                categories,
+                mode="uniform_random",
+            )
         else:
             chosen = _match_item(categories, imp_type)
             if not chosen:
@@ -2948,6 +3009,7 @@ class DataSampler:
             return None
         if _is_random(tier):
             chosen = self._pick_one(tiers, rng)
+            self._record_pool_sampling_rationale(chosen, tiers, mode="uniform_random")
         else:
             chosen = next((t for t in tiers if t.get("name_zh") == tier or t.get("id") == tier or t.get("name") == tier), None)
             if not chosen:
@@ -2980,6 +3042,7 @@ class DataSampler:
             return None
         if _is_random(tier):
             chosen = self._pick_one(tiers, rng)
+            self._record_pool_sampling_rationale(chosen, tiers, mode="uniform_random")
         else:
             chosen = next((t for t in tiers if t.get("name_zh") == tier or t.get("id") == tier or t.get("name") == tier), None)
             if not chosen:
@@ -3012,6 +3075,7 @@ class DataSampler:
             return None
         if _is_random(cat):
             chosen = self._pick_one(wardrobe, rng)
+            self._record_pool_sampling_rationale(chosen, wardrobe, mode="uniform_random")
         else:
             chosen = next((w for w in wardrobe if w.get("name_zh") == cat or w.get("id") == cat or w.get("name") == cat), None)
             if not chosen:
