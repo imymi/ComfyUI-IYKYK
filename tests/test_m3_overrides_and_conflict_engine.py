@@ -978,7 +978,8 @@ class TestM3OverridesAndConflictEngine(unittest.TestCase):
         self.assertNotIn("study desk", prompt2, "'study desk' leaked after scene_theme override!")
 
     def test_33_preset_three_props_overload_resolution(self):
-        """[Audit-R4-1] 同一预设内 3 个独立道具 (水瓶、咖啡杯、相机) 识别为 3 个独立实体并消解双手超容量。"""
+        """[Audit-R4-1] 同一预设内 3 个独立道具 (水瓶、咖啡杯、相机 以及 锅铲、平底锅、相机) 识别为 3 个独立实体并消解双手超容量。"""
+        # 1. 水瓶、咖啡杯、相机
         preset_with_3_props = {
             "id": "C02",
             "fragments": [
@@ -998,6 +999,24 @@ class TestM3OverridesAndConflictEngine(unittest.TestCase):
         self.assertIn("holding coffee cup", prompt)
         self.assertNotIn("holding camera", prompt)
         self.assertIn("handheld_props_single_holder", res.rules_applied)
+
+        # 2. 锅铲、平底锅、相机 (严禁按烹饪器具大类粗粒度合并)
+        preset_with_cookware = {
+            "id": "C02",
+            "fragments": [
+                {"id": "c02__frag_001", "slot": "props", "text": "holding spatula"},
+                {"id": "c02__frag_002", "slot": "props", "text": "holding skillet"},
+                {"id": "c02__frag_003", "slot": "props", "text": "holding camera"},
+            ],
+        }
+        res_cook = self.assembler.assemble_preset(preset_with_cookware, None, "高清写真 (High)", rng=Random(42))
+        prompt_cook = res_cook.prompt
+        retained_cook = [p for p in ("holding spatula", "holding skillet", "holding camera") if p in prompt_cook]
+        self.assertEqual(
+            len(retained_cook), 2,
+            f"Expected 2 props retained (spatula & skillet independent entities, camera dropped), got {len(retained_cook)}: {retained_cook}"
+        )
+        self.assertIn("handheld_props_single_holder", res_cook.rules_applied)
 
     def test_34_preset_same_explicit_id_phone_with_hand_description_coexists_with_pose(self):
         """[Audit-R4-2] 预设来源同一明确 ID 手机的多条描述 (含左手方位与屏幕状态) 不被割裂，配合单手姿势完整保留 (1+1=2 <= 2)。"""
@@ -1141,6 +1160,137 @@ class TestM3OverridesAndConflictEngine(unittest.TestCase):
                 external_overrides={"props": "holding water bottle, holding coffee cup, holding camera"},
             )
         self.assertEqual(cm2.exception.rule_id, "handheld_props_single_holder")
+
+    def test_36_schema_validation_before_assembly_and_prop_entity_contracts(self):
+        """[Audit-R4-4] 严格 Schema 校验通过后再装配：打通 Schema、数据校验、装配与消解全流程。
+        分别验证：
+        1. 独立道具预设与配方通过 Schema 校验后装配，消解超容量（3件留2件，锅铲与平底锅不合并）；
+        2. 同实体多描述 (含 item_id / entity_id) 预设与配方通过 Schema 校验后装配，与单手姿态共存保留。
+        """
+        import jsonschema
+        from pathlib import Path
+
+        schemas_dir = Path(__file__).resolve().parent.parent / "schemas"
+        with open(schemas_dir / "presets.schema.json", encoding="utf-8") as f:
+            presets_schema = json.load(f)
+        with open(schemas_dir / "style_recipes.schema.json", encoding="utf-8") as f:
+            recipes_schema = json.load(f)
+
+        origin_p = {
+            "entry_point": "preset_browser",
+            "mode": "preset",
+            "selector": "preset_core",
+            "selected_id": "C02",
+            "raw_value": "test_preset",
+            "parent_ids": ["C02"],
+        }
+        origin_r = {
+            "entry_point": "preset_browser",
+            "mode": "recipe",
+            "selector": "style_recipe",
+            "selected_id": "recipe_test_01",
+            "raw_value": "test_recipe",
+            "parent_ids": ["recipe_test_01"],
+        }
+        prop_facts = {"prop_usage": "handheld", "hands_required": 1}
+        pose_facts = {"hand_state": "one_busy", "hands_required": 1}
+        recipe_base_fields = {
+            "exposure_mode": "natural",
+            "lighting_palette": "warm",
+            "pose_direction": "dynamic",
+            "makeup_direction": "clean",
+            "expression_gaze": "camera",
+            "focus_detail": "sharp",
+        }
+
+        # ─── 1. 预设 Schema 校验与装配 ───
+        # 1.1 独立道具超容：锅铲 + 平底锅 + 相机
+        preset_diff = {
+            "id": "C02",
+            "name_zh": "独立道具测试",
+            "style_zh": "写真",
+            "category": "test",
+            "positive": "holding spatula, holding skillet, holding camera",
+            "description_zh": "测试",
+            "fragments": [
+                {"id": "c02__frag_001", "slot": "props", "text": "holding spatula", "facts": prop_facts, "origin": origin_p},
+                {"id": "c02__frag_002", "slot": "props", "text": "holding skillet", "facts": prop_facts, "origin": origin_p},
+                {"id": "c02__frag_003", "slot": "props", "text": "holding camera", "facts": prop_facts, "origin": origin_p},
+            ],
+        }
+        # 断言数据通过生产级 Schema 校验
+        jsonschema.validate(instance={"presets": [preset_diff]}, schema=presets_schema)
+        # 装配并验证容量消解
+        res_p_diff = self.assembler.assemble_preset(preset_diff, None, "高清写真 (High)", rng=Random(42))
+        retained_p_diff = [p for p in ("holding spatula", "holding skillet", "holding camera") if p in res_p_diff.prompt]
+        self.assertEqual(len(retained_p_diff), 2, f"独立道具超容量必须保留2件，实际: {retained_p_diff}")
+        self.assertIn("holding spatula", res_p_diff.prompt)
+        self.assertIn("holding skillet", res_p_diff.prompt)
+        self.assertNotIn("holding camera", res_p_diff.prompt)
+
+        # 1.2 同实体多描述 (含 item_id / entity_id) + 单手姿态：完整保留
+        preset_same = {
+            "id": "C02",
+            "name_zh": "同实体多描述测试",
+            "style_zh": "写真",
+            "category": "test",
+            "positive": "hand on cheek, holding smartphone in left hand, smartphone screen illuminated",
+            "description_zh": "测试",
+            "fragments": [
+                {"id": "c02__frag_000", "slot": "pose", "text": "hand on cheek", "facts": pose_facts, "origin": origin_p},
+                {"id": "c02__frag_001", "slot": "props", "text": "holding smartphone in left hand", "item_id": "prop_phone_01", "entity_id": "prop_phone_01", "facts": prop_facts, "origin": origin_p},
+                {"id": "c02__frag_002", "slot": "props", "text": "smartphone screen illuminated", "item_id": "prop_phone_01", "entity_id": "prop_phone_01", "facts": prop_facts, "origin": origin_p},
+            ],
+        }
+        # 断言数据通过生产级 Schema 校验 (允许 item_id 与 entity_id)
+        jsonschema.validate(instance={"presets": [preset_same]}, schema=presets_schema)
+        # 装配并验证同一实体描述完整保留
+        res_p_same = self.assembler.assemble_preset(preset_same, None, "高清写真 (High)", rng=Random(42))
+        self.assertIn("hand on cheek", res_p_same.prompt)
+        self.assertIn("holding smartphone in left hand", res_p_same.prompt)
+        self.assertIn("smartphone screen illuminated", res_p_same.prompt)
+
+        # ─── 2. 配方 Schema 校验与装配 ───
+        # 2.1 独立道具超容：配方锅铲 + 平底锅 + 相机
+        recipe_diff = {
+            "id": "recipe_test_01",
+            "style_name": "test_recipe_diff",
+            "name_zh": "配方独立道具测试",
+            "style_recipe": "holding spatula, holding skillet, holding camera",
+            **recipe_base_fields,
+            "fragments": [
+                {"id": "rec__frag_001", "slot": "props", "text": "holding spatula", "facts": prop_facts, "origin": origin_r},
+                {"id": "rec__frag_002", "slot": "props", "text": "holding skillet", "facts": prop_facts, "origin": origin_r},
+                {"id": "rec__frag_003", "slot": "props", "text": "holding camera", "facts": prop_facts, "origin": origin_r},
+            ],
+        }
+        # 断言数据通过配方 Schema 校验
+        jsonschema.validate(instance={"recipes": [recipe_diff]}, schema=recipes_schema)
+        # 装配并验证容量消解
+        res_r_diff = self.assembler.assemble_preset({"id": "C01", "positive": "classroom"}, recipe_diff, "高清写真 (High)", rng=Random(42))
+        retained_r_diff = [p for p in ("holding spatula", "holding skillet", "holding camera") if p in res_r_diff.prompt]
+        self.assertEqual(len(retained_r_diff), 2, f"配方独立道具超容量必须保留2件，实际: {retained_r_diff}")
+
+        # 2.2 同实体多描述 (含 item_id / entity_id) + 单手姿态：完整保留
+        recipe_same = {
+            "id": "recipe_test_02",
+            "style_name": "test_recipe_same",
+            "name_zh": "配方同实体多描述测试",
+            "style_recipe": "hand on cheek, holding smartphone in left hand, smartphone screen illuminated",
+            **recipe_base_fields,
+            "fragments": [
+                {"id": "rec__frag_000", "slot": "pose", "text": "hand on cheek", "facts": pose_facts, "origin": origin_r},
+                {"id": "rec__frag_001", "slot": "props", "text": "holding smartphone in left hand", "item_id": "prop_phone_01", "entity_id": "prop_phone_01", "facts": prop_facts, "origin": origin_r},
+                {"id": "rec__frag_002", "slot": "props", "text": "smartphone screen illuminated", "item_id": "prop_phone_01", "entity_id": "prop_phone_01", "facts": prop_facts, "origin": origin_r},
+            ],
+        }
+        # 断言数据通过配方 Schema 校验
+        jsonschema.validate(instance={"recipes": [recipe_same]}, schema=recipes_schema)
+        # 装配并验证同实体完整保留
+        res_r_same = self.assembler.assemble_preset({"id": "C01", "positive": "classroom"}, recipe_same, "高清写真 (High)", rng=Random(42))
+        self.assertIn("hand on cheek", res_r_same.prompt)
+        self.assertIn("holding smartphone in left hand", res_r_same.prompt)
+        self.assertIn("smartphone screen illuminated", res_r_same.prompt)
 
 
 if __name__ == "__main__":

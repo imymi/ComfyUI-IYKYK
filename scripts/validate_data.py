@@ -234,9 +234,13 @@ def validate_all(
             result.errors.append(f"[ERROR] presets.json [{pid}]: fragments text mismatch with positive prompt: expected {expected_tags} vs actual {actual_tags}")
         for idx, f in enumerate(frags):
             actual_frag_keys = set(f.keys())
-            expected_frag_keys = {"id", "slot", "text", "facts", "origin"}
-            if actual_frag_keys != expected_frag_keys:
+            required_frag_keys = {"id", "slot", "text", "facts", "origin"}
+            allowed_frag_keys = required_frag_keys | {"item_id", "entity_id", "prop_id"}
+            if not required_frag_keys.issubset(actual_frag_keys) or not actual_frag_keys.issubset(allowed_frag_keys):
                 result.errors.append(f"[ERROR] presets.json [{pid}] fragment[{idx}]: invalid fragment keys: {sorted(actual_frag_keys)}")
+            for opt_key in ("item_id", "entity_id", "prop_id"):
+                if opt_key in f and (not isinstance(f[opt_key], str) or not f[opt_key].strip()):
+                    result.errors.append(f"[ERROR] presets.json [{pid}] fragment[{idx}]: {opt_key} must be non-empty string")
             fid = f.get("id")
             frag_path = f"presets[{p_idx}][{pid}].fragments[{idx}]"
             if not fid or not isinstance(fid, str) or not id_regex.match(fid):
@@ -315,9 +319,13 @@ def validate_all(
         # 校验 Fragment origin 闭环与强类型
         for idx, f in enumerate(frags):
             actual_frag_keys = set(f.keys())
-            expected_frag_keys = {"id", "slot", "text", "facts", "origin"}
-            if actual_frag_keys != expected_frag_keys:
+            required_frag_keys = {"id", "slot", "text", "facts", "origin"}
+            allowed_frag_keys = required_frag_keys | {"item_id", "entity_id", "prop_id"}
+            if not required_frag_keys.issubset(actual_frag_keys) or not actual_frag_keys.issubset(allowed_frag_keys):
                 result.errors.append(f"[ERROR] style_recipes.json [{rid}] fragment[{idx}]: invalid fragment keys: {sorted(actual_frag_keys)}")
+            for opt_key in ("item_id", "entity_id", "prop_id"):
+                if opt_key in f and (not isinstance(f[opt_key], str) or not f[opt_key].strip()):
+                    result.errors.append(f"[ERROR] style_recipes.json [{rid}] fragment[{idx}]: {opt_key} must be non-empty string")
             fid = f.get("id")
             frag_path = f"recipes[{r_idx}][{rid}].fragments[{idx}]"
             if not fid or not isinstance(fid, str) or not id_regex.match(fid):

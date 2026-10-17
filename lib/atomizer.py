@@ -126,6 +126,7 @@ def fragments_to_atoms(
             f_origin = SelectionOrigin(entry_point="custom_combiner", mode="custom", selector="custom", raw_value=f)
             f_id = ""
             f_target_id = None
+            f_entity_id = None
         else:
             f_text = f.text
             f_slot = f.source_slot
@@ -137,6 +138,7 @@ def fragments_to_atoms(
             f_origin = getattr(f, "origin", None)
             f_id = getattr(f, "id", "")
             f_target_id = getattr(f, "target_id", None)
+            f_entity_id = getattr(f, "entity_id", None)
 
         f_text = f.text if isinstance(f, PromptFragment) else (f.text if hasattr(f, "text") else str(f))
         if isinstance(f_text, dict):
@@ -180,6 +182,7 @@ def fragments_to_atoms(
                         origin=f_origin,
                         id=f_id,
                         target_id=f_target_id,
+                        entity_id=f_entity_id,
                     )
                     tag_atoms.append(atom)
                     atoms.append(atom)

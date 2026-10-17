@@ -2628,6 +2628,7 @@ class PromptFragment:
     facts: SemanticFacts = field(default_factory=SemanticFacts)
     origin: Optional[SelectionOrigin] = None
     target_id: Optional[str] = None
+    entity_id: Optional[str] = None
 
 
 @dataclass(frozen=True)
@@ -2651,6 +2652,7 @@ class PromptAtom:
     origin: Optional[SelectionOrigin] = None
     id: str = ""
     target_id: Optional[str] = None
+    entity_id: Optional[str] = None
 
     @property
     def can_detect(self) -> bool:
