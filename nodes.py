@@ -21,19 +21,21 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, Sequence, Tuple
 
 if __package__:
-    from .lib.assembler import PromptAssembler, assemble_result, make_override_fragments, split_top_level_tags
+    from .lib.assembler import PromptAssembler, assemble_result, classify_preset_tag_and_facts, make_override_fragments, split_top_level_tags
     from .lib.context_affinity import compute_context_profile
+    from .lib.errors import PromptValidationError
     from .lib.models import GenerationResult, ORDERED_CONTEXT_IDS, PromptAtom, PromptFragment, SelectionOrigin, SemanticFacts, TagProvenance
     from .lib.rng import derive_substream_rng, recover_effective_seed
     from .lib.sampler import DataSampler, _is_none, get_selection_mode
-    from .lib.slot_contract import normalize_slot_name
+    from .lib.slot_contract import ALLOWED_SLOTS, AUXILIARY_SLOT_ORDER, SLOT_ORDER, normalize_slot_mapping, normalize_slot_name
 else:
-    from lib.assembler import PromptAssembler, assemble_result, make_override_fragments, split_top_level_tags
+    from lib.assembler import PromptAssembler, assemble_result, classify_preset_tag_and_facts, make_override_fragments, split_top_level_tags
     from lib.context_affinity import compute_context_profile
+    from lib.errors import PromptValidationError
     from lib.models import GenerationResult, ORDERED_CONTEXT_IDS, PromptAtom, PromptFragment, SelectionOrigin, SemanticFacts, TagProvenance
     from lib.rng import derive_substream_rng, recover_effective_seed
     from lib.sampler import DataSampler, _is_none, get_selection_mode
-    from lib.slot_contract import normalize_slot_name
+    from lib.slot_contract import ALLOWED_SLOTS, AUXILIARY_SLOT_ORDER, SLOT_ORDER, normalize_slot_mapping, normalize_slot_name
 
 DATA_DIR = Path(__file__).parent / "data"
 _sampler = DataSampler(DATA_DIR)
@@ -61,6 +63,126 @@ def _compute_is_changed(prompt_seed: int, inputs: Dict[str, Any]) -> Any:
         hasher.update(f"{key}:{inputs[key]}".encode("utf-8"))
 
     return hasher.hexdigest()
+
+
+# ═══════════════════════════════════════════════════════════════════════════
+# 20 槽位外部覆盖端口定义与提取器 (M4 契约)
+# ═══════════════════════════════════════════════════════════════════════════
+
+SLOT_OVERRIDE_TOOLTIPS: Dict[str, str] = {
+    "scene_theme": "外部场景主题覆盖：完全重写场景与剧情环境；留空则回退至内部采样或预设。",
+    "shot_type": "外部景别覆盖：完全重写画面景别（如 close-up shot）；留空则回退至内部采样或预设。",
+    "camera_angle": "外部视角覆盖：完全重写机位拍摄角度（如 low angle）；留空则回退至内部采样或预设。",
+    "character": "外部角色设定覆盖：完全重写角色身份设定；留空则回退至内部采样或预设。",
+    "nudity": "外部裸露等级覆盖：完全重写裸露程度与状态；留空则回退至内部采样或预设。",
+    "clothing": "外部服装款式覆盖：完全重写服装款式与状态；留空则回退至内部采样或预设。",
+    "lighting": "外部光影氛围覆盖：完全重写光影与照明效果；留空则回退至内部采样或预设。",
+    "pose": "外部姿势动作覆盖：完全重写人物姿势与手部动作；留空则回退至内部采样或预设。",
+    "expression": "外部情绪表情覆盖：完全重写面部表情与眼神；留空则回退至内部采样或预设。",
+    "makeup": "外部妆容细节覆盖：完全重写面部妆容与眼唇细节；留空则回退至内部采样或预设。",
+    "hairstyle": "外部发型发色覆盖：完全重写发型、长度与发色；留空则回退至内部采样或预设。",
+    "jewelry": "外部饰品头饰覆盖：完全重写首饰与佩戴物；留空则回退至内部采样或预设。",
+    "imperfections": "外部真实微瑕覆盖：完全重写皮肤质感与微瑕细节；留空则回退至内部采样或预设。",
+    "tattoo": "外部纹身标记覆盖：完全重写纹身部位与图案；留空则回退至内部采样或预设。",
+    "props": "外部道具物件覆盖：完全重写手持与交互道具；留空则回退至内部采样或预设。",
+    "liquids": "外部液体效果覆盖：完全重写体液与环境液体；留空则回退至内部采样或预设。",
+    "film": "外部风格胶片覆盖：完全重写胶片色彩与颗粒质感；留空则回退至内部采样或预设。",
+    "quality": "外部画质等级覆盖：完全重写渲染画质与摄影器材修饰；留空则回退至内部采样或预设。",
+    "style_recipe": "外部风格配方覆盖：完全重写叠加的艺术风格配方；留空则回退至内部采样或预设。",
+    "custom": "外部自定义追加覆盖：额外注入自定义提示词；留空则不追加。",
+}
+
+SLOT_OVERRIDE_OPTIONAL_INPUTS: Dict[str, Tuple[str, Dict[str, Any]]] = {
+    f"{slot}_override": (
+        "STRING",
+        {
+            "multiline": True,
+            "default": "",
+            "tooltip": SLOT_OVERRIDE_TOOLTIPS.get(
+                slot, f"外部覆盖槽位 '{slot}'：连接外部文本完全重写该槽位；留空则回退至内部采样或预设。"
+            ),
+        },
+    )
+    for slot in (*SLOT_ORDER, *AUXILIARY_SLOT_ORDER)
+}
+
+_FRAMEWORK_RESERVED_KEYS = {
+    "prompt_seed",
+    "自定义提示词",
+    "control_after_generate",
+    "node_id",
+    "extra_pnginfo",
+    "dynprompt",
+    "预设模板",
+    "风格配方",
+    "场景大类",
+    "剧情主题",
+    "景别构图",
+    "拍摄视角",
+    "裸露等级",
+    "服装款式",
+    "服装状态",
+    "发型发色",
+    "饰品头饰",
+    "妆容细节",
+    "姿势动作",
+    "情绪表情",
+    "光影预设",
+    "胶片风格",
+    "液体效果",
+    "纹身标记",
+    "道具物件",
+    "角色设定",
+    "真实微瑕",
+    "画质等级",
+}
+
+
+def _extract_external_overrides(inputs: Dict[str, Any]) -> Dict[str, Any]:
+    """
+    从节点输入字典中提取外部槽位覆盖 (M4 契约)：
+    1. 识别并归一化来自 explicit dict inputs["external_overrides"] 的槽位；
+    2. 识别并归一化来自 20 个规范槽位 *_override 端口的输入；
+    3. 识别并归一化直接通过规范槽位名传入的输入（排除 22 个主生成器下拉框与框架元数据）；
+    4. 凡非空且不在 20 槽位 (ALLOWED_SLOTS) 中的未知输入，严格 Fail-Closed 抛出 PromptValidationError；
+    5. 返回归一化为规范槽位名且仅包含非空有效覆盖的字典。
+    """
+    candidate_overrides: Dict[str, Any] = {}
+
+    # 1. 显式 external_overrides 字典
+    ext_dict = inputs.get("external_overrides")
+    if ext_dict is not None:
+        if not isinstance(ext_dict, dict):
+            raise PromptValidationError(
+                f"external_overrides must be a dict if provided, got {type(ext_dict).__name__}"
+            )
+        for k, v in ext_dict.items():
+            candidate_overrides[k] = v
+
+    # 2. 扫描顶层输入字典中的 override 端口与直接槽位
+    for k, v in inputs.items():
+        if k == "external_overrides" or k in _FRAMEWORK_RESERVED_KEYS:
+            continue
+        candidate_overrides[k] = v
+
+    if not candidate_overrides:
+        return {}
+
+    # 3. 校验并归一化全部候选覆盖输入 (Fail-Closed)
+    normalized = normalize_slot_mapping(candidate_overrides)
+
+    # 4. 过滤出实际具有非空内容的有效覆盖
+    clean_overrides: Dict[str, Any] = {}
+    for slot_name, val in normalized.items():
+        if val is None:
+            continue
+        if isinstance(val, str) and not val.strip():
+            continue
+        if isinstance(val, (list, tuple)) and (len(val) == 0 or all(isinstance(x, str) and not x.strip() for x in val)):
+            continue
+        clean_overrides[slot_name] = val
+
+    return clean_overrides
 
 
 def _extract_ordered_selections(atoms: Sequence[PromptAtom]) -> Tuple[SelectionOrigin, ...]:
@@ -421,17 +543,8 @@ def _generate_structured(
 
     custom_fragments = _custom_prompt_fragments(inputs.get("自定义提示词", ""), entry_point)
 
-    # 提取外部覆盖字典并预先统一规范化所有槽位别名
-    external_overrides: Dict[str, Any] = {}
-    if "external_overrides" in inputs and isinstance(inputs["external_overrides"], dict):
-        for k, v in inputs["external_overrides"].items():
-            if v is not None:
-                external_overrides[normalize_slot_name(k)] = v
-    for k, v in inputs.items():
-        if k.endswith("_override") and len(k) > 9:
-            s_name = k[:-9].strip()
-            if s_name and v is not None:
-                external_overrides[normalize_slot_name(s_name)] = v
+    # 提取外部覆盖字典并预先统一规范化所有槽位别名 (M4 契约)
+    external_overrides = _extract_external_overrides(inputs)
 
     # 1. 检查是否使用预设模板
     if not _is_none(预设模板):
@@ -820,6 +933,7 @@ class IYKYKPromptGenerator:
                     "default": "",
                     "tooltip": "追加到正向提示词，支持多行文本、LoRA 和权重语法；留空不追加。",
                 }),
+                **SLOT_OVERRIDE_OPTIONAL_INPUTS,
             }
         }
 
@@ -988,6 +1102,7 @@ class IYKYKPresetBrowser:
                     "default": "",
                     "tooltip": "追加到正向提示词，支持多行文本、LoRA 和权重语法；留空不追加。",
                 }),
+                **SLOT_OVERRIDE_OPTIONAL_INPUTS,
             }
         }
 
@@ -1007,6 +1122,7 @@ class IYKYKPresetBrowser:
         画质等级: str,
         prompt_seed: int = -1,
         自定义提示词: str = "",
+        **kwargs: Any,
     ) -> GenerationResult:
         rng, effective_seed = _get_rng(prompt_seed)
         preset = _sampler.get_preset(预设模板, rng)
@@ -1022,6 +1138,16 @@ class IYKYKPresetBrowser:
             )
 
         recipe = _sampler.get_style_recipe(风格配方, rng) if not _is_none(风格配方) else None
+
+        # 提取外部覆盖字典 (M4 契约)
+        all_inputs = dict(kwargs)
+        all_inputs["预设模板"] = 预设模板
+        all_inputs["风格配方"] = 风格配方
+        all_inputs["画质等级"] = 画质等级
+        all_inputs["自定义提示词"] = 自定义提示词
+        all_inputs["prompt_seed"] = prompt_seed
+        external_overrides = _extract_external_overrides(all_inputs)
+
         assembly_res = _assembler.assemble_preset(
             preset,
             recipe,
@@ -1031,6 +1157,7 @@ class IYKYKPresetBrowser:
             extra_fragments=_custom_prompt_fragments(自定义提示词, "preset_browser"),
             preset_raw_value=预设模板,
             recipe_raw_value=风格配方 if not _is_none(风格配方) else None,
+            external_overrides=external_overrides,
         )
         neg = _sampler.get_negative_prompt()
 
@@ -1063,8 +1190,16 @@ class IYKYKPresetBrowser:
         画质等级: str,
         prompt_seed: int = -1,
         自定义提示词: str = "",
+        **kwargs: Any,
     ) -> Tuple[str, str, str]:
-        res = self.browse_structured(预设模板, 风格配方, 画质等级, prompt_seed, 自定义提示词)
+        res = self.browse_structured(
+            预设模板=预设模板,
+            风格配方=风格配方,
+            画质等级=画质等级,
+            prompt_seed=prompt_seed,
+            自定义提示词=自定义提示词,
+            **kwargs,
+        )
         return (res.positive, res.negative, res.description)
 
 
@@ -1086,6 +1221,7 @@ class IYKYKCustomSlotCombiner:
                     "max": 0xFFFFFFFFFFFFFFFF,
                     "control_after_generate": True,
                 }),
+                # 保持历史 15 槽位完全兼容且默认值与顺序完全一致
                 "场景主题": ("STRING", {"multiline": True, "default": ""}),
                 "景别视角": ("STRING", {"multiline": True, "default": ""}),
                 "裸露状态": ("STRING", {"multiline": True, "default": ""}),
@@ -1101,6 +1237,14 @@ class IYKYKCustomSlotCombiner:
                 "角色体液": ("STRING", {"multiline": True, "default": ""}),
                 "画质修饰": ("STRING", {"multiline": True, "default": "best quality, masterpiece"}),
                 "自定义追加": ("STRING", {"multiline": True, "default": ""}),
+                # 补齐 5 大规范正交槽位 (M4 契约)
+                "拍摄视角": ("STRING", {"multiline": True, "default": ""}),
+                "发型发色": ("STRING", {"multiline": True, "default": ""}),
+                "饰品头饰": ("STRING", {"multiline": True, "default": ""}),
+                "角色设定": ("STRING", {"multiline": True, "default": ""}),
+                "风格配方": ("STRING", {"multiline": True, "default": ""}),
+                # 外部覆盖端口 (20 规范槽位 *_override)
+                **SLOT_OVERRIDE_OPTIONAL_INPUTS,
             }
         }
 
@@ -1116,51 +1260,60 @@ class IYKYKCustomSlotCombiner:
     def combine_structured(self, prompt_seed: int = -1, **kwargs) -> GenerationResult:
         rng, effective_seed = _get_rng(prompt_seed)
 
-        slot_mapping = {
-            "场景主题": "scene_theme",
-            "景别视角": "shot_type",
-            "裸露状态": "nudity",
-            "服装款式": "clothing",
-            "光影氛围": "lighting",
-            "姿势动作": "pose",
-            "表情眼神": "expression",
-            "风格胶片": "film",
-            "妆容发型": "makeup",
-            "微瑕细节": "imperfections",
-            "纹身标记": "tattoo",
-            "道具物件": "props",
-            "角色体液": "liquids",
-            "画质修饰": "quality",
-            "自定义追加": "custom",
-        }
+        candidate_inputs: Dict[str, Any] = {}
+        for k, v in kwargs.items():
+            if k in ("prompt_seed", "control_after_generate", "node_id", "extra_pnginfo", "dynprompt"):
+                continue
+            candidate_inputs[k] = v
+
+        # 处理画质默认值与显式 quality 覆盖的共存：
+        # 若提供了显式画质覆盖 (quality, quality_override, 画质等级 等非空)，
+        # 且 "画质修饰" 仍为其静态默认值 "best quality, masterpiece"，则自动让位于显式覆盖
+        has_explicit_quality = False
+        for q_key in ("quality", "quality_override", "画质等级", "画质等级_override"):
+            if candidate_inputs.get(q_key) and str(candidate_inputs[q_key]).strip():
+                has_explicit_quality = True
+                break
+        if has_explicit_quality and candidate_inputs.get("画质修饰") == "best quality, masterpiece":
+            del candidate_inputs["画质修饰"]
+
+        # 执行规范化与 Fail-Closed 冲突检测
+        normalized_slots = normalize_slot_mapping(candidate_inputs)
 
         fragments: List[PromptFragment] = []
         order = 0
         active_count = 0
 
-        for user_key, slot_name in slot_mapping.items():
-            val = kwargs.get(user_key, "")
-            if val and str(val).strip():
-                active_count += 1
-                slot_raw_val = str(val)
-                slot_origin = SelectionOrigin(
-                    entry_point="custom_combiner",
-                    mode="custom",
-                    selector=slot_name,
-                    raw_value=slot_raw_val,
-                )
-                tags = split_top_level_tags(slot_raw_val.strip())
-                for t in tags:
-                    fragments.append(
-                        PromptFragment(
-                            text=t,
-                            source_slot=slot_name,
-                            order=order,
-                            provenance=TagProvenance(kind="user_input", semantic_ids=(f"slot:{slot_name}",)),
-                            origin=slot_origin,
+        for slot_name in (*SLOT_ORDER, *AUXILIARY_SLOT_ORDER):
+            if slot_name in normalized_slots:
+                val = normalized_slots[slot_name]
+                if val is not None and str(val).strip():
+                    active_count += 1
+                    slot_raw_val = str(val)
+                    tags = split_top_level_tags(slot_raw_val.strip())
+                    for t in tags:
+                        _, f_facts = classify_preset_tag_and_facts(t, DATA_DIR, target_slot=slot_name)
+                        slot_origin = SelectionOrigin(
+                            entry_point="custom_combiner",
+                            mode="custom",
+                            selector=slot_name,
+                            raw_value=slot_raw_val,
                         )
-                    )
-                    order += 1
+                        fragments.append(
+                            PromptFragment(
+                                text=t,
+                                source_slot=slot_name,
+                                order=order,
+                                provenance=TagProvenance(
+                                    item_id=f"combiner_{slot_name}_{order:03d}",
+                                    kind="user_input",
+                                    semantic_ids=(f"slot:{slot_name}",),
+                                ),
+                                origin=slot_origin,
+                                facts=f_facts,
+                            )
+                        )
+                        order += 1
 
         assembly_res = assemble_result(fragments, DATA_DIR, rng=rng)
         negative_prompt = _sampler.get_negative_prompt()

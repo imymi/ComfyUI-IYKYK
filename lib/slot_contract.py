@@ -54,16 +54,78 @@ SLOT_ALIASES: Dict[str, str] = {
     "recipe": "style_recipe",
 }
 
+# 中文槽位名称与别名映射 (M4 契约)
+CHINESE_SLOT_ALIASES: Dict[str, str] = {
+    "场景主题": "scene_theme",
+    "场景": "scene_theme",
+    "主题": "scene_theme",
+    "景别构图": "shot_type",
+    "景别": "shot_type",
+    "景别视角": "shot_type",
+    "拍摄视角": "camera_angle",
+    "视角": "camera_angle",
+    "角色设定": "character",
+    "角色": "character",
+    "人格角色": "character",
+    "裸露等级": "nudity",
+    "裸露状态": "nudity",
+    "裸露": "nudity",
+    "服装款式": "clothing",
+    "服装": "clothing",
+    "服装状态": "clothing",
+    "光影预设": "lighting",
+    "光影氛围": "lighting",
+    "光影": "lighting",
+    "姿势动作": "pose",
+    "姿势": "pose",
+    "动作": "pose",
+    "情绪表情": "expression",
+    "表情眼神": "expression",
+    "表情": "expression",
+    "妆容细节": "makeup",
+    "妆容": "makeup",
+    "妆容发型": "makeup",
+    "发型发色": "hairstyle",
+    "发型": "hairstyle",
+    "饰品头饰": "jewelry",
+    "饰品": "jewelry",
+    "真实微瑕": "imperfections",
+    "微瑕细节": "imperfections",
+    "微瑕": "imperfections",
+    "纹身标记": "tattoo",
+    "纹身": "tattoo",
+    "道具物件": "props",
+    "道具": "props",
+    "液体效果": "liquids",
+    "角色体液": "liquids",
+    "体液": "liquids",
+    "液体": "liquids",
+    "胶片风格": "film",
+    "风格胶片": "film",
+    "胶片": "film",
+    "画质等级": "quality",
+    "画质修饰": "quality",
+    "画质": "quality",
+    "风格配方": "style_recipe",
+    "配方": "style_recipe",
+    "自定义提示词": "custom",
+    "自定义追加": "custom",
+    "自定义": "custom",
+}
+
 # 允许的完整槽位集合（包含 18 核心槽位与辅助槽位 style_recipe, custom）
 ALLOWED_SLOTS: Set[str] = set(SLOT_ORDER) | set(AUXILIARY_SLOT_ORDER)
 
 
 def normalize_slot_name(name: str) -> str:
     """规范化槽位名称，映射历史别名与 _override 后缀。"""
-    s = str(name).strip().lower()
+    s = str(name).strip()
     if s.endswith("_override") and len(s) > 9:
         s = s[:-9].strip()
-    return SLOT_ALIASES.get(s, s)
+    if s in CHINESE_SLOT_ALIASES:
+        return CHINESE_SLOT_ALIASES[s]
+    s_lower = s.lower()
+    return CHINESE_SLOT_ALIASES.get(s_lower, SLOT_ALIASES.get(s_lower, s_lower))
 
 
 def normalize_slot_mapping(slots: Dict[str, Any]) -> Dict[str, Any]:
