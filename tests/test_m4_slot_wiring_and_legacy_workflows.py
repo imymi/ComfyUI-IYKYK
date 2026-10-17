@@ -12,7 +12,7 @@ from __future__ import annotations
 import json
 import unittest
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any, Dict, Optional, Tuple
 
 from lib.errors import PromptValidationError
 from lib.slot_contract import ALLOWED_SLOTS, AUXILIARY_SLOT_ORDER, SLOT_ORDER
@@ -449,7 +449,7 @@ class TestM4SlotWiringAndLegacyWorkflows(unittest.TestCase):
     def test_20_all_four_nodes_adhere_to_override_contract_pillars(self):
         """断言四大节点均严格落实五大覆盖契约支柱：
         1. 基础与覆盖共存替换；
-        2. 空白外部覆盖完全回退内部/预设基线；
+        2. 空白外部覆盖（空字符串、空白字符或未连接端口）完全回退内部/预设基线（显式 None 见 test_24 按 P2-1 抛错）；
         3. 外部纹身内容免受增强注入；
         4. 外部姿势与道具超容量显式报硬冲突；
         5. 外部超 250 词自身超限 Fail-Closed 抛错；
@@ -580,97 +580,257 @@ class TestM4SlotWiringAndLegacyWorkflows(unittest.TestCase):
             )
 
     # ═══════════════════════════════════════════════════════════════════════
-    # 门禁 9: ComfyUI 工作流 JSON 反序列化加载与真实执行验证
+    # 门禁 9: 四节点中文/英文别名覆盖一致性 (闭环拼装器别名忽略缺陷)
     # ═══════════════════════════════════════════════════════════════════════
 
-    def test_21_deserialized_workflow_json_loading_and_execution(self):
-        """断言加载并反序列化真实 ComfyUI 工作流 JSON 文件，四大节点均能正确解析并执行。"""
-        workflow_fixture_path = Path(__file__).parent / "fixtures" / "legacy_comfyui_workflows.json"
-        self.assertTrue(workflow_fixture_path.exists(), f"Workflow fixture missing: {workflow_fixture_path}")
+    def test_23_four_nodes_chinese_and_english_alias_override_consistency(self):
+        """断言四大节点对外部覆盖字典中的中文别名与英文规范名均享受 100% 恒等覆盖语义。"""
+        # 1. 针对审核反例：拼装器中文字典覆盖必须生效且彻底替换基础输入
+        combiner_res = self.combiner.combine_structured(
+            prompt_seed=0,
+            服装款式="red dress",
+            external_overrides={"服装款式": "blue suit"},
+        )
+        self.assertIn("blue suit", combiner_res.positive.lower())
+        self.assertNotIn("red dress", combiner_res.positive.lower())
+        override_atoms = [a for a in combiner_res.atoms if a.source_slot == "clothing"]
+        self.assertTrue(all(a.origin and a.origin.mode == "override" for a in override_atoms))
+        self.assertEqual(combiner_res.description, "已成功拼装 1 个自定义槽位")
 
-        workflow_data = json.loads(workflow_fixture_path.read_text(encoding="utf-8"))
-        nodes = workflow_data.get("nodes", {})
-        self.assertTrue(len(nodes) >= 5, "Fixture must define at least 5 node execution scenarios")
+        # 2. 四大节点在 4 种覆盖路径下的 100% 等价性矩阵核验：
+        #    路径 A: external_overrides={"服装款式": "blue suit"} (中文别名)
+        #    路径 B: external_overrides={"clothing": "blue suit"} (英文规范名)
+        #    路径 C: clothing_override="blue suit" (英文直接端口)
+        #    路径 D: 服装款式_override="blue suit" (中文别名端口)
 
-        executed_count = 0
-        for node_key, node_spec in nodes.items():
-            class_type = node_spec["type"]
-            inputs = dict(node_spec["inputs"])
+        # 2.1 IYKYKCustomSlotCombiner
+        cA = self.combiner.combine_structured(prompt_seed=42, 服装款式="red dress", external_overrides={"服装款式": "blue suit"})
+        cB = self.combiner.combine_structured(prompt_seed=42, 服装款式="red dress", external_overrides={"clothing": "blue suit"})
+        cC = self.combiner.combine_structured(prompt_seed=42, 服装款式="red dress", clothing_override="blue suit")
+        cD = self.combiner.combine_structured(prompt_seed=42, 服装款式="red dress", 服装款式_override="blue suit")
+        self.assertEqual(cA.positive, cB.positive)
+        self.assertEqual(cA.positive, cC.positive)
+        self.assertEqual(cA.positive, cD.positive)
+        self.assertIn("blue suit", cA.positive)
+        self.assertNotIn("red dress", cA.positive)
 
-            self.assertIn(class_type, NODE_CLASS_MAPPINGS, f"Unknown node class: {class_type}")
-            node_cls = NODE_CLASS_MAPPINGS[class_type]
-            node_instance = node_cls()
+        # 2.2 IYKYKPromptGenerator
+        gA = self.generator.generate_structured(prompt_seed=42, 服装款式="旗袍 (Qipao/Cheongsam)", external_overrides={"服装款式": "blue suit"})
+        gB = self.generator.generate_structured(prompt_seed=42, 服装款式="旗袍 (Qipao/Cheongsam)", external_overrides={"clothing": "blue suit"})
+        gC = self.generator.generate_structured(prompt_seed=42, 服装款式="旗袍 (Qipao/Cheongsam)", clothing_override="blue suit")
+        gD = self.generator.generate_structured(prompt_seed=42, 服装款式="旗袍 (Qipao/Cheongsam)", 服装款式_override="blue suit")
+        self.assertEqual(gA.positive, gB.positive)
+        self.assertEqual(gA.positive, gC.positive)
+        self.assertEqual(gA.positive, gD.positive)
+        self.assertIn("blue suit", gA.positive)
+        self.assertNotIn("qipao", gA.positive.lower())
 
-            func_name = getattr(node_instance, "FUNCTION")
-            self.assertTrue(hasattr(node_instance, func_name))
-            func = getattr(node_instance, func_name)
+        # 2.3 IYKYKPresetBrowser
+        bA = self.browser.browse_structured("C01", "无 (None)", "高清写真 (High)", prompt_seed=42, external_overrides={"服装款式": "blue suit"})
+        bB = self.browser.browse_structured("C01", "无 (None)", "高清写真 (High)", prompt_seed=42, external_overrides={"clothing": "blue suit"})
+        bC = self.browser.browse_structured("C01", "无 (None)", "高清写真 (High)", prompt_seed=42, clothing_override="blue suit")
+        bD = self.browser.browse_structured("C01", "无 (None)", "高清写真 (High)", prompt_seed=42, 服装款式_override="blue suit")
+        self.assertEqual(bA.positive, bB.positive)
+        self.assertEqual(bA.positive, bC.positive)
+        self.assertEqual(bA.positive, bD.positive)
+        self.assertIn("blue suit", bA.positive)
 
-            # 真实模拟 ComfyUI 引擎执行：调用 FUNCTION 并传入反序列化后的 inputs kwargs
-            output = func(**inputs)
-            self.assertIsInstance(output, tuple)
-            self.assertTrue(len(output) >= 3)
-            positive_prompt, negative_prompt, desc = output[0], output[1], output[2]
+        # 2.4 IYKYKPromptDiagnostics
+        dA, auditA = self.diagnostics.diagnose_structured(prompt_seed=42, 服装款式="旗袍 (Qipao/Cheongsam)", external_overrides={"服装款式": "blue suit"})
+        dB, _ = self.diagnostics.diagnose_structured(prompt_seed=42, 服装款式="旗袍 (Qipao/Cheongsam)", external_overrides={"clothing": "blue suit"})
+        dC, _ = self.diagnostics.diagnose_structured(prompt_seed=42, 服装款式="旗袍 (Qipao/Cheongsam)", clothing_override="blue suit")
+        dD, _ = self.diagnostics.diagnose_structured(prompt_seed=42, 服装款式="旗袍 (Qipao/Cheongsam)", 服装款式_override="blue suit")
+        self.assertEqual(dA.positive, dB.positive)
+        self.assertEqual(dA.positive, dC.positive)
+        self.assertEqual(dA.positive, dD.positive)
+        self.assertIn("blue suit", dA.positive)
+        audit_data = json.loads(auditA)
+        self.assertTrue(any(s.get("selector") == "clothing" and s.get("mode") == "override" for s in audit_data["selections"]))
 
-            self.assertTrue(positive_prompt, f"Node {node_key} produced empty positive prompt")
-            self.assertTrue(negative_prompt, f"Node {node_key} produced empty negative prompt")
-            self.assertTrue(desc, f"Node {node_key} produced empty description")
+    # ═══════════════════════════════════════════════════════════════════════
+    # 门禁 10: 显式 None 严格 Fail-Closed 安全契约
+    # ═══════════════════════════════════════════════════════════════════════
 
-            # 针对特定测试用例的语义断言
-            if node_key == "legacy_custom_slot_combiner":
-                self.assertIn("cozy library interior", positive_prompt)
-                self.assertIn("knitted wool sweater", positive_prompt)
-                self.assertIn("best quality", positive_prompt)
-                self.assertEqual(desc, "已成功拼装 4 个自定义槽位")
-            elif node_key == "modern_combiner_with_overrides":
-                self.assertIn("cyberpunk trench coat", positive_prompt)
-                self.assertNotIn("red dress", positive_prompt)
-                self.assertIn("dragon tattoo", positive_prompt)
-                self.assertIn("neon umbrella", positive_prompt)
-            elif node_key == "modern_generator_with_overrides":
-                self.assertIn("silk evening dress", positive_prompt)
-                self.assertIn("wine glass", positive_prompt)
+    def test_24_explicit_none_slot_value_fails_closed(self):
+        """断言显式传入 None 按 P2-1 契约严格 Fail-Closed 抛出 PromptValidationError。
 
-            executed_count += 1
+        注意：空白回退语义严格适用于空字符串、空白字符或省略参数；显式 None 属于非法输入，绝不静默回退。
+        """
+        # 拼装器覆盖端口显式 None 抛错
+        with self.assertRaises(PromptValidationError):
+            self.combiner.combine(clothing_override=None)
 
-        self.assertEqual(executed_count, len(nodes))
+        with self.assertRaises(PromptValidationError):
+            self.combiner.combine(服装款式=None)
 
-    def test_22_workflow_state_saving_and_reloading_determinism(self):
-        """断言工作流状态导出为 JSON 字符串、保存后再重新加载执行，结果严格保持 100% 确定性。"""
-        original_inputs = {
-            "prompt_seed": 54321,
-            "场景主题": "cozy tea house in rain",
-            "服装款式": "linen shirt",
-            "clothing_override": "traditional silk hanfu",
-            "props_override": "holding bamboo umbrella",
-            "画质修饰": "best quality, masterpiece",
-        }
+        # 拼装器覆盖字典内显式 None 抛错
+        with self.assertRaises(PromptValidationError):
+            self.combiner.combine_structured(external_overrides={"clothing": None})
 
-        # 1. 模拟保存工作流为 JSON 字符串
-        serialized_workflow = json.dumps({
-            "type": "IYKYKCustomSlotCombiner",
-            "inputs": original_inputs,
-        })
+        # 主生成器覆盖端口显式 None 抛错
+        with self.assertRaises(PromptValidationError):
+            self.generator.generate(clothing_override=None)
 
-        # 2. 模拟从磁盘或网络加载 JSON 字符串
-        deserialized = json.loads(serialized_workflow)
-        node_cls = NODE_CLASS_MAPPINGS[deserialized["type"]]
-        node = node_cls()
+        # 模板浏览器覆盖端口显式 None 抛错
+        with self.assertRaises(PromptValidationError):
+            self.browser.browse("C01", "无 (None)", "高清写真 (High)", clothing_override=None)
 
-        # 3. 首次执行
-        run1 = node.combine(**deserialized["inputs"])
+    # ═══════════════════════════════════════════════════════════════════════
+    # 门禁 11: 真实 ComfyUI UI 导出工作流图结构、连线解析与执行模拟
+    # ═══════════════════════════════════════════════════════════════════════
 
-        # 4. 再次反序列化并执行
-        deserialized2 = json.loads(serialized_workflow)
-        node2 = NODE_CLASS_MAPPINGS[deserialized2["type"]]()
-        run2 = node2.combine(**deserialized2["inputs"])
+    def test_21_comfyui_legacy_exported_workflow_execution(self):
+        """断言真实导出的 ComfyUI 历史工作流 (无 override 连线、含历史 widgets_values 数组) 零回退正确解析与执行。
 
-        # 断言两次反序列化执行结果完全确定性一致
-        self.assertEqual(run1[0], run2[0])
-        self.assertEqual(run1[1], run2[1])
-        self.assertEqual(run1[2], run2[2])
-        self.assertIn("traditional silk hanfu", run1[0])
-        self.assertIn("bamboo umbrella", run1[0])
-        self.assertNotIn("linen shirt", run1[0])
+        注：本测试在测试环境中完整模拟 ComfyUI 引擎的 UI 节点反序列化、控件数组按 INPUT_TYPES 映射及节点执行；
+        宿主环境（运行中的 ComfyUI 网页前端界面）渲染与交互因无活动前端服务标为未验证。
+        """
+        fixture_path = Path(__file__).parent / "fixtures" / "comfyui_legacy_workflow.json"
+        self.assertTrue(fixture_path.exists(), f"Missing fixture: {fixture_path}")
+
+        workflow_data = json.loads(fixture_path.read_text(encoding="utf-8"))
+        executor = _ComfyUIGraphExecutor(workflow_data)
+
+        # 节点 1: 历史 15 槽位拼装器 (id=1)
+        res1 = executor.execute_node(1)
+        self.assertIsInstance(res1, tuple)
+        self.assertEqual(len(res1), 3)
+        self.assertIn("cozy library interior", res1[0])
+        self.assertIn("cowboy shot", res1[0])
+        self.assertIn("oversized knitted wool sweater", res1[0])
+        self.assertIn("best quality", res1[0])
+        self.assertEqual(res1[2], "已成功拼装 4 个自定义槽位")
+
+        # 节点 2: 历史 3 槽位预设浏览器 (id=2)
+        res2 = executor.execute_node(2)
+        self.assertIsInstance(res2, tuple)
+        self.assertEqual(len(res2), 3)
+        self.assertIn("classroom", res2[0])
+
+        # 节点 3: 历史 22 下拉框生成器 (id=3)
+        res3 = executor.execute_node(3)
+        self.assertIsInstance(res3, tuple)
+        self.assertEqual(len(res3), 3)
+        self.assertTrue(res3[0])
+
+    def test_22_comfyui_modern_connected_workflow_link_resolution(self):
+        """断言带上游文本节点的连线工作流通过 ComfyUI links 机制正确解析至 forceInput 覆盖端口并执行覆盖。
+
+        注：完整解析上游输出槽位 -> 连线 -> 下游 forceInput 覆盖插槽拓扑传递；
+        宿主前端界面交互未在本地无头环境中运行，标为未验证。
+        """
+        fixture_path = Path(__file__).parent / "fixtures" / "comfyui_connected_workflow.json"
+        self.assertTrue(fixture_path.exists(), f"Missing fixture: {fixture_path}")
+
+        workflow_data = json.loads(fixture_path.read_text(encoding="utf-8"))
+        executor = _ComfyUIGraphExecutor(workflow_data)
+
+        # 执行节点 3 (IYKYKCustomSlotCombiner):
+        # 连线 101 来自节点 1 (输出 "blue suit") -> clothing_override
+        # 连线 102 来自节点 2 (输出 "dragon tattoo on back") -> tattoo_override
+        # 控件值原服装为 "red dress"
+        res3 = executor.execute_node(3)
+        self.assertIsInstance(res3, tuple)
+        positive_prompt = res3[0]
+
+        # 1. 上游连线的 blue suit 正确重写了控件中的 red dress
+        self.assertIn("blue suit", positive_prompt)
+        self.assertNotIn("red dress", positive_prompt)
+
+        # 2. 上游连线的 dragon tattoo on back 正确注入
+        self.assertIn("dragon tattoo on back", positive_prompt)
+
+        # 执行节点 5 (IYKYKPromptGenerator):
+        # 连线 103 来自节点 4 (输出 "silk evening dress") -> clothing_override
+        # 控件原本选择 "旗袍 (Qipao/Cheongsam)"
+        res5 = executor.execute_node(5)
+        self.assertIsInstance(res5, tuple)
+        gen_positive = res5[0]
+
+        # 上游连线的 silk evening dress 正确重写了控件中的旗袍
+        self.assertIn("silk evening dress", gen_positive)
+        self.assertNotIn("qipao", gen_positive.lower())
+
+    def test_25_workflow_graph_serialization_and_roundtrip_determinism(self):
+        """断言工作流图导出为 JSON、重新从文件载入并解析执行，结果严格保持 100% 确定性。"""
+        fixture_path = Path(__file__).parent / "fixtures" / "comfyui_connected_workflow.json"
+        original_data = json.loads(fixture_path.read_text(encoding="utf-8"))
+
+        # 1. 首次解析执行
+        exec1 = _ComfyUIGraphExecutor(original_data)
+        out1 = exec1.execute_node(3)
+
+        # 2. 模拟序列化到字符串再反序列化重载
+        serialized_str = json.dumps(original_data, ensure_ascii=False, indent=2)
+        reloaded_data = json.loads(serialized_str)
+        exec2 = _ComfyUIGraphExecutor(reloaded_data)
+        out2 = exec2.execute_node(3)
+
+        # 3. 严格断言输出完全一致
+        self.assertEqual(out1[0], out2[0])
+        self.assertEqual(out1[1], out2[1])
+        self.assertEqual(out1[2], out2[2])
+
+
+class _ComfyUIGraphExecutor:
+    """模拟 ComfyUI 执行引擎对 UI 导出图 (nodes, links) 的连线拓扑解析与执行。"""
+
+    def __init__(self, workflow_data: Dict[str, Any]):
+        self.workflow_data = workflow_data
+        self.nodes_by_id = {n["id"]: n for n in workflow_data.get("nodes", [])}
+        self.links_by_id = {link[0]: link for link in workflow_data.get("links", [])}
+
+    def execute_node(self, node_id: int, execution_cache: Optional[Dict[int, Any]] = None) -> Tuple[Any, ...]:
+        if execution_cache is None:
+            execution_cache = {}
+        if node_id in execution_cache:
+            return execution_cache[node_id]
+
+        node_data = self.nodes_by_id[node_id]
+        class_type = node_data["type"]
+
+        # 模拟标准上游文本/字符串 Primitive 节点
+        if class_type in ("PrimitiveStringNode", "PrimitiveNode", "CLIPTextEncode"):
+            val = node_data.get("widgets_values", [""])[0] if node_data.get("widgets_values") else ""
+            execution_cache[node_id] = (val,)
+            return execution_cache[node_id]
+
+        node_cls = NODE_CLASS_MAPPINGS[class_type]
+        input_types = node_cls.INPUT_TYPES()
+        required_cfg = input_types.get("required", {})
+        optional_cfg = input_types.get("optional", {})
+
+        # 根据 ComfyUI 规范按顺序提取控件键（排除 forceInput=True 的连线专用端口）
+        widget_keys = []
+        for k, v in required_cfg.items():
+            if not (isinstance(v, tuple) and len(v) > 1 and isinstance(v[1], dict) and v[1].get("forceInput")):
+                widget_keys.append(k)
+        for k, v in optional_cfg.items():
+            if not (isinstance(v, tuple) and len(v) > 1 and isinstance(v[1], dict) and v[1].get("forceInput")):
+                widget_keys.append(k)
+
+        kwargs: Dict[str, Any] = {}
+        widgets_values = node_data.get("widgets_values", [])
+        for idx, val in enumerate(widgets_values):
+            if idx < len(widget_keys):
+                kwargs[widget_keys[idx]] = val
+
+        # 解析连线输入 (上游节点输出 -> 本节点 forceInput 插槽)
+        for inp in node_data.get("inputs", []):
+            link_id = inp.get("link")
+            if link_id is not None and link_id in self.links_by_id:
+                link = self.links_by_id[link_id]
+                source_node_id = link[1]
+                source_slot_idx = link[2]
+                source_out = self.execute_node(source_node_id, execution_cache)
+                kwargs[inp["name"]] = source_out[source_slot_idx]
+
+        node_instance = node_cls()
+        func_name = getattr(node_instance, "FUNCTION")
+        func = getattr(node_instance, func_name)
+        res = func(**kwargs)
+        execution_cache[node_id] = res
+        return res
 
 
 if __name__ == "__main__":

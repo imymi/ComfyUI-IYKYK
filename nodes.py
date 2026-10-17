@@ -21,21 +21,21 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, Sequence, Tuple
 
 if __package__:
-    from .lib.assembler import PromptAssembler, assemble_result, classify_preset_tag_and_facts, make_override_fragments, split_top_level_tags
+    from .lib.assembler import PromptAssembler, make_override_fragments, split_top_level_tags
     from .lib.context_affinity import compute_context_profile
     from .lib.errors import PromptValidationError
     from .lib.models import GenerationResult, ORDERED_CONTEXT_IDS, PromptAtom, PromptFragment, SelectionOrigin, SemanticFacts, TagProvenance
     from .lib.rng import derive_substream_rng, recover_effective_seed
     from .lib.sampler import DataSampler, _is_none, get_selection_mode
-    from .lib.slot_contract import ALLOWED_SLOTS, AUXILIARY_SLOT_ORDER, SLOT_ORDER, normalize_slot_mapping, normalize_slot_name
+    from .lib.slot_contract import AUXILIARY_SLOT_ORDER, SLOT_ORDER, normalize_slot_mapping
 else:
-    from lib.assembler import PromptAssembler, assemble_result, classify_preset_tag_and_facts, make_override_fragments, split_top_level_tags
+    from lib.assembler import PromptAssembler, make_override_fragments, split_top_level_tags
     from lib.context_affinity import compute_context_profile
     from lib.errors import PromptValidationError
     from lib.models import GenerationResult, ORDERED_CONTEXT_IDS, PromptAtom, PromptFragment, SelectionOrigin, SemanticFacts, TagProvenance
     from lib.rng import derive_substream_rng, recover_effective_seed
     from lib.sampler import DataSampler, _is_none, get_selection_mode
-    from lib.slot_contract import ALLOWED_SLOTS, AUXILIARY_SLOT_ORDER, SLOT_ORDER, normalize_slot_mapping, normalize_slot_name
+    from lib.slot_contract import AUXILIARY_SLOT_ORDER, SLOT_ORDER, normalize_slot_mapping
 
 DATA_DIR = Path(__file__).parent / "data"
 _sampler = DataSampler(DATA_DIR)
@@ -1278,8 +1278,7 @@ class IYKYKCustomSlotCombiner:
                 raise PromptValidationError(
                     f"external_overrides must be a dict if provided, got {type(ext_dict).__name__}"
                 )
-            for k, v in ext_dict.items():
-                raw_override_inputs[k] = v
+            raw_override_inputs["external_overrides"] = ext_dict
 
         for k, v in kwargs.items():
             if k in ("prompt_seed", "control_after_generate", "node_id", "extra_pnginfo", "dynprompt", "external_overrides"):
@@ -1299,7 +1298,7 @@ class IYKYKCustomSlotCombiner:
                 has_explicit_quality = True
                 break
         if not has_explicit_quality and ext_dict and isinstance(ext_dict, dict):
-            for q_key in ("quality", "quality_override", "画质等级", "画质等级_override"):
+            for q_key in ("quality", "quality_override", "画质等级", "画质等级_override", "画质修饰", "画质"):
                 val = ext_dict.get(q_key)
                 if val is not None and str(val).strip():
                     has_explicit_quality = True
@@ -1323,7 +1322,6 @@ class IYKYKCustomSlotCombiner:
                     tags = split_top_level_tags(slot_raw_val.strip())
                     frags: List[PromptFragment] = []
                     for t in tags:
-                        _, f_facts = classify_preset_tag_and_facts(t, DATA_DIR, target_slot=slot_name)
                         slot_origin = SelectionOrigin(
                             entry_point="custom_combiner",
                             mode="custom",
@@ -1341,7 +1339,7 @@ class IYKYKCustomSlotCombiner:
                                     semantic_ids=(f"slot:{slot_name}",),
                                 ),
                                 origin=slot_origin,
-                                facts=f_facts,
+                                facts=None,
                             )
                         )
                         order += 1

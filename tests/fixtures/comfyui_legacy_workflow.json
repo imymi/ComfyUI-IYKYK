@@ -1,0 +1,110 @@
+{
+  "last_node_id": 3,
+  "last_link_id": 0,
+  "nodes": [
+    {
+      "id": 1,
+      "type": "IYKYKCustomSlotCombiner",
+      "pos": [100, 100],
+      "size": [400, 600],
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {"name": "正面提示词 (STRING)", "type": "STRING", "links": []},
+        {"name": "负面提示词 (STRING)", "type": "STRING", "links": []},
+        {"name": "已拼装槽位数 (STRING)", "type": "STRING", "links": []}
+      ],
+      "properties": {"Node name for S&R": "IYKYKCustomSlotCombiner"},
+      "widgets_values": [
+        42,
+        "cozy library interior",
+        "cowboy shot",
+        "",
+        "oversized knitted wool sweater",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "best quality, masterpiece",
+        ""
+      ]
+    },
+    {
+      "id": 2,
+      "type": "IYKYKPresetBrowser",
+      "pos": [550, 100],
+      "size": [350, 300],
+      "flags": {},
+      "order": 1,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {"name": "正面提示词 (STRING)", "type": "STRING", "links": []},
+        {"name": "负面提示词 (STRING)", "type": "STRING", "links": []},
+        {"name": "中文场景描述 (STRING)", "type": "STRING", "links": []}
+      ],
+      "properties": {"Node name for S&R": "IYKYKPresetBrowser"},
+      "widgets_values": [
+        "C01",
+        "无 (None)",
+        "高清写真 (High)",
+        123,
+        ""
+      ]
+    },
+    {
+      "id": 3,
+      "type": "IYKYKPromptGenerator",
+      "pos": [950, 100],
+      "size": [400, 700],
+      "flags": {},
+      "order": 2,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {"name": "正面提示词 (STRING)", "type": "STRING", "links": []},
+        {"name": "负面提示词 (STRING)", "type": "STRING", "links": []},
+        {"name": "中文场景描述 (STRING)", "type": "STRING", "links": []}
+      ],
+      "properties": {"Node name for S&R": "IYKYKPromptGenerator"},
+      "widgets_values": [
+        "无 (None)",
+        "无 (None)",
+        "随机 (Random)",
+        "随机 (Random)",
+        "自动 (Auto)",
+        "自动 (Auto)",
+        "随机 (Random)",
+        "旗袍 (Qipao/Cheongsam)",
+        "自动联动裸露等级 (Auto Link Nudity)",
+        "随机 (Random)",
+        "无 (None)",
+        "无 (None)",
+        "随机 (Random)",
+        "随机 (Random)",
+        "自动 (Auto)",
+        "无 (None)",
+        "无 (None)",
+        "无 (None)",
+        "无 (None)",
+        "无 (None)",
+        "无 (None)",
+        "高清写真 (High)",
+        777,
+        ""
+      ]
+    }
+  ],
+  "links": [],
+  "groups": [],
+  "config": {},
+  "extra": {},
+  "version": 0.4
+}
