@@ -1412,6 +1412,98 @@ class TestM3OverridesAndConflictEngine(unittest.TestCase):
         missing_frags = [t for t in all_frag_texts if t not in res_h03.prompt]
         self.assertEqual(missing_frags, [], f"真实预设 H03 片段被误删: {missing_frags}")
 
+        # 2.5 事实断言：pose 片段实际手部事实
+        pose_atom = next(a for a in res_h03.accepted_atoms if "other hand tracing inner thigh" in a.text)
+        self.assertEqual(pose_atom.facts.hand_state, "one_busy")
+        self.assertEqual(pose_atom.facts.hands_required, 1)
+
+    def test_38_h03_hand_capacity_and_pose_yielding(self):
+        """M3 手部事实与消解决策回归验证：
+        1. 默认状态：
+           - H03 的 'one hand holding phone' 需 1 手，'other hand tracing inner thigh' 需 1 手 (hand_state="one_busy")；
+           - 双手容量核算为 1 + 1 = 2 <= 2，两者合法共存，不触发 pose_hand_occupation；
+           - 严格断言实际占用事实 (hand_state, hands_required)。
+        2. 外接两件单手道具覆盖状态：
+           - 外部覆盖 props: 'holding smartphone, holding coffee cup' (各需 1 手，合计 2 手)；
+           - 系统动作 'other hand tracing inner thigh' (需 1 手) 导致总需求 3 手 > 2 手；
+           - 外部道具优先，系统姿态动作退让；
+           - 严格断言：
+             a. 实际占用事实：保留的两件外部道具 hands_required 各为 1；
+             b. 消解决策：rules_applied 包含 'pose_hand_occupation'；
+             c. ResolutionReport 审计证据：包含 rule_id='pose_hand_occupation', action='drop',
+                reason_code='external_prop_overrides_pose', before_text='other hand tracing inner thigh'。
+        """
+        from lib.sampler import DataSampler
+        sampler = DataSampler(self.data_dir)
+        p_h03 = sampler.get_preset("H03", Random(42))
+        self.assertIsNotNone(p_h03)
+
+        # ─── 1. 默认状态：手机 + 单手动作 合法共存 ───
+        res_default = self.assembler.assemble_preset(p_h03, None, "高清写真 (High)", rng=Random(42))
+        self.assertIn("one hand holding phone", res_default.prompt)
+        self.assertIn("other hand tracing inner thigh", res_default.prompt)
+
+        # 断言实际手部占用事实
+        phone_atom = next(a for a in res_default.accepted_atoms if "one hand holding phone" in a.text)
+        pose_atom = next(a for a in res_default.accepted_atoms if "other hand tracing inner thigh" in a.text)
+
+        self.assertIsNotNone(phone_atom.facts)
+        self.assertEqual(phone_atom.facts.hands_required, 1, "手机手持道具必须声明占用 1 只手")
+        self.assertEqual(phone_atom.facts.prop_usage, "handheld")
+
+        self.assertIsNotNone(pose_atom.facts)
+        self.assertEqual(pose_atom.facts.hand_state, "one_busy", "轻触大腿姿态必须声明占用 1 只手 (one_busy)")
+        self.assertEqual(pose_atom.facts.hands_required, 1, "轻触大腿姿态必须占用 1 只手")
+
+        # 断言未触发冲突裁撤
+        self.assertNotIn("pose_hand_occupation", res_default.rules_applied)
+
+        # ─── 2. 外部覆盖两件单手道具：系统动作退让 ───
+        res_override = self.assembler.assemble_preset(
+            p_h03,
+            None,
+            "高清写真 (High)",
+            rng=Random(42),
+            external_overrides={"props": "holding smartphone, holding coffee cup"},
+        )
+
+        # 2.1 文本断言：外部道具保留，系统姿态退让被删除
+        self.assertIn("holding smartphone", res_override.prompt)
+        self.assertIn("holding coffee cup", res_override.prompt)
+        self.assertNotIn("other hand tracing inner thigh", res_override.prompt)
+
+        # 2.2 实际占用事实断言
+        ext_prop_atoms = [a for a in res_override.accepted_atoms if a.source_slot == "props"]
+        self.assertEqual(len(ext_prop_atoms), 2, f"必须且仅保留 2 件外部道具，实际: {[a.text for a in ext_prop_atoms]}")
+        for pa in ext_prop_atoms:
+            self.assertEqual(pa.facts.hands_required, 1, f"外部道具 '{pa.text}' 必须占用 1 只手")
+        self.assertEqual(sum(pa.facts.hands_required for pa in ext_prop_atoms), 2, "两件外部道具必须占满 2 只手容量")
+
+        # 验证系统姿态原子确实未被采纳
+        self.assertFalse(
+            any("other hand tracing inner thigh" in a.text for a in res_override.accepted_atoms),
+            "系统姿态动作不应出现在 accepted_atoms 中",
+        )
+
+        # 2.3 消解决策与审计证据断言
+        self.assertIn("pose_hand_occupation", res_override.rules_applied, "必须记录触发规则 pose_hand_occupation")
+        self.assertIsNotNone(res_override.resolution_report, "组装结果必须包含完整消解审计报告")
+
+        decisions = res_override.resolution_report.decisions
+        drop_decisions = [
+            d for d in decisions
+            if d.rule_id == "pose_hand_occupation"
+            and d.action == "drop"
+            and d.reason_code == "external_prop_overrides_pose"
+            and d.before_text == "other hand tracing inner thigh"
+        ]
+        self.assertEqual(
+            len(drop_decisions), 1,
+            f"必须记录针对 'other hand tracing inner thigh' 的 external_prop_overrides_pose 裁撤决策，实际决策: {decisions}"
+        )
+        drop_d = drop_decisions[0]
+        self.assertTrue(len(drop_d.winner_atom_ids) > 0, "裁撤决策必须记录外部赢家原子 ID")
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -282,11 +282,14 @@ def classify_preset_tag_and_facts(
         if not facts.hand_state:
             if any(w in t for w in ("bound", "tied", "behind back", "hands on head")):
                 hs = "both_busy"
-            elif any(w in t for w in ("hand on", "touching", "holding", "biting")):
+                hr = 2
+            elif any(w in t for w in ("hand on", "touching", "holding", "biting", "tracing", "hand tracing", "other hand", "one hand")):
                 hs = "one_busy"
+                hr = 1
             else:
                 hs = "free"
-            facts = facts.merge(SemanticFacts(hand_state=hs))
+                hr = 0
+            facts = facts.merge(SemanticFacts(hand_state=hs, hands_required=hr))
     elif slot in ("props", "prop"):
         if facts.hands_required == 0 and not facts.prop_usage:
             hr = 2 if any(w in t for w in ("controller", "sword", "rifle")) else 1
@@ -709,9 +712,9 @@ def make_override_fragments(
         elif slot_name == "pose":
             if facts.hand_state is None and facts.hands_required == 0:
                 if any(w in t_lower for w in ("hands behind back", "hands tied", "arms above head", "tied behind back")):
-                    facts = SemanticFacts(hand_state="both_busy")
-                elif any(w in t_lower for w in ("hand on cheek", "hand on hip")):
-                    facts = SemanticFacts(hand_state="one_busy")
+                    facts = SemanticFacts(hand_state="both_busy", hands_required=2)
+                elif any(w in t_lower for w in ("hand on cheek", "hand on hip", "hand on", "touching", "tracing", "hand tracing", "other hand", "one hand")):
+                    facts = SemanticFacts(hand_state="one_busy", hands_required=1)
         elif slot_name == "clothing":
             if not facts.garment_topologies:
                 if any(w in t_lower for w in ("catsuit", "latex suit", "bodysuit", "swimsuit", "leotard", "one-piece")):

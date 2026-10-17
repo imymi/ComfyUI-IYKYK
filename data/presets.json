@@ -6886,7 +6886,9 @@
           "slot": "pose",
           "text": "other hand tracing inner thigh",
           "facts": {
-            "semantic_role": "selector"
+            "semantic_role": "selector",
+            "hand_state": "one_busy",
+            "hands_required": 1
           },
           "origin": {
             "entry_point": "preset_browser",
