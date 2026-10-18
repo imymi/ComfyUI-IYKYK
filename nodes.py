@@ -23,7 +23,16 @@ from typing import Any, Dict, List, Optional, Sequence, Tuple
 if __package__:
     from .lib.assembler import CANONICAL_20_SLOTS, PromptAssembler, _inspect_blank_input, make_override_fragments, split_top_level_tags
     from .lib.context_affinity import compute_context_profile
-    from .lib.errors import CATEGORY_EXTERNAL_OVERRIDE_CONFLICT, CATEGORY_UNRESOLVED_HARD_CONFLICT, PromptValidationError, UnresolvedConflictError
+    from .lib.errors import (
+        CATEGORY_EXTERNAL_BUDGET_EXCEEDED,
+        CATEGORY_EXTERNAL_OVERRIDE_CONFLICT,
+        CATEGORY_GENERIC_ERROR,
+        CATEGORY_INVALID_INPUT_TYPE,
+        CATEGORY_SLOT_ALIAS_COLLISION,
+        CATEGORY_UNRESOLVED_HARD_CONFLICT,
+        PromptValidationError,
+        UnresolvedConflictError,
+    )
     from .lib.models import GenerationResult, ORDERED_CONTEXT_IDS, PromptAtom, PromptFragment, SelectionOrigin, SemanticFacts, TagProvenance
     from .lib.rng import derive_substream_rng, recover_effective_seed
     from .lib.sampler import DataSampler, _is_none, get_selection_mode
@@ -31,7 +40,16 @@ if __package__:
 else:
     from lib.assembler import CANONICAL_20_SLOTS, PromptAssembler, _inspect_blank_input, make_override_fragments, split_top_level_tags
     from lib.context_affinity import compute_context_profile
-    from lib.errors import CATEGORY_EXTERNAL_OVERRIDE_CONFLICT, CATEGORY_UNRESOLVED_HARD_CONFLICT, PromptValidationError, UnresolvedConflictError
+    from lib.errors import (
+        CATEGORY_EXTERNAL_BUDGET_EXCEEDED,
+        CATEGORY_EXTERNAL_OVERRIDE_CONFLICT,
+        CATEGORY_GENERIC_ERROR,
+        CATEGORY_INVALID_INPUT_TYPE,
+        CATEGORY_SLOT_ALIAS_COLLISION,
+        CATEGORY_UNRESOLVED_HARD_CONFLICT,
+        PromptValidationError,
+        UnresolvedConflictError,
+    )
     from lib.models import GenerationResult, ORDERED_CONTEXT_IDS, PromptAtom, PromptFragment, SelectionOrigin, SemanticFacts, TagProvenance
     from lib.rng import derive_substream_rng, recover_effective_seed
     from lib.sampler import DataSampler, _is_none, get_selection_mode
@@ -1424,27 +1442,105 @@ def serialize_raw_input(val: Any) -> Any:
     return str(val)
 
 
+def _safe_extract_slot_inputs(inputs: Optional[Dict[str, Any]]) -> Dict[str, List[Tuple[str, Any]]]:
+    """
+    安全提取原始输入字典中针对各槽位的输入键值对列表，杜绝任何二次抛错。
+    返回 {canonical_slot: [(raw_key, raw_val), ...]}
+    """
+    res: Dict[str, List[Tuple[str, Any]]] = {}
+    if not inputs or not isinstance(inputs, dict):
+        return res
+
+    # 1. external_overrides 字典
+    ext_dict = inputs.get("external_overrides")
+    if isinstance(ext_dict, dict):
+        for k, v in ext_dict.items():
+            norm = normalize_slot_name(k)
+            res.setdefault(norm, []).append((k, v))
+
+    # 2. 顶层输入键
+    for k, v in inputs.items():
+        if k == "external_overrides" or k in _FRAMEWORK_RESERVED_KEYS:
+            continue
+        norm = normalize_slot_name(k)
+        res.setdefault(norm, []).append((k, v))
+
+    return res
+
+
 def build_error_override_records(
     inputs: Optional[Dict[str, Any]],
     err: Optional[Exception] = None,
+    existing_overrides: Optional[Sequence[Any]] = None,
 ) -> List[Dict[str, Any]]:
-    """在生成失败或消解抛错时，根据原始输入字典精确构建 20 规范槽位的错误状态覆盖报告。"""
-    candidate_overrides: Dict[str, Any] = {}
-    if inputs:
-        candidate_overrides = _extract_external_overrides(inputs)
+    """在生成失败或消解抛错时，根据已有覆盖记录或原始输入安全构建 20 规范槽位的错误状态覆盖报告。"""
+    # 确定涉及错误/冲突的规范槽位集合
+    err_slots = set(getattr(err, "slots", ()))
+    unres_conflicts = getattr(err, "unresolved_conflicts", ())
+    for c in unres_conflicts:
+        if isinstance(c, (list, tuple)):
+            for item in c:
+                if isinstance(item, str):
+                    err_slots.add(normalize_slot_name(item))
 
-    # 判定错误状态类型
+    # 判定错误类型 (硬冲突 vs 输入校验失败)
     is_conflict = (
-        isinstance(err, (UnresolvedConflictError, ))
+        isinstance(err, (UnresolvedConflictError,))
         or getattr(err, "category", "") in (CATEGORY_UNRESOLVED_HARD_CONFLICT, CATEGORY_EXTERNAL_OVERRIDE_CONFLICT)
-        or "conflict" in str(err).lower()
+        or (
+            getattr(err, "category", "") not in (CATEGORY_SLOT_ALIAS_COLLISION, CATEGORY_INVALID_INPUT_TYPE, CATEGORY_EXTERNAL_BUDGET_EXCEEDED)
+            and ("external override conflict" in str(err).lower() or "unresolved conflict" in str(err).lower())
+        )
     )
     failed_status = "failed_conflict" if is_conflict else "failed_validation"
 
-    records: List[Dict[str, Any]] = []
+    # 场景 A: 存在下游组装器执行后的已有覆盖记录 (existing_overrides)
+    if existing_overrides:
+        records: List[Dict[str, Any]] = []
+        for o in existing_overrides:
+            slot = o.canonical_slot if hasattr(o, "canonical_slot") else o.get("canonical_slot")
+            raw_input_val = o.raw_input if hasattr(o, "raw_input") else o.get("raw_input")
+            source_port = o.source_port if hasattr(o, "source_port") else o.get("source_port")
+            status = o.status if hasattr(o, "status") else o.get("status")
+            blank_reason = o.blank_fallback_reason if hasattr(o, "blank_fallback_reason") else o.get("blank_fallback_reason")
+            replaced_targets = list(o.replaced_target_ids if hasattr(o, "replaced_target_ids") else o.get("replaced_target_ids", []))
+            replaced_txts = list(o.replaced_texts if hasattr(o, "replaced_texts") else o.get("replaced_texts", []))
+            injected_atoms = list(o.injected_atom_ids if hasattr(o, "injected_atom_ids") else o.get("injected_atom_ids", []))
+
+            # 仅将真正参与冲突/校验失败的槽位标记为失败状态
+            if slot in err_slots:
+                records.append({
+                    "blank_fallback_reason": None,
+                    "canonical_slot": slot,
+                    "injected_atom_ids": [],
+                    "raw_input": serialize_raw_input(raw_input_val),
+                    "replaced_target_ids": [],
+                    "replaced_texts": [],
+                    "source_port": source_port,
+                    "status": failed_status,
+                })
+            else:
+                records.append({
+                    "blank_fallback_reason": blank_reason,
+                    "canonical_slot": slot,
+                    "injected_atom_ids": injected_atoms,
+                    "raw_input": serialize_raw_input(raw_input_val),
+                    "replaced_target_ids": replaced_targets,
+                    "replaced_texts": replaced_txts,
+                    "source_port": source_port,
+                    "status": status,
+                })
+        return records
+
+    # 场景 B: 组装前校验即失败 (如 NoneType、未知槽位或重复别名冲突)
+    # 安全从原始 inputs 提取各槽位输入候选，绝不调用会抛错的 _extract_external_overrides
+    slot_input_map = _safe_extract_slot_inputs(inputs)
     canonical_20 = (*SLOT_ORDER, *AUXILIARY_SLOT_ORDER)
+    records = []
+
     for slot in canonical_20:
-        if slot not in candidate_overrides:
+        entries = slot_input_map.get(slot, [])
+        if not entries:
             records.append({
                 "blank_fallback_reason": "omitted",
                 "canonical_slot": slot,
@@ -1457,42 +1553,61 @@ def build_error_override_records(
             })
             continue
 
-        raw_val = candidate_overrides[slot]
-        source_port = f"{slot}_override"
-        if inputs:
-            if f"{slot}_override" in inputs:
-                source_port = f"{slot}_override"
-            elif slot in inputs and slot not in _FRAMEWORK_RESERVED_KEYS:
-                source_port = slot
-            elif "external_overrides" in inputs and isinstance(inputs["external_overrides"], dict):
-                for k in inputs["external_overrides"]:
-                    if normalize_slot_name(k) == slot:
-                        source_port = k
-                        break
+        raw_key, raw_val = entries[0]
+        source_port = raw_key
+        has_multiple_entries = len(entries) > 1
 
-        is_blank, blank_reason = _inspect_blank_input(raw_val)
-        if is_blank:
-            records.append({
-                "blank_fallback_reason": blank_reason,
-                "canonical_slot": slot,
-                "injected_atom_ids": [],
-                "raw_input": serialize_raw_input(raw_val),
-                "replaced_target_ids": [],
-                "replaced_texts": [],
-                "source_port": source_port,
-                "status": "fallback_blank",
-            })
-        else:
+        is_slot_failed = (
+            slot in err_slots
+            or any(v is None for _, v in entries)
+            or has_multiple_entries
+        )
+
+        if is_slot_failed:
+            if has_multiple_entries:
+                raw_input_repr = [serialize_raw_input(v) for _, v in entries]
+                source_port = ", ".join(k for k, _ in entries)
+            elif raw_val is None:
+                raw_input_repr = None
+            else:
+                raw_input_repr = serialize_raw_input(raw_val)
+
             records.append({
                 "blank_fallback_reason": None,
                 "canonical_slot": slot,
                 "injected_atom_ids": [],
-                "raw_input": serialize_raw_input(raw_val),
+                "raw_input": raw_input_repr,
                 "replaced_target_ids": [],
                 "replaced_texts": [],
                 "source_port": source_port,
                 "status": failed_status,
             })
+        else:
+            is_blank, blank_reason = _inspect_blank_input(raw_val)
+            if is_blank:
+                records.append({
+                    "blank_fallback_reason": blank_reason,
+                    "canonical_slot": slot,
+                    "injected_atom_ids": [],
+                    "raw_input": serialize_raw_input(raw_val),
+                    "replaced_target_ids": [],
+                    "replaced_texts": [],
+                    "source_port": source_port,
+                    "status": "fallback_blank",
+                })
+            else:
+                # 合法输入但因全局其它槽位校验失败未被组装
+                records.append({
+                    "blank_fallback_reason": None,
+                    "canonical_slot": slot,
+                    "injected_atom_ids": [],
+                    "raw_input": serialize_raw_input(raw_val),
+                    "replaced_target_ids": [],
+                    "replaced_texts": [],
+                    "source_port": source_port,
+                    "status": "failed_validation",
+                })
+
     return records
 
 
@@ -1692,46 +1807,8 @@ def format_diagnostics_error_dict(
     raw_inputs: Optional[Dict[str, Any]] = None,
 ) -> Dict[str, Any]:
     """构建符合 schemas/diagnostics.schema.json 契约的错误状态审计报告字典 (2.0 契约)。"""
-    if overrides:
-        overrides_list = []
-        for o in overrides:
-            if isinstance(o, dict):
-                d_copy = dict(o)
-                d_copy["raw_input"] = serialize_raw_input(d_copy.get("raw_input"))
-                overrides_list.append(d_copy)
-            elif hasattr(o, "canonical_slot"):
-                overrides_list.append({
-                    "blank_fallback_reason": o.blank_fallback_reason,
-                    "canonical_slot": o.canonical_slot,
-                    "injected_atom_ids": list(o.injected_atom_ids),
-                    "raw_input": serialize_raw_input(o.raw_input),
-                    "replaced_target_ids": list(o.replaced_target_ids),
-                    "replaced_texts": list(o.replaced_texts),
-                    "source_port": o.source_port,
-                    "status": o.status,
-                })
-    elif raw_inputs:
-        overrides_list = build_error_override_records(raw_inputs, err)
-    elif hasattr(err, "overrides") and getattr(err, "overrides", None):
-        overrides_list = []
-        for o in getattr(err, "overrides"):
-            if isinstance(o, dict):
-                d_copy = dict(o)
-                d_copy["raw_input"] = serialize_raw_input(d_copy.get("raw_input"))
-                overrides_list.append(d_copy)
-            elif hasattr(o, "canonical_slot"):
-                overrides_list.append({
-                    "blank_fallback_reason": o.blank_fallback_reason,
-                    "canonical_slot": o.canonical_slot,
-                    "injected_atom_ids": list(o.injected_atom_ids),
-                    "raw_input": serialize_raw_input(o.raw_input),
-                    "replaced_target_ids": list(o.replaced_target_ids),
-                    "replaced_texts": list(o.replaced_texts),
-                    "source_port": o.source_port,
-                    "status": o.status,
-                })
-    else:
-        overrides_list = build_error_override_records(None, err)
+    existing_ov = overrides if overrides is not None else getattr(err, "overrides", None)
+    overrides_list = build_error_override_records(raw_inputs, err, existing_overrides=existing_ov)
 
     if hasattr(err, "to_diagnostics_dict"):
         try:
@@ -1894,7 +1971,7 @@ class IYKYKPromptDiagnostics:
                 audit_json = format_diagnostics_json(res)
                 return res, audit_json
             except Exception as err:
-                audit_json = format_diagnostics_error_json(err, effective_seed, raw_inputs=inputs)
+                audit_json = format_diagnostics_error_json(err, effective_seed, overrides=getattr(err, "overrides", None), raw_inputs=inputs)
                 return None, audit_json
 
         res = _generate_structured(

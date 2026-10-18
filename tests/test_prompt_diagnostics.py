@@ -1315,5 +1315,151 @@ print(audit)
         self.assertTrue(len(sc_ov.replaced_texts) > 0)
 
 
+    def test_37_m5_1_diagnostics_error_on_explicit_none(self):
+        """验证显式 None 输入在 raise_on_error=False 下安全输出 error 诊断 JSON (不崩溃，category=invalid_input_type)。"""
+        res, audit_str = self.diagnostics.diagnose_structured(
+            clothing_override=None,
+            prompt_seed=42,
+            raise_on_error=False,
+        )
+        self.assertIsNone(res)
+        self.assertIsInstance(audit_str, str)
+        audit = json.loads(audit_str)
+        self.assertEqual(audit["status"], "error")
+        self.assertEqual(audit["error_info"]["category"], "invalid_input_type")
+        self.assertIn("clothing", audit["error_info"]["slots"])
+
+        cloth_ov = next(o for o in audit["overrides"] if o["canonical_slot"] == "clothing")
+        self.assertEqual(cloth_ov["status"], "failed_validation")
+        self.assertIsNone(cloth_ov["raw_input"])
+
+        if HAS_JSONSCHEMA:
+            self.validator.validate(audit)
+
+    def test_38_m5_1_diagnostics_error_on_alias_collision(self):
+        """验证槽位别名冲突在 raise_on_error=False 下安全输出 error 诊断 JSON (category=slot_alias_collision)。"""
+        res, audit_str = self.diagnostics.diagnose_structured(
+            external_overrides={"clothing": "red dress", "服装款式": "blue suit"},
+            prompt_seed=42,
+            raise_on_error=False,
+        )
+        self.assertIsNone(res)
+        audit = json.loads(audit_str)
+        self.assertEqual(audit["status"], "error")
+        self.assertEqual(audit["error_info"]["category"], "slot_alias_collision")
+        self.assertIn("clothing", audit["error_info"]["slots"])
+
+        cloth_ov = next(o for o in audit["overrides"] if o["canonical_slot"] == "clothing")
+        self.assertEqual(cloth_ov["status"], "failed_validation")
+        self.assertEqual(cloth_ov["raw_input"], ["red dress", "blue suit"])
+
+        if HAS_JSONSCHEMA:
+            self.validator.validate(audit)
+
+        # 同样验证端口别名冲突 (clothing 与 clothing_override)
+        res2, audit_str2 = self.diagnostics.diagnose_structured(
+            clothing="red dress",
+            clothing_override="blue suit",
+            prompt_seed=42,
+            raise_on_error=False,
+        )
+        self.assertIsNone(res2)
+        audit2 = json.loads(audit_str2)
+        self.assertEqual(audit2["status"], "error")
+        self.assertEqual(audit2["error_info"]["category"], "slot_alias_collision")
+        self.assertIn("clothing", audit2["error_info"]["slots"])
+
+    def test_39_m5_1_diagnostics_error_on_unknown_slot(self):
+        """验证未知槽位在 raise_on_error=False 下安全输出 error 诊断 JSON (category=invalid_input_type)。"""
+        res, audit_str = self.diagnostics.diagnose_structured(
+            unknown_slot_override="magic wand",
+            prompt_seed=42,
+            raise_on_error=False,
+        )
+        self.assertIsNone(res)
+        audit = json.loads(audit_str)
+        self.assertEqual(audit["status"], "error")
+        self.assertEqual(audit["error_info"]["category"], "invalid_input_type")
+        self.assertIn("unknown_slot", audit["error_info"]["slots"])
+
+        if HAS_JSONSCHEMA:
+            self.validator.validate(audit)
+
+    def test_40_m5_1_unrelated_slots_not_marked_as_failed_conflict(self):
+        """验证多覆盖硬冲突发生时，无关槽位保持 applied 状态，不被连带误标为 failed_conflict。"""
+        res, audit_str = self.diagnostics.diagnose_structured(
+            pose_override="arms bound behind back",
+            props_override="holding smartphone",
+            clothing_override="blue suit",
+            prompt_seed=42,
+            raise_on_error=False,
+        )
+        self.assertIsNone(res)
+        audit = json.loads(audit_str)
+        self.assertEqual(audit["status"], "error")
+
+        pose_ov = next(o for o in audit["overrides"] if o["canonical_slot"] == "pose")
+        props_ov = next(o for o in audit["overrides"] if o["canonical_slot"] == "props")
+        cloth_ov = next(o for o in audit["overrides"] if o["canonical_slot"] == "clothing")
+
+        self.assertEqual(pose_ov["status"], "failed_conflict")
+        self.assertEqual(props_ov["status"], "failed_conflict")
+        # 服装未参与姿势-道具双手冲突，保持 applied 状态
+        self.assertEqual(cloth_ov["status"], "applied")
+        self.assertEqual(cloth_ov["raw_input"], "blue suit")
+
+        if HAS_JSONSCHEMA:
+            self.validator.validate(audit)
+
+    def test_41_m5_1_oracle_accepts_authentic_override_with_base_inputs(self):
+        """验证真实提供外部覆盖连同原始基础 UI 输入交给 Oracle 时，Oracle 依据覆盖优先级正确接受。"""
+        inp = {**self.default_inputs, "clothing_override": "blue suit"}
+        res, audit_str = self.diagnostics.diagnose_structured(**inp, prompt_seed=42)
+        self.assertIsNotNone(res)
+        self.assertIn("blue suit", res.positive)
+
+        # Oracle 接收原始完整 inputs，不会因基础选项为'随机'而误报不一致
+        schema = self.schema_doc if HAS_JSONSCHEMA else None
+        audit = validate_audit_json_oracle(
+            audit_str, schema_doc=schema, expected_positive=res.positive, trusted_inputs=inp
+        )
+        self.assertEqual(audit["status"], "success")
+        cloth_rec = next(o for o in audit["overrides"] if o["canonical_slot"] == "clothing")
+        self.assertEqual(cloth_rec["status"], "applied")
+        self.assertEqual(cloth_rec["raw_input"], "blue suit")
+
+    def test_42_m5_1_oracle_and_schema_reject_forged_applied_and_fake_atom(self):
+        """验证未提供覆盖时伪造 applied、虚构输入与不存在 atom_id 时，Schema 与 Oracle 严厉拒绝。"""
+        # 1. 正常生成基线报告（未提供外部覆盖）
+        res, audit_str = self.diagnostics.diagnose_structured(**self.default_inputs, prompt_seed=42)
+        audit = json.loads(audit_str)
+
+        # 变异 1: 伪造 applied 覆盖记录与虚构 atom_does_not_exist
+        m1 = copy.deepcopy(audit)
+        cloth_rec = next(o for o in m1["overrides"] if o["canonical_slot"] == "clothing")
+        cloth_rec["status"] = "applied"
+        cloth_rec["raw_input"] = "fake business suit"
+        cloth_rec["source_port"] = "clothing_override"
+        cloth_rec["injected_atom_ids"] = ["atom_does_not_exist"]
+        cloth_rec["blank_fallback_reason"] = None
+
+        # Oracle 必须检测出未提供覆盖却标记 applied，以及引用的 atom 不存在
+        with self.assertRaises(AssertionError):
+            validate_audit_json_oracle(m1, schema_doc=self.schema_doc, trusted_inputs=self.default_inputs)
+
+        # 变异 2: 在 not_provided 槽位塞入虚构 atom_does_not_exist
+        m2 = copy.deepcopy(audit)
+        cloth_rec2 = next(o for o in m2["overrides"] if o["canonical_slot"] == "clothing")
+        cloth_rec2["status"] = "not_provided"
+        cloth_rec2["injected_atom_ids"] = ["atom_does_not_exist"]
+
+        # Schema 与 Oracle 均必须拒绝
+        with self.assertRaises(AssertionError):
+            validate_audit_json_oracle(m2, schema_doc=self.schema_doc, trusted_inputs=self.default_inputs)
+        if HAS_JSONSCHEMA:
+            with self.assertRaises(Exception):
+                self.validator.validate(m2)
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -8,9 +8,17 @@ from __future__ import annotations
 from typing import Any, Dict, List, Set, Tuple
 
 if __package__:
-    from .errors import PromptValidationError
+    from .errors import (
+        PromptValidationError,
+        CATEGORY_INVALID_INPUT_TYPE,
+        CATEGORY_SLOT_ALIAS_COLLISION,
+    )
 else:
-    from lib.errors import PromptValidationError
+    from lib.errors import (
+        PromptValidationError,
+        CATEGORY_INVALID_INPUT_TYPE,
+        CATEGORY_SLOT_ALIAS_COLLISION,
+    )
 
 
 # 18 个正式内部装配流水线槽位（规范顺序保持既有语义不变）
@@ -146,7 +154,9 @@ def normalize_slot_mapping(slots: Dict[str, Any]) -> Dict[str, Any]:
             if norm_key in ALLOWED_SLOTS:
                 raise PromptValidationError(
                     f"Slot {norm_key!r} (from raw key {raw_key!r}) explicitly provided as None (type NoneType). "
-                    "Expected str, PromptFragment, or list/tuple of str/PromptFragment."
+                    "Expected str, PromptFragment, or list/tuple of str/PromptFragment.",
+                    slots=[norm_key],
+                    category=CATEGORY_INVALID_INPUT_TYPE,
                 )
             # 未知槽位且为 None，静默忽略
             continue
@@ -156,13 +166,20 @@ def normalize_slot_mapping(slots: Dict[str, Any]) -> Dict[str, Any]:
         if not is_empty:
             if norm_key not in ALLOWED_SLOTS:
                 raise PromptValidationError(
-                    f"Unknown non-empty slot {raw_key!r} (normalized: {norm_key!r}) is not allowed in pipeline."
+                    f"Unknown non-empty slot {raw_key!r} (normalized: {norm_key!r}) is not allowed in pipeline.",
+                    slots=[norm_key],
+                    texts=[str(val)],
+                    category=CATEGORY_INVALID_INPUT_TYPE,
                 )
 
             if norm_key in sources:
                 sources[norm_key].append(raw_key)
+                prev_val = normalized[norm_key]
                 raise PromptValidationError(
-                    f"Conflicting slot inputs normalized to canonical slot '{norm_key}': raw keys {sources[norm_key]}"
+                    f"Conflicting slot inputs normalized to canonical slot '{norm_key}': raw keys {sources[norm_key]}",
+                    slots=[norm_key],
+                    texts=[str(prev_val), str(val)],
+                    category=CATEGORY_SLOT_ALIAS_COLLISION,
                 )
             else:
                 sources[norm_key] = [raw_key]

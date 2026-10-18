@@ -120,7 +120,29 @@
       ],
       "properties": {
         "canonical_slot": {
-          "type": "string"
+          "type": "string",
+          "enum": [
+            "scene_theme",
+            "shot_type",
+            "camera_angle",
+            "character",
+            "nudity",
+            "clothing",
+            "lighting",
+            "pose",
+            "expression",
+            "makeup",
+            "hairstyle",
+            "jewelry",
+            "imperfections",
+            "tattoo",
+            "props",
+            "liquids",
+            "film",
+            "quality",
+            "style_recipe",
+            "custom"
+          ]
         },
         "status": {
           "type": "string",
@@ -155,10 +177,110 @@
         "injected_atom_ids": {
           "type": "array",
           "items": {
-            "type": "string"
+            "type": "string",
+            "pattern": "^atom_[a-zA-Z0-9_]+$"
           }
         }
-      }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "not_provided"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "raw_input": {
+                "type": "null"
+              },
+              "source_port": {
+                "type": "null"
+              },
+              "blank_fallback_reason": {
+                "const": "omitted"
+              },
+              "injected_atom_ids": {
+                "maxItems": 0
+              },
+              "replaced_target_ids": {
+                "maxItems": 0
+              },
+              "replaced_texts": {
+                "maxItems": 0
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "fallback_blank"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "blank_fallback_reason": {
+                "enum": ["empty_string", "whitespace_only", "empty_list"]
+              },
+              "injected_atom_ids": {
+                "maxItems": 0
+              },
+              "replaced_target_ids": {
+                "maxItems": 0
+              },
+              "replaced_texts": {
+                "maxItems": 0
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "applied"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "blank_fallback_reason": {
+                "type": "null"
+              },
+              "source_port": {
+                "type": "string"
+              },
+              "injected_atom_ids": {
+                "minItems": 1
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "enum": ["failed_conflict", "failed_validation"]
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "blank_fallback_reason": {
+                "type": "null"
+              },
+              "injected_atom_ids": {
+                "maxItems": 0
+              }
+            }
+          }
+        }
+      ]
     },
     "sampling_rationale": {
       "type": "object",

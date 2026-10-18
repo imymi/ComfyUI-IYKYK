@@ -68,9 +68,9 @@ class PromptValidationError(Exception):
             return CATEGORY_EXTERNAL_OVERRIDE_CONFLICT
         if ("word count" in msg_low and "exceeds" in msg_low) or ("250" in msg_low and "budget" in msg_low):
             return CATEGORY_EXTERNAL_BUDGET_EXCEEDED
-        if "conflicting slot aliases" in msg_low or "multiple conflicting" in msg_low:
+        if "conflicting slot" in msg_low or "slot alias" in msg_low or "alias collision" in msg_low or "multiple conflicting" in msg_low:
             return CATEGORY_SLOT_ALIAS_COLLISION
-        if "none" in msg_low or "type none" in msg_low or "invalid" in msg_low or "expected str" in msg_low or "disallowed" in msg_low:
+        if "none" in msg_low or "type none" in msg_low or "invalid" in msg_low or "expected str" in msg_low or "disallowed" in msg_low or "unknown" in msg_low or "not allowed" in msg_low:
             return CATEGORY_INVALID_INPUT_TYPE
         return CATEGORY_GENERIC_ERROR
 

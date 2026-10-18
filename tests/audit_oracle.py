@@ -20,6 +20,8 @@ from __future__ import annotations
 import json
 from typing import Any, Dict, List, Optional, Sequence, Set, Tuple
 
+from lib.slot_contract import normalize_slot_name
+
 try:
     import jsonschema
     HAS_JSONSCHEMA = True
@@ -27,6 +29,45 @@ except ImportError:
     HAS_JSONSCHEMA = False
 
 _COMPILED_VALIDATORS: Dict[int, Any] = {}
+
+
+def _inspect_blank_input(val: Any) -> Tuple[bool, Optional[str]]:
+    if val is None:
+        return True, "omitted"
+    if isinstance(val, str):
+        if not val:
+            return True, "empty_string"
+        if not val.strip():
+            return True, "whitespace_only"
+        return False, None
+    if isinstance(val, (list, tuple)):
+        if len(val) == 0:
+            return True, "empty_list"
+        return False, None
+    return False, None
+
+
+def _extract_override_from_trusted(slot: str, trusted_inputs: Dict[str, Any]) -> Tuple[bool, Any]:
+    """检查 trusted_inputs 中是否针对规范槽位 slot 显式提供了外部覆盖。"""
+    norm_target = normalize_slot_name(slot)
+
+    # 1. 显式 external_overrides 字典
+    ext_dict = trusted_inputs.get("external_overrides")
+    if isinstance(ext_dict, dict):
+        for k, v in ext_dict.items():
+            if normalize_slot_name(k) == norm_target:
+                return True, v
+
+    # 2. {norm_target}_override 命名端口
+    if f"{norm_target}_override" in trusted_inputs:
+        return True, trusted_inputs[f"{norm_target}_override"]
+
+    # 3. 其它以 _override 结尾的别名键
+    for k, v in trusted_inputs.items():
+        if k.endswith("_override") and normalize_slot_name(k) == norm_target:
+            return True, v
+
+    return False, None
 
 EXPECTED_TOP_LEVEL_KEYS_V1 = {
     "schema_version",
@@ -139,7 +180,7 @@ _SEMANTIC_PREFIXES = {
     "expression", "extension", "extension_family", "extension_tier", "film",
     "hairstyle", "imperfection", "imperfections", "jewelry", "lighting", "linkage",
     "liquid", "liquids", "makeup", "nudity", "override", "pose", "prop", "props", "quality",
-    "preset", "recipe", "scene", "shot", "shot_type", "slot", "state", "tattoo", "theme",
+    "preset", "recipe", "scene", "shot", "shot_type", "slot", "slot_override", "state", "tattoo", "theme",
 }
 _RUNTIME_SEMANTIC_IDS = {
     "extension_family:cloth_transparency",
@@ -307,16 +348,51 @@ def validate_audit_json_oracle(
                 f"Selection[{s_idx}] selector '{selector}' is invalid for entry point '{entry_point}'"
             )
 
-        if mode != "resolver":
+        norm_slot = normalize_slot_name(selector)
+        if mode == "override":
+            if raw_val is None:
+                raise AssertionError(f"Selection[{s_idx}] for selector '{selector}' has null raw_value")
+            if trusted_inputs is None:
+                raise AssertionError(
+                    "trusted_inputs is required to validate override selection raw values"
+                )
+            has_ov, ov_val = _extract_override_from_trusted(norm_slot, trusted_inputs)
+            if not has_ov:
+                raise AssertionError(
+                    f"Selection for selector '{selector}' has mode='override', but no override for slot '{norm_slot}' was provided in trusted_inputs"
+                )
+            expected_raw = str(getattr(ov_val, "text", ov_val))
+            if raw_val != expected_raw:
+                raise AssertionError(
+                    f"Selection raw_value {raw_val!r} does not match trusted override {expected_raw!r} for selector '{selector}'"
+                )
+            pair = (selector, raw_val)
+            if pair in seen_selector_values:
+                raise AssertionError(
+                    f"Duplicate selection record detected for selector '{selector}' and raw_value {raw_val!r}. "
+                    f"A single selection must group multi-leaf atoms into one record."
+                )
+            seen_selector_values.add(pair)
+        elif mode != "resolver":
             if raw_val is None:
                 raise AssertionError(f"Selection[{s_idx}] for selector '{selector}' has null raw_value")
             if trusted_inputs is None:
                 raise AssertionError(
                     "trusted_inputs is required to validate non-resolver selection raw values"
                 )
+            has_ov, ov_val = _extract_override_from_trusted(norm_slot, trusted_inputs)
+            if has_ov and ov_val is not None and str(getattr(ov_val, "text", ov_val)).strip() != "":
+                raise AssertionError(
+                    f"Selection for selector '{selector}' has mode={mode!r}, but trusted_inputs provided non-blank override {ov_val!r} for slot '{norm_slot}'. Override should have taken precedence."
+                )
             expected_raw = trusted_inputs.get(selector)
             if expected_raw is None and selector in SELECTOR_TO_UI_PARAM:
                 expected_raw = trusted_inputs.get(SELECTOR_TO_UI_PARAM[selector])
+            if expected_raw is None:
+                for k, v in trusted_inputs.items():
+                    if normalize_slot_name(k) == norm_slot and not k.endswith("_override") and k != "external_overrides":
+                        expected_raw = v
+                        break
             if expected_raw is None:
                 raise AssertionError(
                     f"No trusted input supplied for non-resolver selector '{selector}'"
@@ -388,6 +464,66 @@ def validate_audit_json_oracle(
     all_registered_atoms: Dict[str, Dict[str, Any]] = {**source_map, **produced_map}
     accepted_map: Dict[str, Dict[str, Any]] = {a["atom_id"]: a for a in all_accepted_atoms}
 
+    # 5.1 2.0 外部覆盖 Atom 真实性与来源槽位强闭环校验 (Fail-Closed)
+    if version == "2.0":
+        overrides = audit.get("overrides", [])
+        for o in overrides:
+            slot = o["canonical_slot"]
+            st = o["status"]
+            injected_ids = o.get("injected_atom_ids", [])
+
+            for aid in injected_ids:
+                if not str(aid).startswith("atom_"):
+                    raise AssertionError(f"injected_atom_id must start with 'atom_', got {aid!r}")
+                if aid not in source_map:
+                    raise AssertionError(
+                        f"Override for slot '{slot}' references non-existent injected_atom_id '{aid}'"
+                    )
+                src_atom = source_map[aid]
+                atom_slot = normalize_slot_name(src_atom.get("source_slot", ""))
+                if atom_slot != slot and atom_slot not in (slot, "preset_core", "custom"):
+                    raise AssertionError(
+                        f"Override for slot '{slot}' references atom '{aid}' which belongs to slot '{atom_slot}', not '{slot}'"
+                    )
+                owner_idx = source_owners.get(aid)
+                if owner_idx is not None:
+                    owner_sel = selections[owner_idx]
+                    if owner_sel.get("mode") != "override":
+                        raise AssertionError(
+                            f"Override for slot '{slot}' references atom '{aid}' whose selection mode is {owner_sel.get('mode')!r}, expected 'override'"
+                        )
+
+            if st == "applied":
+                if not injected_ids:
+                    raise AssertionError(f"Override for slot '{slot}' has status='applied' but empty injected_atom_ids")
+            else:
+                if injected_ids:
+                    raise AssertionError(f"Override for slot '{slot}' has status={st!r} but non-empty injected_atom_ids: {injected_ids}")
+
+            if trusted_inputs is not None:
+                has_ov, ov_val = _extract_override_from_trusted(slot, trusted_inputs)
+                if not has_ov:
+                    if st == "applied":
+                        raise AssertionError(
+                            f"Override for slot '{slot}' is marked as 'applied' with raw_input={o.get('raw_input')!r}, but no override was provided in trusted_inputs"
+                        )
+                else:
+                    is_blank, _ = _inspect_blank_input(ov_val)
+                    if is_blank:
+                        if st != "fallback_blank":
+                            raise AssertionError(
+                                f"Override for slot '{slot}' should be 'fallback_blank', got {st!r} (trusted input={ov_val!r})"
+                            )
+                    elif audit.get("status") == "success":
+                        if st != "applied":
+                            raise AssertionError(
+                                f"Override for slot '{slot}' should be 'applied' for successful generation, got {st!r} (trusted input={ov_val!r})"
+                            )
+                        if str(o.get("raw_input")) != str(getattr(ov_val, "text", ov_val)):
+                            raise AssertionError(
+                                f"Override for slot '{slot}' raw_input mismatch: audit has {o.get('raw_input')!r}, trusted has {ov_val!r}"
+                            )
+
     # 6. accepted 与 source/produced 载荷强一致性及 is_accepted 标记一致性
     for aid, acc_atom in accepted_map.items():
         if not acc_atom.get("is_accepted"):
@@ -440,17 +576,21 @@ def validate_audit_json_oracle(
     valid_parent_pool.update(catalog_ids)
     for sel in selections:
         selected_id = sel.get("selected_id")
-        if selected_id and sel.get("mode") != "resolver":
+        sel_mode = sel.get("mode")
+        if selected_id and sel_mode not in ("resolver", "override", "custom"):
             if selected_id not in catalog_ids:
                 raise AssertionError(
                     f"Selection '{sel.get('selector')}' has non-authoritative selected_id '{selected_id}'"
                 )
             valid_parent_pool.add(selected_id)
+        elif selected_id:
+            valid_parent_pool.add(selected_id)
+
         for p in sel.get("parent_ids", []):
-            if sel.get("mode") == "resolver":
-                if p not in all_registered_atoms:
+            if sel_mode in ("resolver", "override", "custom"):
+                if p not in all_registered_atoms and p not in valid_parent_pool and p not in catalog_ids:
                     raise AssertionError(
-                        f"Resolver selection has unknown parent_id '{p}'"
+                        f"{sel_mode} selection has unknown parent_id '{p}'"
                     )
             elif p not in catalog_ids:
                 raise AssertionError(
@@ -461,20 +601,30 @@ def validate_audit_json_oracle(
     for a in all_source_atoms:
         source_item_id = a.get("source_item_id")
         leaf_id = a.get("id")
+        owner_idx = source_owners.get(a["atom_id"])
+        atom_mode = selections[owner_idx].get("mode") if owner_idx is not None else None
+        is_override_or_custom = (
+            atom_mode in ("override", "custom")
+            or (source_item_id and (source_item_id.startswith("override_") or source_item_id.startswith("custom_")))
+        )
+
         if source_item_id and source_item_id not in catalog_ids:
-            raise AssertionError(
-                f"Source atom '{a['atom_id']}' has non-authoritative source_item_id '{source_item_id}'"
-            )
-        if leaf_id and leaf_id not in catalog_ids:
-            if not source_item_id or not leaf_id.startswith(f"{source_item_id}__"):
+            if not is_override_or_custom:
                 raise AssertionError(
-                    f"Source atom '{a['atom_id']}' has non-authoritative leaf id '{leaf_id}'"
+                    f"Source atom '{a['atom_id']}' has non-authoritative source_item_id '{source_item_id}'"
                 )
+        if leaf_id and leaf_id not in catalog_ids:
+            if not is_override_or_custom:
+                if not source_item_id or not leaf_id.startswith(f"{source_item_id}__"):
+                    raise AssertionError(
+                        f"Source atom '{a['atom_id']}' has non-authoritative leaf id '{leaf_id}'"
+                    )
         for parent_id in a.get("parent_ids", []):
             if parent_id not in catalog_ids:
-                raise AssertionError(
-                    f"Source atom '{a['atom_id']}' has non-authoritative parent_id '{parent_id}'"
-                )
+                if not is_override_or_custom or (parent_id not in valid_parent_pool and parent_id != source_item_id):
+                    raise AssertionError(
+                        f"Source atom '{a['atom_id']}' has non-authoritative parent_id '{parent_id}'"
+                    )
         for semantic_id in a.get("semantic_ids", []):
             if ":" not in semantic_id:
                 raise AssertionError(
@@ -485,7 +635,7 @@ def validate_audit_json_oracle(
                 raise AssertionError(
                     f"Source atom '{a['atom_id']}' has non-authoritative semantic_id '{semantic_id}'"
                 )
-            is_slot_semantic = prefix == "slot" and suffix in SELECTOR_TO_UI_PARAM
+            is_slot_semantic = (prefix in ("slot", "slot_override"))
             if (
                 semantic_id not in _RUNTIME_SEMANTIC_IDS
                 and not is_slot_semantic
