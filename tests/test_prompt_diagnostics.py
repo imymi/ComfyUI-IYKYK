@@ -27,6 +27,7 @@ from lib.conflict_resolver import ConflictResolver, is_formal_atom
 from lib.models import (
     GenerationResult,
     PromptAtom,
+    PromptFragment,
     SelectionOrigin,
     SemanticFacts,
     SpanType,
@@ -1459,6 +1460,114 @@ print(audit)
         if HAS_JSONSCHEMA:
             with self.assertRaises(Exception):
                 self.validator.validate(m2)
+
+    def test_43_m5_1_oracle_accepts_empty_list_fallback_blank(self):
+        """验证 clothing_override=[] 正常回退为 fallback_blank，且能顺利通过 Oracle 与 Schema 校验。"""
+        inp = {**self.default_inputs, "clothing_override": []}
+        res, audit_str = self.diagnostics.diagnose_structured(**inp, prompt_seed=42)
+        self.assertIsNotNone(res)
+        schema = self.schema_doc if HAS_JSONSCHEMA else None
+        audit = validate_audit_json_oracle(
+            audit_str, schema_doc=schema, expected_positive=res.positive, trusted_inputs=inp
+        )
+        self.assertEqual(audit["status"], "success")
+        cloth_rec = next(o for o in audit["overrides"] if o["canonical_slot"] == "clothing")
+        self.assertEqual(cloth_rec["status"], "fallback_blank")
+        self.assertEqual(cloth_rec["blank_fallback_reason"], "empty_list")
+
+    def test_44_m5_1_oracle_accepts_multi_item_override_list(self):
+        """验证多 tag 列表覆盖 clothing_override=['blue suit', 'white shirt'] 聚合成单一 Selection，顺利通过 Oracle。"""
+        inp = {**self.default_inputs, "clothing_override": ["blue suit", "white shirt"]}
+        res, audit_str = self.diagnostics.diagnose_structured(**inp, prompt_seed=42)
+        self.assertIsNotNone(res)
+        schema = self.schema_doc if HAS_JSONSCHEMA else None
+        audit = validate_audit_json_oracle(
+            audit_str, schema_doc=schema, expected_positive=res.positive, trusted_inputs=inp
+        )
+        self.assertEqual(audit["status"], "success")
+        cloth_rec = next(o for o in audit["overrides"] if o["canonical_slot"] == "clothing")
+        self.assertEqual(cloth_rec["status"], "applied")
+        self.assertEqual(cloth_rec["raw_input"], ["blue suit", "white shirt"])
+        self.assertGreaterEqual(len(cloth_rec["injected_atom_ids"]), 2)
+        # 验证 selections 中仅有一条对应的 override selection 记录
+        ov_sels = [s for s in audit["selections"] if s["selector"] == "clothing" and s["mode"] == "override"]
+        self.assertEqual(len(ov_sels), 1)
+        self.assertEqual(ov_sels[0]["raw_value"], "blue suit, white shirt")
+
+    def test_45_m5_1_oracle_accepts_prompt_fragment_override(self):
+        """验证 PromptFragment 对象覆盖能归一化比较，顺利通过 Oracle 与 Schema 强断言。"""
+        frag = PromptFragment(text="blue suit", source_slot="clothing")
+        inp = {**self.default_inputs, "clothing_override": frag}
+        res, audit_str = self.diagnostics.diagnose_structured(**inp, prompt_seed=42)
+        self.assertIsNotNone(res)
+        schema = self.schema_doc if HAS_JSONSCHEMA else None
+        audit = validate_audit_json_oracle(
+            audit_str, schema_doc=schema, expected_positive=res.positive, trusted_inputs=inp
+        )
+        self.assertEqual(audit["status"], "success")
+        cloth_rec = next(o for o in audit["overrides"] if o["canonical_slot"] == "clothing")
+        self.assertEqual(cloth_rec["status"], "applied")
+        self.assertEqual(cloth_rec["raw_input"], {"source_slot": "clothing", "text": "blue suit"})
+
+    def test_46_m5_1_oracle_accepts_explicit_none_error_report(self):
+        """验证显式 None 产生的错误审计报告被判定为 failed_validation，并通过 Oracle 与 Schema 校验。"""
+        inp = {**self.default_inputs, "clothing_override": None, "raise_on_error": False}
+        res, audit_str = self.diagnostics.diagnose_structured(**inp, prompt_seed=42)
+        self.assertIsNone(res)
+        schema = self.schema_doc if HAS_JSONSCHEMA else None
+        audit = validate_audit_json_oracle(
+            audit_str, schema_doc=schema, trusted_inputs=inp
+        )
+        self.assertEqual(audit["status"], "error")
+        cloth_rec = next(o for o in audit["overrides"] if o["canonical_slot"] == "clothing")
+        self.assertEqual(cloth_rec["status"], "failed_validation")
+        self.assertIsNone(cloth_rec["raw_input"])
+        self.assertIsNone(cloth_rec["blank_fallback_reason"])
+
+    def test_47_m5_1_oracle_accepts_hard_conflict_with_retained_override_source_evidence(self):
+        """验证硬冲突错误报告中保留的 applied 服装覆盖携带真实 source_atoms 证据，顺利通过 Oracle 引用核验。"""
+        inp = {
+            **self.default_inputs,
+            "pose_override": "arms bound behind back",
+            "props_override": "holding smartphone",
+            "clothing_override": "blue suit",
+            "raise_on_error": False,
+        }
+        res, audit_str = self.diagnostics.diagnose_structured(**inp, prompt_seed=42)
+        self.assertIsNone(res)
+        schema = self.schema_doc if HAS_JSONSCHEMA else None
+        audit = validate_audit_json_oracle(
+            audit_str, schema_doc=schema, trusted_inputs=inp
+        )
+        self.assertEqual(audit["status"], "error")
+        cloth_rec = next(o for o in audit["overrides"] if o["canonical_slot"] == "clothing")
+        self.assertEqual(cloth_rec["status"], "applied")
+        self.assertEqual(cloth_rec["raw_input"], "blue suit")
+        self.assertGreater(len(cloth_rec["injected_atom_ids"]), 0)
+        # 验证 selections 包含服装原子的真实来源证据
+        source_atom_ids = {a["atom_id"] for s in audit["selections"] for a in s["source_atoms"]}
+        for aid in cloth_rec["injected_atom_ids"]:
+            self.assertIn(aid, source_atom_ids)
+
+    def test_48_m5_1_oracle_strictly_rejects_cross_slot_atom_forgery(self):
+        """验证若将服装覆盖的注入 Atom ID 篡改为来自 custom 或其它槽位的真实 Atom ID，Oracle 严厉拒绝 (漏洞封堵)。"""
+        inp = {**self.default_inputs, "clothing_override": "blue suit", "自定义提示词": "masterpiece, 8k wallpaper"}
+        res, audit_str = self.diagnostics.diagnose_structured(**inp, prompt_seed=42)
+        self.assertIsNotNone(res)
+        audit = json.loads(audit_str)
+
+        # 找到一个属于 custom 槽位的真实存在 atom_id
+        custom_sel = next(s for s in audit["selections"] if s["selector"] == "custom")
+        custom_aid = custom_sel["source_atoms"][0]["atom_id"]
+
+        # 伪造攻击：将 clothing 覆盖记录的 injected_atom_ids 换成 custom 的真实 atom_id
+        forged = copy.deepcopy(audit)
+        cloth_rec = next(o for o in forged["overrides"] if o["canonical_slot"] == "clothing")
+        cloth_rec["injected_atom_ids"] = [custom_aid]
+
+        schema = self.schema_doc if HAS_JSONSCHEMA else None
+        with self.assertRaisesRegex(AssertionError, r"belongs to slot 'custom', not 'clothing'"):
+            validate_audit_json_oracle(forged, schema_doc=schema, trusted_inputs=inp)
 
 
 if __name__ == "__main__":

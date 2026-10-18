@@ -33,7 +33,7 @@ if __package__:
         PromptValidationError,
         UnresolvedConflictError,
     )
-    from .lib.models import GenerationResult, ORDERED_CONTEXT_IDS, PromptAtom, PromptFragment, SelectionOrigin, SemanticFacts, TagProvenance
+    from .lib.models import GenerationResult, ORDERED_CONTEXT_IDS, PromptAtom, PromptFragment, SelectionOrigin, SemanticFacts, TagProvenance, is_external_atom
     from .lib.rng import derive_substream_rng, recover_effective_seed
     from .lib.sampler import DataSampler, _is_none, get_selection_mode
     from .lib.slot_contract import AUXILIARY_SLOT_ORDER, SLOT_ORDER, normalize_slot_mapping, normalize_slot_name
@@ -50,7 +50,7 @@ else:
         PromptValidationError,
         UnresolvedConflictError,
     )
-    from lib.models import GenerationResult, ORDERED_CONTEXT_IDS, PromptAtom, PromptFragment, SelectionOrigin, SemanticFacts, TagProvenance
+    from lib.models import GenerationResult, ORDERED_CONTEXT_IDS, PromptAtom, PromptFragment, SelectionOrigin, SemanticFacts, TagProvenance, is_external_atom
     from lib.rng import derive_substream_rng, recover_effective_seed
     from lib.sampler import DataSampler, _is_none, get_selection_mode
     from lib.slot_contract import AUXILIARY_SLOT_ORDER, SLOT_ORDER, normalize_slot_mapping, normalize_slot_name
@@ -1810,43 +1810,92 @@ def format_diagnostics_error_dict(
     existing_ov = overrides if overrides is not None else getattr(err, "overrides", None)
     overrides_list = build_error_override_records(raw_inputs, err, existing_overrides=existing_ov)
 
-    if hasattr(err, "to_diagnostics_dict"):
-        try:
-            d = err.to_diagnostics_dict(effective_seed, overrides=overrides_list)
-        except TypeError:
-            d = err.to_diagnostics_dict(effective_seed)
-        d["overrides"] = overrides_list
-        return d
+    raw_atoms = getattr(err, "source_atoms", None) or getattr(err, "raw_atoms", None)
+    selections_list: List[Dict[str, Any]] = []
+    if raw_atoms:
+        seen_origins: set[SelectionOrigin] = set()
+        ordered_origins: List[SelectionOrigin] = []
+        for a in raw_atoms:
+            if a.origin is not None and a.origin not in seen_origins:
+                seen_origins.add(a.origin)
+                ordered_origins.append(a.origin)
+        for s in ordered_origins:
+            source_atoms_for_s = [a for a in raw_atoms if a.origin == s]
+            selections_list.append({
+                "accepted_atoms": [],
+                "budget_filtered_records": [],
+                "deduplicated_records": [],
+                "entry_point": s.entry_point,
+                "mode": s.mode,
+                "parent_ids": list(s.parent_ids),
+                "produced_atoms": [],
+                "raw_value": s.raw_value,
+                "sampling_rationale": s.sampling_rationale,
+                "selected_id": s.selected_id,
+                "selector": s.selector,
+                "source_atoms": [
+                    _serialize_atom_item(a, False)
+                    for a in source_atoms_for_s
+                ],
+            })
+
+    cp = getattr(err, "context_profile", None)
+    if cp is not None:
+        cp_dict: Dict[str, Any] = {
+            "schema_version": cp.schema_version,
+            "scene_context_ids": list(cp.scene_context_ids),
+            "scene_item_id": cp.scene_item_id,
+            "theme_context_ids": list(cp.theme_context_ids),
+            "theme_id": cp.theme_id,
+            "weights": {
+                c: _quantize_weight(w)
+                for c, w in cp.weights
+            },
+        }
+    else:
+        cp_dict = {}
+
+    injected_count = sum(1 for a in raw_atoms if is_external_atom(a)) if raw_atoms else 0
+    source_atoms_count = len(raw_atoms) if raw_atoms else 0
+    counts_dict = {
+        "accepted_atoms": 0,
+        "budget_filtered": 0,
+        "deduplicated": 0,
+        "dropped": 0,
+        "injected": injected_count,
+        "produced": 0,
+        "replaced": 0,
+        "source_atoms": source_atoms_count,
+    }
+
+    unres_raw = getattr(err, "unresolved_conflicts", ())
+    unresolved_list = [
+        list(c) if isinstance(c, (list, tuple)) else c
+        for c in unres_raw
+    ]
+
+    error_info_dict = {
+        "category": getattr(err, "category", "generic_error"),
+        "details": getattr(err, "details", {}),
+        "error_code": getattr(err, "error_code", type(err).__name__),
+        "message": str(err),
+        "rule_id": getattr(err, "rule_id", None),
+        "slots": list(getattr(err, "slots", ())),
+        "texts": list(getattr(err, "texts", ())),
+    }
 
     return {
-        "context_profile": {},
-        "counts": {
-            "accepted_atoms": 0,
-            "budget_filtered": 0,
-            "deduplicated": 0,
-            "dropped": 0,
-            "injected": 0,
-            "produced": 0,
-            "replaced": 0,
-            "source_atoms": 0,
-        },
+        "context_profile": cp_dict,
+        "counts": counts_dict,
         "decisions": [],
         "effective_seed": int(effective_seed),
-        "error_info": {
-            "category": getattr(err, "category", "generic_error"),
-            "details": getattr(err, "details", {}),
-            "error_code": getattr(err, "error_code", type(err).__name__),
-            "message": str(err),
-            "rule_id": getattr(err, "rule_id", None),
-            "slots": list(getattr(err, "slots", ())),
-            "texts": list(getattr(err, "texts", ())),
-        },
+        "error_info": error_info_dict,
         "overrides": overrides_list,
         "rules_applied": [],
         "schema_version": "2.0",
-        "selections": [],
+        "selections": selections_list,
         "status": "error",
-        "unresolved_conflicts": [],
+        "unresolved_conflicts": unresolved_list,
     }
 
 

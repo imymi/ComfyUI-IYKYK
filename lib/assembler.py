@@ -38,7 +38,7 @@ if __package__:
         SemanticFacts,
         TagProvenance,
     )
-    from .slot_contract import ALLOWED_SLOTS, AUXILIARY_SLOT_ORDER, SLOT_ORDER, normalize_slot_mapping, normalize_slot_name
+    from .slot_contract import ALLOWED_SLOTS, AUXILIARY_SLOT_ORDER, SLOT_ORDER, normalize_raw_input_text, normalize_slot_mapping, normalize_slot_name
 else:
     from lib.atomizer import (
         PromptTag,
@@ -61,7 +61,7 @@ else:
         SemanticFacts,
         TagProvenance,
     )
-    from lib.slot_contract import ALLOWED_SLOTS, AUXILIARY_SLOT_ORDER, SLOT_ORDER, normalize_slot_mapping, normalize_slot_name
+    from lib.slot_contract import ALLOWED_SLOTS, AUXILIARY_SLOT_ORDER, SLOT_ORDER, normalize_raw_input_text, normalize_slot_mapping, normalize_slot_name
 
 MAX_PROMPT_WORDS = 250
 
@@ -511,7 +511,10 @@ def assemble_result(
             raw_atoms, rng, context_profile
         )
     except (UnresolvedConflictError, PromptValidationError) as e:
-        e.overrides = tuple(overrides)
+        e.overrides = tuple(overrides) if overrides else build_default_canonical_override_records()
+        e.source_atoms = tuple(source_atoms)
+        e.raw_atoms = tuple(raw_atoms)
+        e.context_profile = context_profile
         raise
 
     # 3. 按 tag_order 汇聚为 PromptTag，并执行完整 Tag 级保序去重
@@ -748,6 +751,10 @@ def make_override_fragments(
     tag_texts: List[str] = []
     if isinstance(raw_val, str):
         tag_texts = [t.strip() for t in split_top_level_tags(raw_val) if t.strip()]
+    elif hasattr(raw_val, "text"):
+        tag_texts = [t.strip() for t in split_top_level_tags(str(raw_val.text)) if t.strip()]
+    elif isinstance(raw_val, dict) and "text" in raw_val:
+        tag_texts = [t.strip() for t in split_top_level_tags(str(raw_val["text"])) if t.strip()]
     elif isinstance(raw_val, (list, tuple)):
         for item in raw_val:
             if isinstance(item, str):
@@ -755,14 +762,49 @@ def make_override_fragments(
                     if sub.strip():
                         tag_texts.append(sub.strip())
             elif hasattr(item, "text"):
-                tag_texts.append(str(item.text).strip())
+                for sub in split_top_level_tags(str(item.text)):
+                    if sub.strip():
+                        tag_texts.append(sub.strip())
+            elif isinstance(item, dict) and "text" in item:
+                for sub in split_top_level_tags(str(item["text"])):
+                    if sub.strip():
+                        tag_texts.append(sub.strip())
             else:
-                tag_texts.append(str(item).strip())
+                for sub in split_top_level_tags(str(item)):
+                    if sub.strip():
+                        tag_texts.append(sub.strip())
     else:
         tag_texts = [t.strip() for t in split_top_level_tags(str(raw_val)) if t.strip()]
 
     new_frags: List[PromptFragment] = []
     frag_entry_point = entry_point or "generator"
+    raw_value_canonical = normalize_raw_input_text(raw_val)
+    slot_selected_id = f"override_{slot_name}"
+    slot_origin = SelectionOrigin(
+        entry_point=frag_entry_point,
+        mode="override",
+        selector=slot_name,
+        selected_id=slot_selected_id,
+        raw_value=raw_value_canonical,
+        sampling_rationale={
+            "active_contexts": [],
+            "candidate_filter": {
+                "total_candidates": 1,
+                "excluded_hard_conflicts": [],
+                "passed_candidates": 1,
+            },
+            "distribution": {},
+            "fallback": {
+                "used": False,
+                "reason": None,
+            },
+            "final_selection": {
+                "selected_id": slot_selected_id,
+                "mode": "override",
+            },
+        },
+    )
+
     for order, tag_text in enumerate(tag_texts):
         facts = SemanticFacts()
         t_lower = tag_text.lower().strip()
@@ -815,30 +857,7 @@ def make_override_fragments(
             ),
             id=item_id,
             facts=facts,
-            origin=SelectionOrigin(
-                entry_point=frag_entry_point,
-                mode="override",
-                selector=slot_name,
-                selected_id=item_id,
-                raw_value=str(raw_val),
-                sampling_rationale={
-                    "active_contexts": [],
-                    "candidate_filter": {
-                        "total_candidates": 1,
-                        "excluded_hard_conflicts": [],
-                        "passed_candidates": 1,
-                    },
-                    "distribution": {},
-                    "fallback": {
-                        "used": False,
-                        "reason": None,
-                    },
-                    "final_selection": {
-                        "selected_id": item_id,
-                        "mode": "override",
-                    },
-                },
-            ),
+            origin=slot_origin,
         )
         new_frags.append(frag)
     return new_frags

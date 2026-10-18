@@ -20,7 +20,7 @@ from __future__ import annotations
 import json
 from typing import Any, Dict, List, Optional, Sequence, Set, Tuple
 
-from lib.slot_contract import normalize_slot_name
+from lib.slot_contract import normalize_raw_input_text, normalize_slot_name
 
 try:
     import jsonschema
@@ -33,7 +33,7 @@ _COMPILED_VALIDATORS: Dict[int, Any] = {}
 
 def _inspect_blank_input(val: Any) -> Tuple[bool, Optional[str]]:
     if val is None:
-        return True, "omitted"
+        return False, None
     if isinstance(val, str):
         if not val:
             return True, "empty_string"
@@ -42,6 +42,8 @@ def _inspect_blank_input(val: Any) -> Tuple[bool, Optional[str]]:
         return False, None
     if isinstance(val, (list, tuple)):
         if len(val) == 0:
+            return True, "empty_list"
+        if all(isinstance(x, str) and not x.strip() for x in val):
             return True, "empty_list"
         return False, None
     return False, None
@@ -317,11 +319,13 @@ def validate_audit_json_oracle(
             raise AssertionError(f"Draft-7 Schema validation failed with {len(errors)} error(s): {msg_list}")
 
     # 3. 正常成功报告 unresolved_conflicts 强断言为空 (R3-P2-001)
+    status = audit.get("status", "success")
     unresolved = audit.get("unresolved_conflicts", [])
-    if unresolved != [] and unresolved != ():
-        raise AssertionError(
-            f"Successful generation report must have empty unresolved_conflicts, got {unresolved!r}"
-        )
+    if status == "success":
+        if unresolved != [] and unresolved != ():
+            raise AssertionError(
+                f"Successful generation report must have empty unresolved_conflicts, got {unresolved!r}"
+            )
 
     # 4. 提取 selections 并校验选择项契约与业务顺序 (R3-P1-001, R3-P2-001)
     selections = audit.get("selections", [])
@@ -361,7 +365,7 @@ def validate_audit_json_oracle(
                 raise AssertionError(
                     f"Selection for selector '{selector}' has mode='override', but no override for slot '{norm_slot}' was provided in trusted_inputs"
                 )
-            expected_raw = str(getattr(ov_val, "text", ov_val))
+            expected_raw = normalize_raw_input_text(ov_val)
             if raw_val != expected_raw:
                 raise AssertionError(
                     f"Selection raw_value {raw_val!r} does not match trusted override {expected_raw!r} for selector '{selector}'"
@@ -381,10 +385,12 @@ def validate_audit_json_oracle(
                     "trusted_inputs is required to validate non-resolver selection raw values"
                 )
             has_ov, ov_val = _extract_override_from_trusted(norm_slot, trusted_inputs)
-            if has_ov and ov_val is not None and str(getattr(ov_val, "text", ov_val)).strip() != "":
-                raise AssertionError(
-                    f"Selection for selector '{selector}' has mode={mode!r}, but trusted_inputs provided non-blank override {ov_val!r} for slot '{norm_slot}'. Override should have taken precedence."
-                )
+            if has_ov and ov_val is not None:
+                is_blank, _ = _inspect_blank_input(ov_val)
+                if not is_blank:
+                    raise AssertionError(
+                        f"Selection for selector '{selector}' has mode={mode!r}, but trusted_inputs provided non-blank override {ov_val!r} for slot '{norm_slot}'. Override should have taken precedence."
+                    )
             expected_raw = trusted_inputs.get(selector)
             if expected_raw is None and selector in SELECTOR_TO_UI_PARAM:
                 expected_raw = trusted_inputs.get(SELECTOR_TO_UI_PARAM[selector])
@@ -481,7 +487,7 @@ def validate_audit_json_oracle(
                     )
                 src_atom = source_map[aid]
                 atom_slot = normalize_slot_name(src_atom.get("source_slot", ""))
-                if atom_slot != slot and atom_slot not in (slot, "preset_core", "custom"):
+                if atom_slot != slot:
                     raise AssertionError(
                         f"Override for slot '{slot}' references atom '{aid}' which belongs to slot '{atom_slot}', not '{slot}'"
                     )
@@ -508,21 +514,38 @@ def validate_audit_json_oracle(
                             f"Override for slot '{slot}' is marked as 'applied' with raw_input={o.get('raw_input')!r}, but no override was provided in trusted_inputs"
                         )
                 else:
-                    is_blank, _ = _inspect_blank_input(ov_val)
-                    if is_blank:
-                        if st != "fallback_blank":
+                    if ov_val is None:
+                        if audit.get("status") == "error":
+                            if st != "failed_validation":
+                                raise AssertionError(
+                                    f"Override for slot '{slot}' with explicit None should be 'failed_validation', got {st!r}"
+                                )
+                        else:
                             raise AssertionError(
-                                f"Override for slot '{slot}' should be 'fallback_blank', got {st!r} (trusted input={ov_val!r})"
+                                f"Explicit None override for slot '{slot}' must fail validation and result in error status"
                             )
-                    elif audit.get("status") == "success":
-                        if st != "applied":
-                            raise AssertionError(
-                                f"Override for slot '{slot}' should be 'applied' for successful generation, got {st!r} (trusted input={ov_val!r})"
-                            )
-                        if str(o.get("raw_input")) != str(getattr(ov_val, "text", ov_val)):
-                            raise AssertionError(
-                                f"Override for slot '{slot}' raw_input mismatch: audit has {o.get('raw_input')!r}, trusted has {ov_val!r}"
-                            )
+                    else:
+                        is_blank, _ = _inspect_blank_input(ov_val)
+                        if is_blank:
+                            if st != "fallback_blank":
+                                raise AssertionError(
+                                    f"Override for slot '{slot}' should be 'fallback_blank', got {st!r} (trusted input={ov_val!r})"
+                                )
+                        elif audit.get("status") == "success":
+                            if st != "applied":
+                                raise AssertionError(
+                                    f"Override for slot '{slot}' should be 'applied' for successful generation, got {st!r} (trusted input={ov_val!r})"
+                                )
+                            if normalize_raw_input_text(o.get("raw_input")) != normalize_raw_input_text(ov_val):
+                                raise AssertionError(
+                                    f"Override for slot '{slot}' raw_input mismatch: audit has {o.get('raw_input')!r}, trusted has {ov_val!r}"
+                                )
+                        elif audit.get("status") == "error":
+                            if st == "applied":
+                                if normalize_raw_input_text(o.get("raw_input")) != normalize_raw_input_text(ov_val):
+                                    raise AssertionError(
+                                        f"Override for slot '{slot}' raw_input mismatch: audit has {o.get('raw_input')!r}, trusted has {ov_val!r}"
+                                    )
 
     # 6. accepted 与 source/produced 载荷强一致性及 is_accepted 标记一致性
     for aid, acc_atom in accepted_map.items():
@@ -651,6 +674,31 @@ def validate_audit_json_oracle(
                 raise AssertionError(f"Atom '{aid}' has self-referential parent_id: {p}")
             if p not in valid_parent_pool:
                 raise AssertionError(f"Atom '{aid}' has invalid parent_id '{p}' not in valid parent scope")
+
+    if audit.get("status") == "error":
+        counts = audit.get("counts", {})
+        counts_keys = set(counts.keys())
+        if counts_keys != EXPECTED_COUNT_KEYS:
+            raise AssertionError(
+                f"counts dictionary keys mismatch: missing={sorted(EXPECTED_COUNT_KEYS - counts_keys)}, "
+                f"extra={sorted(counts_keys - EXPECTED_COUNT_KEYS)}"
+            )
+        for k, val in counts.items():
+            if not isinstance(val, int) or isinstance(val, bool) or val < 0:
+                raise AssertionError(f"counts[{k!r}] must be a non-negative int, got {val!r}")
+        if counts["accepted_atoms"] != 0 or len(all_accepted_atoms) != 0:
+            raise AssertionError(
+                f"Error report must have 0 accepted atoms, got counts={counts['accepted_atoms']}, accepted_atoms={len(all_accepted_atoms)}"
+            )
+        if counts["source_atoms"] != len(all_source_atoms):
+            raise AssertionError(
+                f"counts.source_atoms ({counts['source_atoms']}) != actual source atoms ({len(all_source_atoms)})"
+            )
+        if counts["produced"] != len(all_produced_atoms):
+            raise AssertionError(
+                f"counts.produced ({counts['produced']}) != actual produced atoms ({len(all_produced_atoms)})"
+            )
+        return audit
 
     # 8. 消解决策状态机单次消费与时序合法性重放
     active_atoms: Dict[str, Dict[str, Any]] = dict(source_map)

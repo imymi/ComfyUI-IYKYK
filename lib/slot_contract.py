@@ -198,3 +198,17 @@ def validate_slots_subset(slots: Dict[str, Any]) -> None:
     - 若存在任何不在 ALLOWED_SLOTS 中且具有非空内容的未知槽位，立即 Fail-Closed 抛出 PromptValidationError。
     """
     normalize_slot_mapping(slots)
+
+
+def normalize_raw_input_text(val: Any) -> str:
+    """归一化任意槽位原始输入为一致的纯文本表示 (支持 str, PromptFragment, dict, list/tuple 等)。"""
+    if val is None:
+        return ""
+    if hasattr(val, "text"):
+        return str(val.text).strip()
+    if isinstance(val, dict) and "text" in val:
+        return str(val["text"]).strip()
+    if isinstance(val, (list, tuple)):
+        elem_texts = [normalize_raw_input_text(x) for x in val]
+        return ", ".join(t for t in elem_texts if t)
+    return str(val).strip()
