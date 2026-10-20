@@ -1,0 +1,399 @@
+{
+  "auditor_binding": {
+    "baseline_batch_hash": "8762ecaf48c48d49b9f538047bc12e3aec3ad941727a72155f39993d51fd42e4",
+    "baseline_commit": "f1b873c",
+    "core_source_digest": "7641d348b44249de809a73e8e3bfd22c8d7ba48ed4e71f6cdf36fe8ab6a6ee7f",
+    "is_dirty": false,
+    "script_path": "scratch/run_m5_3_audit.py",
+    "script_sha256": "091ce81717c7ca8a45eec25dab0b81abaa35c624ca433c16b55f446fd3751e0f",
+    "target_batch_hash": "48ae2e927fc6c6dc3f19362c806b31e2587df49aad85193f75e2731b18fa4c7d",
+    "target_commit": "1db9e675666854d569da85d72f6a39708b81c66c",
+    "target_tree_hash": "1530ce71c110f69cba39fee5f9d8d70b841c25ca"
+  },
+  "evaluation_result": {
+    "category_breakdown": {
+      "UNEXPLAINED": 116,
+      "conflict_rule:clothing_style_state_coherence": 22,
+      "conflict_rule:framing_lower_body_coherence": 229,
+      "conflict_rule:makeup_details_coherence": 114,
+      "conflict_rule:material_penetration": 443,
+      "conflict_rule:nudity_clothing_conflicts": 163,
+      "conflict_rule:pose_hand_occupation": 67,
+      "context_affinity_calibration": 8846
+    },
+    "divergent_count": 10000,
+    "elapsed_seconds": 73.15,
+    "identical_count": 0,
+    "is_all_explained": false,
+    "total_seeds": 10000,
+    "unexplained_count": 116,
+    "unexplained_seeds": {
+      "124": [
+        "UNEXPLAINED_SILENT_ATOM_DROP: seed 124, slot 'props', removed atom 'smartphone in hand recording' dropped silently without rule decision despite target selecting identical item 'smartphone_recording'."
+      ],
+      "149": [
+        "UNEXPLAINED_SILENT_ATOM_DROP: seed 149, slot 'props', removed atom 'metal handcuffs on headboard' dropped silently without rule decision despite target selecting identical item 'bondage_rope_collar'."
+      ],
+      "200": [
+        "UNEXPLAINED_SILENT_ATOM_DROP: seed 200, slot 'props', removed atom 'ice bucket on table' dropped silently without rule decision despite target selecting identical item 'ice_cubes'."
+      ],
+      "280": [
+        "UNEXPLAINED_SILENT_ATOM_DROP: seed 280, slot 'props', removed atom 'crimson hemp rope bindings' dropped silently without rule decision despite target selecting identical item 'bondage_rope_collar'."
+      ],
+      "287": [
+        "UNEXPLAINED_SILENT_ATOM_DROP: seed 287, slot 'props', removed atom 'bottle of champagne on ice' dropped silently without rule decision despite target selecting identical item 'wine_glass_bottle'."
+      ],
+      "332": [
+        "UNEXPLAINED_SILENT_ATOM_DROP: seed 332, slot 'props', removed atom 'smartphone in hand recording' dropped silently without rule decision despite target selecting identical item 'smartphone_recording'."
+      ],
+      "374": [
+        "UNEXPLAINED_SILENT_ATOM_DROP: seed 374, slot 'props', removed atom 'bouquet wrapped in crinkled craft paper' dropped silently without rule decision despite target selecting identical item 'fresh_flower_bouquet'."
+      ],
+      "444": [
+        "UNEXPLAINED_SILENT_ATOM_DROP: seed 444, slot 'props', removed atom 'bouquet wrapped in crinkled craft paper' dropped silently without rule decision despite target selecting identical item 'fresh_flower_bouquet'."
+      ],
+      "455": [
+        "UNEXPLAINED_SILENT_ATOM_DROP: seed 455, slot 'props', removed atom 'half-empty wine glass on nightstand' dropped silently without rule decision despite target selecting identical item 'wine_glass_bottle'."
+      ],
+      "521": [
+        "UNEXPLAINED_SILENT_ATOM_DROP: seed 521, slot 'props', removed atom 'smartphone in hand recording' dropped silently without rule decision despite target selecting identical item 'smartphone_recording'."
+      ],
+      "580": [
+        "UNEXPLAINED_SILENT_ATOM_DROP: seed 580, slot 'props', removed atom 'professional DSLR on tripod in background' dropped silently without rule decision despite target selecting identical item 'camera_tripod_flash'."
+      ],
+      "696": [
+        "UNEXPLAINED_SILENT_ATOM_DROP: seed 696, slot 'props', removed atom 'bullet vibrator resting on skin' dropped silently without rule decision despite target selecting identical item 'sex_toy_vibrator'."
+      ],
+      "780": [
+        "UNEXPLAINED_SILENT_ATOM_DROP: seed 780, slot 'props', removed atom 'glistening lube bottle nearby' dropped silently without rule decision despite target selecting identical item 'sex_toy_vibrator'."
+      ],
+      "1048": [
+        "UNEXPLAINED_SILENT_ATOM_DROP: seed 1048, slot 'props', removed atom 'studio lighting equipment' dropped silently without rule decision despite target selecting identical item 'camera_tripod_flash'."
+      ],
+      "1075": [
+        "UNEXPLAINED_SILENT_ATOM_DROP: seed 1075, slot 'props', removed atom 'stemware with red wine' dropped silently without rule decision despite target selecting identical item 'wine_glass_bottle'."
+      ],
+      "1134": [
+        "UNEXPLAINED_SILENT_ATOM_DROP: seed 1134, slot 'props', removed atom 'ring light reflection in eyes' dropped silently without rule decision despite target selecting identical item 'camera_tripod_flash'."
+      ],
+      "1259": [
+        "UNEXPLAINED_SILENT_ATOM_DROP: seed 1259, slot 'props', removed atom 'melting ice cube resting on collarbone' dropped silently without rule decision despite target selecting identical item 'ice_cubes'."
+      ],
+      "1342": [
+        "UNEXPLAINED_SILENT_ATOM_DROP: seed 1342, slot 'props', removed atom 'phone face down on bed' dropped silently without rule decision despite target selecting identical item 'smartphone_recording'."
+      ],
+      "1402": [
+        "UNEXPLAINED_SILENT_ATOM_DROP: seed 1402, slot 'props', removed atom 'flower petals pressed against chest' dropped silently without rule decision despite target selecting identical item 'fresh_flower_bouquet'."
+      ],
+      "1410": [
+        "UNEXPLAINED_SILENT_ATOM_DROP: seed 1410, slot 'props', removed atom 'studio lighting equipment' dropped silently without rule decision despite target selecting identical item 'camera_tripod_flash'."
+      ],
+      "1448": [
+        "UNEXPLAINED_SILENT_ATOM_DROP: seed 1448, slot 'props', removed atom 'smartphone in hand recording' dropped silently without rule decision despite target selecting identical item 'smartphone_recording'."
+      ],
+      "1705": [
+        "UNEXPLAINED_SILENT_ATOM_DROP: seed 1705, slot 'props', removed atom 'bouquet wrapped in crinkled craft paper' dropped silently without rule decision despite target selecting identical item 'fresh_flower_bouquet'."
+      ],
+      "1861": [
+        "UNEXPLAINED_SILENT_ATOM_DROP: seed 1861, slot 'props', removed atom 'magic wand vibrator on bed' dropped silently without rule decision despite target selecting identical item 'sex_toy_vibrator'."
+      ],
+      "1952": [
+        "UNEXPLAINED_SILENT_ATOM_DROP: seed 1952, slot 'props', removed atom 'studio lighting equipment' dropped silently without rule decision despite target selecting identical item 'camera_tripod_flash'."
+      ],
+      "2053": [
+        "UNEXPLAINED_SILENT_ATOM_DROP: seed 2053, slot 'props', removed atom 'leather collar with O-ring' dropped silently without rule decision despite target selecting identical item 'bondage_rope_collar'."
+      ],
+      "2067": [
+        "UNEXPLAINED_SILENT_ATOM_DROP: seed 2067, slot 'props', removed atom 'bottle of champagne on ice' dropped silently without rule decision despite target selecting identical item 'wine_glass_bottle'."
+      ],
+      "2237": [
+        "UNEXPLAINED_SILENT_ATOM_DROP: seed 2237, slot 'props', removed atom 'fingers tightly gripping wrinkled bed sheets' dropped silently without rule decision despite target selecting identical item 'pillow_clutching'."
+      ],
+      "2285": [
+        "UNEXPLAINED_SILENT_ATOM_DROP: seed 2285, slot 'props', removed atom 'smartphone in hand recording' dropped silently without rule decision despite target selecting identical item 'smartphone_recording'."
+      ],
+      "2327": [
+        "UNEXPLAINED_SILENT_ATOM_DROP: seed 2327, slot 'props', removed atom 'professional DSLR on tripod in background' dropped silently without rule decision despite target selecting identical item 'camera_tripod_flash'."
+      ],
+      "2383": [
+        "UNEXPLAINED_SILENT_ATOM_DROP: seed 2383, slot 'props', removed atom 'glistening lube bottle nearby' dropped silently without rule decision despite target selecting identical item 'sex_toy_vibrator'."
+      ],
+      "2470": [
+        "UNEXPLAINED_SILENT_ATOM_DROP: seed 2470, slot 'props', removed atom 'magic wand vibrator on bed' dropped silently without rule decision despite target selecting identical item 'sex_toy_vibrator'."
+      ],
+      "2472": [
+        "UNEXPLAINED_SILENT_ATOM_DROP: seed 2472, slot 'props', removed atom 'studio lighting equipment' dropped silently without rule decision despite target selecting identical item 'camera_tripod_flash'."
+      ],
+      "2477": [
+        "UNEXPLAINED_SILENT_ATOM_DROP: seed 2477, slot 'props', removed atom 'stemware with red wine' dropped silently without rule decision despite target selecting identical item 'wine_glass_bottle'."
+      ],
+      "2553": [
+        "UNEXPLAINED_SILENT_ATOM_DROP: seed 2553, slot 'props', removed atom 'soft plush toy on bed' dropped silently without rule decision despite target selecting identical item 'fluffy_teddy_bear'."
+      ],
+      "2604": [
+        "UNEXPLAINED_SILENT_ATOM_DROP: seed 2604, slot 'props', removed atom 'smartphone in hand recording' dropped silently without rule decision despite target selecting identical item 'smartphone_recording'."
+      ],
+      "2631": [
+        "UNEXPLAINED_SILENT_ATOM_DROP: seed 2631, slot 'props', removed atom 'bouquet wrapped in crinkled craft paper' dropped silently without rule decision despite target selecting identical item 'fresh_flower_bouquet'."
+      ],
+      "2681": [
+        "UNEXPLAINED_SILENT_ATOM_DROP: seed 2681, slot 'props', removed atom 'glistening lube bottle nearby' dropped silently without rule decision despite target selecting identical item 'sex_toy_vibrator'."
+      ],
+      "2729": [
+        "UNEXPLAINED_SILENT_ATOM_DROP: seed 2729, slot 'props', removed atom 'bouquet wrapped in crinkled craft paper' dropped silently without rule decision despite target selecting identical item 'fresh_flower_bouquet'."
+      ],
+      "2758": [
+        "UNEXPLAINED_SILENT_ATOM_DROP: seed 2758, slot 'props', removed atom 'studio lighting equipment' dropped silently without rule decision despite target selecting identical item 'camera_tripod_flash'."
+      ],
+      "2861": [
+        "UNEXPLAINED_SILENT_ATOM_DROP: seed 2861, slot 'props', removed atom 'holding game controller' dropped silently without rule decision despite target selecting identical item 'game_controller'."
+      ],
+      "2874": [
+        "UNEXPLAINED_SILENT_ATOM_DROP: seed 2874, slot 'props', removed atom 'professional DSLR on tripod in background' dropped silently without rule decision despite target selecting identical item 'camera_tripod_flash'."
+      ],
+      "2932": [
+        "UNEXPLAINED_SILENT_ATOM_DROP: seed 2932, slot 'props', removed atom 'bouquet wrapped in crinkled craft paper' dropped silently without rule decision despite target selecting identical item 'fresh_flower_bouquet'."
+      ],
+      "3055": [
+        "UNEXPLAINED_SILENT_ATOM_DROP: seed 3055, slot 'props', removed atom 'smartphone in hand recording' dropped silently without rule decision despite target selecting identical item 'smartphone_recording'."
+      ],
+      "3101": [
+        "UNEXPLAINED_SILENT_ATOM_DROP: seed 3101, slot 'props', removed atom 'smartphone in hand recording' dropped silently without rule decision despite target selecting identical item 'smartphone_recording'."
+      ],
+      "3116": [
+        "UNEXPLAINED_SILENT_ATOM_DROP: seed 3116, slot 'props', removed atom 'glistening lube bottle nearby' dropped silently without rule decision despite target selecting identical item 'sex_toy_vibrator'."
+      ],
+      "3223": [
+        "UNEXPLAINED_SILENT_ATOM_DROP: seed 3223, slot 'props', removed atom 'studio lighting equipment' dropped silently without rule decision despite target selecting identical item 'camera_tripod_flash'."
+      ],
+      "3232": [
+        "UNEXPLAINED_SILENT_ATOM_DROP: seed 3232, slot 'props', removed atom 'stemware with red wine' dropped silently without rule decision despite target selecting identical item 'wine_glass_bottle'."
+      ],
+      "3484": [
+        "UNEXPLAINED_SILENT_ATOM_DROP: seed 3484, slot 'props', removed atom 'bouquet wrapped in crinkled craft paper' dropped silently without rule decision despite target selecting identical item 'fresh_flower_bouquet'."
+      ],
+      "3493": [
+        "UNEXPLAINED_SILENT_ATOM_DROP: seed 3493, slot 'props', removed atom 'leather collar with O-ring' dropped silently without rule decision despite target selecting identical item 'bondage_rope_collar'."
+      ],
+      "3495": [
+        "UNEXPLAINED_SILENT_ATOM_DROP: seed 3495, slot 'props', removed atom 'bouquet wrapped in crinkled craft paper' dropped silently without rule decision despite target selecting identical item 'fresh_flower_bouquet'."
+      ],
+      "3504": [
+        "UNEXPLAINED_SILENT_ATOM_DROP: seed 3504, slot 'props', removed atom 'fingers tightly gripping wrinkled bed sheets' dropped silently without rule decision despite target selecting identical item 'pillow_clutching'."
+      ],
+      "3507": [
+        "UNEXPLAINED_SILENT_ATOM_DROP: seed 3507, slot 'props', removed atom 'studio lighting equipment' dropped silently without rule decision despite target selecting identical item 'camera_tripod_flash'."
+      ],
+      "3508": [
+        "UNEXPLAINED_SILENT_ATOM_DROP: seed 3508, slot 'props', removed atom 'holding lush fresh floral bouquet' dropped silently without rule decision despite target selecting identical item 'fresh_flower_bouquet'."
+      ],
+      "3816": [
+        "UNEXPLAINED_SILENT_ATOM_DROP: seed 3816, slot 'props', removed atom 'arms wrapped around cute stuffed animal' dropped silently without rule decision despite target selecting identical item 'fluffy_teddy_bear'."
+      ],
+      "3823": [
+        "UNEXPLAINED_SILENT_ATOM_DROP: seed 3823, slot 'props', removed atom 'professional DSLR on tripod in background' dropped silently without rule decision despite target selecting identical item 'camera_tripod_flash'."
+      ],
+      "3887": [
+        "UNEXPLAINED_SILENT_ATOM_DROP: seed 3887, slot 'props', removed atom 'leather collar with O-ring' dropped silently without rule decision despite target selecting identical item 'bondage_rope_collar'."
+      ],
+      "3896": [
+        "UNEXPLAINED_SILENT_ATOM_DROP: seed 3896, slot 'props', removed atom 'professional DSLR on tripod in background' dropped silently without rule decision despite target selecting identical item 'camera_tripod_flash'."
+      ],
+      "3946": [
+        "UNEXPLAINED_SILENT_ATOM_DROP: seed 3946, slot 'props', removed atom 'studio lighting equipment' dropped silently without rule decision despite target selecting identical item 'camera_tripod_flash'."
+      ],
+      "3953": [
+        "UNEXPLAINED_SILENT_ATOM_DROP: seed 3953, slot 'props', removed atom 'glistening lube bottle nearby' dropped silently without rule decision despite target selecting identical item 'sex_toy_vibrator'."
+      ],
+      "4131": [
+        "UNEXPLAINED_SILENT_ATOM_DROP: seed 4131, slot 'props', removed atom 'holding lush fresh floral bouquet' dropped silently without rule decision despite target selecting identical item 'fresh_flower_bouquet'."
+      ],
+      "4160": [
+        "UNEXPLAINED_SILENT_ATOM_DROP: seed 4160, slot 'props', removed atom 'soft plush toy on bed' dropped silently without rule decision despite target selecting identical item 'fluffy_teddy_bear'."
+      ],
+      "4299": [
+        "UNEXPLAINED_SILENT_ATOM_DROP: seed 4299, slot 'props', removed atom 'smartphone in hand recording' dropped silently without rule decision despite target selecting identical item 'smartphone_recording'."
+      ],
+      "4303": [
+        "UNEXPLAINED_SILENT_ATOM_DROP: seed 4303, slot 'props', removed atom 'studio lighting equipment' dropped silently without rule decision despite target selecting identical item 'camera_tripod_flash'."
+      ],
+      "4346": [
+        "UNEXPLAINED_SILENT_ATOM_DROP: seed 4346, slot 'props', removed atom 'melting ice cube resting on collarbone' dropped silently without rule decision despite target selecting identical item 'ice_cubes'."
+      ],
+      "4400": [
+        "UNEXPLAINED_SILENT_ATOM_DROP: seed 4400, slot 'props', removed atom 'smartphone in hand recording' dropped silently without rule decision despite target selecting identical item 'smartphone_recording'."
+      ],
+      "4514": [
+        "UNEXPLAINED_SILENT_ATOM_DROP: seed 4514, slot 'props', removed atom 'smartphone in hand recording' dropped silently without rule decision despite target selecting identical item 'smartphone_recording'."
+      ],
+      "4541": [
+        "UNEXPLAINED_SILENT_ATOM_DROP: seed 4541, slot 'props', removed atom 'smartphone in hand recording' dropped silently without rule decision despite target selecting identical item 'smartphone_recording'."
+      ],
+      "4617": [
+        "UNEXPLAINED_SILENT_ATOM_DROP: seed 4617, slot 'props', removed atom 'stemware with red wine' dropped silently without rule decision despite target selecting identical item 'wine_glass_bottle'."
+      ],
+      "4724": [
+        "UNEXPLAINED_SILENT_ATOM_DROP: seed 4724, slot 'props', removed atom 'water trickle running down chest' dropped silently without rule decision despite target selecting identical item 'ice_cubes'."
+      ],
+      "4820": [
+        "UNEXPLAINED_SILENT_ATOM_DROP: seed 4820, slot 'props', removed atom 'melting ice cube resting on collarbone' dropped silently without rule decision despite target selecting identical item 'ice_cubes'."
+      ],
+      "4843": [
+        "UNEXPLAINED_SILENT_ATOM_DROP: seed 4843, slot 'props', removed atom 'melting ice cube resting on collarbone' dropped silently without rule decision despite target selecting identical item 'ice_cubes'."
+      ],
+      "4865": [
+        "UNEXPLAINED_SILENT_ATOM_DROP: seed 4865, slot 'props', removed atom 'stemware with red wine' dropped silently without rule decision despite target selecting identical item 'wine_glass_bottle'."
+      ],
+      "4903": [
+        "UNEXPLAINED_SILENT_ATOM_DROP: seed 4903, slot 'props', removed atom 'smartphone in hand recording' dropped silently without rule decision despite target selecting identical item 'smartphone_recording'."
+      ],
+      "4971": [
+        "UNEXPLAINED_SILENT_ATOM_DROP: seed 4971, slot 'props', removed atom 'fingers tightly gripping wrinkled bed sheets' dropped silently without rule decision despite target selecting identical item 'pillow_clutching'."
+      ],
+      "4992": [
+        "UNEXPLAINED_SILENT_ATOM_DROP: seed 4992, slot 'props', removed atom 'ice bucket on table' dropped silently without rule decision despite target selecting identical item 'ice_cubes'."
+      ],
+      "5143": [
+        "UNEXPLAINED_SILENT_ATOM_DROP: seed 5143, slot 'props', removed atom 'phone face down on bed' dropped silently without rule decision despite target selecting identical item 'smartphone_recording'."
+      ],
+      "5297": [
+        "UNEXPLAINED_SILENT_ATOM_DROP: seed 5297, slot 'props', removed atom 'ring light reflection in eyes' dropped silently without rule decision despite target selecting identical item 'camera_tripod_flash'."
+      ],
+      "5350": [
+        "UNEXPLAINED_SILENT_ATOM_DROP: seed 5350, slot 'props', removed atom 'stemware with red wine' dropped silently without rule decision despite target selecting identical item 'wine_glass_bottle'."
+      ],
+      "5361": [
+        "UNEXPLAINED_SILENT_ATOM_DROP: seed 5361, slot 'props', removed atom 'holding lush fresh floral bouquet' dropped silently without rule decision despite target selecting identical item 'fresh_flower_bouquet'."
+      ],
+      "5410": [
+        "UNEXPLAINED_SILENT_ATOM_DROP: seed 5410, slot 'props', removed atom 'melting ice cube resting on collarbone' dropped silently without rule decision despite target selecting identical item 'ice_cubes'."
+      ],
+      "5606": [
+        "UNEXPLAINED_SILENT_ATOM_DROP: seed 5606, slot 'props', removed atom 'professional DSLR on tripod in background' dropped silently without rule decision despite target selecting identical item 'camera_tripod_flash'."
+      ],
+      "5751": [
+        "UNEXPLAINED_SILENT_ATOM_DROP: seed 5751, slot 'props', removed atom 'ring light reflection in eyes' dropped silently without rule decision despite target selecting identical item 'camera_tripod_flash'."
+      ],
+      "5801": [
+        "UNEXPLAINED_SILENT_ATOM_DROP: seed 5801, slot 'props', removed atom 'smartphone in hand recording' dropped silently without rule decision despite target selecting identical item 'smartphone_recording'."
+      ],
+      "5856": [
+        "UNEXPLAINED_SILENT_ATOM_DROP: seed 5856, slot 'props', removed atom 'flower petals pressed against chest' dropped silently without rule decision despite target selecting identical item 'fresh_flower_bouquet'."
+      ],
+      "5881": [
+        "UNEXPLAINED_SILENT_ATOM_DROP: seed 5881, slot 'props', removed atom 'ice bucket on table' dropped silently without rule decision despite target selecting identical item 'ice_cubes'."
+      ],
+      "5908": [
+        "UNEXPLAINED_SILENT_ATOM_DROP: seed 5908, slot 'props', removed atom 'metal handcuffs on headboard' dropped silently without rule decision despite target selecting identical item 'bondage_rope_collar'."
+      ],
+      "6043": [
+        "UNEXPLAINED_SILENT_ATOM_DROP: seed 6043, slot 'props', removed atom 'studio lighting equipment' dropped silently without rule decision despite target selecting identical item 'camera_tripod_flash'."
+      ],
+      "6178": [
+        "UNEXPLAINED_SILENT_ATOM_DROP: seed 6178, slot 'props', removed atom 'crimson hemp rope bindings' dropped silently without rule decision despite target selecting identical item 'bondage_rope_collar'."
+      ],
+      "6396": [
+        "UNEXPLAINED_SILENT_ATOM_DROP: seed 6396, slot 'props', removed atom 'smartphone in hand recording' dropped silently without rule decision despite target selecting identical item 'smartphone_recording'."
+      ],
+      "7099": [
+        "UNEXPLAINED_SILENT_ATOM_DROP: seed 7099, slot 'props', removed atom 'bottle of champagne on ice' dropped silently without rule decision despite target selecting identical item 'wine_glass_bottle'."
+      ],
+      "7257": [
+        "UNEXPLAINED_SILENT_ATOM_DROP: seed 7257, slot 'props', removed atom 'smartphone in hand recording' dropped silently without rule decision despite target selecting identical item 'smartphone_recording'."
+      ],
+      "7521": [
+        "UNEXPLAINED_SILENT_ATOM_DROP: seed 7521, slot 'props', removed atom 'glistening lube bottle nearby' dropped silently without rule decision despite target selecting identical item 'sex_toy_vibrator'."
+      ],
+      "7684": [
+        "UNEXPLAINED_SILENT_ATOM_DROP: seed 7684, slot 'props', removed atom 'bullet vibrator resting on skin' dropped silently without rule decision despite target selecting identical item 'sex_toy_vibrator'."
+      ],
+      "8011": [
+        "UNEXPLAINED_SILENT_ATOM_DROP: seed 8011, slot 'props', removed atom 'studio lighting equipment' dropped silently without rule decision despite target selecting identical item 'camera_tripod_flash'."
+      ],
+      "8067": [
+        "UNEXPLAINED_SILENT_ATOM_DROP: seed 8067, slot 'props', removed atom 'screen light glowing on face' dropped silently without rule decision despite target selecting identical item 'smartphone_recording'."
+      ],
+      "8136": [
+        "UNEXPLAINED_SILENT_ATOM_DROP: seed 8136, slot 'props', removed atom 'studio lighting equipment' dropped silently without rule decision despite target selecting identical item 'camera_tripod_flash'."
+      ],
+      "8150": [
+        "UNEXPLAINED_SILENT_ATOM_DROP: seed 8150, slot 'props', removed atom 'studio lighting equipment' dropped silently without rule decision despite target selecting identical item 'camera_tripod_flash'."
+      ],
+      "8189": [
+        "UNEXPLAINED_SILENT_ATOM_DROP: seed 8189, slot 'props', removed atom 'metal handcuffs on headboard' dropped silently without rule decision despite target selecting identical item 'bondage_rope_collar'."
+      ],
+      "8269": [
+        "UNEXPLAINED_SILENT_ATOM_DROP: seed 8269, slot 'props', removed atom 'professional DSLR on tripod in background' dropped silently without rule decision despite target selecting identical item 'camera_tripod_flash'."
+      ],
+      "8331": [
+        "UNEXPLAINED_SILENT_ATOM_DROP: seed 8331, slot 'props', removed atom 'smartphone in hand recording' dropped silently without rule decision despite target selecting identical item 'smartphone_recording'."
+      ],
+      "8476": [
+        "UNEXPLAINED_SILENT_ATOM_DROP: seed 8476, slot 'props', removed atom 'professional DSLR on tripod in background' dropped silently without rule decision despite target selecting identical item 'camera_tripod_flash'."
+      ],
+      "8581": [
+        "UNEXPLAINED_SILENT_ATOM_DROP: seed 8581, slot 'props', removed atom 'holding lush fresh floral bouquet' dropped silently without rule decision despite target selecting identical item 'fresh_flower_bouquet'."
+      ],
+      "8753": [
+        "UNEXPLAINED_SILENT_ATOM_DROP: seed 8753, slot 'props', removed atom 'pillow clutched to chest' dropped silently without rule decision despite target selecting identical item 'pillow_clutching'."
+      ],
+      "8862": [
+        "UNEXPLAINED_SILENT_ATOM_DROP: seed 8862, slot 'props', removed atom 'half-empty wine glass on nightstand' dropped silently without rule decision despite target selecting identical item 'wine_glass_bottle'."
+      ],
+      "8884": [
+        "UNEXPLAINED_SILENT_ATOM_DROP: seed 8884, slot 'props', removed atom 'holding lush fresh floral bouquet' dropped silently without rule decision despite target selecting identical item 'fresh_flower_bouquet'."
+      ],
+      "9032": [
+        "UNEXPLAINED_SILENT_ATOM_DROP: seed 9032, slot 'props', removed atom 'ring light reflection in eyes' dropped silently without rule decision despite target selecting identical item 'camera_tripod_flash'."
+      ],
+      "9112": [
+        "UNEXPLAINED_SILENT_ATOM_DROP: seed 9112, slot 'props', removed atom 'flower petals pressed against chest' dropped silently without rule decision despite target selecting identical item 'fresh_flower_bouquet'."
+      ],
+      "9145": [
+        "UNEXPLAINED_SILENT_ATOM_DROP: seed 9145, slot 'props', removed atom 'phone face down on bed' dropped silently without rule decision despite target selecting identical item 'smartphone_recording'."
+      ],
+      "9147": [
+        "UNEXPLAINED_SILENT_ATOM_DROP: seed 9147, slot 'props', removed atom 'stemware with red wine' dropped silently without rule decision despite target selecting identical item 'wine_glass_bottle'."
+      ],
+      "9347": [
+        "UNEXPLAINED_SILENT_ATOM_DROP: seed 9347, slot 'props', removed atom 'bullet vibrator resting on skin' dropped silently without rule decision despite target selecting identical item 'sex_toy_vibrator'."
+      ],
+      "9379": [
+        "UNEXPLAINED_SILENT_ATOM_DROP: seed 9379, slot 'props', removed atom 'smartphone in hand recording' dropped silently without rule decision despite target selecting identical item 'smartphone_recording'."
+      ],
+      "9386": [
+        "UNEXPLAINED_SILENT_ATOM_DROP: seed 9386, slot 'props', removed atom 'bouquet wrapped in crinkled craft paper' dropped silently without rule decision despite target selecting identical item 'fresh_flower_bouquet'."
+      ],
+      "9628": [
+        "UNEXPLAINED_SILENT_ATOM_DROP: seed 9628, slot 'props', removed atom 'ring light reflection in eyes' dropped silently without rule decision despite target selecting identical item 'camera_tripod_flash'."
+      ],
+      "9662": [
+        "UNEXPLAINED_SILENT_ATOM_DROP: seed 9662, slot 'props', removed atom 'ring light reflection in eyes' dropped silently without rule decision despite target selecting identical item 'camera_tripod_flash'."
+      ],
+      "9699": [
+        "UNEXPLAINED_SILENT_ATOM_DROP: seed 9699, slot 'props', removed atom 'bullet vibrator resting on skin' dropped silently without rule decision despite target selecting identical item 'sex_toy_vibrator'."
+      ],
+      "9846": [
+        "UNEXPLAINED_SILENT_ATOM_DROP: seed 9846, slot 'props', removed atom 'smartphone in hand recording' dropped silently without rule decision despite target selecting identical item 'smartphone_recording'."
+      ]
+    }
+  },
+  "manifest_version": "2.0-reeval",
+  "quality_gates": {
+    "determinism": "PASS (0 failures)",
+    "oracle_validation": "PASS (0 failures)",
+    "prompt_syntax": "PASS (0 failures)",
+    "provenance_closed_loop": "PASS (0 failures)",
+    "residual_conflicts": "PASS (0 failures)",
+    "secondary_idempotency": "PASS (0 failures)",
+    "word_budget": "PASS (0 failures)"
+  },
+  "source_archive": {
+    "path": "audit_m5_3_evidence.json.gz",
+    "sha256": "5417aa6529e4a86d2f920d6387ecd88626d70d9fd1973c7896ffa16544b01ff9",
+    "size_bytes": 737487743,
+    "total_records_processed": 10000
+  },
+  "task": "M5-3 10,000 Seeds Read-Only Archive Re-evaluation",
+  "timestamp": "2026-10-20T09:35:32Z"
+}

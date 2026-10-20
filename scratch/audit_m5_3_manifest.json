@@ -1,0 +1,61 @@
+{
+  "archive_file": {
+    "path": "audit_m5_3_evidence.json.gz",
+    "records_count": 10000,
+    "sha256": "5417aa6529e4a86d2f920d6387ecd88626d70d9fd1973c7896ffa16544b01ff9",
+    "size_bytes": 737487743
+  },
+  "baseline_batch_hash": "8762ecaf48c48d49b9f538047bc12e3aec3ad941727a72155f39993d51fd42e4",
+  "baseline_commit": "f1b873c",
+  "category_breakdown": {
+    "conflict_rule:clothing_style_state_coherence": 22,
+    "conflict_rule:framing_lower_body_coherence": 238,
+    "conflict_rule:makeup_details_coherence": 116,
+    "conflict_rule:material_penetration": 431,
+    "conflict_rule:nudity_clothing_conflicts": 163,
+    "conflict_rule:pose_hand_occupation": 79,
+    "context_affinity_calibration": 8951
+  },
+  "manifest_version": "2.0",
+  "quality_gates": {
+    "determinism": "PASS (0 failures, Round A == Round B byte-for-byte across positive, negative, description, d_audit)",
+    "oracle_validation": "PASS (0 oracle failures)",
+    "prompt_syntax": "PASS (0 syntax errors)",
+    "provenance_closed_loop": "PASS (0 orphaned atoms)",
+    "residual_conflicts": "PASS (0 unresolved)",
+    "secondary_idempotency": "PASS (0 new decisions, atoms identical before and after secondary resolution)",
+    "unexplained_divergences": "PASS (0 unexplained)",
+    "word_budget": "PASS (0 > 250 words)"
+  },
+  "source_binding": {
+    "core_source_digest": "7641d348b44249de809a73e8e3bfd22c8d7ba48ed4e71f6cdf36fe8ab6a6ee7f",
+    "is_dirty": false,
+    "target_commit": "1db9e675666854d569da85d72f6a39708b81c66c",
+    "target_tree_hash": "1530ce71c110f69cba39fee5f9d8d70b841c25ca"
+  },
+  "target_batch_hash": "48ae2e927fc6c6dc3f19362c806b31e2587df49aad85193f75e2731b18fa4c7d",
+  "target_data_hashes": {
+    "accessories.json": "45ff0c77286c47cda4f8b1b5ef9d1157870f1b70747b19e3f6fb90e7fbca5bc0",
+    "characters.json": "f41cd8e5e61b1db7d4d1f60233c8bcde020c5635e52f0c43e579c87f97ed5618",
+    "clothing.json": "7ca0f31ceea0702c79127bdca464f5061c0cd6337e319b7e83a9e8f58f4f6e3e",
+    "conflict_rules.json": "eb8c8f0e83e2d93789d6fd1813be528d7e218bb0ceb06537c8c86b781e1baa6b",
+    "context_affinity.json": "89ebd2973ab232818015355090eb7da697b41488008437ad02820fa8f9ec1ebc",
+    "expressions.json": "b2052279dbf12657bff56668291a2301c6b5783809ae44b6691f68a6c61248ef",
+    "film_stocks.json": "8eab7b02f23cf11160d8c62c335de16dc64b93142aa339079da91644b9a22c5e",
+    "imperfections.json": "ebfa6d027449c0d2ac35c2184b5e02db7e8bd00fbd9c076cd5b564a33494b4fc",
+    "lighting.json": "ce7950c99822156b39eb6a859856c57d4d0e33dc337f7b92ca9c1b17d2f2c3ac",
+    "makeup.json": "57e57c908275d6e8ff929799e4025e1ab2386f7758b4f97ff0e55e96b6988d1f",
+    "negative_prompts.json": "ea8da0ea2e14fcbe99c6c18c29ee32cbc972f8af3bf89a9205d4e216267a1b9b",
+    "nudity_levels.json": "9041ad4f741fbe94cddd66a7f86095e5c49995f9db96f22396b155caf59cc3aa",
+    "poses.json": "c77c98a2ca3890c26be4262bbee073b085ccf83fafa95ac7480ae6dda8b3a0f2",
+    "presets.json": "7ab88821f6d45d6baf6f438bec5a46433f6691fd3a3691230b7a072c7af7e6b7",
+    "props.json": "e0496d2ca8866a755ebe6f4bfc3f9304a17189ab893808bf5cc6d612f05845be",
+    "scenes.json": "35804b30eb79a9b8d169f93e8c4adf484ce7dfe676fa408ded3c9dd746d1b0fa",
+    "shot_types.json": "24ae39af0753b17172471edf4bec6665fdbfcae6168dd72fad0bb6adde98b702",
+    "style_recipes.json": "44873d98f4c365d1a25448d6996f84df310b1b2ac1e526a5e492124fb6279e44",
+    "tattoos.json": "37fa5158d826e6ce1b35dc730fec20494f2d41b8626a2cf2d4bdeceef1951bdd",
+    "themes.json": "d15509a75939757d7e27225bff0a1cd871a562ceeeeddad4d7f636ae70290287"
+  },
+  "task": "M5-3 10,000 Seeds Audit and Divergence Attribution",
+  "total_seeds": 10000
+}

@@ -1,0 +1,453 @@
+{
+  "files_count": 44,
+  "total_discovered": 447,
+  "total_passed": 447,
+  "total_failed": 0,
+  "total_errors": 0,
+  "total_skipped": 0,
+  "total_test_duration": 894.535,
+  "total_wall_time": 895.516,
+  "all_passed": true,
+  "files": [
+    {
+      "file": "test_bracket_protection.py",
+      "discovered": 4,
+      "passed": 4,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "duration": 0.0,
+      "success": true
+    },
+    {
+      "file": "test_catalog_rule_reachability.py",
+      "discovered": 10,
+      "passed": 10,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "duration": 1.114,
+      "success": true
+    },
+    {
+      "file": "test_ci_path_classification.py",
+      "discovered": 9,
+      "passed": 9,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "duration": 5.217,
+      "success": true
+    },
+    {
+      "file": "test_clothing_catalog_integrity.py",
+      "discovered": 6,
+      "passed": 6,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "duration": 0.099,
+      "success": true
+    },
+    {
+      "file": "test_clothing_expansion_batches.py",
+      "discovered": 15,
+      "passed": 15,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "duration": 24.641,
+      "success": true
+    },
+    {
+      "file": "test_conflict_engine_matrix.py",
+      "discovered": 7,
+      "passed": 7,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "duration": 0.775,
+      "success": true
+    },
+    {
+      "file": "test_conflict_rule_fixtures.py",
+      "discovered": 16,
+      "passed": 16,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "duration": 0.002,
+      "success": true
+    },
+    {
+      "file": "test_context_affinity_matrix.py",
+      "discovered": 4,
+      "passed": 4,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "duration": 0.423,
+      "success": true
+    },
+    {
+      "file": "test_context_affinity_rc8.py",
+      "discovered": 18,
+      "passed": 18,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "duration": 8.021,
+      "success": true
+    },
+    {
+      "file": "test_custom_prompt.py",
+      "discovered": 2,
+      "passed": 2,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "duration": 0.94,
+      "success": true
+    },
+    {
+      "file": "test_data_contracts.py",
+      "discovered": 3,
+      "passed": 3,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "duration": 0.084,
+      "success": true
+    },
+    {
+      "file": "test_doc_contracts.py",
+      "discovered": 5,
+      "passed": 5,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "duration": 0.002,
+      "success": true
+    },
+    {
+      "file": "test_emotion_gaze_cascade.py",
+      "discovered": 2,
+      "passed": 2,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "duration": 0.877,
+      "success": true
+    },
+    {
+      "file": "test_environmental_coherence.py",
+      "discovered": 3,
+      "passed": 3,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "duration": 0.543,
+      "success": true
+    },
+    {
+      "file": "test_finalize_boundaries.py",
+      "discovered": 7,
+      "passed": 7,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "duration": 8.152,
+      "success": true
+    },
+    {
+      "file": "test_is_changed.py",
+      "discovered": 3,
+      "passed": 3,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "duration": 0.0,
+      "success": true
+    },
+    {
+      "file": "test_lexer_and_spans.py",
+      "discovered": 21,
+      "passed": 21,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "duration": 1.086,
+      "success": true
+    },
+    {
+      "file": "test_m1_counterexamples.py",
+      "discovered": 6,
+      "passed": 6,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "duration": 0.54,
+      "success": true
+    },
+    {
+      "file": "test_m2_matrix_and_sampling.py",
+      "discovered": 17,
+      "passed": 17,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "duration": 3.87,
+      "success": true
+    },
+    {
+      "file": "test_m33_runtime_contracts.py",
+      "discovered": 41,
+      "passed": 41,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "duration": 13.723,
+      "success": true
+    },
+    {
+      "file": "test_m3_slice_resolution.py",
+      "discovered": 31,
+      "passed": 31,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "duration": 1.832,
+      "success": true
+    },
+    {
+      "file": "test_m4_batch1_ingestion.py",
+      "discovered": 10,
+      "passed": 10,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "duration": 14.284,
+      "success": true
+    },
+    {
+      "file": "test_m4_batch2_ingestion.py",
+      "discovered": 10,
+      "passed": 10,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "duration": 11.825,
+      "success": true
+    },
+    {
+      "file": "test_m4_batch3_ingestion.py",
+      "discovered": 9,
+      "passed": 9,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "duration": 17.956,
+      "success": true
+    },
+    {
+      "file": "test_m4_batch4_ingestion.py",
+      "discovered": 11,
+      "passed": 11,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "duration": 21.562,
+      "success": true
+    },
+    {
+      "file": "test_m4_batch5_ingestion.py",
+      "discovered": 11,
+      "passed": 11,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "duration": 14.163,
+      "success": true
+    },
+    {
+      "file": "test_m4_batch6_ingestion.py",
+      "discovered": 10,
+      "passed": 10,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "duration": 20.542,
+      "success": true
+    },
+    {
+      "file": "test_nudity_levels.py",
+      "discovered": 6,
+      "passed": 6,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "duration": 31.236,
+      "success": true
+    },
+    {
+      "file": "test_pipeline_bypass_and_provenance.py",
+      "discovered": 4,
+      "passed": 4,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "duration": 0.697,
+      "success": true
+    },
+    {
+      "file": "test_pose_hand_coherence.py",
+      "discovered": 2,
+      "passed": 2,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "duration": 1.284,
+      "success": true
+    },
+    {
+      "file": "test_presets_matrix.py",
+      "discovered": 1,
+      "passed": 1,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "duration": 33.851,
+      "success": true
+    },
+    {
+      "file": "test_props_and_extensions_reachability.py",
+      "discovered": 9,
+      "passed": 9,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "duration": 93.956,
+      "success": true
+    },
+    {
+      "file": "test_random_generations.py",
+      "discovered": 1,
+      "passed": 1,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "duration": 23.498,
+      "success": true
+    },
+    {
+      "file": "test_rc9_extended_states_and_catalogs.py",
+      "discovered": 9,
+      "passed": 9,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "duration": 13.593,
+      "success": true
+    },
+    {
+      "file": "test_rc9_step3_cross_catalogs.py",
+      "discovered": 13,
+      "passed": 13,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "duration": 4.159,
+      "success": true
+    },
+    {
+      "file": "test_release_build.py",
+      "discovered": 19,
+      "passed": 19,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "duration": 307.921,
+      "success": true
+    },
+    {
+      "file": "test_rng_seed.py",
+      "discovered": 2,
+      "passed": 2,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "duration": 23.92,
+      "success": true
+    },
+    {
+      "file": "test_scene_structure.py",
+      "discovered": 3,
+      "passed": 3,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "duration": 1.419,
+      "success": true
+    },
+    {
+      "file": "test_schema_negatives.py",
+      "discovered": 15,
+      "passed": 15,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "duration": 42.64,
+      "success": true
+    },
+    {
+      "file": "test_selection_contracts.py",
+      "discovered": 11,
+      "passed": 11,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "duration": 15.406,
+      "success": true
+    },
+    {
+      "file": "test_semantic_catalogs.py",
+      "discovered": 42,
+      "passed": 42,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "duration": 100.955,
+      "success": true
+    },
+    {
+      "file": "test_slot_pipeline_integrity.py",
+      "discovered": 14,
+      "passed": 14,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "duration": 25.679,
+      "success": true
+    },
+    {
+      "file": "test_spatial_coherence.py",
+      "discovered": 3,
+      "passed": 3,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "duration": 0.008,
+      "success": true
+    },
+    {
+      "file": "test_tattoo_scoping.py",
+      "discovered": 2,
+      "passed": 2,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "duration": 2.04,
+      "success": true
+    }
+  ]
+}

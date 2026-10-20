@@ -1,0 +1,7 @@
+test_audit_replay_purely_from_archive (tests.test_m1_wildcards_slice.TestM1AuditNegativeVerification)
+反例与自洽闭环：验证归档证据包含全部必要输入（atoms, decisions, bindings, dedup/budget 等）， ... ok
+
+----------------------------------------------------------------------
+Ran 1 test in 120.956s
+
+OK

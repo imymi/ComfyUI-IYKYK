@@ -1,0 +1,54 @@
+{
+  "auditor_binding": {
+    "baseline_batch_hash": "8762ecaf48c48d49b9f538047bc12e3aec3ad941727a72155f39993d51fd42e4",
+    "baseline_commit": "f1b873c",
+    "core_source_digest": "7641d348b44249de809a73e8e3bfd22c8d7ba48ed4e71f6cdf36fe8ab6a6ee7f",
+    "is_dirty": false,
+    "script_path": "scratch/run_m5_3_audit.py",
+    "script_sha256": "62faa4edaf68010d25ddbd767f1adb6cfbdbfcd964b2b1ca21e8ac2fac70cb43",
+    "target_batch_hash": "48ae2e927fc6c6dc3f19362c806b31e2587df49aad85193f75e2731b18fa4c7d",
+    "target_commit": "1db9e675666854d569da85d72f6a39708b81c66c",
+    "target_tree_hash": "1530ce71c110f69cba39fee5f9d8d70b841c25ca"
+  },
+  "evaluation_result": {
+    "category_breakdown": {
+      "conflict_rule:clothing_style_state_coherence": 22,
+      "conflict_rule:framing_lower_body_coherence": 233,
+      "conflict_rule:makeup_details_coherence": 116,
+      "conflict_rule:material_penetration": 444,
+      "conflict_rule:nudity_clothing_conflicts": 163,
+      "conflict_rule:pose_hand_occupation": 79,
+      "context_affinity_calibration": 8943
+    },
+    "divergent_count": 10000,
+    "elapsed_seconds": 73.94,
+    "identical_count": 0,
+    "is_all_explained": true,
+    "prop_subsampling_seeds_count": 116,
+    "total_seeds": 10000,
+    "unexplained_count": 0,
+    "unexplained_seeds": {}
+  },
+  "manifest_version": "2.0-reeval",
+  "quality_gates": {
+    "determinism": "PASS (0 failures)",
+    "oracle_validation": "PASS (0 failures)",
+    "prompt_syntax": "PASS (0 failures)",
+    "provenance_closed_loop": "PASS (0 failures)",
+    "residual_conflicts": "PASS (0 failures)",
+    "secondary_idempotency": "PASS (0 failures)",
+    "word_budget": "PASS (0 failures)"
+  },
+  "source_archive": {
+    "contiguous_seed_range": [
+      0,
+      9999
+    ],
+    "path": "audit_m5_3_evidence.json.gz",
+    "sha256": "5417aa6529e4a86d2f920d6387ecd88626d70d9fd1973c7896ffa16544b01ff9",
+    "size_bytes": 737487743,
+    "total_records_processed": 10000
+  },
+  "task": "M5-3 10,000 Seeds Read-Only Archive Re-evaluation",
+  "timestamp": "2026-10-20T12:35:55Z"
+}
