@@ -6,20 +6,53 @@ on:
       - "v*"
 
 permissions:
-  contents: write
+  contents: read
 
 concurrency:
   group: release-${{ github.ref }}
   cancel-in-progress: false
 
 jobs:
-  publish:
+  resolve_ci:
     runs-on: ubuntu-latest
-    timeout-minutes: 240
+    timeout-minutes: 250
+    permissions:
+      contents: read
+      actions: read
+    outputs:
+      reused: ${{ steps.ci.outputs.reused }}
+    steps:
+    - uses: actions/checkout@v6
+      with:
+        ref: ${{ github.sha }}
+    - name: Reuse complete CI for this commit
+      id: ci
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: python3 scripts/check_release_ci.py
+
+  quality_gates:
+    needs: resolve_ci
+    if: needs.resolve_ci.outputs.reused != 'true'
+    uses: ./.github/workflows/ci.yml
+    with:
+      force_full: true
+
+  publish:
+    needs: [resolve_ci, quality_gates]
+    if: >-
+      ${{ !cancelled() && needs.resolve_ci.result == 'success' &&
+          ((needs.resolve_ci.outputs.reused == 'true' && needs.quality_gates.result == 'skipped') ||
+           needs.quality_gates.result == 'success') }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: write
 
     steps:
     - uses: actions/checkout@v6
       with:
+        ref: ${{ github.sha }}
         fetch-depth: 0
         fetch-tags: true
 
@@ -33,13 +66,6 @@ jobs:
         python -m pip install --upgrade pip
         python -m pip install -e ".[dev]"
 
-    - name: Run Release Quality Gates
-      run: |
-        ruff check .
-        python scripts/generate_rule_schemas.py --check
-        python scripts/validate_data.py --strict
-        python -m unittest discover -s tests -v
-
     - name: Build Release Assets
       run: |
         python scripts/build_release.py --mode release --output-dir dist
@@ -50,6 +76,8 @@ jobs:
       run: |
         GEN_DIR=$(python -c "import json; print(json.load(open('dist/CURRENT.json'))['generation_dir'])")
         RELEASE_FILE=$(python -c "import json; print(json.load(open('dist/CURRENT.json'))['release_file'])")
+        test "$GITHUB_REF_NAME" = "$(python -c "import json; print(json.load(open('dist/CURRENT.json'))['version'])")"
+        test "$(git ls-remote --exit-code origin "refs/tags/$GITHUB_REF_NAME^{}" | cut -f1)" = "$GITHUB_SHA"
         RELEASE_FLAGS=()
         if [[ "$GITHUB_REF_NAME" == *-* ]]; then
           RELEASE_FLAGS+=(--prerelease)
@@ -59,6 +87,16 @@ jobs:
           "dist/$GEN_DIR/MANIFEST.json" \
           "dist/$GEN_DIR/SHA256SUMS.txt" \
           --verify-tag \
+          --draft \
           --generate-notes \
           --title "$GITHUB_REF_NAME" \
           "${RELEASE_FLAGS[@]}"
+        # Verify all uploaded bytes before making the release public.
+        DOWNLOAD_DIR="$RUNNER_TEMP/release-assets"
+        mkdir -p "$DOWNLOAD_DIR"
+        gh release download "$GITHUB_REF_NAME" --dir "$DOWNLOAD_DIR"
+        test "$(find "$DOWNLOAD_DIR" -maxdepth 1 -type f | wc -l)" -eq 3
+        for asset in "$RELEASE_FILE" MANIFEST.json SHA256SUMS.txt; do
+          cmp "dist/$GEN_DIR/$asset" "$DOWNLOAD_DIR/$asset"
+        done
+        gh release edit "$GITHUB_REF_NAME" --draft=false

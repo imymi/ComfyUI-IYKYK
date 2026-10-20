@@ -52,12 +52,13 @@ class TestCIPathClassification(unittest.TestCase):
         self.git("commit", "-qm", "classification fixture")
         return self.git("rev-parse", "HEAD")
 
-    def classify(self, base):
+    def classify(self, base, force_full=""):
         output = self.root / "github-output"
         output.write_text("", encoding="utf-8")
         result = subprocess.run(
             ["bash", "-e", "-o", "pipefail", "-c", self.classifier], cwd=self.repo,
-            env={**os.environ, "BASE_SHA": base, "RUNNER_TEMP": str(self.root), "GITHUB_OUTPUT": str(output)},
+            env={**os.environ, "BASE_SHA": base, "FORCE_FULL": force_full,
+                 "RUNNER_TEMP": str(self.root), "GITHUB_OUTPUT": str(output)},
             capture_output=True, text=True,
         )
         self.assertEqual(result.returncode, 0, result.stderr)
@@ -78,6 +79,12 @@ class TestCIPathClassification(unittest.TestCase):
         for path in ("README.md", "CHANGELOG.md", "THIRD_PARTY.md", "docs/guide.md", "source_md/source.md"):
             with self.subTest(path=path):
                 self.assert_paths((path,), True)
+
+    def test_release_call_forces_full_gate_even_for_docs_only_diff(self):
+        base = self.git("rev-parse", "HEAD")
+        self.commit_paths(ARCHIVE_DOCS)
+        self.assertEqual(self.classify(base, force_full="true"), "docs_only=false")
+        self.assertEqual(self.classify(base, force_full="false"), "docs_only=true")
 
     def test_other_scratch_paths_and_non_markdown_require_full_gate(self):
         for path in (

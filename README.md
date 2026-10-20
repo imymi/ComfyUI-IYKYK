@@ -7,7 +7,7 @@
 
 ComfyUI-IYKYK 是一套面向东亚人像与剧情场景的提示词生成节点。它把场景、人物、服装、构图、光线等选择组织成结构化语义，再通过冲突规则生成更自洽的正向提示词、负向提示词和中文说明。
 
-当前版本：**v1.1.0-rc10**。本版本完成全量词库合流与结构化变体治理、L1/L5 裸露纯净度防护、服装动作载体相容性加固与历史快照受控门禁。
+当前版本：**v1.2.0**。本版本优化情境亲和矩阵与冲突规则，为全部 20 个槽位提供外部覆盖端口，并升级 Diagnostics 2.0 审计输出。
 
 > 本项目包含仅适合成年人的 SFW/NSFW 词库。请先阅读[内容与授权](#内容与授权)。
 
@@ -16,6 +16,7 @@ ComfyUI-IYKYK 是一套面向东亚人像与剧情场景的提示词生成节点
 - 四个 ComfyUI 原生节点：完整生成、预设浏览、自定义拼装和提示词诊断。
 - 77 个预设、8 个风格配方、14 类情境和 20 份运行时数据目录。
 - Random/Auto 使用情境亲和采样；显式选择保持优先，但仍接受物理与语义冲突检查。
+- 四个节点均支持 20 个规范槽位的外部覆盖，可接入其他节点提供的文本或结构化内容；覆盖结果参与统一冲突消解与来源追踪。
 - 17 条稳定规则按阶段、优先级和依赖 DAG 执行，不依赖文档编号或隐式代码顺序。
 - 固定 `prompt_seed` 可在同一版本内确定性复现；不同版本之间不承诺提示词逐字一致。
 - LoRA、加权括号、引号和转义逗号等受保护 Span 保持字节不变。
@@ -26,7 +27,7 @@ ComfyUI-IYKYK 是一套面向东亚人像与剧情场景的提示词生成节点
 
 ### Release ZIP（推荐）
 
-1. 从 [GitHub Releases](https://github.com/imymi/ComfyUI-IYKYK/releases) 下载 `ComfyUI-IYKYK-v1.1.0-rc10.zip`。
+1. 从 [GitHub Releases](https://github.com/imymi/ComfyUI-IYKYK/releases) 下载 `ComfyUI-IYKYK-v1.2.0.zip`。
 2. 解压到 `ComfyUI/custom_nodes/ComfyUI-IYKYK`。
 3. 重启 ComfyUI，在节点搜索中输入 `IYKYK`。
 
@@ -37,11 +38,11 @@ cd /path/to/ComfyUI/custom_nodes
 git clone https://github.com/imymi/ComfyUI-IYKYK.git
 ```
 
-如果需要固定到当前候选版本：
+如果需要固定到当前版本：
 
 ```bash
 cd ComfyUI-IYKYK
-git checkout v1.1.0-rc10
+git checkout v1.2.0
 ```
 
 ### ComfyUI Manager
@@ -108,6 +109,10 @@ https://github.com/imymi/ComfyUI-IYKYK.git
 
 ## 工作原理
 
+### 20 槽位外部覆盖
+
+将上游节点连接至对应的 `<slot>_override` 端口，即可接管该槽位。端口支持文本、结构化字典及 PromptAtom 列表；外部来源和冲突处理结果会写入诊断信息。完整端口清单、输入格式及旧工作流迁移说明见 [使用与迁移指南](docs/m5_4_usage_and_migration_guide.md)。
+
 ```mermaid
 flowchart LR
     I[UI 选择 / 预设 / 自定义文本] --> S[结构化采样]
@@ -153,7 +158,7 @@ P = 0.15 × 全局合法分布 + 0.85 × Σ(情境权重 × 情境候选分布)
 
 `IYKYKPromptDiagnostics` 只采样和消解一次。固定 seed 与相同输入下，它的前三个输出和 `IYKYKPromptGenerator` 逐字节一致。
 
-JSON 顶层固定包含：
+Diagnostics 2.0 的完整结构以 [Schema](schemas/diagnostics.schema.json) 为准，包含以下审计字段，并记录执行状态、采样理由与外部覆盖结果：
 
 ```text
 schema_version
@@ -177,9 +182,9 @@ counts
 
 ## 确定性与兼容性
 
-- `prompt_seed >= 0`：同一 rc10 版本、相同输入得到相同输出与诊断 JSON。
+- `prompt_seed >= 0`：同一 v1.2.0 版本、相同输入得到相同输出与诊断 JSON。
 - `prompt_seed = -1`：按 ComfyUI 的生成周期更新结果。
-- 升级至 rc10 扩充了采样目录与变体结构，同一个 seed 的输出可能变化；升级后应在 rc10 内重新固定并验证预期结果。
+- v1.2.0 调整了亲和采样与冲突消解，同一个 seed 的输出可能与旧版不同；升级后请在 v1.2.0 内重新固定并验证预期结果。
 - 四个节点的输出数量与类型保持不变；旧工作流中的服装选项 ID 继续保留。
 - 输出是普通字符串，可接入常见 ComfyUI 文本编码流程；最终模型效果仍取决于 checkpoint、文本编码器、采样参数和工作流。
 
@@ -203,7 +208,15 @@ python -m unittest discover -s tests -q
 python scripts/build_release.py --mode verify
 ```
 
-rc10 候选冻结的本地审核记录包括：
+v1.2.0 的本地验收记录包括：
+
+- 53 个模块共 747 项测试通过，其中 241 项复用已有完成记录，506 项补测通过；失败、错误和跳过均为 0。
+- 10,000 种子 M5 归档完整性与因果重评通过，未解释差异为 0；核心源码与验收归档保持绑定。
+- Jacoby 完成节点加载与双轮确定性、Diagnostics JSON、服装外部覆盖和裸露等级触发衣物冲突消解四类实机验证。
+- 发布包包含 43 个运行时文件；大型离线审计归档不随节点安装包分发。
+- 发布过程仅更新版本与文档，并保留远程已有 CI 改进；验收依据与复用范围见 [v1.2.0 发布记录](docs/v1.2.0_release_record.md)。
+
+rc10 历史候选冻结的本地审核记录包括：
 
 - 165 款服装大类、234 个场景、837 个 UI 显式选项。
 - 完整全量回归 574 项测试通过；针对性专项复测（服装 14 项、L1 纯净度 6 项、RC8 质量门禁 5 项）全部通过。
