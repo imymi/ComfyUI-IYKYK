@@ -227,8 +227,18 @@ python -m pip install -e ".[dev]"
 ruff check .
 python scripts/generate_rule_schemas.py --check
 python scripts/validate_data.py --strict
-python -m unittest discover -s tests -q
+RUN_LIVE_SEED_GATE=1 python -m unittest discover -s tests -q
 python scripts/build_release.py --mode verify
+```
+
+CI 实时验证当前源码的 10,000 组种子，并与历史黄金哈希对照。历史 M5 原始归档未存入 Git，CI 会明确跳过其完整归档校验；该归档只证明它绑定的历史提交。Release 工作流会复用此 CI，云端发布门禁同样不校验该历史归档。
+
+如需在本机完整校验历史归档，可指定归档路径并确保本地 Git 历史包含归档绑定的提交：
+
+```bash
+M5_ARCHIVE_PATH=/path/to/audit_m5_3_evidence.json.gz python -m unittest \
+  tests.test_rc8_quality_gate.TestRC8QualityGate.test_03b_seed_gate_golden_hash \
+  tests.test_m5_3_audit_engine.TestM5EvidenceVerification.test_17_real_production_evidence_fast_metadata_verified -v
 ```
 
 v1.2.0 的本地验收记录包括：
