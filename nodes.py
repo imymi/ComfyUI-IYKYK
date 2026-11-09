@@ -21,12 +21,18 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, Sequence, Tuple
 
 if __package__:
-    from .lib.assembler import CANONICAL_20_SLOTS, PromptAssembler, _inspect_blank_input, make_override_fragments, split_top_level_tags
+    from .lib.assembler import (
+        CANONICAL_20_SLOTS as CANONICAL_20_SLOTS,
+        PromptAssembler,
+        _inspect_blank_input,
+        make_override_fragments as make_override_fragments,
+        split_top_level_tags,
+    )
     from .lib.context_affinity import compute_context_profile
     from .lib.errors import (
         CATEGORY_EXTERNAL_BUDGET_EXCEEDED,
         CATEGORY_EXTERNAL_OVERRIDE_CONFLICT,
-        CATEGORY_GENERIC_ERROR,
+        CATEGORY_GENERIC_ERROR as CATEGORY_GENERIC_ERROR,
         CATEGORY_INVALID_INPUT_TYPE,
         CATEGORY_SLOT_ALIAS_COLLISION,
         CATEGORY_UNRESOLVED_HARD_CONFLICT,
@@ -38,12 +44,18 @@ if __package__:
     from .lib.sampler import DataSampler, _is_none, get_selection_mode
     from .lib.slot_contract import AUXILIARY_SLOT_ORDER, SLOT_ORDER, normalize_slot_mapping, normalize_slot_name
 else:
-    from lib.assembler import CANONICAL_20_SLOTS, PromptAssembler, _inspect_blank_input, make_override_fragments, split_top_level_tags
+    from lib.assembler import (
+        CANONICAL_20_SLOTS as CANONICAL_20_SLOTS,
+        PromptAssembler,
+        _inspect_blank_input,
+        make_override_fragments as make_override_fragments,
+        split_top_level_tags,
+    )
     from lib.context_affinity import compute_context_profile
     from lib.errors import (
         CATEGORY_EXTERNAL_BUDGET_EXCEEDED,
         CATEGORY_EXTERNAL_OVERRIDE_CONFLICT,
-        CATEGORY_GENERIC_ERROR,
+        CATEGORY_GENERIC_ERROR as CATEGORY_GENERIC_ERROR,
         CATEGORY_INVALID_INPUT_TYPE,
         CATEGORY_SLOT_ALIAS_COLLISION,
         CATEGORY_UNRESOLVED_HARD_CONFLICT,

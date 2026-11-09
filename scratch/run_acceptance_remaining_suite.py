@@ -29,7 +29,7 @@ def main():
     test_dir = REPO_DIR / "tests"
     rem_files = [p for p in sorted(test_dir.glob("test_*.py")) if p.name not in COMPLETED_FILES]
     print(f"Starting test run for {len(rem_files)} files...")
-    
+
     loader = unittest.TestLoader()
     results_summary = []
     total_passed = 0
@@ -46,7 +46,7 @@ def main():
         suite = loader.loadTestsFromName(mod_name)
         count = suite.countTestCases()
         total_discovered += count
-        
+
         t0 = time.time()
         runner = unittest.TextTestRunner(stream=sys.stdout, verbosity=1)
         res = runner.run(suite)
