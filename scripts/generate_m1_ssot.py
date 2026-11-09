@@ -17,7 +17,7 @@ ComfyUI-IYKYK M1 单一真实数据源 (SSoT) 完整构建与一致性校验生�
 
 import json
 from pathlib import Path
-from typing import Dict, List, Set, Tuple
+from typing import Dict, Tuple
 
 from lib.context_affinity import ORDERED_SLOT_IDS, load_slot_id_registries
 from lib.models import ORDERED_CONTEXT_IDS
@@ -876,7 +876,7 @@ for slot in ORDERED_SLOT_IDS:
         f"| [`{slot}`](file:///Users/jacobyang/Hermes/iykyk-affinity-override/docs/m1_selector_attribution_ledger.tsv) | {reg_cnt} | {asgn_cnt} ({asgn_cnt/reg_cnt*100:.1f}%) | {glob_cnt} ({glob_cnt/reg_cnt*100:.1f}%) | 0 (0.0%) | **100.0%** |"
     )
 
-summary_doc_content = f"""# ComfyUI-IYKYK M1 选择器情境归属与全量台账审核摘要 (M1-D3)
+summary_doc_content = """# ComfyUI-IYKYK M1 选择器情境归属与全量台账审核摘要 (M1-D3)
 
 - **基线 Commit SHA**：`f1b873c2479c287817f5780991e6621e31b9f848`
 - **采样槽位总数**：14

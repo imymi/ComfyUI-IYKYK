@@ -33,7 +33,7 @@ from lib.runtime_manifest import (
 
 
 def pack():
-    print(f"📦 Starting lightweight packaging for ComfyUI...")
+    print("📦 Starting lightweight packaging for ComfyUI...")
     print(f"   Source directory: {REPO_DIR}")
     print(f"   Runtime manifest specifies {TOTAL_RUNTIME_FILES_COUNT} files.")
 
@@ -60,7 +60,7 @@ def pack():
         dst_file = target_node_dir / rel_path
         dst_file.parent.mkdir(parents=True, exist_ok=True)
         shutil.copy2(src_file, dst_file)
-        
+
         file_bytes = dst_file.read_bytes()
         copied_count += 1
         total_raw_bytes += len(file_bytes)
@@ -137,11 +137,11 @@ def pack():
     shutil.copyfile(sums_path, workspace_dist / "SHA256SUMS.txt")
 
     # 5. 执行隔离环境烟雾测试验证打包结果
-    print(f"\n🧪 Running smoke test on packaged node...")
+    print("\n🧪 Running smoke test on packaged node...")
     test_node(target_node_dir)
-    print(f"🎉 Packaging and verification complete!")
-    print(f"\nSummary:")
-    print(f"   - Original folder:      ~1.7 GB (dominated by 1.6GB scratch/ audit data)")
+    print("🎉 Packaging and verification complete!")
+    print("\nSummary:")
+    print("   - Original folder:      ~1.7 GB (dominated by 1.6GB scratch/ audit data)")
     print(f"   - Repackaged folder:    {target_node_dir} ({total_raw_bytes / (1024 * 1024):.2f} MB)")
     print(f"   - Repackaged zip:       {zip_path} ({zip_size_mb:.2f} MB)")
     print(f"   - Workspace zip:        {workspace_dist / 'ComfyUI-IYKYK.zip'}")
@@ -158,7 +158,7 @@ def test_node(node_dir: Path):
         sys_path_backup = list(sys.path)
         try:
             sys.path = [str(test_copy)] + [p for p in sys_path_backup if "iykyk" not in p and "ComfyUI" not in p]
-            
+
             # 清理已加载的模块
             for m in list(sys.modules.keys()):
                 if m.startswith("nodes") or m.startswith("lib"):
@@ -167,7 +167,7 @@ def test_node(node_dir: Path):
             import nodes
             assert hasattr(nodes, "NODE_CLASS_MAPPINGS"), "Missing NODE_CLASS_MAPPINGS"
             assert hasattr(nodes, "NODE_DISPLAY_NAME_MAPPINGS"), "Missing NODE_DISPLAY_NAME_MAPPINGS"
-            
+
             classes = nodes.NODE_CLASS_MAPPINGS
             assert "IYKYKPromptGenerator" in classes
             assert "IYKYKPresetBrowser" in classes
@@ -197,7 +197,7 @@ def test_node(node_dir: Path):
             audit_obj = json.loads(d_audit)
             assert "decisions" in audit_obj, "Invalid diagnostics audit JSON"
 
-            print(f"   ✅ Successfully verified all 4 ComfyUI nodes in isolated environment.")
+            print("   ✅ Successfully verified all 4 ComfyUI nodes in isolated environment.")
         finally:
             sys.path = sys_path_backup
 
