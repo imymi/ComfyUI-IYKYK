@@ -23,6 +23,7 @@ if __package__:
         CANONICAL_SELECTORS_BY_ENTRY_POINT,
         FORMAL_ORIGIN_MODES,
         ContextProfile,
+        NudityConstraint,
         PieceBinding,
         PosePhysicalFacts,
         PromptAtom,
@@ -55,6 +56,7 @@ else:
         CANONICAL_SELECTORS_BY_ENTRY_POINT,
         FORMAL_ORIGIN_MODES,
         ContextProfile,
+        NudityConstraint,
         PieceBinding,
         PosePhysicalFacts,
         PromptAtom,
@@ -1983,6 +1985,7 @@ class ConflictResolver:
         self.canonical_catalog_facts: Dict[Tuple[str, str], SemanticFacts] = build_canonical_catalog_facts(data_dir)
         self.text_fallback_hits: int = 0
         self.last_report: Optional[ResolutionReport] = None
+        self._active_nudity_constraint: Optional[NudityConstraint] = None
 
     def _validate_formal_atom(self, a: PromptAtom, rule_id: str, index: Optional[OneTimeIndex] = None) -> None:
         """验证正式目录/预设/配方原子是否携带当前规则所需的基础语义事实。若事实缺失则 Fail-Closed (R2R2-P1-001)。"""
@@ -2105,12 +2108,19 @@ class ConflictResolver:
                 )
         elif rule_id == "nudity_clothing_conflicts":
             if slot == "nudity":
-                if not (facts.visible_regions or facts.garment_topologies or canon):
+                if not (facts.visible_regions or facts.garment_topologies or facts.exposed_regions or canon):
                     raise RuleConfigurationError(
                         f"Formal nudity atom '{a.atom_id}' missing required facts for rule '{rule_id}'"
                     )
             elif slot in ("clothing", "clothing_state", "clothing_extension", "underwear"):
-                if not (facts.garment_topologies or facts.garment_states or facts.visible_regions or canon):
+                if not (
+                    facts.garment_topologies
+                    or facts.garment_states
+                    or facts.visible_regions
+                    or facts.piece_role
+                    or facts.covered_regions
+                    or canon
+                ):
                     raise RuleConfigurationError(
                         f"Formal clothing atom '{a.atom_id}' missing required facts for rule '{rule_id}'"
                     )
@@ -2267,6 +2277,7 @@ class ConflictResolver:
         rng: Optional[Random] = None,
         context_profile: Optional[ContextProfile] = None,
         effective_seed: Optional[int] = None,
+        nudity_constraint: Optional[NudityConstraint] = None,
     ) -> Tuple[List[PromptAtom], Tuple[str, ...], ResolutionReport]:
         """按 DAG 冻结顺序执行 17 条冲突消解规则并产出完备审计报告与零硬冲突闭环。"""
         if rng is None:
@@ -2281,6 +2292,7 @@ class ConflictResolver:
                 )
 
         self.text_fallback_hits = 0
+        self._active_nudity_constraint = nudity_constraint
 
         # R2-P1-002: 提取或恢复 effective seed
         if effective_seed is None:
@@ -2299,68 +2311,75 @@ class ConflictResolver:
         ledger = DecisionLedger(rule_registry=self.registry)
         rules_applied: List[str] = []
 
-        # 1. 针对输入原子构建单次扫描不可变快速索引
-        index = OneTimeIndex(atoms)
+        try:
+            # 1. 针对输入原子构建单次扫描不可变快速索引
+            index = OneTimeIndex(atoms)
 
-        # 2. 依次按 execution_order (DAG 拓扑顺序) 执行 17 条规则，使用独立派生 RNG 子流
-        for rule_id in self.registry.doc.execution_order:
-            rule_item = self.registry.get_rule_item(rule_id)
-            resolver_fn = getattr(self, f"_resolve_{rule_id}_atoms", None)
-            if resolver_fn is None:
-                continue
+            # 2. 依次按 execution_order (DAG 拓扑顺序) 执行 17 条规则，使用独立派生 RNG 子流
+            for rule_id in self.registry.doc.execution_order:
+                rule_item = self.registry.get_rule_item(rule_id)
+                resolver_fn = getattr(self, f"_resolve_{rule_id}_atoms", None)
+                if resolver_fn is None:
+                    continue
 
-            rule_rng = derive_substream_rng(effective_seed, f"rule:{rule_item.id}")
-            dec_count_before = len(ledger.decisions)
-            current_atoms = resolver_fn(current_atoms, rule_item, ledger, rule_rng, index, context_profile)
-            if len(ledger.decisions) > dec_count_before:
-                if rule_id not in rules_applied:
-                    rules_applied.append(rule_id)
+                rule_rng = derive_substream_rng(effective_seed, f"rule:{rule_item.id}")
+                dec_count_before = len(ledger.decisions)
+                current_atoms = resolver_fn(current_atoms, rule_item, ledger, rule_rng, index, context_profile)
+                if len(ledger.decisions) > dec_count_before:
+                    if rule_id not in rules_applied:
+                        rules_applied.append(rule_id)
 
-        # 3. 计算产出哈希与构建决策报告
-        current_atoms = index.get_all_active_ordered()
-        output_hash = compute_atoms_hash(current_atoms)
-        actual_dropped = sum(1 for d in ledger.decisions if d.action == "drop")
-        actual_replaced = sum(1 for d in ledger.decisions if d.action == "replace")
-        actual_injected = sum(1 for d in ledger.decisions if d.action == "inject")
+            # 3. 计算产出哈希与构建决策报告
+            current_atoms = index.get_all_active_ordered()
+            output_hash = compute_atoms_hash(current_atoms)
+            actual_dropped = sum(1 for d in ledger.decisions if d.action == "drop")
+            actual_replaced = sum(1 for d in ledger.decisions if d.action == "replace")
+            actual_injected = sum(1 for d in ledger.decisions if d.action == "inject")
 
-        report = ResolutionReport(
-            schema_version="1.0",
-            input_atom_hash=input_hash,
-            output_atom_hash=output_hash,
-            input_count=len(atoms),
-            output_count=len(current_atoms),
-            dropped_count=actual_dropped,
-            replaced_count=actual_replaced,
-            injected_count=actual_injected,
-            rules_applied=tuple(rules_applied),
-            decisions=tuple(ledger.decisions),
-            unresolved_conflicts=(),
-            produced_atoms=tuple(ledger.produced_atoms),
-        )
-
-        # 4. 只读最终零硬冲突检测 (detect_hard_conflicts)
-        residual_conflicts, has_protected = self.detect_hard_conflicts(current_atoms)
-        if residual_conflicts:
-            reason = "protected_syntax_conflict" if has_protected else "unresolved_hard_conflict"
-            unres_report = replace(report, unresolved_conflicts=tuple(residual_conflicts))
-            self.last_report = unres_report
-            raise UnresolvedConflictError(
-                reason=reason,
-                unresolved_conflicts=tuple(residual_conflicts),
-                report=unres_report,
+            report = ResolutionReport(
+                schema_version="1.0",
+                input_atom_hash=input_hash,
+                output_atom_hash=output_hash,
+                input_count=len(atoms),
+                output_count=len(current_atoms),
+                dropped_count=actual_dropped,
+                replaced_count=actual_replaced,
+                injected_count=actual_injected,
+                rules_applied=tuple(rules_applied),
+                decisions=tuple(ledger.decisions),
+                unresolved_conflicts=(),
+                produced_atoms=tuple(ledger.produced_atoms),
+                nudity_constraint=self._active_nudity_constraint,
             )
 
-        self.last_report = report
-        return current_atoms, tuple(rules_applied), report
+            # 4. 只读最终零硬冲突检测 (detect_hard_conflicts)
+            residual_conflicts, has_protected = self.detect_hard_conflicts(current_atoms)
+            if residual_conflicts:
+                reason = "protected_syntax_conflict" if has_protected else "unresolved_hard_conflict"
+                unres_report = replace(report, unresolved_conflicts=tuple(residual_conflicts))
+                self.last_report = unres_report
+                raise UnresolvedConflictError(
+                    reason=reason,
+                    unresolved_conflicts=tuple(residual_conflicts),
+                    report=unres_report,
+                )
+
+            self.last_report = report
+            return current_atoms, tuple(rules_applied), report
+        finally:
+            self._active_nudity_constraint = None
 
     def resolve_atoms_with_report(
         self,
         atoms: Sequence[PromptAtom],
         rng: Optional[Random] = None,
         context_profile: Optional[ContextProfile] = None,
+        nudity_constraint: Optional[NudityConstraint] = None,
     ) -> Tuple[List[PromptAtom], Tuple[str, ...]]:
         """向后兼容接口：执行消解并返回 (resolved_atoms, rules_applied)。"""
-        resolved, rules_applied, _ = self.resolve_atoms_with_full_report(atoms, rng, context_profile)
+        resolved, rules_applied, _ = self.resolve_atoms_with_full_report(
+            atoms, rng, context_profile, nudity_constraint=nudity_constraint
+        )
         return resolved, rules_applied
 
     def resolve_atoms(
@@ -2368,9 +2387,12 @@ class ConflictResolver:
         atoms: Sequence[PromptAtom],
         rng: Optional[Random] = None,
         context_profile: Optional[ContextProfile] = None,
+        nudity_constraint: Optional[NudityConstraint] = None,
     ) -> List[PromptAtom]:
         """向后兼容接口：执行消解并返回 resolved_atoms 列表。"""
-        resolved, _ = self.resolve_atoms_with_report(atoms, rng, context_profile)
+        resolved, _ = self.resolve_atoms_with_report(
+            atoms, rng, context_profile, nudity_constraint=nudity_constraint
+        )
         return resolved
 
     def resolve_fragments(
@@ -2720,7 +2742,7 @@ class ConflictResolver:
         }
         _nude_fact_atoms = index.get_active_by_fact("coverage_level", "L6")
 
-        # 1. 裸露等级决定允许的最大服装穿着
+        # 1. 裸露等级决定允许的最大服装穿着 (优先消费内部 NudityConstraint 对象，外部覆盖始终优先)
         nudity_atoms = index.get_active_by_slot("nudity")
         detected_nudity: List[Tuple[str, PromptAtom]] = []
 
@@ -2730,19 +2752,28 @@ class ConflictResolver:
             self._validate_formal_atom(a, rule_item.id)
             matched_lvl = None
             if is_formal_atom(a) or is_external_atom(a):
-                raw_id = (((a.provenance.item_id if a.provenance else "") or "") + " " + (a.source_item_id or "") + " " + ((a.origin.selected_id if a.origin else "") or "")).upper()
-                for lvl in ("L6", "L5", "L4", "L3", "L2", "L1"):
-                    if lvl in raw_id:
-                        matched_lvl = lvl
-                        break
+                if a.facts and len(a.facts.allowed_nudity_levels) == 1:
+                    matched_lvl = a.facts.allowed_nudity_levels[0]
+                if not matched_lvl:
+                    raw_id = (((a.provenance.item_id if a.provenance else "") or "") + " " + (a.source_item_id or "") + " " + ((a.origin.selected_id if a.origin else "") or "")).upper()
+                    for lvl in ("L6", "L5", "L4", "L3", "L2", "L1"):
+                        if lvl in raw_id:
+                            matched_lvl = lvl
+                            break
                 if not matched_lvl and a.facts:
-                    if "full_body" in a.facts.visible_regions:
+                    if "full_nude" in a.facts.exposed_regions or (
+                        "full_body" in a.facts.visible_regions
+                        and "none" not in a.facts.exposed_regions
+                        and not any(lvl in ("L1", "L2", "L3") for lvl in a.facts.allowed_nudity_levels)
+                    ):
+                        matched_lvl = "L5"
+                    elif any(r in a.facts.exposed_regions for r in ("genitals", "anus", "buttocks")):
                         matched_lvl = "L5"
                     elif any(r in a.facts.visible_regions for r in ("crotch", "buttocks")):
                         matched_lvl = "L5"
-                    elif any(r in a.facts.visible_regions for r in ("breasts", "topless")):
+                    elif "breasts" in a.facts.exposed_regions or any(r in a.facts.visible_regions for r in ("breasts", "topless")):
                         matched_lvl = "L4"
-                    elif any(r in a.facts.visible_regions for r in ("cleavage", "midriff")):
+                    elif any(r in a.facts.exposed_regions for r in ("cleavage", "midriff")) or any(r in a.facts.visible_regions for r in ("cleavage", "midriff")):
                         matched_lvl = "L2"
             elif tf.enabled:
                 for lvl, ps in active_lvl_specs.items():
@@ -2752,13 +2783,43 @@ class ConflictResolver:
             if matched_lvl:
                 detected_nudity.append((matched_lvl, a))
 
-        if detected_nudity:
+        constraint = self._active_nudity_constraint
+        dominant_lvl: Optional[str] = None
+        nudity_winner: Optional[PromptAtom] = None
+
+        ext_detected = [(lvl, a) for (lvl, a) in detected_nudity if is_external_atom(a)]
+        if ext_detected:
+            ext_detected.sort(key=lambda x: (x[1].tag_order, x[1].span_order))
+            dominant_lvl, nudity_winner = ext_detected[0]
+            if constraint is not None and constraint.effective_level and constraint.effective_level != dominant_lvl:
+                self._active_nudity_constraint = replace(
+                    constraint,
+                    effective_level=dominant_lvl,
+                    source="external_override",
+                    selected_branch=None,
+                    yielded_to_override=True,
+                    yield_reason="external_nudity_override",
+                )
+        elif (
+            constraint is not None
+            and constraint.effective_level
+            and constraint.source in ("ui_explicit", "ui_random", "external_override", "derived_override")
+            and (detected_nudity or constraint.source == "ui_explicit")
+        ):
+            dominant_lvl = constraint.effective_level
+            if detected_nudity:
+                detected_nudity.sort(key=lambda x: (x[1].tag_order, x[1].span_order))
+                nudity_winner = detected_nudity[0][1]
+        elif detected_nudity:
             detected_nudity.sort(key=lambda x: (x[1].tag_order, x[1].span_order))
             dominant_lvl, nudity_winner = detected_nudity[0]
 
+        if dominant_lvl:
+            winner_atom_id = nudity_winner.atom_id if nudity_winner is not None else None
+            winner_ids = (winner_atom_id,) if winner_atom_id is not None else ()
             candidates = [
                 a for a in index.get_all_active_ordered()
-                if a.source_slot != "nudity" and a.atom_id != nudity_winner.atom_id
+                if a.source_slot != "nudity" and a.atom_id != winner_atom_id
             ]
 
             for a in candidates:
@@ -2840,6 +2901,13 @@ class ConflictResolver:
                                     (a.atom_id,),
                                     n_atom,
                                 )
+                        if self._active_nudity_constraint is not None:
+                            self._active_nudity_constraint = replace(
+                                self._active_nudity_constraint,
+                                source="derived_override",
+                                yielded_to_override=True,
+                                yield_reason="external_clothing_override",
+                            )
                         continue
                     if not a.can_delete_atom:
                         continue
@@ -2849,6 +2917,7 @@ class ConflictResolver:
                     is_underwear = (
                         "underwear" in a.source_slot
                         or (a.facts and any(t in a.facts.garment_topologies for t in ("underwear", "panties", "bra", "bikini", "lingerie")))
+                        or (a.facts and a.facts.piece_role == "underwear")
                         or bool(underwear_pattern.search((a.source_item_id or "").lower().replace("_", " ")))
                         or bool(underwear_pattern.search(((a.provenance.item_id if a.provenance else "") or "").lower().replace("_", " ")))
                     )
@@ -2858,7 +2927,7 @@ class ConflictResolver:
                         rule_item.id,
                         rule_item.phase,
                         rc,
-                        (nudity_winner.atom_id,),
+                        winner_ids,
                         a,
                     )
 
@@ -2872,8 +2941,7 @@ class ConflictResolver:
                     if not a.can_detect or not index.is_active(a):
                         continue
                     if is_formal_atom(a) or is_external_atom(a):
-                        is_nude_slot = a.source_slot == "nudity" or (a.origin and a.origin.selector == "nudity") or (a.provenance and a.provenance.kind == "nudity")
-                        if a.facts and (any(r in a.facts.visible_regions for r in ("crotch", "breasts", "buttocks", "pubic")) or ("full_body" in a.facts.visible_regions and is_nude_slot)):
+                        if self._is_formal_section2_nudity_trigger(a):
                             trig_atoms.append(a)
                     elif tf.enabled:
                         if any(t.matches(a.text) for t in triggers):
@@ -2927,6 +2995,31 @@ class ConflictResolver:
                             )
 
         return index.get_all_active_ordered()
+
+    def _is_formal_section2_nudity_trigger(self, a: PromptAtom) -> bool:
+        """判断形式化原子是否触发裸露全衣禁令（严格区分穿着衣物、L1-L4 与 L5/L6 全裸）。"""
+        if not a.facts:
+            return False
+        if a.facts.piece_role in ("top", "bottom", "one_piece", "ensemble", "outerwear", "legwear", "footwear", "underwear"):
+            return False
+        exp = a.facts.exposed_regions
+        alvl = a.facts.allowed_nudity_levels
+        if exp or alvl:
+            if "none" in exp:
+                return False
+            if alvl and all(lvl in ("L1", "L2", "L3", "L4") for lvl in alvl):
+                return False
+            if any(lvl in ("L5", "L6") for lvl in alvl):
+                return True
+            return any(r in ("full_nude", "genitals", "anus") for r in exp)
+        is_nude_slot = (
+            a.source_slot == "nudity"
+            or (a.origin and a.origin.selector == "nudity")
+            or (a.provenance and a.provenance.kind == "nudity")
+        )
+        return any(r in a.facts.visible_regions for r in ("crotch", "breasts", "buttocks", "pubic")) or (
+            "full_body" in a.facts.visible_regions and is_nude_slot
+        )
 
     # ─── 规则 3: framing_lower_body_coherence (anchors, 120) ───
 
@@ -4803,14 +4896,7 @@ class ConflictResolver:
             c_ban = select_fallback_patterns(r2_tf, role="banned", group_id=gid)
             trig_atoms = [
                 a for a in detectable
-                if (
-                    is_formal_atom(a)
-                    and a.facts
-                    and (
-                        any(r in a.facts.visible_regions for r in ("crotch", "breasts", "buttocks", "pubic"))
-                        or ("full_body" in a.facts.visible_regions and (a.source_slot == "nudity" or (a.origin and a.origin.selector == "nudity") or (a.provenance and a.provenance.kind == "nudity")))
-                    )
-                )
+                if (is_formal_atom(a) and self._is_formal_section2_nudity_trigger(a))
                 or (not is_formal_atom(a) and any(t.matches(a.text) for t in c_trig))
             ]
             ban_atoms = [

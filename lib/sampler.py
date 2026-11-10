@@ -41,6 +41,7 @@ if __package__:
     from .models import (
         ClothingSampleResult,
         ContextProfile,
+        NudityConstraint,
         PromptAtom,
         SampleResult,
         SampledTag,
@@ -48,6 +49,8 @@ if __package__:
         SpanType,
         TagProvenance,
         ThemeSampleResult,
+        VALID_NUDITY_LEVELS,
+        normalize_nudity_level_code,
     )
 else:
     from lib.conflict_resolver import (
@@ -72,6 +75,7 @@ else:
     from lib.models import (
         ClothingSampleResult,
         ContextProfile,
+        NudityConstraint,
         PromptAtom,
         SampleResult,
         SampledTag,
@@ -79,6 +83,8 @@ else:
         SpanType,
         TagProvenance,
         ThemeSampleResult,
+        VALID_NUDITY_LEVELS,
+        normalize_nudity_level_code,
     )
 
 
@@ -1791,6 +1797,86 @@ class DataSampler:
         """返回 (采样tags, 标准等级代码比如L1/L2/L3/L4/L5/L6)"""
         res, lvl_code = self.sample_nudity_result(level, rng)
         return (list(res.tags) if res else [], lvl_code)
+
+    def _resolve_explicit_nudity_level_code(self, level: str | int) -> str:
+        data = self._load("nudity_levels")
+        levels = data.get("nudity_levels", [])
+        if not levels:
+            return "L3"
+        lvl = _match_item(levels, str(level), "nudity_levels")
+        if not lvl:
+            mapped = normalize_nudity_level_code(level)
+            if mapped in VALID_NUDITY_LEVELS:
+                lvl = next((item for item in levels if item.get("level") == mapped), None)
+        if not lvl:
+            raise DataSelectionError(f"Unknown nudity level: {level!r}")
+        for code in VALID_NUDITY_LEVELS:
+            if code in str(lvl.get("level", "")) or code in str(lvl.get("name_zh", "")):
+                return code
+        return "L3"
+
+    def resolve_nudity_constraint(
+        self,
+        level: str | int,
+        rng: Random,
+        has_preset: bool = False,
+        external_overrides: Optional[Dict[str, Any]] = None,
+    ) -> Tuple[Optional[SampleResult], NudityConstraint]:
+        """
+        解析统一裸露等级约束对象 (NudityConstraint)，并按需执行裸露标签采样。
+        - has_preset=False: 显式/随机/None 均记录 requested/effective/source 并返回采样结果；
+        - has_preset=True: 若 UI 显式选择 L1-L6 则记录 ui_explicit，若为随机则记录 preset_native；
+          若 UI 为 None 则记录 ui_none。预设标签自身的等级过滤与采样在 M3 阶段打通。
+        - external_overrides['nudity'] 若直接携带可识别等级编码，记录 external_override 与让位说明；
+          其余外部自由文本覆盖在冲突消解阶段由 ConflictResolver 判定并回填让位标记。
+        """
+        raw_val = None if level is None else str(level)
+        res: Optional[SampleResult] = None
+        yielded = False
+        yield_reason: Optional[str] = None
+
+        if _is_none(level):
+            requested_level = "none"
+            effective_level: Optional[str] = None
+            source = "ui_none"
+        elif _is_random(level):
+            requested_level = "random"
+            if has_preset:
+                effective_level = None
+                source = "preset_native"
+            else:
+                res, lvl_code = self.sample_nudity_result(level, rng)
+                effective_level = lvl_code
+                source = "ui_random"
+        else:
+            if has_preset:
+                lvl_code = self._resolve_explicit_nudity_level_code(level)
+            else:
+                res, lvl_code = self.sample_nudity_result(level, rng)
+            requested_level = lvl_code
+            effective_level = lvl_code
+            source = "ui_explicit"
+
+        ext_nudity = external_overrides.get("nudity") if isinstance(external_overrides, dict) else None
+        if isinstance(ext_nudity, str) and ext_nudity.strip():
+            ext_code = normalize_nudity_level_code(ext_nudity)
+            if ext_code in VALID_NUDITY_LEVELS:
+                if (effective_level is not None and effective_level != ext_code) or requested_level == "none":
+                    yielded = True
+                    yield_reason = "external_nudity_override"
+                effective_level = ext_code
+                source = "external_override"
+
+        constraint = NudityConstraint(
+            requested_level=requested_level,
+            effective_level=effective_level,
+            source=source,
+            selected_branch=None,
+            yielded_to_override=yielded,
+            yield_reason=yield_reason,
+            raw_requested_value=raw_val,
+        )
+        return res, constraint
 
     # ─── 槽位 4: 服装款式与穿脱状态 ───
 

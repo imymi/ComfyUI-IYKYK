@@ -46,7 +46,18 @@
           "facts": {
             "semantic_role": "selector",
             "makeup_base": "clean",
-            "makeup_effects": []
+            "makeup_effects": [],
+            "exposed_regions": [
+              "none"
+            ],
+            "allowed_nudity_levels": [
+              "L1",
+              "L2",
+              "L3",
+              "L4",
+              "L5",
+              "L6"
+            ]
           }
         },
         {
@@ -64,7 +75,18 @@
           "facts": {
             "semantic_role": "selector",
             "makeup_base": "natural",
-            "makeup_effects": []
+            "makeup_effects": [],
+            "exposed_regions": [
+              "none"
+            ],
+            "allowed_nudity_levels": [
+              "L1",
+              "L2",
+              "L3",
+              "L4",
+              "L5",
+              "L6"
+            ]
           }
         }
       ]
@@ -835,7 +857,18 @@
           "facts": {
             "semantic_role": "selector",
             "makeup_base": "natural",
-            "makeup_effects": []
+            "makeup_effects": [],
+            "exposed_regions": [
+              "none"
+            ],
+            "allowed_nudity_levels": [
+              "L1",
+              "L2",
+              "L3",
+              "L4",
+              "L5",
+              "L6"
+            ]
           }
         },
         {
@@ -983,7 +1016,18 @@
           "facts": {
             "semantic_role": "selector",
             "makeup_base": "full",
-            "makeup_effects": []
+            "makeup_effects": [],
+            "exposed_regions": [
+              "none"
+            ],
+            "allowed_nudity_levels": [
+              "L1",
+              "L2",
+              "L3",
+              "L4",
+              "L5",
+              "L6"
+            ]
           }
         },
         {

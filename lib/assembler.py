@@ -30,6 +30,7 @@ if __package__:
         AssemblyResult,
         BudgetFilterRecord,
         ContextProfile,
+        NudityConstraint,
         OverrideRecord,
         PromptAtom,
         PromptFragment,
@@ -53,6 +54,7 @@ else:
         AssemblyResult,
         BudgetFilterRecord,
         ContextProfile,
+        NudityConstraint,
         OverrideRecord,
         PromptAtom,
         PromptFragment,
@@ -400,6 +402,7 @@ def assemble_result(
     resolver: Optional[ConflictResolver] = None,
     context_profile: Optional[ContextProfile] = None,
     overrides: Sequence[OverrideRecord] = (),
+    nudity_constraint: Optional[NudityConstraint] = None,
 ) -> AssemblyResult:
     """核心统一入口：执行原子化、冲突消解、去重与截断，返回强类型不可变 AssemblyResult。"""
     if isinstance(max_words, bool) or not isinstance(max_words, int) or max_words < 0:
@@ -508,7 +511,7 @@ def assemble_result(
         resolver = _RESOLVER_CACHE[cache_key]
     try:
         resolved_atoms, rules_applied, resolution_report = resolver.resolve_atoms_with_full_report(
-            raw_atoms, rng, context_profile
+            raw_atoms, rng, context_profile, nudity_constraint=nudity_constraint
         )
     except (UnresolvedConflictError, PromptValidationError) as e:
         e.overrides = tuple(overrides) if overrides else build_default_canonical_override_records()
@@ -594,6 +597,7 @@ def assemble_result(
             f"Rendered prompt word count {final_words} exceeds maximum allowed budget {max_words}"
         )
 
+    effective_nc = resolution_report.nudity_constraint if (resolution_report and resolution_report.nudity_constraint is not None) else nudity_constraint
     return AssemblyResult(
         prompt=sanitized,
         accepted_atoms=tuple(accepted_atoms),
@@ -606,6 +610,7 @@ def assemble_result(
         deduplication_records=tuple(dedup_records),
         budget_filter_records=tuple(budget_filter_records),
         overrides=tuple(overrides) if overrides else build_default_canonical_override_records(),
+        nudity_constraint=effective_nc,
     )
 
 
@@ -1092,6 +1097,7 @@ class PromptAssembler:
         context_profile: Optional[ContextProfile] = None,
         external_overrides: Optional[Dict[str, Any]] = None,
         entry_point: str = "generator",
+        nudity_constraint: Optional[NudityConstraint] = None,
     ) -> AssemblyResult:
         """从各槽位片段字典执行装配，返回强类型 AssemblyResult。"""
         override_records: Tuple[OverrideRecord, ...] = ()
@@ -1115,6 +1121,7 @@ class PromptAssembler:
             resolver=self.resolver,
             context_profile=context_profile,
             overrides=override_records,
+            nudity_constraint=nudity_constraint,
         )
 
     def assemble_result_with_sources(
@@ -1184,6 +1191,7 @@ class PromptAssembler:
         recipe_raw_value: Optional[str] = None,
         extra_fragments: Sequence[PromptFragment] = (),
         external_overrides: Optional[Dict[str, Any]] = None,
+        nudity_constraint: Optional[NudityConstraint] = None,
     ) -> AssemblyResult:
         """预设模板与风格配方统一装配接口，返回包含 source_atoms 的不可变 AssemblyResult。"""
         if rng is None:
@@ -1510,7 +1518,7 @@ class PromptAssembler:
         else:
             override_records = build_default_canonical_override_records()
 
-        return assemble_result(
+        res = assemble_result(
             fragments,
             self.data_dir,
             rng,
@@ -1518,6 +1526,9 @@ class PromptAssembler:
             resolver=self.resolver,
             overrides=override_records,
         )
+        if nudity_constraint is not None and res.nudity_constraint is None:
+            return replace(res, nudity_constraint=nudity_constraint)
+        return res
 
     def assemble_preset_result(
         self,

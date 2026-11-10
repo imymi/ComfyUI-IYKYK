@@ -2361,6 +2361,14 @@
             "venue_ids": [],
             "visible_regions": [
               "intimate_lower_body"
+            ],
+            "exposed_regions": [
+              "full_nude"
+            ],
+            "allowed_nudity_levels": [
+              "L4",
+              "L5",
+              "L6"
             ]
           }
         }
@@ -3862,7 +3870,15 @@
           "facts": {
             "semantic_role": "selector",
             "space_kind": "outdoor",
-            "venue_ids": []
+            "venue_ids": [],
+            "exposed_regions": [
+              "full_nude"
+            ],
+            "allowed_nudity_levels": [
+              "L4",
+              "L5",
+              "L6"
+            ]
           }
         },
         {
@@ -3871,7 +3887,17 @@
           "facts": {
             "semantic_role": "selector",
             "space_kind": "outdoor",
-            "venue_ids": []
+            "venue_ids": [],
+            "exposed_regions": [
+              "breasts",
+              "genitals"
+            ],
+            "allowed_nudity_levels": [
+              "L3",
+              "L4",
+              "L5",
+              "L6"
+            ]
           }
         },
         {
@@ -3880,7 +3906,17 @@
           "facts": {
             "semantic_role": "selector",
             "space_kind": "outdoor",
-            "venue_ids": []
+            "venue_ids": [],
+            "exposed_regions": [
+              "breasts",
+              "genitals"
+            ],
+            "allowed_nudity_levels": [
+              "L3",
+              "L4",
+              "L5",
+              "L6"
+            ]
           }
         },
         {
@@ -4053,7 +4089,16 @@
             "space_kind": "outdoor",
             "venue_ids": [],
             "visible_regions": [
+              "lower_body",
               "intimate_lower_body"
+            ],
+            "exposed_regions": [
+              "thigh_leg",
+              "underwear_panties"
+            ],
+            "allowed_nudity_levels": [
+              "L3",
+              "L4"
             ]
           }
         },
@@ -5337,6 +5382,15 @@
             "venue_ids": [],
             "visible_regions": [
               "upper_body"
+            ],
+            "exposed_regions": [
+              "breasts"
+            ],
+            "allowed_nudity_levels": [
+              "L3",
+              "L4",
+              "L5",
+              "L6"
             ]
           }
         },
@@ -5346,7 +5400,17 @@
           "facts": {
             "semantic_role": "selector",
             "space_kind": null,
-            "venue_ids": []
+            "venue_ids": [],
+            "visible_regions": [
+              "intimate_lower_body"
+            ],
+            "exposed_regions": [
+              "genitals"
+            ],
+            "allowed_nudity_levels": [
+              "L5",
+              "L6"
+            ]
           }
         },
         {
@@ -5421,6 +5485,15 @@
             "venue_ids": [],
             "visible_regions": [
               "upper_body"
+            ],
+            "exposed_regions": [
+              "breasts"
+            ],
+            "allowed_nudity_levels": [
+              "L3",
+              "L4",
+              "L5",
+              "L6"
             ]
           }
         },
@@ -5715,6 +5788,14 @@
             "venue_ids": [],
             "visible_regions": [
               "intimate_lower_body"
+            ],
+            "exposed_regions": [
+              "full_nude"
+            ],
+            "allowed_nudity_levels": [
+              "L4",
+              "L5",
+              "L6"
             ]
           }
         },
@@ -5727,6 +5808,14 @@
             "venue_ids": [],
             "visible_regions": [
               "intimate_lower_body"
+            ],
+            "exposed_regions": [
+              "full_nude"
+            ],
+            "allowed_nudity_levels": [
+              "L4",
+              "L5",
+              "L6"
             ]
           }
         },
@@ -5748,6 +5837,14 @@
             "venue_ids": [],
             "visible_regions": [
               "intimate_lower_body"
+            ],
+            "exposed_regions": [
+              "full_nude"
+            ],
+            "allowed_nudity_levels": [
+              "L4",
+              "L5",
+              "L6"
             ]
           }
         },

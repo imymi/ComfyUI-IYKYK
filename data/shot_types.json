@@ -448,6 +448,12 @@
             "semantic_role": "selector",
             "visible_regions": [
               "face"
+            ],
+            "allowed_nudity_levels": [
+              "L3",
+              "L4",
+              "L5",
+              "L6"
             ]
           }
         },
@@ -458,6 +464,16 @@
             "semantic_role": "selector",
             "visible_regions": [
               "upper_body"
+            ],
+            "exposed_regions": [
+              "breasts",
+              "cleavage"
+            ],
+            "allowed_nudity_levels": [
+              "L2",
+              "L3",
+              "L4",
+              "L5"
             ]
           }
         },
@@ -467,7 +483,16 @@
           "facts": {
             "semantic_role": "selector",
             "visible_regions": [
-              "upper_body"
+              "lower_body",
+              "intimate_lower_body"
+            ],
+            "exposed_regions": [
+              "genitals",
+              "thigh_leg"
+            ],
+            "allowed_nudity_levels": [
+              "L5",
+              "L6"
             ]
           }
         },
@@ -478,6 +503,13 @@
             "semantic_role": "selector",
             "visible_regions": [
               "face"
+            ],
+            "allowed_nudity_levels": [
+              "L2",
+              "L3",
+              "L4",
+              "L5",
+              "L6"
             ]
           }
         },
@@ -494,7 +526,14 @@
               "mood": "intimate",
               "dimension": "shot_size_framing"
             },
-            "governance_metadata": {}
+            "governance_metadata": {},
+            "allowed_nudity_levels": [
+              "L2",
+              "L3",
+              "L4",
+              "L5",
+              "L6"
+            ]
           }
         },
         {
@@ -509,7 +548,14 @@
               "mood": "intimate",
               "dimension": "shot_size_framing"
             },
-            "governance_metadata": {}
+            "governance_metadata": {},
+            "allowed_nudity_levels": [
+              "L2",
+              "L3",
+              "L4",
+              "L5",
+              "L6"
+            ]
           }
         },
         {
@@ -521,7 +567,14 @@
               "distance": "proximity",
               "dimension": "shot_size_framing"
             },
-            "governance_metadata": {}
+            "governance_metadata": {},
+            "allowed_nudity_levels": [
+              "L2",
+              "L3",
+              "L4",
+              "L5",
+              "L6"
+            ]
           }
         },
         {
@@ -533,7 +586,17 @@
               "focus": "lower_body",
               "dimension": "shot_size_framing"
             },
-            "governance_metadata": {}
+            "governance_metadata": {},
+            "visible_regions": [
+              "lower_body"
+            ],
+            "allowed_nudity_levels": [
+              "L2",
+              "L3",
+              "L4",
+              "L5",
+              "L6"
+            ]
           }
         },
         {
@@ -545,7 +608,13 @@
               "dimension": "shot_size_framing",
               "reveal": "partial"
             },
-            "governance_metadata": {}
+            "governance_metadata": {},
+            "allowed_nudity_levels": [
+              "L2",
+              "L3",
+              "L4",
+              "L5"
+            ]
           }
         },
         {
@@ -560,7 +629,14 @@
               "mood": "suggestive",
               "dimension": "shot_size_framing"
             },
-            "governance_metadata": {}
+            "governance_metadata": {},
+            "allowed_nudity_levels": [
+              "L2",
+              "L3",
+              "L4",
+              "L5",
+              "L6"
+            ]
           }
         }
       ]
@@ -1349,7 +1425,17 @@
           "facts": {
             "semantic_role": "selector",
             "visible_regions": [
-              "upper_body"
+              "lower_body"
+            ],
+            "exposed_regions": [
+              "thigh_leg"
+            ],
+            "allowed_nudity_levels": [
+              "L2",
+              "L3",
+              "L4",
+              "L5",
+              "L6"
             ]
           }
         },
@@ -1359,7 +1445,17 @@
           "facts": {
             "semantic_role": "selector",
             "visible_regions": [
-              "upper_body"
+              "lower_body",
+              "intimate_lower_body"
+            ],
+            "exposed_regions": [
+              "thigh_leg",
+              "underwear_panties"
+            ],
+            "allowed_nudity_levels": [
+              "L2",
+              "L3",
+              "L4"
             ]
           }
         },
@@ -1369,7 +1465,15 @@
           "facts": {
             "semantic_role": "selector",
             "visible_regions": [
-              "upper_body"
+              "lower_body"
+            ],
+            "allowed_nudity_levels": [
+              "L1",
+              "L2",
+              "L3",
+              "L4",
+              "L5",
+              "L6"
             ]
           }
         },
@@ -1379,7 +1483,15 @@
           "facts": {
             "semantic_role": "selector",
             "visible_regions": [
-              "upper_body"
+              "lower_body",
+              "intimate_lower_body"
+            ],
+            "exposed_regions": [
+              "genitals"
+            ],
+            "allowed_nudity_levels": [
+              "L5",
+              "L6"
             ]
           }
         }

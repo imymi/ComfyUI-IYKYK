@@ -122,18 +122,19 @@ class TestV121M0Reproductions(unittest.TestCase):
 
         res_l4, c_l4 = self._run_generator_case("REP-NUDITY-02")
         self.assertEqual([a.text for a in res_l4.atoms if a.source_slot == "nudity"], c_l4["baseline_actual"]["nudity_texts"])
-        self.assertEqual([a.text for a in res_l4.atoms if a.source_slot == "clothing"], c_l4["baseline_actual"]["clothing_texts"])
-        # 验证真实决策链：原始连衣裙已被删除，随后 material_penetration 改写产生新连衣裙文本并沿用 underwear 事实
+        # M1 已清理 linkage L4 general_tags 的伪造 underwear/wet_clinging 事实：
+        # 原始连衣裙仍被 drop，不再触发 material_penetration 误改写为 wet dress；
+        # 剩余 L4 局部遮挡分支与 sfw_exposure 扩展冲突留待 M2/M3 统一消解。
         decisions = res_l4.resolution_report.decisions
         drop_step, replace_step = c_l4["baseline_actual"]["resolution_chain"]
         dropped_texts = [d.before_text for d in decisions if d.rule_id == drop_step["rule_id"] and d.action == drop_step["action"]]
         self.assertEqual(dropped_texts, drop_step["dropped_texts"])
         replaced_decisions = [d for d in decisions if d.rule_id == replace_step["rule_id"] and d.action == replace_step["action"]]
-        self.assertEqual([d.before_text for d in replaced_decisions], replace_step["replaced_texts"])
-        self.assertTrue(all(d.after_text == replace_step["produced_text"] for d in replaced_decisions))
-        rewritten_dress = [a for a in res_l4.atoms if a.text == replace_step["produced_text"]]
-        self.assertTrue(rewritten_dress)
-        self.assertEqual(list(rewritten_dress[0].facts.garment_topologies), replace_step["stale_garment_topologies"])
+        self.assertEqual(replaced_decisions, [])
+        l4_clothing_texts = [a.text for a in res_l4.atoms if a.source_slot == "clothing"]
+        self.assertNotIn(replace_step["produced_text"], l4_clothing_texts)
+        self.assertIn("topless", l4_clothing_texts)
+        self.assertIn("bare breasts exposed", l4_clothing_texts)
 
         res_l6, c_l6 = self._run_generator_case("REP-NUDITY-03")
         self.assertEqual([a.text for a in res_l6.atoms if a.source_slot == "nudity"], c_l6["baseline_actual"]["nudity_texts"])

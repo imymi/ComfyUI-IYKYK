@@ -30,7 +30,15 @@ sys.path.insert(0, str(REPO_DIR))
 
 from lib.context_affinity import ContextAffinityRegistry
 from lib.lexer import split_top_level_tags
-from lib.models import CANONICAL_RECIPE_SELECTORS, SelectionOrigin, SemanticFacts
+from lib.models import (
+    CANONICAL_RECIPE_SELECTORS,
+    NUDITY_BRANCHES_BY_LEVEL,
+    SelectionOrigin,
+    SemanticFacts,
+    VALID_COVERAGE_DELTAS,
+    VALID_NUDITY_LEVELS,
+    VALID_PIECE_ROLES,
+)
 from lib.rule_contract import validate_rule_document
 from lib.runtime_manifest import RUNTIME_DATA_FILES
 
@@ -570,6 +578,98 @@ def validate_all(
             result.errors.append(f"[ERROR] context_affinity.json: {e}")
     else:
         result.errors.append("[ERROR] context_affinity.json: File not found in data directory")
+
+    # 11. v1.2.1 M1 结构化服装/裸露事实完备性与文本-事实一致性校验
+    nudity_doc = data_cache.get("nudity_levels.json")
+    if isinstance(nudity_doc, dict):
+        for item in nudity_doc.get("nudity_levels", []):
+            lvl = item.get("level")
+            if lvl not in VALID_NUDITY_LEVELS:
+                result.errors.append(f"[ERROR] nudity_levels.json [{item.get('id')}]: invalid level {lvl!r}")
+                continue
+            valid_branches_for_lvl = set(NUDITY_BRANCHES_BY_LEVEL.get(lvl, ()))
+            for t in item.get("tags", []):
+                if not isinstance(t, dict):
+                    continue
+                tid = t.get("id", "<unknown>")
+                fcts = t.get("facts", {})
+                if not fcts.get("exposed_regions"):
+                    result.errors.append(f"[ERROR] nudity_levels.json [{tid}]: missing non-empty exposed_regions")
+                elif lvl == "L1" and fcts.get("exposed_regions") != ["none"]:
+                    result.errors.append(f"[ERROR] nudity_levels.json [{tid}]: L1 tag must have exposed_regions=['none'], got {fcts.get('exposed_regions')!r}")
+                alvl = fcts.get("allowed_nudity_levels")
+                if not alvl or lvl not in alvl:
+                    result.errors.append(f"[ERROR] nudity_levels.json [{tid}]: allowed_nudity_levels {alvl!r} must include {lvl!r}")
+                branches = fcts.get("nudity_branches")
+                if not branches:
+                    result.errors.append(f"[ERROR] nudity_levels.json [{tid}]: missing non-empty nudity_branches")
+                else:
+                    for br in branches:
+                        if br not in valid_branches_for_lvl:
+                            result.errors.append(f"[ERROR] nudity_levels.json [{tid}]: nudity_branch {br!r} incompatible with level {lvl!r}")
+
+    if isinstance(clothing_data, dict):
+        wearable_roles = {"top", "bottom", "one_piece", "ensemble", "outerwear", "legwear", "footwear", "underwear"}
+        for cat in clothing_data.get("categories", []):
+            cid = cat.get("id", "")
+            for t in cat.get("tags", []):
+                if not isinstance(t, dict):
+                    continue
+                tid = t.get("id", "<unknown>")
+                fcts = t.get("facts", {})
+                pr = fcts.get("piece_role")
+                cr = fcts.get("covered_regions")
+                if not pr or pr not in VALID_PIECE_ROLES:
+                    result.errors.append(f"[ERROR] clothing.json [{cid}:{tid}]: missing or invalid piece_role {pr!r}")
+                if not isinstance(cr, list):
+                    result.errors.append(f"[ERROR] clothing.json [{cid}:{tid}]: covered_regions must be list, got {cr!r}")
+                elif pr in wearable_roles and (not cr or cr == ["none"]):
+                    result.errors.append(f"[ERROR] clothing.json [{cid}:{tid}]: wearable piece_role={pr!r} requires non-empty covered_regions")
+
+        for state_item in clothing_data.get("clothing_states", []):
+            sid = state_item.get("id", "")
+            if sid == "auto_link":
+                continue
+            for t in state_item.get("tags", []):
+                if not isinstance(t, dict):
+                    continue
+                tid = t.get("id", "<unknown>")
+                fcts = t.get("facts", {})
+                cd = fcts.get("coverage_delta")
+                if not cd or cd not in VALID_COVERAGE_DELTAS:
+                    result.errors.append(f"[ERROR] clothing.json [clothing_states:{tid}]: missing or invalid coverage_delta {cd!r}")
+                if not fcts.get("allowed_nudity_levels"):
+                    result.errors.append(f"[ERROR] clothing.json [clothing_states:{tid}]: missing allowed_nudity_levels")
+
+        for t in clothing_data.get("sfw_exposure_tiers", []) + clothing_data.get("cloth_transparency_tiers", []):
+            if not isinstance(t, dict):
+                continue
+            for leaf in t.get("tags", []):
+                if isinstance(leaf, dict):
+                    tid = leaf.get("id", "<unknown>")
+                    fcts = leaf.get("facts", {})
+                    if not fcts.get("coverage_delta") or not fcts.get("allowed_nudity_levels"):
+                        result.errors.append(f"[ERROR] clothing.json [ext:{tid}]: missing coverage_delta or allowed_nudity_levels")
+
+        for ling_item in clothing_data.get("lingerie_wardrobe", []):
+            for leaf in ling_item.get("tags", []):
+                if isinstance(leaf, dict):
+                    tid = leaf.get("id", "<unknown>")
+                    fcts = leaf.get("facts", {})
+                    if not fcts.get("piece_role") or not fcts.get("allowed_nudity_levels"):
+                        result.errors.append(f"[ERROR] clothing.json [lingerie_wardrobe:{tid}]: missing piece_role or allowed_nudity_levels")
+
+        linkage = clothing_data.get("clothing_nudity_linkage", {})
+        for leaf in linkage.get("L4", {}).get("general_tags", []):
+            if isinstance(leaf, dict):
+                fcts = leaf.get("facts", {})
+                if "wet_clinging" in fcts.get("garment_states", []):
+                    result.errors.append(f"[ERROR] clothing.json [{leaf.get('id')}]: L4 general_tag must not declare bogus wet_clinging")
+        for leaf in linkage.get("L5", {}).get("general_tags", []):
+            if isinstance(leaf, dict):
+                fcts = leaf.get("facts", {})
+                if "torn" in fcts.get("garment_states", []):
+                    result.errors.append(f"[ERROR] clothing.json [{leaf.get('id')}]: L5 general_tag must not declare bogus torn state")
 
     return result
 

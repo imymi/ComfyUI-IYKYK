@@ -1467,6 +1467,133 @@
         },
         "governance_metadata": {
           "type": "object"
+        },
+        "piece_role": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "enum": [
+            "top",
+            "bottom",
+            "one_piece",
+            "ensemble",
+            "outerwear",
+            "legwear",
+            "footwear",
+            "accessory",
+            "underwear",
+            "none",
+            "unspecified",
+            null
+          ]
+        },
+        "covered_regions": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "upper_torso",
+              "lower_torso",
+              "outer_layer",
+              "intimate_upper",
+              "intimate_lower",
+              "legs",
+              "feet",
+              "none"
+            ]
+          }
+        },
+        "coverage_delta": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "enum": [
+            "none",
+            "preserve",
+            "partial_reveal",
+            "uncover_upper",
+            "uncover_lower",
+            "uncover_all",
+            "minimal_cover_only",
+            "unspecified",
+            null
+          ]
+        },
+        "exposed_regions": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "none",
+              "collarbone_neck",
+              "shoulders",
+              "arms_wrists",
+              "back",
+              "midriff",
+              "cleavage",
+              "thigh_leg",
+              "ankle_feet",
+              "underboob_sideboob",
+              "breasts",
+              "underwear_bra",
+              "underwear_panties",
+              "buttocks",
+              "genitals",
+              "anus",
+              "full_nude"
+            ]
+          }
+        },
+        "allowed_nudity_levels": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "L1",
+              "L2",
+              "L3",
+              "L4",
+              "L5",
+              "L6"
+            ]
+          }
+        },
+        "nudity_branches": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "l1_full_clothed",
+              "l2_collar_neckline",
+              "l2_shoulder_strap",
+              "l2_midriff_waist",
+              "l2_leg_slit",
+              "l2_backless",
+              "l2_sheer_hint",
+              "l2_sleeve_wrist",
+              "l3_open_shirt_breasts",
+              "l3_raised_top_breasts",
+              "l3_pulled_down_dress",
+              "l3_bra_pushed_up",
+              "l3_topless_skirt_kept",
+              "l3_topless_pants_kept",
+              "l3_bikini_top_removed",
+              "l3_panties_only",
+              "l4_panties_only",
+              "l4_bra_and_panties",
+              "l4_hosiery_footwear_only",
+              "l4_towel_sheet_wrap",
+              "l4_accessory_only",
+              "l5_full_nude_standing_or_frontal",
+              "l5_clothes_discarded_nearby",
+              "l6_frontal_genital_display",
+              "l6_rear_bent_display",
+              "l6_lying_spread_display",
+              "l6_squatting_self_touch"
+            ]
+          }
         }
       }
     }

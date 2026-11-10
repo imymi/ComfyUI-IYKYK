@@ -33,7 +33,7 @@ if __package__:
         PromptValidationError,
         UnresolvedConflictError,
     )
-    from .lib.models import GenerationResult, ORDERED_CONTEXT_IDS, PromptAtom, PromptFragment, SelectionOrigin, SemanticFacts, TagProvenance, is_external_atom
+    from .lib.models import GenerationResult, NudityConstraint, ORDERED_CONTEXT_IDS, PromptAtom, PromptFragment, SelectionOrigin, SemanticFacts, TagProvenance, VALID_NUDITY_LEVELS, is_external_atom, normalize_nudity_level_code
     from .lib.rng import derive_substream_rng, recover_effective_seed
     from .lib.sampler import DataSampler, _is_none, get_selection_mode
     from .lib.slot_contract import AUXILIARY_SLOT_ORDER, SLOT_ORDER, normalize_slot_mapping, normalize_slot_name
@@ -50,7 +50,7 @@ else:
         PromptValidationError,
         UnresolvedConflictError,
     )
-    from lib.models import GenerationResult, ORDERED_CONTEXT_IDS, PromptAtom, PromptFragment, SelectionOrigin, SemanticFacts, TagProvenance, is_external_atom
+    from lib.models import GenerationResult, NudityConstraint, ORDERED_CONTEXT_IDS, PromptAtom, PromptFragment, SelectionOrigin, SemanticFacts, TagProvenance, VALID_NUDITY_LEVELS, is_external_atom, normalize_nudity_level_code
     from lib.rng import derive_substream_rng, recover_effective_seed
     from lib.sampler import DataSampler, _is_none, get_selection_mode
     from lib.slot_contract import AUXILIARY_SLOT_ORDER, SLOT_ORDER, normalize_slot_mapping, normalize_slot_name
@@ -571,6 +571,13 @@ def _generate_structured(
         if preset:
             rng_recipe = derive_substream_rng(effective_seed, "selector:style_recipe")
             recipe = sampler.get_style_recipe(风格配方, rng_recipe) if not _is_none(风格配方) else None
+            rng_nudity = derive_substream_rng(effective_seed, "selector:nudity")
+            _, preset_nudity_constraint = sampler.resolve_nudity_constraint(
+                裸露等级,
+                rng_nudity,
+                has_preset=True,
+                external_overrides=external_overrides,
+            )
             assembly_res = assembler.assemble_preset(
                 preset,
                 recipe,
@@ -581,6 +588,7 @@ def _generate_structured(
                 preset_raw_value=预设模板,
                 recipe_raw_value=风格配方 if not _is_none(风格配方) else None,
                 external_overrides=external_overrides,
+                nudity_constraint=preset_nudity_constraint,
             )
             neg = sampler.get_negative_prompt()
             desc = f"【预设模板】{preset.get('id', '')} {preset.get('name_zh', '')}"
@@ -603,6 +611,7 @@ def _generate_structured(
                 deduplication_records=assembly_res.deduplication_records,
                 budget_filter_records=assembly_res.budget_filter_records,
                 overrides=assembly_res.overrides,
+                nudity_constraint=assembly_res.nudity_constraint,
             )
 
     # 2. 采样各槽位
@@ -652,7 +661,13 @@ def _generate_structured(
 
     # 槽位 3 & 4: 裸露等级与服装穿脱联动 (优先解析裸露等级以约束视角与服装)
     rng_nudity = derive_substream_rng(effective_seed, "selector:nudity")
-    nudity_res, lvl_code = sampler.sample_nudity_result(裸露等级, rng_nudity)
+    nudity_res, nudity_constraint = sampler.resolve_nudity_constraint(
+        裸露等级,
+        rng_nudity,
+        has_preset=False,
+        external_overrides=external_overrides,
+    )
+    lvl_code = nudity_constraint.effective_level or "L1"
     slots["nudity"] = _make_slot_fragments(nudity_res, "nudity", 裸露等级, entry_point)
 
     # 槽位 2: 景别 + 视角
@@ -837,6 +852,7 @@ def _generate_structured(
         context_profile=context_profile,
         external_overrides=external_overrides,
         entry_point=entry_point,
+        nudity_constraint=nudity_constraint,
     )
     negative_prompt = sampler.get_negative_prompt()
 
@@ -876,6 +892,7 @@ def _generate_structured(
         deduplication_records=assembly_res.deduplication_records,
         budget_filter_records=assembly_res.budget_filter_records,
         overrides=assembly_res.overrides,
+        nudity_constraint=assembly_res.nudity_constraint,
     )
 
 
@@ -1161,6 +1178,22 @@ class IYKYKPresetBrowser:
         all_inputs["自定义提示词"] = 自定义提示词
         all_inputs["prompt_seed"] = prompt_seed
         external_overrides = _extract_external_overrides(all_inputs)
+        ext_nudity = external_overrides.get("nudity") if external_overrides else None
+        ext_code = normalize_nudity_level_code(ext_nudity) if isinstance(ext_nudity, str) else None
+        if ext_code in VALID_NUDITY_LEVELS:
+            browser_constraint = NudityConstraint(
+                requested_level="unspecified",
+                effective_level=ext_code,
+                source="external_override",
+                yielded_to_override=False,
+                yield_reason="external_nudity_override",
+            )
+        else:
+            browser_constraint = NudityConstraint(
+                requested_level="unspecified",
+                effective_level=None,
+                source="preset_native",
+            )
 
         assembly_res = _assembler.assemble_preset(
             preset,
@@ -1172,6 +1205,7 @@ class IYKYKPresetBrowser:
             preset_raw_value=预设模板,
             recipe_raw_value=风格配方 if not _is_none(风格配方) else None,
             external_overrides=external_overrides,
+            nudity_constraint=browser_constraint,
         )
         neg = _sampler.get_negative_prompt()
 
@@ -1196,6 +1230,7 @@ class IYKYKPresetBrowser:
             deduplication_records=assembly_res.deduplication_records,
             budget_filter_records=assembly_res.budget_filter_records,
             overrides=assembly_res.overrides,
+            nudity_constraint=assembly_res.nudity_constraint,
         )
 
     def browse(
@@ -1354,11 +1389,38 @@ class IYKYKCustomSlotCombiner:
                         slot_fragments[slot_name] = frags
 
         # 4. 复用 M3 标准 assemble_slots 执行覆盖与消解装配
+        ext_nudity = clean_overrides.get("nudity") if clean_overrides else None
+        ext_code = normalize_nudity_level_code(ext_nudity) if isinstance(ext_nudity, str) else None
+        base_nudity = normalized_base.get("nudity")
+        base_code = normalize_nudity_level_code(base_nudity) if isinstance(base_nudity, str) else None
+        if ext_code in VALID_NUDITY_LEVELS:
+            combiner_constraint = NudityConstraint(
+                requested_level="unspecified",
+                effective_level=ext_code,
+                source="external_override",
+                yielded_to_override=False,
+                yield_reason="external_nudity_override",
+            )
+        elif base_code in VALID_NUDITY_LEVELS:
+            combiner_constraint = NudityConstraint(
+                requested_level=base_code,
+                effective_level=base_code,
+                source="unconstrained",
+                raw_requested_value=str(base_nudity),
+            )
+        else:
+            combiner_constraint = NudityConstraint(
+                requested_level="unspecified",
+                effective_level=None,
+                source="unconstrained",
+            )
+
         assembly_res = _assembler.assemble_slots(
             slot_fragments,
             rng=rng,
             external_overrides=clean_overrides,
             entry_point="custom_combiner",
+            nudity_constraint=combiner_constraint,
         )
 
         negative_prompt = _sampler.get_negative_prompt()
@@ -1390,6 +1452,7 @@ class IYKYKCustomSlotCombiner:
             deduplication_records=assembly_res.deduplication_records,
             budget_filter_records=assembly_res.budget_filter_records,
             overrides=assembly_res.overrides,
+            nudity_constraint=assembly_res.nudity_constraint,
         )
 
     def combine(self, prompt_seed: int = -1, **kwargs) -> Tuple[str, str, str]:

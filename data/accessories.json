@@ -651,7 +651,15 @@
           "facts": {
             "semantic_role": "selector",
             "visible_regions": [
-              "face"
+              "upper_body"
+            ],
+            "exposed_regions": [
+              "breasts"
+            ],
+            "allowed_nudity_levels": [
+              "L3",
+              "L4",
+              "L5"
             ]
           }
         },
@@ -661,7 +669,15 @@
           "facts": {
             "semantic_role": "selector",
             "visible_regions": [
-              "face"
+              "upper_body"
+            ],
+            "exposed_regions": [
+              "breasts"
+            ],
+            "allowed_nudity_levels": [
+              "L3",
+              "L4",
+              "L5"
             ]
           }
         },
@@ -671,7 +687,13 @@
           "facts": {
             "semantic_role": "selector",
             "visible_regions": [
-              "face"
+              "upper_body"
+            ],
+            "allowed_nudity_levels": [
+              "L2",
+              "L3",
+              "L4",
+              "L5"
             ]
           }
         }
@@ -876,7 +898,18 @@
             "accessory_facts": {
               "surface": "shiny"
             },
-            "governance_metadata": {}
+            "governance_metadata": {},
+            "exposed_regions": [
+              "none"
+            ],
+            "allowed_nudity_levels": [
+              "L1",
+              "L2",
+              "L3",
+              "L4",
+              "L5",
+              "L6"
+            ]
           }
         },
         {
@@ -3099,7 +3132,18 @@
           "facts": {
             "semantic_role": "selector",
             "prop_usage": "worn",
-            "occlusion": "eyes"
+            "occlusion": "eyes",
+            "exposed_regions": [
+              "none"
+            ],
+            "allowed_nudity_levels": [
+              "L1",
+              "L2",
+              "L3",
+              "L4",
+              "L5",
+              "L6"
+            ]
           }
         }
       ]
@@ -3506,7 +3550,16 @@
           "text": "delicate gold body chain across bare chest and waist",
           "facts": {
             "semantic_role": "selector",
-            "prop_usage": "worn"
+            "prop_usage": "worn",
+            "exposed_regions": [
+              "breasts",
+              "midriff"
+            ],
+            "allowed_nudity_levels": [
+              "L3",
+              "L4",
+              "L5"
+            ]
           }
         },
         {
@@ -3528,7 +3581,19 @@
           "text": "small barbell nipple rings",
           "facts": {
             "semantic_role": "selector",
-            "prop_usage": "worn"
+            "prop_usage": "worn",
+            "visible_regions": [
+              "upper_body"
+            ],
+            "exposed_regions": [
+              "breasts"
+            ],
+            "allowed_nudity_levels": [
+              "L3",
+              "L4",
+              "L5",
+              "L6"
+            ]
           }
         },
         {
@@ -3536,7 +3601,19 @@
           "text": "silver piercing flush against areola",
           "facts": {
             "semantic_role": "selector",
-            "prop_usage": "worn"
+            "prop_usage": "worn",
+            "visible_regions": [
+              "upper_body"
+            ],
+            "exposed_regions": [
+              "breasts"
+            ],
+            "allowed_nudity_levels": [
+              "L3",
+              "L4",
+              "L5",
+              "L6"
+            ]
           }
         }
       ]
@@ -3550,7 +3627,21 @@
           "text": "thin gold anklet around bare ankle",
           "facts": {
             "semantic_role": "selector",
-            "prop_usage": "worn"
+            "prop_usage": "worn",
+            "visible_regions": [
+              "feet"
+            ],
+            "exposed_regions": [
+              "ankle_feet"
+            ],
+            "allowed_nudity_levels": [
+              "L1",
+              "L2",
+              "L3",
+              "L4",
+              "L5",
+              "L6"
+            ]
           }
         },
         {
