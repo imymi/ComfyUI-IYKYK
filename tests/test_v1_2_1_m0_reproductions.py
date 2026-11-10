@@ -2,10 +2,10 @@
 test_v1_2_1_m0_reproductions.py — IYKYK v1.2.1 M0 基线异常复现与目标契约差分验证
 
 说明：
-- M0 阶段在基线 v1.2.0 (5744eeb) 上冻结 19 组确定性复现案例；
+- M0 阶段在基线 v1.2.0 (5744eeb) 上冻结 23 组确定性复现与豁免兼容性对照案例；
 - 直接消费 tests/fixtures/v1_2_1_m0_reproductions.json 中的输入与种子；
-- 明确断言当前基线确实存在缺件、L1–L6 分支自相矛盾、跨槽位暴露泄露、
-  预设跳过显式裸露等级、以及预算裁剪拆分完整穿搭等问题。
+- 明确断言当前基线确实存在随机缺件、L1–L6 分支与规则改写后事实背离、跨槽位暴露泄露、
+  预设跳过显式裸露等级、以及无完整套装锚点时预算裁剪撕裂分体穿搭等问题，并验证豁免入口兼容性。
 - 在 M1–M3 逐阶段修复后，本文件中的断言将逐步由“复现基线缺陷”切换为“强制满足 v1.2.1 契约”。
 """
 from __future__ import annotations
@@ -52,10 +52,14 @@ class TestV121M0Reproductions(unittest.TestCase):
             "REP-NUDITY-03",
             "REP-NUDITY-04",
             "REP-NUDITY-05",
+            "REP-NUDITY-06",
             "REP-PRESET-01",
             "REP-PRESET-02",
             "REP-BUDGET-01",
             "REP-BUDGET-02",
+            "REP-BUDGET-03",
+            "COMPAT-EXEMPT-01",
+            "COMPAT-EXEMPT-02",
         }
         self.assertEqual(set(self.cases.keys()), expected_ids)
         for cid, case in self.cases.items():
@@ -119,6 +123,17 @@ class TestV121M0Reproductions(unittest.TestCase):
         res_l4, c_l4 = self._run_generator_case("REP-NUDITY-02")
         self.assertEqual([a.text for a in res_l4.atoms if a.source_slot == "nudity"], c_l4["baseline_actual"]["nudity_texts"])
         self.assertEqual([a.text for a in res_l4.atoms if a.source_slot == "clothing"], c_l4["baseline_actual"]["clothing_texts"])
+        # 验证真实决策链：原始连衣裙已被删除，随后 material_penetration 改写产生新连衣裙文本并沿用 underwear 事实
+        decisions = res_l4.resolution_report.decisions
+        drop_step, replace_step = c_l4["baseline_actual"]["resolution_chain"]
+        dropped_texts = [d.before_text for d in decisions if d.rule_id == drop_step["rule_id"] and d.action == drop_step["action"]]
+        self.assertEqual(dropped_texts, drop_step["dropped_texts"])
+        replaced_decisions = [d for d in decisions if d.rule_id == replace_step["rule_id"] and d.action == replace_step["action"]]
+        self.assertEqual([d.before_text for d in replaced_decisions], replace_step["replaced_texts"])
+        self.assertTrue(all(d.after_text == replace_step["produced_text"] for d in replaced_decisions))
+        rewritten_dress = [a for a in res_l4.atoms if a.text == replace_step["produced_text"]]
+        self.assertTrue(rewritten_dress)
+        self.assertEqual(list(rewritten_dress[0].facts.garment_topologies), replace_step["stale_garment_topologies"])
 
         res_l6, c_l6 = self._run_generator_case("REP-NUDITY-03")
         self.assertEqual([a.text for a in res_l6.atoms if a.source_slot == "nudity"], c_l6["baseline_actual"]["nudity_texts"])
@@ -131,9 +146,13 @@ class TestV121M0Reproductions(unittest.TestCase):
 
         res_l5, c_l5 = self._run_generator_case("REP-NUDITY-05")
         self.assertEqual([a.text for a in res_l5.atoms if a.source_slot == "nudity"], c_l5["baseline_actual"]["nudity_texts"])
-        self.assertEqual([a.text for a in res_l5.atoms if a.source_slot == "shot_type"], c_l5["baseline_actual"]["shot_type_texts"])
         self.assertEqual([a.text for a in res_l5.source_atoms if a.source_slot == "clothing"], c_l5["baseline_actual"]["source_clothing_texts"])
         self.assertEqual([a.text for a in res_l5.atoms if a.source_slot == "clothing"], c_l5["baseline_actual"]["accepted_clothing_texts"])
+
+        res_l4_top, c_l4_top = self._run_generator_case("REP-NUDITY-06")
+        self.assertEqual(len(res_l4_top.resolution_report.decisions), c_l4_top["baseline_actual"]["decision_count"])
+        kept_top_texts = [a.text for a in res_l4_top.atoms if a.source_slot == "clothing" and "top" in a.facts.garment_topologies]
+        self.assertEqual(kept_top_texts, c_l4_top["baseline_actual"]["retained_top_texts"])
 
     def test_04_presets_ignore_explicit_nudity_level(self) -> None:
         """复现固定预设与随机预设均跳过界面显式裸露等级选择（L1 与 L5 逐字相同）。"""
@@ -159,10 +178,11 @@ class TestV121M0Reproductions(unittest.TestCase):
                     self.assertEqual(res_a.description, case["baseline_actual"]["preset_desc"])
 
     def test_05_budget_truncation_splits_complete_outfit(self) -> None:
-        """复现消解后词数预算裁剪在生成器与装配器路径下撕裂完整穿搭。"""
+        """验证套装锚点不误报对照，并复现无锚点分体穿搭在预算裁剪后真正缺件。"""
         c1 = self.cases["REP-BUDGET-01"]
-        n_tokens = c1["inputs"]["quality_override_token_count"]
-        long_quality = ", ".join(f"masterpiece quality detail token{i}" for i in range(n_tokens))
+        n_frags = c1["inputs"]["quality_override_fragment_count"]
+        long_quality = ", ".join(f"masterpiece quality detail token{i}" for i in range(n_frags))
+        self.assertEqual(len(long_quality.split()), c1["inputs"]["quality_override_word_count"])
         res1 = self.generator.generate_structured(
             裸露等级=c1["inputs"]["裸露等级"],
             服装款式=c1["inputs"]["服装款式"],
@@ -174,6 +194,8 @@ class TestV121M0Reproductions(unittest.TestCase):
             [a.text for a in res1.atoms if a.source_slot == "clothing"],
             c1["baseline_actual"]["accepted_clothing"],
         )
+        anchor_atom = next(a for a in res1.atoms if a.text == c1["baseline_actual"]["accepted_ensemble_anchor"])
+        self.assertIn("ensemble_outfit", anchor_atom.facts.garment_topologies)
         self.assertEqual(
             [a.text for a in res1.budget_filtered_atoms if a.source_slot == "clothing"],
             c1["baseline_actual"]["budget_filtered_clothing"],
@@ -225,6 +247,48 @@ class TestV121M0Reproductions(unittest.TestCase):
         )
         self.assertEqual(res2.prompt, c2["baseline_actual"]["prompt"])
         self.assertEqual([a.text for a in res2.budget_filtered_atoms], c2["baseline_actual"]["budget_filtered"])
+
+        c3 = self.cases["REP-BUDGET-03"]
+        n_frags_3 = c3["inputs"]["quality_override_fragment_count"]
+        long_quality_3 = ", ".join(f"masterpiece quality detail token{i}" for i in range(n_frags_3))
+        self.assertEqual(len(long_quality_3.split()), c3["inputs"]["quality_override_word_count"])
+        res3 = self.generator.generate_structured(
+            裸露等级=c3["inputs"]["裸露等级"],
+            服装款式=c3["inputs"]["服装款式"],
+            服装状态=c3["inputs"]["服装状态"],
+            quality_override=long_quality_3,
+            prompt_seed=c3["seed"],
+        )
+        acc_cl_3 = [a for a in res3.atoms if a.source_slot == "clothing"]
+        self.assertEqual([a.text for a in acc_cl_3], c3["baseline_actual"]["accepted_clothing"])
+        self.assertEqual([list(a.facts.garment_topologies) for a in acc_cl_3], c3["baseline_actual"]["accepted_clothing_topologies"])
+        self.assertEqual(
+            [a.text for a in res3.budget_filtered_atoms if a.source_slot == "clothing"],
+            c3["baseline_actual"]["budget_filtered_clothing"],
+        )
+
+    def test_06_exempt_entry_compatibility_l1_none_and_explicit_single(self) -> None:
+        """验证豁免入口兼容性：L1 + 服装=None 跳过槽位允许通过，显式单品不自动补全亦不报错。"""
+        res_none, c_none = self._run_generator_case("COMPAT-EXEMPT-01")
+        self.assertEqual(
+            [a.text for a in res_none.atoms if a.source_slot == "clothing"],
+            c_none["baseline_actual"]["clothing_texts"],
+        )
+        self.assertTrue(res_none.positive)
+
+        c_exp = self.cases["COMPAT-EXEMPT-02"]
+        for item in c_exp["inputs"]["cases"]:
+            with self.subTest(style=item["服装款式"]):
+                res_exp = self.generator.generate_structured(
+                    裸露等级=item["裸露等级"],
+                    服装款式=item["服装款式"],
+                    服装状态=item["服装状态"],
+                    prompt_seed=c_exp["seed"],
+                )
+                self.assertEqual(
+                    [a.text for a in res_exp.atoms if a.source_slot == "clothing"],
+                    item["expected_clothing_texts"],
+                )
 
 
 if __name__ == "__main__":

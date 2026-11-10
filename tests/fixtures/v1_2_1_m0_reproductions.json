@@ -262,7 +262,7 @@
     },
     {
       "id": "REP-NUDITY-02",
-      "category": "l4_full_garment_and_branch_contradiction",
+      "category": "l4_material_rewrite_reintroduces_dress_with_stale_facts",
       "entry_point": "generator",
       "seed": 1,
       "inputs": {
@@ -276,6 +276,30 @@
           "nothing but thigh-highs",
           "completely bare except wristwatch"
         ],
+        "resolution_chain": [
+          {
+            "rule_id": "nudity_clothing_conflicts",
+            "action": "drop",
+            "reason_code": "nudity_removes_clothing",
+            "dropped_texts": [
+              "white apron dress",
+              "frilled pinafore apron with back tie"
+            ]
+          },
+          {
+            "rule_id": "material_penetration",
+            "action": "replace",
+            "reason_code": "material_penetration_replaced",
+            "replaced_texts": [
+              "topless",
+              "bare breasts exposed"
+            ],
+            "produced_text": "wet dress clinging tightly to skin",
+            "stale_garment_topologies": [
+              "underwear"
+            ]
+          }
+        ],
         "clothing_texts": [
           "wet dress clinging tightly to skin",
           "multi-point openwork cutouts across shoulders",
@@ -283,7 +307,7 @@
           "and waist"
         ]
       },
-      "v1_2_1_expectation": "L4 must pick one coherent minimal-cover branch and must not retain full outer dresses/tops/pants or contradictory L4 tags."
+      "v1_2_1_expectation": "Rewritten atoms must align semantic facts with rewritten text and undergo target nudity level re-validation; L4 must pick one coherent minimal-cover branch and never reintroduce a full dress."
     },
     {
       "id": "REP-NUDITY-03",
@@ -333,7 +357,7 @@
     },
     {
       "id": "REP-NUDITY-05",
-      "category": "l5_face_only_framing_and_discarded_loss",
+      "category": "l5_discarded_clothes_narrative_loss",
       "entry_point": "generator",
       "seed": 2,
       "inputs": {
@@ -346,17 +370,34 @@
           "completely naked",
           "full body naked"
         ],
-        "shot_type_texts": [
-          "close-up",
-          "face shot filling frame"
-        ],
         "source_clothing_texts": [
           "clothes discarded on floor",
           "fully bare body"
         ],
         "accepted_clothing_texts": []
       },
-      "v1_2_1_expectation": "L5 full-body nudity must not be paired with face-only close-up framing, and discarded-clothes narrative must be distinguished from worn garments rather than blindly dropped."
+      "v1_2_1_expectation": "Discarded-clothes narrative must be distinguished from worn garments by structured state facts rather than blindly dropped; L5 imposes no global ban on close-up face framing unless a specific branch requires body framing."
+    },
+    {
+      "id": "REP-NUDITY-06",
+      "category": "l4_topology_enum_omission_allows_top",
+      "entry_point": "generator",
+      "seed": 0,
+      "inputs": {
+        "裸露等级": "L4 重点暴露 (Topless / Bottomless)",
+        "服装款式": "随机 (Random)",
+        "服装状态": "自动联动裸露等级 (Auto Link Nudity)"
+      },
+      "baseline_actual": {
+        "clothing_style_id": "knit_sweater",
+        "decision_count": 0,
+        "retained_top_texts": [
+          "virgin killer knit sweater",
+          "backless chunky knit",
+          "oversized knitted sweater slipping off"
+        ]
+      },
+      "v1_2_1_expectation": "L4 conflict resolution must match VALID_GARMENT_TOPOLOGIES enums (including 'top', 'bottom_pants', 'bottom_skirt', 'outerwear', 'ensemble_outfit') rather than non-enum labels like 'sweater'."
     },
     {
       "id": "REP-PRESET-01",
@@ -403,20 +444,22 @@
     },
     {
       "id": "REP-BUDGET-01",
-      "category": "budget_truncation_splits_outfit_generator",
+      "category": "budget_ensemble_anchor_preserved_non_false_positive",
       "entry_point": "generator",
       "seed": 1,
       "inputs": {
         "裸露等级": "L1 包裹暗示 (Fully Clothed / Suggestive)",
         "服装款式": "水手服 (JK Sailor Suit)",
         "服装状态": "无 (None)",
-        "quality_override_token_count": 53
+        "quality_override_fragment_count": 53,
+        "quality_override_word_count": 212
       },
       "baseline_actual": {
         "accepted_clothing": [
           "Japanese school uniform",
           "sailor collar"
         ],
+        "accepted_ensemble_anchor": "Japanese school uniform",
         "budget_filtered_clothing": [
           "pleated mini skirt",
           "sailor scarf",
@@ -424,7 +467,7 @@
           "navy blue skirt"
         ]
       },
-      "v1_2_1_expectation": "Budget trimming must preserve external overrides and minimal required outfit/level pieces ahead of optional modifiers, or fail clearly if minimal core exceeds budget."
+      "v1_2_1_expectation": "Non-false-positive control: 'Japanese school uniform' carries garment_topologies=['ensemble_outfit'], so retaining that anchor still counts as a complete outfit even when secondary tags are trimmed."
     },
     {
       "id": "REP-BUDGET-02",
@@ -449,6 +492,82 @@
         ]
       },
       "v1_2_1_expectation": "Budget trimming must protect minimal required outfit pieces or raise explicit validation error rather than silently dropping the skirt from an L1 complete outfit."
+    },
+    {
+      "id": "REP-BUDGET-03",
+      "category": "budget_truncation_splits_two_piece_outfit_generator",
+      "entry_point": "generator",
+      "seed": 1,
+      "inputs": {
+        "裸露等级": "L1 包裹暗示 (Fully Clothed / Suggestive)",
+        "服装款式": "啦啦队服 (Cheerleader)",
+        "服装状态": "无 (None)",
+        "quality_override_fragment_count": 53,
+        "quality_override_word_count": 212
+      },
+      "baseline_actual": {
+        "accepted_clothing": [
+          "sleeveless cheerleader crop top"
+        ],
+        "accepted_clothing_topologies": [
+          [
+            "top"
+          ]
+        ],
+        "budget_filtered_clothing": [
+          "mini pleated skirt",
+          "pompoms",
+          "vivid team colors"
+        ]
+      },
+      "v1_2_1_expectation": "Without an ensemble_outfit anchor, generator budget trimming drops the bottom skirt after conflict resolution and leaves only top; v1.2.1 must protect minimal required outfit pieces or report budget insufficiency."
+    },
+    {
+      "id": "COMPAT-EXEMPT-01",
+      "category": "clothing_none_skips_slot_under_l1",
+      "entry_point": "generator",
+      "seed": 42,
+      "inputs": {
+        "裸露等级": "L1 包裹暗示 (Fully Clothed / Suggestive)",
+        "服装款式": "无 (None)",
+        "服装状态": "无 (None)"
+      },
+      "baseline_actual": {
+        "clothing_texts": []
+      },
+      "v1_2_1_expectation": "Clothing=None means skip clothing slot (not naked) and must remain valid under L1 with zero clothing atoms."
+    },
+    {
+      "id": "COMPAT-EXEMPT-02",
+      "category": "explicit_single_piece_exempt_from_completion",
+      "entry_point": "generator",
+      "seed": 0,
+      "inputs": {
+        "cases": [
+          {
+            "裸露等级": "L1 包裹暗示 (Fully Clothed / Suggestive)",
+            "服装款式": "连帽衫 (Hoodie)",
+            "服装状态": "无 (None)",
+            "expected_clothing_texts": [
+              "hoodie",
+              "oversized hoodie with hood"
+            ]
+          },
+          {
+            "裸露等级": "L1 包裹暗示 (Fully Clothed / Suggestive)",
+            "服装款式": "迷你超短裙 (Miniskirt)",
+            "服装状态": "无 (None)",
+            "expected_clothing_texts": [
+              "tight fitted miniskirt",
+              "high-waisted miniskirt"
+            ]
+          }
+        ]
+      },
+      "baseline_actual": {
+        "single_piece_retained_without_completion_or_error": true
+      },
+      "v1_2_1_expectation": "Explicit single-piece clothing under L1 must not auto-append another outfit and must not error merely for lacking the other half."
     }
   ]
 }
