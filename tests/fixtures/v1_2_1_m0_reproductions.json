@@ -1,0 +1,454 @@
+{
+  "schema_version": "1.0",
+  "baseline_tag": "v1.2.0",
+  "baseline_commit": "5744eeb7b621679678d988763a87e8a847d92e4c",
+  "target_version": "1.2.1",
+  "spec_doc": "docs/v1.2.1_m0_contract_and_reproduction.md",
+  "cases": [
+    {
+      "id": "REP-OUTFIT-01",
+      "category": "incomplete_outfit_top_only_l1",
+      "entry_point": "generator",
+      "seed": 0,
+      "inputs": {
+        "裸露等级": "L1 包裹暗示 (Fully Clothed / Suggestive)",
+        "服装款式": "随机 (Random)",
+        "服装状态": "自动联动裸露等级 (Auto Link Nudity)"
+      },
+      "baseline_actual": {
+        "clothing_style_id": "knit_sweater",
+        "clothing_texts": [
+          "cozy oversized turtleneck knit sweater",
+          "chunky sweater hugging silhouette"
+        ],
+        "has_bottom_or_one_piece": false,
+        "leaked_pose_or_theme": [
+          "sponge bath",
+          "upright straddle"
+        ]
+      },
+      "v1_2_1_expectation": "Must complete a compatible bottom garment for L1 without losing main knit_sweater, and exclude L1-incompatible theme/pose exposure semantics."
+    },
+    {
+      "id": "REP-OUTFIT-02",
+      "category": "incomplete_outfit_top_only_l1",
+      "entry_point": "generator",
+      "seed": 170,
+      "inputs": {
+        "裸露等级": "L1 包裹暗示 (Fully Clothed / Suggestive)",
+        "服装款式": "随机 (Random)",
+        "服装状态": "自动联动裸露等级 (Auto Link Nudity)"
+      },
+      "baseline_actual": {
+        "clothing_style_id": "hoodie",
+        "clothing_texts": [
+          "hooded sweatshirt with kangaroo pocket",
+          "oversized hoodie with hood",
+          "tight clinging fabric",
+          "body curves outlined through fabric"
+        ],
+        "has_bottom_or_one_piece": false
+      },
+      "v1_2_1_expectation": "Must retain hoodie and complete compatible bottom garment under L1."
+    },
+    {
+      "id": "REP-OUTFIT-03",
+      "category": "incomplete_outfit_bottom_only_l1",
+      "entry_point": "generator",
+      "seed": 126,
+      "inputs": {
+        "裸露等级": "L1 包裹暗示 (Fully Clothed / Suggestive)",
+        "服装款式": "随机 (Random)",
+        "服装状态": "自动联动裸露等级 (Auto Link Nudity)"
+      },
+      "baseline_actual": {
+        "clothing_style_id": "bottom_shorts_casual",
+        "clothing_texts": [
+          "casual shorts",
+          "tight clinging fabric",
+          "form-fitting clothing"
+        ],
+        "has_top_or_one_piece": false
+      },
+      "v1_2_1_expectation": "Must retain bottom_shorts_casual and complete compatible top garment under L1."
+    },
+    {
+      "id": "REP-OUTFIT-04",
+      "category": "incomplete_outfit_outerwear_only_l1",
+      "entry_point": "generator",
+      "seed": 46,
+      "inputs": {
+        "裸露等级": "L1 包裹暗示 (Fully Clothed / Suggestive)",
+        "服装款式": "随机 (Random)",
+        "服装状态": "自动联动裸露等级 (Auto Link Nudity)"
+      },
+      "baseline_actual": {
+        "clothing_style_id": "denim_jacket",
+        "clothing_texts": [
+          "distressed blue denim jacket",
+          "denim trucker jacket with metal hardware",
+          "form-fitting clothing",
+          "neatly dressed"
+        ],
+        "has_inner_full_outfit": false
+      },
+      "v1_2_1_expectation": "Outerwear cannot count as a complete outfit alone; must complete compatible inner full outfit (top+bottom or one_piece)."
+    },
+    {
+      "id": "REP-OUTFIT-05",
+      "category": "incomplete_outfit_legwear_only_l1",
+      "entry_point": "generator",
+      "seed": 237,
+      "inputs": {
+        "裸露等级": "L1 包裹暗示 (Fully Clothed / Suggestive)",
+        "服装款式": "随机 (Random)",
+        "服装状态": "自动联动裸露等级 (Auto Link Nudity)"
+      },
+      "baseline_actual": {
+        "clothing_style_id": "legwear_thighhighs",
+        "clothing_texts": [
+          "single thighhigh",
+          "thighhighs",
+          "tight clinging fabric",
+          "form-fitting clothing"
+        ],
+        "has_full_outfit": false
+      },
+      "v1_2_1_expectation": "Legwear alone cannot count as complete outfit in L1; must complete compatible main outfit or exclude bare/hosiery-only standalone selection."
+    },
+    {
+      "id": "REP-OUTFIT-06",
+      "category": "underwear_and_adult_leak_in_l1",
+      "entry_point": "generator",
+      "seed": 2,
+      "inputs": {
+        "裸露等级": "L1 包裹暗示 (Fully Clothed / Suggestive)",
+        "服装款式": "随机 (Random)",
+        "服装状态": "自动联动裸露等级 (Auto Link Nudity)"
+      },
+      "baseline_actual": {
+        "clothing_style_id": "lingerie_panties",
+        "clothing_texts": [
+          "g-strings",
+          "body curves outlined through fabric",
+          "neatly dressed"
+        ],
+        "contains_l1_violation": true,
+        "leaked_theme_texts": [
+          "raw sex no condom",
+          "raw dogging",
+          "creampie"
+        ]
+      },
+      "v1_2_1_expectation": "L1 random sampling must not emit underwear-only g-strings or explicit adult themes."
+    },
+    {
+      "id": "REP-OUTFIT-07",
+      "category": "empty_garment_after_resolver_l1",
+      "entry_point": "generator",
+      "seed": 4,
+      "inputs": {
+        "裸露等级": "L1 包裹暗示 (Fully Clothed / Suggestive)",
+        "服装款式": "随机 (Random)",
+        "服装状态": "自动联动裸露等级 (Auto Link Nudity)"
+      },
+      "baseline_actual": {
+        "clothing_style_id": "lingerie_bra",
+        "clothing_texts": [
+          "form-fitting clothing",
+          "body curves outlined through fabric"
+        ],
+        "actual_garment_count": 0
+      },
+      "v1_2_1_expectation": "L1 random sampling must exclude underwear-only pools before sampling and guarantee a valid complete outfit remains after resolution."
+    },
+    {
+      "id": "REP-OUTFIT-08",
+      "category": "incomplete_outfit_with_state_none_l1",
+      "entry_point": "generator",
+      "seed": 5,
+      "inputs": {
+        "裸露等级": "L1 包裹暗示 (Fully Clothed / Suggestive)",
+        "服装款式": "随机 (Random)",
+        "服装状态": "无 (None)"
+      },
+      "baseline_actual": {
+        "clothing_style_id": "layered_skirt",
+        "clothing_texts": [
+          "tiered ruffle skirt",
+          "flowing tiered layered skirt"
+        ],
+        "has_top_or_one_piece": false
+      },
+      "v1_2_1_expectation": "When clothing_state=None and clothing_style=Random, state/extension tags remain empty, while base outfit completion still supplies a compatible top."
+    },
+    {
+      "id": "REP-OUTFIT-09",
+      "category": "incomplete_and_material_mismatch_l2",
+      "entry_point": "generator",
+      "seed": 0,
+      "inputs": {
+        "裸露等级": "L2 差分微露 (Partially Exposed)",
+        "服装款式": "随机 (Random)",
+        "服装状态": "自动联动裸露等级 (Auto Link Nudity)"
+      },
+      "baseline_actual": {
+        "clothing_style_id": "knit_sweater",
+        "clothing_texts": [
+          "virgin killer knit sweater",
+          "backless chunky knit",
+          "oversized knitted sweater slipping off",
+          "backless knit sweater showing bare back",
+          "sweater slipping off one shoulder",
+          "plunging neckline",
+          "sheer chiffon fabric with gentle skin silhouette visible"
+        ],
+        "has_bottom_or_one_piece": false,
+        "has_material_contradiction": true
+      },
+      "v1_2_1_expectation": "L2 must keep main outfit complete (add compatible bottom) and avoid incompatible sheer chiffon extension on chunky knit sweater."
+    },
+    {
+      "id": "REP-OUTFIT-10",
+      "category": "multi_tag_ensemble_subsampling_broken_l2",
+      "entry_point": "sampler",
+      "seed": 4,
+      "inputs": {
+        "style": "blazer_uniform",
+        "state": "随机 (Random)",
+        "nudity_level_code": "L2"
+      },
+      "baseline_actual": {
+        "base_tags": [
+          "school necktie",
+          "knee-high socks"
+        ],
+        "state_tags": [
+          "buttons undone revealing cleavage",
+          "blouse unbuttoned"
+        ]
+      },
+      "v1_2_1_expectation": "Multi-tag ensemble categories must preserve required main/top/bottom pieces compatible with the chosen state instead of subsampling neckties/socks alone."
+    },
+    {
+      "id": "REP-NUDITY-01",
+      "category": "l3_cross_branch_contradiction",
+      "entry_point": "generator",
+      "seed": 5,
+      "inputs": {
+        "裸露等级": "L3 半裸诱惑 (Half Nude)",
+        "服装款式": "随机 (Random)",
+        "服装状态": "自动联动裸露等级 (Auto Link Nudity)"
+      },
+      "baseline_actual": {
+        "clothing_style_id": "armored_skirt",
+        "nudity_texts": [
+          "bra pushed up above breasts",
+          "panties only",
+          "bare chest with pants on"
+        ],
+        "clothing_texts": [
+          "armored skirt",
+          "leather tassets over skirt",
+          "sideboob peeking",
+          "shirt open at chest revealing lace bra",
+          "multi-point openwork cutouts across shoulders",
+          "back",
+          "and waist",
+          "semi-translucent fabric creating hazy skin contours"
+        ]
+      },
+      "v1_2_1_expectation": "L3 must pick a single coherent half-nude branch and align nudity tags, garment pieces, state, and extensions without contradictory statements."
+    },
+    {
+      "id": "REP-NUDITY-02",
+      "category": "l4_full_garment_and_branch_contradiction",
+      "entry_point": "generator",
+      "seed": 1,
+      "inputs": {
+        "裸露等级": "L4 重点暴露 (Topless / Bottomless)",
+        "服装款式": "随机 (Random)",
+        "服装状态": "自动联动裸露等级 (Auto Link Nudity)"
+      },
+      "baseline_actual": {
+        "clothing_style_id": "apron_dress",
+        "nudity_texts": [
+          "nothing but thigh-highs",
+          "completely bare except wristwatch"
+        ],
+        "clothing_texts": [
+          "wet dress clinging tightly to skin",
+          "multi-point openwork cutouts across shoulders",
+          "back",
+          "and waist"
+        ]
+      },
+      "v1_2_1_expectation": "L4 must pick one coherent minimal-cover branch and must not retain full outer dresses/tops/pants or contradictory L4 tags."
+    },
+    {
+      "id": "REP-NUDITY-03",
+      "category": "l6_framing_cuts_off_display",
+      "entry_point": "generator",
+      "seed": 1,
+      "inputs": {
+        "裸露等级": "L6 特写全见 (Explicit Genital Close-up)",
+        "服装款式": "随机 (Random)",
+        "服装状态": "自动联动裸露等级 (Auto Link Nudity)"
+      },
+      "baseline_actual": {
+        "nudity_texts": [
+          "opening herself up",
+          "presenting genitals to camera"
+        ],
+        "shot_type_texts": [
+          "medium shot",
+          "waist-up framing"
+        ]
+      },
+      "v1_2_1_expectation": "L6 genital display must not be paired with waist-up framing that hides lower-body/genital exposure."
+    },
+    {
+      "id": "REP-NUDITY-04",
+      "category": "l1_cross_slot_exposure_leak",
+      "entry_point": "generator",
+      "seed": 2,
+      "inputs": {
+        "裸露等级": "L1 包裹暗示 (Fully Clothed / Suggestive)",
+        "剧情主题": "随机 (Random)",
+        "饰品头饰": "性感身体链/乳链 (Body Chain Harness)",
+        "发型发色": "发丝遮乳/纯欲 (Hair Draped Over Breasts)",
+        "纹身标记": "💃 胸下曼陀罗/胸骨花纹"
+      },
+      "baseline_actual": {
+        "leaked_fragments": [
+          "raw sex no condom",
+          "raw dogging",
+          "creampie",
+          "strands partially covering breasts",
+          "cross-torso body jewelry",
+          "ornamental underbust mandala tattoo curving below breasts"
+        ]
+      },
+      "v1_2_1_expectation": "L1 must prevent random explicit themes and detect/block or report cross-slot exposure conflicts from hairstyle/jewelry/tattoo."
+    },
+    {
+      "id": "REP-NUDITY-05",
+      "category": "l5_face_only_framing_and_discarded_loss",
+      "entry_point": "generator",
+      "seed": 2,
+      "inputs": {
+        "裸露等级": "L5 极致全裸 (Full Nude)",
+        "服装款式": "随机 (Random)",
+        "服装状态": "自动联动裸露等级 (Auto Link Nudity)"
+      },
+      "baseline_actual": {
+        "nudity_texts": [
+          "completely naked",
+          "full body naked"
+        ],
+        "shot_type_texts": [
+          "close-up",
+          "face shot filling frame"
+        ],
+        "source_clothing_texts": [
+          "clothes discarded on floor",
+          "fully bare body"
+        ],
+        "accepted_clothing_texts": []
+      },
+      "v1_2_1_expectation": "L5 full-body nudity must not be paired with face-only close-up framing, and discarded-clothes narrative must be distinguished from worn garments rather than blindly dropped."
+    },
+    {
+      "id": "REP-PRESET-01",
+      "category": "preset_ignores_explicit_nudity_level",
+      "entry_point": "generator",
+      "seed": 42,
+      "inputs": {
+        "预设模板": "C01 (教室后排露出)",
+        "compare_levels": [
+          "L1 包裹暗示 (Fully Clothed / Suggestive)",
+          "L5 极致全裸 (Full Nude)"
+        ]
+      },
+      "baseline_actual": {
+        "l1_equals_l5": true,
+        "shared_violation_tokens_in_l1": [
+          "one breast exposed",
+          "erect nipple",
+          "dark areolae",
+          "skirt hiked up",
+          "no panties",
+          "pussy barely visible between crossed thighs"
+        ]
+      },
+      "v1_2_1_expectation": "Explicit L1..L6 on IYKYKPromptGenerator must constrain preset and recipe fragments; L1 and L5 outputs must diverge and comply with target level."
+    },
+    {
+      "id": "REP-PRESET-02",
+      "category": "random_preset_ignores_explicit_nudity_level",
+      "entry_point": "generator",
+      "seed": 7,
+      "inputs": {
+        "预设模板": "随机 (Random)",
+        "compare_levels": [
+          "L1 包裹暗示 (Fully Clothed / Suggestive)",
+          "L5 极致全裸 (Full Nude)"
+        ]
+      },
+      "baseline_actual": {
+        "l1_equals_l5": true,
+        "preset_desc": "【预设模板】V08 日本成人式"
+      },
+      "v1_2_1_expectation": "Random preset with explicit L1..L6 must apply target level constraint; Random preset with nudity=Random preserves preset's native state."
+    },
+    {
+      "id": "REP-BUDGET-01",
+      "category": "budget_truncation_splits_outfit_generator",
+      "entry_point": "generator",
+      "seed": 1,
+      "inputs": {
+        "裸露等级": "L1 包裹暗示 (Fully Clothed / Suggestive)",
+        "服装款式": "水手服 (JK Sailor Suit)",
+        "服装状态": "无 (None)",
+        "quality_override_token_count": 53
+      },
+      "baseline_actual": {
+        "accepted_clothing": [
+          "Japanese school uniform",
+          "sailor collar"
+        ],
+        "budget_filtered_clothing": [
+          "pleated mini skirt",
+          "sailor scarf",
+          "white short sleeve shirt",
+          "navy blue skirt"
+        ]
+      },
+      "v1_2_1_expectation": "Budget trimming must preserve external overrides and minimal required outfit/level pieces ahead of optional modifiers, or fail clearly if minimal core exceeds budget."
+    },
+    {
+      "id": "REP-BUDGET-02",
+      "category": "budget_truncation_splits_outfit_assembler",
+      "entry_point": "assembler",
+      "seed": 42,
+      "inputs": {
+        "max_words": 18,
+        "slots": {
+          "scene_theme": "cozy sunlit bedroom with wooden bookshelves and sheer curtains by the window",
+          "nudity": "fully clothed",
+          "clothing": [
+            "white cotton button-down blouse",
+            "navy pleated mini skirt"
+          ]
+        }
+      },
+      "baseline_actual": {
+        "prompt": "cozy sunlit bedroom with wooden bookshelves and sheer curtains by the window, fully clothed, white cotton button-down blouse",
+        "budget_filtered": [
+          "navy pleated mini skirt"
+        ]
+      },
+      "v1_2_1_expectation": "Budget trimming must protect minimal required outfit pieces or raise explicit validation error rather than silently dropping the skirt from an L1 complete outfit."
+    }
+  ]
+}
