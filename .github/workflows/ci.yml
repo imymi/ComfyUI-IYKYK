@@ -100,6 +100,8 @@ jobs:
 
     - name: Run Full Test Suite
       if: steps.changes.outputs.docs_only != 'true'
+      env:
+        RUN_LIVE_SEED_GATE: "1"
       run: |
         python -m unittest discover -s tests -v
 
