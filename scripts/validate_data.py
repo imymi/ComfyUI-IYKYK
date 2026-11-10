@@ -610,12 +610,21 @@ def validate_all(
 
     if isinstance(clothing_data, dict):
         wearable_roles = {"top", "bottom", "one_piece", "ensemble", "outerwear", "legwear", "footwear", "underwear"}
+        l1_incompatible_text_re = re.compile(
+            r"\b(?:see-through|semi-transparent|translucent gelatinous|sheer tulle dress|sheer blouse|sheer bodystocking|sheer clinging silk|sheer gossamer|fluid translucent silk|sheer ethereal fabric|lingerie|underwear only|cheeky underwear|crotchless|pasties|bodystocking|micro triangle bikini|underboob|sideboob|topless)\b",
+            re.I,
+        )
+        opaque_underlayer_re = re.compile(
+            r"\b(?:underdress|sheath|lining|shift|overlaid with|layered atop|overskirt|formfitting black plugsuit|matte black base layer|frosted with)\b",
+            re.I,
+        )
         for cat in clothing_data.get("categories", []):
             cid = cat.get("id", "")
             for t in cat.get("tags", []):
                 if not isinstance(t, dict):
                     continue
                 tid = t.get("id", "<unknown>")
+                txt = str(t.get("text", ""))
                 fcts = t.get("facts", {})
                 pr = fcts.get("piece_role")
                 cr = fcts.get("covered_regions")
@@ -625,6 +634,19 @@ def validate_all(
                     result.errors.append(f"[ERROR] clothing.json [{cid}:{tid}]: covered_regions must be list, got {cr!r}")
                 elif pr in wearable_roles and (not cr or cr == ["none"]):
                     result.errors.append(f"[ERROR] clothing.json [{cid}:{tid}]: wearable piece_role={pr!r} requires non-empty covered_regions")
+
+                is_boudoir = fcts.get("style_genre") == "boudoir_lingerie" or pr == "underwear"
+                if (is_boudoir or (l1_incompatible_text_re.search(txt) and not opaque_underlayer_re.search(txt))):
+                    alvl = fcts.get("allowed_nudity_levels")
+                    if not alvl or "L1" in alvl:
+                        result.errors.append(
+                            f"[ERROR] clothing.json [{cid}:{tid}]: sheer/lingerie/exposed garment cannot allow L1 or omit allowed_nudity_levels (got {alvl!r})"
+                        )
+                    exp_r = fcts.get("exposed_regions")
+                    if not is_boudoir and l1_incompatible_text_re.search(txt) and (not exp_r or exp_r == ["none"]):
+                        result.errors.append(
+                            f"[ERROR] clothing.json [{cid}:{tid}]: sheer/lingerie/exposed garment requires non-empty exposed_regions (got {exp_r!r})"
+                        )
 
         for state_item in clothing_data.get("clothing_states", []):
             sid = state_item.get("id", "")

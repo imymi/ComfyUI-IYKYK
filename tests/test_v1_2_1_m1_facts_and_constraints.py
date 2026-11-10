@@ -19,6 +19,7 @@ import tempfile
 import unittest
 
 from lib.conflict_resolver import ConflictResolver
+from lib.errors import PromptValidationError
 from lib.models import (
     NudityConstraint,
     PromptAtom,
@@ -244,6 +245,15 @@ class TestV121M1FactsAndConstraints(unittest.TestCase):
         self.assertEqual(cat_tags["bottom_jeans_casual__tag_000"]["facts"]["garment_topologies"], ["bottom_pants"])
         self.assertEqual(cat_tags["legwear_pantyhose__tag_000"]["facts"]["piece_role"], "legwear")
         self.assertEqual(cat_tags["footwear_boots__tag_000"]["facts"]["piece_role"], "footwear")
+        # P2-4: 透视睡衣/内衣/连体袜套装条目不可仅标完整 ensemble 而允许 L1，必须携带等级限制与暴露事实
+        t_03324 = cat_tags["ensemble__cloth_03324_nightgown_see_through_by_sourc"]
+        self.assertNotIn("L1", t_03324["facts"]["allowed_nudity_levels"])
+        self.assertTrue(t_03324["facts"].get("exposed_regions"))
+        self.assertNotIn("L1", cat_tags["ensemble__cloth_01980_bikini_string_bikini_frilled_b"]["facts"]["allowed_nudity_levels"])
+        self.assertNotIn("L1", cat_tags["ensemble__cloth_01983_lingerie_underwear_underwear_o"]["facts"]["allowed_nudity_levels"])
+        self.assertEqual(cat_tags["tops_tanks__ext_03679_bodystocking"]["facts"]["piece_role"], "underwear")
+        self.assertNotIn("L1", cat_tags["tops_tanks__ext_03747_underwear"]["facts"]["allowed_nudity_levels"])
+        self.assertNotIn("L1", cat_tags["bottoms_specialty__ext_00309_cheeky_underwear"]["facts"]["allowed_nudity_levels"])
 
         l4_gen = clothing_doc["clothing_nudity_linkage"]["L4"]["general_tags"]
         for t in l4_gen:
@@ -312,6 +322,12 @@ class TestV121M1FactsAndConstraints(unittest.TestCase):
             c_doc = json.loads(c_path.read_text(encoding="utf-8"))
             c_doc["categories"][0]["tags"][0]["facts"].pop("piece_role")
             c_doc["clothing_nudity_linkage"]["L4"]["general_tags"][0]["facts"]["garment_states"] = ["wet_clinging"]
+
+            # 3. 透视套装条目若删除 allowed_nudity_levels/exposed_regions 仅剩 ensemble 覆盖，必须被严格校验拦截
+            cec = next(c for c in c_doc["categories"] if c["id"] == "clothing_ensemble_combos")
+            t_03324 = next(t for t in cec["tags"] if t["id"] == "ensemble__cloth_03324_nightgown_see_through_by_sourc")
+            t_03324["facts"].pop("allowed_nudity_levels", None)
+            t_03324["facts"].pop("exposed_regions", None)
             c_path.write_text(json.dumps(c_doc, ensure_ascii=False, indent=2), encoding="utf-8")
 
             res = validate_all(data_dir=tmp_data, schemas_dir=SCHEMAS_DIR, strict_jsonschema=True)
@@ -320,6 +336,202 @@ class TestV121M1FactsAndConstraints(unittest.TestCase):
             self.assertIn("missing non-empty nudity_branches", joined)
             self.assertIn("missing or invalid piece_role", joined)
             self.assertIn("wet_clinging", joined)
+            self.assertIn("ensemble__cloth_03324_nightgown_see_through_by_sourc", joined)
+
+    def test_07_cross_level_general_tags_do_not_drop_clothes_or_underwear(self) -> None:
+        """[P1-1] 脚链等允许 L1..L6 的跨等级通用标签不得误删 L1 下装或正常服装。"""
+        gen = IYKYKPromptGenerator()
+        common_kwargs = dict(
+            裸露等级="L1 包裹暗示 (Fully Clothed / Suggestive)",
+            服装款式="啦啦队服 (Cheerleader)",
+            服装状态="无 (None)",
+            prompt_seed=42,
+            scene_theme_override="bedroom",
+            shot_type_override="full body shot",
+            camera_angle_override="eye-level view",
+            lighting_override="soft window light",
+            pose_override="standing",
+            expression_override="gentle smile",
+            hairstyle_override="long hair",
+            makeup_override="clean face",
+            film_override="color photo",
+            imperfections_override="natural skin",
+            quality_override="best quality",
+            props_override="none",
+        )
+        res_plain = gen.generate_structured(饰品头饰="无 (None)", **common_kwargs)
+        res_anklet = gen.generate_structured(饰品头饰="细金脚链 (Delicate Anklet)", **common_kwargs)
+
+        plain_clothes = [a.text for a in res_plain.atoms if a.source_slot == "clothing"]
+        anklet_clothes = [a.text for a in res_anklet.atoms if a.source_slot == "clothing"]
+        self.assertIn("mini pleated skirt", plain_clothes)
+        self.assertEqual(anklet_clothes, plain_clothes)
+        self.assertEqual(
+            [d for d in res_anklet.resolution_report.decisions if d.rule_id == "nudity_clothing_conflicts"],
+            [],
+        )
+
+        # 直接校验多类跨等级通用标签 (脚链 / L1..L6 允许的摄影胶片与妆容等) 与 L1 服装/内衣不误删
+        resolver = ConflictResolver(data_dir=DATA_DIR)
+        general_atoms = [
+            PromptAtom(
+                atom_id="j1",
+                text="thin gold anklet around bare ankle",
+                span_type=SpanType.PLAIN,
+                source_slot="jewelry",
+                source_item_id="ankle_bracelet",
+                tag_order=0,
+                span_order=0,
+                facts=SemanticFacts(
+                    semantic_role="selector",
+                    prop_usage="worn",
+                    visible_regions=("feet",),
+                    exposed_regions=("ankle_feet",),
+                    allowed_nudity_levels=("L1", "L2", "L3", "L4", "L5", "L6"),
+                ),
+                provenance=TagProvenance(item_id="ankle_bracelet", kind="jewelry"),
+            ),
+            PromptAtom(
+                atom_id="f1",
+                text="intimate warmth",
+                span_type=SpanType.PLAIN,
+                source_slot="film",
+                source_item_id="kodak_gold_200",
+                tag_order=1,
+                span_order=0,
+                facts=SemanticFacts(
+                    semantic_role="selector",
+                    exposed_regions=("none",),
+                    allowed_nudity_levels=("L1", "L2", "L3", "L4", "L5", "L6"),
+                ),
+                provenance=TagProvenance(item_id="kodak_gold_200", kind="film"),
+            ),
+            PromptAtom(
+                atom_id="top1",
+                text="sleeveless cheerleader crop top",
+                span_type=SpanType.PLAIN,
+                source_slot="clothing",
+                source_item_id="cheerleader",
+                tag_order=2,
+                span_order=0,
+                facts=SemanticFacts(semantic_role="selector", garment_topologies=("top",), piece_role="top", covered_regions=("upper_torso",)),
+                provenance=TagProvenance(item_id="cheerleader", kind="base_clothing"),
+            ),
+            PromptAtom(
+                atom_id="bot1",
+                text="mini pleated skirt",
+                span_type=SpanType.PLAIN,
+                source_slot="clothing",
+                source_item_id="cheerleader",
+                tag_order=3,
+                span_order=0,
+                facts=SemanticFacts(semantic_role="selector", garment_topologies=("bottom_skirt",), piece_role="bottom", covered_regions=("lower_torso",)),
+                provenance=TagProvenance(item_id="cheerleader", kind="base_clothing"),
+            ),
+        ]
+        resolved, _, rep = resolver.resolve_atoms_with_full_report(
+            general_atoms,
+            nudity_constraint=NudityConstraint(requested_level="L1", effective_level="L1", source="ui_explicit"),
+        )
+        self.assertIn("mini pleated skirt", [a.text for a in resolved])
+        self.assertEqual(rep.dropped_count, 0)
+
+    def test_08_external_nudity_level_override_enforced_and_sync_checked(self) -> None:
+        """[P2-2] 已识别外部等级编码 nudity_override='L5' 必须权威生效并移除内部服装，外部服装碰撞时明确报错。"""
+        gen = IYKYKPromptGenerator()
+        res = gen.generate_structured(
+            裸露等级="L1 包裹暗示 (Fully Clothed / Suggestive)",
+            服装款式="水手服 (JK Sailor Suit)",
+            服装状态="无 (None)",
+            nudity_override="L5",
+            prompt_seed=42,
+        )
+        self.assertIsNotNone(res.nudity_constraint)
+        self.assertEqual(res.nudity_constraint.requested_level, "L1")
+        self.assertEqual(res.nudity_constraint.effective_level, "L5")
+        self.assertEqual(res.nudity_constraint.source, "external_override")
+        self.assertTrue(res.nudity_constraint.yielded_to_override)
+        self.assertEqual([a for a in res.atoms if a.source_slot == "clothing"], [])
+        self.assertTrue(
+            any(d.rule_id == "nudity_clothing_conflicts" and d.action == "drop" for d in res.resolution_report.decisions)
+        )
+
+        # 纯内部 NudityConstraint (source=external_override) 在无字符串原子情况下也必须独立生效
+        resolver = ConflictResolver(data_dir=DATA_DIR)
+        resolved_only, _, rep_only = resolver.resolve_atoms_with_full_report(
+            [
+                PromptAtom(
+                    atom_id="uni1",
+                    text="Japanese school uniform",
+                    span_type=SpanType.PLAIN,
+                    source_slot="clothing",
+                    source_item_id="jk_seifuku",
+                    tag_order=0,
+                    span_order=0,
+                    facts=SemanticFacts(semantic_role="selector", garment_topologies=("ensemble_outfit",), piece_role="ensemble", covered_regions=("upper_torso", "lower_torso")),
+                    provenance=TagProvenance(item_id="jk_seifuku", kind="base_clothing", source_mode="explicit"),
+                )
+            ],
+            nudity_constraint=NudityConstraint(requested_level="L1", effective_level="L5", source="external_override", yielded_to_override=True),
+        )
+        self.assertEqual(resolved_only, [])
+        self.assertEqual(rep_only.dropped_count, 1)
+
+        # 外部 nudity_override="L5" + 外部正常服装覆盖必须识别为外部硬冲突报错
+        with self.assertRaises(PromptValidationError):
+            gen.generate_structured(
+                裸露等级="L1 包裹暗示 (Fully Clothed / Suggestive)",
+                服装款式="水手服 (JK Sailor Suit)",
+                服装状态="无 (None)",
+                nudity_override="L5",
+                clothing_override="white shirt, pleated skirt",
+                prompt_seed=42,
+            )
+
+    def test_09_external_override_yield_updates_and_clears_stale_constraint(self) -> None:
+        """[P2-3] 裸露=None+外部裸露覆盖同步更新 source/effective_level；L5+外部普通衣物覆盖清空失效等级与分支。"""
+        gen = IYKYKPromptGenerator()
+
+        # 情况 1: 裸露=None + 可识别外部裸露覆盖 -> 不再残留 ui_none / None
+        res_ext_nude = gen.generate_structured(
+            裸露等级="无 (None)",
+            服装款式="水手服 (JK Sailor Suit)",
+            服装状态="无 (None)",
+            nudity_override="completely naked, nude",
+            prompt_seed=42,
+        )
+        self.assertEqual([a for a in res_ext_nude.atoms if a.source_slot == "clothing"], [])
+        c1 = res_ext_nude.nudity_constraint
+        self.assertIsNotNone(c1)
+        self.assertEqual(c1.requested_level, "none")
+        self.assertEqual(c1.effective_level, "L5")
+        self.assertEqual(c1.source, "external_override")
+        self.assertTrue(c1.yielded_to_override)
+        self.assertIsNone(c1.selected_branch)
+        self.assertEqual(res_ext_nude.resolution_report.nudity_constraint, c1)
+
+        # 情况 2: 请求 L5 + 外部覆盖普通衬衫与裙子 -> 删除内部 L5 裸露并清空失效 effective_level/selected_branch
+        res_ext_cloth = gen.generate_structured(
+            裸露等级="L5 极致全裸 (Full Nude)",
+            服装款式="水手服 (JK Sailor Suit)",
+            服装状态="无 (None)",
+            clothing_override="white shirt, pleated skirt",
+            prompt_seed=42,
+        )
+        self.assertEqual([a for a in res_ext_cloth.atoms if a.source_slot == "nudity"], [])
+        self.assertEqual(
+            [a.text for a in res_ext_cloth.atoms if a.source_slot == "clothing"],
+            ["white shirt", "pleated skirt"],
+        )
+        c2 = res_ext_cloth.nudity_constraint
+        self.assertIsNotNone(c2)
+        self.assertEqual(c2.requested_level, "L5")
+        self.assertIsNone(c2.effective_level)
+        self.assertIsNone(c2.selected_branch)
+        self.assertEqual(c2.source, "derived_override")
+        self.assertTrue(c2.yielded_to_override)
+        self.assertEqual(c2.yield_reason, "external_clothing_override")
+        self.assertEqual(res_ext_cloth.resolution_report.nudity_constraint, c2)
 
 
 if __name__ == "__main__":

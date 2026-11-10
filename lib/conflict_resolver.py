@@ -35,7 +35,9 @@ if __package__:
         SpanType,
         TagProvenance,
         UNSPECIFIED,
+        VALID_NUDITY_LEVELS,
         is_external_atom,
+        normalize_nudity_level_code,
     )
     from .rng import derive_substream_rng, recover_effective_seed
     from .rule_contract import (
@@ -68,7 +70,9 @@ else:
         SpanType,
         TagProvenance,
         UNSPECIFIED,
+        VALID_NUDITY_LEVELS,
         is_external_atom,
+        normalize_nudity_level_code,
     )
     from lib.rng import derive_substream_rng, recover_effective_seed
     from lib.rule_contract import (
@@ -2754,6 +2758,10 @@ class ConflictResolver:
             if is_formal_atom(a) or is_external_atom(a):
                 if a.facts and len(a.facts.allowed_nudity_levels) == 1:
                     matched_lvl = a.facts.allowed_nudity_levels[0]
+                if not matched_lvl and is_external_atom(a):
+                    ext_code = normalize_nudity_level_code(a.text)
+                    if ext_code in VALID_NUDITY_LEVELS:
+                        matched_lvl = ext_code
                 if not matched_lvl:
                     raw_id = (((a.provenance.item_id if a.provenance else "") or "") + " " + (a.source_item_id or "") + " " + ((a.origin.selected_id if a.origin else "") or "")).upper()
                     for lvl in ("L6", "L5", "L4", "L3", "L2", "L1"):
@@ -2775,6 +2783,11 @@ class ConflictResolver:
                         matched_lvl = "L4"
                     elif any(r in a.facts.exposed_regions for r in ("cleavage", "midriff")) or any(r in a.facts.visible_regions for r in ("cleavage", "midriff")):
                         matched_lvl = "L2"
+                if not matched_lvl and is_external_atom(a) and tf.enabled:
+                    for lvl, ps in active_lvl_specs.items():
+                        if ps.matches(a.text):
+                            matched_lvl = lvl
+                            break
             elif tf.enabled:
                 for lvl, ps in active_lvl_specs.items():
                     if ps.matches(a.text):
@@ -2791,25 +2804,47 @@ class ConflictResolver:
         if ext_detected:
             ext_detected.sort(key=lambda x: (x[1].tag_order, x[1].span_order))
             dominant_lvl, nudity_winner = ext_detected[0]
-            if constraint is not None and constraint.effective_level and constraint.effective_level != dominant_lvl:
+            base_c = constraint or NudityConstraint(
+                requested_level="unspecified",
+                effective_level=None,
+                source="unconstrained",
+            )
+            prev_differs = (
+                (base_c.effective_level is not None and base_c.effective_level != dominant_lvl)
+                or (base_c.requested_level in VALID_NUDITY_LEVELS and base_c.requested_level != dominant_lvl)
+                or base_c.requested_level in ("none", "random")
+            )
+            yielded = base_c.yielded_to_override or prev_differs
+            y_reason = base_c.yield_reason or ("external_nudity_override" if yielded else None)
+            if (
+                base_c.source != "external_override"
+                or base_c.effective_level != dominant_lvl
+                or yielded != base_c.yielded_to_override
+                or base_c.selected_branch is not None
+            ):
                 self._active_nudity_constraint = replace(
-                    constraint,
+                    base_c,
                     effective_level=dominant_lvl,
                     source="external_override",
                     selected_branch=None,
-                    yielded_to_override=True,
-                    yield_reason="external_nudity_override",
+                    yielded_to_override=yielded,
+                    yield_reason=y_reason,
                 )
         elif (
             constraint is not None
             and constraint.effective_level
             and constraint.source in ("ui_explicit", "ui_random", "external_override", "derived_override")
-            and (detected_nudity or constraint.source == "ui_explicit")
+            and (detected_nudity or constraint.source in ("ui_explicit", "external_override", "derived_override"))
         ):
             dominant_lvl = constraint.effective_level
             if detected_nudity:
                 detected_nudity.sort(key=lambda x: (x[1].tag_order, x[1].span_order))
                 nudity_winner = detected_nudity[0][1]
+            elif constraint.source == "external_override":
+                ext_nudity_atoms = [a for a in nudity_atoms if is_external_atom(a) and index.is_active(a)]
+                if ext_nudity_atoms:
+                    ext_nudity_atoms.sort(key=lambda x: (x.tag_order, x.span_order))
+                    nudity_winner = ext_nudity_atoms[0]
         elif detected_nudity:
             detected_nudity.sort(key=lambda x: (x[1].tag_order, x[1].span_order))
             dominant_lvl, nudity_winner = detected_nudity[0]
@@ -2901,13 +2936,7 @@ class ConflictResolver:
                                     (a.atom_id,),
                                     n_atom,
                                 )
-                        if self._active_nudity_constraint is not None:
-                            self._active_nudity_constraint = replace(
-                                self._active_nudity_constraint,
-                                source="derived_override",
-                                yielded_to_override=True,
-                                yield_reason="external_clothing_override",
-                            )
+                        self._yield_constraint_to_external_clothing(index.get_all_active_ordered())
                         continue
                     if not a.can_delete_atom:
                         continue
@@ -2980,6 +3009,7 @@ class ConflictResolver:
                                         (a.atom_id,),
                                         first_trig,
                                     )
+                                self._yield_constraint_to_external_clothing(index.get_all_active_ordered())
                                 continue
                             if not a.can_delete_atom:
                                 continue
@@ -2996,12 +3026,48 @@ class ConflictResolver:
 
         return index.get_all_active_ordered()
 
+    def _yield_constraint_to_external_clothing(self, active_atoms: Sequence[PromptAtom]) -> None:
+        """外部服装覆盖迫使内部裸露约束让位：统一更新 source/effective_level/selected_branch。"""
+        base_c = self._active_nudity_constraint or NudityConstraint(
+            requested_level="unspecified",
+            effective_level=None,
+            source="unconstrained",
+        )
+        ext_clothing = [
+            x for x in active_atoms
+            if is_external_atom(x)
+            and x.source_slot in ("clothing", "clothing_state", "clothing_extension", "underwear")
+        ]
+        derived_lvl: Optional[str] = None
+        annotated_sets = [
+            set(x.facts.allowed_nudity_levels)
+            for x in ext_clothing
+            if x.facts and x.facts.allowed_nudity_levels
+        ]
+        if annotated_sets and len(annotated_sets) == len(ext_clothing):
+            common = set.intersection(*annotated_sets)
+            if len(common) == 1:
+                derived_lvl = next(iter(common))
+        self._active_nudity_constraint = replace(
+            base_c,
+            effective_level=derived_lvl,
+            source="derived_override",
+            selected_branch=None,
+            yielded_to_override=True,
+            yield_reason="external_clothing_override",
+        )
+
     def _is_formal_section2_nudity_trigger(self, a: PromptAtom) -> bool:
-        """判断形式化原子是否触发裸露全衣禁令（严格区分穿着衣物、L1-L4 与 L5/L6 全裸）。"""
+        """判断形式化原子是否触发裸露全衣禁令（仅由实际裸露状态触发，严禁仅因 allowed_nudity_levels 含 L5/L6 误触发）。"""
         if not a.facts:
             return False
         if a.facts.piece_role in ("top", "bottom", "one_piece", "ensemble", "outerwear", "legwear", "footwear", "underwear"):
             return False
+        is_nude_slot = (
+            a.source_slot == "nudity"
+            or (a.origin and a.origin.selector == "nudity")
+            or (a.provenance and a.provenance.kind == "nudity")
+        )
         exp = a.facts.exposed_regions
         alvl = a.facts.allowed_nudity_levels
         if exp or alvl:
@@ -3009,14 +3075,9 @@ class ConflictResolver:
                 return False
             if alvl and all(lvl in ("L1", "L2", "L3", "L4") for lvl in alvl):
                 return False
-            if any(lvl in ("L5", "L6") for lvl in alvl):
-                return True
-            return any(r in ("full_nude", "genitals", "anus") for r in exp)
-        is_nude_slot = (
-            a.source_slot == "nudity"
-            or (a.origin and a.origin.selector == "nudity")
-            or (a.provenance and a.provenance.kind == "nudity")
-        )
+            if not (is_nude_slot or a.facts.coverage_delta == "uncover_all"):
+                return False
+            return "full_nude" in exp or any(r in ("genitals", "anus") for r in exp)
         return any(r in a.facts.visible_regions for r in ("crotch", "breasts", "buttocks", "pubic")) or (
             "full_body" in a.facts.visible_regions and is_nude_slot
         )
