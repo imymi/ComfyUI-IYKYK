@@ -1461,21 +1461,89 @@ def _is_atom_compatible_with_level_and_branch(
     if dominant_lvl == "L3":
         if f and any(r in f.visible_regions for r in ("crotch", "buttocks", "intimate_lower_body")):
             return False
+        is_state_or_ext_l3 = (
+            a.source_slot in ("clothing_state", "clothing_extension")
+            or (a.provenance is not None and a.provenance.kind in ("clothing_state", "clothing_extension"))
+            or (a.origin is not None and a.origin.selector in ("clothing_state", "clothing_extension"))
+            or _get_atom_item_id(a).lower() in ("auto_linkage", "linkage_general")
+        )
+        _l3_bra_re = re.compile(r"\b(?:bra|bralette|bustier|bikini\s+top|nipple\s+covers|pasties)\b")
+        _has_bra_garment = bool(
+            (f and "intimate_upper" in f.covered_regions)
+            or (
+                ((f and f.piece_role == "underwear") or a.source_slot in ("clothing", "underwear"))
+                and _l3_bra_re.search(tl)
+                and "no bra" not in tl
+                and "braless" not in tl
+                and "bra removed" not in tl
+                and "bra edge" not in tl
+                and "showing lace bra" not in tl
+            )
+        )
         if selected_branch == "l3_panties_only":
             if f and any(t in _L4_FULL_GARMENT_TOPOLOGIES for t in f.garment_topologies):
                 return False
             if f and f.piece_role in ("top", "bottom", "one_piece", "ensemble", "outerwear"):
                 return False
-            if a.source_slot == "clothing_state" and any(w in tl for w in ("shirt", "blouse", "skirt", "dress")):
+            if _has_bra_garment:
+                return False
+            if is_state_or_ext_l3 and any(
+                w in tl for w in ("shirt", "blouse", "skirt", "dress", "tank top", "off-shoulder", "collar cutout", "plunging neckline", "subtle cleavage", "high slit", "crop cut")
+            ):
                 return False
         elif selected_branch in ("l3_topless_skirt_kept", "l3_topless_pants_kept", "l3_bikini_top_removed"):
             if f and (f.piece_role in ("top", "outerwear", "one_piece") or any(t in ("top", "outerwear", "one_piece") for t in f.garment_topologies)):
                 return False
+            if selected_branch == "l3_bikini_top_removed":
+                if (f and "intimate_upper" in f.covered_regions and "intimate_lower" not in f.covered_regions) or (
+                    _has_bra_garment and "bikini" not in tl
+                ):
+                    return False
+            else:
+                if _has_bra_garment:
+                    return False
             if selected_branch == "l3_topless_skirt_kept" and f and "bottom_pants" in f.garment_topologies:
                 return False
             if selected_branch == "l3_topless_pants_kept" and f and "bottom_skirt" in f.garment_topologies:
                 return False
-            if a.source_slot == "clothing_state" and any(w in tl for w in ("shirt open", "dress bunched", "bra")):
+            if is_state_or_ext_l3:
+                banned_l3 = (
+                    "shirt open", "dress bunched", "dress pulled", "tank top", "bra", "blouse",
+                    "off-shoulder", "collar cutout", "plunging neckline", "subtle cleavage", "crop cut",
+                )
+                if selected_branch != "l3_topless_skirt_kept":
+                    banned_l3 = banned_l3 + ("high slit",)
+                if any(w in tl for w in banned_l3):
+                    return False
+        elif selected_branch == "l3_bra_pushed_up":
+            if re.search(r"\b(?:nipple\s+covers|pasties)\b", tl):
+                return False
+            if (is_state_or_ext_l3 or a.source_slot in ("clothing", "underwear")) and any(
+                w in tl for w in (
+                    "bra removed", "braless", "no bra", "shirt open", "tank top",
+                    "dress bunched", "dress pulled", "skirt hitched", "all top removed",
+                    "panties only", "bikini top removed", "topless", "high slit",
+                    "off-shoulder", "collar cutout", "plunging neckline", "subtle cleavage", "crop cut",
+                )
+            ):
+                return False
+        elif selected_branch == "l3_pulled_down_dress":
+            if is_state_or_ext_l3 and any(
+                w in tl for w in (
+                    "shirt open", "tank top", "skirt hitched", "bra pushed up",
+                    "off-shoulder", "collar cutout", "plunging neckline", "subtle cleavage", "crop cut",
+                )
+            ):
+                return False
+        elif selected_branch in ("l3_open_shirt_breasts", "l3_raised_top_breasts"):
+            if is_state_or_ext_l3 and any(
+                w in tl for w in (
+                    "dress bunched", "dress pulled", "skirt hitched", "bra pushed up",
+                    "off-shoulder", "plunging neckline", "high slit",
+                )
+            ):
+                return False
+            if selected_branch == "l3_raised_top_breasts" and is_state_or_ext_l3 and "shirt open" in tl:
                 return False
         return True
 
@@ -1514,8 +1582,74 @@ def _is_atom_compatible_with_level_and_branch(
                 return False
             if f.liquid_kind in ("sexual_fluid", "cum", "semen"):
                 return False
-        if _L2_EXPOSURE_RE.search(tl):
+            if selected_branch and f.nudity_branches:
+                branch_specific = [b for b in f.nudity_branches if b != "l2_sheer_hint"]
+                if branch_specific and selected_branch not in branch_specific:
+                    return False
+        is_state_origin = (
+            a.source_slot == "clothing_state"
+            or (a.provenance is not None and a.provenance.kind == "clothing_state")
+            or (a.origin is not None and a.origin.selector == "clothing_state")
+        )
+        allow_formal_absence_state = bool(
+            is_state_origin
+            and f
+            and "L2" in f.allowed_nudity_levels
+            and "none" in f.exposed_regions
+            and re.search(r"\bno\s+(?:bra|panties)\b", tl)
+        )
+        if not allow_formal_absence_state and _L2_EXPOSURE_RE.search(tl):
             return False
+        if selected_branch:
+            if (
+                selected_branch == "l2_midriff_waist"
+                and a.source_slot == "clothing"
+                and f
+                and ("one_piece" in f.garment_topologies or f.piece_role == "one_piece")
+                and not (a.origin and a.origin.mode == "preset")
+                and not re.search(r"\b(?:crop|midriff|cutout|two[- ]piece|bikini)\b", tl)
+            ):
+                return False
+
+            _l2_positional_state_ids = {
+                "auto_linkage", "linkage_general", "unbuttoned", "slipping_off", "lifted_up",
+                "back_cutout", "heart_cutout", "off_shoulder_cut", "bare_shoulders",
+            }
+            item_id_low = _get_atom_item_id(a).lower()
+            is_branch_scoped_mod = (
+                a.source_slot == "clothing_extension"
+                or (a.provenance is not None and a.provenance.kind == "clothing_extension")
+                or (
+                    is_state_origin
+                    and (
+                        item_id_low in _l2_positional_state_ids
+                        or (a.origin is not None and (a.origin.selected_id or "").lower() in _l2_positional_state_ids)
+                    )
+                )
+            )
+            if is_branch_scoped_mod:
+                _l2_allowed_exp: Dict[str, Set[str]] = {
+                    "l2_collar_neckline": {"none", "cleavage", "collarbone_neck", "underwear_bra"},
+                    "l2_shoulder_strap": {"none", "shoulders"},
+                    "l2_leg_slit": {"none", "thigh_leg", "ankle_feet"},
+                    "l2_midriff_waist": {"none", "midriff"},
+                    "l2_backless": {"none", "back"},
+                    "l2_sleeve_wrist": {"none", "arms_wrists"},
+                }
+                allowed_exp = _l2_allowed_exp.get(selected_branch)
+                if allowed_exp is not None and f and f.exposed_regions:
+                    if any(r not in allowed_exp for r in f.exposed_regions):
+                        return False
+                _l2_banned_tokens: Dict[str, Tuple[str, ...]] = {
+                    "l2_collar_neckline": ("strap slipping", "off-shoulder", "off shoulder", "high slit", "bare leg", "skirt slit", "midriff", "waist cutout", "open side", "backless", "rolled up", "pushed sleeve"),
+                    "l2_shoulder_strap": ("collar unbuttoned", "unbuttoned", "button undone", "cleavage", "collarbone", "high slit", "bare leg", "skirt slit", "midriff", "waist cutout", "open side", "backless", "rolled up", "pushed sleeve"),
+                    "l2_leg_slit": ("collar unbuttoned", "unbuttoned", "button undone", "cleavage", "collarbone", "strap slipping", "off-shoulder", "midriff", "waist cutout", "open side", "backless", "rolled up", "pushed sleeve"),
+                    "l2_midriff_waist": ("collar unbuttoned", "unbuttoned", "button undone", "cleavage", "collarbone", "strap slipping", "off-shoulder", "high slit", "bare leg", "skirt slit", "backless", "rolled up", "pushed sleeve"),
+                    "l2_backless": ("collar unbuttoned", "unbuttoned", "button undone", "cleavage", "collarbone", "strap slipping", "off-shoulder", "high slit", "bare leg", "skirt slit", "midriff", "waist cutout", "open side", "rolled up", "pushed sleeve"),
+                    "l2_sleeve_wrist": ("collar unbuttoned", "unbuttoned", "button undone", "cleavage", "collarbone", "strap slipping", "off-shoulder", "high slit", "bare leg", "skirt slit", "midriff", "waist cutout", "open side", "backless"),
+                }
+                if any(w in tl for w in _l2_banned_tokens.get(selected_branch, ())):
+                    return False
         return True
 
     return True
@@ -3232,6 +3366,21 @@ class ConflictResolver:
 
                 if is_formal_atom(a) or is_external_atom(a):
                     if not _is_atom_compatible_with_level_and_branch(a, dominant_lvl, selected_branch):
+                        should_drop = True
+                    elif (
+                        dominant_lvl == "L3"
+                        and nudity_winner is not None
+                        and "bra removed" in nudity_winner.text.lower()
+                        and (
+                            (a.facts and "intimate_upper" in a.facts.covered_regions)
+                            or (
+                                ((a.facts and a.facts.piece_role == "underwear") or a.source_slot in ("clothing", "underwear"))
+                                and re.search(r"\b(?:bra|bralette|bustier)\b", a.text.lower())
+                                and "no bra" not in a.text.lower()
+                                and "bra removed" not in a.text.lower()
+                            )
+                        )
+                    ):
                         should_drop = True
                 elif tf.enabled:
                     if dominant_lvl in ("L5", "L6") and _is_non_worn_discarded_narrative_atom(a):
@@ -5380,6 +5529,14 @@ class ConflictResolver:
                             break
                     if not detected_lvl and any(s in first_nude.text.lower() for s in ("completely naked", "full nude", "bare body", "no clothes")):
                         detected_lvl = "L5"
+            if (
+                not active_branch
+                and not (active_nc is not None and active_nc.yielded_to_override)
+                and first_nude is not None
+                and first_nude.facts
+                and len(first_nude.facts.nudity_branches) == 1
+            ):
+                active_branch = first_nude.facts.nudity_branches[0]
 
             nude_win_id = first_nude.atom_id if first_nude is not None else "__nudity_constraint__"
             if detected_lvl in ("L5", "L6"):
@@ -5403,7 +5560,7 @@ class ConflictResolver:
                     conflicts.append(("residual_nudity_clothing_conflict", "nudity_clothing_conflicts", "nudity_removes_clothing", winner.atom_id, loser.atom_id))
                     if _is_loser_protected(loser):
                         protected_losers.append(loser)
-            elif detected_lvl in ("L1", "L2", "L4"):
+            elif detected_lvl in ("L1", "L2", "L3", "L4"):
                 violating_atoms = [
                     a for a in detectable
                     if a.source_slot != "nudity"

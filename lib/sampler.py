@@ -412,13 +412,20 @@ def _choose_coherent_branch(
     raw_tags: Sequence[Any],
     rng: Random,
     explicit_branch: Optional[str] = None,
+    allowed_branches: Optional[Sequence[str]] = None,
 ) -> Optional[str]:
-    """为目标等级选定唯一状态分支；有标签集合时确保所选分支在集合内至少存在 1 条相容词条。"""
+    """为目标等级选定唯一状态分支；有标签集合时确保所选分支在集合内至少存在 1 条相容词条，并遵循服装约束分支池。"""
     allowed = tuple(NUDITY_BRANCHES_BY_LEVEL.get(lvl_code, ()))
     if not allowed:
         return None
     if explicit_branch and explicit_branch in allowed:
         return explicit_branch
+
+    candidate_allowed = allowed
+    if allowed_branches:
+        narrowed = tuple(b for b in allowed if b in allowed_branches)
+        if narrowed:
+            candidate_allowed = narrowed
 
     tag_branches: Set[str] = set()
     for t in raw_tags:
@@ -426,10 +433,10 @@ def _choose_coherent_branch(
             f = t.get("facts") or {}
             if isinstance(f, dict):
                 for b in f.get("nudity_branches") or ():
-                    if b in allowed:
+                    if b in candidate_allowed:
                         tag_branches.add(b)
-    pool = [b for b in allowed if b in tag_branches] if raw_tags and tag_branches else list(allowed)
-    return rng.choice(pool) if pool else allowed[0]
+    pool = [b for b in candidate_allowed if b in tag_branches] if raw_tags and tag_branches else list(candidate_allowed)
+    return rng.choice(pool) if pool else candidate_allowed[0]
 
 
 def _is_linkage_tag_compatible_with_branch(
@@ -472,30 +479,63 @@ def _is_linkage_tag_compatible_with_branch(
         if "discarded" in (facts.get("garment_states") or ()) or "discarded" in txt or "tossed aside" in txt:
             return False
 
+    if lvl_code == "L2":
+        exp_regions = set(facts.get("exposed_regions") or ())
+        if nudity_branch == "l2_collar_neckline":
+            if exp_regions & {"shoulders", "thigh_leg", "ankle_feet", "midriff", "back", "arms_wrists"}:
+                return False
+            if any(w in txt for w in ("strap slipping", "off-shoulder", "off shoulder", "high slit", "bare leg", "skirt slit", "midriff", "waist cutout", "open side", "backless", "rolled up", "pushed sleeve")):
+                return False
+        elif nudity_branch == "l2_shoulder_strap":
+            if exp_regions & {"cleavage", "collarbone_neck", "underwear_bra", "thigh_leg", "ankle_feet", "midriff", "back", "arms_wrists"}:
+                return False
+            if any(w in txt for w in ("collar unbuttoned", "unbuttoned", "button undone", "cleavage", "collarbone", "high slit", "bare leg", "skirt slit", "midriff", "waist cutout", "open side", "backless", "rolled up", "pushed sleeve")):
+                return False
+        elif nudity_branch == "l2_leg_slit":
+            if exp_regions & {"cleavage", "collarbone_neck", "underwear_bra", "shoulders", "midriff", "back", "arms_wrists"}:
+                return False
+            if any(w in txt for w in ("collar unbuttoned", "unbuttoned", "button undone", "cleavage", "collarbone", "strap slipping", "off-shoulder", "midriff", "waist cutout", "open side", "backless", "rolled up", "pushed sleeve")):
+                return False
+        elif nudity_branch == "l2_midriff_waist":
+            if exp_regions & {"cleavage", "collarbone_neck", "underwear_bra", "shoulders", "thigh_leg", "ankle_feet", "back", "arms_wrists"}:
+                return False
+            if any(w in txt for w in ("collar unbuttoned", "unbuttoned", "button undone", "cleavage", "collarbone", "strap slipping", "off-shoulder", "high slit", "bare leg", "skirt slit", "backless", "rolled up", "pushed sleeve")):
+                return False
+        elif nudity_branch == "l2_backless":
+            if exp_regions & {"cleavage", "collarbone_neck", "underwear_bra", "shoulders", "thigh_leg", "ankle_feet", "midriff", "arms_wrists"}:
+                return False
+            if any(w in txt for w in ("collar unbuttoned", "unbuttoned", "button undone", "cleavage", "collarbone", "strap slipping", "off-shoulder", "high slit", "bare leg", "skirt slit", "midriff", "waist cutout", "open side", "rolled up", "pushed sleeve")):
+                return False
+        elif nudity_branch == "l2_sleeve_wrist":
+            if exp_regions & {"cleavage", "collarbone_neck", "underwear_bra", "shoulders", "thigh_leg", "ankle_feet", "midriff", "back"}:
+                return False
+            if any(w in txt for w in ("collar unbuttoned", "unbuttoned", "button undone", "cleavage", "collarbone", "strap slipping", "off-shoulder", "high slit", "bare leg", "skirt slit", "midriff", "waist cutout", "open side", "backless")):
+                return False
+
     if lvl_code == "L3":
         if nudity_branch == "l3_panties_only":
-            if any(w in txt for w in ("shirt", "blouse", "skirt", "dress", "bra")):
+            if any(w in txt for w in ("shirt", "blouse", "skirt", "dress", "bra", "tank top")):
                 return False
         elif nudity_branch == "l3_topless_skirt_kept":
-            if any(w in txt for w in ("shirt open", "dress bunched", "bra")):
+            if any(w in txt for w in ("shirt open", "dress bunched", "dress pulled", "tank top", "bra", "blouse")):
                 return False
         elif nudity_branch == "l3_topless_pants_kept":
-            if any(w in txt for w in ("shirt open", "dress bunched", "skirt", "bra")):
+            if any(w in txt for w in ("shirt open", "dress bunched", "dress pulled", "tank top", "skirt", "bra", "blouse")):
                 return False
         elif nudity_branch == "l3_pulled_down_dress":
-            if any(w in txt for w in ("shirt open", "skirt hitched")):
+            if any(w in txt for w in ("shirt open", "skirt hitched", "tank top", "blouse")):
                 return False
         elif nudity_branch == "l3_open_shirt_breasts":
-            if any(w in txt for w in ("dress bunched", "skirt hitched")):
+            if any(w in txt for w in ("dress bunched", "dress pulled", "skirt hitched", "tank top")):
                 return False
         elif nudity_branch == "l3_raised_top_breasts":
-            if any(w in txt for w in ("dress bunched", "skirt hitched")):
+            if any(w in txt for w in ("dress bunched", "dress pulled", "skirt hitched", "shirt open", "blouse")):
                 return False
         elif nudity_branch == "l3_bra_pushed_up":
-            if any(w in txt for w in ("dress bunched", "skirt hitched")):
+            if any(w in txt for w in ("dress bunched", "dress pulled", "skirt hitched", "shirt open", "tank top", "bra removed", "braless", "no bra")):
                 return False
         elif nudity_branch == "l3_bikini_top_removed":
-            if any(w in txt for w in ("shirt open", "dress bunched", "skirt hitched")):
+            if any(w in txt for w in ("shirt open", "dress bunched", "dress pulled", "skirt hitched", "tank top", "blouse")):
                 return False
 
     if lvl_code == "L4":
@@ -1268,6 +1308,39 @@ class DataSampler:
                     }
                     if top_ids:
                         excluded.update(all_cids - top_ids)
+            elif nudity_level_code == "L2" and nudity_branch:
+                if data is None:
+                    data = self._load("clothing")
+                cats = data.get("categories", [])
+                all_cids = {c.get("id") for c in cats if c.get("id")}
+                if nudity_branch == "l2_backless":
+                    backless_ids = {
+                        "dress_backless", "evening_dress", "cocktail_dress", "halter_dress",
+                        "strapless_dress", "party_club", "tulle_dress", "summer_sundress",
+                        "dress_casual", "wedding_dress", "qipao",
+                    } & all_cids
+                    if backless_ids:
+                        excluded.update(all_cids - backless_ids)
+                elif nudity_branch == "l2_midriff_waist":
+                    non_midriff_one_piece = {
+                        c.get("id") for c in cats
+                        if c.get("id")
+                        and any((t.get("facts") or {}).get("piece_role") == "one_piece" for t in c.get("tags", []))
+                        and all((t.get("facts") or {}).get("piece_role") in ("one_piece", "accessory", "legwear", "footwear", "unspecified", None) for t in c.get("tags", []))
+                        and "bikini" not in c.get("id", "").lower()
+                        and "crop" not in c.get("id", "").lower()
+                        and not any(any(k in str(t.get("text", "")).lower() for k in ("midriff", "crop", "cutout", "two-piece")) for t in c.get("tags", []))
+                    }
+                    excluded.update(non_midriff_one_piece)
+                elif nudity_branch == "l2_sleeve_wrist":
+                    sleeveless_cids = {
+                        "dress_backless", "sleeveless_dress", "strapless_dress", "halter_dress",
+                        "off_shoulder_dress", "summer_sundress", "camisole_slip", "crop_top",
+                        "strapless_top", "bikini_classic", "bikini_micro", "bikini_creative",
+                        "bikini_strappy", "one_piece_swimsuit", "swimsuit_school", "bunny_suit",
+                        "lingerie_bra", "lingerie_panties", "lingerie_lace",
+                    } & all_cids
+                    excluded.update(sleeveless_cids)
 
         return excluded
 
@@ -2305,11 +2378,177 @@ class DataSampler:
 
     # ─── 槽位 3: 裸露状态 ───
 
+    def _compatible_branches_for_explicit_style(
+        self,
+        lvl_code: str,
+        explicit_clothing: Optional[str],
+        clothing_state: Optional[str] = None,
+    ) -> Optional[Tuple[str, ...]]:
+        """根据显式服装款式与状态，返回目标裸露等级下与之语义/形制相容的分支白名单。"""
+        if lvl_code not in ("L2", "L3"):
+            return None
+
+        cands: List[str] = list(NUDITY_BRANCHES_BY_LEVEL.get(lvl_code, ()))
+        if not cands:
+            return None
+
+        st_id = ""
+        if clothing_state and get_selection_mode(clothing_state) == SelectionMode.EXPLICIT:
+            states = self._load("clothing").get("clothing_states", [])
+            st_item = _match_item(states, clothing_state, "clothing_states")
+            st_id = st_item.get("id", "") if isinstance(st_item, dict) else ""
+
+        if explicit_clothing and get_selection_mode(explicit_clothing) == SelectionMode.EXPLICIT:
+            data = self._load("clothing")
+            cats = data.get("categories", [])
+            chosen_style = _match_item(cats, explicit_clothing)
+            if not chosen_style:
+                tm = _match_tag(cats, explicit_clothing)
+                if tm:
+                    chosen_style = tm[0]
+            if chosen_style:
+                cid = str(chosen_style.get("id", "") or "").lower()
+                tags = chosen_style.get("tags", [])
+                roles: Set[str] = set()
+                topos: Set[str] = set()
+                covered: Set[str] = set()
+                txts: List[str] = []
+                for t in tags:
+                    if isinstance(t, dict):
+                        f = t.get("facts") or {}
+                        if f.get("piece_role"):
+                            roles.add(str(f["piece_role"]))
+                        for g in f.get("garment_topologies") or ():
+                            topos.add(str(g))
+                        for cv in f.get("covered_regions") or ():
+                            covered.add(str(cv))
+                        if t.get("text"):
+                            txts.append(str(t["text"]).lower())
+                joined = " ".join(txts)
+
+                is_bra_only = bool(
+                    "underwear" in roles
+                    and "intimate_upper" in covered
+                    and "intimate_lower" not in covered
+                    and not (topos & {"top", "bottom_skirt", "bottom_pants", "one_piece", "ensemble_outfit", "outerwear"})
+                )
+                is_panties_only = bool(
+                    "underwear" in roles
+                    and "intimate_lower" in covered
+                    and "intimate_upper" not in covered
+                    and not (topos & {"top", "bottom_skirt", "bottom_pants", "one_piece", "ensemble_outfit", "outerwear"})
+                )
+                is_bikini = ("bikini" in cid)
+                is_lingerie_set = bool(
+                    roles <= {"underwear", "accessory", "legwear", "footwear", "unspecified"}
+                    and "intimate_upper" in covered
+                    and "intimate_lower" in covered
+                    and not is_bikini
+                )
+                has_one_piece = ("one_piece" in roles or "one_piece" in topos)
+                has_top = ("top" in roles or "top" in topos)
+                has_skirt = ("bottom_skirt" in topos or ("bottom" in roles and self._is_clothing_skirt_compatible(chosen_style)))
+                has_pants = ("bottom_pants" in topos)
+                has_ensemble = ("ensemble" in roles or "ensemble_outfit" in topos)
+                is_pure_one_piece = has_one_piece and not has_top and not has_skirt and not has_pants and not has_ensemble
+                is_top_only = has_top and not has_skirt and not has_pants and not has_one_piece and not has_ensemble
+                is_skirt_only = has_skirt and not has_top and not has_pants and not has_one_piece and not has_ensemble
+                is_pants_only = has_pants and not has_top and not has_skirt and not has_one_piece and not has_ensemble
+
+                if lvl_code == "L2":
+                    if "backless" in cid:
+                        cands = ["l2_backless"]
+                    else:
+                        if (
+                            st_id != "back_cutout"
+                            and cid not in ("dress_backless", "evening_dress", "cocktail_dress", "halter_dress", "party_club")
+                            and "backless" not in joined
+                        ):
+                            cands = [b for b in cands if b != "l2_backless"]
+                        has_midriff_cue = any(k in cid or k in joined for k in ("crop", "midriff", "cutout", "two-piece", "bikini"))
+                        if (is_pure_one_piece and not has_midriff_cue) or is_bra_only or is_panties_only or is_top_only or is_skirt_only or is_pants_only:
+                            cands = [b for b in cands if b != "l2_midriff_waist"]
+                        sleeveless_cues = (
+                            "backless", "sleeveless", "strapless", "halter", "off_shoulder",
+                            "sundress", "camisole", "crop_top", "bikini", "swimsuit", "bunny_suit",
+                        )
+                        if (
+                            is_bra_only
+                            or is_panties_only
+                            or is_skirt_only
+                            or is_pants_only
+                            or any(k in cid for k in sleeveless_cues)
+                        ):
+                            cands = [b for b in cands if b != "l2_sleeve_wrist"]
+                        if is_top_only or is_bra_only:
+                            cands = [b for b in cands if b != "l2_leg_slit"]
+                        if is_skirt_only or is_pants_only or is_panties_only:
+                            cands = [b for b in cands if b not in ("l2_collar_neckline", "l2_shoulder_strap")]
+                        if is_bra_only or "strapless" in cid:
+                            cands = [b for b in cands if b != "l2_shoulder_strap"]
+                elif lvl_code == "L3":
+                    if is_bra_only:
+                        cands = ["l3_bra_pushed_up"]
+                    elif is_panties_only:
+                        cands = ["l3_panties_only"]
+                    elif is_bikini:
+                        cands = ["l3_bikini_top_removed"]
+                    elif is_lingerie_set:
+                        cands = ["l3_bra_pushed_up", "l3_panties_only"]
+                    elif cid == "nurse_uniform":
+                        cands = ["l3_open_shirt_breasts", "l3_pulled_down_dress"]
+                    elif is_pure_one_piece:
+                        if cid in NON_SKIRT_ONE_PIECE or cid in ALLOWED_BUTTON_STYLES:
+                            cands = ["l3_pulled_down_dress", "l3_open_shirt_breasts"]
+                        else:
+                            cands = ["l3_pulled_down_dress"]
+                    elif is_top_only:
+                        if cid in ALLOWED_BUTTON_STYLES or any(k in cid for k in ("shirt", "blouse")):
+                            cands = ["l3_open_shirt_breasts", "l3_raised_top_breasts"]
+                        else:
+                            cands = ["l3_raised_top_breasts"]
+                    elif is_skirt_only:
+                        cands = ["l3_topless_skirt_kept"]
+                    elif is_pants_only:
+                        cands = ["l3_topless_pants_kept"]
+                    elif has_ensemble or (has_top and (has_skirt or has_pants)):
+                        multi: List[str] = []
+                        if has_skirt:
+                            multi.append("l3_topless_skirt_kept")
+                        if has_pants:
+                            multi.append("l3_topless_pants_kept")
+                        if has_top or has_ensemble:
+                            multi.append("l3_raised_top_breasts")
+                            if cid in ALLOWED_BUTTON_STYLES or "shirt" in joined or "blouse" in joined:
+                                multi.append("l3_open_shirt_breasts")
+                        if multi:
+                            cands = multi
+
+        if st_id:
+            state_branch_map: Dict[str, Tuple[str, ...]] = {
+                "unbuttoned": ("l2_collar_neckline", "l3_open_shirt_breasts"),
+                "lifted_up": ("l2_leg_slit", "l3_topless_skirt_kept", "l3_pulled_down_dress"),
+                "slipping_off": ("l2_shoulder_strap",),
+                "off_shoulder_cut": ("l2_shoulder_strap",),
+                "bare_shoulders": ("l2_shoulder_strap",),
+                "back_cutout": ("l2_backless",),
+                "heart_cutout": ("l2_collar_neckline",),
+                "only_lingerie": ("l3_panties_only", "l3_bra_pushed_up", "l3_bikini_top_removed"),
+            }
+            if st_id in state_branch_map:
+                narrowed = [b for b in cands if b in state_branch_map[st_id]]
+                if narrowed:
+                    cands = narrowed
+
+        return tuple(cands) if cands else None
+
     def _sample_nudity_result_with_branch(
         self,
         level: str | int,
         rng: Random,
         branch: Optional[str] = None,
+        explicit_clothing: Optional[str] = None,
+        clothing_state: Optional[str] = None,
     ) -> Tuple[Optional[SampleResult], str, Optional[str]]:
         if _is_none(level):
             return (None, "L1", None)
@@ -2344,7 +2583,12 @@ class DataSampler:
                 break
 
         raw_tags = list(lvl.get("tags", []))
-        selected_branch = _choose_coherent_branch(lvl_code, raw_tags, rng, explicit_branch=branch)
+        allowed_branches = self._compatible_branches_for_explicit_style(
+            lvl_code, explicit_clothing, clothing_state=clothing_state
+        )
+        selected_branch = _choose_coherent_branch(
+            lvl_code, raw_tags, rng, explicit_branch=branch, allowed_branches=allowed_branches
+        )
         if selected_branch:
             branch_tags = [
                 t for t in raw_tags
@@ -2411,6 +2655,9 @@ class DataSampler:
         rng: Random,
         has_preset: bool = False,
         external_overrides: Optional[Dict[str, Any]] = None,
+        *,
+        explicit_clothing: Optional[str] = None,
+        clothing_state: Optional[str] = None,
     ) -> Tuple[Optional[SampleResult], NudityConstraint]:
         """
         解析统一裸露等级约束对象 (NudityConstraint)，并按需执行单一相容分支裸露标签采样。
@@ -2425,6 +2672,9 @@ class DataSampler:
         yielded = False
         yield_reason: Optional[str] = None
         selected_branch: Optional[str] = None
+        has_ext_clothing = isinstance(external_overrides, dict) and bool(external_overrides.get("clothing"))
+        eff_explicit_clothing = None if (has_preset or has_ext_clothing) else explicit_clothing
+        eff_clothing_state = None if (has_preset or has_ext_clothing) else clothing_state
 
         if _is_none(level):
             requested_level = "none"
@@ -2436,7 +2686,12 @@ class DataSampler:
                 effective_level = None
                 source = "preset_native"
             else:
-                res, lvl_code, selected_branch = self._sample_nudity_result_with_branch(level, rng)
+                res, lvl_code, selected_branch = self._sample_nudity_result_with_branch(
+                    level,
+                    rng,
+                    explicit_clothing=eff_explicit_clothing,
+                    clothing_state=eff_clothing_state,
+                )
                 effective_level = lvl_code
                 source = "ui_random"
         else:
@@ -2450,7 +2705,12 @@ class DataSampler:
                 lvl_tags = lvl_item.get("tags", []) if isinstance(lvl_item, dict) else ()
                 selected_branch = _choose_coherent_branch(lvl_code, lvl_tags, rng)
             else:
-                res, lvl_code, selected_branch = self._sample_nudity_result_with_branch(level, rng)
+                res, lvl_code, selected_branch = self._sample_nudity_result_with_branch(
+                    level,
+                    rng,
+                    explicit_clothing=eff_explicit_clothing,
+                    clothing_state=eff_clothing_state,
+                )
             requested_level = lvl_code
             effective_level = lvl_code
             source = "ui_explicit"
@@ -2469,7 +2729,12 @@ class DataSampler:
                         None,
                     )
                     lvl_tags = lvl_item.get("tags", []) if isinstance(lvl_item, dict) else ()
-                    selected_branch = _choose_coherent_branch(ext_code, lvl_tags, rng)
+                    allowed_ext = self._compatible_branches_for_explicit_style(
+                        ext_code, eff_explicit_clothing, clothing_state=eff_clothing_state
+                    )
+                    selected_branch = _choose_coherent_branch(
+                        ext_code, lvl_tags, rng, allowed_branches=allowed_ext
+                    )
                 effective_level = ext_code
                 source = "external_override"
 
@@ -2615,6 +2880,14 @@ class DataSampler:
                 clothing_state=state,
                 style_mode=style_mode,
             )
+            if c_id == "lingerie_bra" and nudity_branch == "l3_bra_pushed_up":
+                bra_pool = [
+                    t for t in chosen_style.get("tags", [])
+                    if isinstance(t, dict)
+                    and "intimate_upper" in ((t.get("facts") or {}).get("covered_regions") or ())
+                ]
+                if bra_pool and not any(t in bra_pool for t in raw_style_tags):
+                    raw_style_tags = [self._pick_one(bra_pool, rng)]
         _, all_base_sampled = self._to_sampled_tags(
             raw_style_tags,
             c_id,
@@ -2852,12 +3125,12 @@ class DataSampler:
             # L2, L3, L4 Auto mode
             if c_id in style_overrides:
                 override_tags = list(style_overrides[c_id])
-                if nudity_level_code in ("L3", "L4") or nudity_branch:
+                if nudity_level_code in ("L2", "L3", "L4") or nudity_branch:
                     branch_ov = [
                         t for t in override_tags
                         if _is_linkage_tag_compatible_with_branch(t, nudity_level_code, nudity_branch)
                     ]
-                    if branch_ov:
+                    if nudity_branch or nudity_level_code in ("L3", "L4"):
                         override_tags = branch_ov
                 _, state_tags_list = self._to_sampled_tags(
                     override_tags,
@@ -2867,14 +3140,14 @@ class DataSampler:
                 )
             else:
                 gen_tags = list(linkage_data.get("general_tags", []))
-                if nudity_level_code in ("L3", "L4") or nudity_branch:
+                if nudity_level_code in ("L2", "L3", "L4") or nudity_branch:
                     branch_gen = [
                         t for t in gen_tags
                         if _is_linkage_tag_compatible_with_branch(t, nudity_level_code, nudity_branch)
                     ]
-                    if branch_gen:
+                    if nudity_branch or nudity_level_code in ("L3", "L4"):
                         gen_tags = branch_gen
-                chosen_gen = self._pick(gen_tags, rng, min(2, len(gen_tags)))
+                chosen_gen = self._pick(gen_tags, rng, min(2, len(gen_tags))) if gen_tags else []
                 _, state_tags_list = self._to_sampled_tags(
                     chosen_gen,
                     "linkage_general",
@@ -2904,7 +3177,18 @@ class DataSampler:
             if nudity_level_code == "L1":
                 allowed_state_ids = {"normal"}
             elif nudity_level_code == "L2":
-                allowed_state_ids = {"normal", "unbuttoned", "slipping_off", "disheveled", "wet_clinging", "sweat_soaked"}
+                l2_branch_states = {
+                    "l2_collar_neckline": {"normal", "unbuttoned", "disheveled", "wet_clinging", "sweat_soaked"},
+                    "l2_shoulder_strap": {"normal", "slipping_off", "disheveled"},
+                    "l2_leg_slit": {"normal", "lifted_up", "torn_shredded"},
+                    "l2_midriff_waist": {"normal", "disheveled", "taut_tight"},
+                    "l2_backless": {"normal", "taut_tight", "wet_pure"},
+                    "l2_sleeve_wrist": {"normal", "disheveled"},
+                }
+                allowed_state_ids = l2_branch_states.get(
+                    nudity_branch,
+                    {"normal", "unbuttoned", "slipping_off", "disheveled", "wet_clinging", "sweat_soaked"},
+                )
             elif nudity_level_code == "L3":
                 if nudity_branch == "l3_open_shirt_breasts":
                     allowed_state_ids = {"unbuttoned", "disheveled", "wet_clinging"}

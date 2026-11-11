@@ -713,6 +713,340 @@ class TestV121M3UnifiedNudityAndBudget(unittest.TestCase):
         self.assertEqual(b_audit["error_info"]["error_code"], "insufficient_budget_for_complete_outfit")
         self.assertEqual(list(self.validator.iter_errors(b_audit)), [])
 
+    # ------------------------------------------------------------------
+    # 10. M3 复审缺陷回归：L5 预算兜底 / L2-L3 单分支实体一致性 / 终态诊断去陈旧
+    # ------------------------------------------------------------------
+
+    def test_10_budget_retains_required_nudity_level_prompts_and_branch_carriers(self) -> None:
+        """[P1] 极紧预算剪光目标等级核心提示词（如 L5 仅剩 quality/lighting）时必须显式报错，绝不可假成功。"""
+        all_none = {
+            k: "无 (None)"
+            for k, v in self.generator.INPUT_TYPES()["optional"].items()
+            if isinstance(v[0], list) and "无 (None)" in v[0]
+        }
+        # 1. 复现用例：L5、seed=0、可选槽位 None、249 词去重 quality_override -> 剩余 1 词无法容纳 L5 裸露词
+        qo_249 = " ".join(f"qword{i}" for i in range(249))
+        with self.assertRaises(PromptValidationError) as ctx_l5:
+            self.generator.generate_structured(
+                **{
+                    **all_none,
+                    "裸露等级": "L5",
+                    "画质等级": "高清写真 (High)",
+                    "prompt_seed": 0,
+                    "quality_override": qo_249,
+                }
+            )
+        self.assertEqual(ctx_l5.exception.category, "external_budget_exceeded")
+        self.assertEqual(ctx_l5.exception.error_code, "insufficient_budget_for_nudity_level")
+
+        # 2. 放宽至 240 词时可容纳 L5 核心词，正常成功且接受原子确含 nudity 词
+        qo_240 = " ".join(f"qword{i}" for i in range(240))
+        res_ok = self.generator.generate_structured(
+            **{
+                **all_none,
+                "裸露等级": "L5",
+                "画质等级": "高清写真 (High)",
+                "prompt_seed": 0,
+                "quality_override": qo_240,
+            }
+        )
+        self.assertTrue(any(a.source_slot == "nudity" for a in res_ok.atoms))
+        self.assertEqual(res_ok.nudity_constraint.effective_level, "L5")
+
+        # 3. 诊断入口在预算剥光 L5 等级时也必须给出 status="error" 与 Schema 合规 JSON
+        d_pos, _, d_desc, d_audit_str = self.diagnostics.diagnose(
+            **{
+                **all_none,
+                "裸露等级": "L5",
+                "画质等级": "高清写真 (High)",
+                "prompt_seed": 0,
+                "quality_override": qo_249,
+                "raise_on_error": False,
+            }
+        )
+        self.assertEqual(d_pos, "")
+        self.assertTrue(d_desc.startswith("无法生成:"))
+        d_audit = json.loads(d_audit_str)
+        self.assertEqual(d_audit["status"], "error")
+        self.assertEqual(d_audit["error_info"]["error_code"], "insufficient_budget_for_nudity_level")
+        self.assertEqual(list(self.validator.iter_errors(d_audit)), [])
+
+        # 4. L6 极紧预算剥光生殖器展示词亦必须 Fail-Closed；max_words=0 例外保持不变
+        qo_248 = " ".join(f"qsix{i}" for i in range(248))
+        with self.assertRaises(PromptValidationError) as ctx_l6:
+            self.assembler.assemble_slots(
+                {
+                    "nudity": [
+                        PromptFragment(
+                            text="pussy fully displayed",
+                            source_slot="nudity",
+                            source_item_id="nudity_l6",
+                            order=0,
+                            provenance=TagProvenance(item_id="nudity_l6", kind="nudity", semantic_ids=("nudity:L6",)),
+                            facts=SemanticFacts(
+                                semantic_role="selector",
+                                allowed_nudity_levels=("L6",),
+                                exposed_regions=("genitals",),
+                                nudity_branches=("l6_frontal_genital_display",),
+                            ),
+                        )
+                    ],
+                    "lighting": [
+                        PromptFragment(
+                            text="backlight",
+                            source_slot="lighting",
+                            source_item_id="backlight",
+                            order=1,
+                            facts=SemanticFacts(semantic_role="selector"),
+                        )
+                    ],
+                },
+                max_words=250,
+                external_overrides={"quality": qo_248},
+                nudity_constraint=NudityConstraint(
+                    requested_level="L6",
+                    effective_level="L6",
+                    source="ui_explicit",
+                    selected_branch="l6_frontal_genital_display",
+                ),
+            )
+        self.assertEqual(ctx_l6.exception.error_code, "insufficient_budget_for_nudity_level")
+
+    def test_11_l2_l3_explicit_single_garments_and_conflict_resolver_coherence(self) -> None:
+        """[P1] 显式单品与 L2/L3 联动必须在分支、联动词、扩展与 ConflictResolver 全链严格自洽。"""
+        # 1. 复现 2a: L2 + dress_backless + Auto Link 多种子（含 seed=3）不得出现 midriff/cleavage/high slit/off-shoulder/sleeve 矛盾
+        forbidden_backless_l2 = (
+            "midriff showing between top and skirt",
+            "subtle cleavage peeking",
+            "plunging neckline",
+            "high slit showing bare leg",
+            "off-shoulder cut",
+            "bare arm from sleeve rolled up",
+            "wrist exposed from pushed sleeve",
+            "collar unbuttoned",
+            "one button undone",
+        )
+        for sd in range(8):
+            with self.subTest(case="dress_backless_l2", seed=sd):
+                res = self.generator.generate_structured(
+                    裸露等级="L2",
+                    服装款式="dress_backless",
+                    服装状态="自动联动裸露等级 (Auto Link Nudity)",
+                    prompt_seed=sd,
+                )
+                self.assertEqual(res.nudity_constraint.selected_branch, "l2_backless")
+                pos_low = res.positive.lower()
+                self.assertIn("backless", pos_low)
+                for bad in forbidden_backless_l2:
+                    self.assertNotIn(bad, pos_low, f"seed={sd} leaked contradictory text {bad!r}: {res.positive}")
+
+        # 2. 复现 2b: L3 + lingerie_bra + 服装状态=None 多种子（含 seed=3）不得出现 topless/all top removed/tank top/dress/bra removed
+        forbidden_bra_l3 = (
+            "all top removed",
+            "topless bottom still dressed",
+            "topless with skirt still on",
+            "tank top raised",
+            "dress pulled down",
+            "bra removed",
+            "shirt open",
+            "panties only",
+            "bare chest with pants on",
+        )
+        for sd in range(8):
+            with self.subTest(case="lingerie_bra_l3", seed=sd):
+                res = self.generator.generate_structured(
+                    裸露等级="L3",
+                    服装款式="lingerie_bra",
+                    服装状态="无 (None)",
+                    prompt_seed=sd,
+                )
+                self.assertEqual(res.nudity_constraint.selected_branch, "l3_bra_pushed_up")
+                pos_low = res.positive.lower()
+                self.assertTrue("bra" in pos_low or "bralette" in pos_low, f"Missing bra carrier in: {res.positive}")
+                for bad in forbidden_bra_l3:
+                    self.assertNotIn(bad, pos_low, f"seed={sd} leaked contradictory text {bad!r}: {res.positive}")
+
+        # 3. 消解器直连负向用例：即使直接喂入 L2 l2_midriff_waist + dress_backless + subtle_cleavage/high_slit 也必须清理跨分支矛盾
+        l2_mid_c = NudityConstraint(
+            requested_level="L2",
+            effective_level="L2",
+            source="ui_explicit",
+            selected_branch="l2_midriff_waist",
+        )
+        l2_conflict_atoms = [
+            PromptAtom(
+                atom_id="n_mid",
+                text="midriff showing between top and skirt",
+                span_type=SpanType.PLAIN,
+                source_slot="nudity",
+                source_item_id="nudity_l2",
+                tag_order=0,
+                span_order=0,
+                provenance=TagProvenance(item_id="nudity_l2", kind="nudity"),
+                origin=SelectionOrigin(mode="explicit", selector="nudity", selected_id="nudity_l2"),
+                facts=SemanticFacts(allowed_nudity_levels=("L2",), exposed_regions=("midriff",), nudity_branches=("l2_midriff_waist",)),
+            ),
+            PromptAtom(
+                atom_id="c_backless",
+                text="crisscross strap backless dress",
+                span_type=SpanType.PLAIN,
+                source_slot="clothing",
+                source_item_id="dress_backless",
+                tag_order=1,
+                span_order=0,
+                provenance=TagProvenance(item_id="dress_backless", kind="base_clothing"),
+                origin=SelectionOrigin(mode="explicit", selector="clothing", selected_id="dress_backless"),
+                facts=SemanticFacts(piece_role="one_piece", garment_topologies=("one_piece",), covered_regions=("upper_torso", "lower_torso"), allowed_nudity_levels=("L2", "L3")),
+            ),
+            PromptAtom(
+                atom_id="c_cleav",
+                text="subtle cleavage peeking",
+                span_type=SpanType.PLAIN,
+                source_slot="clothing",
+                source_item_id="linkage_general",
+                tag_order=2,
+                span_order=0,
+                provenance=TagProvenance(item_id="linkage_general", kind="clothing_state"),
+                origin=SelectionOrigin(mode="auto", selector="clothing_state", selected_id="auto_linkage"),
+                facts=SemanticFacts(
+                    semantic_role="selector",
+                    garment_states=("loosened",),
+                    exposed_regions=("cleavage",),
+                    allowed_nudity_levels=("L2",),
+                ),
+            ),
+            PromptAtom(
+                atom_id="c_ext",
+                text="plunging neckline",
+                span_type=SpanType.PLAIN,
+                source_slot="clothing",
+                source_item_id="subtle_cleavage",
+                tag_order=3,
+                span_order=0,
+                provenance=TagProvenance(item_id="subtle_cleavage", kind="clothing_extension"),
+                origin=SelectionOrigin(mode="auto", selector="clothing_state", selected_id="subtle_cleavage"),
+                facts=SemanticFacts(
+                    semantic_role="selector",
+                    garment_states=("worn",),
+                    exposed_regions=("cleavage",),
+                    allowed_nudity_levels=("L2",),
+                    nudity_branches=("l2_collar_neckline",),
+                ),
+            ),
+        ]
+        resolved_l2, _, _ = self.resolver.resolve_atoms_with_full_report(l2_conflict_atoms, Random(3), nudity_constraint=l2_mid_c)
+        resolved_l2_ids = {a.atom_id for a in resolved_l2}
+        self.assertEqual(resolved_l2_ids, {"n_mid"})
+
+        # 4. 消解器直连负向用例：L3 l3_topless_skirt_kept 必须剔除 covered_regions 含 intimate_upper 的文胸且 detect_hard_conflicts 可捕获残余 L3 冲突
+        l3_top_c = NudityConstraint(
+            requested_level="L3",
+            effective_level="L3",
+            source="ui_explicit",
+            selected_branch="l3_topless_skirt_kept",
+        )
+        l3_atoms = [
+            PromptAtom(
+                atom_id="n_top",
+                text="all top removed",
+                span_type=SpanType.PLAIN,
+                source_slot="nudity",
+                source_item_id="nudity_l3",
+                tag_order=0,
+                span_order=0,
+                provenance=TagProvenance(item_id="nudity_l3", kind="nudity"),
+                origin=SelectionOrigin(mode="explicit", selector="nudity", selected_id="nudity_l3"),
+                facts=SemanticFacts(allowed_nudity_levels=("L3",), exposed_regions=("breasts",), nudity_branches=("l3_topless_skirt_kept",)),
+            ),
+            PromptAtom(
+                atom_id="c_bra",
+                text="bra",
+                span_type=SpanType.PLAIN,
+                source_slot="clothing",
+                source_item_id="lingerie_bra",
+                tag_order=1,
+                span_order=0,
+                provenance=TagProvenance(item_id="lingerie_bra", kind="base_clothing"),
+                origin=SelectionOrigin(mode="explicit", selector="clothing", selected_id="lingerie_bra"),
+                facts=SemanticFacts(piece_role="underwear", garment_topologies=("underwear",), covered_regions=("intimate_upper",), allowed_nudity_levels=("L3", "L4")),
+            ),
+        ]
+        resolved_l3, _, _ = self.resolver.resolve_atoms_with_full_report(l3_atoms, Random(3), nudity_constraint=l3_top_c)
+        self.assertEqual([a.atom_id for a in resolved_l3], ["n_top"])
+        hard_conflicts, _ = self.resolver.detect_hard_conflicts(l3_atoms)
+        self.assertTrue(any(c[0] == "residual_nudity_clothing_conflict" for c in hard_conflicts))
+
+    def test_12_diagnostics_and_descriptions_clear_stale_nudity_and_completion_states(self) -> None:
+        """[P2] 外部服装覆盖让位或替换随机服装后，description、outfit_completion_info 与诊断 JSON 绝不可保留陈旧状态。"""
+        # 1. 复现 3a: L5 + clothing_override="white shirt, pleated skirt" -> description 不得仍报 "裸露: L5"
+        res_yield = self.generator.generate_structured(
+            裸露等级="L5",
+            clothing_override="white shirt, pleated skirt",
+            prompt_seed=0,
+        )
+        self.assertTrue(res_yield.nudity_constraint.yielded_to_override)
+        self.assertIsNone(res_yield.nudity_constraint.effective_level)
+        self.assertNotIn("裸露: L5", res_yield.description)
+        self.assertIn("裸露: 已让位(原请求: L5)", res_yield.description)
+        self.assertIn("服装: 外部覆盖", res_yield.description)
+        self.assertIn("外部覆盖导致等级让位", res_yield.description)
+
+        # 2. 复现 3b: 原本会触发自动补全的随机种子 + clothing_override -> exempt=True, complement_ids=[], 描述不含 "已补全"
+        for sd in (1, 4, 5, 8, 9):
+            with self.subTest(seed=sd):
+                res_ov = self.generator.generate_structured(
+                    裸露等级="L1 包裹暗示 (Fully Clothed / Suggestive)",
+                    服装款式="随机 (Random)",
+                    服装状态="自动联动裸露等级 (Auto Link Nudity)",
+                    clothing_override="black pleated miniskirt",
+                    prompt_seed=sd,
+                )
+                self.assertEqual(res_ov.outfit_completion_info["exempt"], True)
+                self.assertEqual(res_ov.outfit_completion_info["exempt_reason"], "external_clothing_override")
+                self.assertEqual(res_ov.outfit_completion_info["complement_ids"], [])
+                self.assertFalse(res_ov.outfit_completion_info["repaired_ensemble"])
+                self.assertFalse(res_ov.outfit_completion_info["fallback_used"])
+                self.assertNotIn("已补全", res_ov.description)
+                self.assertIn("服装: 外部覆盖", res_ov.description)
+
+        # 3. 诊断 JSON 对上述两场景同样不报陈旧状态，且全量通过 Schema 与 Oracle
+        ov_inputs = {
+            "预设模板": "无 (None)",
+            "风格配方": "无 (None)",
+            "场景大类": "随机 (Random)",
+            "剧情主题": "随机 (Random)",
+            "景别构图": "自动 (Auto)",
+            "拍摄视角": "自动 (Auto)",
+            "裸露等级": "L1 包裹暗示 (Fully Clothed / Suggestive)",
+            "服装款式": "随机 (Random)",
+            "服装状态": "自动联动裸露等级 (Auto Link Nudity)",
+            "发型发色": "随机 (Random)",
+            "饰品头饰": "无 (None)",
+            "妆容细节": "无 (None)",
+            "姿势动作": "随机 (Random)",
+            "情绪表情": "随机 (Random)",
+            "光影预设": "自动 (Auto)",
+            "胶片风格": "无 (None)",
+            "液体效果": "无 (None)",
+            "纹身标记": "无 (None)",
+            "道具物件": "无 (None)",
+            "角色设定": "无 (None)",
+            "真实微瑕": "无 (None)",
+            "画质等级": "高清写真 (High)",
+            "clothing_override": "black pleated miniskirt",
+            "prompt_seed": 5,
+        }
+        pos_d, _, desc_d, audit_d_str = self.diagnostics.diagnose(**ov_inputs)
+        self.assertNotIn("已补全", desc_d)
+        audit_d = json.loads(audit_d_str)
+        self.assertEqual(list(self.validator.iter_errors(audit_d)), [])
+        validate_audit_json_oracle(audit_d, schema_doc=self.schema_doc, expected_positive=pos_d, trusted_inputs=ov_inputs)
+        by_sel_d = {s["selector"]: s for s in audit_d["selections"]}
+        comp_diag = by_sel_d["clothing"]["sampling_rationale"]["outfit_completion"]
+        self.assertTrue(comp_diag["exempt"])
+        self.assertEqual(comp_diag["exempt_reason"], "external_clothing_override")
+        self.assertEqual(comp_diag["complement_ids"], [])
+
 
 if __name__ == "__main__":
     unittest.main()

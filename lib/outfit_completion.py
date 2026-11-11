@@ -162,16 +162,22 @@ EVERYDAY_ONE_PIECE_IDS: Tuple[str, ...] = (
     "strapless_dress",
 )
 
-# 按结构化 L2/L3 分支优先匹配的扩展层级 ID
+# 按结构化 L2/L3 分支严格匹配的扩展层级 ID（空元组表示该分支禁止叠加无关露肤扩展）
 BRANCH_PREFERRED_EXPOSURE_IDS: Dict[str, Tuple[str, ...]] = {
     "l2_collar_neckline": ("collar_cutout", "subtle_cleavage"),
     "l2_shoulder_strap": ("off_shoulder",),
     "l2_leg_slit": ("high_slit",),
-    "l2_midriff_waist": ("crop_midriff", "waist_cutouts", "subtle_cleavage"),
-    "l2_backless": ("plunging_backless", "off_shoulder"),
+    "l2_midriff_waist": ("crop_midriff", "waist_cutouts", "open_sides"),
+    "l2_backless": ("plunging_backless",),
+    "l2_sleeve_wrist": (),
     "l3_topless_skirt_kept": ("high_slit",),
+    "l3_topless_pants_kept": (),
     "l3_open_shirt_breasts": ("multipoint_cutout", "open_sides"),
     "l3_raised_top_breasts": ("crop_midriff", "waist_cutouts"),
+    "l3_pulled_down_dress": ("high_slit", "plunging_backless"),
+    "l3_bra_pushed_up": (),
+    "l3_panties_only": (),
+    "l3_bikini_top_removed": (),
 }
 
 
@@ -398,7 +404,7 @@ def filter_extensions_for_garments(
     garment_tags: Sequence[Any] = (),
     nudity_branch: Optional[str] = None,
 ) -> List[Dict[str, Any]]:
-    """根据材质、服装形制与裸露分支过滤相容扩展库层级。"""
+    """根据材质、服装形制与裸露分支严格过滤相容扩展库层级。"""
     tiers = list(ext_tiers or ())
     if not tiers:
         return []
@@ -415,11 +421,76 @@ def filter_extensions_for_garments(
         if heavy and any(k in cid_low for k in ("knight_armor", "berserker_armor", "mecha_")):
             filtered = [x for x in filtered if x.get("id") not in ("off_shoulder", "subtle_cleavage", "high_slit", "plunging_backless")]
 
+        if garment_tags:
+            garment_roles: Set[str] = set()
+            garment_topos: Set[str] = set()
+            garment_txts: List[str] = []
+            for gt in garment_tags:
+                gf = _extract_facts_dict(gt)
+                if gf.get("piece_role"):
+                    garment_roles.add(str(gf["piece_role"]))
+                for gp in gf.get("garment_topologies") or ():
+                    garment_topos.add(str(gp))
+                gt_txt = _extract_text(gt).lower()
+                if gt_txt:
+                    garment_txts.append(gt_txt)
+            joined_gt = " ".join(garment_txts)
+            has_skirt_or_dress = bool(
+                ("bottom_skirt" in garment_topos)
+                or ("one_piece" in garment_roles)
+                or ("one_piece" in garment_topos)
+                or ("ensemble" in garment_roles)
+                or ("ensemble_outfit" in garment_topos)
+                or _SKIRT_TEXT_RE.search(joined_gt)
+            )
+            has_upper_or_dress = bool(
+                garment_roles & {"top", "one_piece", "ensemble", "outerwear"}
+                or garment_topos & {"top", "one_piece", "ensemble_outfit", "outerwear"}
+            )
+            underwear_only_garments = bool(
+                garment_roles
+                and garment_roles <= {"underwear", "accessory", "legwear", "footwear", "unspecified"}
+                and not (garment_topos & {"top", "bottom_skirt", "bottom_pants", "one_piece", "ensemble_outfit", "outerwear"})
+            )
+            if not has_skirt_or_dress:
+                filtered = [x for x in filtered if x.get("id") != "high_slit"]
+            if underwear_only_garments:
+                filtered = [
+                    x for x in filtered
+                    if x.get("id") not in (
+                        "collar_cutout", "off_shoulder", "subtle_cleavage", "high_slit",
+                        "plunging_backless", "crop_midriff", "waist_cutouts", "open_sides",
+                    )
+                ]
+            elif garment_roles and not has_upper_or_dress:
+                filtered = [
+                    x for x in filtered
+                    if x.get("id") not in (
+                        "collar_cutout", "off_shoulder", "subtle_cleavage", "plunging_backless",
+                        "crop_midriff", "waist_cutouts", "open_sides",
+                    )
+                ]
+            if ("backless" in cid_low or "backless" in joined_gt) and not ("midriff" in joined_gt or "crop" in joined_gt):
+                filtered = [
+                    x for x in filtered
+                    if x.get("id") not in ("crop_midriff", "waist_cutouts", "open_sides", "off_shoulder", "subtle_cleavage", "collar_cutout")
+                ]
+
         if nudity_branch and nudity_branch in BRANCH_PREFERRED_EXPOSURE_IDS:
             pref_ids = set(BRANCH_PREFERRED_EXPOSURE_IDS[nudity_branch])
-            branch_matched = [x for x in filtered if x.get("id") in pref_ids]
-            if branch_matched:
-                return branch_matched
+            return [x for x in filtered if x.get("id") in pref_ids]
+
+        # 若明确传入 L2/L3 分支且未匹配到任何容许分支，禁止回退放行跨分支露肤扩展
+        if nudity_branch and str(nudity_branch).startswith(("l2_", "l3_")):
+            branch_matched = []
+            for x in filtered:
+                for xt in x.get("tags") or ():
+                    xb = ((xt.get("facts") or {}).get("nudity_branches") or ()) if isinstance(xt, dict) else ()
+                    if xb and nudity_branch in xb:
+                        branch_matched.append(x)
+                        break
+            return branch_matched
+
         return filtered
 
     return tiers
@@ -1353,7 +1424,9 @@ def complete_outfit_tags(
 
     # 判断当前状态是否已在主款上存在载体；若无且状态需要载体，则补件必须承担该载体要求
     existing_has_carrier = is_tags_compatible_with_state(active_tags, state_id, state_tags, style_id=primary_style_id)
-    need_skirt_carrier = (state_id == "lifted_up" and not existing_has_carrier) or (nudity_branch == "l3_topless_skirt_kept")
+    need_skirt_carrier = (state_id == "lifted_up" and not existing_has_carrier) or (
+        nudity_branch in ("l3_topless_skirt_kept", "l2_midriff_waist", "l2_leg_slit")
+    )
     need_button_carrier = (state_id == "unbuttoned" and not existing_has_carrier) or (nudity_branch == "l3_open_shirt_breasts")
 
     complements: List[SampledTag] = []

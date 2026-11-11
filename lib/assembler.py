@@ -455,7 +455,7 @@ def _infer_active_nudity_from_tags(
                     lvl = a.facts.allowed_nudity_levels[0]
                     br = a.facts.nudity_branches[0] if (a.facts.nudity_branches and len(a.facts.nudity_branches) == 1) else None
                     return lvl, br
-                raw_id = ((a.source_item_id or "") + " " + (a.provenance.item_id if a.provenance else "")).upper()
+                raw_id = ((a.source_item_id or "") + " " + ((a.provenance.item_id or "") if a.provenance else "")).upper()
                 for lvl in VALID_NUDITY_LEVELS:
                     if lvl in raw_id:
                         return lvl, None
@@ -469,8 +469,13 @@ def _select_budget_core_tag_indices(
     active_lvl: Optional[str],
     active_branch: Optional[str],
 ) -> set[int]:
-    """识别构成当前完整穿搭/分支必需载体的最低核心 tag 索引，在词数预算收紧时优先保护。"""
+    """识别构成当前完整穿搭/分支必需载体的最低核心 tag 与裸露等级锚点索引，在词数预算收紧时优先保护。"""
     core_indices: set[int] = set()
+    for idx, tag in enumerate(deduped_tags):
+        if any(a.source_slot == "nudity" or (a.provenance and a.provenance.kind == "nudity") for a in tag.atoms):
+            core_indices.add(idx)
+            break
+
     clothing_entries: List[Tuple[int, List[PromptAtom]]] = []
     for idx, tag in enumerate(deduped_tags):
         cl_atoms = [a for a in tag.atoms if a.source_slot in ("clothing", "clothing_state", "underwear")]
@@ -507,7 +512,10 @@ def _select_budget_core_tag_indices(
         for idx, cl_atoms in clothing_entries:
             topos = _entry_topologies(cl_atoms)
             roles = _entry_roles(cl_atoms)
+            txts = " ".join(a.text.lower() for a in cl_atoms)
             if active_branch == "l4_hosiery_footwear_only" and (roles & {"legwear", "footwear"} or topos & {"legwear", "footwear"}):
+                core_indices.add(idx)
+            elif active_branch == "l4_towel_sheet_wrap" and re.search(r"\b(?:towel|sheet|bathrobe|wrap)\b", txts):
                 core_indices.add(idx)
             elif active_branch in ("l4_panties_only", "l4_bra_and_panties", None) and ("underwear" in topos or "underwear" in roles):
                 core_indices.add(idx)
@@ -521,10 +529,11 @@ def _select_budget_core_tag_indices(
             core_indices.add(idx)
             return core_indices
 
-    # 4. 分体上下装（top + bottom_pants/bottom_skirt）：成对保护主上装与主下装
+    # 4. 分体上下装与 L3 特定分支载体（bra / panties / top + bottom）
     first_top_idx: Optional[int] = None
     first_bottom_idx: Optional[int] = None
     first_underwear_idx: Optional[int] = None
+    first_bra_idx: Optional[int] = None
     for idx, cl_atoms in clothing_entries:
         topos = _entry_topologies(cl_atoms)
         roles = _entry_roles(cl_atoms)
@@ -534,9 +543,20 @@ def _select_budget_core_tag_indices(
             first_bottom_idx = idx
         if first_underwear_idx is None and ("underwear" in topos or "underwear" in roles):
             first_underwear_idx = idx
+        if first_bra_idx is None and any(
+            (a.facts and "intimate_upper" in a.facts.covered_regions) or re.search(r"\b(?:bra|bralette|bustier)\b", a.text.lower())
+            for a in cl_atoms
+        ):
+            first_bra_idx = idx
 
-    if active_lvl == "L3" and active_branch == "l3_panties_only":
+    if active_lvl == "L3" and active_branch in ("l3_panties_only", "l3_bikini_top_removed"):
         if first_underwear_idx is not None:
+            core_indices.add(first_underwear_idx)
+        return core_indices
+    if active_lvl == "L3" and active_branch == "l3_bra_pushed_up":
+        if first_bra_idx is not None:
+            core_indices.add(first_bra_idx)
+        elif first_underwear_idx is not None:
             core_indices.add(first_underwear_idx)
         return core_indices
     if active_lvl == "L3" and active_branch in ("l3_topless_skirt_kept", "l3_topless_pants_kept"):
@@ -907,7 +927,7 @@ def assemble_result(
                         )
                     )
 
-        # 4.2 预算裁剪后针对实际 accepted_atoms 执行完整穿搭复验：禁止把已截断的服装仍算作完整穿搭
+        # 4.2 预算裁剪后针对实际 accepted_atoms 执行完整穿搭与等级/分支必需语义复验
         if not is_fallback and active_lvl in ("L1", "L2", "L3") and any(
             a.source_slot in ("clothing", "clothing_state", "clothing_extension", "underwear")
             for a in budget_filtered_atoms
@@ -947,6 +967,133 @@ def assemble_result(
                             "dropped_clothing": dropped_cl,
                         },
                     )
+
+        # 4.3 预算裁剪后针对 L1..L6 必需裸露等级语义与分支载体复验（禁止把等级标签全删光后仍成功返回）
+        if (
+            not is_fallback
+            and active_lvl in ("L1", "L2", "L3", "L4", "L5", "L6")
+            and not (eff_nc is not None and eff_nc.yielded_to_override)
+        ):
+            pre_all_atoms = [a for t in non_empty_tags for a in t.atoms]
+            pre_nudity_atoms = [
+                a for a in pre_all_atoms
+                if a.source_slot == "nudity" or (a.provenance and a.provenance.kind == "nudity")
+            ]
+            post_nudity_atoms = [
+                a for a in accepted_atoms
+                if a.source_slot == "nudity" or (a.provenance and a.provenance.kind == "nudity")
+            ]
+            if pre_nudity_atoms and not post_nudity_atoms:
+                dropped_nudity = [
+                    a.text for a in budget_filtered_atoms
+                    if a.source_slot == "nudity" or (a.provenance and a.provenance.kind == "nudity")
+                ]
+                err = PromptValidationError(
+                    f"Word budget ({max_words}) cannot retain required nudity prompts for {active_lvl} "
+                    f"(branch={active_branch}, dropped_nudity={dropped_nudity})",
+                    category="external_budget_exceeded",
+                    error_code="insufficient_budget_for_nudity_level",
+                    slots=("nudity",),
+                    texts=dropped_nudity,
+                    details={
+                        "max_words": max_words,
+                        "level": active_lvl,
+                        "branch": active_branch,
+                        "missing_parts": ["nudity_level_prompt"],
+                        "dropped_nudity": dropped_nudity,
+                    },
+                )
+                err.nudity_constraint = eff_nc
+                raise err
+
+            pre_cl_all = [
+                a for a in pre_all_atoms
+                if a.source_slot in ("clothing", "clothing_state", "clothing_extension", "underwear")
+            ]
+            post_cl_all = [
+                a for a in accepted_atoms
+                if a.source_slot in ("clothing", "clothing_state", "clothing_extension", "underwear")
+            ]
+            missing_branch_parts: List[str] = []
+            if active_lvl == "L4" and pre_cl_all and not any(is_external_atom(a) for a in pre_cl_all):
+                has_bra_pre = any(
+                    (a.facts and "intimate_upper" in a.facts.covered_regions)
+                    or ("bra" in a.text.lower() and "no bra" not in a.text.lower() and "braless" not in a.text.lower())
+                    for a in pre_cl_all
+                )
+                has_bra_post = any(
+                    (a.facts and "intimate_upper" in a.facts.covered_regions)
+                    or ("bra" in a.text.lower() and "no bra" not in a.text.lower() and "braless" not in a.text.lower())
+                    for a in post_cl_all
+                )
+                has_panties_pre = any(
+                    (a.facts and "intimate_lower" in a.facts.covered_regions)
+                    or re.search(r"\b(?:panties|thong|g-string|briefs|bloomers|underwear)\b", a.text.lower())
+                    for a in pre_cl_all
+                )
+                has_panties_post = any(
+                    (a.facts and "intimate_lower" in a.facts.covered_regions)
+                    or re.search(r"\b(?:panties|thong|g-string|briefs|bloomers|underwear)\b", a.text.lower())
+                    for a in post_cl_all
+                )
+                if active_branch == "l4_bra_and_panties":
+                    if has_bra_pre and not has_bra_post:
+                        missing_branch_parts.append("bra")
+                    if has_panties_pre and not has_panties_post:
+                        missing_branch_parts.append("panties")
+                elif active_branch == "l4_panties_only" and has_panties_pre and not has_panties_post:
+                    missing_branch_parts.append("panties")
+                elif active_branch == "l4_hosiery_footwear_only":
+                    has_hf_pre = any(a.facts and a.facts.piece_role in ("legwear", "footwear") for a in pre_cl_all)
+                    has_hf_post = any(a.facts and a.facts.piece_role in ("legwear", "footwear") for a in post_cl_all)
+                    if has_hf_pre and not has_hf_post:
+                        missing_branch_parts.append("hosiery_or_footwear")
+                elif active_branch == "l4_towel_sheet_wrap":
+                    has_tw_pre = any(re.search(r"\b(?:towel|sheet|bathrobe|wrap)\b", a.text.lower()) for a in pre_cl_all)
+                    has_tw_post = any(re.search(r"\b(?:towel|sheet|bathrobe|wrap)\b", a.text.lower()) for a in post_cl_all)
+                    if has_tw_pre and not has_tw_post:
+                        missing_branch_parts.append("towel_or_sheet")
+                elif not post_cl_all:
+                    missing_branch_parts.append("l4_carrier")
+            elif active_lvl == "L5" and active_branch == "l5_clothes_discarded_nearby":
+                has_disc_pre = any(a.facts and "discarded" in a.facts.garment_states for a in pre_cl_all)
+                has_disc_post = any(a.facts and "discarded" in a.facts.garment_states for a in post_cl_all)
+                if has_disc_pre and not has_disc_post:
+                    missing_branch_parts.append("discarded_clothes")
+            elif active_lvl == "L6":
+                has_gen_pre = any(
+                    a.facts and any(r in ("genitals", "anus") for r in a.facts.exposed_regions)
+                    for a in pre_all_atoms
+                )
+                has_gen_post = any(
+                    a.facts and any(r in ("genitals", "anus") for r in a.facts.exposed_regions)
+                    for a in accepted_atoms
+                )
+                if has_gen_pre and not has_gen_post:
+                    missing_branch_parts.append("genital_display")
+
+            if missing_branch_parts:
+                dropped_branch = [
+                    a.text for a in budget_filtered_atoms
+                    if a.source_slot in ("nudity", "clothing", "clothing_state", "clothing_extension", "underwear")
+                ]
+                err = PromptValidationError(
+                    f"Word budget ({max_words}) cannot retain required {active_lvl} branch semantics "
+                    f"(branch={active_branch}, missing={missing_branch_parts})",
+                    category="external_budget_exceeded",
+                    error_code="insufficient_budget_for_nudity_level",
+                    slots=("nudity",),
+                    texts=dropped_branch,
+                    details={
+                        "max_words": max_words,
+                        "level": active_lvl,
+                        "branch": active_branch,
+                        "missing_parts": missing_branch_parts,
+                        "dropped_items": dropped_branch,
+                    },
+                )
+                err.nudity_constraint = eff_nc
+                raise err
 
     sanitized = ", ".join(accepted_tag_texts)
 

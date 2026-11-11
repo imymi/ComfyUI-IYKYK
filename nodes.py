@@ -565,23 +565,77 @@ def _build_completion_info_summary(
     clothing_res: Optional[ClothingSampleResult],
     *,
     controlled_rebuild_attempted: bool = False,
+    has_external_clothing_override: bool = False,
+    accepted_atoms: Sequence[PromptAtom] = (),
 ) -> Optional[Dict[str, Any]]:
     if clothing_res is None:
         return None
+    if has_external_clothing_override:
+        return {
+            "exempt": True,
+            "exempt_reason": "external_clothing_override",
+            "repaired_ensemble": False,
+            "complement_ids": [],
+            "fallback_used": False,
+            "fallback_reason": None,
+            "controlled_rebuild_attempted": False,
+        }
     raw_info = dict(getattr(clothing_res, "completion_info", None) or {})
+    raw_comps = tuple(getattr(clothing_res, "complement_tags", None) or ())
+    if accepted_atoms:
+        acc_cl = [
+            a for a in accepted_atoms
+            if a.source_slot in ("clothing", "clothing_state", "clothing_extension", "underwear")
+        ]
+        acc_texts = {a.text.strip().lower() for a in acc_cl if a.text}
+        acc_item_ids = {
+            getattr(a.provenance, "item_id", None) or a.source_item_id
+            for a in acc_cl
+            if (getattr(a.provenance, "item_id", None) or a.source_item_id)
+        }
+        kept_comps = [
+            t for t in raw_comps
+            if (getattr(t, "text", "") or "").strip().lower() in acc_texts
+            or (
+                getattr(getattr(t, "provenance", None), "item_id", None)
+                and getattr(t.provenance, "item_id", None) in acc_item_ids
+            )
+        ]
+    else:
+        kept_comps = list(raw_comps)
     comp_ids = [
         str(getattr(t, "id", "") or getattr(t, "text", ""))
-        for t in (getattr(clothing_res, "complement_tags", None) or ())
+        for t in kept_comps
     ]
     return {
         "exempt": bool(raw_info.get("exempt", False)),
         "exempt_reason": raw_info.get("exempt_reason"),
-        "repaired_ensemble": bool(raw_info.get("repaired_ensemble", False)),
+        "repaired_ensemble": bool(raw_info.get("repaired_ensemble", False)) and bool(accepted_atoms),
         "complement_ids": comp_ids,
-        "fallback_used": bool(raw_info.get("fallback_used", False)),
+        "fallback_used": bool(raw_info.get("fallback_used", False)) and bool(comp_ids),
         "fallback_reason": raw_info.get("fallback_reason") or raw_info.get("reason"),
         "controlled_rebuild_attempted": bool(controlled_rebuild_attempted),
     }
+
+
+def _format_description_nudity_label(
+    eff_nc: Optional[NudityConstraint],
+    fallback_lvl_code: Optional[str] = None,
+) -> Optional[str]:
+    if eff_nc is None:
+        return fallback_lvl_code
+    if eff_nc.yielded_to_override:
+        if eff_nc.effective_level:
+            if (
+                eff_nc.requested_level in VALID_NUDITY_LEVELS
+                and eff_nc.requested_level != eff_nc.effective_level
+            ):
+                return f"{eff_nc.effective_level} (原请求: {eff_nc.requested_level})"
+            return eff_nc.effective_level
+        if eff_nc.requested_level in VALID_NUDITY_LEVELS:
+            return f"已让位(原请求: {eff_nc.requested_level})"
+        return "已让位"
+    return eff_nc.effective_level or fallback_lvl_code
 
 
 def _append_description_status_markers(
@@ -702,8 +756,9 @@ def _generate_structured(
             desc = f"【预设模板】{preset.get('id', '')} {preset.get('name_zh', '')}"
             if recipe:
                 desc += f" | 【叠加配方】{recipe.get('style_name', recipe.get('name_zh', ''))}"
-            if eff_preset_nc and eff_preset_nc.effective_level and eff_preset_nc.source != "preset_native":
-                desc += f" | 裸露: {eff_preset_nc.effective_level}"
+            preset_nudity_label = _format_description_nudity_label(eff_preset_nc)
+            if eff_preset_nc and preset_nudity_label and eff_preset_nc.source != "preset_native":
+                desc += f" | 裸露: {preset_nudity_label}"
             desc = _append_description_status_markers(
                 desc,
                 nudity_constraint=eff_preset_nc,
@@ -739,6 +794,8 @@ def _generate_structured(
         rng_nudity,
         has_preset=False,
         external_overrides=external_overrides,
+        explicit_clothing=服装款式,
+        clothing_state=服装状态,
     )
     lvl_code = nudity_constraint.effective_level or "L1"
     nudity_branch = nudity_constraint.selected_branch
@@ -1112,6 +1169,8 @@ def _generate_structured(
     completion_summary = _build_completion_info_summary(
         active_clothing_res,
         controlled_rebuild_attempted=rebuild_attempted,
+        has_external_clothing_override=has_ext_clothing_override,
+        accepted_atoms=assembly_res.accepted_atoms,
     )
 
     negative_prompt = sampler.get_negative_prompt()
@@ -1122,9 +1181,13 @@ def _generate_structured(
         desc_parts.append(f"场景: {场景大类}")
     if not _is_none(剧情主题):
         desc_parts.append(f"主题: {剧情主题}")
-    if not _is_none(服装款式):
+    if has_ext_clothing_override:
+        desc_parts.append("服装: 外部覆盖")
+    elif not _is_none(服装款式):
         desc_parts.append(f"服装: {服装款式}")
-    desc_parts.append(f"裸露: {final_eff_nc.effective_level or lvl_code}")
+    nudity_desc_label = _format_description_nudity_label(final_eff_nc, lvl_code)
+    if nudity_desc_label:
+        desc_parts.append(f"裸露: {nudity_desc_label}")
     if not _is_none(发型发色):
         desc_parts.append(f"发型: {发型发色}")
     if not _is_none(妆容细节):
@@ -1481,8 +1544,9 @@ class IYKYKPresetBrowser:
         desc = f"【预设模板】{preset.get('id', '')} {preset.get('name_zh', '')}"
         if recipe:
             desc += f" | 【叠加配方】{recipe.get('style_name', recipe.get('name_zh', ''))}"
-        if eff_browser_nc and eff_browser_nc.effective_level and eff_browser_nc.source != "preset_native":
-            desc += f" | 裸露: {eff_browser_nc.effective_level}"
+        browser_nudity_label = _format_description_nudity_label(eff_browser_nc)
+        if eff_browser_nc and browser_nudity_label and eff_browser_nc.source != "preset_native":
+            desc += f" | 裸露: {browser_nudity_label}"
         desc = _append_description_status_markers(
             desc,
             nudity_constraint=eff_browser_nc,
