@@ -279,15 +279,8 @@ class TestClothingExpansionBatches(unittest.TestCase):
                 self.assertEqual(res_alias.style_id, cid)
 
     def test_02_batches_random_reachability(self):
-        """验证 Batch 1 (16 款), Batch 2 (22 款), Batch 3 (23 款), Batch 4 (23 款), Batch 5 (22 款) 共 106 款新增款式在随机模式 (随机 (Random)) 下均可真实被抽中。"""
-        sampled_styles = set()
-        rng = Random(2026)
-        # 137 款均匀抽取，抽样 6000 次，所有 106 款新增款式必须 100% 被覆盖
-        for _ in range(6000):
-            res = self.sampler.sample_clothing_result("随机 (Random)", "无 (None)", "L1", rng)
-            if res.style_id:
-                sampled_styles.add(res.style_id)
-
+        """验证 Batch 1-5 共 106 款新增款式在相容裸露等级的随机模式 (随机 (Random)) 下均可真实被抽中，且 L2+ 专用款在 L1 下严格受阻。"""
+        l2_only_batch_ids = {"bikini_classic", "bikini_creative", "bikini_strappy", "slime_dress"}
         target_ids = (
             {item[0] for item in BATCH_1_ITEMS}
             | {item[0] for item in BATCH_2_ITEMS}
@@ -295,8 +288,30 @@ class TestClothingExpansionBatches(unittest.TestCase):
             | {item[0] for item in BATCH_4_ITEMS}
             | {item[0] for item in BATCH_5_ITEMS}
         )
-        unreached = target_ids - sampled_styles
-        self.assertEqual(len(unreached), 0, f"Styles never reached in random sampling: {unreached}")
+        l1_target_ids = target_ids - l2_only_batch_ids
+
+        # L1 下抽样 6000 次：所有 L1 合规新增款式均可达，且 L2+ 专用比基尼/史莱姆裙严禁漏入 L1
+        sampled_l1 = set()
+        rng_l1 = Random(2026)
+        for _ in range(6000):
+            res = self.sampler.sample_clothing_result("随机 (Random)", "无 (None)", "L1", rng_l1)
+            if res.style_id:
+                sampled_l1.add(res.style_id)
+
+        unreached_l1 = l1_target_ids - sampled_l1
+        self.assertEqual(len(unreached_l1), 0, f"L1-eligible styles never reached in random sampling: {unreached_l1}")
+        leaked_to_l1 = sampled_l1 & l2_only_batch_ids
+        self.assertEqual(len(leaked_to_l1), 0, f"L2/L3-only styles leaked into L1 random sampling: {leaked_to_l1}")
+
+        # L2 下抽样 4000 次：L2 合规的比基尼与史莱姆裙均可稳定可达
+        sampled_l2 = set()
+        rng_l2 = Random(2027)
+        for _ in range(4000):
+            res = self.sampler.sample_clothing_result("随机 (Random)", "无 (None)", "L2", rng_l2)
+            if res.style_id:
+                sampled_l2.add(res.style_id)
+        unreached_l2 = l2_only_batch_ids - sampled_l2
+        self.assertEqual(len(unreached_l2), 0, f"L2-eligible styles never reached in L2 random sampling: {unreached_l2}")
 
     def test_03_discrete_tag_syntax_and_word_count(self):
         """验证 Batch 1, 2, 3, 4, 5 共 106 款款式返回离散叶子标签，零语法破坏且词数处于合理受控范围。"""
@@ -1297,21 +1312,16 @@ class TestClothingExpansionBatches(unittest.TestCase):
         serialized = json.dumps(records, sort_keys=True, ensure_ascii=False)
         digest = hashlib.sha256(serialized.encode("utf-8")).hexdigest()
 
-        # 1. 当前 rc10 全量数据摘要：在校准 24 处附属细节/配件拓扑（如 furisode 袖子、leather_corset 绑带等剔除误标的 bottom_skirt）后，
-        # 930 组输出中 928 组与原基线完全一致，仅 2 组发生合理修正：
-        # - furisode (L2, seed=2024, unbuttoned):
-        #   * 状态标签：从含有错误裙装开合 ['front unbuttoned', 'skirt unbuttoned']
-        #     修正为和服合法开合 ['front unbuttoned', 'collar unbuttoned']；
-        #   * 扩展标签：由 'semi-translucent fabric creating hazy skin contours' 变为 'high side slit to upper thigh exposing long bare leg'；
-        #   * 后续随机数状态：rng_next 发生相应位移。
-        # - leather_corset (L2, seed=2024, unbuttoned):
-        #   * 状态标签：从含有错误裙装开合 ['collar unbuttoned', 'skirt unbuttoned']
-        #     修正为上衣合法开合 ['front unbuttoned', 'shirt open at chest']；
-        #   * 扩展标签：由 'high side slit to upper thigh exposing long bare leg' 变为 'semi-translucent fabric creating hazy skin contours'；
-        #   * 后续随机数状态：rng_next 发生相应位移。
-        # 上述两组输出的扩展标签在“半透明面料”与“高开衩”之间发生互换，连锁引起 rng_next 变化，
-        # 完整消除了无裙装款式因配件拓扑误判而附带裙装解扣/动作的问题。
-        rc10_expanded_digest = "4f8d2fc0186ddcdad9e252040565a9b3a3f05aa488467c79a9558d0926eb782d"
+        # 1. 当前 v1.2.1 M2 全量数据摘要：
+        #    在 M2 完成三项既有契约修正后，930 组输出中其余非受损场景保持不变，以下确定性修正项生效：
+        #    - 多标签非变体套装（blazer_uniform, jk_seifuku, ol_suit, bunny_suit, cheerleader, hanfu,
+        #      korean_school, modern_chinese, nurse_uniform, street_casual, waitress_uniform）子采样
+        #      若丢失核心上下装/连体款或丢失状态载体，由独立 repair_rng 自动修复为完整且状态相容组合；
+        #    - bikini_micro 在 L2 剔除仅限 L3/L4 的最小覆盖词条（'minimal fabric coverage'）；
+        #    - 重/厚/阻透面料（dungarees, knit_sweater, latex_catsuit, leather_corset, street_casual,
+        #      sweater_casual 等）在 L2/L3 禁止叠加 cloth_transparency_tiers（如 sheer chiffon/semi-translucent）；
+        #    - SelectionMode.NONE 下未扩容变体的存量 23 款仍严格保持 0 次 RNG 消费。
+        rc10_expanded_digest = "173b24be03493e10ed6c4a7a2a21695ab915766c0d1a76391c7d519d9959dde8"
         self.assertEqual(
             digest,
             rc10_expanded_digest,

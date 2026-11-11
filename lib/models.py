@@ -2852,10 +2852,14 @@ class ClothingSampleResult:
     state_id: Optional[str] = None
     nudity_level: str = "L1"
     sampling_rationale: Optional[Dict[str, Any]] = None
+    complement_tags: Tuple[SampledTag, ...] = ()
+    completion_info: Optional[Dict[str, Any]] = field(default=None, compare=False, hash=False)
 
     @property
     def all_tags(self) -> Tuple[SampledTag, ...]:
-        return self.base_tags + self.state_tags + self.extension_tags
+        if self.state_id == "linkage_override" and not self.base_tags:
+            return self.state_tags + self.complement_tags + self.extension_tags
+        return self.base_tags + self.complement_tags + self.state_tags + self.extension_tags
 
     @property
     def sampled_tags(self) -> Tuple[SampledTag, ...]:

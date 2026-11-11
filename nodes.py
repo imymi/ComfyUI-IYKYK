@@ -21,12 +21,11 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, Sequence, Tuple
 
 if __package__:
-    from .lib.assembler import CANONICAL_20_SLOTS, PromptAssembler, _inspect_blank_input, make_override_fragments, split_top_level_tags
+    from .lib.assembler import PromptAssembler, _inspect_blank_input, split_top_level_tags
     from .lib.context_affinity import compute_context_profile
     from .lib.errors import (
         CATEGORY_EXTERNAL_BUDGET_EXCEEDED,
         CATEGORY_EXTERNAL_OVERRIDE_CONFLICT,
-        CATEGORY_GENERIC_ERROR,
         CATEGORY_INVALID_INPUT_TYPE,
         CATEGORY_SLOT_ALIAS_COLLISION,
         CATEGORY_UNRESOLVED_HARD_CONFLICT,
@@ -34,16 +33,16 @@ if __package__:
         UnresolvedConflictError,
     )
     from .lib.models import GenerationResult, NudityConstraint, ORDERED_CONTEXT_IDS, PromptAtom, PromptFragment, SelectionOrigin, SemanticFacts, TagProvenance, VALID_NUDITY_LEVELS, is_external_atom, normalize_nudity_level_code
+    from .lib.outfit_completion import assess_clothing_completeness, check_completion_exemption
     from .lib.rng import derive_substream_rng, recover_effective_seed
     from .lib.sampler import DataSampler, _is_none, get_selection_mode
     from .lib.slot_contract import AUXILIARY_SLOT_ORDER, SLOT_ORDER, normalize_slot_mapping, normalize_slot_name
 else:
-    from lib.assembler import CANONICAL_20_SLOTS, PromptAssembler, _inspect_blank_input, make_override_fragments, split_top_level_tags
+    from lib.assembler import PromptAssembler, _inspect_blank_input, split_top_level_tags
     from lib.context_affinity import compute_context_profile
     from lib.errors import (
         CATEGORY_EXTERNAL_BUDGET_EXCEEDED,
         CATEGORY_EXTERNAL_OVERRIDE_CONFLICT,
-        CATEGORY_GENERIC_ERROR,
         CATEGORY_INVALID_INPUT_TYPE,
         CATEGORY_SLOT_ALIAS_COLLISION,
         CATEGORY_UNRESOLVED_HARD_CONFLICT,
@@ -51,6 +50,7 @@ else:
         UnresolvedConflictError,
     )
     from lib.models import GenerationResult, NudityConstraint, ORDERED_CONTEXT_IDS, PromptAtom, PromptFragment, SelectionOrigin, SemanticFacts, TagProvenance, VALID_NUDITY_LEVELS, is_external_atom, normalize_nudity_level_code
+    from lib.outfit_completion import assess_clothing_completeness, check_completion_exemption
     from lib.rng import derive_substream_rng, recover_effective_seed
     from lib.sampler import DataSampler, _is_none, get_selection_mode
     from lib.slot_contract import AUXILIARY_SLOT_ORDER, SLOT_ORDER, normalize_slot_mapping, normalize_slot_name
@@ -413,9 +413,52 @@ def _make_clothing_fragments(
         )
         order += 1
 
-    # state_tags -> clothing_state_origin (unless linkage_override, which overrides clothing style tags)
+    complement_tags = getattr(res, "complement_tags", ())
     state_tags = getattr(res, "state_tags", ())
     is_linkage_override = (state_id == "linkage_override")
+
+    def _emit_complement_fragments() -> None:
+        nonlocal order
+        for stag in complement_tags:
+            t_text = stag.text if hasattr(stag, "text") else str(stag)
+            t_facts = getattr(stag, "facts", SemanticFacts())
+            t_prov = getattr(stag, "provenance", None)
+            comp_item_id = (t_prov.item_id if (t_prov and t_prov.item_id) else style_id) or ""
+            t_id = getattr(stag, "id", f"{comp_item_id}__comp_{order:03d}" if comp_item_id else "")
+            if not t_prov or not t_prov.item_id:
+                t_prov = TagProvenance(
+                    item_id=comp_item_id or t_id,
+                    kind="clothing_completion",
+                    parent_ids=(comp_item_id,) if comp_item_id else (),
+                    semantic_ids=((f"clothing:{comp_item_id}", "completion:auto_outfit") if comp_item_id else ()),
+                )
+            comp_origin = SelectionOrigin(
+                entry_point=entry_point,
+                mode="auto",
+                selector="clothing",
+                selected_id=comp_item_id,
+                raw_value=clothing_style_val,
+                parent_ids=(comp_item_id,) if comp_item_id else (),
+            )
+            frags.append(
+                PromptFragment(
+                    text=t_text,
+                    source_slot="clothing",
+                    source_item_id=comp_item_id,
+                    order=order,
+                    provenance=t_prov,
+                    id=t_id,
+                    facts=t_facts,
+                    origin=comp_origin,
+                )
+            )
+            order += 1
+
+    # 非 linkage_override 时，先输出主款补充件再输出状态词
+    if not (is_linkage_override and not base_tags):
+        _emit_complement_fragments()
+
+    # state_tags -> clothing_state_origin (unless linkage_override, which overrides clothing style tags)
     for stag in state_tags:
         t_text = stag.text if hasattr(stag, "text") else str(stag)
         t_id = getattr(stag, "id", f"{state_id}__tag_{order:03d}" if state_id else "")
@@ -457,6 +500,10 @@ def _make_clothing_fragments(
         )
         order += 1
 
+    # 若主款走 linkage_override，主款文本即 state_tags，补件跟随在主款之后并保留各自独立 origin
+    if is_linkage_override and not base_tags:
+        _emit_complement_fragments()
+
     # extension_tags -> clothing_origin (extensions of clothing style)
     extension_tags = getattr(res, "extension_tags", ())
     for stag in extension_tags:
@@ -487,8 +534,8 @@ def _make_clothing_fragments(
         )
         order += 1
 
-    # Fallback if res didn't have base_tags/state_tags/extension_tags
-    if not base_tags and not state_tags and not extension_tags and hasattr(res, "all_tags"):
+    # Fallback if res didn't have base_tags/complement_tags/state_tags/extension_tags
+    if not base_tags and not complement_tags and not state_tags and not extension_tags and hasattr(res, "all_tags"):
         for stag in getattr(res, "all_tags", ()):
             t_text = stag.text if hasattr(stag, "text") else str(stag)
             t_id = getattr(stag, "id", f"{style_id}__tag_{order:03d}" if style_id else "")
@@ -687,8 +734,16 @@ def _generate_structured(
     slots["camera_angle"] = _make_slot_fragments(angle_res, "camera_angle", 拍摄视角, entry_point)
 
     rng_clothing = derive_substream_rng(effective_seed, "selector:clothing")
+    rng_clothing_comp = derive_substream_rng(effective_seed, "selector:clothing_completion")
     clothing_res = sampler.sample_clothing_result(
-        服装款式, 服装状态, lvl_code, rng_clothing, context=context, context_profile=context_profile
+        服装款式,
+        服装状态,
+        lvl_code,
+        rng_clothing,
+        context=context,
+        context_profile=context_profile,
+        completion_rng=rng_clothing_comp,
+        nudity_branch=nudity_constraint.selected_branch,
     )
     slots["clothing"] = _make_clothing_fragments(clothing_res, 服装款式, 服装状态, entry_point)
 
@@ -846,6 +901,7 @@ def _generate_structured(
         slots["custom"] = custom_fragments
 
     # 4. 组装、冲突消解与统一 Finalize
+    rng_state_pre_assemble = rng.getstate()
     assembly_res = assembler.assemble_slots(
         slots,
         rng=rng,
@@ -854,6 +910,86 @@ def _generate_structured(
         entry_point=entry_point,
         nudity_constraint=nudity_constraint,
     )
+
+    # 4b. M2 受控重组门禁（仅限非豁免随机/自动服装，最多重组 1 次，失败则显式抛错）
+    has_ext_clothing_override = any(
+        getattr(o, "canonical_slot", None) == "clothing" and getattr(o, "status", None) == "applied"
+        for o in (getattr(assembly_res, "overrides", None) or ())
+    )
+    post_exemption = check_completion_exemption(
+        服装款式,
+        has_external_clothing_override=has_ext_clothing_override,
+    )
+    if not post_exemption.is_exempt:
+        eff_constraint = getattr(assembly_res, "nudity_constraint", None) or nudity_constraint
+        eff_lvl = getattr(eff_constraint, "effective_level", None) or lvl_code
+        eff_branch = getattr(eff_constraint, "selected_branch", None)
+        post_res_clothing_atoms = [
+            a for a in (list(assembly_res.accepted_atoms) + list(assembly_res.budget_filtered_atoms))
+            if getattr(a, "source_slot", None) in ("clothing", "clothing_state", "clothing_extension", "underwear")
+        ]
+        post_assessment = assess_clothing_completeness(
+            post_res_clothing_atoms,
+            (),
+            nudity_level_code=eff_lvl,
+            nudity_branch=eff_branch,
+        )
+        if not post_assessment.is_complete:
+            rng_clothing_rebuild = derive_substream_rng(effective_seed, "selector:clothing_rebuild:1")
+            failed_ids = set(post_assessment.violating_item_ids)
+            if getattr(clothing_res, "style_id", None):
+                failed_ids.add(clothing_res.style_id)
+            rebuild_res = sampler.sample_clothing_result(
+                服装款式,
+                服装状态,
+                eff_lvl,
+                rng_clothing_rebuild,
+                context=context,
+                context_profile=context_profile,
+                completion_rng=rng_clothing_rebuild,
+                nudity_branch=eff_branch,
+                extra_excluded_ids=failed_ids,
+                force_minimal_fallback=True,
+            )
+            slots["clothing"] = _make_clothing_fragments(rebuild_res, 服装款式, 服装状态, entry_point)
+            rng.setstate(rng_state_pre_assemble)
+            assembly_res = assembler.assemble_slots(
+                slots,
+                rng=rng,
+                context_profile=context_profile,
+                external_overrides=external_overrides,
+                entry_point=entry_point,
+                nudity_constraint=eff_constraint,
+            )
+            eff_constraint_after = getattr(assembly_res, "nudity_constraint", None) or eff_constraint
+            eff_lvl_after = getattr(eff_constraint_after, "effective_level", None) or eff_lvl
+            eff_branch_after = getattr(eff_constraint_after, "selected_branch", None)
+            post_res_after = [
+                a for a in (list(assembly_res.accepted_atoms) + list(assembly_res.budget_filtered_atoms))
+                if getattr(a, "source_slot", None) in ("clothing", "clothing_state", "clothing_extension", "underwear")
+            ]
+            final_assessment = assess_clothing_completeness(
+                post_res_after,
+                (),
+                nudity_level_code=eff_lvl_after,
+                nudity_branch=eff_branch_after,
+            )
+            if not final_assessment.is_complete:
+                raise PromptValidationError(
+                    f"Clothing outfit remained incomplete after 1 controlled rebuild under {eff_lvl_after} "
+                    f"(missing_parts={final_assessment.missing_parts}, violating={final_assessment.violating_item_ids})",
+                    slots=("clothing",),
+                    texts=[a.text for a in post_res_after],
+                    error_code="incomplete_outfit_after_rebuild",
+                    details={
+                        "level": eff_lvl_after,
+                        "branch": eff_branch_after,
+                        "missing_parts": list(final_assessment.missing_parts),
+                        "violating_item_ids": list(final_assessment.violating_item_ids),
+                        "rebuild_attempts": 1,
+                    },
+                )
+
     negative_prompt = sampler.get_negative_prompt()
 
     # 5. 生成中文概要

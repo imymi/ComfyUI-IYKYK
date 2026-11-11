@@ -16,6 +16,7 @@ from random import Random
 import unittest
 
 from lib.models import PromptFragment, SemanticFacts, TagProvenance
+from lib.outfit_completion import assess_clothing_completeness, is_tags_compatible_with_state
 from nodes import IYKYKPromptGenerator, _assembler, _sampler
 
 
@@ -76,7 +77,12 @@ class TestV121M0Reproductions(unittest.TestCase):
         return self.generator.generate_structured(**kwargs), case
 
     def test_01_l1_l2_random_outfit_missing_pieces_and_leaks(self) -> None:
-        """复现 L1/L2 随机抽样仅出上装、下装、外套、袜类、内衣或被消解清空的缺件缺陷。"""
+        """M2 契约验证：L1/L2 随机/自动抽样保留主款并补全相容缺失件，禁止纯内衣或被消解清空。"""
+        l1_banned_styles = {
+            "lingerie_panties", "lingerie_bra", "lingerie_lace",
+            "bikini_micro", "bikini_classic", "bikini_creative", "bikini_strappy",
+            "slime_dress", "legwear_bare",
+        }
         for cid in (
             "REP-OUTFIT-01",
             "REP-OUTFIT-02",
@@ -90,19 +96,57 @@ class TestV121M0Reproductions(unittest.TestCase):
         ):
             with self.subTest(case_id=cid):
                 res, case = self._run_generator_case(cid)
-                actual = case["baseline_actual"]
+                eff_lvl = res.nudity_constraint.effective_level or "L1"
                 cl_source = [a for a in res.source_atoms if a.source_slot == "clothing"]
-                style_id = cl_source[0].origin.selected_id if cl_source and cl_source[0].origin else None
-                cl_texts = [a.text for a in res.atoms if a.source_slot == "clothing"]
-                self.assertEqual(style_id, actual["clothing_style_id"])
-                self.assertEqual(cl_texts, actual["clothing_texts"])
-                if "leaked_theme_texts" in actual:
-                    lower_pos = res.positive.lower()
-                    for leaked in actual["leaked_theme_texts"]:
-                        self.assertIn(leaked.lower(), lower_pos)
+                cl_accepted = [a for a in res.atoms if a.source_slot == "clothing"]
+                self.assertGreater(len(cl_accepted), 0, f"{cid}: clothing output must not be empty")
+
+                assessment = assess_clothing_completeness(cl_accepted, (), eff_lvl)
+                self.assertTrue(
+                    assessment.is_complete,
+                    f"{cid}: expected complete outfit under {eff_lvl}, got missing={assessment.missing_parts}, texts={[a.text for a in cl_accepted]}",
+                )
+
+                # 首项为主款 origin，且所有源片段保留一致 provenance 与独立补件 ID
+                first_style_id = cl_source[0].origin.selected_id if cl_source and cl_source[0].origin else None
+                self.assertIsNotNone(first_style_id)
+                for src_atom in cl_source:
+                    self.assertIsNotNone(src_atom.provenance)
+                    if src_atom.provenance.kind == "clothing_completion":
+                        self.assertEqual(src_atom.source_item_id, src_atom.provenance.item_id)
+                        self.assertEqual(src_atom.origin.selected_id, src_atom.provenance.item_id)
+                        self.assertNotEqual(src_atom.origin.selected_id, first_style_id)
+
+                if eff_lvl == "L1":
+                    for a in cl_accepted:
+                        item_id = a.provenance.item_id if a.provenance else ""
+                        self.assertNotIn(item_id, l1_banned_styles)
+                        self.assertNotIn("g-strings", a.text.lower())
+
+                if cid in ("REP-OUTFIT-01", "REP-OUTFIT-02"):
+                    self.assertEqual(first_style_id, "knit_sweater")
+                    self.assertTrue(any(a.provenance and a.provenance.kind == "clothing_completion" for a in cl_source))
+                elif cid == "REP-OUTFIT-04":
+                    self.assertEqual(first_style_id, "pencil_skirt")
+                    self.assertTrue(any(a.provenance and a.provenance.item_id == "t_shirt" for a in cl_accepted))
+                elif cid == "REP-OUTFIT-07":
+                    self.assertEqual(first_style_id, "footwear_sneakers")
+                    self.assertTrue(any(a.provenance and a.provenance.item_id != "footwear_sneakers" for a in cl_accepted))
+                elif cid == "REP-OUTFIT-08":
+                    self.assertEqual(first_style_id, "armored_skirt")
+                    # 服装状态=None：严禁生成 clothing_state/extension，但必须补全上装
+                    self.assertFalse(any(a.provenance and a.provenance.kind in ("clothing_state", "clothing_extension") for a in cl_source))
+                    self.assertTrue(any(a.provenance and a.provenance.kind == "clothing_completion" for a in cl_source))
+                elif cid == "REP-OUTFIT-09":
+                    self.assertEqual(first_style_id, "knit_sweater")
+                    self.assertTrue(any(a.provenance and a.provenance.kind == "clothing_completion" for a in cl_source))
+                    cl_lower = " | ".join(a.text.lower() for a in cl_accepted)
+                    self.assertNotIn("sheer chiffon", cl_lower)
+                    self.assertNotIn("semi-translucent", cl_lower)
+                    self.assertNotIn("translucent", cl_lower)
 
     def test_02_multi_tag_ensemble_subsampling_broken(self) -> None:
-        """复现 L2 随机状态下多标签套装被子采样为领带+袜子却配解扣状态。"""
+        """M2 契约验证：L2 随机状态下 blazer_uniform 子采样保留核心上下装并与 unbuttoned 状态兼容。"""
         case = self.cases["REP-OUTFIT-10"]
         inp = case["inputs"]
         res = _sampler.sample_clothing_result(
@@ -111,8 +155,14 @@ class TestV121M0Reproductions(unittest.TestCase):
             inp["nudity_level_code"],
             Random(case["seed"]),
         )
-        self.assertEqual([t.text for t in res.base_tags], case["baseline_actual"]["base_tags"])
-        self.assertEqual([t.text for t in res.state_tags], case["baseline_actual"]["state_tags"])
+        base_texts = [t.text for t in res.base_tags]
+        self.assertTrue(assess_clothing_completeness(res.base_tags, (), inp["nudity_level_code"]).is_complete)
+        self.assertIn("plaid pleated skirt", base_texts)
+        self.assertIn("collared shirt", base_texts)
+        self.assertNotEqual(base_texts, case["baseline_actual"]["base_tags"])
+        self.assertEqual(res.state_id, "unbuttoned")
+        self.assertTrue(is_tags_compatible_with_state(res.base_tags, res.state_id, res.state_tags, style_id=res.style_id))
+        self.assertTrue(res.completion_info and res.completion_info.get("repaired_ensemble"))
 
     def test_03_l3_l4_l6_branch_contradictions_and_l1_cross_slot_leaks(self) -> None:
         """复现 L3/L4 分支冲突与未删净完整衣、L6 齐腰截断、以及 L1 跨槽位暴露泄露。"""

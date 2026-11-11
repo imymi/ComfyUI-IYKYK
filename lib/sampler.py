@@ -21,7 +21,6 @@ from typing import Any, Dict, List, Optional, Sequence, Set, Tuple
 if __package__:
     from .conflict_resolver import (
         ALLOWED_BUTTON_STYLES,
-        ALLOWED_ZIPPER_STYLES,
         NON_SKIRT_ONE_PIECE,
         GarmentCarrierEntity,
         is_garment_compatible_with_state,
@@ -52,10 +51,17 @@ if __package__:
         VALID_NUDITY_LEVELS,
         normalize_nudity_level_code,
     )
+    from .outfit_completion import (
+        check_completion_exemption,
+        complete_outfit_tags,
+        derive_deterministic_child_rng,
+        filter_extensions_for_garments,
+        is_tag_eligible_for_nudity_level,
+        repair_ensemble_subsampling,
+    )
 else:
     from lib.conflict_resolver import (
         ALLOWED_BUTTON_STYLES,
-        ALLOWED_ZIPPER_STYLES,
         NON_SKIRT_ONE_PIECE,
         GarmentCarrierEntity,
         is_garment_compatible_with_state,
@@ -85,6 +91,14 @@ else:
         ThemeSampleResult,
         VALID_NUDITY_LEVELS,
         normalize_nudity_level_code,
+    )
+    from lib.outfit_completion import (
+        check_completion_exemption,
+        complete_outfit_tags,
+        derive_deterministic_child_rng,
+        filter_extensions_for_garments,
+        is_tag_eligible_for_nudity_level,
+        repair_ensemble_subsampling,
     )
 
 
@@ -768,6 +782,7 @@ class DataSampler:
             pass
 
         elif slot_name == "clothing":
+            data = None
             if clothing_state:
                 st_low = clothing_state.lower()
                 if any(w in st_low for w in ("unbuttoned", "解开纽扣", "opened", "解扣")):
@@ -782,8 +797,16 @@ class DataSampler:
                         cid = c.get("id", "")
                         if cid and not self._is_clothing_skirt_compatible(c):
                             excluded.add(cid)
-            if nudity_level_code == "L1":
-                excluded.update({"bikini_micro", "naked_ribbon", "bondage_harness", "sling_bikini"})
+            if nudity_level_code in ("L1", "L2"):
+                if nudity_level_code == "L1":
+                    excluded.update({"bikini_micro", "naked_ribbon", "bondage_harness", "sling_bikini"})
+                if data is None:
+                    data = self._load("clothing")
+                for c in data.get("categories", []):
+                    cid = c.get("id")
+                    tags = c.get("tags", [])
+                    if cid and tags and not any(is_tag_eligible_for_nudity_level(t, nudity_level_code) for t in tags):
+                        excluded.add(cid)
 
         return excluded
 
@@ -884,6 +907,7 @@ class DataSampler:
         rng: Random,
         nudity_level_code: Optional[str] = None,
         clothing_state: Optional[str] = None,
+        style_mode: Optional[str] = None,
     ) -> List[Any]:
         """从服装款式中按两步契约受控选择单品款式及相容构件：
         第一步：先选且仅选 1 个独立款式（主款式/版型/变体）；
@@ -895,23 +919,13 @@ class DataSampler:
             return []
 
         c_id = chosen_style.get("id", "")
+        enforce_tag_level = (style_mode in (SelectionMode.RANDOM, SelectionMode.AUTO))
 
-        # 1. 复合风格穿搭组合池严格单选 1 套完整穿搭 (杜绝拼接冲突长句与 L1 穿透)
+        # 1. 复合风格穿搭组合池严格单选 1 套完整穿搭 (杜绝拼接冲突长句与跨等级穿透)
         if c_id == "clothing_ensemble_combos" or chosen_style.get("is_ensemble"):
             filtered = list(all_tags)
-            if nudity_level_code == "L1":
-                banned_l1_words = (
-                    "bra", "panties", "breasts", "pussy", "nude", "naked",
-                    "undressed", "topless", "upskirt", "thong", "g-string",
-                    "boudoir", "lingerie", "cleavage", "underboob", "sideboob"
-                )
-                filtered = [
-                    t for t in filtered
-                    if not (
-                        (isinstance(t, dict) and t.get("facts", {}).get("style_genre") == "boudoir_lingerie")
-                        or any(bw in (t.get("text", "") if isinstance(t, dict) else str(t)).lower() for bw in banned_l1_words)
-                    )
-                ]
+            if nudity_level_code in ("L1", "L2", "L3", "L4"):
+                filtered = [t for t in filtered if is_tag_eligible_for_nudity_level(t, nudity_level_code)]
             if clothing_state and any(w in clothing_state.lower() for w in ("lifted", "掀起裙摆", "lifted_up", "lifted_skirt")):
                 skirt_filtered = [t for t in filtered if cls._tag_has_skirt_carrier(t, c_id)]
                 if skirt_filtered:
@@ -922,7 +936,12 @@ class DataSampler:
 
         # 2. 独立单品款式池（例如 16 个新增独立单品大类）：各标签均为独立完整款式，严格单选 1 件
         if c_id in STANDALONE_CLOTHING_CATEGORIES or chosen_style.get("is_standalone_pieces"):
-            return [rng.choice(all_tags)]
+            filtered_standalone = list(all_tags)
+            if enforce_tag_level and nudity_level_code in ("L1", "L2", "L3", "L4"):
+                filtered_standalone = [t for t in filtered_standalone if is_tag_eligible_for_nudity_level(t, nudity_level_code)]
+            if not filtered_standalone:
+                return []
+            return [rng.choice(filtered_standalone)]
 
         # 3. 存量扩增分类（包含 Batch 6 新增变体 tags 的分类）：
         # 例如 qipao, kimono, yukata, dress_casual, summer_sundress 等 35 个大类。
@@ -936,6 +955,8 @@ class DataSampler:
             attribute_candidates: List[Any] = []
 
             for t in all_tags:
+                if enforce_tag_level and nudity_level_code in ("L1", "L2", "L3", "L4") and not is_tag_eligible_for_nudity_level(t, nudity_level_code):
+                    continue
                 if isinstance(t, dict):
                     role = t.get("role")
 
@@ -968,9 +989,13 @@ class DataSampler:
                         result.append(chosen_attr)
 
                 return result
+            if enforce_tag_level and nudity_level_code in ("L1", "L2", "L3", "L4"):
+                return []
 
         # 4. 其他分类（M3.2 既有款式与套装构件，如 denim_shorts, hanfu, jk_seifuku, maid_dress 等）：
         # 全量传入 _to_sampled_tags 以保全各标签的 dynamic_slots 统计学抽样，随后由受控基线采样器及消解器处理。
+        if enforce_tag_level and nudity_level_code in ("L1", "L2", "L3", "L4"):
+            return [t for t in all_tags if is_tag_eligible_for_nudity_level(t, nudity_level_code)]
         return list(all_tags)
 
     @classmethod
@@ -1888,35 +1913,53 @@ class DataSampler:
         rng: Random,
         context: Optional[str] = None,
         context_profile: Optional[ContextProfile] = None,
+        *,
+        completion_rng: Optional[Random] = None,
+        nudity_branch: Optional[str] = None,
+        extra_excluded_ids: Optional[Set[str]] = None,
+        force_minimal_fallback: bool = False,
     ) -> ClothingSampleResult:
         """
         结构化采样服装标签及语义 Provenance，彻底解耦 DataSampler 与 PromptFragment。
         严格落实四态契约：
-        - None: 纯净基础款式，不加状态词、不加裸露联动override、不加扩展库。
+        - None: 纯净基础款式，不加状态词、不加裸露联动override、不加扩展库；若款式为随机/自动则仍补全基础穿搭。
         - Auto: 联动裸露等级，L2/L3/L4 接入 24 档数据驱动扩展。
         - Random: 随机合法状态，L2/L3/L4 接入 24 档数据驱动扩展。
         - Explicit: 指定状态，L2/L3/L4 接入 24 档数据驱动扩展。
         """
         if _is_none(style):
             rat_none = self._pop_sampling_rationale(None, "none")
-            return ClothingSampleResult(base_tags=(), nudity_level=nudity_level_code, sampling_rationale=rat_none)
+            return ClothingSampleResult(
+                base_tags=(),
+                nudity_level=nudity_level_code,
+                sampling_rationale=rat_none,
+                completion_info={"exempt": True, "exempt_reason": "style_none"},
+            )
 
         data = self._load("clothing")
         styles = data.get("categories", [])
         if not styles:
             rat_empty = self._pop_sampling_rationale(None, "none")
-            return ClothingSampleResult(base_tags=(), nudity_level=nudity_level_code, sampling_rationale=rat_empty)
+            return ClothingSampleResult(
+                base_tags=(),
+                nudity_level=nudity_level_code,
+                sampling_rationale=rat_empty,
+                completion_info={"exempt": True, "exempt_reason": "empty_catalog"},
+            )
 
         # 1. 确定服装款式对象
         style_mode = get_selection_mode(style)
         target_tag = None
+        excluded_ids = self.get_excluded_candidate_ids(
+            "clothing",
+            nudity_level_code=nudity_level_code,
+            clothing_state=state,
+            context=context,
+        )
+        if extra_excluded_ids:
+            excluded_ids = set(excluded_ids) | set(extra_excluded_ids)
+
         if style_mode in (SelectionMode.RANDOM, SelectionMode.AUTO) or _is_random(style) or _is_auto(style):
-            excluded_ids = self.get_excluded_candidate_ids(
-                "clothing",
-                nudity_level_code=nudity_level_code,
-                clothing_state=state,
-                context=context,
-            )
             chosen_style = self._sample_from_candidates(
                 "clothing",
                 styles,
@@ -1927,7 +1970,45 @@ class DataSampler:
             )
             if not chosen_style:
                 rat_fallback = self._pop_sampling_rationale(None, "none")
-                return ClothingSampleResult(base_tags=(), nudity_level=nudity_level_code, sampling_rationale=rat_fallback)
+                if force_minimal_fallback and nudity_level_code in ("L1", "L2", "L3"):
+                    comp_rng_fb = completion_rng or derive_deterministic_child_rng(
+                        rng, style, state, nudity_level_code, nudity_branch or "", "clothing_completion_fb"
+                    )
+                    affinity_matrix = getattr(getattr(self, "affinity_registry", None), "matrix", None)
+                    fb_tags, fb_info = complete_outfit_tags(
+                        primary_style_id="",
+                        active_tags=(),
+                        state_id=None,
+                        state_tags=(),
+                        nudity_level_code=nudity_level_code,
+                        nudity_branch=nudity_branch,
+                        categories=styles,
+                        excluded_ids=excluded_ids,
+                        context_profile=context_profile,
+                        context=context,
+                        affinity_matrix=affinity_matrix,
+                        to_sampled_fn=self._to_sampled_tags,
+                        completion_rng=comp_rng_fb,
+                        force_minimal_fallback=True,
+                    )
+                    fb_info["exempt"] = False
+                    return ClothingSampleResult(
+                        base_tags=(),
+                        state_tags=(),
+                        extension_tags=(),
+                        style_id="",
+                        state_id=None,
+                        nudity_level=nudity_level_code,
+                        sampling_rationale=rat_fallback,
+                        complement_tags=fb_tags,
+                        completion_info=fb_info,
+                    )
+                return ClothingSampleResult(
+                    base_tags=(),
+                    nudity_level=nudity_level_code,
+                    sampling_rationale=rat_fallback,
+                    completion_info={"exempt": False, "reason": "no_legal_primary_style"},
+                )
         else:
             chosen_style = _match_item(styles, style)
             if not chosen_style:
@@ -1940,22 +2021,17 @@ class DataSampler:
         c_id = chosen_style.get("id", "")
         style_rat = self._pop_sampling_rationale(c_id, "random" if _is_random(style) or _is_auto(style) else "explicit")
         if target_tag:
-            if nudity_level_code == "L1":
-                banned_l1_words = (
-                    "bra", "panties", "breasts", "pussy", "nude", "naked",
-                    "undressed", "topless", "upskirt", "thong", "g-string",
-                    "boudoir", "lingerie", "cleavage", "underboob", "sideboob"
-                )
-                is_banned = (
-                    (isinstance(target_tag, dict) and target_tag.get("facts", {}).get("style_genre") == "boudoir_lingerie")
-                    or any(bw in (target_tag.get("text", "") if isinstance(target_tag, dict) else str(target_tag)).lower() for bw in banned_l1_words)
-                )
-                raw_style_tags = [] if is_banned else [target_tag]
+            if nudity_level_code in ("L1", "L2", "L3", "L4") and not is_tag_eligible_for_nudity_level(target_tag, nudity_level_code):
+                raw_style_tags = []
             else:
                 raw_style_tags = [target_tag]
         else:
             raw_style_tags = self._select_clothing_style_tags(
-                chosen_style, rng, nudity_level_code=nudity_level_code, clothing_state=state
+                chosen_style,
+                rng,
+                nudity_level_code=nudity_level_code,
+                clothing_state=state,
+                style_mode=style_mode,
             )
         _, all_base_sampled = self._to_sampled_tags(
             raw_style_tags,
@@ -1965,24 +2041,138 @@ class DataSampler:
             rng=rng,
         )
         base_tags_tuple = tuple(all_base_sampled)
+        full_base_tags_tuple = base_tags_tuple
         has_variant_metadata = self._has_variant_metadata(base_tags_tuple, chosen_style=chosen_style)
-
         state_mode = get_selection_mode(state)
+        exemption = check_completion_exemption(style)
+        affinity_matrix = getattr(getattr(self, "affinity_registry", None), "matrix", None)
 
-        # 契约 1: 状态为 None -> 仅保留基础款式，不加状态词、不加裸露联动override、不加扩展
+        def _get_comp_rng() -> Random:
+            if completion_rng is not None:
+                return completion_rng
+            return derive_deterministic_child_rng(
+                rng,
+                style,
+                state,
+                nudity_level_code,
+                nudity_branch or "",
+                c_id,
+                "clothing_completion",
+            )
+
+        def _finalize_clothing_result(
+            chosen_base_seq: Sequence[SampledTag],
+            state_tags_seq: Sequence[SampledTag],
+            chosen_state_id: Optional[str],
+            *,
+            allow_extensions: bool,
+        ) -> ClothingSampleResult:
+            final_base = tuple(chosen_base_seq)
+            final_state_tags = tuple(state_tags_seq)
+            final_state_id = chosen_state_id
+            repaired_ensemble = False
+
+            if nudity_level_code in ("L5", "L6") and state_mode != SelectionMode.NONE:
+                return ClothingSampleResult(
+                    base_tags=(),
+                    state_tags=final_state_tags,
+                    extension_tags=(),
+                    style_id=c_id,
+                    state_id=final_state_id,
+                    nudity_level=nudity_level_code,
+                    sampling_rationale=style_rat,
+                    complement_tags=(),
+                    completion_info={"exempt": True, "exempt_reason": f"level_{nudity_level_code}"},
+                )
+
+            if (
+                not has_variant_metadata
+                and len(full_base_tags_tuple) >= 2
+                and state_mode != SelectionMode.NONE
+                and not target_tag
+                and final_base
+                and any(bool(t.facts and t.facts.piece_role) for t in full_base_tags_tuple)
+            ):
+                final_base, repaired_ensemble = repair_ensemble_subsampling(
+                    full_base_tags_tuple,
+                    final_base,
+                    style_id=c_id,
+                    state_id=final_state_id,
+                    state_tags=final_state_tags,
+                    nudity_level_code=nudity_level_code,
+                    nudity_branch=nudity_branch,
+                    repair_rng=_get_comp_rng(),
+                )
+
+            if exemption.is_exempt:
+                comp_tags_tuple: Tuple[SampledTag, ...] = ()
+                comp_info: Dict[str, Any] = {
+                    "exempt": True,
+                    "exempt_reason": exemption.reason,
+                    "repaired_ensemble": repaired_ensemble,
+                }
+            else:
+                comp_tags_tuple, comp_info = complete_outfit_tags(
+                    primary_style_id=c_id,
+                    active_tags=final_base,
+                    state_id=final_state_id,
+                    state_tags=final_state_tags,
+                    nudity_level_code=nudity_level_code,
+                    nudity_branch=nudity_branch,
+                    categories=styles,
+                    excluded_ids=excluded_ids,
+                    context_profile=context_profile,
+                    context=context,
+                    affinity_matrix=affinity_matrix,
+                    to_sampled_fn=self._to_sampled_tags,
+                    completion_rng=_get_comp_rng(),
+                    force_minimal_fallback=force_minimal_fallback,
+                )
+                comp_info["exempt"] = False
+                comp_info["repaired_ensemble"] = repaired_ensemble
+                if comp_info.get("replace_base_with_fallback"):
+                    final_base = ()
+                    final_state_tags = ()
+                    final_state_id = None
+
+            extension_sampled_tags: List[SampledTag] = []
+            if allow_extensions and nudity_level_code in ("L2", "L3", "L4"):
+                garment_tags_for_ext = list(final_base) + list(comp_tags_tuple) + (
+                    list(final_state_tags) if final_state_id == "linkage_override" else []
+                )
+                ext_tags = self._sample_clothing_extensions_provenance(
+                    nudity_level_code,
+                    c_id,
+                    rng,
+                    data,
+                    garment_tags=garment_tags_for_ext,
+                    nudity_branch=nudity_branch,
+                )
+                extension_sampled_tags.extend(ext_tags)
+
+            return ClothingSampleResult(
+                base_tags=final_base,
+                state_tags=final_state_tags,
+                extension_tags=tuple(extension_sampled_tags),
+                style_id=c_id,
+                state_id=final_state_id,
+                nudity_level=nudity_level_code,
+                sampling_rationale=style_rat,
+                complement_tags=comp_tags_tuple,
+                completion_info=comp_info,
+            )
+
+        # 契约 1: 状态为 None -> 不加状态词、不加裸露联动override、不加扩展；若款式为随机/自动，仍检查并补全基础穿搭
         if state_mode == SelectionMode.NONE:
             if has_variant_metadata:
                 controlled_base = self._sample_controlled_base_clothing_tags(base_tags_tuple, rng)
             else:
                 controlled_base = base_tags_tuple
-            return ClothingSampleResult(
-                base_tags=controlled_base,
-                state_tags=(),
-                extension_tags=(),
-                style_id=c_id,
-                state_id=None,
-                nudity_level=nudity_level_code,
-                sampling_rationale=style_rat,
+            return _finalize_clothing_result(
+                controlled_base,
+                (),
+                None,
+                allow_extensions=False,
             )
 
         linkages = data.get("clothing_nudity_linkage", {})
@@ -2003,14 +2193,11 @@ class DataSampler:
                     "clothing_state",
                     semantic_ids=(f"clothing:{c_id}", f"nudity:{nudity_level_code}", "override:linkage")
                 )
-                return ClothingSampleResult(
-                    base_tags=(),
-                    state_tags=tuple(state_tags_list),
-                    extension_tags=(),
-                    style_id=c_id,
-                    state_id="linkage_override",
-                    nudity_level=nudity_level_code,
-                    sampling_rationale=style_rat,
+                return _finalize_clothing_result(
+                    (),
+                    state_tags_list,
+                    "linkage_override",
+                    allow_extensions=False,
                 )
             else:
                 gen_tags = linkage_data.get("general_tags", [])
@@ -2028,18 +2215,24 @@ class DataSampler:
                         chosen_base = self._pick(base_tags_tuple, rng, min(2, len(base_tags_tuple)))
                 else:
                     chosen_base = ()
-                return ClothingSampleResult(
-                    base_tags=tuple(chosen_base),
-                    state_tags=tuple(state_tags_list),
-                    extension_tags=(),
-                    style_id=c_id,
-                    state_id="linkage_general",
-                    nudity_level=nudity_level_code,
-                    sampling_rationale=style_rat,
+                return _finalize_clothing_result(
+                    chosen_base,
+                    state_tags_list,
+                    "linkage_general",
+                    allow_extensions=False,
                 )
 
         if state_mode == SelectionMode.AUTO:
-            if nudity_level_code in ("L1", "L5", "L6"):
+            # L2, L3, L4 Auto mode
+            if c_id in style_overrides:
+                override_tags = list(style_overrides[c_id])
+                _, state_tags_list = self._to_sampled_tags(
+                    override_tags,
+                    c_id,
+                    "clothing_state",
+                    semantic_ids=(f"clothing:{c_id}", f"nudity:{nudity_level_code}", "override:linkage")
+                )
+            else:
                 gen_tags = linkage_data.get("general_tags", [])
                 chosen_gen = self._pick(gen_tags, rng, min(2, len(gen_tags)))
                 _, state_tags_list = self._to_sampled_tags(
@@ -2052,41 +2245,8 @@ class DataSampler:
                     chosen_base = self._sample_controlled_base_clothing_tags(base_tags_tuple, rng)
                 else:
                     chosen_base = self._pick(base_tags_tuple, rng, min(2, len(base_tags_tuple)))
-                return ClothingSampleResult(
-                    base_tags=tuple(chosen_base),
-                    state_tags=tuple(state_tags_list),
-                    extension_tags=(),
-                    style_id=c_id,
-                    state_id="linkage_general",
-                    nudity_level=nudity_level_code,
-                    sampling_rationale=style_rat,
-                )
-
-            else:
-                # L2, L3, L4 Auto mode
-                if c_id in style_overrides:
-                    override_tags = list(style_overrides[c_id])
-                    _, state_tags_list = self._to_sampled_tags(
-                        override_tags,
-                        c_id,
-                        "clothing_state",
-                        semantic_ids=(f"clothing:{c_id}", f"nudity:{nudity_level_code}", "override:linkage")
-                    )
-                else:
-                    gen_tags = linkage_data.get("general_tags", [])
-                    chosen_gen = self._pick(gen_tags, rng, min(2, len(gen_tags)))
-                    _, state_tags_list = self._to_sampled_tags(
-                        chosen_gen,
-                        "linkage_general",
-                        "clothing_state",
-                        semantic_ids=(f"clothing:{c_id}", f"nudity:{nudity_level_code}", "linkage:general")
-                    )
-                    if has_variant_metadata:
-                        chosen_base = self._sample_controlled_base_clothing_tags(base_tags_tuple, rng)
-                    else:
-                        chosen_base = self._pick(base_tags_tuple, rng, min(2, len(base_tags_tuple)))
-                    base_tags_tuple = tuple(chosen_base)
-                state_id = "auto_linkage"
+                base_tags_tuple = tuple(chosen_base)
+            state_id = "auto_linkage"
 
         elif state_mode == SelectionMode.RANDOM:
             if nudity_level_code == "L1":
@@ -2171,21 +2331,11 @@ class DataSampler:
                     chosen_base = self._pick(base_tags_tuple, rng, min(2, len(base_tags_tuple)))
             base_tags_tuple = tuple(chosen_base)
 
-
-        # 契约：Auto, Random, Explicit 在 L2/L3/L4 均通过数据驱动采样扩展库
-        extension_sampled_tags: List[SampledTag] = []
-        if nudity_level_code in ("L2", "L3", "L4"):
-            ext_tags = self._sample_clothing_extensions_provenance(nudity_level_code, c_id, rng, data)
-            extension_sampled_tags.extend(ext_tags)
-
-        return ClothingSampleResult(
-            base_tags=base_tags_tuple,
-            state_tags=tuple(state_tags_list),
-            extension_tags=tuple(extension_sampled_tags),
-            style_id=c_id,
-            state_id=state_id,
-            nudity_level=nudity_level_code,
-            sampling_rationale=style_rat,
+        return _finalize_clothing_result(
+            base_tags_tuple,
+            state_tags_list,
+            state_id,
+            allow_extensions=True,
         )
 
     def sample_clothing_with_nudity_linkage(
@@ -2204,9 +2354,12 @@ class DataSampler:
         nudity_level_code: Optional[str],
         clothing_id: str,
         rng: Random,
-        data: Dict[str, Any]
+        data: Dict[str, Any],
+        *,
+        garment_tags: Sequence[Any] = (),
+        nudity_branch: Optional[str] = None,
     ) -> List[SampledTag]:
-        """为服装受控应用 9/5/10 扩展库，返回携带真实 Provenance 的 SampledTag 列表。"""
+        """为服装受控应用 9/5/10 扩展库，按材质/分支过滤不相容扩展并返回携带真实 Provenance 的 SampledTag 列表。"""
         if nudity_level_code in ("L1", "L5", "L6") or not nudity_level_code:
             return []
 
@@ -2219,8 +2372,33 @@ class DataSampler:
         allowed_trans_ids = set(policy.get("transparency_ids", []))
         allowed_wardrobe_ids = set(policy.get("wardrobe_ids", []))
 
-        all_exp_tiers = [t for t in data.get("sfw_exposure_tiers", []) if t.get("id") in allowed_exp_ids]
-        all_trans_tiers = [t for t in data.get("cloth_transparency_tiers", []) if t.get("id") in allowed_trans_ids]
+        has_structured_catalog_facts = any(
+            isinstance(t, dict) and bool((t.get("facts") or {}).get("piece_role"))
+            for c in data.get("categories", [])[:5]
+            for t in c.get("tags", [])
+        )
+        raw_exp_tiers = [t for t in data.get("sfw_exposure_tiers", []) if t.get("id") in allowed_exp_ids]
+        raw_trans_tiers = [t for t in data.get("cloth_transparency_tiers", []) if t.get("id") in allowed_trans_ids]
+        if has_structured_catalog_facts:
+            all_exp_tiers = filter_extensions_for_garments(
+                raw_exp_tiers,
+                kind="sfw_exposure",
+                nudity_level_code=nudity_level_code,
+                clothing_id=clothing_id,
+                garment_tags=garment_tags,
+                nudity_branch=nudity_branch,
+            )
+            all_trans_tiers = filter_extensions_for_garments(
+                raw_trans_tiers,
+                kind="cloth_transparency",
+                nudity_level_code=nudity_level_code,
+                clothing_id=clothing_id,
+                garment_tags=garment_tags,
+                nudity_branch=nudity_branch,
+            )
+        else:
+            all_exp_tiers = raw_exp_tiers
+            all_trans_tiers = raw_trans_tiers
         all_wardrobe = [t for t in data.get("lingerie_wardrobe", []) if t.get("id") in allowed_wardrobe_ids]
 
         def _make_ext_tag(itm: Any, parent_id: str, family: str) -> SampledTag:
