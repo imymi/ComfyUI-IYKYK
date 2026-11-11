@@ -248,12 +248,45 @@ class TestV121M1FactsAndConstraints(unittest.TestCase):
         # P2-4: 透视睡衣/内衣/连体袜套装条目不可仅标完整 ensemble 而允许 L1，必须携带等级限制与暴露事实
         t_03324 = cat_tags["ensemble__cloth_03324_nightgown_see_through_by_sourc"]
         self.assertNotIn("L1", t_03324["facts"]["allowed_nudity_levels"])
-        self.assertTrue(t_03324["facts"].get("exposed_regions"))
+        self.assertEqual(t_03324["facts"].get("exposed_regions"), ["underwear_bra", "underwear_panties"])
         self.assertNotIn("L1", cat_tags["ensemble__cloth_01980_bikini_string_bikini_frilled_b"]["facts"]["allowed_nudity_levels"])
         self.assertNotIn("L1", cat_tags["ensemble__cloth_01983_lingerie_underwear_underwear_o"]["facts"]["allowed_nudity_levels"])
         self.assertEqual(cat_tags["tops_tanks__ext_03679_bodystocking"]["facts"]["piece_role"], "underwear")
+        self.assertEqual(cat_tags["tops_tanks__ext_03679_bodystocking"]["facts"]["covered_regions"], ["legs"])
+        self.assertEqual(cat_tags["tops_tanks__ext_03679_bodystocking"]["facts"]["exposed_regions"], ["breasts"])
         self.assertNotIn("L1", cat_tags["tops_tanks__ext_03747_underwear"]["facts"]["allowed_nudity_levels"])
+        self.assertNotIn("exposed_regions", cat_tags["tops_tanks__ext_03747_underwear"]["facts"])
         self.assertNotIn("L1", cat_tags["bottoms_specialty__ext_00309_cheeky_underwear"]["facts"]["allowed_nudity_levels"])
+
+        # M1 复审 P2: 按服装结构区分 covered_regions / exposed_regions，无依据事实保持未指定且不自相矛盾
+        t_bodysuit = cat_tags["ensemble__cloth_01470_black_latex_bodysuit_worn_as_c"]
+        self.assertEqual(t_bodysuit["facts"]["piece_role"], "underwear")
+        self.assertEqual(t_bodysuit["facts"]["covered_regions"], ["intimate_upper", "intimate_lower", "legs"])
+        self.assertEqual(t_bodysuit["facts"].get("exposed_regions"), ["underwear_panties"])
+        for unexpected_exp in ("midriff", "underwear_bra", "cleavage", "thigh_leg"):
+            self.assertNotIn(unexpected_exp, t_bodysuit["facts"].get("exposed_regions", []))
+        self.assertNotIn("L1", t_bodysuit["facts"]["allowed_nudity_levels"])
+
+        t_cupless = cat_tags["ensemble__cloth_01478_black_leather_cupless_corset_w"]
+        self.assertEqual(t_cupless["facts"]["piece_role"], "underwear")
+        self.assertEqual(t_cupless["facts"]["covered_regions"], ["intimate_lower", "legs"])
+        self.assertNotIn("intimate_upper", t_cupless["facts"]["covered_regions"])
+        self.assertEqual(t_cupless["facts"].get("exposed_regions"), ["breasts", "underwear_panties"])
+        for unexpected_exp in ("underwear_bra", "midriff", "cleavage", "thigh_leg"):
+            self.assertNotIn(unexpected_exp, t_cupless["facts"].get("exposed_regions", []))
+
+        t_underbust_crotchless = cat_tags["ensemble__cloth_01517_black_velvet_underbust_corset"]
+        self.assertEqual(t_underbust_crotchless["facts"]["covered_regions"], ["legs"])
+        self.assertEqual(t_underbust_crotchless["facts"].get("exposed_regions"), ["breasts", "genitals"])
+        self.assertNotIn("intimate_upper", cat_tags["lingerie_bra__ext_03685_cage_bra"]["facts"]["covered_regions"])
+        self.assertEqual(cat_tags["lingerie_bra__ext_03685_cage_bra"]["facts"].get("exposed_regions"), ["breasts"])
+        self.assertNotIn("intimate_upper", cat_tags["lingerie_bra__ext_03717_pasties"]["facts"]["covered_regions"])
+        self.assertEqual(cat_tags["lingerie_bra__ext_03717_pasties"]["facts"].get("exposed_regions"), ["breasts"])
+
+        # 纯材质透视（无文本明示部位）保留禁 L1 且不补造 cleavage / thigh_leg
+        for sheer_tid in ("qipao__ext_00926_airy_rose_pink_sheer_gossamer", "lehenga__ext_01421_whimsical_white_lehenga_crafte"):
+            self.assertNotIn("L1", cat_tags[sheer_tid]["facts"]["allowed_nudity_levels"])
+            self.assertNotIn("exposed_regions", cat_tags[sheer_tid]["facts"])
 
         l4_gen = clothing_doc["clothing_nudity_linkage"]["L4"]["general_tags"]
         for t in l4_gen:
@@ -328,6 +361,17 @@ class TestV121M1FactsAndConstraints(unittest.TestCase):
             t_03324 = next(t for t in cec["tags"] if t["id"] == "ensemble__cloth_03324_nightgown_see_through_by_sourc")
             t_03324["facts"].pop("allowed_nudity_levels", None)
             t_03324["facts"].pop("exposed_regions", None)
+
+            # 4. 无罩杯束身衣若错误宣称 intimate_upper 覆盖或遗漏 breasts 暴露，必须被拦截
+            t_cupless = next(t for t in cec["tags"] if t["id"] == "ensemble__cloth_01478_black_leather_cupless_corset_w")
+            t_cupless["facts"]["covered_regions"] = ["intimate_upper", "intimate_lower"]
+            t_cupless["facts"]["exposed_regions"] = ["underwear_bra", "underwear_panties"]
+
+            # 5. 开裆款若错误宣称 intimate_lower 覆盖或遗漏 genitals 暴露，必须被拦截
+            t_crotchless = next(t for t in cec["tags"] if t["id"] == "ensemble__cloth_01460_black_crocodile_embossed_leath")
+            t_crotchless["facts"]["covered_regions"] = ["intimate_upper", "intimate_lower"]
+            t_crotchless["facts"].pop("exposed_regions", None)
+
             c_path.write_text(json.dumps(c_doc, ensure_ascii=False, indent=2), encoding="utf-8")
 
             res = validate_all(data_dir=tmp_data, schemas_dir=SCHEMAS_DIR, strict_jsonschema=True)
@@ -337,6 +381,8 @@ class TestV121M1FactsAndConstraints(unittest.TestCase):
             self.assertIn("missing or invalid piece_role", joined)
             self.assertIn("wet_clinging", joined)
             self.assertIn("ensemble__cloth_03324_nightgown_see_through_by_sourc", joined)
+            self.assertIn("ensemble__cloth_01478_black_leather_cupless_corset_w", joined)
+            self.assertIn("ensemble__cloth_01460_black_crocodile_embossed_leath", joined)
 
     def test_07_cross_level_general_tags_do_not_drop_clothes_or_underwear(self) -> None:
         """[P1-1] 脚链等允许 L1..L6 的跨等级通用标签不得误删 L1 下装或正常服装。"""

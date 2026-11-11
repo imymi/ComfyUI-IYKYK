@@ -618,6 +618,45 @@ def validate_all(
             r"\b(?:underdress|sheath|lining|shift|overlaid with|layered atop|overskirt|formfitting black plugsuit|matte black base layer|frosted with)\b",
             re.I,
         )
+        open_bust_text_re = re.compile(
+            r"\b(?:cupless|open[- ]cup|open[- ]bust|open[- ]chest|shelf[- ]?bra|nippleless|pasties|nipple covers?|cage\s+(?:bra|bralette)s?)\b",
+            re.I,
+        )
+        open_crotch_text_re = re.compile(
+            r"\b(?:crotchless|open[- ]gusset|open[- ]crotch|split[- ]crotch|bottomless)\b",
+            re.I,
+        )
+
+        def _validate_clothing_coverage_consistency(scope: str, cid: str, tid: str, txt: str, fcts: Dict[str, Any]) -> None:
+            cr = fcts.get("covered_regions") or []
+            exp_r = fcts.get("exposed_regions") or []
+            if "intimate_upper" in cr and "breasts" in exp_r:
+                result.errors.append(
+                    f"[ERROR] {scope} [{cid}:{tid}]: intimate_upper coverage contradicts exposed breasts (covered={cr!r}, exposed={exp_r!r})"
+                )
+            if "intimate_lower" in cr and "genitals" in exp_r:
+                result.errors.append(
+                    f"[ERROR] {scope} [{cid}:{tid}]: intimate_lower coverage contradicts exposed genitals (covered={cr!r}, exposed={exp_r!r})"
+                )
+            if open_bust_text_re.search(txt):
+                if "intimate_upper" in cr:
+                    result.errors.append(
+                        f"[ERROR] {scope} [{cid}:{tid}]: open-bust/cupless/pasties garment cannot claim intimate_upper coverage (covered={cr!r})"
+                    )
+                if "breasts" not in exp_r:
+                    result.errors.append(
+                        f"[ERROR] {scope} [{cid}:{tid}]: open-bust/cupless/pasties garment must declare 'breasts' in exposed_regions (got {exp_r!r})"
+                    )
+            if open_crotch_text_re.search(txt):
+                if "intimate_lower" in cr:
+                    result.errors.append(
+                        f"[ERROR] {scope} [{cid}:{tid}]: crotchless/open-gusset garment cannot claim intimate_lower coverage (covered={cr!r})"
+                    )
+                if "genitals" not in exp_r:
+                    result.errors.append(
+                        f"[ERROR] {scope} [{cid}:{tid}]: crotchless/open-gusset garment must declare 'genitals' in exposed_regions (got {exp_r!r})"
+                    )
+
         for cat in clothing_data.get("categories", []):
             cid = cat.get("id", "")
             for t in cat.get("tags", []):
@@ -628,11 +667,17 @@ def validate_all(
                 fcts = t.get("facts", {})
                 pr = fcts.get("piece_role")
                 cr = fcts.get("covered_regions")
+                exp_r = fcts.get("exposed_regions")
                 if not pr or pr not in VALID_PIECE_ROLES:
                     result.errors.append(f"[ERROR] clothing.json [{cid}:{tid}]: missing or invalid piece_role {pr!r}")
+                minimal_open_underwear = (
+                    pr == "underwear"
+                    and isinstance(exp_r, list)
+                    and any(r in ("breasts", "genitals") for r in exp_r)
+                )
                 if not isinstance(cr, list):
                     result.errors.append(f"[ERROR] clothing.json [{cid}:{tid}]: covered_regions must be list, got {cr!r}")
-                elif pr in wearable_roles and (not cr or cr == ["none"]):
+                elif pr in wearable_roles and (not cr or (cr == ["none"] and not minimal_open_underwear)):
                     result.errors.append(f"[ERROR] clothing.json [{cid}:{tid}]: wearable piece_role={pr!r} requires non-empty covered_regions")
 
                 is_boudoir = fcts.get("style_genre") == "boudoir_lingerie" or pr == "underwear"
@@ -642,11 +687,11 @@ def validate_all(
                         result.errors.append(
                             f"[ERROR] clothing.json [{cid}:{tid}]: sheer/lingerie/exposed garment cannot allow L1 or omit allowed_nudity_levels (got {alvl!r})"
                         )
-                    exp_r = fcts.get("exposed_regions")
-                    if not is_boudoir and l1_incompatible_text_re.search(txt) and (not exp_r or exp_r == ["none"]):
+                    if not is_boudoir and re.search(r"\b(?:underboob|sideboob)\b", txt, re.I) and "underboob_sideboob" not in (exp_r or []):
                         result.errors.append(
-                            f"[ERROR] clothing.json [{cid}:{tid}]: sheer/lingerie/exposed garment requires non-empty exposed_regions (got {exp_r!r})"
+                            f"[ERROR] clothing.json [{cid}:{tid}]: underboob/sideboob garment requires underboob_sideboob in exposed_regions (got {exp_r!r})"
                         )
+                _validate_clothing_coverage_consistency("clothing.json", cid, tid, txt, fcts)
 
         for state_item in clothing_data.get("clothing_states", []):
             sid = state_item.get("id", "")
@@ -680,6 +725,7 @@ def validate_all(
                     fcts = leaf.get("facts", {})
                     if not fcts.get("piece_role") or not fcts.get("allowed_nudity_levels"):
                         result.errors.append(f"[ERROR] clothing.json [lingerie_wardrobe:{tid}]: missing piece_role or allowed_nudity_levels")
+                    _validate_clothing_coverage_consistency("clothing.json", "lingerie_wardrobe", tid, str(leaf.get("text", "")), fcts)
 
         linkage = clothing_data.get("clothing_nudity_linkage", {})
         for leaf in linkage.get("L4", {}).get("general_tags", []):
