@@ -422,6 +422,8 @@ def _choose_coherent_branch(
     allowed = tuple(NUDITY_BRANCHES_BY_LEVEL.get(lvl_code, ()))
     if not allowed:
         return None
+    if len(allowed) == 1:
+        return allowed[0]
     if explicit_branch and explicit_branch in allowed:
         return explicit_branch
 
@@ -2402,6 +2404,9 @@ class DataSampler:
             st_item = _match_item(states, clothing_state, "clothing_states")
             st_id = st_item.get("id", "") if isinstance(st_item, dict) else ""
 
+        chosen_style = None
+        is_skirt_only = False
+        is_pants_only = False
         if explicit_clothing and get_selection_mode(explicit_clothing) == SelectionMode.EXPLICIT:
             data = self._load("clothing")
             cats = data.get("categories", [])
@@ -2460,7 +2465,7 @@ class DataSampler:
                 is_pants_only = has_pants and not has_top and not has_skirt and not has_one_piece and not has_ensemble
 
                 if lvl_code == "L2":
-                    if "backless" in cid:
+                    if "backless" in cid and st_id != "lifted_up":
                         cands = ["l2_backless"]
                     else:
                         if (
@@ -2470,7 +2475,16 @@ class DataSampler:
                         ):
                             cands = [b for b in cands if b != "l2_backless"]
                         has_midriff_cue = any(k in cid or k in joined for k in ("crop", "midriff", "cutout", "two-piece", "bikini"))
-                        if (is_pure_one_piece and not has_midriff_cue) or is_bra_only or is_panties_only or is_top_only or is_skirt_only or is_pants_only:
+                        allow_lower_unbuttoned_midriff = (
+                            st_id == "unbuttoned" and (is_skirt_only or is_pants_only)
+                        )
+                        if (
+                            (is_pure_one_piece and not has_midriff_cue)
+                            or is_bra_only
+                            or is_panties_only
+                            or is_top_only
+                            or ((is_skirt_only or is_pants_only) and not allow_lower_unbuttoned_midriff)
+                        ):
                             cands = [b for b in cands if b != "l2_midriff_waist"]
                         sleeveless_cues = (
                             "backless", "sleeveless", "strapless", "halter", "off_shoulder",
@@ -2530,8 +2544,13 @@ class DataSampler:
                             cands = multi
 
         if st_id:
+            unbuttoned_branches: Tuple[str, ...] = (
+                ("l2_midriff_waist",)
+                if (chosen_style is not None and (is_skirt_only or is_pants_only))
+                else ("l2_collar_neckline", "l3_open_shirt_breasts")
+            )
             state_branch_map: Dict[str, Tuple[str, ...]] = {
-                "unbuttoned": ("l2_collar_neckline", "l3_open_shirt_breasts"),
+                "unbuttoned": unbuttoned_branches,
                 "lifted_up": ("l2_leg_slit", "l3_topless_skirt_kept", "l3_pulled_down_dress"),
                 "slipping_off": ("l2_shoulder_strap",),
                 "off_shoulder_cut": ("l2_shoulder_strap",),

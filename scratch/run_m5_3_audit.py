@@ -44,7 +44,7 @@ import random
 import subprocess
 import sys
 import time
-from typing import Any, Dict, List, Optional, Set, Tuple
+from typing import Any, Dict, List, Optional, Sequence, Set, Tuple
 
 REPO_DIR = Path(__file__).resolve().parent.parent
 DATA_DIR = REPO_DIR / "data"
@@ -636,7 +636,7 @@ def verify_affinity_matrix_for_slot(
     seed: Optional[int] = None,
 ) -> Tuple[bool, str]:
     """严格核验亲和数据与矩阵对于特定槽位及情境的因果完备性、精确分布匹配与可重放概率。
-    
+
     Fail-closed 规则：
     1. affinity_data 必须为 dict 且包含有效的 matrix 字典；
     2. matrix 必须覆盖 ORDERED_CONTEXT_IDS 中的有效情境，严禁使用无关假矩阵 (如 {"unrelated": {}})；
@@ -1238,7 +1238,7 @@ def attribute_seed_difference(
             )
         else:
             unexplained_reasons.append(
-                f"UNEXPLAINED_TAG_ORDER_VIOLATION: cur_pos tags sequence does not match assembled final atoms canonical order"
+                "UNEXPLAINED_TAG_ORDER_VIOLATION: cur_pos tags sequence does not match assembled final atoms canonical order"
             )
 
     for i in range(len(cur_atoms) - 1):
@@ -2181,7 +2181,7 @@ def main():
 
         archive_sha256 = compute_file_sha256(archive_file)
         archive_size = archive_file.stat().st_size
-        print(f"[*] Verifying source archive integrity...")
+        print("[*] Verifying source archive integrity...")
         print(f"    Archive Path   : {archive_file}")
         print(f"    Archive Size   : {archive_size:,} bytes")
         print(f"    Archive SHA256 : {archive_sha256}")
@@ -2316,7 +2316,7 @@ def main():
                 "target_batch_hash": cur_batch_hash,
                 "baseline_batch_hash": base_batch_hash,
             },
-            "quality_gates": {k: f"PASS (0 failures)" if v == 0 else f"FAIL ({v} failures)" for k, v in gate_failures.items()},
+            "quality_gates": {k: "PASS (0 failures)" if v == 0 else f"FAIL ({v} failures)" for k, v in gate_failures.items()},
             "evaluation_result": {
                 "total_seeds": total_evaluated,
                 "identical_count": identical_count,
@@ -2344,7 +2344,7 @@ def main():
             f"- **源归档文件**: `scratch/{archive_file.name}`",
             f"- **源归档 SHA-256**: `{archive_sha256}`",
             f"- **源归档大小**: {archive_size:,} 字节",
-            f"- **审核器脚本**: `scratch/run_m5_3_audit.py`",
+            "- **审核器脚本**: `scratch/run_m5_3_audit.py`",
             f"- **审核器脚本 SHA-256**: `{compute_file_sha256(Path(__file__))}`",
             f"- **目标提交 Commit**: `{git_commit}` (Tree: `{git_tree}`, Dirty: `{is_dirty}`)",
             f"- **核心源码摘要**: `{core_source_digest}`",
@@ -2352,7 +2352,7 @@ def main():
             f"- **基线批次哈希**: `{base_batch_hash}`",
             f"- **执行时间**: `{time.strftime('%Y-%m-%d %H:%M:%S UTC', time.gmtime())}`",
             f"- **处理种子总数**: {total_evaluated:,} 组 (连续种子 0..{total_seeds_expected - 1})",
-            f"- **流式读取方式**: 基于 JSONDecoder 块读取流式解包，单条 record 增量解码，无全量内存展开",
+            "- **流式读取方式**: 基于 JSONDecoder 块读取流式解包，单条 record 增量解码，无全量内存展开",
             f"- **重评总耗时**: {elapsed_time:.2f} 秒 (平均 {elapsed_time / (total_evaluated or 1) * 1000:.2f} 毫秒/种子)",
             "",
             "## 二、逐条质量门禁重验结果（复用历史运行证据）",
@@ -2659,8 +2659,8 @@ def main():
         f"- **Python 版本**: `{python_version}`",
         f"- **操作系统与架构**: `{os_info}`",
         f"- **jsonschema 库版本**: `{jsonschema_version}`",
-        f"- **全量种子规模**: 10,000 组 (`seed=0..9999`)",
-        f"- **默认采样输入**: 22 个全槽位标准默认输入（预设/配方无，裸露/服装/发型/姿势等随机，画质高清写真）",
+        "- **全量种子规模**: 10,000 组 (`seed=0..9999`)",
+        "- **默认采样输入**: 22 个全槽位标准默认输入（预设/配方无，裸露/服装/发型/姿势等随机，画质高清写真）",
         "",
         "### 运行时数据文件 SHA-256 哈希列表 (20 个数据文件)",
         "",
@@ -2724,7 +2724,7 @@ def main():
         f"- **归档文件大小**: {archive_file.stat().st_size:,} 字节",
         f"- **归档记录总数**: {len(full_evidence_records):,} 组种子全量完整证据",
         f"- **审计签名清单**: `scratch/{manifest_file.name}`",
-        f"- **重现执行命令**:",
+        "- **重现执行命令**:",
         "  ```bash",
         "  /Users/jacobyang/Hermes/.venv/bin/python3 scratch/run_m5_3_audit.py --seeds 10000",
         "  ```",

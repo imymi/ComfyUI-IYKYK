@@ -1782,11 +1782,13 @@ def _is_upper_body_cutoff_framing_atom(a: PromptAtom) -> bool:
 
 
 def _align_facts_with_rewritten_text(rep_text: str, orig_facts: Optional[SemanticFacts]) -> SemanticFacts:
-    """将规则改写后的文本同步映射为一致的 SemanticFacts，防止残留透视/内衣陈旧事实。"""
+    """将规则改写后的文本同步映射为一致的 SemanticFacts，防止残留透视/内衣/旧动作陈旧事实。"""
     base = orig_facts or SemanticFacts()
-    clean_states = tuple(
+    stale_material_states = ("sheer", "see_through", "transparent", "translucent", "wet_clinging")
+    stale_action_states = ("opened", "lifted", "loosened", "pulled_aside", "removed", "partially_removed")
+    clean_base_states = tuple(
         s for s in base.garment_states
-        if s not in ("sheer", "see_through", "transparent", "translucent")
+        if s not in stale_material_states and s not in stale_action_states
     )
     tl = rep_text.strip().lower()
     if "dress" in tl:
@@ -1797,26 +1799,61 @@ def _align_facts_with_rewritten_text(rep_text: str, orig_facts: Optional[Semanti
         return replace(
             base,
             garment_topologies=("one_piece",),
-            garment_states=("wet_clinging",) if "wet" in tl or "clinging" in tl else clean_states,
+            garment_states=("wet_clinging",) if "wet" in tl or "clinging" in tl else clean_base_states,
             piece_role="one_piece",
             covered_regions=("upper_torso", "lower_torso"),
             exposed_regions=clean_exposed,
             allowed_nudity_levels=tuple(lvl_tag for lvl_tag in base.allowed_nudity_levels if lvl_tag not in ("L5", "L6")),
         )
     if "unbuttoned" in tl:
-        new_states = tuple(dict.fromkeys(s for s in clean_states + ("opened",)))
-        return replace(base, garment_states=new_states)
+        new_states = tuple(dict.fromkeys(clean_base_states + ("opened",)))
+        is_lower_only = (
+            any(t in base.garment_topologies for t in ("bottom_pants", "bottom_skirt"))
+            and not any(t in base.garment_topologies for t in ("top", "one_piece", "outerwear", "ensemble_outfit"))
+        )
+        new_exposed = ("midriff",) if is_lower_only else ("cleavage",)
+        return replace(base, garment_states=new_states, exposed_regions=new_exposed)
     if "lifted up" in tl or "lifted" in tl:
-        new_states = tuple(dict.fromkeys(s for s in clean_states + ("lifted",)))
-        return replace(base, garment_states=new_states)
+        new_states = tuple(dict.fromkeys(clean_base_states + ("lifted",)))
+        return replace(base, garment_states=new_states, exposed_regions=("thigh_leg",))
     if "slipping off shoulder" in tl:
-        new_states = tuple(dict.fromkeys(s for s in clean_states + ("loosened",)))
+        new_states = tuple(dict.fromkeys(clean_base_states + ("loosened",)))
         return replace(
             base,
             garment_states=new_states,
-            exposed_regions=("shoulders",) if not base.exposed_regions else base.exposed_regions,
+            exposed_regions=("shoulders",),
         )
-    return replace(base, garment_states=clean_states)
+    return replace(
+        base,
+        garment_states=tuple(s for s in base.garment_states if s not in stale_material_states),
+    )
+
+
+def _is_lower_body_unbuttoned_atom(a: PromptAtom) -> bool:
+    """判定是否为纯下装腰扣/裤扣/裙扣解开动作（如 pants button undone / skirt unbuttoned），与上装领口解扣严格隔离。"""
+    tl = a.text.lower().strip()
+    if not ("unbuttoned" in tl or "button undone" in tl):
+        return False
+    if not (RE_PANTS_ACTION.search(tl) or RE_SKIRT_ACTION.search(tl)):
+        return False
+    if (
+        RE_UPPER_BODY_ACTION.search(tl)
+        or RE_DRESS_ACTION.search(tl)
+        or RE_ROBE_ACTION.search(tl)
+        or RE_SUIT_ACTION.search(tl)
+        or "buttons undone" in tl
+        or "front unbuttoned" in tl
+        or "one button undone" in tl
+        or "collarbone" in tl
+    ):
+        return False
+    f = a.facts
+    if f:
+        if f.garment_topologies and any(t not in ("bottom_pants", "bottom_skirt") for t in f.garment_topologies):
+            return False
+        if f.exposed_regions and any(r not in ("none", "midriff") for r in f.exposed_regions):
+            return False
+    return True
 
 
 def _format_nudity_constraint_trace(constraint: Optional[NudityConstraint]) -> Optional[Dict[str, Any]]:
@@ -2066,7 +2103,7 @@ def _is_atom_compatible_with_level_and_branch(
                 _l2_allowed_exp: Dict[str, Set[str]] = {
                     "l2_collar_neckline": {"none", "cleavage", "collarbone_neck", "underwear_bra"},
                     "l2_shoulder_strap": {"none", "shoulders"},
-                    "l2_leg_slit": {"none", "thigh_leg", "ankle_feet"},
+                    "l2_leg_slit": {"none", "thigh_leg", "ankle_feet", "underwear_panties"},
                     "l2_midriff_waist": {"none", "midriff"},
                     "l2_backless": {"none", "back"},
                     "l2_sleeve_wrist": {"none", "arms_wrists"},
@@ -2083,8 +2120,14 @@ def _is_atom_compatible_with_level_and_branch(
                     "l2_backless": ("collar unbuttoned", "unbuttoned", "button undone", "cleavage", "collarbone", "strap slipping", "off-shoulder", "high slit", "bare leg", "skirt slit", "midriff", "waist cutout", "open side", "rolled up", "pushed sleeve"),
                     "l2_sleeve_wrist": ("collar unbuttoned", "unbuttoned", "button undone", "cleavage", "collarbone", "strap slipping", "off-shoulder", "high slit", "bare leg", "skirt slit", "midriff", "waist cutout", "open side", "backless"),
                 }
-                if any(w in tl for w in _l2_banned_tokens.get(selected_branch, ())):
-                    return False
+                banned = _l2_banned_tokens.get(selected_branch, ())
+                if banned:
+                    if selected_branch == "l2_midriff_waist" and _is_lower_body_unbuttoned_atom(a):
+                        effective_banned = tuple(w for w in banned if w not in ("unbuttoned", "button undone"))
+                    else:
+                        effective_banned = banned
+                    if any(w in tl for w in effective_banned):
+                        return False
         return True
 
     return True
@@ -4905,6 +4948,65 @@ class ConflictResolver:
 
         return index.get_all_active_ordered()
 
+    def _is_material_replacement_compatible(
+        self,
+        orig_atom: PromptAtom,
+        cand_rep: str,
+        cand_atom: PromptAtom,
+        active_snapshot: Sequence[PromptAtom],
+        eff_lvl: Optional[str],
+        eff_branch: Optional[str],
+    ) -> bool:
+        if not _is_atom_compatible_with_level_and_branch(cand_atom, eff_lvl, eff_branch):
+            return False
+
+        tl = cand_rep.strip().lower()
+        other_active = [x for x in active_snapshot if x.atom_id != orig_atom.atom_id]
+        is_state_origin = (
+            orig_atom.source_slot == "clothing_state"
+            or (orig_atom.provenance is not None and orig_atom.provenance.kind == "clothing_state")
+            or is_garment_modifier_atom(orig_atom)
+        )
+        other_has_garment = any(_is_worn_garment_carrier(x) for x in other_active)
+
+        # 状态词或已存在在穿主衣物时，严禁凭空改写为第二件“wet dress”导致形制/状态互搏
+        if "dress" in tl and (is_state_origin or other_has_garment):
+            return False
+
+        worn_entities_other = [
+            e for e in extract_garment_entities(other_active).values()
+            if e.is_worn and not e.is_ambient
+        ]
+        if worn_entities_other:
+            req_carrier = get_required_carrier_kind(cand_atom)
+            if req_carrier is not None:
+                worn_atoms = [m for e in worn_entities_other for m in e.member_atoms]
+                if not is_carrier_satisfied_by_garments(req_carrier, worn_atoms):
+                    return False
+            if "unbuttoned" in tl:
+                if not any(is_garment_compatible_with_state(e, "unbuttoned", cand_atom) for e in worn_entities_other):
+                    return False
+            elif "lifted" in tl:
+                if not any(is_garment_compatible_with_state(e, "lifted_up", cand_atom) for e in worn_entities_other):
+                    return False
+            elif "slipping off shoulder" in tl:
+                if not any(
+                    is_item_upper_garment_carrier(m, style_id=e.selected_id)
+                    for e in worn_entities_other
+                    for m in e.member_atoms
+                ):
+                    return False
+
+        sim_atoms = [cand_atom if x.atom_id == orig_atom.atom_id else x for x in active_snapshot]
+        base_conflicts, _ = self.detect_hard_conflicts(other_active)
+        conflicts_after, _ = self.detect_hard_conflicts(sim_atoms)
+        if any(cand_atom.atom_id in c for c in conflicts_after) or len(conflicts_after) > len(base_conflicts):
+            return False
+        mismatches_after = find_carrier_mismatch_in_atoms(sim_atoms)
+        if any(m[0].atom_id == cand_atom.atom_id for m in mismatches_after):
+            return False
+        return True
+
     # ─── 规则 7: material_penetration (physical, 230) ───
 
     def _resolve_material_penetration_atoms(
@@ -4960,11 +5062,14 @@ class ConflictResolver:
                 eff_branch = eff_constraint.selected_branch if eff_constraint is not None else None
                 nc_trace = _format_nudity_constraint_trace(eff_constraint)
 
+                active_snapshot = [x for x in index.get_all_active_ordered() if index.is_active(x)]
                 valid_replacements: List[str] = []
                 for cand_rep in replacements:
                     cand_facts = _align_facts_with_rewritten_text(cand_rep, a.facts)
                     cand_atom = make_replaced_atom(a, cand_rep, rule_item.id, new_facts=cand_facts)
-                    if _is_atom_compatible_with_level_and_branch(cand_atom, eff_lvl, eff_branch):
+                    if self._is_material_replacement_compatible(
+                        a, cand_rep, cand_atom, active_snapshot, eff_lvl, eff_branch
+                    ):
                         valid_replacements.append(cand_rep)
 
                 if not valid_replacements:

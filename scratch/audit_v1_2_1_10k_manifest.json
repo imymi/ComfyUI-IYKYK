@@ -1,0 +1,250 @@
+{
+  "auditor_binding": {
+    "core_source_digest": "91887118fbe4af25ac277b27515d9907c70ffbb7e806be5141ff45256faaa7fd",
+    "is_dirty": true,
+    "script_path": "scratch/run_v1_2_1_10k_audit.py",
+    "script_sha256": "86595a231e5baf9b1be6845209125f092273d2f5b109eaa102640a3519e21ecd",
+    "target_batch_hash": "a614506a1380c0e986303c9dd856bd4445a9a4d2549bb7b57bdfa42fef935d22",
+    "target_commit": "6d67ad5a3f615cdfcc01d3e178498df69dc1d4a9",
+    "target_tree_hash": "b1ba47a54fc3db7b2f33fda906fe04fe73a603d9",
+    "v120_baseline_batch_hash": "48ae2e927fc6c6dc3f19362c806b31e2587df49aad85193f75e2731b18fa4c7d"
+  },
+  "command": "/Users/jacobyang/Hermes/.venv/bin/python scratch/run_v1_2_1_10k_audit.py --seeds 10000 --strat-seeds 500",
+  "environment": {
+    "jsonschema_version": "4.25.1",
+    "os_info": "Darwin 27.2.0 (arm64)",
+    "python_version": "3.9.6"
+  },
+  "evaluation_result": {
+    "branch_distribution": {
+      "l1_full_clothed": 1701,
+      "l2_backless": 303,
+      "l2_collar_neckline": 256,
+      "l2_leg_slit": 281,
+      "l2_midriff_waist": 272,
+      "l2_shoulder_strap": 269,
+      "l2_sleeve_wrist": 264,
+      "l3_bikini_top_removed": 207,
+      "l3_bra_pushed_up": 190,
+      "l3_open_shirt_breasts": 192,
+      "l3_panties_only": 212,
+      "l3_pulled_down_dress": 203,
+      "l3_raised_top_breasts": 218,
+      "l3_topless_pants_kept": 202,
+      "l3_topless_skirt_kept": 220,
+      "l4_accessory_only": 341,
+      "l4_bra_and_panties": 356,
+      "l4_hosiery_footwear_only": 318,
+      "l4_panties_only": 356,
+      "l4_towel_sheet_wrap": 310,
+      "l5_clothes_discarded_nearby": 829,
+      "l5_full_nude_standing_or_frontal": 873,
+      "l6_frontal_genital_display": 433,
+      "l6_lying_spread_display": 397,
+      "l6_rear_bent_display": 386,
+      "l6_squatting_self_touch": 411
+    },
+    "divergent_count": 10000,
+    "elapsed_seconds": 559.13,
+    "identical_count": 0,
+    "is_all_explained": true,
+    "level_distribution": {
+      "L1": 1701,
+      "L2": 1645,
+      "L3": 1644,
+      "L4": 1681,
+      "L5": 1702,
+      "L6": 1627
+    },
+    "node_matrix": {
+      "custom_slot_combiner": {
+        "failure_count": 0,
+        "failures": [],
+        "total_checked": 200
+      },
+      "preset_browser": {
+        "failure_count": 0,
+        "failures": [],
+        "total_checked": 125
+      },
+      "stratified_generator_diagnostics": {
+        "branch_counts": {
+          "L1": {
+            "l1_full_clothed": 500
+          },
+          "L2": {
+            "l2_backless": 95,
+            "l2_collar_neckline": 82,
+            "l2_leg_slit": 78,
+            "l2_midriff_waist": 88,
+            "l2_shoulder_strap": 69,
+            "l2_sleeve_wrist": 88
+          },
+          "L3": {
+            "l3_bikini_top_removed": 62,
+            "l3_bra_pushed_up": 54,
+            "l3_open_shirt_breasts": 74,
+            "l3_panties_only": 64,
+            "l3_pulled_down_dress": 52,
+            "l3_raised_top_breasts": 68,
+            "l3_topless_pants_kept": 59,
+            "l3_topless_skirt_kept": 67
+          },
+          "L4": {
+            "l4_accessory_only": 115,
+            "l4_bra_and_panties": 79,
+            "l4_hosiery_footwear_only": 100,
+            "l4_panties_only": 110,
+            "l4_towel_sheet_wrap": 96
+          },
+          "L5": {
+            "l5_clothes_discarded_nearby": 252,
+            "l5_full_nude_standing_or_frontal": 248
+          },
+          "L6": {
+            "l6_frontal_genital_display": 142,
+            "l6_lying_spread_display": 126,
+            "l6_rear_bent_display": 106,
+            "l6_squatting_self_touch": 126
+          }
+        },
+        "failure_count": 0,
+        "failures": [],
+        "level_counts": {
+          "L1": 500,
+          "L2": 500,
+          "L3": 500,
+          "L4": 500,
+          "L5": 500,
+          "L6": 500
+        },
+        "seeds_per_level": 500,
+        "total_checked": 3000
+      }
+    },
+    "total_seeds": 10000,
+    "unexplained_count": 0,
+    "unexplained_seeds": {},
+    "v120_comparison": {
+      "divergence_breakdown": {
+        "level_L1": 1701,
+        "level_L2": 1645,
+        "level_L3": 1644,
+        "level_L4": 1681,
+        "level_L5": 1702,
+        "level_L6": 1627,
+        "outfit_completion_applied": 1888
+      },
+      "divergent_count": 10000,
+      "identical_count": 0,
+      "sample_diffs": [
+        {
+          "branch": "l6_frontal_genital_display",
+          "comp_added": false,
+          "eff_lvl": "L6",
+          "seed": 0,
+          "v120_pos": "a post-apocalyptic world, sponge bath, full body shot, looking directly at camera, caring young hospital nurse, fingers pulling apart labia, backlight, sitting sideways, blank stare, grab redness on face, in a top knot gathered high on the head, rosy flushed chest and neck, blooming red rose tattoo on hip bone, black-framed glasses pushed up nose, beads of sweat rolling down chest, fine grain B&W, best quality, night shift nurse, wide shot, soft-spoken clinical demeanor, fingers inside, rim light, squatting, looking away uninterested, transferred lipstick on lips, hair in a high bun, subtle subsurface scattering, velvet flower petals with thorned vine, open textbook and notebook on desk, dewy sweaty sheen, detailed, patient care, hair glow, going through the motions, submissive makeup, photorealistic, edge light, golden hour, pores visible through ink",
+          "v121_pos": "a post-apocalyptic world, sponge bath, crotch and inner thigh detail, caring young hospital nurse, pussy fully displayed, backlight, sitting sideways, blank stare, grab redness on face, in a top knot gathered high on the head, rosy flushed chest and neck, blooming red rose tattoo on hip bone, black-framed glasses pushed up nose, beads of sweat rolling down chest, fine grain B&W, best quality, night shift nurse, hip up intimate shot, soft-spoken clinical demeanor, fingers pulling apart labia, rim light, squatting, looking away uninterested, transferred lipstick on lips, hair in a high bun, subtle subsurface scattering, velvet flower petals with thorned vine, open textbook and notebook on desk, dewy sweaty sheen, detailed, patient care, hair glow, going through the motions, submissive makeup, photorealistic, sweater tossed aside, edge light, golden hour, pores visible through ink"
+        },
+        {
+          "branch": "l2_shoulder_strap",
+          "comp_added": true,
+          "eff_lvl": "L2",
+          "seed": 1,
+          "v120_pos": "honeymoon suite, forbidden family, medium shot, OTS perspective, glamorous gravure idol, ankle visible, white apron dress, practical lighting, sprawled on bed, can't hold eye contact, mature beauty, in long, face-framing layers, hairband, small solid heart tattoo on inner wrist, soft plush toy on bed, beads of sweat rolling down chest, Polaroid Originals Black & White, best quality, penthouse suite, sister-in-law, waist-up framing, confident bikini model, midriff showing between top and skirt, frilled pinafore apron with back tie, shy expression, wife makeup, delicate tiny minimalist ink, arms wrapped around cute stuffed animal, dewy sweaty sheen, detailed, ceiling mirror, cousin, creamy satin foundation, photorealistic, strap slipping off shoulder, sheer chiffon fabric with gentle skin silhouette visible, ink embedded in dermis",
+          "v121_pos": "honeymoon suite, yoga mom, medium shot, OTS perspective, glamorous gravure idol, shoulder slipping out of neckline, waist apron, practical lighting, sprawled on bed, can't hold eye contact, mature beauty, in long, face-framing layers, hairband, small solid heart tattoo on inner wrist, soft plush toy on bed, beads of sweat rolling down chest, Polaroid Originals Black & White, best quality, penthouse suite, cougar, waist-up framing, confident bikini model, kitchen waist apron with pocket, shy expression, wife makeup, delicate tiny minimalist ink, arms wrapped around cute stuffed animal, dewy sweaty sheen, detailed, ceiling mirror, milf, crewneck sweatshirt, creamy satin foundation, photorealistic, tight high-waisted pencil skirt, strap slipping off shoulder, off-shoulder cut, ink embedded in dermis"
+        },
+        {
+          "branch": "l1_full_clothed",
+          "comp_added": false,
+          "eff_lvl": "L1",
+          "seed": 2,
+          "v120_pos": "audition sofa, raw sex no condom, close-up, looking directly at camera, intellectual female teacher, modest outfit, g-strings, neon side light, hand on own face, eyes squeezed shut in pleasure, transferred lipstick on lips, in two gathered pigtails, one on each side, fluffy cat ear headband, bra strap indent marks on shoulders, 正 kanji tally marks tattoo on inner thigh, melting ice cube resting on collarbone, aroused lubrication, faded colors, best quality, audition lighting, raw dogging, face shot filling frame, glasses wearing tutor, clothed body, body curves outlined through fabric, colored rim, satisfied smile, swollen bruised lip, subtle bikini tan lines, handwritten scratched tally lines, water trickle running down chest, glistening pussy juice on inner thighs, foggy, detailed, creampie, neatly dressed, RGB, photorealistic, love hotel glow, pink ambiance, slightly faded edges",
+          "v121_pos": "audition sofa, everyday girl, close-up, OTS perspective, mature female executive, modest outfit, black skirt dress, bedside lamp, hand on own face, eyes squeezed shut in pleasure, transferred lipstick on lips, in two gathered pigtails, one on each side, fluffy cat ear headband, handwritten scratched tally lines, Nintendo Switch console on bed, wet glistening chin, faded colors, best quality, audition lighting, natural beauty, face shot filling frame, confident dominant demeanor, clothed body, gothic dark botanical pattern, rim light on body, satisfied smile, swollen bruised lip, subtle bikini tan lines, headphones around neck, sloppy kiss moisture trail, foggy, detailed, amateur girl, body curves outlined through fabric, candlelight, photorealistic, form-fitting clothing, slightly faded edges"
+        },
+        {
+          "branch": "l3_bikini_top_removed",
+          "comp_added": false,
+          "eff_lvl": "L3",
+          "seed": 3,
+          "v120_pos": "a hidden underground world ruled by dwarves, self shot, foreshortening, directly above bed, glamorous cabaret club hostess, breasts bare waist covered, push-up cups, warm golden rim lighting on body edges, standing with back arched, virgin look but whore body, grab redness on face, in tight permed curls, full to the shoulders, long flowing cape, natural skin texture, snake tattoo coiling around upper thigh, crimson hemp rope bindings, glossy lubricated skin surface, experimental colors, best quality, bedroom mirror reflection, charming nightlife entertainer, dress pulled down to waist, reluctant enjoyment, finger mark on cheek, cloak, authentic realistic skin surface, detailed serpent scales wrapping limb, leather collar with O-ring, shiny oil sheen, Lomography Redscale XR 50-200, detailed, shirt open showing bare breasts, bare breasts exposed above leather laces, photorealistic, highly translucent fabric clearly revealing silhouette underneath, ink embedded in dermis",
+          "v121_pos": "a hidden underground world ruled by dwarves, self shot, foreshortening, directly above bed, glamorous cabaret club hostess, bikini top removed bottom still on, string bikini, warm golden rim lighting on body edges, standing with back arched, virgin look but whore body, grab redness on face, in tight permed curls, full to the shoulders, natural skin texture, snake tattoo coiling around upper thigh, crimson hemp rope bindings, glossy lubricated skin surface, experimental colors, best quality, bedroom mirror reflection, charming nightlife entertainer, reluctant enjoyment, finger mark on cheek, authentic realistic skin surface, detailed serpent scales wrapping limb, leather collar with O-ring, shiny oil sheen, Lomography Redscale XR 50-200, detailed, tiny bikini bottoms, photorealistic, tie sides, minimal fabric coverage, bikini top removed and held in hand, topless, tiny bikini bottoms still on, backlit translucent fabric outlining body curves, ink embedded in dermis"
+        },
+        {
+          "branch": "l1_full_clothed",
+          "comp_added": true,
+          "eff_lvl": "L1",
+          "seed": 4,
+          "v120_pos": "private dining room, woman on top aggressive, medium shot, eye level angle, submissive French maid, everything covered, soft window light, standing with back arched, passionate gaze, minimal subtle eyeliner, very short hair, white ruffled maid headband, ornamental underbust mandala tattoo curving below breasts, ice bucket on table, drops of semen dripping on stomach, warm nostalgic tones, best quality, hotel restaurant booth, female dominant, waist-up framing, polite devoted servant, fully clothed, form-fitting clothing, loop lighting, standing with legs crossed, sultry gaze, sheer nude lip gloss, ahoge, geometric lace line art, melting ice cube resting on collarbone, milky white fluid glistening, golden cast, detailed, restaurant with lockable door, aggressive seduction, modest outfit, body curves outlined through fabric, diffused, clean aesthetic look, curly hair, photorealistic, bright airy, (musket brown hair), slightly faded edges",
+          "v121_pos": "private dining room, waitress, medium shot, eye level angle, submissive French maid, everything covered, sneakers, Rembrandt lighting, standing with back arched, passionate gaze, downturned doe-eyed eyeliner, in a defined twist-out, full and springy, white ruffled maid headband, delicate Japanese kanji calligraphy down back, ice bucket on table, wet glistening chin, warm nostalgic tones, best quality, hotel restaurant booth, maid, waist-up framing, polite devoted servant, fully clothed, off-shoulder dress, chiaroscuro, standing with legs crossed, sultry gaze, defined puffy aegyo sal highlights, melting ice cube resting on collarbone, sloppy kiss moisture trail, golden cast, detailed, restaurant with lockable door, convenience store clerk, modest outfit, form-fitting clothing, deep shadow, plump gradient pout, photorealistic, body curves outlined through fabric, candlelight, slightly faded edges"
+        },
+        {
+          "branch": "l3_bikini_top_removed",
+          "comp_added": false,
+          "eff_lvl": "L3",
+          "seed": 5,
+          "v120_pos": "a hot air balloon ride over a scenic lake, drug-induced, full body shot, extreme low angle ground level, caring young hospital nurse, panties only, armored skirt, faint bioluminescent glow casting subtle ambient light, straddling, emotionally detached, smudged eyeliner, playful anime hair buns, fluffy cat ear headband, delicate arched foot with tense tendons, snake tattoo coiling around upper thigh, studio lighting equipment, wet glistening chin, high contrast B&W, best quality, after sex, wide shot, soft-spoken clinical demeanor, bare chest with pants on, leather tassets over skirt, bored expression, melting foundation, neko ears with pink inner, prominent defined collarbone hollow, detailed serpent scales wrapping limb, ring light reflection in eyes, saliva string between parted lips, detailed, tank top raised showing breasts, sideboob peeking, unimpressed look, photorealistic, shirt open at chest revealing lace bra, multi-point openwork cutouts across shoulders, back, and waist, semi-translucent fabric creating hazy skin contours, slightly faded edges",
+          "v121_pos": "a hot air balloon ride over a scenic lake, drug-induced, full body shot, extreme low angle ground level, caring young hospital nurse, bikini top removed bottom still on, string bikini, faint bioluminescent glow casting subtle ambient light, straddling, emotionally detached, smudged eyeliner, playful anime hair buns, fluffy cat ear headband, delicate arched foot with tense tendons, snake tattoo coiling around upper thigh, studio lighting equipment, wet glistening chin, high contrast B&W, best quality, after sex, wide shot, soft-spoken clinical demeanor, bored expression, melting foundation, neko ears with pink inner, prominent defined collarbone hollow, detailed serpent scales wrapping limb, ring light reflection in eyes, saliva string between parted lips, detailed, tiny bikini bottoms, unimpressed look, photorealistic, tie sides, minimal fabric coverage, bikini top removed and held in hand, topless, tiny bikini bottoms still on, semi-translucent fabric creating hazy skin contours, slightly faded edges"
+        },
+        {
+          "branch": "l2_leg_slit",
+          "comp_added": false,
+          "eff_lvl": "L2",
+          "seed": 6,
+          "v120_pos": "restaurant private room, throat bulging, medium shot, neutral perspective, submissive French maid, bare arm from sleeve rolled up, silvercleavage dress, beauty dish, lying with ankles crossed, blissful expression, bitten swollen red lips, in structured 1940s-revival waves, deep and sculpted, white ruffled maid headband, prominent defined collarbone hollow, 正 kanji tally marks tattoo on inner thigh, half-empty wine glass on nightstand, beads of sweat rolling down chest, warm skin tones, best quality, hotel restaurant booth, ruined makeup, waist-up framing, polite devoted servant, backless dress showing spine, sculpted sweetheart neckline, hair light, lying on water, heated red face, delicate arched foot with tense tendons, handwritten scratched tally lines, stemware with red wine, dewy sweaty sheen, pastel colors, detailed, skirt slit revealing thigh, high slit showing bare leg, fill, photorealistic, soft even, semi-translucent fabric creating hazy skin contours, slightly faded edges",
+          "v121_pos": "restaurant private room, police costume, medium shot, neutral perspective, intellectual female teacher, bare feet with otherwise fully dressed, silvercleavage dress, beauty dish, lying with back arched, amused expression, smudged kohl eyeliner, in structured 1940s-revival waves, deep and sculpted, white ruffled maid headband, prominent defined collarbone hollow, small barcode tattoo with serial numbers on back of neck, smartphone in hand recording, beads of sweat rolling down chest, warm skin tones, best quality, hotel restaurant booth, demon costume, waist-up framing, glasses wearing tutor, skirt slit revealing thigh, sculpted sweetheart neckline, hair light, on back, finger mark on cheek, delicate arched foot with tense tendons, product mark aesthetic, screen light glowing on face, dewy sweaty sheen, pastel colors, detailed, tight costume, ankle visible, high slit showing bare leg, fill, photorealistic, soft even, slightly faded edges"
+        },
+        {
+          "branch": "l2_backless",
+          "comp_added": false,
+          "eff_lvl": "L2",
+          "seed": 7,
+          "v120_pos": "a hidden underground world ruled by dwarves, first time AV, close-up, canted angle, submissive French maid, bare arm from sleeve rolled up, hooded plugsuit with integrated hood, hmi lighting, lying on stomach, panicked face, grab redness on face, voluminous bouncy curls, playboy bunny ears, subtle knuckle creases, small barcode tattoo with serial numbers on back of neck, magic wand vibrator on bed, glistening pussy juice on inner thighs, faded colors, best quality, test shoot, face shot filling frame, polite devoted servant, low neckline revealing upper chest, eyes wide in panic, delicate manicured fingernails with red polish, product mark aesthetic, bullet vibrator resting on skin, aroused lubrication, foggy, detailed, nervous newbie, horrified realization, swollen bruised lip, photorealistic, ink embedded in dermis",
+          "v121_pos": "a hidden underground world ruled by dwarves, dominant, close-up, canted angle, caring young hospital nurse, backless dress showing spine, hooded skinsuit with integrated hood, soft bounced fill light from neutral reflector, standing with feet together, panicked face, grab redness on face, pigtails tied high, playboy bunny ears, subtle knuckle creases, small barcode tattoo with serial numbers on back of neck, crimson hemp rope bindings, saliva string between parted lips, faded colors, best quality, punishment, face shot filling frame, soft-spoken clinical demeanor, eyes wide in panic, delicate manicured fingernails with red polish, product mark aesthetic, metal handcuffs on headboard, sloppy kiss moisture trail, foggy, detailed, restrained, horrified realization, swollen bruised lip, photorealistic, ink embedded in dermis"
+        },
+        {
+          "branch": "l5_full_nude_standing_or_frontal",
+          "comp_added": false,
+          "eff_lvl": "L5",
+          "seed": 8,
+          "v120_pos": "a beach at dawn, foot domination, full body shot, looking directly at camera, caring young hospital nurse, body fully exposed, oil on body reflection, looking behind, virgin look but whore body, gothic makeup, playful anime hair buns, delicate arched foot with tense tendons, lewd womb tattoo on lower abdomen just above pubic area, water trickle running down chest, milky white fluid glistening, high contrast B&W, best quality, foot smell worship, wide shot, soft-spoken clinical demeanor, completely naked, trying to resist but moaning, dark charcoal smoky eyes, space buns on top of head, prominent defined collarbone hollow, ornate symmetrical succubus crest ink, melting ice cube resting on collarbone, drops of semen dripping on stomach, detailed, innocent face but aroused body, sharp contour, photorealistic, pores visible through ink",
+          "v121_pos": "a beach at dawn, foot domination, full body shot, looking directly at camera, caring young hospital nurse, completely naked, fully bare body, oil on body reflection, looking behind, virgin look but whore body, gothic makeup, playful anime hair buns, delicate arched foot with tense tendons, lewd womb tattoo on lower abdomen just above pubic area, water trickle running down chest, milky white fluid glistening, high contrast B&W, best quality, foot smell worship, wide shot, soft-spoken clinical demeanor, every inch of skin visible, trying to resist but moaning, dark charcoal smoky eyes, space buns on top of head, prominent defined collarbone hollow, ornate symmetrical succubus crest ink, melting ice cube resting on collarbone, drops of semen dripping on stomach, detailed, nude, innocent face but aroused body, sharp contour, photorealistic, pores visible through ink"
+        },
+        {
+          "branch": "l1_full_clothed",
+          "comp_added": true,
+          "eff_lvl": "L1",
+          "seed": 9,
+          "v120_pos": "a magical desert, AV actress, medium long shot, dynamic dramatic composition, intellectual female teacher, fully clothed, army service uniform jacket, gelled lighting, crawling away, winking, plump gradient pout, big loose waves, hooded cloak, prominent defined collarbone hollow, delicate butterfly tattoo on lower back above buttocks, ring light reflection in eyes, fine perspiration glistening on skin, faded colors, best quality, photo shoot seduction, knee-up shot, glasses wearing tutor, body outline visible through fabric, formal military dress uniform, laughing, downturned doe-eyed eyeliner, voluminous bouncy curls, cape hood draped over shoulders, delicate arched foot with tense tendons, ornate symmetrical butterfly wings, professional DSLR on tripod in background, dewy sweaty sheen, degraded grain, detailed, audition, nothing exposed, tight clinging fabric, sticking tongue out playfully, photorealistic, form-fitting clothing, tattoo beneath skin surface",
+          "v121_pos": "a magical desert, medium shot, extreme low angle ground level, mature female executive, fully clothed, sleeveless knit vest, seamless soft ambient light, sitting backwards, caught off guard, clean aesthetic look, long straight black hair, heart necklace, prominent defined collarbone hollow, small barcode tattoo with serial numbers on back of neck, ring light reflection in eyes, fine perspiration glistening on skin, experimental colors, best quality, class president, waist-up framing, confident dominant demeanor, body outline visible through fabric, cable knit sweater vest, panicked face, minimal subtle eyeliner, long with a center part, hanging in a smooth curtain, bead necklace, delicate arched foot with tense tendons, product mark aesthetic, professional DSLR on tripod in background, dewy sweaty sheen, Lomography Color Negative 800, detailed, after school lesson, nothing exposed, low-waist skirt, caught red-handed face, photorealistic, tight clinging fabric, form-fitting clothing, tattoo beneath skin surface"
+        }
+      ],
+      "v120_archive": "audit_m5_3_evidence.json.gz",
+      "v120_core_source_digest": "7641d348b44249de809a73e8e3bfd22c8d7ba48ed4e71f6cdf36fe8ab6a6ee7f",
+      "v120_target_batch_hash": "48ae2e927fc6c6dc3f19362c806b31e2587df49aad85193f75e2731b18fa4c7d"
+    }
+  },
+  "manifest_version": "2.1-v1.2.1",
+  "quality_gates": {
+    "carrier_coherence": "PASS (0 failures)",
+    "determinism": "PASS (0 failures)",
+    "oracle_validation": "PASS (0 failures)",
+    "prompt_syntax": "PASS (0 failures)",
+    "provenance_closed_loop": "PASS (0 failures)",
+    "residual_conflicts": "PASS (0 failures)",
+    "secondary_idempotency": "PASS (0 failures)",
+    "word_budget": "PASS (0 failures)"
+  },
+  "source_archive": {
+    "contiguous_seed_range": [
+      0,
+      9999
+    ],
+    "path": "audit_v1_2_1_10k_evidence.json.gz",
+    "sha256": "5569d8ac9423b2f956beb7cefd663727709057269f62869da23309d0ef527cc1",
+    "size_bytes": 2706962,
+    "total_records_processed": 10000
+  },
+  "task": "v1.2.1 10,000-Seed Multi-Node & M0-M3 Audit",
+  "timestamp": "2026-11-11T19:46:29Z"
+}

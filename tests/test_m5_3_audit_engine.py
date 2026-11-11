@@ -1503,16 +1503,16 @@ class TestM5EvidenceVerification(unittest.TestCase):
             self.assertEqual(res["total_seeds"], 2)
 
     def test_17_real_production_evidence_fast_metadata_verified(self):
-        """生产级元数据快速验证：核验实际真实清单与 737MB 归档实物元数据（大小、SHA-256、7 大门禁、核心源码确定性摘要零漂移），毫秒级完成。"""
+        """生产级元数据快速验证：核验当前 v1.2.1 真实清单与归档实物元数据（大小、SHA-256、门禁、核心源码确定性摘要零漂移），毫秒级完成。"""
         from tests.test_rc8_quality_gate import (
             verify_m5_archive_evidence,
-            EXPECTED_M5_GOLDEN_HASH,
-            EXPECTED_M5_CORE_SOURCE_DIGEST,
+            EXPECTED_V1_2_1_GOLDEN_HASH,
+            EXPECTED_V1_2_1_CORE_SOURCE_DIGEST,
         )
-        manifest_path = REPO_DIR / "scratch" / "audit_m5_3_reeval_manifest.json"
-        archive_path = REPO_DIR / "scratch" / "audit_m5_3_evidence.json.gz"
-        self.assertTrue(manifest_path.is_file(), "Production M5 reeval manifest must exist")
-        self.assertTrue(archive_path.is_file(), "Production M5 evidence archive must exist")
+        manifest_path = REPO_DIR / "scratch" / "audit_v1_2_1_10k_manifest.json"
+        archive_path = REPO_DIR / "scratch" / "audit_v1_2_1_10k_evidence.json.gz"
+        self.assertTrue(manifest_path.is_file(), "Production v1.2.1 10k manifest must exist")
+        self.assertTrue(archive_path.is_file(), "Production v1.2.1 10k evidence archive must exist")
 
         res = verify_m5_archive_evidence(
             manifest_path,
@@ -1521,9 +1521,9 @@ class TestM5EvidenceVerification(unittest.TestCase):
             stream_recompute=False,
         )
         self.assertEqual(res["status"], "VERIFIED")
-        self.assertEqual(res["batch_hash"], EXPECTED_M5_GOLDEN_HASH)
+        self.assertEqual(res["batch_hash"], EXPECTED_V1_2_1_GOLDEN_HASH)
         self.assertEqual(res["total_seeds"], 10000)
-        self.assertEqual(res["core_source_digest"], EXPECTED_M5_CORE_SOURCE_DIGEST)
+        self.assertEqual(res["core_source_digest"], EXPECTED_V1_2_1_CORE_SOURCE_DIGEST)
 
     def test_18_negative_tampered_archive_file_content_fails_sha256(self):
         """反例 18（审查员关键反例）：直接篡改归档实物文件内容（即便是微小单字节篡改、清单声明未变），实算 SHA-256 必须 Fail-Closed 拦截。"""
@@ -1721,7 +1721,7 @@ class TestM5EvidenceVerification(unittest.TestCase):
             self.assertIn("contiguous_seed_range mismatch", str(ctx.exception))
 
     def test_25_rc8_quality_gate_class_discovery_intact(self):
-        """测试类发现完整性验证（审查员问题 3 修复核验）：确保 TestRC8QualityGate 完整暴露且发现全部 6 项测试方法。"""
+        """测试类发现完整性验证（审查员问题 3 修复核验）：确保 TestRC8QualityGate 完整暴露且发现全部 7 项测试方法。"""
         loader = unittest.TestLoader()
         suite = loader.loadTestsFromName("tests.test_rc8_quality_gate")
         def collect_test_ids(s):
@@ -1736,6 +1736,7 @@ class TestM5EvidenceVerification(unittest.TestCase):
         discovered = collect_test_ids(suite)
         expected_tests = [
             "tests.test_rc8_quality_gate.TestRC8QualityGate.test_01_rc7_baseline_28_cases_quality_metrics",
+            "tests.test_rc8_quality_gate.TestRC8QualityGate.test_01b_v1_2_1_28_cases_live_quality_gate",
             "tests.test_rc8_quality_gate.TestRC8QualityGate.test_02_all_77_presets_and_8_recipes_full_matrix",
             "tests.test_rc8_quality_gate.TestRC8QualityGate.test_03_seed_gate_functional_determinism",
             "tests.test_rc8_quality_gate.TestRC8QualityGate.test_03b_seed_gate_golden_hash",
@@ -1744,7 +1745,7 @@ class TestM5EvidenceVerification(unittest.TestCase):
         ]
         for exp in expected_tests:
             self.assertIn(exp, discovered, f"Missing expected test in TestRC8QualityGate discovery: {exp}")
-        self.assertEqual(len(discovered), 6, f"Expected exactly 6 tests in TestRC8QualityGate, got: {discovered}")
+        self.assertEqual(len(discovered), 7, f"Expected exactly 7 tests in TestRC8QualityGate, got: {discovered}")
 
 
 if __name__ == "__main__":

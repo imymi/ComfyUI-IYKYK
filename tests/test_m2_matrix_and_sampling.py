@@ -17,7 +17,7 @@ import math
 import unittest
 from pathlib import Path
 from random import Random
-from typing import Any, Dict, List, Set
+from typing import Any, Dict, List, Set, Tuple
 from unittest.mock import patch
 
 from lib.context_affinity import (

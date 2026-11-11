@@ -525,6 +525,9 @@
         },
         "nudity_constraint": {
           "$ref": "#/definitions/nudity_constraint_trace"
+        },
+        "required_carrier": {
+          "type": ["string", "null"]
         }
       }
     },

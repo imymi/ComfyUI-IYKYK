@@ -872,7 +872,8 @@ class TestSemanticCatalogs(unittest.TestCase):
             rng=random.Random(0),
             entry_point="generator",
         )
-        self.assertTrue(len(res_probe.source_atoms) >= 40)
+        # M2 阻透皮革禁叠加 sheer，M3 L2 单分支 l2_shoulder_strap 仅保留 1 条肩带滑落 nudity 标签，故 18 槽位合计 38 条 source_atoms
+        self.assertTrue(len(res_probe.source_atoms) >= 38, f"Expected >= 38 source_atoms, got {len(res_probe.source_atoms)}")
         for sa in res_probe.source_atoms:
             self.assertTrue(bool(sa.id), f"Atom {sa.text!r} has empty leaf id")
             self.assertTrue(bool(sa.provenance.item_id), f"Atom {sa.text!r} has empty provenance.item_id")

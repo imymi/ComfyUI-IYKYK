@@ -8,6 +8,7 @@ import copy
 import hashlib
 import json
 import os
+import subprocess
 import unittest
 from pathlib import Path
 from random import Random
@@ -320,6 +321,11 @@ EXPECTED_M5_ARCHIVE_SHA256 = "5417aa6529e4a86d2f920d6387ecd88626d70d9fd1973c7896
 EXPECTED_M5_ARCHIVE_SIZE = 737487743
 EXPECTED_M5_CORE_SOURCE_DIGEST = "7641d348b44249de809a73e8e3bfd22c8d7ba48ed4e71f6cdf36fe8ab6a6ee7f"
 
+EXPECTED_V1_2_1_GOLDEN_HASH = "a614506a1380c0e986303c9dd856bd4445a9a4d2549bb7b57bdfa42fef935d22"
+EXPECTED_V1_2_1_ARCHIVE_SHA256 = "5569d8ac9423b2f956beb7cefd663727709057269f62869da23309d0ef527cc1"
+EXPECTED_V1_2_1_ARCHIVE_SIZE = 2706962
+EXPECTED_V1_2_1_CORE_SOURCE_DIGEST = "91887118fbe4af25ac277b27515d9907c70ffbb7e806be5141ff45256faaa7fd"
+
 
 def compute_current_core_source_digest(repo_dir: Path) -> str:
     """计算当前仓库核心业务代码与数据契约文件的确定性 SHA-256 摘要。"""
@@ -343,10 +349,10 @@ def verify_m5_archive_evidence(
     archive_path: Path,
     repo_dir: Path,
     stream_recompute: bool = True,
-    expected_archive_size: int = EXPECTED_M5_ARCHIVE_SIZE,
-    expected_archive_sha256: str = EXPECTED_M5_ARCHIVE_SHA256,
-    expected_golden_hash: str = EXPECTED_M5_GOLDEN_HASH,
-    expected_core_digest: str = EXPECTED_M5_CORE_SOURCE_DIGEST,
+    expected_archive_size: int = EXPECTED_V1_2_1_ARCHIVE_SIZE,
+    expected_archive_sha256: str = EXPECTED_V1_2_1_ARCHIVE_SHA256,
+    expected_golden_hash: str = EXPECTED_V1_2_1_GOLDEN_HASH,
+    expected_core_digest: str = EXPECTED_V1_2_1_CORE_SOURCE_DIGEST,
     expected_seeds_count: int = 10000,
 ) -> dict:
     """
@@ -602,12 +608,24 @@ class TestRC8QualityGate(unittest.TestCase):
 
         # 历史重放基线数据环境绑定 (Directive 3: 历史重放使用匹配的历史数据环境，保留旧黄金基线断言)
         baseline_repo = REPO_DIR / "scratch" / "baseline_6da94cb"
+        if not os.environ.get("IYKYK_INSIDE_ISOLATED_REPLAY"):
+            if not (baseline_repo.exists() and (baseline_repo / "nodes.py").exists() and (baseline_repo / "data").exists()):
+                chk_6da = subprocess.run(["git", "cat-file", "-e", "6da94cb"], capture_output=True, text=True, cwd=str(REPO_DIR))
+                if chk_6da.returncode == 0:
+                    baseline_repo.mkdir(parents=True, exist_ok=True)
+                    subprocess.run(
+                        f"git archive 6da94cb | tar -x -C {baseline_repo}",
+                        shell=True,
+                        check=True,
+                        capture_output=True,
+                        text=True,
+                        cwd=str(REPO_DIR),
+                    )
         if (
             baseline_repo.exists()
             and (baseline_repo / "nodes.py").exists()
             and not os.environ.get("IYKYK_INSIDE_ISOLATED_REPLAY")
         ):
-            import subprocess
             import sys
             worker_code = """
 import os
@@ -819,6 +837,35 @@ sys.exit(0 if res.wasSuccessful() else 1)
         for line in case_report_lines:
             print(line)
         print("=" * 90 + "\n")
+
+    def test_01b_v1_2_1_28_cases_live_quality_gate(self):
+        """在线实时验证全部 28 组 rc7/rc8 场景在当前 v1.2.1 主线上的核心质量门禁（零残余冲突、<=250词、合法语法、无重复、DAG 闭环、M3 单分支一致）。"""
+        baseline_file = FIXTURES_DIR / "rc7_text_quality_baseline.json"
+        doc = json.loads(baseline_file.read_text(encoding="utf-8"))
+        cases = doc.get("cases", [])
+        self.assertEqual(len(cases), 28)
+
+        for c in cases:
+            cid = c["id"]
+            cat = c.get("category", "normal")
+            inputs = c["inputs"]
+            seed = inputs["prompt_seed"]
+            gen_inputs = {k: v for k, v in inputs.items() if k != "prompt_seed"}
+            res = self.generator.generate_structured(**gen_inputs, prompt_seed=seed)
+            pos = res.positive
+            rep = res.resolution_report
+            tags = [t.strip() for t in pos.split(",") if t.strip()]
+
+            self.assertTrue(pos, f"Live Case {cid} returned empty positive prompt")
+            self.assertLessEqual(len(pos.split()), 250, f"Live Case {cid} exceeded 250 words")
+            validate_prompt_syntax(pos)
+            self.assertEqual(len(tags), len(set(tags)), f"Live Case {cid} contains duplicate tags: {pos}")
+            self.assertIsNotNone(rep)
+            self.assertEqual(rep.unresolved_conflicts, (), f"Live Case {cid} has unresolved conflicts: {rep.unresolved_conflicts}")
+            self.assertTrue(_verify_provenance_dag(res), f"Live Case {cid} provenance DAG verification failed")
+            if cat == "normal":
+                drops = [d for d in rep.decisions if d.action == "drop"]
+                self.assertEqual(len(drops), 0, f"Live normal case {cid} had unexpected drops: {drops}")
 
     def test_04_oracle_negative_mutations(self):
         """Oracle 负向变异门禁测试：清空受保护集合、篡改证据、注入垃圾 replace、篡改基线 SHA、断裂 provenance 均必须 Fail-Closed (R2R3-P1-003)。"""
@@ -1316,9 +1363,9 @@ sys.exit(0 if res.wasSuccessful() else 1)
             cls._seed_gate_result = (first_failure, len(total_pairs), batch_hash)
             return cls._seed_gate_result
 
-        # 默认路径：复用经 M5-3 归档实物证据与共用证据校验函数 (Fail-Closed, 毫秒级返回)
-        manifest_path = REPO_DIR / "scratch" / "audit_m5_3_reeval_manifest.json"
-        archive_path = REPO_DIR / "scratch" / "audit_m5_3_evidence.json.gz"
+        # 默认路径：复用经 v1.2.1 归档实物证据与共用证据校验函数 (Fail-Closed, 毫秒级返回)
+        manifest_path = REPO_DIR / "scratch" / "audit_v1_2_1_10k_manifest.json"
+        archive_path = REPO_DIR / "scratch" / "audit_v1_2_1_10k_evidence.json.gz"
         evidence_result = verify_m5_archive_evidence(manifest_path, archive_path, REPO_DIR, stream_recompute=False)
         cls._seed_gate_result = (None, evidence_result["total_seeds"], evidence_result["batch_hash"])
         return cls._seed_gate_result
@@ -1330,11 +1377,12 @@ sys.exit(0 if res.wasSuccessful() else 1)
         self.assertEqual(count, 10000)
 
     def test_03b_seed_gate_golden_hash(self):
-        """固定汇总哈希稳定性门禁：保留历史演进链基线，流式重算当前 M5 黄金基线哈希，并绑定归档实物证据。"""
+        """固定汇总哈希稳定性门禁：保留历史演进链基线（含 v1.2.0 M5），流式重算当前 v1.2.1 黄金基线哈希，并绑定归档实物证据。"""
         baseline_dba5861_hash = "a39a823d09b3b817107ba6a6ebdd5fdb261f4f71bd8148bd7856533fdf21c218"
         step2_baseline_hash = "3e1291ae60af887ebde1869a8fb60f7937424198c1db6a4856bb90aa954725fc"
         step3_baseline_hash = "ab5a633cfb3fde70d9a6c629ee65a540955d87ee143e66570d780743246cab89"
         m1_historical_hash = "aa7581bc2304f6f75530d95ab4e1b75e7e1101720b1dfaf14c2a1c328fcd1139"
+        v1_2_0_m5_historical_hash = EXPECTED_M5_GOLDEN_HASH
 
         # ------------------------------------------------------------------
         # 分支 A: 历史参考数据校验 (保留 M1 历史演进链向下兼容校验)
@@ -1359,6 +1407,7 @@ sys.exit(0 if res.wasSuccessful() else 1)
                 recomputed_historical_hash,
                 m1_historical_hash,
                 f"Historical M1 reference cache hash drifted! Expected M1: {m1_historical_hash}, "
+                f"v1.2.0 M5 was: {v1_2_0_m5_historical_hash}, "
                 f"Step 3 was: {step3_baseline_hash}, Step 2 was: {step2_baseline_hash}, dba5861 was: {baseline_dba5861_hash}",
             )
 
@@ -1373,13 +1422,13 @@ sys.exit(0 if res.wasSuccessful() else 1)
             )
 
         # ------------------------------------------------------------------
-        # 分支 B: 当前阶段 M5 黄金基线核验 (共用函数流式逐条重算 + 实物防篡改校验)
+        # 分支 B: 当前阶段 v1.2.1 黄金基线核验 (共用函数流式逐条重算 + 实物防篡改校验)
         # ------------------------------------------------------------------
-        manifest_path = REPO_DIR / "scratch" / "audit_m5_3_reeval_manifest.json"
-        archive_path = REPO_DIR / "scratch" / "audit_m5_3_evidence.json.gz"
+        manifest_path = REPO_DIR / "scratch" / "audit_v1_2_1_10k_manifest.json"
+        archive_path = REPO_DIR / "scratch" / "audit_v1_2_1_10k_evidence.json.gz"
         res = verify_m5_archive_evidence(manifest_path, archive_path, REPO_DIR, stream_recompute=True)
         self.assertEqual(res["status"], "VERIFIED")
-        self.assertEqual(res["batch_hash"], EXPECTED_M5_GOLDEN_HASH)
+        self.assertEqual(res["batch_hash"], EXPECTED_V1_2_1_GOLDEN_HASH)
 
     def test_03c_dual_version_divergence_audit(self):
         """四阶段全链路版本差异审计门禁：全量核验历史演进链证据 (阶段 1~3)，并核验开发起点 c74084d 至 M1 增量变更的因果归因全量证据 (阶段 4)。"""

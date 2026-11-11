@@ -819,7 +819,7 @@ class TestReleaseBuild(unittest.TestCase):
                 # 故障点 1：在 smoke_test_package 中抛出异常
                 ("smoke_test_package", "def faulty_smoke(zip_path):\n    raise RuntimeError('INJECTED_SMOKE_FAIL')\nbr.smoke_test_package = faulty_smoke\n"),
                 # 故障点 2：在锁内重命名 generation 目录前抛出异常
-                ("os_replace_version", "orig_replace = os.replace\ndef faulty_replace(src, dest):\n    if 'v1.1.0' in str(dest):\n        raise RuntimeError('INJECTED_REPLACE_FAIL')\n    return orig_replace(src, dest)\nos.replace = faulty_replace\n"),
+                ("os_replace_version", "current_ver = br.get_project_version(Path.cwd())\norig_replace = os.replace\ndef faulty_replace(src, dest):\n    if current_ver in str(dest):\n        raise RuntimeError('INJECTED_REPLACE_FAIL')\n    return orig_replace(src, dest)\nos.replace = faulty_replace\n"),
                 # 故障点 3：在更新 CURRENT.json 前抛出异常
                 ("update_pointer", "orig_replace = os.replace\ndef faulty_replace(src, dest):\n    if 'CURRENT.json' in str(dest):\n        raise RuntimeError('INJECTED_POINTER_FAIL')\n    return orig_replace(src, dest)\nos.replace = faulty_replace\n"),
             ]

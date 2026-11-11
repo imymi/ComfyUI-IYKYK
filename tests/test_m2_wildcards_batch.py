@@ -17,6 +17,7 @@ import gzip
 import hashlib
 import json
 from pathlib import Path
+import subprocess
 import unittest
 
 from lib.conflict_resolver import ConflictResolver
@@ -26,6 +27,27 @@ import nodes
 REPO_DIR = Path(__file__).resolve().parent.parent
 DATA_DIR = REPO_DIR / "data"
 DOCS_DIR = REPO_DIR / "docs" / "data_migration"
+
+
+def _ensure_baseline_6da94cb_data() -> Path:
+    """按需从 git 导出 6da94cb 基线完整快照（含 data/ 与 nodes.py），避免回退到当前版本 DATA_DIR。"""
+    target_base = REPO_DIR / "scratch" / "baseline_6da94cb"
+    target_data = target_base / "data"
+    if target_data.exists() and (target_data / "scenes.json").exists() and (target_base / "nodes.py").exists():
+        return target_data
+    chk = subprocess.run(["git", "cat-file", "-e", "6da94cb"], capture_output=True, text=True, cwd=str(REPO_DIR))
+    if chk.returncode != 0:
+        raise RuntimeError("Baseline commit 6da94cb does not exist in git object store")
+    target_base.mkdir(parents=True, exist_ok=True)
+    subprocess.run(
+        f"git archive 6da94cb | tar -x -C {target_base}",
+        shell=True,
+        check=True,
+        capture_output=True,
+        text=True,
+        cwd=str(REPO_DIR),
+    )
+    return target_data
 
 
 class TestM2WildcardsProvenanceLedger(unittest.TestCase):
@@ -860,8 +882,8 @@ class TestM2NegativeCounterexamples(unittest.TestCase):
         hair_atom = next(a for a in seed_0_atoms if a.get("source_slot") == "hairstyle")
         hair_atom["span_order"] = 99
 
-        base_catalog_dir = REPO_DIR / "scratch" / "baseline_6da94cb" / "data"
-        base_catalog_lookup = load_authoritative_catalog_lookup(base_catalog_dir if base_catalog_dir.exists() else DATA_DIR)
+        base_catalog_dir = _ensure_baseline_6da94cb_data()
+        base_catalog_lookup = load_authoritative_catalog_lookup(base_catalog_dir)
 
         with self.assertRaises(ValueError) as cm:
             validate_baseline_cache_integrity(
@@ -896,8 +918,8 @@ class TestM2NegativeCounterexamples(unittest.TestCase):
         hair_atom["source_item_id"] = "long_straight_black"
         hair_atom["text"] = "long straight black hair"
 
-        base_catalog_dir = REPO_DIR / "scratch" / "baseline_6da94cb" / "data"
-        base_catalog_lookup = load_authoritative_catalog_lookup(base_catalog_dir if base_catalog_dir.exists() else DATA_DIR)
+        base_catalog_dir = _ensure_baseline_6da94cb_data()
+        base_catalog_lookup = load_authoritative_catalog_lookup(base_catalog_dir)
 
         # 1. 单独篡改源原子：立即被源-终态内部一致性强校验或可信摘要拦截
         with self.assertRaises(ValueError) as cm:
@@ -966,8 +988,8 @@ class TestM2NegativeCounterexamples(unittest.TestCase):
             },
         }
 
-        base_catalog_dir = REPO_DIR / "scratch" / "baseline_6da94cb" / "data"
-        base_catalog_lookup = load_authoritative_catalog_lookup(base_catalog_dir if base_catalog_dir.exists() else DATA_DIR)
+        base_catalog_dir = _ensure_baseline_6da94cb_data()
+        base_catalog_lookup = load_authoritative_catalog_lookup(base_catalog_dir)
 
         with self.assertRaises(ValueError) as cm:
             validate_baseline_cache_integrity(forged_doc, total_seeds=1, catalog_lookup=base_catalog_lookup)
@@ -995,8 +1017,8 @@ class TestM2NegativeCounterexamples(unittest.TestCase):
         # 清空 seed 0 的 final_atoms (43 -> 0)
         seed_0_item["final_atoms"] = []
 
-        base_catalog_dir = REPO_DIR / "scratch" / "baseline_6da94cb" / "data"
-        base_catalog_lookup = load_authoritative_catalog_lookup(base_catalog_dir if base_catalog_dir.exists() else DATA_DIR)
+        base_catalog_dir = _ensure_baseline_6da94cb_data()
+        base_catalog_lookup = load_authoritative_catalog_lookup(base_catalog_dir)
 
         with self.assertRaises(ValueError) as cm:
             validate_baseline_cache_integrity(

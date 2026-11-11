@@ -7,7 +7,7 @@ build_release.py — ComfyUI-IYKYK 确定性可重复构建与纯净打包脚本
 2. 强制 clean-tree 检查，无任何绕过入口，dirty 工作区直接 Fail-Closed
 3. 动态从 pyproject.toml 读取版本并对 js/version.js 执行只读校验
 4. 打包前执行 validate_data.py --strict 强门禁校验
-5. 严格白名单过滤：打包 38 个核心运行时文件（6 root + 2 js + 11 lib + 19 data）
+5. 严格白名单过滤：打包 44 个核心运行时文件（6 root + 2 js + 15 lib + 20 data + 1 schema）
 6. 规范化 ZIP 文件时间戳（由 HEAD commit timestamp 或 SOURCE_DATE_EPOCH 驱动）与权限
 7. 同时生成 versioned, latest 与 generic 3 个二进制一致的 ZIP 产物
 8. 计算 per-file SHA256，生成 MANIFEST.json 与 SHA256SUMS.txt
@@ -339,7 +339,7 @@ def validate_generation_integrity(
         if m_files_sha != expected_files_sha:
             raise ValueError("Manifest files_sha256 does not match expected_files_sha")
 
-    # 5. 深度校验 ZIP 包内实物：testzip() 与 38 个文件的实际内容 SHA256 逐一比对 (R3)
+    # 5. 深度校验 ZIP 包内实物：testzip() 与运行时白名单文件的实际内容 SHA256 逐一比对 (R3)
     for zip_name in (zip_versioned, zip_latest, zip_generic):
         zip_p = gen_dir / zip_name
         try:
@@ -771,7 +771,7 @@ def build_release(repo_dir: Path, output_dir: Path, mode: str = "verify"):
     # 1. 强校验数据
     run_data_validation(repo_dir)
 
-    # 2. 收集并校验 38 个运行时文件
+    # 2. 收集并校验运行时白名单文件
     files = collect_files_to_pack(repo_dir)
     print(f"📦 Step 2: Collected {len(files)} runtime files for packaging.")
 
