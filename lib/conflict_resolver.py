@@ -756,7 +756,7 @@ def is_carrier_satisfied_by_garments(required_kind: str, garment_objs: Sequence[
 def find_carrier_mismatch_in_atoms(
     atoms: Sequence[PromptAtom],
 ) -> List[Tuple[PromptAtom, str, Tuple[PromptAtom, ...]]]:
-    """核验原子集合中每个需载体修饰词是否在在穿衣物上具备真实对应载体。"""
+    """核验原子集合中每个需载体修饰词（含 nudity / clothing_state / clothing_extension）是否具备在穿衣物载体；实际服装为空时同样严格拦截。"""
     detectable = [a for a in atoms if getattr(a, "can_detect", True)]
     worn_garments = [a for a in detectable if _is_worn_garment_carrier(a)]
     mismatches: List[Tuple[PromptAtom, str, Tuple[PromptAtom, ...]]] = []
@@ -764,14 +764,8 @@ def find_carrier_mismatch_in_atoms(
         req = get_required_carrier_kind(a)
         if req is None:
             continue
-        if worn_garments:
-            if not is_carrier_satisfied_by_garments(req, worn_garments):
-                mismatches.append((a, req, tuple(worn_garments)))
-        elif (
-            a.source_slot in ("clothing_state", "clothing_extension")
-            or (a.provenance is not None and a.provenance.kind in ("clothing_state", "clothing_extension"))
-        ):
-            mismatches.append((a, req, ()))
+        if not worn_garments or not is_carrier_satisfied_by_garments(req, worn_garments):
+            mismatches.append((a, req, tuple(worn_garments)))
     return mismatches
 
 
@@ -3992,51 +3986,53 @@ class ConflictResolver:
                                 a,
                             )
 
-        # 3. 提示词级服装载体前提核验：在穿衣物存在时，剔除缺乏真实对应载体的裸露词条（如无裙装时剔除 skirt slit）
+        # 3. 提示词级服装载体前提核验：有/无在穿衣物时均不得保留缺乏真实对应载体的裸露词条（如无裙装时剔除 skirt slit）
         active_now = index.get_all_active_ordered()
         worn_garments = [a for a in active_now if a.can_detect and index.is_active(a) and _is_worn_garment_carrier(a)]
-        if worn_garments:
-            nc_trace_cur = _format_nudity_constraint_trace(self._active_nudity_constraint)
-            ext_garments = [g for g in worn_garments if is_external_atom(g)]
-            win_garment = ext_garments[0] if ext_garments else worn_garments[0]
-            for na in active_now:
-                if not index.is_active(na) or not na.can_detect or na.source_slot != "nudity":
-                    continue
-                req_carrier = get_required_carrier_kind(na)
-                if req_carrier is None or is_carrier_satisfied_by_garments(req_carrier, worn_garments):
-                    continue
-                if is_external_atom(na):
-                    if ext_garments:
-                        raise PromptValidationError(
-                            f"External override conflict under rule '{rule_item.id}': nudity ('{na.text}') requires '{req_carrier}' carrier missing in external clothing ('{ext_garments[0].text}')",
-                            slots=(na.source_slot, ext_garments[0].source_slot),
-                            texts=(na.text, ext_garments[0].text),
-                            rule_id=rule_item.id,
-                            error_code="missing_garment_carrier",
-                            details={"required_carrier": req_carrier, "nudity_constraint": nc_trace_cur} if nc_trace_cur else {"required_carrier": req_carrier},
-                        )
-                    continue
-                if not na.can_delete_atom:
-                    continue
-                index.drop(na.atom_id)
-                ft = {
-                    "rule_id": rule_item.id,
-                    "phase": rule_item.phase,
-                    "priority": rule_item.priority,
-                    "winner_objects": [win_garment.atom_id],
-                    "target_objects": [na.atom_id],
-                    "required_carrier": req_carrier,
-                }
-                if nc_trace_cur:
-                    ft["nudity_constraint"] = nc_trace_cur
-                ledger.record_drop(
-                    rule_item.id,
-                    rule_item.phase,
-                    "clothing_removes_nudity",
-                    (win_garment.atom_id,),
-                    na,
-                    fact_trace=ft,
-                )
+        nc_trace_cur = _format_nudity_constraint_trace(self._active_nudity_constraint)
+        ext_garments = [g for g in worn_garments if is_external_atom(g)]
+        win_garment = ext_garments[0] if ext_garments else (worn_garments[0] if worn_garments else None)
+        winner_ids_carrier = (win_garment.atom_id,) if win_garment is not None else ()
+        for na in active_now:
+            if not index.is_active(na) or not na.can_detect or na.source_slot != "nudity":
+                continue
+            req_carrier = get_required_carrier_kind(na)
+            if req_carrier is None:
+                continue
+            if worn_garments and is_carrier_satisfied_by_garments(req_carrier, worn_garments):
+                continue
+            if is_external_atom(na):
+                if ext_garments:
+                    raise PromptValidationError(
+                        f"External override conflict under rule '{rule_item.id}': nudity ('{na.text}') requires '{req_carrier}' carrier missing in external clothing ('{ext_garments[0].text}')",
+                        slots=(na.source_slot, ext_garments[0].source_slot),
+                        texts=(na.text, ext_garments[0].text),
+                        rule_id=rule_item.id,
+                        error_code="missing_garment_carrier",
+                        details={"required_carrier": req_carrier, "nudity_constraint": nc_trace_cur} if nc_trace_cur else {"required_carrier": req_carrier},
+                    )
+                continue
+            if not na.can_delete_atom:
+                continue
+            index.drop(na.atom_id)
+            ft = {
+                "rule_id": rule_item.id,
+                "phase": rule_item.phase,
+                "priority": rule_item.priority,
+                "winner_objects": list(winner_ids_carrier),
+                "target_objects": [na.atom_id],
+                "required_carrier": req_carrier,
+            }
+            if nc_trace_cur:
+                ft["nudity_constraint"] = nc_trace_cur
+            ledger.record_drop(
+                rule_item.id,
+                rule_item.phase,
+                "clothing_removes_nudity",
+                winner_ids_carrier,
+                na,
+                fact_trace=ft,
+            )
 
         return index.get_all_active_ordered()
 

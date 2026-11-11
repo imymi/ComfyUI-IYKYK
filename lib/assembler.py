@@ -25,7 +25,10 @@ if __package__:
     )
     from .conflict_resolver import (
         ConflictResolver,
+        _is_worn_garment_carrier,
         find_carrier_mismatch_in_atoms,
+        get_required_carrier_kind,
+        is_carrier_satisfied_by_garments,
         is_external_atom,
     )
     from .errors import PromptValidationError, UnresolvedConflictError
@@ -55,7 +58,10 @@ else:
     )
     from lib.conflict_resolver import (
         ConflictResolver,
+        _is_worn_garment_carrier,
         find_carrier_mismatch_in_atoms,
+        get_required_carrier_kind,
+        is_carrier_satisfied_by_garments,
         is_external_atom,
     )
     from lib.errors import PromptValidationError, UnresolvedConflictError
@@ -602,6 +608,106 @@ def _tag_budget_priority_tier(idx: int, tag: PromptTag, core_tag_indices: set[in
     return 3
 
 
+def _tag_required_carrier_kinds(tag: PromptTag) -> Tuple[str, ...]:
+    """提取单个 PromptTag 中所有可检测原子声明的去重载体需求。"""
+    reqs: List[str] = []
+    for a in tag.atoms:
+        if not getattr(a, "can_detect", True):
+            continue
+        req = get_required_carrier_kind(a)
+        if req and req not in reqs:
+            reqs.append(req)
+    return tuple(reqs)
+
+
+def _pack_budget_tags_with_carriers(
+    non_empty_tags: Sequence[PromptTag],
+    core_tag_indices: set[int],
+    max_words: int,
+) -> set[int]:
+    """按优先级与载体原子依赖执行预算打包：需要载体的词条必须与对应在穿载体共留或让位给相容替代词。"""
+    kept_indices: set[int] = set()
+    kept_atoms: List[PromptAtom] = []
+    remaining_budget = max_words
+    non_ext_ranked: List[Tuple[int, int, PromptTag]] = []
+
+    for idx, tag in enumerate(non_empty_tags):
+        if any(is_external_atom(a) for a in tag.atoms):
+            kept_indices.add(idx)
+            kept_atoms.extend(tag.atoms)
+            remaining_budget -= len(tag.text.split())
+        else:
+            tier = _tag_budget_priority_tier(idx, tag, core_tag_indices)
+            non_ext_ranked.append((tier, idx, tag))
+
+    non_ext_ranked.sort(key=lambda x: (x[0], x[1]))
+
+    for _, idx, tag in non_ext_ranked:
+        if idx in kept_indices:
+            continue
+        tag_words = len(tag.text.split())
+        req_kinds = _tag_required_carrier_kinds(tag)
+        if not req_kinds:
+            if tag_words <= remaining_budget:
+                kept_indices.add(idx)
+                kept_atoms.extend(tag.atoms)
+                remaining_budget -= tag_words
+            continue
+
+        worn_so_far = [
+            a for a in kept_atoms
+            if getattr(a, "can_detect", True) and _is_worn_garment_carrier(a)
+        ]
+        missing_reqs = [
+            rk for rk in req_kinds
+            if not (worn_so_far and is_carrier_satisfied_by_garments(rk, worn_so_far))
+        ]
+        if not missing_reqs:
+            if tag_words <= remaining_budget:
+                kept_indices.add(idx)
+                kept_atoms.extend(tag.atoms)
+                remaining_budget -= tag_words
+            continue
+
+        # 寻找尚未保留的最省字词/高优先级兼容载体集合，满足全部缺失前提才共留
+        chosen_carrier_indices: List[int] = []
+        temp_worn: List[PromptAtom] = list(worn_so_far)
+        extra_words = 0
+        all_satisfied = True
+        for rk in missing_reqs:
+            if temp_worn and is_carrier_satisfied_by_garments(rk, temp_worn):
+                continue
+            cand_carriers = []
+            for c_tier, c_idx, c_tag in non_ext_ranked:
+                if c_idx == idx or c_idx in kept_indices or c_idx in chosen_carrier_indices:
+                    continue
+                c_worn = [
+                    ca for ca in c_tag.atoms
+                    if getattr(ca, "can_detect", True) and _is_worn_garment_carrier(ca)
+                ]
+                if c_worn and is_carrier_satisfied_by_garments(rk, c_worn):
+                    cand_carriers.append((len(c_tag.text.split()), c_tier, c_idx, c_tag, c_worn))
+            if not cand_carriers:
+                all_satisfied = False
+                break
+            cand_carriers.sort(key=lambda x: (x[0], x[1], x[2]))
+            best_words, _, best_idx, _, best_worn = cand_carriers[0]
+            chosen_carrier_indices.append(best_idx)
+            temp_worn.extend(best_worn)
+            extra_words += best_words
+
+        total_cost = tag_words + extra_words
+        if all_satisfied and total_cost <= remaining_budget:
+            kept_indices.add(idx)
+            kept_atoms.extend(tag.atoms)
+            for c_idx in chosen_carrier_indices:
+                kept_indices.add(c_idx)
+                kept_atoms.extend(non_empty_tags[c_idx].atoms)
+            remaining_budget -= total_cost
+
+    return kept_indices
+
+
 def _load_nudity_level_fragments_for_preset(
     data_dir: Path,
     constraint: NudityConstraint,
@@ -893,22 +999,7 @@ def assemble_result(
             current_word_count += len(tag.text.split())
     else:
         core_tag_indices = _select_budget_core_tag_indices(non_empty_tags, active_lvl, active_branch)
-        kept_indices: set[int] = set()
-        remaining_budget = max_words - total_ext_words
-        non_ext_ranked: List[Tuple[int, int, PromptTag]] = []
-        for idx, tag in enumerate(non_empty_tags):
-            if any(is_external_atom(a) for a in tag.atoms):
-                kept_indices.add(idx)
-            else:
-                tier = _tag_budget_priority_tier(idx, tag, core_tag_indices)
-                non_ext_ranked.append((tier, idx, tag))
-
-        non_ext_ranked.sort(key=lambda x: (x[0], x[1]))
-        for _, idx, tag in non_ext_ranked:
-            tag_words = len(tag.text.split())
-            if tag_words <= remaining_budget:
-                kept_indices.add(idx)
-                remaining_budget -= tag_words
+        kept_indices = _pack_budget_tags_with_carriers(non_empty_tags, core_tag_indices, max_words)
 
         for idx, tag in enumerate(non_empty_tags):
             tag_words = len(tag.text.split())
@@ -1143,18 +1234,30 @@ def assemble_result(
         carrier_mismatches = find_carrier_mismatch_in_atoms(accepted_atoms)
         if carrier_mismatches:
             bad_atom, req_kind, worn_atoms = carrier_mismatches[0]
+            culled_carriers = [
+                bf for bf in budget_filtered_atoms
+                if getattr(bf, "can_detect", True) and _is_worn_garment_carrier(bf) and is_carrier_satisfied_by_garments(req_kind, [bf])
+            ]
+            is_budget_culled = bool(culled_carriers)
             err = PromptValidationError(
-                f"Accepted prompt atom '{bad_atom.text}' (slot={bad_atom.source_slot}) requires missing garment carrier '{req_kind}' "
-                f"(worn_garments={[w.text for w in worn_atoms]})",
-                category="unresolved_hard_conflict",
-                error_code="missing_garment_carrier",
-                slots=(bad_atom.source_slot, "clothing") if worn_atoms else (bad_atom.source_slot,),
-                texts=[bad_atom.text] + [w.text for w in worn_atoms[:2]],
+                (
+                    f"Word budget ({max_words}) dropped required '{req_kind}' carrier for accepted atom '{bad_atom.text}' "
+                    f"(dropped_carriers={[c.text for c in culled_carriers]})"
+                    if is_budget_culled
+                    else f"Accepted prompt atom '{bad_atom.text}' (slot={bad_atom.source_slot}) requires missing garment carrier '{req_kind}' "
+                    f"(worn_garments={[w.text for w in worn_atoms]})"
+                ),
+                category="external_budget_exceeded" if is_budget_culled else "unresolved_hard_conflict",
+                error_code="insufficient_budget_for_carrier" if is_budget_culled else "missing_garment_carrier",
+                slots=(bad_atom.source_slot, "clothing") if (worn_atoms or culled_carriers) else (bad_atom.source_slot,),
+                texts=[bad_atom.text] + [w.text for w in (culled_carriers if is_budget_culled else worn_atoms)[:2]],
                 details={
+                    "max_words": max_words,
                     "required_carrier": req_kind,
                     "atom_id": bad_atom.atom_id,
                     "atom_text": bad_atom.text,
                     "worn_garments": [w.text for w in worn_atoms],
+                    "dropped_carriers": [c.text for c in culled_carriers],
                 },
             )
             err.nudity_constraint = eff_nc

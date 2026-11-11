@@ -1205,6 +1205,158 @@ class TestV121M3UnifiedNudityAndBudget(unittest.TestCase):
                     self.generator.generate_structured(**common_none, 服装款式="随机 (Random)", prompt_seed=21)
         self.assertEqual(call_count, 2, "随机服饰载体失败后只允许 1 次初始采样 + 最多 1 次受控重组")
 
+    def test_14_budget_carrier_coherence_and_tight_budget_fail_closed(self) -> None:
+        """[P1] 预算裁剪后实际服装为空时，nudity 也不得绕过载体校验；必须共留载体与依赖词、选兼容替代词或明确报错。"""
+        # 1. worn_garments 为空时，find_carrier_mismatch_in_atoms 对 nudity / clothing_state / clothing_extension 统一拦截
+        empty_garment_dependent_atoms = [
+            PromptAtom(
+                atom_id="d_nud",
+                text="skirt slit revealing thigh",
+                span_type=SpanType.PLAIN,
+                source_slot="nudity",
+                source_item_id="nudity_l2",
+                tag_order=0,
+                span_order=0,
+                provenance=TagProvenance(item_id="nudity_l2", kind="nudity"),
+                origin=SelectionOrigin(mode="explicit", selector="nudity", selected_id="nudity_l2"),
+                facts=SemanticFacts(allowed_nudity_levels=("L2",), exposed_regions=("thigh_leg",), nudity_branches=("l2_leg_slit",)),
+            ),
+            PromptAtom(
+                atom_id="d_st",
+                text="high slit showing bare leg",
+                span_type=SpanType.PLAIN,
+                source_slot="clothing",
+                source_item_id="linkage_general",
+                tag_order=1,
+                span_order=0,
+                provenance=TagProvenance(item_id="linkage_general", kind="clothing_state"),
+                origin=SelectionOrigin(mode="auto", selector="clothing_state", selected_id="auto_linkage"),
+                facts=SemanticFacts(semantic_role="selector", exposed_regions=("thigh_leg",)),
+            ),
+            PromptAtom(
+                atom_id="d_ext",
+                text="high side slit to upper thigh exposing long bare leg",
+                span_type=SpanType.PLAIN,
+                source_slot="clothing",
+                source_item_id="high_slit",
+                tag_order=2,
+                span_order=0,
+                provenance=TagProvenance(item_id="high_slit", kind="clothing_extension"),
+                origin=SelectionOrigin(mode="auto", selector="clothing_state", selected_id="high_slit"),
+                facts=SemanticFacts(semantic_role="selector", exposed_regions=("thigh_leg",)),
+            ),
+        ]
+        mismatches_empty = find_carrier_mismatch_in_atoms(empty_garment_dependent_atoms)
+        self.assertEqual([a.atom_id for a, _, _ in mismatches_empty], ["d_nud", "d_st", "d_ext"])
+
+        common_none = {
+            "裸露等级": "L2",
+            "服装状态": "自动联动裸露等级 (Auto Link Nudity)",
+            "场景大类": "无 (None)",
+            "剧情主题": "无 (None)",
+            "景别构图": "无 (None)",
+            "拍摄视角": "无 (None)",
+            "发型发色": "无 (None)",
+            "姿势动作": "无 (None)",
+            "情绪表情": "无 (None)",
+            "光影预设": "无 (None)",
+        }
+
+        # 2. 复现回归: L2 + pleated_skirt + seed=3 + 246 词 quality_override（仅剩 4 词预算）
+        #    绝不能裁掉全部裙装却悬空输出 skirt slit revealing thigh；应改选相容替代词 ankle visible + pleated skirt 共存
+        qo_246 = " ".join(f"q{i}" for i in range(246))
+        res_246 = self.generator.generate_structured(
+            **common_none,
+            服装款式="pleated_skirt",
+            quality_override=qo_246,
+            prompt_seed=3,
+        )
+        pos_246 = res_246.positive.lower()
+        self.assertNotIn("skirt slit revealing thigh", pos_246)
+        self.assertIn("pleated skirt", pos_246)
+        self.assertIn("ankle visible", pos_246)
+        self.assertEqual(find_carrier_mismatch_in_atoms(res_246.atoms), [])
+
+        # 3. 预算足够共留依赖词与载体时（244 词 -> 剩 6 词），skirt slit revealing thigh(4w) + pleated skirt(2w) 原子级共留
+        qo_244 = " ".join(f"q{i}" for i in range(244))
+        res_244 = self.generator.generate_structured(
+            **common_none,
+            服装款式="pleated_skirt",
+            quality_override=qo_244,
+            prompt_seed=3,
+        )
+        pos_244 = res_244.positive.lower()
+        self.assertIn("skirt slit revealing thigh", pos_244)
+        self.assertIn("pleated skirt", pos_244)
+        self.assertEqual(find_carrier_mismatch_in_atoms(res_244.atoms), [])
+
+        # 4. 预算更紧导致既无法共留载体也无可用替代词时，必须明确 Fail-Closed 报错（不能把被裁掉的服装算作载体）
+        qo_248 = " ".join(f"q{i}" for i in range(248))
+        with self.assertRaises(PromptValidationError) as ctx_248:
+            self.generator.generate_structured(
+                **common_none,
+                服装款式="pleated_skirt",
+                quality_override=qo_248,
+                prompt_seed=3,
+            )
+        self.assertEqual(ctx_248.exception.category, "external_budget_exceeded")
+
+        # 外部 nudity_override='skirt slit revealing thigh' 挤掉 pleated_skirt 时，已裁服装不算作载体，必须报错
+        with self.assertRaises(PromptValidationError) as ctx_ext_culled:
+            self.generator.generate_structured(
+                **common_none,
+                服装款式="pleated_skirt",
+                quality_override=qo_246,
+                nudity_override="skirt slit revealing thigh",
+                prompt_seed=3,
+            )
+        self.assertEqual(ctx_ext_culled.exception.category, "external_budget_exceeded")
+        self.assertEqual(ctx_ext_culled.exception.error_code, "insufficient_budget_for_carrier")
+
+        # 装配器直连：无替代词且 max_words=5 无法同时容纳 pleated skirt(2w) + skirt slit revealing thigh(4w)
+        tight_pair = [
+            PromptFragment(
+                text="skirt slit revealing thigh",
+                source_slot="nudity",
+                source_item_id="nudity_l2",
+                order=0,
+                provenance=TagProvenance(item_id="nudity_l2", kind="nudity"),
+                origin=SelectionOrigin(mode="explicit", selector="nudity", selected_id="nudity_l2"),
+                facts=SemanticFacts(allowed_nudity_levels=("L2",), exposed_regions=("thigh_leg",), nudity_branches=("l2_leg_slit",)),
+            ),
+            PromptFragment(
+                text="pleated skirt",
+                source_slot="clothing",
+                source_item_id="pleated_skirt",
+                order=1,
+                provenance=TagProvenance(item_id="pleated_skirt", kind="base_clothing"),
+                origin=SelectionOrigin(mode="explicit", selector="clothing", selected_id="pleated_skirt"),
+                facts=SemanticFacts(piece_role="bottom", garment_topologies=("bottom_skirt",), covered_regions=("lower_torso",), allowed_nudity_levels=("L1", "L2", "L3")),
+            ),
+        ]
+        with self.assertRaises(PromptValidationError) as ctx_pair5:
+            _assembler.assemble_result(
+                tight_pair,
+                DATA_DIR,
+                Random(3),
+                max_words=5,
+                nudity_constraint=NudityConstraint(requested_level="L2", effective_level="L2", source="ui_explicit", selected_branch="l2_leg_slit"),
+            )
+        self.assertEqual(ctx_pair5.exception.category, "external_budget_exceeded")
+
+        # 5. 正向验证：预算足够真实裙装、裤装露脚踝，以及 max_words=0 例外保持正常
+        res_skirt_full = self.generator.generate_structured(**common_none, 服装款式="pleated_skirt", prompt_seed=0)
+        self.assertIn("skirt slit revealing thigh", res_skirt_full.positive.lower())
+        self.assertIn("pleated skirt", res_skirt_full.positive.lower())
+
+        res_jeans_ok = self.generator.generate_structured(**common_none, 服装款式="denim_jeans", prompt_seed=3)
+        self.assertIn("cropped jeans", res_jeans_ok.positive.lower())
+        self.assertIn("ankle visible", res_jeans_ok.positive.lower())
+        self.assertNotIn("skirt slit", res_jeans_ok.positive.lower())
+
+        res_zero = _assembler.assemble_result(tight_pair, DATA_DIR, Random(3), max_words=0)
+        self.assertEqual(res_zero.prompt, "")
+
 
 if __name__ == "__main__":
     unittest.main()
