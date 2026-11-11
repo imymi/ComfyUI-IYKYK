@@ -2046,19 +2046,21 @@ class DataSampler:
         state_mode = get_selection_mode(state)
         exemption = check_completion_exemption(style)
         affinity_matrix = getattr(getattr(self, "affinity_registry", None), "matrix", None)
+        _comp_rng_cache: Optional[Random] = completion_rng
 
         def _get_comp_rng() -> Random:
-            if completion_rng is not None:
-                return completion_rng
-            return derive_deterministic_child_rng(
-                rng,
-                style,
-                state,
-                nudity_level_code,
-                nudity_branch or "",
-                c_id,
-                "clothing_completion",
-            )
+            nonlocal _comp_rng_cache
+            if _comp_rng_cache is None:
+                _comp_rng_cache = derive_deterministic_child_rng(
+                    rng,
+                    style,
+                    state,
+                    nudity_level_code,
+                    nudity_branch or "",
+                    c_id,
+                    "clothing_completion",
+                )
+            return _comp_rng_cache
 
         def _finalize_clothing_result(
             chosen_base_seq: Sequence[SampledTag],
@@ -2140,10 +2142,16 @@ class DataSampler:
                 garment_tags_for_ext = list(final_base) + list(comp_tags_tuple) + (
                     list(final_state_tags) if final_state_id == "linkage_override" else []
                 )
+                # 若补全、回退或套装修复改动过衣物清单，扩展采样必须走隔离子流，严禁扰动主 rng 状态
+                ext_rng = _get_comp_rng() if (
+                    bool(comp_tags_tuple)
+                    or bool(comp_info.get("fallback_used"))
+                    or repaired_ensemble
+                ) else rng
                 ext_tags = self._sample_clothing_extensions_provenance(
                     nudity_level_code,
                     c_id,
-                    rng,
+                    ext_rng,
                     data,
                     garment_tags=garment_tags_for_ext,
                     nudity_branch=nudity_branch,

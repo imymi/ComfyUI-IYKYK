@@ -25,6 +25,7 @@ from lib.models import AssemblyResult, ContextProfile, NudityConstraint, PromptA
 from lib.outfit_completion import (
     assess_clothing_completeness,
     check_completion_exemption,
+    complete_outfit_tags,
     is_heavy_or_rigid_garment,
     is_tags_compatible_with_state,
 )
@@ -411,6 +412,216 @@ class TestV121M2OutfitCompletion(unittest.TestCase):
         for seed in range(10):
             r_l4 = _sampler.sample_clothing_result("随机 (Random)", "自动联动裸露等级 (Auto Link Nudity)", "L4", Random(seed))
             self.assertEqual(r_l4.complement_tags, ())
+
+    def test_11_dynamic_slot_companion_preserves_main_garment_and_sanitizes_aux(self) -> None:
+        """[P1 回归] t-shirt + bottom_jeans_casual__tag_000 (seed=0) 必须保留 jeans pants 且禁止 sneakers 冒充下装。"""
+        cats = _sampler._load("clothing")["categories"]
+        tshirt_c = next(c for c in cats if c["id"] == "t_shirt")
+        jeans_c = next(c for c in cats if c["id"] == "bottom_jeans_casual")
+        _, ts_tags = _sampler._to_sampled_tags([tshirt_c["tags"][0]], "t_shirt", "base_clothing", rng=Random(0))
+
+        comp_tags, comp_info = complete_outfit_tags(
+            primary_style_id="t_shirt",
+            active_tags=ts_tags,
+            state_id=None,
+            state_tags=(),
+            nudity_level_code="L1",
+            nudity_branch=None,
+            categories=[tshirt_c, jeans_c],
+            excluded_ids=set(),
+            context_profile=None,
+            context=None,
+            affinity_matrix=None,
+            to_sampled_fn=_sampler._to_sampled_tags,
+            completion_rng=Random(0),
+        )
+        self.assertEqual(comp_info["complement_ids"], ["bottom_jeans_casual"])
+        # 确认真实裤装文本与叶子 ID 存在且居前
+        comp_ids = [t.id for t in comp_tags]
+        comp_texts = [t.text.lower() for t in comp_tags]
+        self.assertIn("bottom_jeans_casual__tag_000", comp_ids)
+        self.assertTrue(any("jeans" in txt for txt in comp_texts))
+        self.assertEqual(comp_tags[0].id, "bottom_jeans_casual__tag_000")
+        self.assertEqual(comp_tags[0].facts.piece_role, "bottom")
+
+        # 动态展开的 sneakers 只能携带 footwear 角色，不得伪装为 bottom 触发完整性误放行
+        sneakers_tags = [t for t in comp_tags if t.id.endswith("__slot_0") or "sneaker" in t.text.lower()]
+        self.assertGreater(len(sneakers_tags), 0)
+        for snk in sneakers_tags:
+            self.assertEqual(snk.facts.piece_role, "footwear")
+            self.assertNotIn("lower_torso", snk.facts.covered_regions)
+            solo_check = assess_clothing_completeness(list(ts_tags) + [snk], (), "L1")
+            self.assertFalse(solo_check.is_complete)
+            self.assertEqual(solo_check.missing_parts, ("bottom",))
+
+        # 若上游只传入 __slot_ 动态 PromptAtom（未洗 facts），同样禁止冒充 bottom
+        spoofed_slot_atom = PromptAtom(
+            atom_id="bottom_jeans_casual__tag_000__slot_0",
+            text="sneakers",
+            span_type=SpanType.PLAIN,
+            source_slot="clothing",
+            source_item_id="bottom_jeans_casual",
+            id="bottom_jeans_casual__tag_000__slot_0",
+            facts=SemanticFacts(piece_role="bottom", covered_regions=("lower_torso",), garment_topologies=("bottom_pants",)),
+        )
+        spoof_check = assess_clothing_completeness(list(ts_tags) + [spoofed_slot_atom], (), "L1")
+        self.assertFalse(spoof_check.is_complete)
+        self.assertEqual(spoof_check.missing_parts, ("bottom",))
+
+        # 完整候选通过 sampler.sample_clothing_result 验证：mock categories 仅保留 t_shirt 与 bottom_jeans_casual
+        orig_load = _sampler._load
+
+        def mocked_load_pair(slot_name: str):
+            d = orig_load(slot_name)
+            if slot_name != "clothing":
+                return d
+            return {**d, "categories": [tshirt_c, jeans_c]}
+
+        with patch.object(_sampler, "_load", side_effect=mocked_load_pair):
+            # 取 seed=0 让主款抽 t_shirt（若抽中 jeans 则补 t_shirt），补件均应保留主裤装
+            res_pair = _sampler.sample_clothing_result(
+                "t_shirt",
+                "无 (None)",
+                "L1",
+                Random(0),
+            )
+            self.assertEqual(res_pair.style_id, "t_shirt")
+            # 再测随机主款抽取 t_shirt 并自动补 bottom_jeans_casual
+            found_t_primary = False
+            for seed_probe in range(10):
+                r_probe = _sampler.sample_clothing_result(
+                    "随机 (Random)",
+                    "无 (None)",
+                    "L1",
+                    Random(seed_probe),
+                    completion_rng=Random(0),
+                )
+                if r_probe.style_id == "t_shirt":
+                    found_t_primary = True
+                    ids_all = [t.id for t in r_probe.complement_tags]
+                    self.assertIn("bottom_jeans_casual__tag_000", ids_all)
+                    self.assertTrue(any("jeans" in t.text.lower() for t in r_probe.complement_tags))
+                    break
+            self.assertTrue(found_t_primary)
+
+    def test_12_l3_branch_carrier_validation_and_branch_aware_fallback(self) -> None:
+        """[P2-1 回归] L3 分支必须校验真实载体（裙/裤/连衣裙/文胸），且最小组合回退严守分支要求。"""
+        cats = _sampler._load("clothing")["categories"]
+        c_map = {c["id"]: c for c in cats}
+        _, jeans_tags = _sampler._to_sampled_tags([c_map["bottom_jeans_casual"]["tags"][0]], "bottom_jeans_casual", "base_clothing", rng=Random(1))
+        _, skirt_tags = _sampler._to_sampled_tags([c_map["pleated_skirt"]["tags"][0]], "pleated_skirt", "base_clothing", rng=Random(1))
+        _, ts_tags = _sampler._to_sampled_tags([c_map["t_shirt"]["tags"][0]], "t_shirt", "base_clothing", rng=Random(1))
+        _, bra_tags = _sampler._to_sampled_tags([c_map["lingerie_bra"]["tags"][0]], "lingerie_bra", "base_clothing", rng=Random(1))
+        _, dungarees_tags = _sampler._to_sampled_tags([c_map["dungarees"]["tags"][0]], "dungarees", "base_clothing", rng=Random(1))
+
+        # 1. 牛仔裤 -> 保留裙装分支：必须判为缺 skirt
+        c1 = assess_clothing_completeness(jeans_tags, (), "L3", "l3_topless_skirt_kept")
+        self.assertFalse(c1.is_complete)
+        self.assertEqual(c1.missing_parts, ("bottom_skirt",))
+
+        # 2. 百褶裙 -> 保留裤装分支：必须判为缺 pants
+        c2 = assess_clothing_completeness(skirt_tags, (), "L3", "l3_topless_pants_kept")
+        self.assertFalse(c2.is_complete)
+        self.assertEqual(c2.missing_parts, ("bottom_pants",))
+
+        # 3. T 恤 + 裙子 (以及背带裤 overalls) -> 连衣裙拉下分支：必须判为缺 one_piece 连衣裙
+        c3 = assess_clothing_completeness(list(ts_tags) + list(skirt_tags), (), "L3", "l3_pulled_down_dress")
+        self.assertFalse(c3.is_complete)
+        self.assertEqual(c3.missing_parts, ("one_piece",))
+        c3_overalls = assess_clothing_completeness(dungarees_tags, (), "L3", "l3_pulled_down_dress")
+        self.assertFalse(c3_overalls.is_complete)
+        self.assertEqual(c3_overalls.missing_parts, ("one_piece",))
+
+        # 4. 文胸 (lingerie_bra) -> 文胸推起分支：真实文胸即满足载体，绝不误报缺 top；若无文胸则要求补 bra
+        c4 = assess_clothing_completeness(bra_tags, (), "L3", "l3_bra_pushed_up")
+        self.assertTrue(c4.is_complete)
+        self.assertEqual(c4.missing_parts, ())
+        c4_miss = assess_clothing_completeness(jeans_tags, (), "L3", "l3_bra_pushed_up")
+        self.assertFalse(c4_miss.is_complete)
+        self.assertEqual(c4_miss.missing_parts, ("bra",))
+
+        # 5. 最小安全组合回退严格遵守分支载体，且 replace_base_with_fallback 剥离不匹配原件
+        fb_cases = [
+            ("l3_topless_skirt_kept", jeans_tags, lambda tags: any("skirt" in t.text.lower() or "bottom_skirt" in t.facts.garment_topologies for t in tags)),
+            ("l3_topless_pants_kept", skirt_tags, lambda tags: any(w in t.text.lower() for t in tags for w in ("jeans", "shorts", "pants", "trousers", "leggings")) or any("bottom_pants" in t.facts.garment_topologies for t in tags)),
+            ("l3_pulled_down_dress", list(ts_tags) + list(skirt_tags), lambda tags: any("one_piece" == t.facts.piece_role for t in tags)),
+            ("l3_bra_pushed_up", jeans_tags, lambda tags: any("bra" in t.text.lower() for t in tags)),
+        ]
+        for branch, active, pred in fb_cases:
+            with self.subTest(branch=branch):
+                fb_tags, fb_info = complete_outfit_tags(
+                    primary_style_id="test_primary",
+                    active_tags=active,
+                    state_id=None,
+                    state_tags=(),
+                    nudity_level_code="L3",
+                    nudity_branch=branch,
+                    categories=cats,
+                    excluded_ids=set(),
+                    context_profile=None,
+                    context=None,
+                    affinity_matrix=_sampler.affinity_registry.matrix,
+                    to_sampled_fn=_sampler._to_sampled_tags,
+                    completion_rng=Random(11),
+                    force_minimal_fallback=True,
+                )
+                self.assertTrue(fb_info["fallback_used"])
+                self.assertTrue(fb_info["replace_base_with_fallback"])
+                self.assertTrue(pred(fb_tags), f"Fallback for {branch} violated branch carrier: {[t.text for t in fb_tags]}")
+                self.assertTrue(assess_clothing_completeness(fb_tags, (), "L3", branch).is_complete)
+
+    def test_13_l2_and_l3_extension_sampling_rng_isolation(self) -> None:
+        """[P2-2 回归] L2/L3 下不同补件种子（即使改变扩展材质过滤）绝不扰动主 rng 后续随机序列。"""
+        # Exact reproduction from audit: L2, seed=7, completion_rng Random(1) vs Random(999)
+        r_a = Random(7)
+        res_a = _sampler.sample_clothing_result(
+            "随机 (Random)",
+            "自动联动裸露等级 (Auto Link Nudity)",
+            "L2",
+            r_a,
+            completion_rng=Random(1),
+        )
+        post_a = r_a.random()
+
+        r_b = Random(7)
+        res_b = _sampler.sample_clothing_result(
+            "随机 (Random)",
+            "自动联动裸露等级 (Auto Link Nudity)",
+            "L2",
+            r_b,
+            completion_rng=Random(999),
+        )
+        post_b = r_b.random()
+
+        self.assertEqual(res_a.style_id, "long_skirt")
+        self.assertEqual(res_b.style_id, "long_skirt")
+        self.assertEqual(post_a, post_b)
+
+        # 全量扩展扫测：L2 与 L3（含各分支）横跨 20 种子 × 2 种状态模式，切换补件种子主 rng 100% 一致
+        for lvl, branch in (
+            ("L2", None),
+            ("L3", None),
+            ("L3", "l3_topless_skirt_kept"),
+            ("L3", "l3_topless_pants_kept"),
+            ("L3", "l3_pulled_down_dress"),
+            ("L3", "l3_bra_pushed_up"),
+        ):
+            for st in ("自动联动裸露等级 (Auto Link Nudity)", "随机 (Random)"):
+                for seed in range(20):
+                    r1 = Random(seed)
+                    o1 = _sampler.sample_clothing_result(
+                        "随机 (Random)", st, lvl, r1, completion_rng=Random(1), nudity_branch=branch
+                    )
+                    n1 = r1.random()
+                    r2 = Random(seed)
+                    o2 = _sampler.sample_clothing_result(
+                        "随机 (Random)", st, lvl, r2, completion_rng=Random(999), nudity_branch=branch
+                    )
+                    n2 = r2.random()
+                    self.assertEqual(o1.style_id, o2.style_id, f"Drift in {lvl}/{branch}/{st}/seed={seed}")
+                    self.assertEqual([t.text for t in o1.base_tags], [t.text for t in o2.base_tags])
+                    self.assertEqual(o1.state_id, o2.state_id)
+                    self.assertEqual(n1, n2, f"Main RNG drifted under {lvl}/{branch}/{st}/seed={seed}")
 
 
 if __name__ == "__main__":

@@ -88,7 +88,16 @@ SWIMWEAR_SET_RE = re.compile(r"\b(bikini|swimsuit|monokini)\b")
 SWIMWEAR_SINGLE_PART_RE = re.compile(r"\b(top|bottom|bottoms|panties|briefs|bra|thong|g-string)\b")
 
 _SKIRT_TEXT_RE = re.compile(r"\b(skirt|miniskirt|microskirt|pleated|pettiskirt|tutu|sundress|dress|qipao|cheongsam|kimono|yukata|furisode|hanfu|hanbok|apron|gown)\b")
-_PANTS_TEXT_RE = re.compile(r"\b(pants|trousers|jeans|shorts|hot pants|leggings|bloomers|slacks|denim)\b")
+_PANTS_TEXT_RE = re.compile(r"\b(pants|trousers|jeans|shorts|hot pants|leggings|bloomers|slacks|denim|overalls|dungarees|jumpsuit)\b")
+_DRESS_CARRIER_TEXT_RE = re.compile(
+    r"\b(dress|gown|sundress|underdress|pinafore|qipao|cheongsam|kimono|yukata|furisode|hanfu|hanbok|robe|nightdress|nightgown|slip)\b"
+)
+_NON_DRESS_ONE_PIECE_RE = re.compile(
+    r"\b(dungarees|overalls|jumpsuit|romper|catsuit|bodysuit|plugsuit|skinsuit|techsuit|zentai|swimsuit|sukumizu|leotard|racing suit|bunny suit)\b"
+)
+_BRA_CARRIER_TEXT_RE = re.compile(r"\b(bra|bralette|bustier|bikini top|sports bra|cage bra|lace bra)\b")
+_NON_BRA_UNDERWEAR_RE = re.compile(r"\b(panties only|nipple covers|pasties|braless|thong|g-string|garter belt|panties|bloomers|briefs)\b")
+_PANTIES_CARRIER_TEXT_RE = re.compile(r"\b(panties|thong|g-string|bloomers|briefs|bikini bottoms|lingerie set|boyshorts|hipsters|underwear)\b")
 _BUTTON_TEXT_RE = re.compile(r"\b(shirt|blouse|blazer|cardigan|jacket|coat|vest|uniform|polo|tunic|trench)\b")
 
 _OVERRIDE_UPPER_TEXT_RE = re.compile(
@@ -475,6 +484,18 @@ def is_tags_compatible_with_state(
     return is_garment_compatible_with_state(entity, state_id, None)
 
 
+def _is_auxiliary_expanded_component(obj: Any) -> bool:
+    """判定元素是否属于动态槽位扩展/必选配件构件（如鞋履/配饰），严禁伪装成主上下装载体。"""
+    if isinstance(obj, dict):
+        role = obj.get("role")
+    else:
+        role = getattr(obj, "role", None)
+    if role in ("dynamic_slot_component", "mandatory_component"):
+        return True
+    tid = _extract_id(obj)
+    return "__slot_" in tid or "__comp_" in tid
+
+
 def _tag_is_button_capable(tag: Any) -> bool:
     txt_low = _extract_text(tag).lower()
     if _BUTTON_TEXT_RE.search(txt_low):
@@ -485,22 +506,73 @@ def _tag_is_button_capable(tag: Any) -> bool:
 
 def _tag_is_skirt_capable(tag: Any, cat_id: str = "") -> bool:
     facts = _extract_facts_dict(tag)
-    topos = facts.get("garment_topologies") or []
-    if any(t in ("bottom_skirt", "one_piece", "dress") for t in topos):
-        return True
+    topos = set(facts.get("garment_topologies") or ())
     txt_low = _extract_text(tag).lower()
-    if _SKIRT_TEXT_RE.search(txt_low):
+    if "bottom_skirt" in topos:
         return True
-    return "skirt" in (cat_id or "").lower()
+    if "bottom_pants" in topos and not _SKIRT_TEXT_RE.search(txt_low):
+        return False
+    if "dress" in topos:
+        return True
+    if _SKIRT_TEXT_RE.search(txt_low) and not _PANTS_TEXT_RE.search(txt_low):
+        return True
+    cid_low = (cat_id or "").lower()
+    return "skirt" in cid_low or cid_low in ("qipao", "kimono", "yukata", "furisode", "hanfu", "hanbok", "summer_sundress", "dress_casual")
 
 
 def _tag_is_pants_capable(tag: Any, cat_id: str = "") -> bool:
+    facts = _extract_facts_dict(tag)
+    topos = set(facts.get("garment_topologies") or ())
     txt_low = _extract_text(tag).lower()
+    if "bottom_skirt" in topos and "bottom_pants" not in topos:
+        return False
     if _PANTS_TEXT_RE.search(txt_low) and not _SKIRT_TEXT_RE.search(txt_low):
         return True
+    cid_low = (cat_id or "").lower()
+    if any(k in cid_low for k in ("pants", "jeans", "trousers", "shorts", "leggings", "dungarees")):
+        return True
+    return "bottom_pants" in topos and facts.get("piece_role") in ("bottom", "one_piece") and cid_low != "bottoms_specialty"
+
+
+def _tag_is_dress_carrier(tag: Any, cat_id: str = "") -> bool:
     facts = _extract_facts_dict(tag)
-    topos = facts.get("garment_topologies") or []
-    return "bottom_pants" in topos or any(k in (cat_id or "").lower() for k in ("pants", "jeans", "trousers", "shorts", "leggings"))
+    role = facts.get("piece_role")
+    topos = set(facts.get("garment_topologies") or ())
+    covered = set(facts.get("covered_regions") or ())
+    txt_low = _extract_text(tag).lower()
+    cid_low = (cat_id or "").lower()
+    # 独立 top + bottom 拼装绝不是连衣裙载体
+    if role in ("top", "bottom", "underwear", "outerwear", "accessory", "legwear", "footwear", "none"):
+        return False
+    is_single_body = (role in ("one_piece", "ensemble")) or ("one_piece" in topos) or ({"upper_torso", "lower_torso"} <= covered)
+    if not is_single_body:
+        return False
+    if _NON_DRESS_ONE_PIECE_RE.search(txt_low):
+        return False
+    if _DRESS_CARRIER_TEXT_RE.search(txt_low):
+        return True
+    return (
+        "dress" in cid_low
+        or cid_low in EVERYDAY_ONE_PIECE_IDS
+        or cid_low in ("qipao", "kimono", "yukata", "furisode", "hanfu", "modern_chinese", "silk_robe", "camisole_slip", "traditional_eastern_gown", "sari", "ao_dai", "uchikake")
+    )
+
+
+def _tag_is_bra_carrier(tag: Any, cat_id: str = "") -> bool:
+    txt_low = _extract_text(tag).lower()
+    if _BRA_CARRIER_TEXT_RE.search(txt_low) and "braless" not in txt_low:
+        return True
+    if _NON_BRA_UNDERWEAR_RE.search(txt_low):
+        return False
+    cid_low = (cat_id or "").lower()
+    return cid_low == "lingerie_bra" and "pasties" not in txt_low and "nipple" not in txt_low
+
+
+def _tag_is_panties_carrier(tag: Any, cat_id: str = "") -> bool:
+    txt_low = _extract_text(tag).lower()
+    if _PANTIES_CARRIER_TEXT_RE.search(txt_low):
+        return True
+    return (cat_id or "").lower() == "lingerie_panties"
 
 
 # ---------------------------------------------------------------------------
@@ -547,18 +619,20 @@ def assess_clothing_completeness(
     has_upper = False
     has_lower = False
     has_one_piece = False
+    has_dress_carrier = False
     has_outerwear = False
     has_legwear_or_footwear = False
     has_underwear = False
     has_skirt = False
     has_pants = False
+    has_bra = False
+    has_panties = False
     violating: List[str] = []
 
     combined: List[Any] = list(items or ()) + list(state_items or ())
-    # 收集实件与 linkage_override 文本（忽略 linkage_general 修饰句与扩展词）
+    # 收集实件与 linkage_override 文本（忽略 linkage_general 修饰句、扩展词及动态配件构件）
     for obj in combined:
-        if _is_linkage_general_or_extension(obj):
-            # extension/state 不是独立上下装载体，但检查违规项（如 L1 违规词）
+        if _is_linkage_general_or_extension(obj) or _is_auxiliary_expanded_component(obj):
             if lvl == "L1" and not is_tag_eligible_for_nudity_level(obj, "L1"):
                 violating.append(_extract_id(obj) or _extract_text(obj))
             continue
@@ -578,12 +652,18 @@ def assess_clothing_completeness(
             has_one_piece = True
             has_upper = True
             has_lower = True
+            if _tag_is_dress_carrier(obj, item_id):
+                has_dress_carrier = True
             if _tag_is_skirt_capable(obj, item_id):
                 has_skirt = True
+            if _tag_is_pants_capable(obj, item_id):
+                has_pants = True
             continue
 
         if role == "top":
             has_upper = True
+            if _tag_is_bra_carrier(obj, item_id):
+                has_bra = True
             continue
 
         if role == "bottom":
@@ -612,6 +692,10 @@ def assess_clothing_completeness(
 
         if role == "underwear":
             has_underwear = True
+            if _tag_is_bra_carrier(obj, item_id):
+                has_bra = True
+            if _tag_is_panties_carrier(obj, item_id):
+                has_panties = True
             # L2 整套比基尼/泳衣可自成套装，其余内衣（尤其单件/L1）不算完整日常穿着
             if lvl == "L2" and SWIMWEAR_SET_RE.search(txt_low) and not SWIMWEAR_SINGLE_PART_RE.search(txt_low):
                 has_upper = True
@@ -624,22 +708,37 @@ def assess_clothing_completeness(
             has_one_piece = True
             has_upper = True
             has_lower = True
+            if _tag_is_dress_carrier(obj, item_id):
+                has_dress_carrier = True
+            if _tag_is_skirt_capable(obj, item_id):
+                has_skirt = True
+            if _tag_is_pants_capable(obj, item_id):
+                has_pants = True
             continue
         if "upper_torso" in covered:
             has_upper = True
         if "lower_torso" in covered:
             has_lower = True
+            if _tag_is_skirt_capable(obj, item_id):
+                has_skirt = True
+            if _tag_is_pants_capable(obj, item_id):
+                has_pants = True
 
         # 文本启发式仅针对无 piece_role 的 style_overrides 实体句
         if not role and txt_low:
             if _OVERRIDE_ONE_PIECE_TEXT_RE.search(txt_low):
-                # outfit / uniform / suit 若仅说 knit sweater outfit? 过滤明显不包含 sweater only
                 has_one_piece = True
                 has_upper = True
                 has_lower = True
+                if _DRESS_CARRIER_TEXT_RE.search(txt_low) and not _NON_DRESS_ONE_PIECE_RE.search(txt_low):
+                    has_dress_carrier = True
+                if _tag_is_skirt_capable(obj, item_id):
+                    has_skirt = True
             else:
                 if _OVERRIDE_UPPER_TEXT_RE.search(txt_low):
                     has_upper = True
+                if _BRA_CARRIER_TEXT_RE.search(txt_low):
+                    has_bra = True
                 if _OVERRIDE_LOWER_TEXT_RE.search(txt_low):
                     has_lower = True
                     if _SKIRT_TEXT_RE.search(txt_low):
@@ -651,7 +750,7 @@ def assess_clothing_completeness(
 
     if lvl == "L3":
         if nudity_branch == "l3_topless_skirt_kept":
-            missing = () if (has_skirt or has_lower) else ("bottom_skirt",)
+            missing = () if has_skirt else ("bottom_skirt",)
             return OutfitAssessment(
                 is_complete=not missing and not violating,
                 has_upper=has_upper,
@@ -665,7 +764,7 @@ def assess_clothing_completeness(
                 reason="l3_branch_skirt" if missing else "ok",
             )
         if nudity_branch == "l3_topless_pants_kept":
-            missing = () if (has_pants or has_lower) else ("bottom_pants",)
+            missing = () if has_pants else ("bottom_pants",)
             return OutfitAssessment(
                 is_complete=not missing and not violating,
                 has_upper=has_upper,
@@ -678,8 +777,22 @@ def assess_clothing_completeness(
                 violating_item_ids=tuple(violating),
                 reason="l3_branch_pants" if missing else "ok",
             )
-        if nudity_branch in ("l3_open_shirt_breasts", "l3_raised_top_breasts", "l3_bra_pushed_up"):
-            ok = has_upper or has_one_piece
+        if nudity_branch == "l3_bra_pushed_up":
+            missing = () if has_bra else ("bra",)
+            return OutfitAssessment(
+                is_complete=not missing and not violating,
+                has_upper=has_upper,
+                has_lower=has_lower,
+                has_one_piece=has_one_piece,
+                has_outerwear=has_outerwear,
+                has_legwear_or_footwear=has_legwear_or_footwear,
+                has_underwear_only=has_underwear_only,
+                missing_parts=missing,
+                violating_item_ids=tuple(violating),
+                reason="l3_branch_bra" if missing else "ok",
+            )
+        if nudity_branch in ("l3_open_shirt_breasts", "l3_raised_top_breasts"):
+            ok = has_upper or has_dress_carrier
             missing = () if ok else ("top",)
             return OutfitAssessment(
                 is_complete=not missing and not violating,
@@ -694,8 +807,7 @@ def assess_clothing_completeness(
                 reason="l3_branch_upper" if missing else "ok",
             )
         if nudity_branch == "l3_pulled_down_dress":
-            ok = has_one_piece or (has_upper and has_lower)
-            missing = () if ok else ("one_piece",)
+            missing = () if has_dress_carrier else ("one_piece",)
             return OutfitAssessment(
                 is_complete=not missing and not violating,
                 has_upper=has_upper,
@@ -708,7 +820,21 @@ def assess_clothing_completeness(
                 violating_item_ids=tuple(violating),
                 reason="l3_branch_dress" if missing else "ok",
             )
-        # 未指定分支或 L3 极简内衣分支：只要未违背 L3 规则即放行（兼容 REP-NUDITY-01 及矩阵测试）
+        if nudity_branch in ("l3_panties_only", "l3_bikini_top_removed"):
+            missing = () if has_panties else ("panties",)
+            return OutfitAssessment(
+                is_complete=not missing and not violating,
+                has_upper=has_upper,
+                has_lower=has_lower,
+                has_one_piece=has_one_piece,
+                has_outerwear=has_outerwear,
+                has_legwear_or_footwear=has_legwear_or_footwear,
+                has_underwear_only=has_underwear_only,
+                missing_parts=missing,
+                violating_item_ids=tuple(violating),
+                reason="l3_branch_panties" if missing else "ok",
+            )
+        # 未指定分支：只要未违背 L3 规则即放行（兼容 REP-NUDITY-01 及矩阵测试）
         return OutfitAssessment(
             is_complete=not violating,
             has_upper=has_upper,
@@ -924,6 +1050,7 @@ def _filter_role_tag_candidates(
     state_tags: Sequence[Any] = (),
     require_skirt: bool = False,
     require_pants: bool = False,
+    require_dress: bool = False,
     require_button: bool = False,
 ) -> List[Tuple[Dict[str, Any], List[Dict[str, Any]]]]:
     """从 categories 中过滤具备合法 role 标签且排除禁用大类的候选项。"""
@@ -945,11 +1072,19 @@ def _filter_role_tag_candidates(
             if role == "one_piece":
                 if pr not in ("one_piece", "ensemble"):
                     continue
+            elif role == "bra":
+                if not _tag_is_bra_carrier(t, cid):
+                    continue
+            elif role == "panties":
+                if not _tag_is_panties_carrier(t, cid):
+                    continue
             elif pr != role:
                 continue
             if require_skirt and not _tag_is_skirt_capable(t, cid):
                 continue
             if require_pants and not _tag_is_pants_capable(t, cid):
+                continue
+            if require_dress and not _tag_is_dress_carrier(t, cid):
                 continue
             if require_button and not _tag_is_button_capable(t):
                 continue
@@ -963,6 +1098,45 @@ def _filter_role_tag_candidates(
         if eligible_tags:
             results.append((cat, eligible_tags))
     return results
+
+
+def _sanitize_aux_component_tag(stag: SampledTag, comp_prov: TagProvenance) -> SampledTag:
+    """将动态槽位或必选构件（如鞋履/配饰）的语义事实归一化，禁止继承主衣物的 bottom/top 覆盖声明。"""
+    f_dict = _extract_facts_dict(stag)
+    txt_low = _extract_text(stag).lower()
+    dyn_slots: Sequence[Any] = ()
+    if stag.facts and stag.facts.accessory_facts and getattr(stag.facts.accessory_facts, "dynamic_slots", None):
+        dyn_slots = stag.facts.accessory_facts.dynamic_slots
+    slot_names = {str(s.get("slot_name", "")).lower() for s in dyn_slots if isinstance(s, dict)}
+    if (
+        "footwear" in slot_names
+        or any(w in txt_low for w in ("sneaker", "boot", "heel", "shoe", "sandal", "loafer", "slipper", "pump"))
+    ):
+        aux_role = "footwear"
+        aux_topos: List[str] = []
+        aux_covered: List[str] = []
+    elif (
+        "legwear" in slot_names
+        or any(w in txt_low for w in ("sock", "stocking", "thighhigh", "pantyhose", "tights"))
+    ):
+        aux_role = "legwear"
+        aux_topos = ["underwear"]
+        aux_covered = ["legs"]
+    else:
+        aux_role = "accessory"
+        aux_topos = []
+        aux_covered = []
+
+    clean_facts = SemanticFacts.from_dict(
+        {
+            **f_dict,
+            "piece_role": aux_role,
+            "garment_topologies": aux_topos,
+            "covered_regions": aux_covered,
+            "mutex_groups": [],
+        }
+    )
+    return replace(stag, provenance=comp_prov, facts=clean_facts)
 
 
 def _select_companion_piece(
@@ -981,8 +1155,9 @@ def _select_companion_piece(
     state_tags: Sequence[Any] = (),
     require_skirt: bool = False,
     require_pants: bool = False,
+    require_dress: bool = False,
     require_button: bool = False,
-) -> Optional[Tuple[str, SampledTag]]:
+) -> Optional[Tuple[str, Tuple[SampledTag, ...]]]:
     all_cands = _filter_role_tag_candidates(
         categories,
         role=role,
@@ -992,6 +1167,7 @@ def _select_companion_piece(
         state_tags=state_tags,
         require_skirt=require_skirt,
         require_pants=require_pants,
+        require_dress=require_dress,
         require_button=require_button,
     )
     if not all_cands:
@@ -1023,15 +1199,113 @@ def _select_companion_piece(
     )
     if not sampled:
         return None
-    stag = sampled[0]
-    # 明确 provenance 指向补件自身类别，独立于主款 style_id
+
     comp_prov = TagProvenance(
         item_id=cid,
         semantic_ids=(f"clothing:{cid}", "completion:auto_outfit", f"nudity:{nudity_level_code}"),
         kind="clothing_completion",
         parent_ids=(cid,),
     )
-    return cid, replace(stag, provenance=comp_prov)
+    # 展开结果中动态槽位/必选配件可能排在主衣物之前（例如 bottom_jeans_casual 先出 sneakers 再出 jeans pants）：
+    # 必须识别并保留实际主衣物置前，且将附属构件语义角色归一化，禁止动态配件冒充上下装。
+    main_tags = [
+        replace(stag, provenance=comp_prov)
+        for stag in sampled
+        if getattr(stag, "role", None) not in ("dynamic_slot_component", "mandatory_component")
+    ]
+    if not main_tags:
+        return None
+    aux_tags = [
+        _sanitize_aux_component_tag(stag, comp_prov)
+        for stag in sampled
+        if getattr(stag, "role", None) in ("dynamic_slot_component", "mandatory_component")
+    ]
+    return cid, tuple(main_tags + aux_tags)
+
+
+def _select_branch_minimal_fallback(
+    *,
+    nudity_level_code: str,
+    nudity_branch: Optional[str],
+    categories: Sequence[Dict[str, Any]],
+    excluded_ids: Set[str],
+    context_profile: Optional[ContextProfile],
+    context: Optional[str],
+    affinity_matrix: Optional[Dict[str, Any]],
+    to_sampled_fn: Callable[..., Tuple[Any, List[SampledTag]]],
+    completion_rng: Random,
+) -> Tuple[List[str], List[SampledTag]]:
+    """按目标 (nudity_level_code, nudity_branch) 执行严格遵守分支语义的最小安全组合回退。"""
+    def _pick_single(role: str, prefs: Sequence[str], **kw: Any) -> Optional[Tuple[List[str], List[SampledTag]]]:
+        r = _select_companion_piece(
+            categories,
+            role=role,
+            preferred_ids=prefs,
+            nudity_level_code=nudity_level_code,
+            excluded_ids=excluded_ids,
+            context_profile=context_profile,
+            context=context,
+            affinity_matrix=affinity_matrix,
+            to_sampled_fn=to_sampled_fn,
+            rng=completion_rng,
+            **kw,
+        )
+        if not r:
+            return None
+        return [r[0]], list(r[1])
+
+    if nudity_level_code == "L3" and nudity_branch:
+        if nudity_branch == "l3_topless_skirt_kept":
+            res = _pick_single("bottom", EVERYDAY_BOTTOM_IDS, require_skirt=True)
+            return res if res else ([], [])
+        if nudity_branch == "l3_topless_pants_kept":
+            res = _pick_single("bottom", EVERYDAY_BOTTOM_IDS, require_pants=True)
+            return res if res else ([], [])
+        if nudity_branch == "l3_pulled_down_dress":
+            res = _pick_single("one_piece", EVERYDAY_ONE_PIECE_IDS, require_dress=True)
+            return res if res else ([], [])
+        if nudity_branch == "l3_bra_pushed_up":
+            res = _pick_single("bra", ("lingerie_bra", "lingerie_lace"))
+            return res if res else ([], [])
+        if nudity_branch == "l3_open_shirt_breasts":
+            res = _pick_single("top", EVERYDAY_TOP_IDS, require_button=True) or _pick_single("top", EVERYDAY_TOP_IDS)
+            return res if res else ([], [])
+        if nudity_branch == "l3_raised_top_breasts":
+            res = _pick_single("top", EVERYDAY_TOP_IDS)
+            return res if res else ([], [])
+        if nudity_branch in ("l3_panties_only", "l3_bikini_top_removed"):
+            res = _pick_single("panties", ("lingerie_panties", "bikini_classic", "bikini_micro"))
+            return res if res else ([], [])
+
+    # L1 / L2 / 无明确分支 L3：先尝试最小完整 top + bottom，再尝试 one_piece
+    t_fb = _select_companion_piece(
+        categories,
+        role="top",
+        preferred_ids=EVERYDAY_TOP_IDS,
+        nudity_level_code=nudity_level_code,
+        excluded_ids=excluded_ids,
+        context_profile=context_profile,
+        context=context,
+        affinity_matrix=affinity_matrix,
+        to_sampled_fn=to_sampled_fn,
+        rng=completion_rng,
+    )
+    b_fb = _select_companion_piece(
+        categories,
+        role="bottom",
+        preferred_ids=EVERYDAY_BOTTOM_IDS,
+        nudity_level_code=nudity_level_code,
+        excluded_ids=excluded_ids | ({t_fb[0]} if t_fb else set()),
+        context_profile=context_profile,
+        context=context,
+        affinity_matrix=affinity_matrix,
+        to_sampled_fn=to_sampled_fn,
+        rng=completion_rng,
+    )
+    if t_fb and b_fb:
+        return [t_fb[0], b_fb[0]], list(t_fb[1]) + list(b_fb[1])
+    one_fb = _pick_single("one_piece", EVERYDAY_ONE_PIECE_IDS)
+    return one_fb if one_fb else ([], [])
 
 
 def complete_outfit_tags(
@@ -1080,7 +1354,7 @@ def complete_outfit_tags(
     # 判断当前状态是否已在主款上存在载体；若无且状态需要载体，则补件必须承担该载体要求
     existing_has_carrier = is_tags_compatible_with_state(active_tags, state_id, state_tags, style_id=primary_style_id)
     need_skirt_carrier = (state_id == "lifted_up" and not existing_has_carrier) or (nudity_branch == "l3_topless_skirt_kept")
-    need_button_carrier = (state_id == "unbuttoned" and not existing_has_carrier)
+    need_button_carrier = (state_id == "unbuttoned" and not existing_has_carrier) or (nudity_branch == "l3_open_shirt_breasts")
 
     complements: List[SampledTag] = []
     comp_ids: List[str] = []
@@ -1105,7 +1379,7 @@ def complete_outfit_tags(
                 )
                 if res:
                     comp_ids.append(res[0])
-                    complements.append(res[1])
+                    complements.extend(res[1])
             elif part == "bottom_skirt":
                 res = _select_companion_piece(
                     categories,
@@ -1122,7 +1396,7 @@ def complete_outfit_tags(
                 )
                 if res:
                     comp_ids.append(res[0])
-                    complements.append(res[1])
+                    complements.extend(res[1])
             elif part == "bottom_pants":
                 res = _select_companion_piece(
                     categories,
@@ -1139,7 +1413,7 @@ def complete_outfit_tags(
                 )
                 if res:
                     comp_ids.append(res[0])
-                    complements.append(res[1])
+                    complements.extend(res[1])
             elif part == "top":
                 res = _select_companion_piece(
                     categories,
@@ -1158,8 +1432,41 @@ def complete_outfit_tags(
                 )
                 if res:
                     comp_ids.append(res[0])
-                    complements.append(res[1])
+                    complements.extend(res[1])
+            elif part == "bra":
+                res = _select_companion_piece(
+                    categories,
+                    role="bra",
+                    preferred_ids=("lingerie_bra", "lingerie_lace"),
+                    nudity_level_code=nudity_level_code,
+                    excluded_ids=base_excl | set(comp_ids),
+                    context_profile=context_profile,
+                    context=context,
+                    affinity_matrix=affinity_matrix,
+                    to_sampled_fn=to_sampled_fn,
+                    rng=completion_rng,
+                )
+                if res:
+                    comp_ids.append(res[0])
+                    complements.extend(res[1])
+            elif part == "panties":
+                res = _select_companion_piece(
+                    categories,
+                    role="panties",
+                    preferred_ids=("lingerie_panties", "bikini_classic", "bikini_micro"),
+                    nudity_level_code=nudity_level_code,
+                    excluded_ids=base_excl | set(comp_ids),
+                    context_profile=context_profile,
+                    context=context,
+                    affinity_matrix=affinity_matrix,
+                    to_sampled_fn=to_sampled_fn,
+                    rng=completion_rng,
+                )
+                if res:
+                    comp_ids.append(res[0])
+                    complements.extend(res[1])
             elif part == "one_piece":
+                req_dress = (nudity_branch == "l3_pulled_down_dress")
                 res = _select_companion_piece(
                     categories,
                     role="one_piece",
@@ -1174,13 +1481,13 @@ def complete_outfit_tags(
                     state_id=state_id if (need_skirt_carrier or need_button_carrier) else None,
                     state_tags=state_tags,
                     require_skirt=need_skirt_carrier,
+                    require_dress=req_dress,
                     require_button=need_button_carrier,
                 )
                 if res:
                     comp_ids.append(res[0])
-                    complements.append(res[1])
+                    complements.extend(res[1])
             elif part == "inner_full":
-                # 先确定性决定 top+bottom 还是 one_piece（如状态要求纽扣解开，优先 top+bottom）
                 prefer_two_piece = need_button_carrier or (completion_rng.random() < 0.65)
                 inner_added = False
                 if prefer_two_piece:
@@ -1216,7 +1523,8 @@ def complete_outfit_tags(
                     )
                     if t_res and b_res:
                         comp_ids.extend([t_res[0], b_res[0]])
-                        complements.extend([t_res[1], b_res[1]])
+                        complements.extend(t_res[1])
+                        complements.extend(b_res[1])
                         inner_added = True
                 if not inner_added:
                     d_res = _select_companion_piece(
@@ -1236,7 +1544,7 @@ def complete_outfit_tags(
                     )
                     if d_res:
                         comp_ids.append(d_res[0])
-                        complements.append(d_res[1])
+                        complements.extend(d_res[1])
 
     # 检查补全后是否真正达成完整度与可承载性
     after = assess_clothing_completeness(
@@ -1250,63 +1558,31 @@ def complete_outfit_tags(
         return tuple(complements), info
 
     # -----------------------------------------------------------------------
-    # 最小安全组合回退 (Minimal Combination Fallback)
+    # 最小安全组合回退 (Minimal Combination Fallback, 严格遵守 L1-L6 分支)
     # -----------------------------------------------------------------------
-    fallback_complements: List[SampledTag] = []
-    fallback_ids: List[str] = []
-    # 放松 primary_id 互斥（允许全词库任意合法最小组合），仍遵守 excluded_ids 与等级筛选
-    fb_excl = set(excluded_ids)
-    # 先尝试最小完整 top + bottom 组合，再尝试最小合法 one_piece
-    t_fb = _select_companion_piece(
-        categories,
-        role="top",
-        preferred_ids=EVERYDAY_TOP_IDS,
+    fallback_ids, fallback_complements = _select_branch_minimal_fallback(
         nudity_level_code=nudity_level_code,
-        excluded_ids=fb_excl,
+        nudity_branch=nudity_branch,
+        categories=categories,
+        excluded_ids=set(excluded_ids),
         context_profile=context_profile,
         context=context,
         affinity_matrix=affinity_matrix,
         to_sampled_fn=to_sampled_fn,
-        rng=completion_rng,
+        completion_rng=completion_rng,
     )
-    b_fb = _select_companion_piece(
-        categories,
-        role="bottom",
-        preferred_ids=EVERYDAY_BOTTOM_IDS,
-        nudity_level_code=nudity_level_code,
-        excluded_ids=fb_excl | ({t_fb[0]} if t_fb else set()),
-        context_profile=context_profile,
-        context=context,
-        affinity_matrix=affinity_matrix,
-        to_sampled_fn=to_sampled_fn,
-        rng=completion_rng,
-    )
-    if t_fb and b_fb:
-        fallback_ids = [t_fb[0], b_fb[0]]
-        fallback_complements = [t_fb[1], b_fb[1]]
-    else:
-        one_fb = _select_companion_piece(
-            categories,
-            role="one_piece",
-            preferred_ids=EVERYDAY_ONE_PIECE_IDS,
-            nudity_level_code=nudity_level_code,
-            excluded_ids=fb_excl,
-            context_profile=context_profile,
-            context=context,
-            affinity_matrix=affinity_matrix,
-            to_sampled_fn=to_sampled_fn,
-            rng=completion_rng,
-        )
-        if one_fb:
-            fallback_ids = [one_fb[0]]
-            fallback_complements = [one_fb[1]]
 
     if fallback_complements:
         clean_active = (
-            [] if force_minimal_fallback
+            [] if (force_minimal_fallback or (nudity_level_code == "L3" and nudity_branch))
             else [t for t in active_tags if is_tag_eligible_for_nudity_level(t, nudity_level_code)]
         )
-        replace_base = force_minimal_fallback or bool(assessment.violating_item_ids) or (len(clean_active) < len(active_tags))
+        replace_base = (
+            force_minimal_fallback
+            or bool(assessment.violating_item_ids)
+            or (len(clean_active) < len(active_tags))
+            or bool(nudity_level_code == "L3" and nudity_branch)
+        )
         candidate_tags = fallback_complements if replace_base else (clean_active + fallback_complements)
         fb_check = assess_clothing_completeness(
             candidate_tags,
@@ -1315,7 +1591,6 @@ def complete_outfit_tags(
             nudity_branch=nudity_branch,
         )
         if not fb_check.is_complete and not replace_base:
-            # 若原主款自身导致不可承载或残缺，剥离原主款退回纯最小安全组合
             replace_base = True
             fb_check = assess_clothing_completeness(
                 fallback_complements,

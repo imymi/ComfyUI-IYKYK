@@ -1316,12 +1316,13 @@ class TestClothingExpansionBatches(unittest.TestCase):
         #    在 M2 完成三项既有契约修正后，930 组输出中其余非受损场景保持不变，以下确定性修正项生效：
         #    - 多标签非变体套装（blazer_uniform, jk_seifuku, ol_suit, bunny_suit, cheerleader, hanfu,
         #      korean_school, modern_chinese, nurse_uniform, street_casual, waitress_uniform）子采样
-        #      若丢失核心上下装/连体款或丢失状态载体，由独立 repair_rng 自动修复为完整且状态相容组合；
+        #      若丢失核心上下装/连体款或丢失状态载体，由独立 repair_rng 自动修复为完整且状态相容组合，
+        #      且修复后扩展采样同步切至隔离子流以保全主 rng 消费序列；
         #    - bikini_micro 在 L2 剔除仅限 L3/L4 的最小覆盖词条（'minimal fabric coverage'）；
         #    - 重/厚/阻透面料（dungarees, knit_sweater, latex_catsuit, leather_corset, street_casual,
         #      sweater_casual 等）在 L2/L3 禁止叠加 cloth_transparency_tiers（如 sheer chiffon/semi-translucent）；
         #    - SelectionMode.NONE 下未扩容变体的存量 23 款仍严格保持 0 次 RNG 消费。
-        rc10_expanded_digest = "173b24be03493e10ed6c4a7a2a21695ab915766c0d1a76391c7d519d9959dde8"
+        rc10_expanded_digest = "f0f9f7a828b4f0e6eaaa55e1bb371c2d464ed53e5ff1ec0b93cfa55350e7322b"
         self.assertEqual(
             digest,
             rc10_expanded_digest,
