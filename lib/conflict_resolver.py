@@ -334,6 +334,447 @@ def _is_accessory_or_detail(text: Optional[str]) -> bool:
     ))
 
 
+# ─── 单源真实源 (SSOT): 提示词级服装载体前提核验 ───
+_SLIT_INCAPABLE_ONE_PIECE_IDS: Set[str] = NON_SKIRT_ONE_PIECE - {"qipao", "ao_dai", "anime_cosplay"}
+_SKIRT_ENSEMBLE_IDS: Set[str] = {"jk_seifuku", "korean_school", "hanbok", "waitress_uniform"}
+_EXTENSION_MODIFIER_IDS: Set[str] = {
+    "auto_linkage", "linkage_general", "high_slit", "collar_cutout",
+    "off_shoulder", "subtle_cleavage", "waist_cutouts", "crop_midriff",
+    "multipoint_cutout", "plunging_backless", "open_sides",
+}
+_SKIRT_OR_SLIT_DRESS_TEXT_RE = re.compile(
+    r"\b(?:skirt|miniskirt|microskirt|skort|dress|sundress|minidress|gown|nightgown|nightdress|nightie|qipao|cheongsam|kimono|yukata|furisode|uchikake|hanfu|hanbok|chima|sari|dirndl|petticoat|tutu|kilt|sarong|lehenga|toga|cassock|frock|abaya|caftan|lolita|mahou\s+shoujo|miko\s+clothing|ao\s+dai|apron\s+dress|short\s+apron|changshan|daygown|thin\s+strap\s+silk\s+slip|satin\s+slip)\b",
+    re.IGNORECASE,
+)
+_STRICT_DRESS_TEXT_RE = re.compile(
+    r"\b(?:dress|sundress|minidress|gown|nightgown|nightdress|nightie|qipao|cheongsam|kimono|yukata|furisode|uchikake|hanfu|hanbok|dirndl|toga|cassock|frock|abaya|caftan|daygown)\b",
+    re.IGNORECASE,
+)
+_NON_DRESS_ONE_PIECE_TEXT_RE = re.compile(
+    r"\b(?:leotard|bodysuit|catsuit|jumpsuit|plugsuit|skinsuit|techsuit|zentai|swimsuit|sukumizu|overalls|dungarees|romper|racing\s+suit|bunny\s+suit|bloomers|tuxedo)\b",
+    re.IGNORECASE,
+)
+_PANTS_TEXT_ONLY_RE = re.compile(
+    r"\b(?:pants|jeans|trousers|shorts|slacks|leggings|capris|culottes|joggers|sweatpants|cargo\s+pants|hot\s+pants|denim\s+shorts|bloomers|overalls|dungarees)\b",
+    re.IGNORECASE,
+)
+_BRA_GARMENT_TEXT_RE = re.compile(
+    r"\b(?:bra|bralette|bustier|bikini\s+top|lingerie\s+set|sports\s+bra)\b",
+    re.IGNORECASE,
+)
+_UPPER_GARMENT_TEXT_RE = re.compile(
+    r"\b(?:shirt|blouse|top|t-shirt|tee|sweater|hoodie|cardigan|jacket|coat|vest|blazer|tunic|dress|sundress|gown|kimono|yukata|hanfu|qipao|cheongsam|leotard|bodysuit|catsuit|jumpsuit|plugsuit|swimsuit|sukumizu|uniform|robe|corset|bustier|camisole|tank\s+top|tube\s+top|bra|bralette)\b",
+    re.IGNORECASE,
+)
+_BUTTONLESS_UPPER_TEXT_RE = re.compile(
+    r"\b(?:t-shirt|tee|tshirt|tank\s*top|crop\s*top|tube\s*top|sports\s+bra|camisole|bralette|pullover|sweater|sweatshirt|hoodie|swimsuit|bikini|monokini|leotard|bodysuit|catsuit|plugsuit|zentai|sukumizu|bunny\s+suit|jumpsuit|racing\s+suit)\b",
+    re.IGNORECASE,
+)
+_CARRIER_REQ_SKIRT_SLIT_RE = re.compile(
+    r"\b(?:skirt\s+slit|high\s+slit|high\s+side\s+slit|slit\s+revealing\s+thigh)\b",
+    re.IGNORECASE,
+)
+_CARRIER_REQ_SKIRT_ACTION_RE = re.compile(
+    r"\bskirt\b",
+    re.IGNORECASE,
+)
+_CARRIER_REQ_SKIRT_VERBS_RE = re.compile(
+    r"\b(?:hiked|pulled|hitched|button|unbuttoned|remaining|still\s+on|under|lifted|floating|blown|slit)\b",
+    re.IGNORECASE,
+)
+_CARRIER_REQ_DRESS_RE = re.compile(
+    r"\b(?:dress\s+(?:pulled|bunched|hitched|sliding)|pulled\s+down\s+dress)\b",
+    re.IGNORECASE,
+)
+_CARRIER_REQ_PANTS_RE = re.compile(
+    r"\b(?:pants\s+button\s+undone|jeans\s+unbuttoned|bare\s+chest\s+with\s+pants\s+on)\b",
+    re.IGNORECASE,
+)
+_CARRIER_REQ_BRA_RE = re.compile(
+    r"\b(?:bra\s+pulled\s+down|bra\s+pushed\s+up)\b",
+    re.IGNORECASE,
+)
+_CARRIER_REQ_BUTTONED_UPPER_RE = re.compile(
+    r"\b(?:one\s+button\s+undone|blouse\s+unbuttoned|buttons?\s+undone|shirt\s+open\s+at\s+chest|shirt\s+open\s+showing|collar\s+unbuttoned|suit\s+unbuttoned)\b",
+    re.IGNORECASE,
+)
+_CARRIER_REQ_UPPER_TOP_RE = re.compile(
+    r"\b(?:tank\s+top\s+raised|shirt\s+pulled\s+down|untucked\s+shirt|sweater\s+falling\s+off|sweat-soaked\s+shirt)\b",
+    re.IGNORECASE,
+)
+_UPPER_EXTENSION_CARRIER_IDS: Set[str] = {
+    "collar_cutout", "off_shoulder", "subtle_cleavage",
+    "plunging_backless", "crop_midriff", "waist_cutouts", "open_sides",
+}
+
+
+def _unpack_carrier_subject(obj: Any, style_id: str = "") -> Dict[str, Any]:
+    """统一解包 PromptAtom / SampledTag / JSON dict / plain str 为标准化载体检查字典。"""
+    if isinstance(obj, str):
+        return {
+            "text_low": obj.lower().strip(),
+            "facts": None,
+            "facts_dict": {},
+            "source_slot": "",
+            "prov_kind": "",
+            "origin_sel": "",
+            "sid": (style_id or "").lower(),
+            "raw_item_id": "",
+            "role": "",
+            "topos": (),
+            "covered": (),
+            "garment_states": (),
+            "sem_role": "",
+            "ensemble_pieces": None,
+            "is_modifier_entry": False,
+        }
+    if isinstance(obj, dict):
+        facts = obj.get("facts")
+        facts_dict = facts.to_dict() if isinstance(facts, SemanticFacts) else (facts if isinstance(facts, dict) else {})
+        text_low = str(obj.get("text") or "").lower().strip()
+        source_slot = str(obj.get("source_slot") or "").lower()
+        prov = obj.get("provenance")
+        prov_kind = (prov.get("kind") if isinstance(prov, dict) else getattr(prov, "kind", "")) or ""
+        raw_id = str(obj.get("id") or obj.get("source_item_id") or "")
+        if "__tag_" in raw_id or "__ext_" in raw_id:
+            raw_item_id = raw_id.split("__", 1)[0].lower()
+        else:
+            raw_item_id = raw_id.lower()
+        sid = (style_id or raw_item_id).lower()
+        origin_sel = ""
+    else:
+        facts = getattr(obj, "facts", None)
+        if isinstance(facts, SemanticFacts):
+            facts_dict = {
+                "piece_role": facts.piece_role,
+                "garment_topologies": facts.garment_topologies,
+                "covered_regions": facts.covered_regions,
+                "garment_states": facts.garment_states,
+                "semantic_role": facts.semantic_role,
+                "ensemble_pieces": facts.ensemble_pieces,
+            }
+        elif isinstance(facts, dict):
+            facts_dict = facts
+        else:
+            facts_dict = {}
+        text_low = str(getattr(obj, "text", "") or "").lower().strip()
+        source_slot = str(getattr(obj, "source_slot", "") or "").lower()
+        prov = getattr(obj, "provenance", None)
+        prov_kind = str(getattr(prov, "kind", "") or "").lower()
+        origin = getattr(obj, "origin", None)
+        origin_sel = str(getattr(origin, "selector", "") or "").lower()
+        raw_candidates = [
+            getattr(obj, "source_item_id", None) or "",
+            getattr(prov, "item_id", None) or "" if prov else "",
+            getattr(origin, "selected_id", None) or "" if origin else "",
+        ]
+        raw_item_id = ""
+        for cand in raw_candidates:
+            c_low = str(cand).strip().lower()
+            if c_low and c_low not in ("custom", "candidate", "none", "random", "auto") and not c_low.startswith("rule:"):
+                raw_item_id = c_low.split("__", 1)[0]
+                break
+        sid = (style_id or raw_item_id).lower()
+
+    role = str(facts_dict.get("piece_role") or "").lower()
+    topos = tuple(str(t) for t in (facts_dict.get("garment_topologies") or ()) if t)
+    covered = tuple(str(r) for r in (facts_dict.get("covered_regions") or ()) if r)
+    garment_states = tuple(str(s) for s in (facts_dict.get("garment_states") or ()) if s)
+    sem_role = str(facts_dict.get("semantic_role") or "").lower()
+    ensemble_pieces = facts_dict.get("ensemble_pieces")
+    obj_sem_ids = getattr(obj, "semantic_ids", None) or ()
+    for sm in obj_sem_ids:
+        if sm in ("override:linkage", "linkage:general"):
+            origin_sel = origin_sel or "clothing_state"
+    is_modifier_entry = bool(
+        source_slot in ("nudity", "clothing_state", "clothing_extension")
+        or prov_kind in ("nudity", "clothing_state", "clothing_extension")
+        or origin_sel in ("nudity", "clothing_state", "clothing_extension")
+        or raw_item_id in _EXTENSION_MODIFIER_IDS
+    )
+    return {
+        "text_low": text_low,
+        "facts": facts,
+        "facts_dict": facts_dict,
+        "source_slot": source_slot,
+        "prov_kind": prov_kind,
+        "origin_sel": origin_sel,
+        "sid": sid,
+        "raw_item_id": raw_item_id,
+        "role": role,
+        "topos": topos,
+        "covered": covered,
+        "garment_states": garment_states,
+        "sem_role": sem_role,
+        "ensemble_pieces": ensemble_pieces,
+        "is_modifier_entry": is_modifier_entry,
+    }
+
+
+def _is_worn_garment_carrier(obj: Any, style_id: str = "") -> bool:
+    """判定对象是否为在穿主衣物或贴身衣物实体，排除 nudity / 状态联动 / 配件 / 已脱弃物。"""
+    info = _unpack_carrier_subject(obj, style_id=style_id)
+    if info["is_modifier_entry"]:
+        return False
+    if "discarded" in info["garment_states"]:
+        return False
+    if info["role"] in ("none", "accessory", "legwear", "footwear"):
+        return False
+    if info["source_slot"] and info["source_slot"] not in ("clothing", "underwear"):
+        return False
+    if _is_accessory_or_detail(info["text_low"]):
+        return False
+    if not info["text_low"] and not info["topos"] and not info["role"]:
+        return False
+    return True
+
+
+def _iter_ensemble_piece_texts(ep: Any) -> Tuple[List[Tuple[str, Optional[str], str]], List[str]]:
+    """统一读取 EnsemblePieces 或 raw dict 中的构件拓扑与文本列表。"""
+    bindings: List[Tuple[str, Optional[str], str]] = []
+    extra_bottoms: List[str] = []
+    if isinstance(ep, dict):
+        for pb in ep.get("piece_bindings") or ():
+            if isinstance(pb, dict):
+                bindings.append((
+                    str(pb.get("piece_slot") or ""),
+                    pb.get("garment_topology"),
+                    str(pb.get("piece_text") or pb.get("piece_id") or "").lower(),
+                ))
+        extra_bottoms.extend(str(x).lower() for x in (ep.get("bottom_pieces") or ()))
+        extra_bottoms.extend(str(x).lower() for x in (ep.get("main_garments") or ()))
+    else:
+        for pb in getattr(ep, "piece_bindings", ()) or ():
+            bindings.append((
+                str(getattr(pb, "piece_slot", "") or ""),
+                getattr(pb, "garment_topology", None),
+                str(getattr(pb, "piece_text", None) or getattr(pb, "piece_id", "") or "").lower(),
+            ))
+        extra_bottoms.extend(str(x).lower() for x in (getattr(ep, "bottom_pieces", ()) or ()))
+        extra_bottoms.extend(str(x).lower() for x in (getattr(ep, "main_garments", ()) or ()))
+    return bindings, extra_bottoms
+
+
+def is_item_skirt_or_slit_carrier(obj: Any, style_id: str = "") -> bool:
+    """判定衣物项是否真正具备裙装或可开衩长裙/袍服载体（严禁 leotard/jumpsuit/pantsuit 冒充）。"""
+    if not _is_worn_garment_carrier(obj, style_id=style_id):
+        return False
+    info = _unpack_carrier_subject(obj, style_id=style_id)
+    text_low = info["text_low"]
+    topos = info["topos"]
+    role = info["role"]
+    sid = info["sid"]
+    ep = info["ensemble_pieces"]
+
+    if ep is not None:
+        bindings, extra_pieces = _iter_ensemble_piece_texts(ep)
+        for slot_name, pb_topo, p_txt in bindings:
+            if pb_topo == "bottom_skirt":
+                return True
+            if slot_name in ("bottom_pieces", "main_garments") and not pb_topo:
+                if _SKIRT_OR_SLIT_DRESS_TEXT_RE.search(p_txt) and not _NON_DRESS_ONE_PIECE_TEXT_RE.search(p_txt):
+                    return True
+        return any(
+            _SKIRT_OR_SLIT_DRESS_TEXT_RE.search(pt) and not _NON_DRESS_ONE_PIECE_TEXT_RE.search(pt)
+            for pt in extra_pieces
+        )
+
+    if "bottom_skirt" in topos:
+        return True
+    if sid in _SLIT_INCAPABLE_ONE_PIECE_IDS:
+        return bool(_SKIRT_OR_SLIT_DRESS_TEXT_RE.search(text_low) and not _NON_DRESS_ONE_PIECE_TEXT_RE.search(text_low))
+    if "bottom_pants" in topos and "one_piece" not in topos:
+        return bool(_SKIRT_OR_SLIT_DRESS_TEXT_RE.search(text_low) and not _NON_DRESS_ONE_PIECE_TEXT_RE.search(text_low))
+    if "one_piece" in topos:
+        if _NON_DRESS_ONE_PIECE_TEXT_RE.search(text_low) and not _SKIRT_OR_SLIT_DRESS_TEXT_RE.search(text_low):
+            return False
+        return True
+    if role == "ensemble" or "ensemble_outfit" in topos:
+        if _NON_DRESS_ONE_PIECE_TEXT_RE.search(text_low) and not _SKIRT_OR_SLIT_DRESS_TEXT_RE.search(text_low):
+            return False
+        if _SKIRT_OR_SLIT_DRESS_TEXT_RE.search(text_low):
+            return True
+        return bool(sid in _SKIRT_ENSEMBLE_IDS and not _PANTS_TEXT_ONLY_RE.search(text_low))
+    return bool(
+        _SKIRT_OR_SLIT_DRESS_TEXT_RE.search(text_low)
+        and not _NON_DRESS_ONE_PIECE_TEXT_RE.search(text_low)
+    )
+
+
+def is_item_dress_carrier(obj: Any, style_id: str = "") -> bool:
+    """判定衣物项是否为连衣裙/连体袍服类载物（半身裙、裤装、连体紧身衣不在此列）。"""
+    if not _is_worn_garment_carrier(obj, style_id=style_id):
+        return False
+    info = _unpack_carrier_subject(obj, style_id=style_id)
+    text_low = info["text_low"]
+    topos = info["topos"]
+    role = info["role"]
+    sid = info["sid"]
+    ep = info["ensemble_pieces"]
+
+    if ep is not None:
+        bindings, extra_pieces = _iter_ensemble_piece_texts(ep)
+        for slot_name, _, p_txt in bindings:
+            if slot_name == "main_garments" and _STRICT_DRESS_TEXT_RE.search(p_txt) and not _NON_DRESS_ONE_PIECE_TEXT_RE.search(p_txt) and "dress shirt" not in p_txt:
+                return True
+        return any(
+            _STRICT_DRESS_TEXT_RE.search(pt) and not _NON_DRESS_ONE_PIECE_TEXT_RE.search(pt) and "dress shirt" not in pt
+            for pt in extra_pieces
+        )
+    if sid in _SLIT_INCAPABLE_ONE_PIECE_IDS:
+        return False
+    if "bottom_skirt" in topos and "one_piece" not in topos:
+        return False
+    if "one_piece" in topos:
+        return not (_NON_DRESS_ONE_PIECE_TEXT_RE.search(text_low) and not RE_DRESS_ACTION.search(text_low))
+    if role == "ensemble" or "ensemble_outfit" in topos:
+        return bool(_STRICT_DRESS_TEXT_RE.search(text_low) and "dress shirt" not in text_low)
+    return bool(_STRICT_DRESS_TEXT_RE.search(text_low) and not _NON_DRESS_ONE_PIECE_TEXT_RE.search(text_low) and "dress shirt" not in text_low)
+
+
+def is_item_pants_carrier(obj: Any, style_id: str = "") -> bool:
+    """判定衣物项是否具备裤装载体（jeans / pants / shorts / trousers / leggings）。"""
+    if not _is_worn_garment_carrier(obj, style_id=style_id):
+        return False
+    info = _unpack_carrier_subject(obj, style_id=style_id)
+    text_low = info["text_low"]
+    topos = info["topos"]
+    ep = info["ensemble_pieces"]
+    if ep is not None:
+        bindings, extra_pieces = _iter_ensemble_piece_texts(ep)
+        for _, pb_topo, p_txt in bindings:
+            if pb_topo == "bottom_pants" or (_PANTS_TEXT_ONLY_RE.search(p_txt) and not _SKIRT_OR_SLIT_DRESS_TEXT_RE.search(p_txt)):
+                return True
+        return any(_PANTS_TEXT_ONLY_RE.search(pt) and not _SKIRT_OR_SLIT_DRESS_TEXT_RE.search(pt) for pt in extra_pieces)
+    if "bottom_pants" in topos:
+        return True
+    return bool(_PANTS_TEXT_ONLY_RE.search(text_low) and not _SKIRT_OR_SLIT_DRESS_TEXT_RE.search(text_low))
+
+
+def is_item_bra_carrier(obj: Any) -> bool:
+    """判定衣物项是否为文胸/胸衣实体载体（不含 no bra / bra edge 描述）。"""
+    if not _is_worn_garment_carrier(obj):
+        return False
+    info = _unpack_carrier_subject(obj)
+    tl = info["text_low"]
+    if any(neg in tl for neg in ("no bra", "braless", "bra removed", "bra edge", "showing lace bra")):
+        return False
+    if "intimate_upper" in info["covered"]:
+        return True
+    return bool(
+        (info["role"] == "underwear" or info["source_slot"] in ("clothing", "underwear") or "underwear" in info["topos"] or "bikini" in info["topos"])
+        and _BRA_GARMENT_TEXT_RE.search(tl)
+    )
+
+
+def is_item_upper_garment_carrier(obj: Any, style_id: str = "") -> bool:
+    """判定衣物项是否具备上身衣物载体（top / outerwear / one_piece / ensemble）。"""
+    if not _is_worn_garment_carrier(obj, style_id=style_id):
+        return False
+    info = _unpack_carrier_subject(obj, style_id=style_id)
+    topos = info["topos"]
+    role = info["role"]
+    if any(t in topos for t in ("top", "outerwear", "one_piece", "ensemble_outfit")):
+        return True
+    if role in ("top", "outerwear", "one_piece", "ensemble"):
+        return True
+    if any(t in topos for t in ("bottom_pants", "bottom_skirt")) and not any(t in topos for t in ("top", "outerwear", "one_piece", "ensemble_outfit")):
+        return False
+    return bool(_UPPER_GARMENT_TEXT_RE.search(info["text_low"]))
+
+
+def is_item_button_or_collar_carrier(obj: Any, style_id: str = "") -> bool:
+    """判定衣物项是否具备纽扣开襟/衬衫领口载体（排除纯裤装、纯裙装、t-shirt/leotard 等无扣无领款）。"""
+    if not is_item_upper_garment_carrier(obj, style_id=style_id):
+        return False
+    info = _unpack_carrier_subject(obj, style_id=style_id)
+    tl = info["text_low"]
+    sid = info["sid"]
+    if RE_BUTTON_NEGATION.search(tl):
+        return False
+    if sid in ALLOWED_BUTTON_STYLES or sid in ("jk_seifuku", "korean_school", "blazer_uniform", "ol_suit", "waitress_uniform", "maid_dress", "nurse_uniform"):
+        return True
+    if RE_BUTTON_AFFIRMATION.search(tl) or RE_BUTTON_STYLE_KEYWORDS.search(tl):
+        return True
+    if _BUTTONLESS_UPPER_TEXT_RE.search(tl):
+        return False
+    if "bottom_pants" in info["topos"] and not any(t in info["topos"] for t in ("top", "outerwear", "one_piece", "ensemble_outfit")):
+        return False
+    return False
+
+
+def get_required_carrier_kind(obj: Any, default_slot: str = "") -> Optional[str]:
+    """返回非基础衣物修饰/裸露提示词所依赖的物理载体类别，无载体硬前提或为丢弃态时返回 None。"""
+    if isinstance(obj, PromptAtom) and obj.contains_blackbox:
+        return None
+    info = _unpack_carrier_subject(obj)
+    slot = info["source_slot"] or default_slot.lower()
+    is_mod = info["is_modifier_entry"] or slot in ("nudity", "clothing_state", "clothing_extension")
+    if not is_mod:
+        return None
+    tl = info["text_low"]
+    if "discarded" in info["garment_states"] or any(k in tl for k in ("tossed aside", "discarded on", "scattered beside", "all clothes removed")):
+        return None
+    sid = info["sid"] or info["raw_item_id"]
+    if sid == "high_slit" or _CARRIER_REQ_SKIRT_SLIT_RE.search(tl):
+        return "skirt_slit"
+    if _CARRIER_REQ_SKIRT_ACTION_RE.search(tl) and (
+        _CARRIER_REQ_SKIRT_VERBS_RE.search(tl) or slot in ("clothing_state", "clothing_extension")
+    ):
+        if "no skirt" not in tl and "top and skirt" not in tl:
+            return "skirt_slit"
+    if _CARRIER_REQ_DRESS_RE.search(tl) and "dress shirt" not in tl:
+        return "dress"
+    if _CARRIER_REQ_PANTS_RE.search(tl):
+        return "pants"
+    if _CARRIER_REQ_BRA_RE.search(tl):
+        return "bra"
+    if _CARRIER_REQ_BUTTONED_UPPER_RE.search(tl):
+        return "buttoned_upper"
+    if _CARRIER_REQ_UPPER_TOP_RE.search(tl) or sid in _UPPER_EXTENSION_CARRIER_IDS:
+        return "upper_top"
+    return None
+
+
+def is_carrier_satisfied_by_garments(required_kind: str, garment_objs: Sequence[Any], style_id: str = "") -> bool:
+    """检查候选或在穿衣物列表是否满足指定的载体类别要求。"""
+    if required_kind == "skirt_slit":
+        return any(is_item_skirt_or_slit_carrier(g, style_id=style_id) for g in garment_objs)
+    if required_kind == "dress":
+        return any(is_item_dress_carrier(g, style_id=style_id) for g in garment_objs)
+    if required_kind == "pants":
+        return any(is_item_pants_carrier(g, style_id=style_id) for g in garment_objs)
+    if required_kind == "bra":
+        return any(is_item_bra_carrier(g) for g in garment_objs)
+    if required_kind == "buttoned_upper":
+        return any(is_item_button_or_collar_carrier(g, style_id=style_id) for g in garment_objs)
+    if required_kind == "upper_top":
+        return any(is_item_upper_garment_carrier(g, style_id=style_id) for g in garment_objs)
+    return True
+
+
+def find_carrier_mismatch_in_atoms(
+    atoms: Sequence[PromptAtom],
+) -> List[Tuple[PromptAtom, str, Tuple[PromptAtom, ...]]]:
+    """核验原子集合中每个需载体修饰词是否在在穿衣物上具备真实对应载体。"""
+    detectable = [a for a in atoms if getattr(a, "can_detect", True)]
+    worn_garments = [a for a in detectable if _is_worn_garment_carrier(a)]
+    mismatches: List[Tuple[PromptAtom, str, Tuple[PromptAtom, ...]]] = []
+    for a in detectable:
+        req = get_required_carrier_kind(a)
+        if req is None:
+            continue
+        if worn_garments:
+            if not is_carrier_satisfied_by_garments(req, worn_garments):
+                mismatches.append((a, req, tuple(worn_garments)))
+        elif (
+            a.source_slot in ("clothing_state", "clothing_extension")
+            or (a.provenance is not None and a.provenance.kind in ("clothing_state", "clothing_extension"))
+        ):
+            mismatches.append((a, req, ()))
+    return mismatches
+
+
 class CapabilitySupport(Enum):
     """构件/服装物理开合能力判定三态契约：明确支持、明确不支持、未知。"""
     SUPPORTED = "supported"        # 明确支持
@@ -3551,6 +3992,52 @@ class ConflictResolver:
                                 a,
                             )
 
+        # 3. 提示词级服装载体前提核验：在穿衣物存在时，剔除缺乏真实对应载体的裸露词条（如无裙装时剔除 skirt slit）
+        active_now = index.get_all_active_ordered()
+        worn_garments = [a for a in active_now if a.can_detect and index.is_active(a) and _is_worn_garment_carrier(a)]
+        if worn_garments:
+            nc_trace_cur = _format_nudity_constraint_trace(self._active_nudity_constraint)
+            ext_garments = [g for g in worn_garments if is_external_atom(g)]
+            win_garment = ext_garments[0] if ext_garments else worn_garments[0]
+            for na in active_now:
+                if not index.is_active(na) or not na.can_detect or na.source_slot != "nudity":
+                    continue
+                req_carrier = get_required_carrier_kind(na)
+                if req_carrier is None or is_carrier_satisfied_by_garments(req_carrier, worn_garments):
+                    continue
+                if is_external_atom(na):
+                    if ext_garments:
+                        raise PromptValidationError(
+                            f"External override conflict under rule '{rule_item.id}': nudity ('{na.text}') requires '{req_carrier}' carrier missing in external clothing ('{ext_garments[0].text}')",
+                            slots=(na.source_slot, ext_garments[0].source_slot),
+                            texts=(na.text, ext_garments[0].text),
+                            rule_id=rule_item.id,
+                            error_code="missing_garment_carrier",
+                            details={"required_carrier": req_carrier, "nudity_constraint": nc_trace_cur} if nc_trace_cur else {"required_carrier": req_carrier},
+                        )
+                    continue
+                if not na.can_delete_atom:
+                    continue
+                index.drop(na.atom_id)
+                ft = {
+                    "rule_id": rule_item.id,
+                    "phase": rule_item.phase,
+                    "priority": rule_item.priority,
+                    "winner_objects": [win_garment.atom_id],
+                    "target_objects": [na.atom_id],
+                    "required_carrier": req_carrier,
+                }
+                if nc_trace_cur:
+                    ft["nudity_constraint"] = nc_trace_cur
+                ledger.record_drop(
+                    rule_item.id,
+                    rule_item.phase,
+                    "clothing_removes_nudity",
+                    (win_garment.atom_id,),
+                    na,
+                    fact_trace=ft,
+                )
+
         return index.get_all_active_ordered()
 
     def _yield_constraint_to_external_clothing(self, active_atoms: Sequence[PromptAtom]) -> None:
@@ -4359,12 +4846,44 @@ class ConflictResolver:
                         aa,
                     )
 
-        # 5. 承载主体检查 (基于四阶绑定阶梯检查在穿承载物)
+        # 5. 承载主体检查 (提示词级载体前提核验 + 四阶绑定阶梯检查在穿承载物)
+        worn_garment_atoms = [
+            w for w in index.get_all_active_ordered()
+            if index.is_active(w) and w.can_detect and _is_worn_garment_carrier(w)
+        ]
         for a in active_atoms:
-            if not index.is_active(a) or not a.can_detect or not a.can_delete_atom:
+            if not index.is_active(a) or not a.can_detect:
                 continue
 
-            if not is_formal_atom(a):
+            if a.source_slot != "nudity":
+                req_carrier = get_required_carrier_kind(a)
+                if req_carrier is not None:
+                    has_carrier = bool(worn_garment_atoms) and is_carrier_satisfied_by_garments(req_carrier, worn_garment_atoms)
+                    if not has_carrier:
+                        if is_external_atom(a):
+                            ext_g = [g for g in worn_garment_atoms if is_external_atom(g)]
+                            if ext_g:
+                                raise PromptValidationError(
+                                    f"External override conflict under rule '{rule_item.id}': modifier ('{a.text}') requires '{req_carrier}' carrier missing in external clothing ('{ext_g[0].text}')",
+                                    slots=(a.source_slot, ext_g[0].source_slot),
+                                    texts=(a.text, ext_g[0].text),
+                                    rule_id=rule_item.id,
+                                    error_code="missing_garment_carrier",
+                                    details={"required_carrier": req_carrier},
+                                )
+                            continue
+                        if a.can_delete_atom:
+                            index.drop(a.atom_id)
+                            ledger.record_drop(
+                                rule_item.id,
+                                rule_item.phase,
+                                "state_lacks_carrier",
+                                tuple(w.atom_id for w in worn_garment_atoms[:2]),
+                                a,
+                            )
+                        continue
+
+            if not a.can_delete_atom or not is_formal_atom(a):
                 continue
 
             if not is_garment_modifier_atom(a):
@@ -5792,6 +6311,20 @@ class ConflictResolver:
                         conflicts.append(("residual_pants_state_conflict", "clothing_style_state_coherence", "pants_state_conflict", first_pants.atom_id, a.atom_id))
                         if _is_loser_protected(a):
                             protected_losers.append(a)
+
+        # 6b. 提示词级服装载体前提残余校验（nudity / auto_linkage / clothing_extension）
+        existing_loser_ids = {c[-1] for c in conflicts}
+        for bad_atom, _req_kind, worn_list in find_carrier_mismatch_in_atoms(detectable):
+            if bad_atom.atom_id in existing_loser_ids:
+                continue
+            existing_loser_ids.add(bad_atom.atom_id)
+            win_id = worn_list[0].atom_id if worn_list else "__missing_garment_carrier__"
+            if bad_atom.source_slot == "nudity":
+                conflicts.append(("residual_nudity_carrier_conflict", "nudity_clothing_conflicts", "clothing_removes_nudity", win_id, bad_atom.atom_id))
+            else:
+                conflicts.append(("residual_state_lacks_carrier_conflict", "clothing_style_state_coherence", "state_lacks_carrier", win_id, bad_atom.atom_id))
+            if _is_loser_protected(bad_atom):
+                protected_losers.append(bad_atom)
 
         # 7. 材质穿透
         r7 = self.registry.get_rule("material_penetration")

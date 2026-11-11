@@ -18,7 +18,12 @@ from random import Random
 from typing import Any, Callable, Dict, List, Optional, Sequence, Set, Tuple
 
 if __package__:
-    from .conflict_resolver import GarmentCarrierEntity, is_garment_compatible_with_state
+    from .conflict_resolver import (
+        GarmentCarrierEntity,
+        is_garment_compatible_with_state,
+        is_item_skirt_or_slit_carrier,
+        is_item_upper_garment_carrier,
+    )
     from .context_affinity import compute_context_profile, compute_slot_distribution, sample_categorical
     from .models import (
         ContextProfile,
@@ -29,7 +34,12 @@ if __package__:
         TagProvenance,
     )
 else:
-    from lib.conflict_resolver import GarmentCarrierEntity, is_garment_compatible_with_state
+    from lib.conflict_resolver import (
+        GarmentCarrierEntity,
+        is_garment_compatible_with_state,
+        is_item_skirt_or_slit_carrier,
+        is_item_upper_garment_carrier,
+    )
     from lib.context_affinity import compute_context_profile, compute_slot_distribution, sample_categorical
     from lib.models import (
         ContextProfile,
@@ -435,15 +445,14 @@ def filter_extensions_for_garments(
                 if gt_txt:
                     garment_txts.append(gt_txt)
             joined_gt = " ".join(garment_txts)
-            has_skirt_or_dress = bool(
-                ("bottom_skirt" in garment_topos)
-                or ("one_piece" in garment_roles)
-                or ("one_piece" in garment_topos)
-                or ("ensemble" in garment_roles)
-                or ("ensemble_outfit" in garment_topos)
-                or _SKIRT_TEXT_RE.search(joined_gt)
+            has_skirt_or_dress = any(
+                is_item_skirt_or_slit_carrier(gt, clothing_id)
+                for gt in garment_tags
             )
-            has_upper_or_dress = bool(
+            has_upper_or_dress = any(
+                is_item_upper_garment_carrier(gt, clothing_id)
+                for gt in garment_tags
+            ) or bool(
                 garment_roles & {"top", "one_piece", "ensemble", "outerwear"}
                 or garment_topos & {"top", "one_piece", "ensemble_outfit", "outerwear"}
             )
@@ -462,7 +471,7 @@ def filter_extensions_for_garments(
                         "plunging_backless", "crop_midriff", "waist_cutouts", "open_sides",
                     )
                 ]
-            elif garment_roles and not has_upper_or_dress:
+            elif not has_upper_or_dress:
                 filtered = [
                     x for x in filtered
                     if x.get("id") not in (

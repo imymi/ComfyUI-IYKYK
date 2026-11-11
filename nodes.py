@@ -22,6 +22,7 @@ from typing import Any, Dict, List, Optional, Sequence, Tuple
 
 if __package__:
     from .lib.assembler import PromptAssembler, _inspect_blank_input, split_top_level_tags
+    from .lib.conflict_resolver import find_carrier_mismatch_in_atoms
     from .lib.context_affinity import compute_context_profile
     from .lib.errors import (
         CATEGORY_EXTERNAL_BUDGET_EXCEEDED,
@@ -39,6 +40,7 @@ if __package__:
     from .lib.slot_contract import AUXILIARY_SLOT_ORDER, SLOT_ORDER, normalize_slot_mapping, normalize_slot_name
 else:
     from lib.assembler import PromptAssembler, _inspect_blank_input, split_top_level_tags
+    from lib.conflict_resolver import find_carrier_mismatch_in_atoms
     from lib.context_affinity import compute_context_profile
     from lib.errors import (
         CATEGORY_EXTERNAL_BUDGET_EXCEEDED,
@@ -1061,6 +1063,16 @@ def _generate_structured(
 
     # 4. 组装、冲突消解与统一 Finalize
     rng_state_pre_assemble = rng.getstate()
+    pre_exemption = check_completion_exemption(服装款式)
+    has_ext_clothing_in = bool(
+        external_overrides
+        and "clothing" in external_overrides
+        and not _inspect_blank_input(
+            external_overrides["clothing"][1] if isinstance(external_overrides["clothing"], tuple) else external_overrides["clothing"]
+        )[0]
+    )
+    assembly_res = None
+    rebuild_trigger_err: Optional[Exception] = None
     try:
         assembly_res = assembler.assemble_slots(
             slots,
@@ -1071,38 +1083,51 @@ def _generate_structured(
             nudity_constraint=nudity_constraint,
         )
     except (PromptValidationError, UnresolvedConflictError) as err:
-        err.nudity_constraint = nudity_constraint
-        raise
+        if (
+            not pre_exemption.is_exempt
+            and not has_ext_clothing_in
+            and isinstance(err, PromptValidationError)
+            and getattr(err, "error_code", None) in ("missing_garment_carrier", "nudity_prompts_eliminated_by_conflict")
+        ):
+            rebuild_trigger_err = err
+        else:
+            err.nudity_constraint = nudity_constraint
+            raise
 
-    # 4b. M2/M3 最终实际输出完整性校验与受控重组门禁：只验收实际进入 positive 的 accepted_atoms，最多重组 1 次
+    # 4b. M2/M3 最终实际输出完整性与载体一致性校验（最多受控重组 1 次）
     active_clothing_res = clothing_res
     rebuild_attempted = False
     has_ext_clothing_override = any(
         getattr(o, "canonical_slot", None) == "clothing" and getattr(o, "status", None) == "applied"
         for o in (getattr(assembly_res, "overrides", None) or ())
-    )
+    ) if assembly_res is not None else has_ext_clothing_in
     post_exemption = check_completion_exemption(
         服装款式,
         has_external_clothing_override=has_ext_clothing_override,
     )
-    eff_nc = getattr(assembly_res, "nudity_constraint", None) or nudity_constraint
+    eff_nc = (getattr(assembly_res, "nudity_constraint", None) if assembly_res is not None else None) or nudity_constraint
     if not post_exemption.is_exempt and not (eff_nc and eff_nc.yielded_to_override):
         eff_lvl = getattr(eff_nc, "effective_level", None) or lvl_code
         eff_branch = getattr(eff_nc, "selected_branch", None)
-        post_res_clothing_atoms = [
-            a for a in assembly_res.accepted_atoms
-            if getattr(a, "source_slot", None) in ("clothing", "clothing_state", "clothing_extension", "underwear")
-        ]
-        post_assessment = assess_clothing_completeness(
-            post_res_clothing_atoms,
-            (),
-            nudity_level_code=eff_lvl,
-            nudity_branch=eff_branch,
-        )
-        if not post_assessment.is_complete:
+        need_rebuild = rebuild_trigger_err is not None
+        post_assessment = None
+        if not need_rebuild and assembly_res is not None:
+            post_res_clothing_atoms = [
+                a for a in assembly_res.accepted_atoms
+                if getattr(a, "source_slot", None) in ("clothing", "clothing_state", "clothing_extension", "underwear")
+            ]
+            post_assessment = assess_clothing_completeness(
+                post_res_clothing_atoms,
+                (),
+                nudity_level_code=eff_lvl,
+                nudity_branch=eff_branch,
+            )
+            post_carrier_mismatches = find_carrier_mismatch_in_atoms(assembly_res.accepted_atoms)
+            need_rebuild = (not post_assessment.is_complete) or bool(post_carrier_mismatches)
+        if need_rebuild:
             rebuild_attempted = True
             rng_clothing_rebuild = derive_substream_rng(effective_seed, "selector:clothing_rebuild:1")
-            failed_ids = set(post_assessment.violating_item_ids)
+            failed_ids = set(post_assessment.violating_item_ids) if post_assessment is not None else set()
             if getattr(clothing_res, "style_id", None):
                 failed_ids.add(clothing_res.style_id)
             rebuild_res = sampler.sample_clothing_result(
@@ -1145,6 +1170,7 @@ def _generate_structured(
                 nudity_level_code=eff_lvl_after,
                 nudity_branch=eff_branch_after,
             )
+            final_carrier_mismatches = find_carrier_mismatch_in_atoms(assembly_res.accepted_atoms)
             if not final_assessment.is_complete:
                 err = PromptValidationError(
                     f"Clothing outfit remained incomplete after 1 controlled rebuild under {eff_lvl_after} "
@@ -1164,6 +1190,27 @@ def _generate_structured(
                 )
                 err.nudity_constraint = eff_constraint_after
                 raise err
+            if final_carrier_mismatches:
+                bad_atom, req_kind, worn_atoms = final_carrier_mismatches[0]
+                err = PromptValidationError(
+                    f"Accepted prompt atom '{bad_atom.text}' lacked carrier '{req_kind}' after 1 controlled rebuild under {eff_lvl_after}",
+                    slots=(bad_atom.source_slot, "clothing"),
+                    texts=[bad_atom.text] + [w.text for w in worn_atoms[:2]],
+                    error_code="missing_garment_carrier",
+                    category="unresolved_hard_conflict",
+                    details={
+                        "level": eff_lvl_after,
+                        "branch": eff_branch_after,
+                        "required_carrier": req_kind,
+                        "rebuild_attempts": 1,
+                        "nudity_constraint": _serialize_nudity_constraint_trace(eff_constraint_after),
+                    },
+                )
+                err.nudity_constraint = eff_constraint_after
+                raise err
+    elif rebuild_trigger_err is not None:
+        rebuild_trigger_err.nudity_constraint = eff_nc
+        raise rebuild_trigger_err
 
     final_eff_nc = getattr(assembly_res, "nudity_constraint", None) or nudity_constraint
     completion_summary = _build_completion_info_summary(

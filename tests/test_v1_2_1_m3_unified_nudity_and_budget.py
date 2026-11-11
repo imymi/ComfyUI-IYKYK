@@ -14,8 +14,8 @@ import jsonschema
 import nodes as nodes_mod
 from lib import assembler as _assembler
 from lib.assembler import PromptAssembler
-from lib.conflict_resolver import ConflictResolver
-from lib.errors import PromptValidationError
+from lib.conflict_resolver import ConflictResolver, find_carrier_mismatch_in_atoms
+from lib.errors import PromptValidationError, UnresolvedConflictError
 from lib.models import (
     NUDITY_BRANCHES_BY_LEVEL,
     NudityConstraint,
@@ -1046,6 +1046,164 @@ class TestV121M3UnifiedNudityAndBudget(unittest.TestCase):
         self.assertTrue(comp_diag["exempt"])
         self.assertEqual(comp_diag["exempt_reason"], "external_clothing_override")
         self.assertEqual(comp_diag["complement_ids"], [])
+
+    def test_13_carrier_coherence_denim_jeans_bodysuit_and_positive_skirt_slit(self) -> None:
+        """[P1] 按提示词级核验服装载体前提：裤装/非裙装连体衣绝不放出裙衩/高开衩，真裙/旗袍合法保留，保留最多1次受控重组。"""
+        common_none = {
+            "裸露等级": "L2",
+            "服装状态": "自动联动裸露等级 (Auto Link Nudity)",
+            "场景大类": "无 (None)",
+            "剧情主题": "无 (None)",
+            "景别构图": "无 (None)",
+            "拍摄视角": "无 (None)",
+            "发型发色": "无 (None)",
+            "姿势动作": "无 (None)",
+            "情绪表情": "无 (None)",
+            "光影预设": "无 (None)",
+        }
+
+        # 1. 失败复现 1: L2 + denim_jeans + Auto Link + seed=3 (及多种子)
+        res_jeans = self.generator.generate_structured(**common_none, 服装款式="denim_jeans", prompt_seed=3)
+        pos_jeans = res_jeans.positive.lower()
+        self.assertEqual(res_jeans.nudity_constraint.selected_branch, "l2_leg_slit")
+        self.assertIn("cropped jeans", pos_jeans)
+        self.assertTrue("ankle visible" in pos_jeans or "bare feet with otherwise fully dressed" in pos_jeans)
+        self.assertNotIn("skirt slit", pos_jeans)
+        self.assertNotIn("high slit", pos_jeans)
+        self.assertNotIn("high side slit", pos_jeans)
+        self.assertEqual(find_carrier_mismatch_in_atoms(res_jeans.atoms), [])
+        self.assertTrue(res_jeans.outfit_completion_info["exempt"])
+
+        # 2. 失败复现 2: L2 + 随机 (Random) + Auto Link + seed=21 (leotard_bodysuit)
+        res_rand21 = self.generator.generate_structured(**common_none, 服装款式="随机 (Random)", prompt_seed=21)
+        pos_rand21 = res_rand21.positive.lower()
+        self.assertEqual(res_rand21.nudity_constraint.selected_branch, "l2_leg_slit")
+        self.assertIn("leotard", pos_rand21)
+        self.assertTrue("bare feet with otherwise fully dressed" in pos_rand21 or "ankle visible" in pos_rand21)
+        self.assertNotIn("skirt slit revealing thigh", pos_rand21)
+        self.assertNotIn("high slit showing bare leg", pos_rand21)
+        self.assertNotIn("high side slit", pos_rand21)
+        self.assertEqual(find_carrier_mismatch_in_atoms(res_rand21.atoms), [])
+
+        # 3. 批量核验非裙装连体衣/裤装绝不因 one_piece/ensemble 冒充裙装载体
+        for style_id in ("denim_jeans", "leotard_bodysuit", "latex_catsuit", "tactical_jumpsuit"):
+            for sd in range(12):
+                with self.subTest(style=style_id, seed=sd):
+                    r = self.generator.generate_structured(**common_none, 服装款式=style_id, prompt_seed=sd)
+                    p = r.positive.lower()
+                    for bad in ("skirt slit", "high slit", "high side slit", "one button undone", "collar unbuttoned"):
+                        self.assertNotIn(bad, p, f"{style_id} seed={sd} leaked {bad!r}: {r.positive}")
+                    self.assertEqual(find_carrier_mismatch_in_atoms(r.atoms), [])
+
+        # 4. 正向回归: 真正裙装 / 连衣裙 / 旗袍在 l2_leg_slit 下允许并保留裙衩/高开衩
+        for style_id, sd in (("pleated_skirt", 0), ("dress_casual", 3), ("qipao", 3)):
+            with self.subTest(positive_skirt_style=style_id, seed=sd):
+                r_pos = self.generator.generate_structured(**common_none, 服装款式=style_id, prompt_seed=sd)
+                self.assertEqual(r_pos.nudity_constraint.selected_branch, "l2_leg_slit")
+                p_low = r_pos.positive.lower()
+                self.assertIn("skirt slit revealing thigh", p_low)
+                self.assertIn("high side slit to upper thigh exposing long bare leg", p_low)
+                self.assertEqual(find_carrier_mismatch_in_atoms(r_pos.atoms), [])
+
+        # 5. 消解器与装配器旁路复检: 显式单品不豁免载体冲突，单条冲突全部清除或外部冲突 Fail-Closed
+        l2_slit_nc = NudityConstraint(
+            requested_level="L2",
+            effective_level="L2",
+            source="ui_explicit",
+            selected_branch="l2_leg_slit",
+        )
+        bypass_frags_drop = [
+            PromptFragment(
+                text="cropped jeans",
+                source_slot="clothing",
+                source_item_id="denim_jeans",
+                order=0,
+                provenance=TagProvenance(item_id="denim_jeans", kind="base_clothing"),
+                origin=SelectionOrigin(mode="explicit", selector="clothing", selected_id="denim_jeans"),
+                facts=SemanticFacts(piece_role="bottom", garment_topologies=("bottom_pants",), covered_regions=("lower_torso",), allowed_nudity_levels=("L1", "L2", "L3")),
+            ),
+            PromptFragment(
+                text="skirt slit revealing thigh",
+                source_slot="nudity",
+                source_item_id="nudity_l2",
+                order=1,
+                provenance=TagProvenance(item_id="nudity_l2", kind="nudity"),
+                origin=SelectionOrigin(mode="explicit", selector="nudity", selected_id="nudity_l2"),
+                facts=SemanticFacts(allowed_nudity_levels=("L2",), exposed_regions=("thigh_leg",), nudity_branches=("l2_leg_slit",)),
+            ),
+            PromptFragment(
+                text="ankle visible",
+                source_slot="nudity",
+                source_item_id="nudity_l2",
+                order=2,
+                provenance=TagProvenance(item_id="nudity_l2", kind="nudity"),
+                origin=SelectionOrigin(mode="explicit", selector="nudity", selected_id="nudity_l2"),
+                facts=SemanticFacts(allowed_nudity_levels=("L2",), exposed_regions=("ankle_feet",), nudity_branches=("l2_leg_slit",)),
+            ),
+            PromptFragment(
+                text="high side slit to upper thigh exposing long bare leg",
+                source_slot="clothing",
+                source_item_id="high_slit",
+                order=3,
+                provenance=TagProvenance(item_id="high_slit", kind="clothing_extension"),
+                origin=SelectionOrigin(mode="auto", selector="clothing_state", selected_id="high_slit"),
+                facts=SemanticFacts(semantic_role="selector", exposed_regions=("thigh_leg",), nudity_branches=("l2_leg_slit",)),
+            ),
+        ]
+        asm_drop = _assembler.assemble_result(bypass_frags_drop, DATA_DIR, Random(3), nudity_constraint=l2_slit_nc)
+        self.assertIn("cropped jeans", asm_drop.prompt.lower())
+        self.assertIn("ankle visible", asm_drop.prompt.lower())
+        self.assertNotIn("skirt slit revealing thigh", asm_drop.prompt.lower())
+        self.assertNotIn("high side slit", asm_drop.prompt.lower())
+        self.assertEqual(find_carrier_mismatch_in_atoms(asm_drop.accepted_atoms), [])
+
+        # 若无兼容 nudity 替补、唯一 nudity 词条因缺载体被消光，或外部覆盖冲突，必须 Fail-Closed 报错
+        bypass_only_slit = bypass_frags_drop[:2]
+        with self.assertRaises(PromptValidationError) as ctx_empty_nud:
+            _assembler.assemble_result(bypass_only_slit, DATA_DIR, Random(3), nudity_constraint=l2_slit_nc)
+        self.assertEqual(ctx_empty_nud.exception.error_code, "nudity_prompts_eliminated_by_conflict")
+
+        with self.assertRaises((PromptValidationError, UnresolvedConflictError)):
+            self.generator.generate_structured(
+                裸露等级="L2",
+                服装款式="denim_jeans",
+                clothing_override="cropped jeans",
+                nudity_override="skirt slit revealing thigh",
+                prompt_seed=3,
+            )
+
+        # 6. 最多 1 次受控重组约束：随机服饰若首轮触发载体缺失错误，最多只调用一次 rebuild 后即 Fail-Closed
+        orig_sample_clothing = nodes_mod._sampler.sample_clothing_result
+        orig_sample_nudity = nodes_mod._sampler.__class__._sample_nudity_result_with_branch
+        call_count = 0
+
+        def _forcing_rebuild_sampler(*args, **kwargs):
+            nonlocal call_count
+            call_count += 1
+            return orig_sample_clothing("denim_jeans", *args[1:], **kwargs)
+
+        def _only_slit_nudity(level, rng, **kwargs):
+            res, lvl, branch = orig_sample_nudity(
+                nodes_mod._sampler,
+                level,
+                rng,
+                branch="l2_leg_slit",
+                explicit_clothing=kwargs.get("explicit_clothing"),
+                clothing_state=kwargs.get("clothing_state"),
+            )
+            if res is not None:
+                from dataclasses import replace as _dc_replace
+                lvl_data = [x for x in nodes_mod._sampler._load("nudity_levels")["nudity_levels"] if x.get("level") == "L2"][0]
+                slit_raw = [t for t in lvl_data["tags"] if "skirt slit" in t.get("text", "").lower()][:1]
+                slit_str, slit_sampled = nodes_mod._sampler._to_sampled_tags(slit_raw, res.item_id, "nudity")
+                res = _dc_replace(res, tags=slit_str, sampled_tags=slit_sampled)
+            return res, lvl, branch
+
+        with patch.object(nodes_mod._sampler, "sample_clothing_result", side_effect=_forcing_rebuild_sampler):
+            with patch.object(nodes_mod._sampler, "_sample_nudity_result_with_branch", side_effect=_only_slit_nudity):
+                with self.assertRaises(PromptValidationError):
+                    self.generator.generate_structured(**common_none, 服装款式="随机 (Random)", prompt_seed=21)
+        self.assertEqual(call_count, 2, "随机服饰载体失败后只允许 1 次初始采样 + 最多 1 次受控重组")
 
 
 if __name__ == "__main__":

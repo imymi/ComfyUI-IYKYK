@@ -25,6 +25,7 @@ if __package__:
     )
     from .conflict_resolver import (
         ConflictResolver,
+        find_carrier_mismatch_in_atoms,
         is_external_atom,
     )
     from .errors import PromptValidationError, UnresolvedConflictError
@@ -54,6 +55,7 @@ else:
     )
     from lib.conflict_resolver import (
         ConflictResolver,
+        find_carrier_mismatch_in_atoms,
         is_external_atom,
     )
     from lib.errors import PromptValidationError, UnresolvedConflictError
@@ -1094,6 +1096,69 @@ def assemble_result(
                 )
                 err.nudity_constraint = eff_nc
                 raise err
+
+    # 4.4 无关预算上限的最终 accepted_atoms 载体与等级残留复验（显式单品只豁免自动补件，不豁免语义与载体冲突）
+    if not is_fallback:
+        if (
+            active_lvl in ("L1", "L2", "L3", "L4", "L5", "L6")
+            and not (eff_nc is not None and eff_nc.yielded_to_override)
+            and eff_nc is not None
+            and eff_nc.source in ("ui_explicit", "ui_random")
+        ):
+            post_nudity_now = [
+                a for a in accepted_atoms
+                if a.source_slot == "nudity" or (a.provenance and a.provenance.kind == "nudity")
+            ]
+            if not post_nudity_now:
+                source_nudity_ids = {
+                    a.atom_id for a in source_atoms
+                    if a.source_slot == "nudity" or (a.provenance and a.provenance.kind == "nudity")
+                }
+                eliminated_nudity_decisions = [
+                    dec for dec in getattr(resolution_report, "decisions", ())
+                    if dec.action == "drop"
+                    and dec.reason_code == "clothing_removes_nudity"
+                    and dec.target_atom_id in source_nudity_ids
+                ]
+                if eliminated_nudity_decisions:
+                    dropped_conflict_nudity = [
+                        dec.before_text for dec in eliminated_nudity_decisions if dec.before_text
+                    ]
+                    err = PromptValidationError(
+                        f"All nudity prompts for {active_lvl} were eliminated by garment carrier conflict "
+                        f"(branch={active_branch}, dropped={dropped_conflict_nudity})",
+                        category="unresolved_hard_conflict",
+                        error_code="nudity_prompts_eliminated_by_conflict",
+                        slots=("nudity", "clothing"),
+                        texts=dropped_conflict_nudity,
+                        details={
+                            "level": active_lvl,
+                            "branch": active_branch,
+                            "dropped_nudity": dropped_conflict_nudity,
+                        },
+                    )
+                    err.nudity_constraint = eff_nc
+                    raise err
+
+        carrier_mismatches = find_carrier_mismatch_in_atoms(accepted_atoms)
+        if carrier_mismatches:
+            bad_atom, req_kind, worn_atoms = carrier_mismatches[0]
+            err = PromptValidationError(
+                f"Accepted prompt atom '{bad_atom.text}' (slot={bad_atom.source_slot}) requires missing garment carrier '{req_kind}' "
+                f"(worn_garments={[w.text for w in worn_atoms]})",
+                category="unresolved_hard_conflict",
+                error_code="missing_garment_carrier",
+                slots=(bad_atom.source_slot, "clothing") if worn_atoms else (bad_atom.source_slot,),
+                texts=[bad_atom.text] + [w.text for w in worn_atoms[:2]],
+                details={
+                    "required_carrier": req_kind,
+                    "atom_id": bad_atom.atom_id,
+                    "atom_text": bad_atom.text,
+                    "worn_garments": [w.text for w in worn_atoms],
+                },
+            )
+            err.nudity_constraint = eff_nc
+            raise err
 
     sanitized = ", ".join(accepted_tag_texts)
 

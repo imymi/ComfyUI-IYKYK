@@ -23,6 +23,8 @@ if __package__:
         ALLOWED_BUTTON_STYLES,
         NON_SKIRT_ONE_PIECE,
         GarmentCarrierEntity,
+        get_required_carrier_kind,
+        is_carrier_satisfied_by_garments,
         is_garment_compatible_with_state,
     )
     from .context_affinity import (
@@ -65,6 +67,8 @@ else:
         ALLOWED_BUTTON_STYLES,
         NON_SKIRT_ONE_PIECE,
         GarmentCarrierEntity,
+        get_required_carrier_kind,
+        is_carrier_satisfied_by_garments,
         is_garment_compatible_with_state,
     )
     from lib.context_affinity import (
@@ -2471,6 +2475,7 @@ class DataSampler:
                         sleeveless_cues = (
                             "backless", "sleeveless", "strapless", "halter", "off_shoulder",
                             "sundress", "camisole", "crop_top", "bikini", "swimsuit", "bunny_suit",
+                            "leotard", "bodysuit", "catsuit", "plugsuit", "zentai",
                         )
                         if (
                             is_bra_only
@@ -2597,6 +2602,39 @@ class DataSampler:
             ]
             if branch_tags:
                 raw_tags = branch_tags
+        if explicit_clothing:
+            explicit_mode = get_selection_mode(explicit_clothing)
+            if explicit_mode == SelectionMode.EXPLICIT:
+                styles_data = self._load("clothing").get("categories", [])
+                exp_style = _match_item(styles_data, explicit_clothing)
+                exp_tag_match = None if exp_style else _match_tag(styles_data, explicit_clothing)
+                if exp_tag_match:
+                    exp_style, exp_single_tag = exp_tag_match
+                    garment_pool = [exp_single_tag]
+                elif exp_style:
+                    garment_pool = [
+                        t for t in exp_style.get("tags", [])
+                        if lvl_code not in ("L1", "L2", "L3", "L4")
+                        or is_tag_eligible_for_nudity_level(t, lvl_code)
+                    ] or list(exp_style.get("tags", []))
+                else:
+                    garment_pool = []
+                if garment_pool:
+                    exp_cid = (exp_style or {}).get("id", "")
+                    carrier_ok = [
+                        t for t in raw_tags
+                        if (req := get_required_carrier_kind(t, default_slot="nudity")) is None
+                        or is_carrier_satisfied_by_garments(req, garment_pool, style_id=exp_cid)
+                    ]
+                    if carrier_ok:
+                        raw_tags = carrier_ok
+            elif _is_none(explicit_clothing):
+                carrier_free = [
+                    t for t in raw_tags
+                    if get_required_carrier_kind(t, default_slot="nudity") is None
+                ]
+                if carrier_free:
+                    raw_tags = carrier_free
         selected = self._pick(raw_tags, rng, min(rng.randint(2, 3), len(raw_tags))) if raw_tags else []
         item_id = lvl.get("id", f"nudity_{lvl_code}")
         tags_str, sampled = self._to_sampled_tags(selected, item_id, "nudity")
@@ -3000,6 +3038,23 @@ class DataSampler:
                     final_base = ()
                     final_state_tags = ()
                     final_state_id = None
+
+            if (
+                final_state_tags
+                and final_state_id != "linkage_override"
+                and (final_base or comp_tags_tuple)
+            ):
+                actual_garments = list(final_base) + list(comp_tags_tuple)
+                compat_state_tags = tuple(
+                    st for st in final_state_tags
+                    if (
+                        (getattr(st, "provenance", None) is not None and "override:linkage" in (st.provenance.semantic_ids or ()))
+                        or (req := get_required_carrier_kind(st, default_slot="clothing_state")) is None
+                        or is_carrier_satisfied_by_garments(req, actual_garments, style_id=c_id)
+                    )
+                )
+                if state_mode != SelectionMode.EXPLICIT or compat_state_tags:
+                    final_state_tags = compat_state_tags
 
             extension_sampled_tags: List[SampledTag] = []
             if allow_extensions and nudity_level_code in ("L2", "L3", "L4"):
