@@ -626,6 +626,54 @@ def validate_all(
             r"\b(?:crotchless|open[- ]gusset|open[- ]crotch|split[- ]crotch|bottomless)\b",
             re.I,
         )
+        sheer_word_re = re.compile(r"\b(?:sheer|fishnet|translucent|transparent|gauzy|see-through)\b", re.I)
+
+        def _split_clauses_for_occlusion(txt: str) -> List[str]:
+            parts: List[str] = []
+            for raw in txt.split(","):
+                cl = raw.strip().lower()
+                if not cl:
+                    continue
+                m = re.match(r"^(.+?)\s+(?:worn\s+)?(?:over|beneath|under)\s+(.+)$", cl)
+                if m:
+                    left, right = m.group(1).strip(), m.group(2).strip()
+                    parts.append(left)
+                    if not any(w in left for w in ("chain", "belt", "harness", "cincher", "thong", "briefs", "panties", "gloves", "sleeve")) and right not in {
+                        "bodysuit", "babydoll", "chemise", "slip", "set", "sleep shirt", "kimono", "wrap", "teddy", "corset", "tulle corset", "shoulders", "white silk bodysuit"
+                    }:
+                        parts.append(right)
+                else:
+                    parts.append(cl)
+            return parts
+
+        def _has_opaque_upper_occluder(txt: str) -> bool:
+            for cl in _split_clauses_for_occlusion(txt):
+                subj = re.sub(r"\s+(?:beneath|under|over)$", "", cl).strip()
+                if (
+                    open_bust_text_re.search(subj)
+                    or sheer_word_re.search(subj)
+                    or "underbust" in subj
+                    or any(w in subj for w in ("worn open", "open ", " open", "loosely", "draped", "cape", "shoulder wrap", "shoulder piece", "robe"))
+                    or any(w in subj for w in ("panties", "thong", "briefs", "boyshorts", "stockings", "thigh-high", "pantyhose", "socks", "tights", "harness", "belt", "chain", "gloves", "sleeve"))
+                ):
+                    continue
+                if re.search(
+                    r"\b(?:balconette|bra|bralette|bandeau|bustier|overbust|bodysuit|teddy|tank(?:\s+top)?|camisole|shirt|t-shirt|tee|blouse|sweater|turtleneck|hoodie|blazer|jacket|coat|dress|corset)\b",
+                    subj,
+                ):
+                    return True
+            return False
+
+        def _has_opaque_lower_occluder(txt: str) -> bool:
+            for cl in _split_clauses_for_occlusion(txt):
+                subj = re.sub(r"\s+(?:beneath|under|over)$", "", cl).strip()
+                if open_crotch_text_re.search(subj) or sheer_word_re.search(subj):
+                    continue
+                if re.search(r"\bopaque\b[^,]*\b(?:pantyhose|tights|leggings|bodystocking|bodysuit)\b", subj) or re.search(
+                    r"\b(?:trousers|pants|jeans|leggings)\b", subj
+                ):
+                    return True
+            return False
 
         def _validate_clothing_coverage_consistency(scope: str, cid: str, tid: str, txt: str, fcts: Dict[str, Any]) -> None:
             cr = fcts.get("covered_regions") or []
@@ -638,7 +686,7 @@ def validate_all(
                 result.errors.append(
                     f"[ERROR] {scope} [{cid}:{tid}]: intimate_lower coverage contradicts exposed genitals (covered={cr!r}, exposed={exp_r!r})"
                 )
-            if open_bust_text_re.search(txt):
+            if open_bust_text_re.search(txt) and not _has_opaque_upper_occluder(txt):
                 if "intimate_upper" in cr:
                     result.errors.append(
                         f"[ERROR] {scope} [{cid}:{tid}]: open-bust/cupless/pasties garment cannot claim intimate_upper coverage (covered={cr!r})"
@@ -647,7 +695,7 @@ def validate_all(
                     result.errors.append(
                         f"[ERROR] {scope} [{cid}:{tid}]: open-bust/cupless/pasties garment must declare 'breasts' in exposed_regions (got {exp_r!r})"
                     )
-            if open_crotch_text_re.search(txt):
+            if open_crotch_text_re.search(txt) and not _has_opaque_lower_occluder(txt):
                 if "intimate_lower" in cr:
                     result.errors.append(
                         f"[ERROR] {scope} [{cid}:{tid}]: crotchless/open-gusset garment cannot claim intimate_lower coverage (covered={cr!r})"

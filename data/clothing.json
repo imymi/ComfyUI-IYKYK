@@ -12304,10 +12304,9 @@
             "governance_metadata": {},
             "piece_role": "underwear",
             "covered_regions": [
+              "intimate_upper",
+              "intimate_lower",
               "legs"
-            ],
-            "exposed_regions": [
-              "breasts"
             ],
             "allowed_nudity_levels": [
               "L3",
@@ -47217,10 +47216,11 @@
             "piece_role": "underwear",
             "covered_regions": [
               "intimate_upper",
+              "intimate_lower",
               "legs"
             ],
             "exposed_regions": [
-              "genitals"
+              "underwear_panties"
             ],
             "allowed_nudity_levels": [
               "L3",
@@ -56817,10 +56817,11 @@
             "piece_role": "underwear",
             "covered_regions": [
               "intimate_upper",
+              "intimate_lower",
               "legs"
             ],
             "exposed_regions": [
-              "genitals"
+              "underwear_panties"
             ],
             "allowed_nudity_levels": [
               "L3",
@@ -77073,11 +77074,12 @@
             "semantic_role": "selector",
             "piece_role": "underwear",
             "covered_regions": [
+              "intimate_lower",
               "legs"
             ],
             "exposed_regions": [
               "breasts",
-              "genitals"
+              "underwear_panties"
             ],
             "allowed_nudity_levels": [
               "L3",
@@ -453512,12 +453514,11 @@
             ],
             "piece_role": "underwear",
             "covered_regions": [
+              "intimate_upper",
+              "intimate_lower",
               "legs"
             ],
             "coverage_delta": "minimal_cover_only",
-            "exposed_regions": [
-              "breasts"
-            ],
             "allowed_nudity_levels": [
               "L3",
               "L4"
@@ -453564,11 +453565,11 @@
             ],
             "piece_role": "underwear",
             "covered_regions": [
+              "intimate_upper",
               "legs"
             ],
             "coverage_delta": "minimal_cover_only",
             "exposed_regions": [
-              "breasts",
               "genitals"
             ],
             "allowed_nudity_levels": [
@@ -453760,9 +453761,6 @@
               "none"
             ],
             "coverage_delta": "minimal_cover_only",
-            "exposed_regions": [
-              "breasts"
-            ],
             "allowed_nudity_levels": [
               "L3",
               "L4"
