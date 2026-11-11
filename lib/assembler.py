@@ -10,7 +10,7 @@ from __future__ import annotations
 
 from pathlib import Path
 from random import Random
-from typing import Any, Dict, Iterator, List, Optional, Sequence, Tuple
+from typing import Any, Dict, Iterator, List, Optional, Sequence, Set, Tuple
 
 import json
 import re
@@ -23,7 +23,10 @@ if __package__:
         deduplicate_tags_with_records,
         fragments_to_atoms,
     )
-    from .conflict_resolver import ConflictResolver, is_external_atom
+    from .conflict_resolver import (
+        ConflictResolver,
+        is_external_atom,
+    )
     from .errors import PromptValidationError, UnresolvedConflictError
     from .lexer import split_top_level_tags, validate_prompt_syntax
     from .models import (
@@ -38,7 +41,9 @@ if __package__:
         SelectionOrigin,
         SemanticFacts,
         TagProvenance,
+        VALID_NUDITY_LEVELS,
     )
+    from .outfit_completion import assess_clothing_completeness
     from .slot_contract import ALLOWED_SLOTS, AUXILIARY_SLOT_ORDER, SLOT_ORDER, normalize_raw_input_text, normalize_slot_mapping, normalize_slot_name
 else:
     from lib.atomizer import (
@@ -47,7 +52,10 @@ else:
         deduplicate_tags_with_records,
         fragments_to_atoms,
     )
-    from lib.conflict_resolver import ConflictResolver, is_external_atom
+    from lib.conflict_resolver import (
+        ConflictResolver,
+        is_external_atom,
+    )
     from lib.errors import PromptValidationError, UnresolvedConflictError
     from lib.lexer import split_top_level_tags, validate_prompt_syntax
     from lib.models import (
@@ -62,7 +70,9 @@ else:
         SelectionOrigin,
         SemanticFacts,
         TagProvenance,
+        VALID_NUDITY_LEVELS,
     )
+    from lib.outfit_completion import assess_clothing_completeness
     from lib.slot_contract import ALLOWED_SLOTS, AUXILIARY_SLOT_ORDER, SLOT_ORDER, normalize_raw_input_text, normalize_slot_mapping, normalize_slot_name
 
 MAX_PROMPT_WORDS = 250
@@ -394,6 +404,303 @@ def render_atoms(atoms: Sequence[PromptAtom]) -> str:
     return render_tags(tags)
 
 
+_NUDITY_LEVELS_DOC_CACHE: Dict[Path, List[Dict[str, Any]]] = {}
+
+_PRESET_L1_BANNED_RE = re.compile(
+    r"\b(?:one\s+breast\s+exposed|bare\s+breasts?|exposed\s+breasts?|erect\s+nipple\w*|"
+    r"nipple\s+(?:visible|erect)|nipples?|dark\s+areola\w*|areola\w*|no\s+bra|no\s+panties|"
+    r"pussy\b|vagina|penis|crotch|genitals|skirt\s+hiked\s+up|hiked\s+up|shirt\s+unbuttoned|"
+    r"unbuttoned|slipping\s+off\s+shoulder|bare\s+shoulder|naked\s+under|panties\s+pulled|"
+    r"panties\s+pushed|hand\s+in\s+panties|fingering|spread\s+legs|legs\s+spread|"
+    r"topless|bottomless|cleavage|underboob|sideboob|naked|nude)\b",
+    re.I,
+)
+_PRESET_L2_BANNED_RE = re.compile(
+    r"\b(?:one\s+breast\s+(?:fully\s+)?exposed|bare\s+breasts?|exposed\s+breasts?|"
+    r"erect\s+nipple\w*|nipple\s+(?:visible|erect)|nipples?|dark\s+areola\w*|areola\w*|"
+    r"no\s+bra|no\s+panties|pussy\b|vagina|penis|crotch|genitals|naked\s+under|"
+    r"panties\s+pulled|panties\s+pushed|hand\s+in\s+panties|fingering|topless|bottomless|naked|nude)\b",
+    re.I,
+)
+_PRESET_WORN_CLOTHING_RE = re.compile(
+    r"\b(?:uniform|furisode|kimono|yukata|qipao|cheongsam|dress|skirt|shirt|blouse|sweater|"
+    r"hoodie|jacket|coat|blazer|pants|shorts|jeans|trousers|suit|catsuit|bodysuit|leotard|"
+    r"swimsuit|bikini|lingerie|bra|panties|underwear|apron|stockings|socks|boots|shoes|heels|"
+    r"slipping\s+off\s+shoulder)\b",
+    re.I,
+)
+_PRESET_L56_SUPERSEDED_NUDITY_RE = re.compile(
+    r"\b(?:one\s+breast\s+(?:fully\s+)?exposed|bare\s+shoulder|slipping\s+off\s+shoulder|"
+    r"nipple\s+visible\s+through\s+fabric)\b",
+    re.I,
+)
+_PRESET_L6_UPPER_FRAMING_RE = re.compile(
+    r"\b(?:medium\s+shot|waist-up(?:\s+framing)?|chest-up(?:\s+shot)?|medium\s+close-up|"
+    r"upper[- ]body(?:\s+framing)?|half-body\s+portrait|face\s+shot\s+filling\s+frame|"
+    r"portrait\s+framing|close-up\s+(?:face\s+)?portrait|face\s+close-up|extreme\s+close-up|headshot)\b",
+    re.I,
+)
+
+
+def _infer_active_nudity_from_tags(
+    tags: Sequence[PromptTag],
+    nudity_constraint: Optional[NudityConstraint],
+) -> Tuple[Optional[str], Optional[str]]:
+    if nudity_constraint is not None and not nudity_constraint.yielded_to_override and nudity_constraint.effective_level:
+        return nudity_constraint.effective_level, nudity_constraint.selected_branch
+    for tag in tags:
+        for a in tag.atoms:
+            if a.source_slot == "nudity":
+                if a.facts and len(a.facts.allowed_nudity_levels) == 1:
+                    lvl = a.facts.allowed_nudity_levels[0]
+                    br = a.facts.nudity_branches[0] if (a.facts.nudity_branches and len(a.facts.nudity_branches) == 1) else None
+                    return lvl, br
+                raw_id = ((a.source_item_id or "") + " " + (a.provenance.item_id if a.provenance else "")).upper()
+                for lvl in VALID_NUDITY_LEVELS:
+                    if lvl in raw_id:
+                        return lvl, None
+                if any(s in a.text.lower() for s in ("fully clothed", "completely covered")):
+                    return "L1", "l1_full_clothed"
+    return None, None
+
+
+def _select_budget_core_tag_indices(
+    deduped_tags: Sequence[PromptTag],
+    active_lvl: Optional[str],
+    active_branch: Optional[str],
+) -> set[int]:
+    """识别构成当前完整穿搭/分支必需载体的最低核心 tag 索引，在词数预算收紧时优先保护。"""
+    core_indices: set[int] = set()
+    clothing_entries: List[Tuple[int, List[PromptAtom]]] = []
+    for idx, tag in enumerate(deduped_tags):
+        cl_atoms = [a for a in tag.atoms if a.source_slot in ("clothing", "clothing_state", "underwear")]
+        if cl_atoms:
+            clothing_entries.append((idx, cl_atoms))
+
+    if not clothing_entries:
+        return core_indices
+
+    def _entry_topologies(atoms_seq: Sequence[PromptAtom]) -> set[str]:
+        topos: set[str] = set()
+        for a in atoms_seq:
+            if a.facts and a.facts.garment_topologies:
+                topos.update(a.facts.garment_topologies)
+        return topos
+
+    def _entry_roles(atoms_seq: Sequence[PromptAtom]) -> set[str]:
+        roles: set[str] = set()
+        for a in atoms_seq:
+            if a.facts and a.facts.piece_role:
+                roles.add(a.facts.piece_role)
+        return roles
+
+    # 1. L5 discarded narrative protection
+    if active_lvl == "L5":
+        for idx, cl_atoms in clothing_entries:
+            if any(a.facts and "discarded" in a.facts.garment_states for a in cl_atoms):
+                core_indices.add(idx)
+                break
+        return core_indices
+
+    # 2. L4 branch minimal-cover carrier protection
+    if active_lvl == "L4":
+        for idx, cl_atoms in clothing_entries:
+            topos = _entry_topologies(cl_atoms)
+            roles = _entry_roles(cl_atoms)
+            if active_branch == "l4_hosiery_footwear_only" and (roles & {"legwear", "footwear"} or topos & {"legwear", "footwear"}):
+                core_indices.add(idx)
+            elif active_branch in ("l4_panties_only", "l4_bra_and_panties", None) and ("underwear" in topos or "underwear" in roles):
+                core_indices.add(idx)
+        return core_indices
+
+    # 3. 检查是否已有 one_piece / ensemble_outfit 主锚点
+    for idx, cl_atoms in clothing_entries:
+        topos = _entry_topologies(cl_atoms)
+        roles = _entry_roles(cl_atoms)
+        if ("one_piece" in topos or "ensemble_outfit" in topos or "one_piece" in roles or "ensemble" in roles):
+            core_indices.add(idx)
+            return core_indices
+
+    # 4. 分体上下装（top + bottom_pants/bottom_skirt）：成对保护主上装与主下装
+    first_top_idx: Optional[int] = None
+    first_bottom_idx: Optional[int] = None
+    first_underwear_idx: Optional[int] = None
+    for idx, cl_atoms in clothing_entries:
+        topos = _entry_topologies(cl_atoms)
+        roles = _entry_roles(cl_atoms)
+        if first_top_idx is None and ("top" in topos or "top" in roles):
+            first_top_idx = idx
+        if first_bottom_idx is None and (topos & {"bottom_pants", "bottom_skirt"} or "bottom" in roles):
+            first_bottom_idx = idx
+        if first_underwear_idx is None and ("underwear" in topos or "underwear" in roles):
+            first_underwear_idx = idx
+
+    if active_lvl == "L3" and active_branch == "l3_panties_only":
+        if first_underwear_idx is not None:
+            core_indices.add(first_underwear_idx)
+        return core_indices
+    if active_lvl == "L3" and active_branch in ("l3_topless_skirt_kept", "l3_topless_pants_kept"):
+        if first_bottom_idx is not None:
+            core_indices.add(first_bottom_idx)
+        return core_indices
+
+    if first_top_idx is not None:
+        core_indices.add(first_top_idx)
+    if first_bottom_idx is not None:
+        core_indices.add(first_bottom_idx)
+    if not core_indices and first_underwear_idx is not None:
+        core_indices.add(first_underwear_idx)
+    return core_indices
+
+
+def _tag_budget_priority_tier(idx: int, tag: PromptTag, core_tag_indices: set[int]) -> int:
+    if any(is_external_atom(a) for a in tag.atoms):
+        return 0
+    if idx in core_tag_indices:
+        return 1
+    slots = {a.source_slot for a in tag.atoms}
+    if "nudity" in slots:
+        return 1
+    if slots & {"clothing_extension"}:
+        return 4
+    if slots & {"clothing", "clothing_state", "underwear"}:
+        # 套装配饰/修饰词 (accessory/necktie/pompoms) 降为 4，其余状态让位于 core_tag_indices
+        roles = {a.facts.piece_role for a in tag.atoms if a.facts and a.facts.piece_role}
+        if "accessory" in roles:
+            return 4
+        return 3
+    if slots & {"scene_theme", "scene", "theme", "shot_type", "shot", "camera_angle", "camera", "character"}:
+        if any(a.facts and a.facts.semantic_role == "scene_detail" for a in tag.atoms):
+            return 4
+        return 2
+    if slots & {"quality"}:
+        return 5
+    if slots & {"jewelry", "tattoo", "props", "liquids"}:
+        return 4
+    return 3
+
+
+def _load_nudity_level_fragments_for_preset(
+    data_dir: Path,
+    constraint: NudityConstraint,
+    entry_point: str,
+    start_order: int,
+) -> List[PromptFragment]:
+    eff_lvl = constraint.effective_level
+    if eff_lvl not in VALID_NUDITY_LEVELS:
+        return []
+    if data_dir not in _NUDITY_LEVELS_DOC_CACHE:
+        p = data_dir / "nudity_levels.json"
+        if p.is_file():
+            try:
+                _NUDITY_LEVELS_DOC_CACHE[data_dir] = json.loads(p.read_text(encoding="utf-8")).get("nudity_levels", [])
+            except Exception:
+                _NUDITY_LEVELS_DOC_CACHE[data_dir] = []
+        else:
+            _NUDITY_LEVELS_DOC_CACHE[data_dir] = []
+    levels = _NUDITY_LEVELS_DOC_CACHE[data_dir]
+    lvl_item = next((it for it in levels if it.get("level") == eff_lvl), None)
+    if not isinstance(lvl_item, dict):
+        return []
+    lvl_id = lvl_item.get("id", f"nudity_{eff_lvl.lower()}")
+    raw_tags = list(lvl_item.get("tags", []))
+    branch = constraint.selected_branch
+    if branch:
+        b_tags = [
+            t for t in raw_tags
+            if isinstance(t, dict) and branch in ((t.get("facts") or {}).get("nudity_branches") or ())
+        ]
+        if b_tags:
+            raw_tags = b_tags
+    if not raw_tags:
+        return []
+    picked = raw_tags[:2] if len(raw_tags) >= 2 else raw_tags[:1]
+    origin = SelectionOrigin(
+        entry_point=entry_point,
+        mode="resolver",
+        selector="nudity",
+        selected_id=lvl_id,
+        raw_value=constraint.raw_requested_value,
+        parent_ids=(lvl_id,),
+    )
+    out: List[PromptFragment] = []
+    cur_order = start_order
+    for t in picked:
+        if not isinstance(t, dict) or not t.get("text"):
+            continue
+        out.append(
+            PromptFragment(
+                text=t["text"],
+                source_slot="nudity",
+                source_item_id=lvl_id,
+                order=cur_order,
+                provenance=TagProvenance(
+                    item_id=lvl_id,
+                    kind="nudity",
+                    parent_ids=(lvl_id,),
+                    semantic_ids=(f"nudity:{eff_lvl}",),
+                ),
+                id=t.get("id", ""),
+                facts=SemanticFacts.from_dict(t.get("facts", {})),
+                origin=origin,
+            )
+        )
+        cur_order += 1
+    return out
+
+
+def _is_preset_fragment_compatible_with_nudity(
+    frag: PromptFragment,
+    target_level: str,
+    target_branch: Optional[str],
+) -> bool:
+    """在 UI 显式/覆盖裸露等级作用于预设与配方时，精准过滤不相容片段（保留 preset_native 原意不受影响）。"""
+    f = frag.facts
+    tl = frag.text.strip().lower()
+    if f and f.allowed_nudity_levels and target_level not in f.allowed_nudity_levels:
+        return False
+    if target_level == "L1":
+        if f and any(r in ("breasts", "genitals", "anus", "buttocks", "full_nude", "cleavage", "midriff", "underboob_sideboob", "underwear_panties", "underwear_bra", "shoulders") for r in f.exposed_regions):
+            return False
+        if f and any(r in ("intimate_lower_body", "crotch", "breasts", "buttocks", "underboob", "sideboob") for r in f.visible_regions):
+            return False
+        if _PRESET_L1_BANNED_RE.search(tl):
+            return False
+        return True
+    if target_level == "L2":
+        if f and any(r in ("breasts", "genitals", "anus", "buttocks", "full_nude") for r in f.exposed_regions):
+            return False
+        if f and any(r in ("intimate_lower_body", "crotch") for r in f.visible_regions):
+            return False
+        if _PRESET_L2_BANNED_RE.search(tl):
+            return False
+        return True
+    if target_level in ("L5", "L6"):
+        if f and any(r == "none" for r in f.exposed_regions):
+            return False
+        if _PRESET_WORN_CLOTHING_RE.search(tl) and "no panties" not in tl and "no bra" not in tl:
+            return False
+        if frag.source_slot in ("clothing", "clothing_state", "clothing_extension", "underwear") and "no panties" not in tl and "no bra" not in tl:
+            return False
+        if _PRESET_L56_SUPERSEDED_NUDITY_RE.search(tl):
+            return False
+        if target_level == "L6" and (frag.source_slot in ("shot_type", "shot", "preset_shot_type") or _PRESET_L6_UPPER_FRAMING_RE.search(tl)):
+            if _PRESET_L6_UPPER_FRAMING_RE.search(tl):
+                return False
+            if f and f.visible_regions:
+                vis = set(f.visible_regions)
+                if (vis & {"face", "upper_body"}) and not (vis & {"lower_body", "intimate_lower_body", "full_body", "legs"}):
+                    return False
+        return True
+    if target_level == "L4":
+        if f and any(t in ("top", "bottom_pants", "bottom_skirt", "outerwear", "one_piece", "ensemble_outfit") for t in f.garment_topologies):
+            return False
+        if _PRESET_WORN_CLOTHING_RE.search(tl) and not any(w in tl for w in ("panties", "bra", "stockings", "socks", "heels", "towel", "lingerie", "no panties", "no bra")):
+            return False
+        return True
+    return True
+
+
 def assemble_result(
     fragments: Sequence[PromptFragment | str] | PromptFragment | str,
     data_dir: str | Path,
@@ -525,54 +832,69 @@ def assemble_result(
     deduped_tags, dropped_dedup_tags, dedup_records = deduplicate_tags_with_records(resolved_tags)
     deduplicated_atoms = [a for t in dropped_dedup_tags for a in t.atoms]
 
-    # 4. 严谨的词数原子预算管理 (外部优先与 Fail-Closed 校验)
+    # 4. 严谨的词数原子预算管理 (外部优先 + 核心穿搭与等级锚点优先级保护 + Fail-Closed 校验)
     accepted_atoms: List[PromptAtom] = []
     accepted_tag_texts: List[str] = []
     budget_filtered_atoms: List[PromptAtom] = []
     budget_filter_records: List[BudgetFilterRecord] = []
     current_word_count = 0
 
-    # 4.1 预先核算全部外部内容词数：外部自身超上限直接抛异常 Fail-Closed
-    ext_tags = [t for t in deduped_tags if any(is_external_atom(a) for a in t.atoms) and t.text]
+    # 4.1 预先核算全部外部内容与单原子长度限制（外部超预算优先准确归类为 external_budget_exceeded）
+    non_empty_tags: List[PromptTag] = [tag for tag in deduped_tags if tag.text]
+
+    ext_tags = [t for t in non_empty_tags if any(is_external_atom(a) for a in t.atoms)]
     total_ext_words = sum(len(t.text.split()) for t in ext_tags)
     if total_ext_words > max_words:
         raise PromptValidationError(
-            f"External overrides exceed maximum allowed budget of {max_words} words ({total_ext_words} words)"
+            f"External overrides exceed maximum allowed budget of {max_words} words ({total_ext_words} words)",
+            category="external_budget_exceeded",
         )
 
-    remaining_ext_words = total_ext_words
-
-    for tag in deduped_tags:
-        tag_text = tag.text
-        if not tag_text:
-            continue
-
-        tag_is_ext = any(is_external_atom(a) for a in tag.atoms)
-
-        # 若非系统 fallback 自动生成的 tag，逐 atom 检查是否有单个 atom 超过总上限
-        if not is_fallback:
+    if not is_fallback:
+        for tag in non_empty_tags:
             for a in tag.atoms:
                 atom_words = len(a.text.split())
                 if atom_words > max_words:
                     raise PromptValidationError(
-                        f"Single atomic span exceeds {max_words} words limit ({atom_words} words): '{a.text[:50]}...'"
+                        f"Single atomic span exceeds {max_words} words limit ({atom_words} words): '{a.text[:50]}...'",
+                        category="external_budget_exceeded",
                     )
 
-        tag_words = len(tag_text.split())
-        if tag_is_ext:
-            # 外部内容绝对优先保证装入（此前已断言 total_ext_words <= max_words）
+    eff_nc = resolution_report.nudity_constraint if (resolution_report and resolution_report.nudity_constraint is not None) else nudity_constraint
+    active_lvl, active_branch = _infer_active_nudity_from_tags(non_empty_tags, eff_nc)
+    total_non_empty_words = sum(len(t.text.split()) for t in non_empty_tags)
+
+    if total_non_empty_words <= max_words:
+        for tag in non_empty_tags:
             accepted_atoms.extend(tag.atoms)
-            accepted_tag_texts.append(tag_text)
-            current_word_count += tag_words
-            remaining_ext_words -= tag_words
-        else:
-            # 系统生成内容：需确保装入后剩余预算仍足够容纳所有后续外部内容
-            if current_word_count + tag_words + remaining_ext_words <= max_words:
+            accepted_tag_texts.append(tag.text)
+            current_word_count += len(tag.text.split())
+    else:
+        core_tag_indices = _select_budget_core_tag_indices(non_empty_tags, active_lvl, active_branch)
+        kept_indices: set[int] = set()
+        remaining_budget = max_words - total_ext_words
+        non_ext_ranked: List[Tuple[int, int, PromptTag]] = []
+        for idx, tag in enumerate(non_empty_tags):
+            if any(is_external_atom(a) for a in tag.atoms):
+                kept_indices.add(idx)
+            else:
+                tier = _tag_budget_priority_tier(idx, tag, core_tag_indices)
+                non_ext_ranked.append((tier, idx, tag))
+
+        non_ext_ranked.sort(key=lambda x: (x[0], x[1]))
+        for _, idx, tag in non_ext_ranked:
+            tag_words = len(tag.text.split())
+            if tag_words <= remaining_budget:
+                kept_indices.add(idx)
+                remaining_budget -= tag_words
+
+        for idx, tag in enumerate(non_empty_tags):
+            tag_words = len(tag.text.split())
+            if idx in kept_indices:
                 accepted_atoms.extend(tag.atoms)
-                accepted_tag_texts.append(tag_text)
+                accepted_tag_texts.append(tag.text)
                 current_word_count += tag_words
             else:
-                # 系统内容让位截断并记录详细记录 (R3-P1-002)
                 budget_filtered_atoms.extend(tag.atoms)
                 for a in tag.atoms:
                     budget_filter_records.append(
@@ -584,7 +906,47 @@ def assemble_result(
                             reason="word_budget_exceeded",
                         )
                     )
-                continue
+
+        # 4.2 预算裁剪后针对实际 accepted_atoms 执行完整穿搭复验：禁止把已截断的服装仍算作完整穿搭
+        if not is_fallback and active_lvl in ("L1", "L2", "L3") and any(
+            a.source_slot in ("clothing", "clothing_state", "clothing_extension", "underwear")
+            for a in budget_filtered_atoms
+        ):
+            pre_cl_atoms = [
+                a for t in non_empty_tags for a in t.atoms
+                if a.source_slot in ("clothing", "clothing_state", "clothing_extension", "underwear")
+            ]
+            post_cl_atoms = [
+                a for a in accepted_atoms
+                if a.source_slot in ("clothing", "clothing_state", "clothing_extension", "underwear")
+            ]
+            if pre_cl_atoms and not any(is_external_atom(a) for a in pre_cl_atoms):
+                pre_assess = assess_clothing_completeness(
+                    pre_cl_atoms, (), nudity_level_code=active_lvl, nudity_branch=active_branch
+                )
+                post_assess = assess_clothing_completeness(
+                    post_cl_atoms, (), nudity_level_code=active_lvl, nudity_branch=active_branch
+                )
+                if pre_assess.is_complete and not post_assess.is_complete:
+                    dropped_cl = [
+                        a.text for a in budget_filtered_atoms
+                        if a.source_slot in ("clothing", "clothing_state", "clothing_extension", "underwear")
+                    ]
+                    raise PromptValidationError(
+                        f"Word budget ({max_words}) cannot retain a complete outfit under {active_lvl} "
+                        f"(missing_after_budget={post_assess.missing_parts}, dropped_clothing={dropped_cl})",
+                        category="external_budget_exceeded",
+                        error_code="insufficient_budget_for_complete_outfit",
+                        slots=("clothing",),
+                        texts=dropped_cl,
+                        details={
+                            "max_words": max_words,
+                            "level": active_lvl,
+                            "branch": active_branch,
+                            "missing_parts": list(post_assess.missing_parts),
+                            "dropped_clothing": dropped_cl,
+                        },
+                    )
 
     sanitized = ", ".join(accepted_tag_texts)
 
@@ -597,7 +959,6 @@ def assemble_result(
             f"Rendered prompt word count {final_words} exceeds maximum allowed budget {max_words}"
         )
 
-    effective_nc = resolution_report.nudity_constraint if (resolution_report and resolution_report.nudity_constraint is not None) else nudity_constraint
     return AssemblyResult(
         prompt=sanitized,
         accepted_atoms=tuple(accepted_atoms),
@@ -610,7 +971,7 @@ def assemble_result(
         deduplication_records=tuple(dedup_records),
         budget_filter_records=tuple(budget_filter_records),
         overrides=tuple(overrides) if overrides else build_default_canonical_override_records(),
-        nudity_constraint=effective_nc,
+        nudity_constraint=eff_nc,
     )
 
 
@@ -1396,6 +1757,82 @@ class PromptAssembler:
         if extra_fragments:
             fragments.extend(extra_fragments)
 
+        # 3b. 当存在显式/随机 UI 或外部裸露等级约束（非 preset_native）时，对预设与配方片段执行统一等级过滤与锚点适配
+        preset_adjusted = False
+        active_preset_lvl = (
+            nudity_constraint.effective_level
+            if (
+                nudity_constraint is not None
+                and nudity_constraint.effective_level in VALID_NUDITY_LEVELS
+                and nudity_constraint.source != "preset_native"
+            )
+            else None
+        )
+        has_ext_nudity_override = bool(
+            isinstance(external_overrides, dict)
+            and "nudity" in external_overrides
+            and not _inspect_blank_input(external_overrides.get("nudity"))[0]
+        )
+        if active_preset_lvl and not (external_overrides and "clothing" in external_overrides and not _inspect_blank_input(external_overrides.get("clothing"))[0] and nudity_constraint and nudity_constraint.yielded_to_override):
+            preset_non_quality = [
+                f for f in fragments
+                if f.origin and f.origin.mode == "preset" and f.source_slot != "quality"
+            ]
+            filtered_frags: List[PromptFragment] = []
+            for f in fragments:
+                if f.source_slot == "quality" or f in extra_fragments:
+                    filtered_frags.append(f)
+                    continue
+                if _is_preset_fragment_compatible_with_nudity(
+                    f, active_preset_lvl, nudity_constraint.selected_branch if nudity_constraint else None
+                ):
+                    filtered_frags.append(f)
+                else:
+                    preset_adjusted = True
+
+            surviving_preset_non_quality = [
+                f for f in filtered_frags
+                if f.origin and f.origin.mode == "preset" and f.source_slot != "quality"
+            ]
+            if preset_non_quality and not surviving_preset_non_quality:
+                raise PromptValidationError(
+                    f"Preset '{preset_id}' core content cannot satisfy target nudity level {active_preset_lvl}",
+                    category="unresolved_hard_conflict",
+                    error_code="preset_incompatible_with_nudity_level",
+                    slots=("nudity", "clothing"),
+                    texts=[f.text for f in preset_non_quality],
+                    details={
+                        "preset_id": preset_id,
+                        "nudity_constraint": nudity_constraint.to_dict() if nudity_constraint else None,
+                    },
+                )
+
+            if not has_ext_nudity_override:
+                existing_nudity = any(f.source_slot == "nudity" for f in filtered_frags)
+                if not existing_nudity:
+                    nudity_frags = _load_nudity_level_fragments_for_preset(
+                        Path(self.data_dir),
+                        nudity_constraint,
+                        entry_point=entry_point,
+                        start_order=order,
+                    )
+                    if nudity_frags:
+                        # 将等级锚点插入 preset 核心之后 / quality 之前，保留 canonical order
+                        insert_pos = len(filtered_frags)
+                        for idx_f, ff in enumerate(filtered_frags):
+                            if ff.source_slot == "quality" or ff in extra_fragments:
+                                insert_pos = idx_f
+                                break
+                        filtered_frags = filtered_frags[:insert_pos] + nudity_frags + filtered_frags[insert_pos:]
+                        order += len(nudity_frags)
+                        preset_adjusted = True
+
+            # 重新顺排 order，确保碎片连续单调递增
+            fragments = [
+                replace(f, order=i) if f.order != i else f
+                for i, f in enumerate(filtered_frags)
+            ]
+
         override_records: Tuple[OverrideRecord, ...] = ()
         if external_overrides:
             applied_records: Dict[str, OverrideRecord] = {}
@@ -1525,9 +1962,12 @@ class PromptAssembler:
             max_words,
             resolver=self.resolver,
             overrides=override_records,
+            nudity_constraint=nudity_constraint,
         )
+        if preset_adjusted and not res.preset_adjusted:
+            res = replace(res, preset_adjusted=True)
         if nudity_constraint is not None and res.nudity_constraint is None:
-            return replace(res, nudity_constraint=nudity_constraint)
+            res = replace(res, nudity_constraint=nudity_constraint)
         return res
 
     def assemble_preset_result(

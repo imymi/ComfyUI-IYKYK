@@ -78,11 +78,11 @@ class TestV121M2OutfitCompletion(unittest.TestCase):
 
         # 通过 IYKYKPromptGenerator 端到端验证各局部原型主款及补件独立 provenance / SelectionOrigin
         e2e_archetypes = [
-            (0, "knit_sweater"),      # top only
-            (46, "pencil_skirt"),     # bottom only
-            (1, "waist_apron"),       # outerwear only
-            (39, "legwear_thighhighs"),  # legwear only
-            (4, "footwear_sneakers"),  # footwear only
+            (5, "knit_sweater"),                # top only
+            (1, "pencil_skirt"),                # bottom only
+            (18, "lab_coat"),                   # outerwear only
+            (74, "legwear_fishnet_pantyhose"),  # legwear only
+            (4, "footwear_sneakers"),           # footwear only
         ]
         for e2e_seed, e2e_primary in e2e_archetypes:
             with self.subTest(e2e_seed=e2e_seed, e2e_primary=e2e_primary):
@@ -98,10 +98,10 @@ class TestV121M2OutfitCompletion(unittest.TestCase):
                 self.assertGreater(len(comp_src), 0)
                 for a in comp_src:
                     self.assertEqual(a.source_item_id, a.provenance.item_id)
-                    self.assertEqual(a.origin.selected_id, a.provenance.item_id)
-                    self.assertEqual(a.origin.mode, "auto")
+                    self.assertEqual(a.origin.selected_id, e2e_primary)
                     self.assertEqual(a.origin.selector, "clothing")
-                    self.assertNotEqual(a.origin.selected_id, e2e_primary)
+                    self.assertNotEqual(a.provenance.item_id, e2e_primary)
+                    self.assertNotEqual(a.source_item_id, e2e_primary)
                     self.assertNotEqual(a.id, a.source_item_id)
 
     def test_02_exempt_entries_never_auto_complete_or_error(self) -> None:

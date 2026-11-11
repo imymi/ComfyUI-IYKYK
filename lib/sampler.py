@@ -40,6 +40,7 @@ if __package__:
     from .models import (
         ClothingSampleResult,
         ContextProfile,
+        NUDITY_BRANCHES_BY_LEVEL,
         NudityConstraint,
         PromptAtom,
         SampleResult,
@@ -81,6 +82,7 @@ else:
     from lib.models import (
         ClothingSampleResult,
         ContextProfile,
+        NUDITY_BRANCHES_BY_LEVEL,
         NudityConstraint,
         PromptAtom,
         SampleResult,
@@ -181,6 +183,336 @@ STANDALONE_CLOTHING_CATEGORIES = frozenset({
     "tops_specialty",
     "lingerie_bra",
 })
+
+_NON_L1_EXPOSED_REGIONS = frozenset({
+    "breasts",
+    "genitals",
+    "anus",
+    "buttocks",
+    "full_nude",
+    "cleavage",
+    "midriff",
+    "underboob_sideboob",
+    "underwear_panties",
+    "underwear_bra",
+    "thigh_leg",
+    "shoulders",
+    "back",
+})
+_NON_L2_EXPOSED_REGIONS = frozenset({
+    "breasts",
+    "genitals",
+    "anus",
+    "buttocks",
+    "full_nude",
+    "underwear_panties",
+})
+_NON_L1_VISIBLE_REGIONS = frozenset({
+    "intimate_lower_body",
+    "crotch",
+    "underboob",
+    "sideboob",
+    "breasts",
+    "buttocks",
+    "pubic",
+})
+_L1_BANNED_THEMES = frozenset({
+    "theme_chikan_ntr",
+    "theme_humiliation_training",
+    "theme_special_state",
+    "theme_multi_person",
+    "theme_cohabitation_trip",
+    "theme_av_audition",
+    "theme_reverse_ntr",
+    "theme_yuri",
+    "theme_kinbaku",
+    "theme_netorare",
+    "theme_aphrodisiac",
+    "theme_blackmail",
+    "theme_drunken",
+    "theme_impregnation",
+    "theme_deepthroat",
+    "theme_facial",
+    "theme_nympho",
+    "theme_outdoor_exposure",
+    "theme_voyeur",
+    "theme_unconscious",
+    "theme_foot_fetish",
+    "theme_sm_dominance",
+    "theme_food_play",
+    "theme_remote_imagery",
+    "theme_nightlife_services",
+})
+_L2_BANNED_THEMES = frozenset({
+    "theme_av_audition",
+    "theme_impregnation",
+    "theme_deepthroat",
+    "theme_facial",
+    "theme_multi_person",
+    "theme_reverse_ntr",
+    "theme_nympho",
+    "theme_unconscious",
+    "theme_aphrodisiac",
+    "theme_outdoor_exposure",
+    "theme_remote_imagery",
+})
+_SAFE_NON_NUDE_PHRASE_RE = re.compile(
+    r"\b(?:sheer\s+nude\s+lip|nude\s+lip(?:\s+gloss)?|nude\s+peach|"
+    r"bare\s+(?:bulb|bulbs|tree|trees|wall|walls|face|brick|wood|concrete|floor|branch|branches)|"
+    r"ankle\s+bracelet)\b",
+    re.I,
+)
+_L1_NSFW_TEXT_RE = re.compile(
+    r"\b(?:raw\s+sex|raw\s+dogging|no\s+condom|unprotected\s+sex|creampie|cum\s+inside|"
+    r"cumshot|bukkake|cum\b|semen|ejaculation|blowjob|deepthroat|irrumatio|face\s+fucking|"
+    r"throat\s+fucking|handjob|fingering|masturbat\w*|orgasm|ahegao|threesome|foursome|"
+    r"gangbang|orgy|sex\s+addict|nympho|sleep\s+sex|video\s+call\s+sex|cam\s+sex|"
+    r"video\s+chat\s+sex|park\s+sex|outdoor\s+sex|rooftop\s+sex|beach\s+sex|mountain\s+sex|"
+    r"walking\s+after\s+sex|after\s+sex|post-sex|sponge\s+bath|mixed\s+bathing|one\s+night\s+stand|"
+    r"business\s+trip\s+affair|cheating\s+wife|netorare|chikan|bondage|shibari|kinbaku|"
+    r"vibrator|dildo|lube\s+bottle|mind\s+break|knocked\s+up|lactating|sloppy\s+seconds|"
+    r"nipple\w*|areola\w*|pussy|vagina|penis|cock|genitals|crotch|upskirt|downblouse|"
+    r"flashing|streaking|mooning|public\s+nudity|outdoor\s+exposure|exhibitionism|"
+    r"bare\s+breasts?|exposed\s+breasts?|covering\s+breasts?|below\s+breasts?|"
+    r"cupping\s+breasts?|skirt\s+(?:lifted|hiked|pulled|riding)|underboob|sideboob|cleavage|"
+    r"no\s+panties|no\s+bra|topless|bottomless|naked|nude|undressed|av\s+actress|gravure\s+model)\b",
+    re.I,
+)
+_L2_NSFW_TEXT_RE = re.compile(
+    r"\b(?:raw\s+sex|raw\s+dogging|no\s+condom|unprotected\s+sex|creampie|cum\s+inside|"
+    r"cumshot|bukkake|cum\b|semen|ejaculation|blowjob|deepthroat|irrumatio|face\s+fucking|"
+    r"throat\s+fucking|handjob|fingering|masturbat\w*|orgasm|ahegao|threesome|foursome|"
+    r"gangbang|orgy|sleep\s+sex|video\s+call\s+sex|cam\s+sex|park\s+sex|outdoor\s+sex|"
+    r"rooftop\s+sex|beach\s+sex|mountain\s+sex|after\s+sex|post-sex|"
+    r"vibrator|dildo|pussy|vagina|penis|cock|genitals|bare\s+breasts?|exposed\s+breasts?|"
+    r"nipple\w*|no\s+panties|no\s+bra|topless|bottomless|public\s+nudity)\b",
+    re.I,
+)
+_L6_INCOMPATIBLE_SHOT_IDS = frozenset({"close_up", "medium_close_up", "medium_shot"})
+_L6_UPPER_CUTOFF_RE = re.compile(
+    r"\b(?:waist-up\s+framing|chest-up\s+shot|upper\s+body\s+framing|half-body\s+portrait|"
+    r"face\s+shot\s+filling\s+frame|portrait\s+framing|medium\s+shot|medium\s+close-up|"
+    r"breast\s+and\s+cleavage\s+focus)\b",
+    re.I,
+)
+_L4_BRANCH_PREFERRED_STYLES: Dict[str, Set[str]] = {
+    "l4_hosiery_footwear_only": {
+        "clothing_legwear_combo",
+        "legwear_fishnet_pantyhose",
+        "legwear_fishnet_thighhighs",
+        "legwear_pantyhose",
+        "legwear_thighhighs",
+        "hosiery_legwear",
+        "footwear_boots",
+        "footwear_sneakers",
+    },
+    "l4_panties_only": {"lingerie_panties", "bikini_micro", "lingerie_lace"},
+    "l4_bra_and_panties": {
+        "lingerie_lace",
+        "lingerie_bra",
+        "lingerie_panties",
+        "bikini_classic",
+        "bikini_strappy",
+        "bikini_creative",
+        "bikini_micro",
+    },
+}
+_L3_BRANCH_PREFERRED_STYLES: Dict[str, Set[str]] = {
+    "l3_bra_pushed_up": {"lingerie_bra", "lingerie_lace", "jk_seifuku", "blazer_uniform", "ol_suit"},
+    "l3_bikini_top_removed": {"bikini_classic", "bikini_strappy", "bikini_creative", "bikini_micro"},
+    "l3_panties_only": {"lingerie_panties", "bikini_micro", "lingerie_lace"},
+}
+
+
+def _is_tag_compatible_with_nudity(
+    tag: Any,
+    nudity_level_code: Optional[str],
+    *,
+    slot_name: str = "",
+    item_id: str = "",
+    nudity_branch: Optional[str] = None,
+) -> bool:
+    """判定跨槽位标签是否与目标裸露等级/分支相容（优先结构化事实，其次安全关键词保底）。"""
+    if not nudity_level_code:
+        return True
+
+    facts = tag.get("facts", {}) if isinstance(tag, dict) else {}
+    txt = str(tag.get("text", "") if isinstance(tag, dict) else tag).strip()
+    tl = txt.lower()
+    is_safe_phrase = bool(_SAFE_NON_NUDE_PHRASE_RE.search(tl))
+
+    if isinstance(facts, dict):
+        allowed_lvls = facts.get("allowed_nudity_levels") or ()
+        if allowed_lvls and nudity_level_code not in allowed_lvls:
+            return False
+
+        exp_regions = set(facts.get("exposed_regions") or ())
+        vis_regions = set(facts.get("visible_regions") or ())
+        liq_kind = facts.get("liquid_kind")
+
+        if nudity_level_code == "L1":
+            if exp_regions & _NON_L1_EXPOSED_REGIONS:
+                return False
+            if vis_regions & _NON_L1_VISIBLE_REGIONS:
+                return False
+            if liq_kind in ("sexual_fluid", "cum", "semen"):
+                return False
+        elif nudity_level_code == "L2":
+            if exp_regions & _NON_L2_EXPOSED_REGIONS:
+                return False
+            if vis_regions & {"intimate_lower_body", "crotch"}:
+                return False
+            if liq_kind in ("sexual_fluid", "cum", "semen"):
+                return False
+        elif nudity_level_code == "L6" and slot_name == "shot_type":
+            if item_id in _L6_INCOMPATIBLE_SHOT_IDS:
+                return False
+            if (vis_regions & {"face", "upper_body"}) and not (vis_regions & {"lower_body", "intimate_lower_body", "full_body"}):
+                return False
+            if exp_regions and "breasts" in exp_regions and "genitals" not in exp_regions:
+                return False
+
+    if nudity_level_code == "L6" and slot_name == "shot_type":
+        if item_id in _L6_INCOMPATIBLE_SHOT_IDS or _L6_UPPER_CUTOFF_RE.search(tl):
+            return False
+    elif nudity_level_code == "L1" and not is_safe_phrase:
+        if slot_name in ("theme", "scene_theme") and item_id in _L1_BANNED_THEMES:
+            return False
+        if slot_name == "props" and item_id in ("sex_toy_vibrator", "bondage_rope_collar"):
+            return False
+        if _L1_NSFW_TEXT_RE.search(tl):
+            return False
+    elif nudity_level_code == "L2" and not is_safe_phrase:
+        if slot_name in ("theme", "scene_theme") and item_id in _L2_BANNED_THEMES:
+            return False
+        if slot_name == "props" and item_id in ("sex_toy_vibrator",):
+            return False
+        if _L2_NSFW_TEXT_RE.search(tl):
+            return False
+
+    return True
+
+
+def _collect_item_tags(item: Dict[str, Any]) -> List[Any]:
+    tags: List[Any] = []
+    for k in ("tags", "anchor_tags", "detail_tags"):
+        if isinstance(item.get(k), list):
+            tags.extend(item[k])
+    for sub in item.get("subcategories", []):
+        if isinstance(sub, dict) and isinstance(sub.get("tags"), list):
+            tags.extend(sub["tags"])
+    for it in item.get("items", []):
+        if isinstance(it, dict) and isinstance(it.get("tags"), list):
+            tags.extend(it["tags"])
+    return tags
+
+
+def _choose_coherent_branch(
+    lvl_code: str,
+    raw_tags: Sequence[Any],
+    rng: Random,
+    explicit_branch: Optional[str] = None,
+) -> Optional[str]:
+    """为目标等级选定唯一状态分支；有标签集合时确保所选分支在集合内至少存在 1 条相容词条。"""
+    allowed = tuple(NUDITY_BRANCHES_BY_LEVEL.get(lvl_code, ()))
+    if not allowed:
+        return None
+    if explicit_branch and explicit_branch in allowed:
+        return explicit_branch
+
+    tag_branches: Set[str] = set()
+    for t in raw_tags:
+        if isinstance(t, dict):
+            f = t.get("facts") or {}
+            if isinstance(f, dict):
+                for b in f.get("nudity_branches") or ():
+                    if b in allowed:
+                        tag_branches.add(b)
+    pool = [b for b in allowed if b in tag_branches] if raw_tags and tag_branches else list(allowed)
+    return rng.choice(pool) if pool else allowed[0]
+
+
+def _is_linkage_tag_compatible_with_branch(
+    tag: Any,
+    lvl_code: Optional[str],
+    nudity_branch: Optional[str],
+) -> bool:
+    """过滤 clothing_nudity_linkage 的通用联动词条，确保与单一选定分支及等级规则一致。"""
+    if not isinstance(tag, dict):
+        return True
+    facts = tag.get("facts") or {}
+    txt = str(tag.get("text", "")).lower()
+
+    if lvl_code == "L4":
+        topos = set(facts.get("garment_topologies") or ())
+        if topos & {"top", "bottom_pants", "bottom_skirt", "outerwear", "one_piece", "ensemble_outfit"}:
+            return False
+        if nudity_branch == "l4_bra_and_panties":
+            if (
+                "topless" in txt
+                or "bare breasts" in txt
+                or "only lace panties" in txt
+                or "breasts" in (facts.get("exposed_regions") or ())
+            ):
+                return False
+        elif nudity_branch in ("l4_hosiery_footwear_only", "l4_towel_sheet_wrap", "l4_accessory_only"):
+            if "panties" in txt or "bra" in txt or "underwear" in topos:
+                return False
+
+    if not nudity_branch:
+        return True
+
+    tag_branches = facts.get("nudity_branches") or ()
+    if tag_branches and nudity_branch not in tag_branches:
+        return False
+
+    if nudity_branch == "l5_clothes_discarded_nearby":
+        return True
+    if nudity_branch == "l5_full_nude_standing_or_frontal":
+        if "discarded" in (facts.get("garment_states") or ()) or "discarded" in txt or "tossed aside" in txt:
+            return False
+
+    if lvl_code == "L3":
+        if nudity_branch == "l3_panties_only":
+            if any(w in txt for w in ("shirt", "blouse", "skirt", "dress", "bra")):
+                return False
+        elif nudity_branch == "l3_topless_skirt_kept":
+            if any(w in txt for w in ("shirt open", "dress bunched", "bra")):
+                return False
+        elif nudity_branch == "l3_topless_pants_kept":
+            if any(w in txt for w in ("shirt open", "dress bunched", "skirt", "bra")):
+                return False
+        elif nudity_branch == "l3_pulled_down_dress":
+            if any(w in txt for w in ("shirt open", "skirt hitched")):
+                return False
+        elif nudity_branch == "l3_open_shirt_breasts":
+            if any(w in txt for w in ("dress bunched", "skirt hitched")):
+                return False
+        elif nudity_branch == "l3_raised_top_breasts":
+            if any(w in txt for w in ("dress bunched", "skirt hitched")):
+                return False
+        elif nudity_branch == "l3_bra_pushed_up":
+            if any(w in txt for w in ("dress bunched", "skirt hitched")):
+                return False
+        elif nudity_branch == "l3_bikini_top_removed":
+            if any(w in txt for w in ("shirt open", "dress bunched", "skirt hitched")):
+                return False
+
+    if lvl_code == "L4":
+        if nudity_branch == "l4_hosiery_footwear_only":
+            if any(w in txt for w in ("panties", "bra", "underwear")):
+                return False
+        elif nudity_branch == "l4_towel_sheet_wrap":
+            if any(w in txt for w in ("panties", "bra", "underwear")):
+                return False
+        elif nudity_branch == "l4_accessory_only":
+            if any(w in txt for w in ("panties", "bra", "underwear")):
+                return False
+        elif nudity_branch == "l4_panties_only":
+            if "bra" in txt and "panties" not in txt:
+                return False
+
+    return True
 
 
 class ExactCatalogIndex:
@@ -693,37 +1025,102 @@ class DataSampler:
         pose_id: Optional[str] = None,
         hand_state: Optional[str] = None,
         context: Optional[str] = None,
+        nudity_branch: Optional[str] = None,
     ) -> Set[str]:
-        """依据已知硬约束规则，在实际抽样前精确生成被排除的冲突候选 ID 集合。
-
-        已知硬约束规约：
-        1. camera_angle:
-           - L1 裸露等级下排除窥底/情色视角 (between_legs_angle)；
-        2. clothing:
-           - 当指定为解扣状态时，排除无纽扣/拉链开合能力的连体衣/泳装/无开合结构款式；
-           - 当指定为掀裙状态时，核验款式具备裙装载体（自身拓扑含 bottom_skirt、支持对应 modifier，或非排除名单的连体裙装），排除无裙摆款式（如袜类、上衣、裤装、非裙连体衣等）；
-           - L1 裸露等级下排除超微比基尼/裸体缎带/情趣束缚等极度暴露款式；
-        3. lighting:
-           - L1 裸露等级下排除情色光影 (erotic_lighting_00..03)；
-        4. pose:
-           - 构图景别属于软偏好 (规则 13)，画外体态具有电影叙事合法性，绝不硬排除 all_fours, kneeling, limb_posture；
-           - L1 裸露等级下按标签事实执行内容过滤（杜绝整类误杀非情色动作）；
-        5. props:
-           - 依据规则 9 (2-Hand Capacity Model)，严格依据姿势事实判断占用数；双手均被占用时排除需要手持的款式，严格保留穿戴类 (fashion_baguette_bag, glasses_reading) 与环境类道具；
-           - L1 裸露等级下排除成人情趣道具 (sex_toy_vibrator, bondage_rope_collar)。
-        """
+        """依据已知硬约束规则，在实际抽样前精确生成被排除的冲突候选 ID 集合。"""
         excluded: Set[str] = set()
+
+        def _exclude_if_no_compatible_tag(items: Sequence[Dict[str, Any]], check_slot: str) -> None:
+            for it in items:
+                iid = it.get("id")
+                if not iid or iid == "none":
+                    continue
+                tags = _collect_item_tags(it)
+                if not tags:
+                    if not _is_tag_compatible_with_nudity(
+                        {"text": it.get("name_zh", iid)},
+                        nudity_level_code,
+                        slot_name=check_slot,
+                        item_id=iid,
+                        nudity_branch=nudity_branch,
+                    ):
+                        excluded.add(iid)
+                    continue
+                if not any(
+                    _is_tag_compatible_with_nudity(
+                        t,
+                        nudity_level_code,
+                        slot_name=check_slot,
+                        item_id=iid,
+                        nudity_branch=nudity_branch,
+                    )
+                    for t in tags
+                ):
+                    excluded.add(iid)
 
         if slot_name == "camera_angle":
             if nudity_level_code == "L1":
                 excluded.add("between_legs_angle")
+            elif nudity_level_code in ("L1", "L2"):
+                data = self._load("shot_types")
+                _exclude_if_no_compatible_tag(data.get("camera_angles", []), "camera_angle")
+
+        elif slot_name == "shot_type":
+            if nudity_level_code == "L6":
+                excluded.update(_L6_INCOMPATIBLE_SHOT_IDS)
+            if nudity_level_code in ("L1", "L2", "L6"):
+                data = self._load("shot_types")
+                _exclude_if_no_compatible_tag(data.get("shot_types", []), "shot_type")
+
+        elif slot_name in ("theme", "scene_theme"):
+            if nudity_level_code == "L1":
+                excluded.update(_L1_BANNED_THEMES)
+            elif nudity_level_code == "L2":
+                excluded.update(_L2_BANNED_THEMES)
+            if nudity_level_code in ("L1", "L2"):
+                data = self._load("themes")
+                _exclude_if_no_compatible_tag(data.get("themes", []), "theme")
+
+        elif slot_name == "hairstyle":
+            if nudity_level_code in ("L1", "L2"):
+                data = self._load("accessories")
+                _exclude_if_no_compatible_tag(data.get("hairstyles", []), "hairstyle")
+
+        elif slot_name == "jewelry":
+            if nudity_level_code in ("L1", "L2"):
+                data = self._load("accessories")
+                items = list(data.get("headwear_jewelry", [])) + list(data.get("jewelry", []))
+                _exclude_if_no_compatible_tag(items, "jewelry")
+
+        elif slot_name == "tattoo":
+            if nudity_level_code in ("L1", "L2"):
+                data = self._load("tattoos")
+                _exclude_if_no_compatible_tag(data.get("categories", []), "tattoo")
+
+        elif slot_name == "liquids":
+            if nudity_level_code in ("L1", "L2"):
+                data = self._load("nudity_levels")
+                liquids = data.get("body_liquids", []) + data.get("environmental_liquids", [])
+                if not liquids:
+                    liquids = data.get("liquid_effects", [])
+                _exclude_if_no_compatible_tag(liquids, "liquids")
 
         elif slot_name == "lighting":
-            # L1 级别下保留具有合法光影事实的预设 (如屏幕光、走廊漏光、冰箱光等)，由标签层执行具体内容过滤，不整类禁用
-            pass
+            if nudity_level_code in ("L1", "L2"):
+                data = self._load("lighting")
+                for group in data.values():
+                    if isinstance(group, list):
+                        for item in group:
+                            if isinstance(item, dict) and item.get("id"):
+                                base_tags = item.get("tags", [])
+                                if nudity_level_code == "L1" and base_tags:
+                                    if not any(
+                                        _is_tag_compatible_with_nudity(t, "L1", slot_name="lighting", item_id=item["id"])
+                                        for t in base_tags
+                                    ):
+                                        excluded.add(item["id"])
 
         elif slot_name == "props":
-            # 依据规则 9 (2-Hand Capacity Model)：严格依据姿势事实判断占用数
             hands_occupied = 0
             if hand_state in ("both_busy", "restrained"):
                 hands_occupied = 2
@@ -742,7 +1139,6 @@ class DataSampler:
 
             available_hands = max(0, 2 - hands_occupied)
 
-            # 按剩余手部容量筛选具体变体，仅在没有合法变体时排除类别 (杜绝误杀具有免手持变体的类别)
             data = self._load("props")
             for cat in data.get("categories", []):
                 cid = cat.get("id")
@@ -766,7 +1162,7 @@ class DataSampler:
                         continue
                     if available_hands == 0 and usage == "handheld":
                         continue
-                    if nudity_level_code == "L1" and cid in ("sex_toy_vibrator", "bondage_rope_collar"):
+                    if not _is_tag_compatible_with_nudity(t, nudity_level_code, slot_name="props", item_id=cid):
                         continue
                     has_valid_variant = True
                     break
@@ -776,10 +1172,13 @@ class DataSampler:
 
             if nudity_level_code == "L1":
                 excluded.update({"sex_toy_vibrator", "bondage_rope_collar"})
+            elif nudity_level_code == "L2":
+                excluded.add("sex_toy_vibrator")
 
         elif slot_name == "pose":
-            # 景别构图属于软偏好 (规则 13)，不硬排除姿势动作；L1 级别下按标签事实执行内容过滤
-            pass
+            if nudity_level_code in ("L1", "L2"):
+                data = self._load("poses")
+                _exclude_if_no_compatible_tag(data.get("pose_categories", []), "pose")
 
         elif slot_name == "clothing":
             data = None
@@ -807,6 +1206,68 @@ class DataSampler:
                     tags = c.get("tags", [])
                     if cid and tags and not any(is_tag_eligible_for_nudity_level(t, nudity_level_code) for t in tags):
                         excluded.add(cid)
+            elif nudity_level_code == "L4" and nudity_branch in _L4_BRANCH_PREFERRED_STYLES:
+                preferred = _L4_BRANCH_PREFERRED_STYLES[nudity_branch]
+                if data is None:
+                    data = self._load("clothing")
+                all_cids = {c.get("id") for c in data.get("categories", []) if c.get("id")}
+                if preferred & all_cids:
+                    excluded.update(all_cids - preferred)
+            elif nudity_level_code == "L3" and nudity_branch:
+                if data is None:
+                    data = self._load("clothing")
+                cats = data.get("categories", [])
+                all_cids = {c.get("id") for c in cats if c.get("id")}
+                if nudity_branch in _L3_BRANCH_PREFERRED_STYLES:
+                    preferred = _L3_BRANCH_PREFERRED_STYLES[nudity_branch]
+                    if preferred & all_cids:
+                        excluded.update(all_cids - preferred)
+                elif nudity_branch == "l3_open_shirt_breasts":
+                    excluded.update(all_cids - set(ALLOWED_BUTTON_STYLES))
+                elif nudity_branch == "l3_topless_skirt_kept":
+                    skirt_ids = {c.get("id") for c in cats if c.get("id") and self._is_clothing_skirt_compatible(c)}
+                    if skirt_ids:
+                        excluded.update(all_cids - skirt_ids)
+                elif nudity_branch == "l3_topless_pants_kept":
+                    pants_ids = {
+                        c.get("id")
+                        for c in cats
+                        if c.get("id")
+                        and any(
+                            "bottom_pants" in ((t.get("facts") or {}).get("garment_topologies") or ())
+                            for t in c.get("tags", [])
+                            if isinstance(t, dict)
+                        )
+                    }
+                    if pants_ids:
+                        excluded.update(all_cids - pants_ids)
+                elif nudity_branch == "l3_pulled_down_dress":
+                    dress_ids = {
+                        c.get("id")
+                        for c in cats
+                        if c.get("id")
+                        and c.get("id") not in NON_SKIRT_ONE_PIECE
+                        and any(
+                            "one_piece" in ((t.get("facts") or {}).get("garment_topologies") or ())
+                            for t in c.get("tags", [])
+                            if isinstance(t, dict)
+                        )
+                    }
+                    if dress_ids:
+                        excluded.update(all_cids - dress_ids)
+                elif nudity_branch == "l3_raised_top_breasts":
+                    top_ids = {
+                        c.get("id")
+                        for c in cats
+                        if c.get("id")
+                        and any(
+                            "top" in ((t.get("facts") or {}).get("garment_topologies") or ())
+                            for t in c.get("tags", [])
+                            if isinstance(t, dict)
+                        )
+                    }
+                    if top_ids:
+                        excluded.update(all_cids - top_ids)
 
         return excluded
 
@@ -1522,7 +1983,12 @@ class DataSampler:
         res = self.sample_scene_result(category, rng)
         return list(res.tags) if res else []
 
-    def sample_theme_result(self, theme: str, rng: Random) -> Optional[ThemeSampleResult]:
+    def sample_theme_result(
+        self,
+        theme: str,
+        rng: Random,
+        nudity_level_code: Optional[str] = None,
+    ) -> Optional[ThemeSampleResult]:
         if _is_none(theme):
             return None
         data = self._load("themes")
@@ -1530,13 +1996,19 @@ class DataSampler:
         if not themes:
             return None
 
-        if _is_random(theme):
-            t = self._pick_one(themes, rng)
+        is_rand = _is_random(theme) or _is_auto(theme)
+        if is_rand:
+            excluded_ids = self.get_excluded_candidate_ids("theme", nudity_level_code=nudity_level_code)
+            pool = [t for t in themes if t.get("id") not in excluded_ids] if excluded_ids else list(themes)
+            if not pool:
+                pool = list(themes)
+            t = self._pick_one(pool, rng)
             self._record_pool_sampling_rationale(
                 t,
-                themes,
+                pool,
                 mode="uniform_random",
-                active_contexts=t.get("context_ids", ()),
+                active_contexts=t.get("context_ids", ()) if t else (),
+                excluded_ids=excluded_ids,
             )
         else:
             idx = self._get_catalog_index("themes", themes)
@@ -1545,7 +2017,14 @@ class DataSampler:
                 raise DataSelectionError(f"Unknown theme: {theme!r}")
 
         t_id = t.get("id", "theme_unknown")
-        raw_tags = t.get("tags", [])
+        raw_tags = list(t.get("tags", []))
+        if is_rand and nudity_level_code in ("L1", "L2"):
+            filtered_tags = [
+                tg for tg in raw_tags
+                if _is_tag_compatible_with_nudity(tg, nudity_level_code, slot_name="theme", item_id=t_id)
+            ]
+            if filtered_tags:
+                raw_tags = filtered_tags
         sampled_raw = rng.sample(raw_tags, min(rng.randint(2, 3), len(raw_tags))) if raw_tags else []
         prov = TagProvenance(
             item_id=t_id,
@@ -1581,18 +2060,30 @@ class DataSampler:
             theme_id=t_id,
             provenance=prov,
             context_ids=ctx_ids,
-            sampling_rationale=self._pop_sampling_rationale(t_id, "random" if _is_random(theme) else "explicit", active_contexts=ctx_ids),
+            sampling_rationale=self._pop_sampling_rationale(t_id, "random" if is_rand else "explicit", active_contexts=ctx_ids),
         )
 
-    def sample_theme(self, theme: str, rng: Random) -> List[str]:
+    def sample_theme(
+        self,
+        theme: str,
+        rng: Random,
+        nudity_level_code: Optional[str] = None,
+    ) -> List[str]:
         if _is_none(theme):
             return []
-        res = self.sample_theme_result(theme, rng)
+        res = self.sample_theme_result(theme, rng, nudity_level_code=nudity_level_code)
         return list(res.all_text_tags) if res else []
 
     # ─── 槽位 2: 景别 + 视角 + 画质/设备 ───
 
-    def sample_shot_type_result(self, shot_type: str, rng: Random, context_profile: Optional[ContextProfile] = None) -> Optional[SampleResult]:
+    def sample_shot_type_result(
+        self,
+        shot_type: str,
+        rng: Random,
+        context_profile: Optional[ContextProfile] = None,
+        nudity_level_code: Optional[str] = None,
+        nudity_branch: Optional[str] = None,
+    ) -> Optional[SampleResult]:
         if _is_none(shot_type):
             return None
         data = self._load("shot_types")
@@ -1601,8 +2092,22 @@ class DataSampler:
             return None
 
         target_tag = None
-        if _is_random(shot_type) or _is_auto(shot_type):
-            chosen = self._sample_from_candidates("shot_type", shots, rng, profile=context_profile)
+        is_rand_or_auto = _is_random(shot_type) or _is_auto(shot_type)
+        if is_rand_or_auto:
+            excluded_ids = self.get_excluded_candidate_ids(
+                "shot_type",
+                nudity_level_code=nudity_level_code,
+                nudity_branch=nudity_branch,
+            )
+            chosen = self._sample_from_candidates(
+                "shot_type",
+                shots,
+                rng,
+                profile=context_profile,
+                excluded_ids=excluded_ids,
+            )
+            if not chosen:
+                return None
         else:
             chosen = _match_item(shots, shot_type, "shot_types")
             if not chosen:
@@ -1612,12 +2117,25 @@ class DataSampler:
             if not chosen:
                 raise DataSelectionError(f"Unknown shot type: {shot_type!r}")
 
-        raw_tags = chosen.get("tags", [])
+        raw_tags = list(chosen.get("tags", []))
+        item_id = chosen.get("id", "shot_type_custom")
+        if is_rand_or_auto and nudity_level_code in ("L1", "L2", "L6"):
+            filtered_tags = [
+                tg for tg in raw_tags
+                if _is_tag_compatible_with_nudity(
+                    tg,
+                    nudity_level_code,
+                    slot_name="shot_type",
+                    item_id=item_id,
+                    nudity_branch=nudity_branch,
+                )
+            ]
+            if filtered_tags:
+                raw_tags = filtered_tags
         if target_tag:
             selected_raw = [target_tag]
         else:
             selected_raw = raw_tags[:2] if raw_tags else []
-        item_id = chosen.get("id", "shot_type_custom")
         tags_str, sampled = self._to_sampled_tags(selected_raw, item_id, "shot_type")
         prov = TagProvenance(
             item_id=item_id,
@@ -1629,11 +2147,22 @@ class DataSampler:
             item_id=item_id,
             provenance=prov,
             sampled_tags=sampled,
-            sampling_rationale=self._pop_sampling_rationale(item_id, "random" if _is_random(shot_type) or _is_auto(shot_type) else "explicit"),
+            sampling_rationale=self._pop_sampling_rationale(item_id, "random" if is_rand_or_auto else "explicit"),
         )
 
-    def sample_shot_type(self, shot_type: str, rng: Random) -> List[str]:
-        res = self.sample_shot_type_result(shot_type, rng)
+    def sample_shot_type(
+        self,
+        shot_type: str,
+        rng: Random,
+        nudity_level_code: Optional[str] = None,
+        nudity_branch: Optional[str] = None,
+    ) -> List[str]:
+        res = self.sample_shot_type_result(
+            shot_type,
+            rng,
+            nudity_level_code=nudity_level_code,
+            nudity_branch=nudity_branch,
+        )
         return list(res.tags) if res else []
 
     def sample_camera_angle_result(
@@ -1658,7 +2187,8 @@ class DataSampler:
         )
 
         target_tag = None
-        if _is_random(angle) or _is_auto(angle):
+        is_rand_or_auto = _is_random(angle) or _is_auto(angle)
+        if is_rand_or_auto:
             chosen = self._sample_from_candidates(
                 "camera_angle",
                 angles,
@@ -1677,12 +2207,19 @@ class DataSampler:
             if not chosen:
                 raise DataSelectionError(f"Unknown camera angle: {angle!r}")
 
-        raw_tags = chosen.get("tags", [])
+        raw_tags = list(chosen.get("tags", []))
+        item_id = chosen.get("id", "camera_angle_custom")
+        if is_rand_or_auto and nudity_level_code in ("L1", "L2", "L6"):
+            filtered_tags = [
+                tg for tg in raw_tags
+                if _is_tag_compatible_with_nudity(tg, nudity_level_code, slot_name="camera_angle", item_id=item_id)
+            ]
+            if filtered_tags:
+                raw_tags = filtered_tags
         if target_tag:
             selected_raw = [target_tag]
         else:
             selected_raw = self._pick(raw_tags, rng, 1) if raw_tags else []
-        item_id = chosen.get("id", "camera_angle_custom")
         tags_str, sampled = self._to_sampled_tags(selected_raw, item_id, "camera_angle")
         prov = TagProvenance(
             item_id=item_id,
@@ -1768,14 +2305,19 @@ class DataSampler:
 
     # ─── 槽位 3: 裸露状态 ───
 
-    def sample_nudity_result(self, level: str | int, rng: Random) -> Tuple[Optional[SampleResult], str]:
+    def _sample_nudity_result_with_branch(
+        self,
+        level: str | int,
+        rng: Random,
+        branch: Optional[str] = None,
+    ) -> Tuple[Optional[SampleResult], str, Optional[str]]:
         if _is_none(level):
-            return (None, "L1")
+            return (None, "L1", None)
 
         data = self._load("nudity_levels")
         levels = data.get("nudity_levels", [])
         if not levels:
-            return (None, "L3")
+            return (None, "L3", None)
 
         if _is_random(level):
             lvl = self._pick_one(levels, rng)
@@ -1801,7 +2343,16 @@ class DataSampler:
                 lvl_code = code
                 break
 
-        raw_tags = lvl.get("tags", [])
+        raw_tags = list(lvl.get("tags", []))
+        selected_branch = _choose_coherent_branch(lvl_code, raw_tags, rng, explicit_branch=branch)
+        if selected_branch:
+            branch_tags = [
+                t for t in raw_tags
+                if isinstance(t, dict)
+                and selected_branch in ((t.get("facts") or {}).get("nudity_branches") or ())
+            ]
+            if branch_tags:
+                raw_tags = branch_tags
         selected = self._pick(raw_tags, rng, min(rng.randint(2, 3), len(raw_tags))) if raw_tags else []
         item_id = lvl.get("id", f"nudity_{lvl_code}")
         tags_str, sampled = self._to_sampled_tags(selected, item_id, "nudity")
@@ -1816,11 +2367,25 @@ class DataSampler:
             provenance=prov,
             sampled_tags=sampled,
             sampling_rationale=self._pop_sampling_rationale(item_id, "random" if _is_random(level) else "explicit"),
-        ), lvl_code
+        ), lvl_code, selected_branch
 
-    def sample_nudity(self, level: str | int, rng: Random) -> Tuple[List[str], str]:
+    def sample_nudity_result(
+        self,
+        level: str | int,
+        rng: Random,
+        branch: Optional[str] = None,
+    ) -> Tuple[Optional[SampleResult], str]:
+        res, lvl_code, _ = self._sample_nudity_result_with_branch(level, rng, branch=branch)
+        return res, lvl_code
+
+    def sample_nudity(
+        self,
+        level: str | int,
+        rng: Random,
+        branch: Optional[str] = None,
+    ) -> Tuple[List[str], str]:
         """返回 (采样tags, 标准等级代码比如L1/L2/L3/L4/L5/L6)"""
-        res, lvl_code = self.sample_nudity_result(level, rng)
+        res, lvl_code = self.sample_nudity_result(level, rng, branch=branch)
         return (list(res.tags) if res else [], lvl_code)
 
     def _resolve_explicit_nudity_level_code(self, level: str | int) -> str:
@@ -1848,10 +2413,10 @@ class DataSampler:
         external_overrides: Optional[Dict[str, Any]] = None,
     ) -> Tuple[Optional[SampleResult], NudityConstraint]:
         """
-        解析统一裸露等级约束对象 (NudityConstraint)，并按需执行裸露标签采样。
-        - has_preset=False: 显式/随机/None 均记录 requested/effective/source 并返回采样结果；
-        - has_preset=True: 若 UI 显式选择 L1-L6 则记录 ui_explicit，若为随机则记录 preset_native；
-          若 UI 为 None 则记录 ui_none。预设标签自身的等级过滤与采样在 M3 阶段打通。
+        解析统一裸露等级约束对象 (NudityConstraint)，并按需执行单一相容分支裸露标签采样。
+        - has_preset=False: 显式/随机/None 均记录 requested/effective/source/selected_branch 并返回采样结果；
+        - has_preset=True: 若 UI 显式选择 L1-L6 则记录 ui_explicit + selected_branch，若为随机则记录 preset_native；
+          若 UI 为 None 则记录 ui_none。
         - external_overrides['nudity'] 若直接携带可识别等级编码，记录 external_override 与让位说明；
           其余外部自由文本覆盖在冲突消解阶段由 ConflictResolver 判定并回填让位标记。
         """
@@ -1859,6 +2424,7 @@ class DataSampler:
         res: Optional[SampleResult] = None
         yielded = False
         yield_reason: Optional[str] = None
+        selected_branch: Optional[str] = None
 
         if _is_none(level):
             requested_level = "none"
@@ -1870,14 +2436,21 @@ class DataSampler:
                 effective_level = None
                 source = "preset_native"
             else:
-                res, lvl_code = self.sample_nudity_result(level, rng)
+                res, lvl_code, selected_branch = self._sample_nudity_result_with_branch(level, rng)
                 effective_level = lvl_code
                 source = "ui_random"
         else:
             if has_preset:
                 lvl_code = self._resolve_explicit_nudity_level_code(level)
+                data = self._load("nudity_levels")
+                lvl_item = next(
+                    (it for it in data.get("nudity_levels", []) if it.get("level") == lvl_code),
+                    None,
+                )
+                lvl_tags = lvl_item.get("tags", []) if isinstance(lvl_item, dict) else ()
+                selected_branch = _choose_coherent_branch(lvl_code, lvl_tags, rng)
             else:
-                res, lvl_code = self.sample_nudity_result(level, rng)
+                res, lvl_code, selected_branch = self._sample_nudity_result_with_branch(level, rng)
             requested_level = lvl_code
             effective_level = lvl_code
             source = "ui_explicit"
@@ -1889,6 +2462,14 @@ class DataSampler:
                 if (effective_level is not None and effective_level != ext_code) or requested_level == "none":
                     yielded = True
                     yield_reason = "external_nudity_override"
+                if ext_code != effective_level or not selected_branch:
+                    data = self._load("nudity_levels")
+                    lvl_item = next(
+                        (it for it in data.get("nudity_levels", []) if it.get("level") == ext_code),
+                        None,
+                    )
+                    lvl_tags = lvl_item.get("tags", []) if isinstance(lvl_item, dict) else ()
+                    selected_branch = _choose_coherent_branch(ext_code, lvl_tags, rng)
                 effective_level = ext_code
                 source = "external_override"
 
@@ -1896,7 +2477,7 @@ class DataSampler:
             requested_level=requested_level,
             effective_level=effective_level,
             source=source,
-            selected_branch=None,
+            selected_branch=selected_branch,
             yielded_to_override=yielded,
             yield_reason=yield_reason,
             raw_requested_value=raw_val,
@@ -1955,6 +2536,7 @@ class DataSampler:
             nudity_level_code=nudity_level_code,
             clothing_state=state,
             context=context,
+            nudity_branch=nudity_branch if style_mode in (SelectionMode.RANDOM, SelectionMode.AUTO) else None,
         )
         if extra_excluded_ids:
             excluded_ids = set(excluded_ids) | set(extra_excluded_ids)
@@ -2095,6 +2677,15 @@ class DataSampler:
                 and final_base
                 and any(bool(t.facts and t.facts.piece_role) for t in full_base_tags_tuple)
             ):
+                repair_rng = derive_deterministic_child_rng(
+                    rng,
+                    style,
+                    state,
+                    nudity_level_code,
+                    nudity_branch or "",
+                    c_id,
+                    "ensemble_repair",
+                )
                 final_base, repaired_ensemble = repair_ensemble_subsampling(
                     full_base_tags_tuple,
                     final_base,
@@ -2103,7 +2694,7 @@ class DataSampler:
                     state_tags=final_state_tags,
                     nudity_level_code=nudity_level_code,
                     nudity_branch=nudity_branch,
-                    repair_rng=_get_comp_rng(),
+                    repair_rng=repair_rng,
                 )
 
             if exemption.is_exempt:
@@ -2195,6 +2786,13 @@ class DataSampler:
         if nudity_level_code in ("L1", "L5", "L6"):
             if c_id in style_overrides:
                 override_tags = list(style_overrides[c_id])
+                if nudity_level_code == "L5" and nudity_branch:
+                    branch_ov = [
+                        t for t in override_tags
+                        if _is_linkage_tag_compatible_with_branch(t, nudity_level_code, nudity_branch)
+                    ]
+                    if branch_ov:
+                        override_tags = branch_ov
                 _, state_tags_list = self._to_sampled_tags(
                     override_tags,
                     c_id,
@@ -2208,8 +2806,28 @@ class DataSampler:
                     allow_extensions=False,
                 )
             else:
-                gen_tags = linkage_data.get("general_tags", [])
-                chosen_gen = self._pick(gen_tags, rng, min(2, len(gen_tags)))
+                gen_tags = list(linkage_data.get("general_tags", []))
+                if nudity_branch:
+                    branch_gen = [
+                        t for t in gen_tags
+                        if _is_linkage_tag_compatible_with_branch(t, nudity_level_code, nudity_branch)
+                    ]
+                    if branch_gen:
+                        gen_tags = branch_gen
+                if nudity_level_code == "L5" and nudity_branch == "l5_clothes_discarded_nearby":
+                    discarded_pool = [
+                        t for t in gen_tags
+                        if isinstance(t, dict) and "discarded" in ((t.get("facts") or {}).get("garment_states") or ())
+                    ]
+                    non_discarded_pool = [t for t in gen_tags if t not in discarded_pool]
+                    if discarded_pool:
+                        chosen_gen = [self._pick_one(discarded_pool, rng)]
+                        if non_discarded_pool:
+                            chosen_gen.append(self._pick_one(non_discarded_pool, rng))
+                    else:
+                        chosen_gen = self._pick(gen_tags, rng, min(2, len(gen_tags)))
+                else:
+                    chosen_gen = self._pick(gen_tags, rng, min(2, len(gen_tags)))
                 _, state_tags_list = self._to_sampled_tags(
                     chosen_gen,
                     "linkage_general",
@@ -2234,6 +2852,13 @@ class DataSampler:
             # L2, L3, L4 Auto mode
             if c_id in style_overrides:
                 override_tags = list(style_overrides[c_id])
+                if nudity_level_code in ("L3", "L4") or nudity_branch:
+                    branch_ov = [
+                        t for t in override_tags
+                        if _is_linkage_tag_compatible_with_branch(t, nudity_level_code, nudity_branch)
+                    ]
+                    if branch_ov:
+                        override_tags = branch_ov
                 _, state_tags_list = self._to_sampled_tags(
                     override_tags,
                     c_id,
@@ -2241,7 +2866,14 @@ class DataSampler:
                     semantic_ids=(f"clothing:{c_id}", f"nudity:{nudity_level_code}", "override:linkage")
                 )
             else:
-                gen_tags = linkage_data.get("general_tags", [])
+                gen_tags = list(linkage_data.get("general_tags", []))
+                if nudity_level_code in ("L3", "L4") or nudity_branch:
+                    branch_gen = [
+                        t for t in gen_tags
+                        if _is_linkage_tag_compatible_with_branch(t, nudity_level_code, nudity_branch)
+                    ]
+                    if branch_gen:
+                        gen_tags = branch_gen
                 chosen_gen = self._pick(gen_tags, rng, min(2, len(gen_tags)))
                 _, state_tags_list = self._to_sampled_tags(
                     chosen_gen,
@@ -2249,11 +2881,23 @@ class DataSampler:
                     "clothing_state",
                     semantic_ids=(f"clothing:{c_id}", f"nudity:{nudity_level_code}", "linkage:general")
                 )
-                if has_variant_metadata:
+                if (
+                    nudity_level_code == "L4"
+                    and nudity_branch in ("l4_towel_sheet_wrap", "l4_accessory_only")
+                    and style_mode in (SelectionMode.RANDOM, SelectionMode.AUTO)
+                ):
+                    chosen_base = ()
+                elif has_variant_metadata:
                     chosen_base = self._sample_controlled_base_clothing_tags(base_tags_tuple, rng)
                 else:
                     chosen_base = self._pick(base_tags_tuple, rng, min(2, len(base_tags_tuple)))
                 base_tags_tuple = tuple(chosen_base)
+            if (
+                nudity_level_code == "L4"
+                and nudity_branch in ("l4_towel_sheet_wrap", "l4_accessory_only")
+                and style_mode in (SelectionMode.RANDOM, SelectionMode.AUTO)
+            ):
+                base_tags_tuple = ()
             state_id = "auto_linkage"
 
         elif state_mode == SelectionMode.RANDOM:
@@ -2262,9 +2906,23 @@ class DataSampler:
             elif nudity_level_code == "L2":
                 allowed_state_ids = {"normal", "unbuttoned", "slipping_off", "disheveled", "wet_clinging", "sweat_soaked"}
             elif nudity_level_code == "L3":
-                allowed_state_ids = {"unbuttoned", "slipping_off", "lifted_up", "pulled_down", "wet_clinging", "torn_shredded"}
+                if nudity_branch == "l3_open_shirt_breasts":
+                    allowed_state_ids = {"unbuttoned", "disheveled", "wet_clinging"}
+                elif nudity_branch == "l3_pulled_down_dress":
+                    allowed_state_ids = {"pulled_down", "slipping_off", "wet_clinging"}
+                elif nudity_branch == "l3_topless_skirt_kept":
+                    allowed_state_ids = {"lifted_up", "wet_clinging", "torn_shredded"}
+                elif nudity_branch in ("l3_panties_only", "l3_bikini_top_removed"):
+                    allowed_state_ids = {"pulled_down", "only_lingerie", "torn_shredded"}
+                else:
+                    allowed_state_ids = {"unbuttoned", "slipping_off", "lifted_up", "pulled_down", "wet_clinging", "torn_shredded"}
             elif nudity_level_code == "L4":
-                allowed_state_ids = {"only_lingerie", "pulled_down", "lifted_up", "torn_shredded", "slipping_off"}
+                if nudity_branch in ("l4_panties_only", "l4_bra_and_panties"):
+                    allowed_state_ids = {"only_lingerie", "pulled_down", "slipping_off"}
+                elif nudity_branch in ("l4_hosiery_footwear_only", "l4_towel_sheet_wrap", "l4_accessory_only"):
+                    allowed_state_ids = {"only_lingerie", "torn_shredded"}
+                else:
+                    allowed_state_ids = {"only_lingerie", "pulled_down", "lifted_up", "torn_shredded", "slipping_off"}
             else:
                 allowed_state_ids = set()
 
@@ -2407,7 +3065,23 @@ class DataSampler:
         else:
             all_exp_tiers = raw_exp_tiers
             all_trans_tiers = raw_trans_tiers
-        all_wardrobe = [t for t in data.get("lingerie_wardrobe", []) if t.get("id") in allowed_wardrobe_ids]
+        all_wardrobe = (
+            [t for t in data.get("lingerie_wardrobe", []) if t.get("id") in allowed_wardrobe_ids]
+            if (nudity_level_code == "L4" and nudity_branch in ("l4_panties_only", "l4_bra_and_panties", None))
+            else []
+        )
+        if nudity_level_code == "L4" and nudity_branch == "l4_panties_only":
+            all_wardrobe = [
+                t for t in all_wardrobe
+                if (t.get("id") or "") in ("crotchless_panties", "garter_stockings")
+            ]
+        elif nudity_level_code == "L4" and nudity_branch == "l4_bra_and_panties":
+            all_wardrobe = [
+                t for t in all_wardrobe
+                if (t.get("id") or "") not in ("crotchless_panties", "crotchless_free")
+            ]
+        if nudity_level_code == "L4" and nudity_branch in ("l4_towel_sheet_wrap", "l4_accessory_only"):
+            return []
 
         def _make_ext_tag(itm: Any, parent_id: str, family: str) -> SampledTag:
             if isinstance(itm, dict):
@@ -2741,10 +3415,19 @@ class DataSampler:
 
         def _is_banned_by_l1(tag: Any) -> bool:
             txt = (tag.get("text", "") if isinstance(tag, dict) else str(tag)).lower()
-            return any(b in txt for b in banned_in_l1)
+            if any(b in txt for b in banned_in_l1):
+                return True
+            return not _is_tag_compatible_with_nudity(tag, "L1", slot_name="pose", item_id=cat_id)
 
         if nudity_level_code == "L1":
             all_tags = [t for t in all_tags if not _is_banned_by_l1(t)]
+        elif nudity_level_code == "L2" and (_is_random(category) or _is_auto(category)):
+            filtered_l2_pose = [
+                t for t in all_tags
+                if _is_tag_compatible_with_nudity(t, "L2", slot_name="pose", item_id=cat_id)
+            ]
+            if filtered_l2_pose:
+                all_tags = filtered_l2_pose
 
         if target_tag:
             if nudity_level_code == "L1" and _is_banned_by_l1(target_tag):
@@ -2964,7 +3647,14 @@ class DataSampler:
 
     # ─── 槽位 10: 发型与饰品 ───
 
-    def sample_hairstyle_result(self, hairstyle: str, rng: Random, context: Optional[str] = None, context_profile: Optional[ContextProfile] = None) -> Optional[SampleResult]:
+    def sample_hairstyle_result(
+        self,
+        hairstyle: str,
+        rng: Random,
+        context: Optional[str] = None,
+        context_profile: Optional[ContextProfile] = None,
+        nudity_level_code: Optional[str] = None,
+    ) -> Optional[SampleResult]:
         if _is_none(hairstyle):
             return None
         data = self._load("accessories")
@@ -2973,8 +3663,19 @@ class DataSampler:
             return None
 
         target_tag = None
-        if _is_random(hairstyle):
-            chosen = self._sample_from_candidates("hairstyle", styles, rng, profile=context_profile, context=context)
+        is_rand = _is_random(hairstyle) or _is_auto(hairstyle)
+        if is_rand:
+            excluded_ids = self.get_excluded_candidate_ids("hairstyle", nudity_level_code=nudity_level_code)
+            chosen = self._sample_from_candidates(
+                "hairstyle",
+                styles,
+                rng,
+                profile=context_profile,
+                context=context,
+                excluded_ids=excluded_ids,
+            )
+            if not chosen:
+                return None
         else:
             chosen = _match_item(styles, hairstyle, "hairstyles")
             if not chosen:
@@ -2984,12 +3685,19 @@ class DataSampler:
             if not chosen:
                 raise DataSelectionError(f"Unknown hairstyle: {hairstyle!r}")
 
-        raw_tags = chosen.get("tags", [])
+        c_id = chosen.get("id", "hairstyle_default")
+        raw_tags = list(chosen.get("tags", []))
+        if is_rand and nudity_level_code in ("L1", "L2"):
+            filtered_tags = [
+                tg for tg in raw_tags
+                if _is_tag_compatible_with_nudity(tg, nudity_level_code, slot_name="hairstyle", item_id=c_id)
+            ]
+            if filtered_tags:
+                raw_tags = filtered_tags
         if target_tag:
             selected = [target_tag]
         else:
-            selected = self._pick_tags_respecting_mutex(raw_tags, rng, chosen.get("id", "")) if raw_tags else []
-        c_id = chosen.get("id", "hairstyle_default")
+            selected = self._pick_tags_respecting_mutex(raw_tags, rng, c_id) if raw_tags else []
         tags_str, sampled = self._to_sampled_tags(selected, c_id, "hairstyle", rng=rng)
         prov = TagProvenance(item_id=c_id, kind="hairstyle", semantic_ids=(f"hairstyle:{c_id}",))
         return SampleResult(
@@ -2997,15 +3705,26 @@ class DataSampler:
             item_id=c_id,
             provenance=prov,
             sampled_tags=sampled,
-            sampling_rationale=self._pop_sampling_rationale(c_id, "random" if _is_random(hairstyle) else "explicit"),
+            sampling_rationale=self._pop_sampling_rationale(c_id, "random" if is_rand else "explicit"),
         )
 
-    def sample_hairstyle(self, hairstyle: str, rng: Random, context: Optional[str] = None) -> List[str]:
-        res = self.sample_hairstyle_result(hairstyle, rng, context)
+    def sample_hairstyle(
+        self,
+        hairstyle: str,
+        rng: Random,
+        context: Optional[str] = None,
+        nudity_level_code: Optional[str] = None,
+    ) -> List[str]:
+        res = self.sample_hairstyle_result(hairstyle, rng, context, nudity_level_code=nudity_level_code)
         return list(res.tags) if res else []
 
     def sample_jewelry_result(
-        self, jewelry_style: str, rng: Random, context: Optional[str] = None, context_profile: Optional[ContextProfile] = None
+        self,
+        jewelry_style: str,
+        rng: Random,
+        context: Optional[str] = None,
+        context_profile: Optional[ContextProfile] = None,
+        nudity_level_code: Optional[str] = None,
     ) -> Optional[SampleResult]:
         if _is_none(jewelry_style):
             return None
@@ -3015,8 +3734,17 @@ class DataSampler:
             return None
 
         target_tag = None
-        if _is_random(jewelry_style):
-            chosen = self._sample_from_candidates("jewelry", items, rng, profile=context_profile, context=context)
+        is_rand = _is_random(jewelry_style) or _is_auto(jewelry_style)
+        if is_rand:
+            excluded_ids = self.get_excluded_candidate_ids("jewelry", nudity_level_code=nudity_level_code)
+            chosen = self._sample_from_candidates(
+                "jewelry",
+                items,
+                rng,
+                profile=context_profile,
+                context=context,
+                excluded_ids=excluded_ids,
+            )
         else:
             chosen = _match_item(items, jewelry_style)
             if not chosen:
@@ -3029,12 +3757,19 @@ class DataSampler:
         if not chosen:
             return None
 
-        raw_tags = chosen.get("tags", [])
+        c_id = chosen.get("id", "jewelry_unknown")
+        raw_tags = list(chosen.get("tags", []))
+        if is_rand and nudity_level_code in ("L1", "L2"):
+            filtered_tags = [
+                tg for tg in raw_tags
+                if _is_tag_compatible_with_nudity(tg, nudity_level_code, slot_name="jewelry", item_id=c_id)
+            ]
+            if filtered_tags:
+                raw_tags = filtered_tags
         if target_tag:
             selected = [target_tag]
         else:
-            selected = self._pick_tags_respecting_mutex(raw_tags, rng, chosen.get("id", "")) if raw_tags else []
-        c_id = chosen.get("id", "jewelry_unknown")
+            selected = self._pick_tags_respecting_mutex(raw_tags, rng, c_id) if raw_tags else []
         tags_str, sampled = self._to_sampled_tags(selected, c_id, "jewelry", rng=rng)
         prov = TagProvenance(
             kind="jewelry",
@@ -3046,11 +3781,17 @@ class DataSampler:
             item_id=c_id,
             provenance=prov,
             sampled_tags=sampled,
-            sampling_rationale=self._pop_sampling_rationale(c_id, "random" if _is_random(jewelry_style) else "explicit"),
+            sampling_rationale=self._pop_sampling_rationale(c_id, "random" if is_rand else "explicit"),
         )
 
-    def sample_jewelry(self, jewelry_style: str, rng: Random, context: Optional[str] = None) -> List[str]:
-        res = self.sample_jewelry_result(jewelry_style, rng, context)
+    def sample_jewelry(
+        self,
+        jewelry_style: str,
+        rng: Random,
+        context: Optional[str] = None,
+        nudity_level_code: Optional[str] = None,
+    ) -> List[str]:
+        res = self.sample_jewelry_result(jewelry_style, rng, context, nudity_level_code=nudity_level_code)
         return list(res.tags) if res else []
 
     # ─── 槽位 11: 真实瑕疵细节 ───
@@ -3095,7 +3836,12 @@ class DataSampler:
     # ─── 槽位 12: 纹身标记与皮肤融合 ───
 
     def sample_tattoo_result(
-        self, tattoo_style: str, rng: Random, context: Optional[str] = None, context_profile: Optional[ContextProfile] = None
+        self,
+        tattoo_style: str,
+        rng: Random,
+        context: Optional[str] = None,
+        context_profile: Optional[ContextProfile] = None,
+        nudity_level_code: Optional[str] = None,
     ) -> Optional[SampleResult]:
         if _is_none(tattoo_style):
             return None
@@ -3104,9 +3850,18 @@ class DataSampler:
         if not tattoos:
             return None
 
-        if _is_random(tattoo_style):
+        is_rand = _is_random(tattoo_style) or _is_auto(tattoo_style)
+        if is_rand:
             pool = [t for t in tattoos if t.get("id") != "none"]
-            chosen = self._sample_from_candidates("tattoo", pool, rng, profile=context_profile, context=context)
+            excluded_ids = self.get_excluded_candidate_ids("tattoo", nudity_level_code=nudity_level_code)
+            chosen = self._sample_from_candidates(
+                "tattoo",
+                pool,
+                rng,
+                profile=context_profile,
+                context=context,
+                excluded_ids=excluded_ids,
+            )
         else:
             chosen = _match_item(tattoos, tattoo_style)
             if not chosen:
@@ -3115,9 +3870,16 @@ class DataSampler:
         if not chosen or chosen.get("id") == "none":
             return None
 
-        raw_tags = chosen.get("tags", [])
-        selected = raw_tags[:2] if raw_tags else []
         c_id = chosen.get("id", "tattoo_unknown")
+        raw_tags = list(chosen.get("tags", []))
+        if is_rand and nudity_level_code in ("L1", "L2"):
+            filtered_tags = [
+                tg for tg in raw_tags
+                if _is_tag_compatible_with_nudity(tg, nudity_level_code, slot_name="tattoo", item_id=c_id)
+            ]
+            if filtered_tags:
+                raw_tags = filtered_tags
+        selected = raw_tags[:2] if raw_tags else []
         tags_str, sampled = self._to_sampled_tags(selected, c_id, "tattoo")
         prov = TagProvenance(
             kind="tattoo",
@@ -3129,11 +3891,17 @@ class DataSampler:
             item_id=c_id,
             provenance=prov,
             sampled_tags=sampled,
-            sampling_rationale=self._pop_sampling_rationale(c_id, "random" if _is_random(tattoo_style) else "explicit"),
+            sampling_rationale=self._pop_sampling_rationale(c_id, "random" if is_rand else "explicit"),
         )
 
-    def sample_tattoo(self, tattoo_style: str, rng: Random, context: Optional[str] = None) -> List[str]:
-        res = self.sample_tattoo_result(tattoo_style, rng, context)
+    def sample_tattoo(
+        self,
+        tattoo_style: str,
+        rng: Random,
+        context: Optional[str] = None,
+        nudity_level_code: Optional[str] = None,
+    ) -> List[str]:
+        res = self.sample_tattoo_result(tattoo_style, rng, context, nudity_level_code=nudity_level_code)
         return list(res.tags) if res else []
 
     # ─── 槽位 13: 道具宠物 ───
@@ -3222,7 +3990,10 @@ class DataSampler:
                 if isinstance(t, dict)
                 and t.get("facts", {}).get("hands_required", 0) <= available_hands
                 and (available_hands > 0 or t.get("facts", {}).get("prop_usage") != "handheld")
-                and not (nudity_level_code == "L1" and c_id in ("sex_toy_vibrator", "bondage_rope_collar"))
+                and (
+                    not (_is_random(prop_style) or _is_auto(prop_style))
+                    or _is_tag_compatible_with_nudity(t, nudity_level_code, slot_name="props", item_id=c_id)
+                )
             ]
             if valid_tags:
                 raw_tags = valid_tags
@@ -3411,7 +4182,14 @@ class DataSampler:
 
     # ─── 槽位 15: 液体体液系统 ───
 
-    def sample_liquid_result(self, liquid_effect: str, rng: Random, context: Optional[str] = None, context_profile: Optional[ContextProfile] = None) -> Optional[SampleResult]:
+    def sample_liquid_result(
+        self,
+        liquid_effect: str,
+        rng: Random,
+        context: Optional[str] = None,
+        context_profile: Optional[ContextProfile] = None,
+        nudity_level_code: Optional[str] = None,
+    ) -> Optional[SampleResult]:
         if _is_none(liquid_effect):
             return None
         data = self._load("nudity_levels")
@@ -3421,9 +4199,18 @@ class DataSampler:
         if not liquids:
             return None
 
-        if _is_random(liquid_effect):
+        is_rand = _is_random(liquid_effect) or _is_auto(liquid_effect)
+        if is_rand:
             pool = [liq for liq in liquids if liq.get("id") != "none"]
-            chosen = self._sample_from_candidates("liquids", pool, rng, profile=context_profile, context=context)
+            excluded_ids = self.get_excluded_candidate_ids("liquids", nudity_level_code=nudity_level_code)
+            chosen = self._sample_from_candidates(
+                "liquids",
+                pool,
+                rng,
+                profile=context_profile,
+                context=context,
+                excluded_ids=excluded_ids,
+            )
         else:
             chosen = _match_item(liquids, liquid_effect)
             if not chosen:
@@ -3432,9 +4219,16 @@ class DataSampler:
         if not chosen or chosen.get("id") == "none":
             return None
 
-        raw_tags = chosen.get("tags", [])
-        selected = self._pick(raw_tags, rng, min(2, len(raw_tags))) if raw_tags else []
         c_id = chosen.get("id", "liquid_default")
+        raw_tags = list(chosen.get("tags", []))
+        if is_rand and nudity_level_code in ("L1", "L2"):
+            filtered_tags = [
+                tg for tg in raw_tags
+                if _is_tag_compatible_with_nudity(tg, nudity_level_code, slot_name="liquids", item_id=c_id)
+            ]
+            if filtered_tags:
+                raw_tags = filtered_tags
+        selected = self._pick(raw_tags, rng, min(2, len(raw_tags))) if raw_tags else []
         tags_str, sampled = self._to_sampled_tags(selected, c_id, "liquid")
         prov = TagProvenance(item_id=c_id, kind="liquid", semantic_ids=(f"liquid:{c_id}",))
         return SampleResult(
@@ -3442,11 +4236,17 @@ class DataSampler:
             item_id=c_id,
             provenance=prov,
             sampled_tags=sampled,
-            sampling_rationale=self._pop_sampling_rationale(c_id, "random" if _is_random(liquid_effect) else "explicit"),
+            sampling_rationale=self._pop_sampling_rationale(c_id, "random" if is_rand else "explicit"),
         )
 
-    def sample_liquid(self, liquid_effect: str, rng: Random, context: Optional[str] = None) -> List[str]:
-        res = self.sample_liquid_result(liquid_effect, rng, context)
+    def sample_liquid(
+        self,
+        liquid_effect: str,
+        rng: Random,
+        context: Optional[str] = None,
+        nudity_level_code: Optional[str] = None,
+    ) -> List[str]:
+        res = self.sample_liquid_result(liquid_effect, rng, context, nudity_level_code=nudity_level_code)
         return list(res.tags) if res else []
 
     # ─── 风格配方与预设 ───

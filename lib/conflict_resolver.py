@@ -938,6 +938,8 @@ def is_garment_modifier_atom(a: PromptAtom) -> bool:
     """判定原子是否属于需要服装主体承载的衣物动作、湿润、切口或质感修饰。"""
     if is_body_exposure_atom(a):
         return False
+    if a.provenance and a.provenance.rule_id == "material_penetration":
+        return False
 
     slot = (a.source_slot or (a.origin.selector if a.origin else "") or "").lower()
     kind = ((a.provenance.kind or "") if a.provenance else "").lower()
@@ -1201,6 +1203,322 @@ def is_camera_hardware_atom(a: Any) -> bool:
             return True
 
     return False
+
+
+_SAFE_NON_NUDE_TEXT_RE = re.compile(
+    r"\b(?:sheer\s+nude\s+lip|nude\s+lip(?:\s+gloss)?|nude\s+peach|"
+    r"bare\s+(?:bulb|bulbs|tree|trees|wall|walls|face|brick|wood|concrete|floor|branch|branches)|"
+    r"ankle\s+bracelet)\b",
+    re.I,
+)
+_L6_UPPER_CUTOFF_TEXT_RE = re.compile(
+    r"\b(?:waist-up(?:\s+framing)?|chest-up(?:\s+shot)?|upper[- ]body(?:\s+framing)?|"
+    r"half-body\s+portrait|face\s+shot\s+filling\s+frame|portrait\s+framing|"
+    r"close-up\s+portrait|face\s+portrait|face\s+close-up|extreme\s+close-up|"
+    r"headshot|bust\s+shot|shoulder-up|medium\s+shot|medium\s+close-up|"
+    r"breast\s+and\s+cleavage\s+focus)\b",
+    re.I,
+)
+_L6_LOWER_GENITAL_ALLOW_RE = re.compile(
+    r"\b(?:crotch|genital|pussy|vulva|vagina|anus|lower\s+body|between\s+legs|spread|pelvis)\b",
+    re.I,
+)
+_L4_PANTIES_ONLY_UPPER_RE = re.compile(
+    r"\b(?:bra|cups|underwire|halter|lingerie\s+set|teddy|bikini\s+underwear|three-point)\b",
+    re.I,
+)
+_L4_HOSIERY_ACCESSORY_UNDERWEAR_RE = re.compile(r"\b(?:bra|panties|underwear|lingerie)\b", re.I)
+_L1_CROSS_SLOT_EXPOSURE_RE = re.compile(
+    r"\b(?:upskirt|downblouse|panties|bra|bare\s+breasts?|exposed\s+breasts?|one\s+breast\s+exposed|"
+    r"covering\s+breasts?|below\s+breasts?|cross-torso\s+body\s+jewelry|nipple\w*|areola\w*|"
+    r"underbust\s+mandala|womb\s+tattoo|pubic|topless|bottomless|pussy|vagina|penis|cock|"
+    r"nude|naked|undressed|crotch\s+close-up|between\s+legs\s+angle|crotch\s+level\s+view|"
+    r"thong|g-string|cleavage|underboob|sideboob|raw\s+sex|raw\s+dogging|no\s+condom|"
+    r"creampie|cum|semen|vibrator|dildo|sponge\s+bath|no\s+bra|no\s+panties|"
+    r"skirt\s+hiked\s+up|sailor\s+shirt\s+unbuttoned|slipping\s+off\s+shoulder|bare\s+shoulder)\b",
+    re.I,
+)
+_L2_EXPOSURE_RE = re.compile(
+    r"\b(?:one\s+breast\s+exposed|bare\s+breasts?|exposed\s+breasts?|nipple\w*|areola\w*|"
+    r"no\s+panties|no\s+bra|topless|bottomless|pussy|vagina|penis|cock|genitals|"
+    r"raw\s+sex|raw\s+dogging|creampie|cum|semen|vibrator|dildo|public\s+nudity)\b",
+    re.I,
+)
+_L4_FULL_GARMENT_TOPOLOGIES = frozenset({
+    "top",
+    "bottom_pants",
+    "bottom_skirt",
+    "outerwear",
+    "one_piece",
+    "ensemble_outfit",
+    # 兼容历史/自定义非标准拓扑词
+    "suit",
+    "coat",
+    "jacket",
+    "hoodie",
+    "pants",
+    "blazer",
+    "sweater",
+})
+_NON_L1_EXPOSED_REGIONS_SET = frozenset({
+    "breasts",
+    "genitals",
+    "anus",
+    "buttocks",
+    "full_nude",
+    "cleavage",
+    "midriff",
+    "underboob_sideboob",
+    "underwear_panties",
+    "underwear_bra",
+    "thigh_leg",
+    "shoulders",
+    "back",
+})
+_NON_L2_EXPOSED_REGIONS_SET = frozenset({
+    "breasts",
+    "genitals",
+    "anus",
+    "buttocks",
+    "full_nude",
+})
+
+
+def _get_atom_item_id(a: PromptAtom) -> str:
+    return (
+        a.source_item_id
+        or (a.provenance.item_id if a.provenance else "")
+        or (a.origin.selected_id if a.origin else "")
+        or ""
+    )
+
+
+def _is_non_worn_discarded_narrative_atom(a: PromptAtom) -> bool:
+    """判定是否为“衣物脱下散落旁侧 / 非在身赤裸”叙事原子，避免 L4/L5/L6 误删。"""
+    f = a.facts
+    if not f:
+        return False
+    if f.piece_role not in (None, "none"):
+        return False
+    if f.garment_topologies and any(t != "none" for t in f.garment_topologies):
+        return False
+    if f.covered_regions and any(r != "none" for r in f.covered_regions):
+        return False
+    return bool(
+        "discarded" in f.garment_states
+        or "removed" in f.garment_states
+        or "full_nude" in f.exposed_regions
+        or f.coverage_delta == "uncover_all"
+    )
+
+
+def _is_safe_non_nude_atom_text(a: PromptAtom) -> bool:
+    tl = a.text.lower()
+    if _SAFE_NON_NUDE_TEXT_RE.search(tl):
+        return True
+    if a.source_slot in ("makeup", "scene", "scene_theme", "lighting", "film"):
+        if a.facts and a.facts.exposed_regions in ((), ("none",)) and not a.facts.allowed_nudity_levels:
+            if any(w in tl for w in ("nude", "bare")) and not any(
+                b in tl for b in ("breast", "nipple", "pussy", "genital", "crotch", "buttocks", "naked")
+            ):
+                return True
+    return False
+
+
+def _is_upper_body_cutoff_framing_atom(a: PromptAtom) -> bool:
+    """判定 L6 下会裁切私处展示的上半身/面部景别或构图。"""
+    if a.source_slot not in ("shot_type", "shot", "camera_angle", "camera"):
+        return False
+    iid = _get_atom_item_id(a)
+    tl = a.text.lower()
+    if iid in ("close_up", "medium_close_up", "medium_shot"):
+        return True
+    if a.facts and a.facts.visible_regions:
+        vis = set(a.facts.visible_regions)
+        if (vis & {"face", "upper_body"}) and not (vis & {"lower_body", "intimate_lower_body", "full_body", "legs"}):
+            return True
+    if a.facts and a.facts.exposed_regions:
+        exp = set(a.facts.exposed_regions)
+        if "breasts" in exp and "genitals" not in exp:
+            return True
+    if _L6_LOWER_GENITAL_ALLOW_RE.search(tl):
+        return False
+    return bool(_L6_UPPER_CUTOFF_TEXT_RE.search(tl))
+
+
+def _align_facts_with_rewritten_text(rep_text: str, orig_facts: Optional[SemanticFacts]) -> SemanticFacts:
+    """将规则改写后的文本同步映射为一致的 SemanticFacts，防止残留透视/内衣陈旧事实。"""
+    base = orig_facts or SemanticFacts()
+    clean_states = tuple(
+        s for s in base.garment_states
+        if s not in ("sheer", "see_through", "transparent", "translucent")
+    )
+    tl = rep_text.strip().lower()
+    if "dress" in tl:
+        clean_exposed = tuple(
+            r for r in base.exposed_regions
+            if r not in ("breasts", "genitals", "anus", "underwear_panties", "underwear_bra")
+        )
+        return replace(
+            base,
+            garment_topologies=("one_piece",),
+            garment_states=("wet_clinging",) if "wet" in tl or "clinging" in tl else clean_states,
+            piece_role="one_piece",
+            covered_regions=("upper_torso", "lower_torso"),
+            exposed_regions=clean_exposed,
+            allowed_nudity_levels=tuple(lvl_tag for lvl_tag in base.allowed_nudity_levels if lvl_tag not in ("L5", "L6")),
+        )
+    if "unbuttoned" in tl:
+        new_states = tuple(dict.fromkeys(s for s in clean_states + ("opened",)))
+        return replace(base, garment_states=new_states)
+    if "lifted up" in tl or "lifted" in tl:
+        new_states = tuple(dict.fromkeys(s for s in clean_states + ("lifted",)))
+        return replace(base, garment_states=new_states)
+    if "slipping off shoulder" in tl:
+        new_states = tuple(dict.fromkeys(s for s in clean_states + ("loosened",)))
+        return replace(
+            base,
+            garment_states=new_states,
+            exposed_regions=("shoulders",) if not base.exposed_regions else base.exposed_regions,
+        )
+    return replace(base, garment_states=clean_states)
+
+
+def _format_nudity_constraint_trace(constraint: Optional[NudityConstraint]) -> Optional[Dict[str, Any]]:
+    if constraint is None:
+        return None
+    return {
+        "requested_level": constraint.requested_level,
+        "effective_level": constraint.effective_level,
+        "source": constraint.source,
+        "selected_branch": constraint.selected_branch,
+        "yielded_to_override": constraint.yielded_to_override,
+        "yield_reason": constraint.yield_reason,
+    }
+
+
+def _is_atom_compatible_with_level_and_branch(
+    a: PromptAtom,
+    dominant_lvl: Optional[str],
+    selected_branch: Optional[str] = None,
+) -> bool:
+    """统一校验非 nudity 原子与 (effective_level, selected_branch) 的相容性。"""
+    if not dominant_lvl:
+        return True
+    f = a.facts
+    tl = a.text.lower()
+    is_safe_phrase = _is_safe_non_nude_atom_text(a)
+
+    if dominant_lvl in ("L5", "L6"):
+        if _is_non_worn_discarded_narrative_atom(a):
+            return True
+        if dominant_lvl == "L6" and _is_upper_body_cutoff_framing_atom(a):
+            return False
+        if f and (
+            any(t != "none" for t in f.garment_topologies)
+            or (f.garment_states and not _is_non_worn_discarded_narrative_atom(a))
+            or f.piece_role in ("top", "bottom", "one_piece", "ensemble", "outerwear", "underwear", "legwear", "footwear")
+        ):
+            return False
+        if a.source_slot in ("clothing", "clothing_state", "clothing_extension", "underwear"):
+            return False
+        return True
+
+    if dominant_lvl == "L4":
+        if _is_non_worn_discarded_narrative_atom(a):
+            return True
+        if f and (
+            any(t in _L4_FULL_GARMENT_TOPOLOGIES for t in f.garment_topologies)
+            or f.piece_role in ("top", "bottom", "one_piece", "ensemble", "outerwear")
+        ):
+            return False
+        if selected_branch == "l4_hosiery_footwear_only":
+            if f and ("underwear" in f.garment_topologies or f.piece_role == "underwear"):
+                return False
+            if a.source_slot == "underwear" or _L4_HOSIERY_ACCESSORY_UNDERWEAR_RE.search(tl):
+                return False
+        elif selected_branch == "l4_panties_only":
+            if f and ("intimate_upper" in f.covered_regions or "breasts" in f.exposed_regions):
+                return False
+            if _L4_PANTIES_ONLY_UPPER_RE.search(tl) and "panties" not in tl:
+                return False
+            if "string halter bikini" in tl or "strappy lingerie set" in tl:
+                return False
+        elif selected_branch == "l4_bra_and_panties":
+            if f and "breasts" in f.exposed_regions and "underwear_bra" not in f.exposed_regions:
+                return False
+            if any(w in tl for w in ("topless", "bare breasts", "only lace panties")):
+                return False
+        elif selected_branch in ("l4_towel_sheet_wrap", "l4_accessory_only"):
+            if f and ("underwear" in f.garment_topologies or f.piece_role == "underwear"):
+                return False
+            if selected_branch == "l4_accessory_only" and f and f.piece_role in ("legwear", "footwear"):
+                return False
+            if a.source_slot in ("underwear", "clothing_extension") or _L4_HOSIERY_ACCESSORY_UNDERWEAR_RE.search(tl):
+                return False
+        return True
+
+    if dominant_lvl == "L3":
+        if f and any(r in f.visible_regions for r in ("crotch", "buttocks", "intimate_lower_body")):
+            return False
+        if selected_branch == "l3_panties_only":
+            if f and any(t in _L4_FULL_GARMENT_TOPOLOGIES for t in f.garment_topologies):
+                return False
+            if f and f.piece_role in ("top", "bottom", "one_piece", "ensemble", "outerwear"):
+                return False
+            if a.source_slot == "clothing_state" and any(w in tl for w in ("shirt", "blouse", "skirt", "dress")):
+                return False
+        elif selected_branch in ("l3_topless_skirt_kept", "l3_topless_pants_kept", "l3_bikini_top_removed"):
+            if f and (f.piece_role in ("top", "outerwear", "one_piece") or any(t in ("top", "outerwear", "one_piece") for t in f.garment_topologies)):
+                return False
+            if selected_branch == "l3_topless_skirt_kept" and f and "bottom_pants" in f.garment_topologies:
+                return False
+            if selected_branch == "l3_topless_pants_kept" and f and "bottom_skirt" in f.garment_topologies:
+                return False
+            if a.source_slot == "clothing_state" and any(w in tl for w in ("shirt open", "dress bunched", "bra")):
+                return False
+        return True
+
+    if dominant_lvl == "L1":
+        if is_safe_phrase:
+            return True
+        if f:
+            if f.allowed_nudity_levels and "L1" not in f.allowed_nudity_levels:
+                return False
+            if any(r in _NON_L1_EXPOSED_REGIONS_SET for r in f.exposed_regions):
+                return False
+            if any(r in ("intimate_lower_body", "cleavage", "breasts", "crotch", "buttocks", "underboob", "sideboob", "pubic") for r in f.visible_regions):
+                return False
+            if getattr(f, "style_genre", None) == "boudoir_lingerie":
+                return False
+            if f.liquid_kind in ("sexual_fluid", "cum", "semen"):
+                return False
+            if any(s in ("lifted", "lifted_up", "opened", "removed", "lifted_skirt", "unbuttoned") for s in f.garment_states):
+                return False
+        iid = _get_atom_item_id(a).lower().replace("_", " ")
+        if "between legs angle" in iid or "erotic close up" in iid:
+            return False
+        if _L1_CROSS_SLOT_EXPOSURE_RE.search(tl):
+            return False
+        return True
+
+    if dominant_lvl == "L2":
+        if is_safe_phrase:
+            return True
+        if f:
+            if f.allowed_nudity_levels and "L2" not in f.allowed_nudity_levels:
+                return False
+            if any(r in _NON_L2_EXPOSED_REGIONS_SET for r in f.exposed_regions):
+                return False
+            if any(r in ("intimate_lower_body", "crotch", "pubic") for r in f.visible_regions):
+                return False
+            if f.liquid_kind in ("sexual_fluid", "cum", "semen"):
+                return False
+        if _L2_EXPOSURE_RE.search(tl):
+            return False
+        return True
+
+    return True
 
 
 def make_replaced_atom(
@@ -2333,6 +2651,48 @@ class ConflictResolver:
                     if rule_id not in rules_applied:
                         rules_applied.append(rule_id)
 
+            # 2b. 规则改写后目标等级与单一分支复检（防止后期规则改写重现被删衣物或语义漂移）
+            eff_constraint = self._active_nudity_constraint
+            if eff_constraint is not None and eff_constraint.effective_level and not eff_constraint.yielded_to_override:
+                eff_lvl = eff_constraint.effective_level
+                eff_branch = eff_constraint.selected_branch
+                nc_trace = _format_nudity_constraint_trace(eff_constraint)
+                for a in list(index.get_all_active_ordered()):
+                    if not a.can_detect or not index.is_active(a) or a.source_slot == "nudity":
+                        continue
+                    is_produced = bool(a.provenance and a.provenance.rule_id and a.provenance.rule_id != "nudity_clothing_conflicts")
+                    if not is_produced:
+                        continue
+                    if not _is_atom_compatible_with_level_and_branch(a, eff_lvl, eff_branch):
+                        if is_external_atom(a) or not a.can_delete_atom:
+                            continue
+                        prod_rule_id = a.provenance.rule_id
+                        if prod_rule_id == "material_penetration":
+                            index.drop(a.atom_id)
+                            ft = {
+                                "rule_id": "material_penetration",
+                                "phase": "physical",
+                                "priority": 230,
+                                "winner_objects": [],
+                                "target_objects": [a.atom_id],
+                            }
+                            if nc_trace:
+                                ft["nudity_constraint"] = nc_trace
+                            ledger.record_drop(
+                                "material_penetration",
+                                "physical",
+                                "material_penetration_removed",
+                                (),
+                                a,
+                                fact_trace=ft,
+                            )
+
+            # 按决策实际首次出现顺序严格同步 rules_applied
+            rules_applied = []
+            for d in ledger.decisions:
+                if d.rule_id not in rules_applied:
+                    rules_applied.append(d.rule_id)
+
             # 3. 计算产出哈希与构建决策报告
             current_atoms = index.get_all_active_ordered()
             output_hash = compute_atoms_hash(current_atoms)
@@ -2852,6 +3212,12 @@ class ConflictResolver:
         if dominant_lvl:
             winner_atom_id = nudity_winner.atom_id if nudity_winner is not None else None
             winner_ids = (winner_atom_id,) if winner_atom_id is not None else ()
+            selected_branch = (
+                self._active_nudity_constraint.selected_branch
+                if self._active_nudity_constraint is not None
+                else None
+            )
+            nc_trace = _format_nudity_constraint_trace(self._active_nudity_constraint)
             candidates = [
                 a for a in index.get_all_active_ordered()
                 if a.source_slot != "nudity" and a.atom_id != winner_atom_id
@@ -2864,56 +3230,32 @@ class ConflictResolver:
                 should_drop = False
                 is_fallback = False
 
-                if dominant_lvl in ("L6", "L5"):
-                    # 全裸与极致全裸：禁止一切常规穿着
-                    if is_formal_atom(a) or is_external_atom(a):
-                        if a.facts and (a.facts.garment_topologies or a.facts.garment_states):
-                            should_drop = True
-                        elif a.source_slot in ("clothing", "clothing_state", "clothing_extension", "underwear"):
-                            should_drop = True
-                    elif tf.enabled:
-                        if any(b.matches(a.text) for b in level_rules["L5"].banned_patterns):
-                            should_drop = True
-                            is_fallback = True
-                elif dominant_lvl == "L4":
-                    # 微型覆盖/比基尼：禁止外穿大衣/整套长裙，但不删轻量内衣
-                    if is_formal_atom(a) or is_external_atom(a):
-                        if a.facts and any(t in a.facts.garment_topologies for t in ("suit", "coat", "jacket", "hoodie", "one_piece", "pants", "blazer", "sweater")):
-                            should_drop = True
-                    elif tf.enabled:
+                if is_formal_atom(a) or is_external_atom(a):
+                    if not _is_atom_compatible_with_level_and_branch(a, dominant_lvl, selected_branch):
+                        should_drop = True
+                elif tf.enabled:
+                    if dominant_lvl in ("L5", "L6") and _is_non_worn_discarded_narrative_atom(a):
+                        should_drop = False
+                    elif dominant_lvl == "L6" and _is_upper_body_cutoff_framing_atom(a):
+                        should_drop = True
+                    elif not _is_atom_compatible_with_level_and_branch(a, dominant_lvl, selected_branch):
+                        should_drop = True
+                        is_fallback = True
+                    elif dominant_lvl == "L4":
                         if any(b.matches(a.text) for b in level_rules["L4"].banned_patterns):
                             should_drop = True
                             is_fallback = True
-                elif dominant_lvl == "L3":
-                    if is_formal_atom(a) or is_external_atom(a):
-                        if a.facts and any(r in a.facts.visible_regions for r in ("crotch", "buttocks", "intimate_lower_body")):
-                            should_drop = True
-                    elif tf.enabled:
+                    elif dominant_lvl == "L3":
                         if any(b.matches(a.text) for b in level_rules["L3"].banned_patterns):
                             should_drop = True
                             is_fallback = True
-                elif dominant_lvl in ("L1", "L2"):
-                    if dominant_lvl == "L1" and a.source_slot in ("clothing", "clothing_state", "clothing_extension", "underwear", "camera_angle", "shot_type", "shot", "pose"):
-                        item_id = ((a.source_item_id or "") + " " + ((a.provenance.item_id or "") if a.provenance else "") + " " + ((a.origin.selected_id or "") if a.origin else "")).lower().replace("_", " ")
-                        text_lower = a.text.lower()
-                        banned_l1_pattern = re.compile(
-                            r"\b(upskirt|panties|bra|bare breasts|exposed breasts|topless|pussy|nude|naked|undressed|crotch close-up|between legs angle|crotch level view|thong|g-string|cleavage|underboob|sideboob)\b"
-                        )
-                        if (
-                            "between legs angle" in item_id
-                            or "erotic close up" in item_id
-                            or (a.facts and getattr(a.facts, "style_genre", None) == "boudoir_lingerie")
-                            or (a.facts and any(r in a.facts.visible_regions for r in ("intimate_lower_body", "cleavage", "breasts", "crotch", "buttocks", "underboob", "sideboob")))
-                            or (a.facts and any(s in a.facts.garment_states for s in ("lifted", "opened", "removed", "lifted_skirt")))
-                            or bool(banned_l1_pattern.search(text_lower))
-                        ):
+                    elif dominant_lvl in ("L5", "L6"):
+                        if any(b.matches(a.text) for b in level_rules["L5"].banned_patterns):
                             should_drop = True
-                    elif is_formal_atom(a) or is_external_atom(a):
-                        if a.facts and any(r in a.facts.visible_regions for r in ("intimate_lower_body",)):
-                            should_drop = True
-                    elif tf.enabled:
+                            is_fallback = True
+                    else:
                         lvl_rule = level_rules.get(dominant_lvl)
-                        if lvl_rule and any(b.matches(a.text) for b in lvl_rule.banned_patterns):
+                        if lvl_rule and not _is_safe_non_nude_atom_text(a) and any(b.matches(a.text) for b in lvl_rule.banned_patterns):
                             should_drop = True
                             is_fallback = True
 
@@ -2924,19 +3266,45 @@ class ConflictResolver:
                             slots=(nudity_winner.source_slot, a.source_slot),
                             texts=(nudity_winner.text, a.text),
                             rule_id=rule_item.id,
+                            details={"nudity_constraint": nc_trace} if nc_trace else None,
                         )
                     if is_external_atom(a) and not is_external_atom(nudity_winner):
                         for n_atom in nudity_atoms:
                             if not is_external_atom(n_atom) and n_atom.can_delete_atom and index.is_active(n_atom):
                                 index.drop(n_atom.atom_id)
+                                ft = {
+                                    "rule_id": rule_item.id,
+                                    "phase": rule_item.phase,
+                                    "priority": rule_item.priority,
+                                    "winner_objects": [a.atom_id],
+                                    "target_objects": [n_atom.atom_id],
+                                }
+                                if nc_trace:
+                                    ft["nudity_constraint"] = nc_trace
                                 ledger.record_drop(
                                     rule_item.id,
                                     rule_item.phase,
                                     "clothing_removes_nudity",
                                     (a.atom_id,),
                                     n_atom,
+                                    fact_trace=ft,
                                 )
-                        self._yield_constraint_to_external_clothing(index.get_all_active_ordered())
+                        if a.source_slot in ("clothing", "clothing_state", "clothing_extension", "underwear"):
+                            self._yield_constraint_to_external_clothing(index.get_all_active_ordered())
+                        else:
+                            base_c = self._active_nudity_constraint or NudityConstraint(
+                                requested_level="unspecified",
+                                effective_level=None,
+                                source="unconstrained",
+                            )
+                            self._active_nudity_constraint = replace(
+                                base_c,
+                                effective_level=None,
+                                source="derived_override",
+                                selected_branch=None,
+                                yielded_to_override=True,
+                                yield_reason=f"external_{a.source_slot}_override",
+                            )
                         continue
                     if not a.can_delete_atom:
                         continue
@@ -2952,12 +3320,22 @@ class ConflictResolver:
                     )
                     rc = "nudity_removes_underwear" if is_underwear else "nudity_removes_clothing"
                     index.drop(a.atom_id)
+                    ft = {
+                        "rule_id": rule_item.id,
+                        "phase": rule_item.phase,
+                        "priority": rule_item.priority,
+                        "winner_objects": list(winner_ids),
+                        "target_objects": [a.atom_id],
+                    }
+                    if nc_trace:
+                        ft["nudity_constraint"] = nc_trace
                     ledger.record_drop(
                         rule_item.id,
                         rule_item.phase,
                         rc,
                         winner_ids,
                         a,
+                        fact_trace=ft,
                     )
 
         # 2. Trigger-Ban 细粒度互斥 (R2-N07: 不直接裸露抛错，保护结构留给最终检测器)
@@ -3068,6 +3446,8 @@ class ConflictResolver:
             or (a.origin and a.origin.selector == "nudity")
             or (a.provenance and a.provenance.kind == "nudity")
         )
+        if not is_nude_slot and "discarded" in a.facts.garment_states:
+            return False
         exp = a.facts.exposed_regions
         alvl = a.facts.allowed_nudity_levels
         if exp or alvl:
@@ -3907,15 +4287,61 @@ class ConflictResolver:
             if matched and replacements:
                 if is_external_atom(a) or not a.can_modify_internal:
                     continue
-                rep_text = rng.choice(replacements)
-                new_facts = None
-                if a.facts:
-                    clean_states = tuple(s for s in a.facts.garment_states if s not in ("sheer", "see_through", "transparent", "translucent"))
-                    new_facts = replace(a.facts, garment_states=clean_states)
+                eff_constraint = getattr(self, "_active_nudity_constraint", None)
+                eff_lvl = (
+                    eff_constraint.effective_level
+                    if (eff_constraint is not None and not eff_constraint.yielded_to_override)
+                    else None
+                )
+                eff_branch = eff_constraint.selected_branch if eff_constraint is not None else None
+                nc_trace = _format_nudity_constraint_trace(eff_constraint)
+
+                valid_replacements: List[str] = []
+                for cand_rep in replacements:
+                    cand_facts = _align_facts_with_rewritten_text(cand_rep, a.facts)
+                    cand_atom = make_replaced_atom(a, cand_rep, rule_item.id, new_facts=cand_facts)
+                    if _is_atom_compatible_with_level_and_branch(cand_atom, eff_lvl, eff_branch):
+                        valid_replacements.append(cand_rep)
+
+                if not valid_replacements:
+                    if a.can_delete_atom:
+                        if is_fallback:
+                            self.text_fallback_hits += 1
+                        index.drop(a.atom_id)
+                        ft = {
+                            "rule_id": rule_item.id,
+                            "phase": rule_item.phase,
+                            "priority": rule_item.priority,
+                            "winner_objects": [],
+                            "target_objects": [a.atom_id],
+                        }
+                        if nc_trace:
+                            ft["nudity_constraint"] = nc_trace
+                        ledger.record_drop(
+                            rule_item.id,
+                            rule_item.phase,
+                            "material_penetration_removed",
+                            (),
+                            a,
+                            fact_trace=ft,
+                        )
+                    continue
+
+                rep_text = rng.choice(valid_replacements)
+                new_facts = _align_facts_with_rewritten_text(rep_text, a.facts)
                 new_a = make_replaced_atom(a, rep_text, rule_item.id, new_facts=new_facts)
                 if is_fallback:
                     self.text_fallback_hits += 1
                 index.replace(a.atom_id, new_a)
+                ft = {
+                    "rule_id": rule_item.id,
+                    "phase": rule_item.phase,
+                    "priority": rule_item.priority,
+                    "winner_objects": [],
+                    "target_objects": [a.atom_id],
+                }
+                if nc_trace:
+                    ft["nudity_constraint"] = nc_trace
                 ledger.record_replace(
                     rule_item.id,
                     rule_item.phase,
@@ -3923,6 +4349,7 @@ class ConflictResolver:
                     (),
                     a,
                     (new_a,),
+                    fact_trace=ft,
                 )
 
         return index.get_all_active_ordered()
@@ -4922,35 +5349,72 @@ class ConflictResolver:
                 if _is_loser_protected(loser):
                     protected_losers.append(loser)
 
-        # 2. 裸露 vs 服装
+        # 2. 裸露 vs 服装与跨槽位等级一致性
         r2_tf = rule_tf_map["nudity_clothing_conflicts"]
         r2_l5_banned = select_fallback_patterns(r2_tf, role="banned", group_id="L5")
         nude_atoms = [a for a in detectable if a.source_slot == "nudity"]
-        if nude_atoms:
-            first_nude = min(nude_atoms, key=lambda x: (x.tag_order, x.span_order))
-            is_full_nude = False
-            raw_id = ((first_nude.source_item_id or "") + " " + ((first_nude.provenance.item_id or "") if first_nude.provenance else "") + " " + ((first_nude.origin.selected_id or "") if first_nude.origin else "")).upper()
-            if is_formal_atom(first_nude):
-                is_full_nude = any(lvl in raw_id for lvl in ("L5", "L6"))
-            else:
-                if any(lvl in raw_id for lvl in ("L5", "L6")) or any(s in first_nude.text.lower() for s in ("completely naked", "full nude", "bare body", "no clothes")):
-                    is_full_nude = True
-            if is_full_nude:
+        active_nc = getattr(self, "_active_nudity_constraint", None)
+        active_lvl = (
+            active_nc.effective_level
+            if (active_nc is not None and not active_nc.yielded_to_override)
+            else None
+        )
+        active_branch = active_nc.selected_branch if active_nc is not None else None
+        if nude_atoms or active_lvl:
+            first_nude = min(nude_atoms, key=lambda x: (x.tag_order, x.span_order)) if nude_atoms else None
+            detected_lvl = active_lvl
+            if not detected_lvl and first_nude is not None:
+                raw_id = (
+                    (first_nude.source_item_id or "")
+                    + " "
+                    + ((first_nude.provenance.item_id or "") if first_nude.provenance else "")
+                    + " "
+                    + ((first_nude.origin.selected_id or "") if first_nude.origin else "")
+                ).upper()
+                if is_formal_atom(first_nude) and first_nude.facts and len(first_nude.facts.allowed_nudity_levels) == 1:
+                    detected_lvl = first_nude.facts.allowed_nudity_levels[0]
+                else:
+                    for cand_l in ("L6", "L5", "L4", "L3", "L2", "L1"):
+                        if cand_l in raw_id:
+                            detected_lvl = cand_l
+                            break
+                    if not detected_lvl and any(s in first_nude.text.lower() for s in ("completely naked", "full nude", "bare body", "no clothes")):
+                        detected_lvl = "L5"
+
+            nude_win_id = first_nude.atom_id if first_nude is not None else "__nudity_constraint__"
+            if detected_lvl in ("L5", "L6"):
                 clothing_atoms = [
                     a for a in detectable
-                    if a.source_slot in ("clothing", "clothing_state", "clothing_extension")
-                    or (not is_formal_atom(a) and any(b.matches(a.text) for b in r2_l5_banned))
+                    if a.source_slot != "nudity"
+                    and not _is_non_worn_discarded_narrative_atom(a)
+                    and (
+                        a.source_slot in ("clothing", "clothing_state", "clothing_extension", "underwear")
+                        or (not is_formal_atom(a) and any(b.matches(a.text) for b in r2_l5_banned))
+                        or (detected_lvl == "L6" and _is_upper_body_cutoff_framing_atom(a))
+                    )
                 ]
-                clothing_atoms = [a for a in clothing_atoms if a.atom_id != first_nude.atom_id]
+                clothing_atoms = [a for a in clothing_atoms if first_nude is None or a.atom_id != first_nude.atom_id]
                 if clothing_atoms:
                     first_cloth = min(clothing_atoms, key=lambda x: (x.tag_order, x.span_order))
-                    if is_external_atom(first_cloth) and not is_external_atom(first_nude):
-                        winner, loser = first_cloth, first_nude
+                    if is_external_atom(first_cloth) and not (first_nude and is_external_atom(first_nude)):
+                        winner, loser = first_cloth, (first_nude or first_cloth)
                     else:
-                        winner, loser = first_nude, first_cloth
+                        winner, loser = (first_nude or first_cloth), first_cloth
                     conflicts.append(("residual_nudity_clothing_conflict", "nudity_clothing_conflicts", "nudity_removes_clothing", winner.atom_id, loser.atom_id))
                     if _is_loser_protected(loser):
                         protected_losers.append(loser)
+            elif detected_lvl in ("L1", "L2", "L4"):
+                violating_atoms = [
+                    a for a in detectable
+                    if a.source_slot != "nudity"
+                    and not is_external_atom(a)
+                    and not _is_atom_compatible_with_level_and_branch(a, detected_lvl, active_branch)
+                ]
+                if violating_atoms:
+                    first_bad = min(violating_atoms, key=lambda x: (x.tag_order, x.span_order))
+                    conflicts.append(("residual_nudity_clothing_conflict", "nudity_clothing_conflicts", "nudity_removes_clothing", nude_win_id, first_bad.atom_id))
+                    if _is_loser_protected(first_bad):
+                        protected_losers.append(first_bad)
 
         for gid in get_fallback_group_ids(r2_tf, role="trigger"):
             c_trig = select_fallback_patterns(r2_tf, role="trigger", group_id=gid)

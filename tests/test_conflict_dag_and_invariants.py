@@ -856,14 +856,14 @@ class TestConflictDAGAndInvariants(unittest.TestCase):
                 "dec_1": None,  # lighting drops nothing on post-state
                 "pre_dec_later": {"rule_id": "environmental_lighting_coherence", "action": "drop", "winner": ("atom_001",), "target": "atom_002"},
             },
-            # 2. nudity_clothing_conflicts
+            # 2. nudity_clothing_conflicts (L4 drops one_piece; underwear-layer opened state awaits clothing_style_state_coherence)
             "nudity_clothing_conflicts": {
                 "earlier_rid": "nudity_clothing_conflicts",
                 "later_rid": "clothing_style_state_coherence",
                 "atoms": [
                     make_cascade_atom("topless bare breasts", "nudity", 0, facts=SemanticFacts(visible_regions=("upper_body",)), item_id="nudity_l4"),
                     make_cascade_atom("one-piece dress", "clothing", 1, facts=SemanticFacts(visible_regions=("upper_body",), garment_topologies=("one_piece",), garment_states=("worn",)), item_id="item_001"),
-                    make_cascade_atom("unbuttoned blouse", "clothing", 2, facts=SemanticFacts(visible_regions=("upper_body",), garment_topologies=("top",), garment_states=("opened",)), item_id="item_002"),
+                    make_cascade_atom("unbuttoned lace lingerie", "clothing_state", 2, facts=SemanticFacts(visible_regions=("upper_body",), garment_topologies=("underwear",), garment_states=("opened",)), item_id="unbuttoned"),
                 ],
                 "intermediate_ids": ["atom_000", "atom_002"],
                 "final_ids": ["atom_000"],

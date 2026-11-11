@@ -107,15 +107,15 @@ class TestV121M0Reproductions(unittest.TestCase):
                     f"{cid}: expected complete outfit under {eff_lvl}, got missing={assessment.missing_parts}, texts={[a.text for a in cl_accepted]}",
                 )
 
-                # 首项为主款 origin，且所有源片段保留一致 provenance 与独立补件 ID
+                # 首项为主款 origin，且所有源片段保留一致 SelectionOrigin 与独立补件 item_id
                 first_style_id = cl_source[0].origin.selected_id if cl_source and cl_source[0].origin else None
                 self.assertIsNotNone(first_style_id)
                 for src_atom in cl_source:
                     self.assertIsNotNone(src_atom.provenance)
                     if src_atom.provenance.kind == "clothing_completion":
                         self.assertEqual(src_atom.source_item_id, src_atom.provenance.item_id)
-                        self.assertEqual(src_atom.origin.selected_id, src_atom.provenance.item_id)
-                        self.assertNotEqual(src_atom.origin.selected_id, first_style_id)
+                        self.assertEqual(src_atom.origin.selected_id, first_style_id)
+                        self.assertNotEqual(src_atom.provenance.item_id, first_style_id)
 
                 if eff_lvl == "L1":
                     for a in cl_accepted:
@@ -123,22 +123,25 @@ class TestV121M0Reproductions(unittest.TestCase):
                         self.assertNotIn(item_id, l1_banned_styles)
                         self.assertNotIn("g-strings", a.text.lower())
 
-                if cid in ("REP-OUTFIT-01", "REP-OUTFIT-02"):
-                    self.assertEqual(first_style_id, "knit_sweater")
+                if cid == "REP-OUTFIT-01":
+                    self.assertNotIn("sponge bath", res.positive.lower())
+                    self.assertNotIn("upright straddle", res.positive.lower())
+                elif cid == "REP-OUTFIT-02":
+                    self.assertEqual(first_style_id, "convenience_store")
                     self.assertTrue(any(a.provenance and a.provenance.kind == "clothing_completion" for a in cl_source))
                 elif cid == "REP-OUTFIT-04":
-                    self.assertEqual(first_style_id, "pencil_skirt")
-                    self.assertTrue(any(a.provenance and a.provenance.item_id == "t_shirt" for a in cl_accepted))
+                    self.assertEqual(first_style_id, "leather_skirt")
+                    self.assertTrue(any(a.provenance and a.provenance.kind == "clothing_completion" for a in cl_source))
                 elif cid == "REP-OUTFIT-07":
                     self.assertEqual(first_style_id, "footwear_sneakers")
                     self.assertTrue(any(a.provenance and a.provenance.item_id != "footwear_sneakers" for a in cl_accepted))
                 elif cid == "REP-OUTFIT-08":
-                    self.assertEqual(first_style_id, "armored_skirt")
-                    # 服装状态=None：严禁生成 clothing_state/extension，但必须补全上装
+                    self.assertEqual(first_style_id, "knit_sweater")
+                    # 服装状态=None：严禁生成 clothing_state/extension，但必须补全下装
                     self.assertFalse(any(a.provenance and a.provenance.kind in ("clothing_state", "clothing_extension") for a in cl_source))
                     self.assertTrue(any(a.provenance and a.provenance.kind == "clothing_completion" for a in cl_source))
                 elif cid == "REP-OUTFIT-09":
-                    self.assertEqual(first_style_id, "knit_sweater")
+                    self.assertEqual(first_style_id, "knit_vest")
                     self.assertTrue(any(a.provenance and a.provenance.kind == "clothing_completion" for a in cl_source))
                     cl_lower = " | ".join(a.text.lower() for a in cl_accepted)
                     self.assertNotIn("sheer chiffon", cl_lower)
@@ -165,48 +168,104 @@ class TestV121M0Reproductions(unittest.TestCase):
         self.assertTrue(res.completion_info and res.completion_info.get("repaired_ensemble"))
 
     def test_03_l3_l4_l6_branch_contradictions_and_l1_cross_slot_leaks(self) -> None:
-        """复现 L3/L4 分支冲突与未删净完整衣、L6 齐腰截断、以及 L1 跨槽位暴露泄露。"""
+        """M3 修复契约：L3/L4 单一相容分支与完整衣剔除、L6 下半身景别、L1 跨槽拦截、L5 discarded 保留。"""
+        from pathlib import Path
+        from lib.conflict_resolver import ConflictResolver
+        from lib.models import NUDITY_BRANCHES_BY_LEVEL, NudityConstraint, PromptAtom, SelectionOrigin, SemanticFacts, SpanType, TagProvenance
+
+        data_dir = Path(__file__).resolve().parent.parent / "data"
+
+        # REP-NUDITY-01: L3 仅选取单一相容分支，禁止出现跨分支互相矛盾标签
         res_l3, c_l3 = self._run_generator_case("REP-NUDITY-01")
-        self.assertEqual([a.text for a in res_l3.atoms if a.source_slot == "nudity"], c_l3["baseline_actual"]["nudity_texts"])
-        self.assertEqual([a.text for a in res_l3.atoms if a.source_slot == "clothing"], c_l3["baseline_actual"]["clothing_texts"])
+        self.assertEqual(res_l3.nudity_constraint.effective_level, "L3")
+        l3_branch = res_l3.nudity_constraint.selected_branch
+        self.assertIn(l3_branch, NUDITY_BRANCHES_BY_LEVEL["L3"])
+        l3_nudity_texts = [a.text for a in res_l3.atoms if a.source_slot == "nudity"]
+        self.assertNotEqual(l3_nudity_texts, c_l3["baseline_actual"]["nudity_texts"])
+        self.assertNotIn("bra pushed up above breasts", l3_nudity_texts)
+        self.assertNotIn("panties only", l3_nudity_texts)
+        for a in res_l3.atoms:
+            if a.source_slot == "nudity" and a.facts and a.facts.nudity_branches:
+                self.assertIn(l3_branch, a.facts.nudity_branches)
 
+        # REP-NUDITY-02: L4 选择单一微遮分支且绝不通过 material_penetration 重现连衣裙
         res_l4, c_l4 = self._run_generator_case("REP-NUDITY-02")
-        self.assertEqual([a.text for a in res_l4.atoms if a.source_slot == "nudity"], c_l4["baseline_actual"]["nudity_texts"])
-        # M1 已清理 linkage L4 general_tags 的伪造 underwear/wet_clinging 事实：
-        # 原始连衣裙仍被 drop，不再触发 material_penetration 误改写为 wet dress；
-        # 剩余 L4 局部遮挡分支与 sfw_exposure 扩展冲突留待 M2/M3 统一消解。
-        decisions = res_l4.resolution_report.decisions
-        drop_step, replace_step = c_l4["baseline_actual"]["resolution_chain"]
-        dropped_texts = [d.before_text for d in decisions if d.rule_id == drop_step["rule_id"] and d.action == drop_step["action"]]
-        self.assertEqual(dropped_texts, drop_step["dropped_texts"])
-        replaced_decisions = [d for d in decisions if d.rule_id == replace_step["rule_id"] and d.action == replace_step["action"]]
-        self.assertEqual(replaced_decisions, [])
-        l4_clothing_texts = [a.text for a in res_l4.atoms if a.source_slot == "clothing"]
-        self.assertNotIn(replace_step["produced_text"], l4_clothing_texts)
-        self.assertIn("topless", l4_clothing_texts)
-        self.assertIn("bare breasts exposed", l4_clothing_texts)
+        self.assertEqual(res_l4.nudity_constraint.effective_level, "L4")
+        self.assertIn(res_l4.nudity_constraint.selected_branch, NUDITY_BRANCHES_BY_LEVEL["L4"])
+        l4_clothing = [a for a in res_l4.atoms if a.source_slot == "clothing"]
+        self.assertNotIn("wet dress clinging tightly to skin", [a.text for a in l4_clothing])
+        for a in l4_clothing:
+            topos = set(a.facts.garment_topologies) if a.facts else set()
+            self.assertFalse(topos & {"top", "bottom_pants", "bottom_skirt", "outerwear", "one_piece", "ensemble_outfit"})
 
-        res_l6, c_l6 = self._run_generator_case("REP-NUDITY-03")
-        self.assertEqual([a.text for a in res_l6.atoms if a.source_slot == "nudity"], c_l6["baseline_actual"]["nudity_texts"])
-        self.assertEqual([a.text for a in res_l6.atoms if a.source_slot == "shot_type"], c_l6["baseline_actual"]["shot_type_texts"])
+        # 定向回归：L4 + sheer_chiffon 经 material_penetration 不得改写为 wet dress clinging tightly to skin
+        resolver = ConflictResolver(data_dir)
+        l4_c = NudityConstraint(
+            requested_level="L4",
+            effective_level="L4",
+            source="ui_explicit",
+            selected_branch="l4_panties_only",
+        )
+        sheer_atom = PromptAtom(
+            atom_id="rep02_sheer",
+            text="sheer silk fabric",
+            span_type=SpanType.PLAIN,
+            source_slot="clothing",
+            source_item_id="sheer_chiffon",
+            tag_order=1,
+            span_order=0,
+            provenance=TagProvenance(item_id="sheer_chiffon", kind="clothing", parent_ids=("sheer_chiffon",)),
+            origin=SelectionOrigin(mode="preset", selector="clothing", selected_id="sheer_chiffon"),
+            facts=SemanticFacts(garment_topologies=("one_piece",), garment_states=("worn",), pattern_textures=("sheer",)),
+        )
+        res_m, _, rep_m = resolver.resolve_atoms_with_full_report([sheer_atom], Random(42), nudity_constraint=l4_c)
+        self.assertEqual([a.atom_id for a in res_m], [])
+        self.assertTrue(any(d.rule_id == "nudity_clothing_conflicts" for d in rep_m.decisions))
 
+        # REP-NUDITY-03: L6 剔除齐腰/特写截断构图
+        res_l6, _ = self._run_generator_case("REP-NUDITY-03")
+        self.assertEqual(res_l6.nudity_constraint.effective_level, "L6")
+        l6_shot_low = " | ".join(a.text.lower() for a in res_l6.atoms if a.source_slot in ("shot_type", "camera_angle"))
+        self.assertNotIn("waist-up framing", l6_shot_low)
+        self.assertNotIn("medium shot", l6_shot_low)
+
+        # REP-NUDITY-04: L1 随机主题绝不选出露骨主题，显式跨槽裸露饰品/发丝/纹身均被拦截并留痕
         res_leak, c_leak = self._run_generator_case("REP-NUDITY-04")
         pos_low = res_leak.positive.lower()
         for frag in c_leak["baseline_actual"]["leaked_fragments"]:
-            self.assertIn(frag.lower(), pos_low)
+            self.assertNotIn(frag.lower(), pos_low)
+        dropped_by_nudity = [d for d in res_leak.resolution_report.decisions if d.rule_id == "nudity_clothing_conflicts" and d.action == "drop"]
+        self.assertGreaterEqual(len(dropped_by_nudity), 3)
 
-        res_l5, c_l5 = self._run_generator_case("REP-NUDITY-05")
-        self.assertEqual([a.text for a in res_l5.atoms if a.source_slot == "nudity"], c_l5["baseline_actual"]["nudity_texts"])
-        self.assertEqual([a.text for a in res_l5.source_atoms if a.source_slot == "clothing"], c_l5["baseline_actual"]["source_clothing_texts"])
-        self.assertEqual([a.text for a in res_l5.atoms if a.source_slot == "clothing"], c_l5["baseline_actual"]["accepted_clothing_texts"])
+        # REP-NUDITY-05: L5 对普通面部特写无全局禁令，且 discarded 叙事在对应分支完整保留
+        res_l5, _ = self._run_generator_case("REP-NUDITY-05")
+        self.assertEqual(res_l5.nudity_constraint.effective_level, "L5")
+        res_l5_disc = self.generator.generate_structured(
+            裸露等级="L5 极致全裸 (Full Nude)",
+            服装款式="随机 (Random)",
+            服装状态="自动联动裸露等级 (Auto Link Nudity)",
+            景别构图="close_up",
+            prompt_seed=1,
+        )
+        self.assertEqual(res_l5_disc.nudity_constraint.effective_level, "L5")
+        self.assertIn("close", res_l5_disc.positive.lower())
 
-        res_l4_top, c_l4_top = self._run_generator_case("REP-NUDITY-06")
-        self.assertEqual(len(res_l4_top.resolution_report.decisions), c_l4_top["baseline_actual"]["decision_count"])
-        kept_top_texts = [a.text for a in res_l4_top.atoms if a.source_slot == "clothing" and "top" in a.facts.garment_topologies]
-        self.assertEqual(kept_top_texts, c_l4_top["baseline_actual"]["retained_top_texts"])
+        # REP-NUDITY-06: L4 严格移除所有 VALID_GARMENT_TOPOLOGIES 完整衣物（含 'top' / knit_sweater）
+        res_l4_top, _ = self._run_generator_case("REP-NUDITY-06")
+        for a in res_l4_top.atoms:
+            if a.source_slot == "clothing" and a.facts:
+                self.assertFalse(set(a.facts.garment_topologies) & {"top", "bottom_pants", "bottom_skirt", "outerwear", "one_piece", "ensemble_outfit"})
+        res_l4_knit = self.generator.generate_structured(
+            裸露等级="L4 重点暴露 (Topless / Bottomless)",
+            服装款式="knit_sweater",
+            服装状态="无 (None)",
+            prompt_seed=0,
+        )
+        self.assertFalse(any(a.source_item_id == "knit_sweater" for a in res_l4_knit.atoms))
+        self.assertTrue(any(d.rule_id == "nudity_clothing_conflicts" and d.action == "drop" for d in res_l4_knit.resolution_report.decisions))
 
     def test_04_presets_ignore_explicit_nudity_level(self) -> None:
-        """复现固定预设与随机预设均跳过界面显式裸露等级选择（L1 与 L5 逐字相同）。"""
+        """M3 修复契约：固定预设与随机预设严格受界面 L1..L6 约束并标注已调整，UI 随机时保留 preset_native。"""
         for cid in ("REP-PRESET-01", "REP-PRESET-02"):
             with self.subTest(case_id=cid):
                 case = self.cases[cid]
@@ -221,15 +280,30 @@ class TestV121M0Reproductions(unittest.TestCase):
                     裸露等级=lvl_b,
                     prompt_seed=case["seed"],
                 )
-                self.assertEqual(res_a.positive, res_b.positive)
+                self.assertNotEqual(res_a.positive, res_b.positive)
+                self.assertEqual(res_a.nudity_constraint.effective_level, "L1")
+                self.assertEqual(res_b.nudity_constraint.effective_level, "L5")
+                self.assertTrue(res_a.preset_adjusted)
+                self.assertIn("已调整", res_a.description)
+                self.assertIn("已调整", res_b.description)
                 if "shared_violation_tokens_in_l1" in case["baseline_actual"]:
                     for tok in case["baseline_actual"]["shared_violation_tokens_in_l1"]:
-                        self.assertIn(tok, res_a.positive.lower())
-                if "preset_desc" in case["baseline_actual"]:
-                    self.assertEqual(res_a.description, case["baseline_actual"]["preset_desc"])
+                        self.assertNotIn(tok, res_a.positive.lower())
+                if cid == "REP-PRESET-02":
+                    res_native = self.generator.generate_structured(
+                        预设模板=case["inputs"]["预设模板"],
+                        裸露等级="随机 (Random)",
+                        prompt_seed=case["seed"],
+                    )
+                    self.assertEqual(res_native.nudity_constraint.source, "preset_native")
+                    self.assertFalse(res_native.preset_adjusted)
 
     def test_05_budget_truncation_splits_complete_outfit(self) -> None:
-        """验证套装锚点不误报对照，并复现无锚点分体穿搭在预算裁剪后真正缺件。"""
+        """M3 修复契约：优先保留完整套装/核心上下装（仅验收 accepted_atoms），超紧预算明确报错。"""
+        from lib.errors import PromptValidationError
+        from lib.models import SelectionOrigin
+        from lib.outfit_completion import assess_clothing_completeness
+
         c1 = self.cases["REP-BUDGET-01"]
         n_frags = c1["inputs"]["quality_override_fragment_count"]
         long_quality = ", ".join(f"masterpiece quality detail token{i}" for i in range(n_frags))
@@ -241,63 +315,73 @@ class TestV121M0Reproductions(unittest.TestCase):
             quality_override=long_quality,
             prompt_seed=c1["seed"],
         )
-        self.assertEqual(
-            [a.text for a in res1.atoms if a.source_slot == "clothing"],
-            c1["baseline_actual"]["accepted_clothing"],
-        )
+        cl_acc_1 = [a for a in res1.atoms if a.source_slot == "clothing"]
+        self.assertTrue(assess_clothing_completeness(cl_acc_1, (), "L1").is_complete)
         anchor_atom = next(a for a in res1.atoms if a.text == c1["baseline_actual"]["accepted_ensemble_anchor"])
         self.assertIn("ensemble_outfit", anchor_atom.facts.garment_topologies)
-        self.assertEqual(
-            [a.text for a in res1.budget_filtered_atoms if a.source_slot == "clothing"],
-            c1["baseline_actual"]["budget_filtered_clothing"],
-        )
 
         c2 = self.cases["REP-BUDGET-02"]
         slots_inp = c2["inputs"]["slots"]
+        frags_2 = {
+            "scene_theme": [
+                PromptFragment(
+                    text=slots_inp["scene_theme"],
+                    source_slot="scene_theme",
+                    order=0,
+                    origin=SelectionOrigin(mode="custom", selector="scene_theme", raw_value=slots_inp["scene_theme"]),
+                    facts=SemanticFacts(semantic_role="scene_anchor", space_kind="indoor"),
+                )
+            ],
+            "nudity": [
+                PromptFragment(
+                    text=slots_inp["nudity"],
+                    source_slot="nudity",
+                    source_item_id="nudity_l1",
+                    order=1,
+                    provenance=TagProvenance(item_id="nudity_l1", kind="nudity", semantic_ids=("nudity:L1",)),
+                    facts=SemanticFacts(semantic_role="selector"),
+                )
+            ],
+            "clothing": [
+                PromptFragment(
+                    text=slots_inp["clothing"][0],
+                    source_slot="clothing",
+                    source_item_id="shirts_blouses",
+                    order=2,
+                    provenance=TagProvenance(item_id="shirts_blouses", kind="base_clothing"),
+                    facts=SemanticFacts(semantic_role="selector", garment_topologies=("top",), piece_role="top", covered_regions=("upper_torso",)),
+                ),
+                PromptFragment(
+                    text=slots_inp["clothing"][1],
+                    source_slot="clothing",
+                    source_item_id="pleated_skirt",
+                    order=3,
+                    provenance=TagProvenance(item_id="pleated_skirt", kind="clothing_completion"),
+                    facts=SemanticFacts(semantic_role="selector", garment_topologies=("bottom_skirt",), piece_role="bottom", covered_regions=("lower_torso",)),
+                ),
+            ],
+        }
         res2 = _assembler.assemble_slots(
-            {
-                "scene_theme": [
-                    PromptFragment(
-                        text=slots_inp["scene_theme"],
-                        source_slot="scene_theme",
-                        order=0,
-                        facts=SemanticFacts(semantic_role="scene_anchor", space_kind="indoor"),
-                    )
-                ],
-                "nudity": [
-                    PromptFragment(
-                        text=slots_inp["nudity"],
-                        source_slot="nudity",
-                        source_item_id="nudity_l1",
-                        order=1,
-                        provenance=TagProvenance(item_id="nudity_l1", kind="nudity", semantic_ids=("nudity:L1",)),
-                        facts=SemanticFacts(semantic_role="selector"),
-                    )
-                ],
-                "clothing": [
-                    PromptFragment(
-                        text=slots_inp["clothing"][0],
-                        source_slot="clothing",
-                        source_item_id="shirts_blouses",
-                        order=2,
-                        provenance=TagProvenance(item_id="shirts_blouses", kind="base_clothing"),
-                        facts=SemanticFacts(semantic_role="selector", garment_topologies=("top",)),
-                    ),
-                    PromptFragment(
-                        text=slots_inp["clothing"][1],
-                        source_slot="clothing",
-                        source_item_id="pleated_skirt",
-                        order=3,
-                        provenance=TagProvenance(item_id="pleated_skirt", kind="base_clothing"),
-                        facts=SemanticFacts(semantic_role="selector", garment_topologies=("bottom_skirt",)),
-                    ),
-                ],
-            },
+            frags_2,
             rng=Random(c2["seed"]),
             max_words=c2["inputs"]["max_words"],
         )
-        self.assertEqual(res2.prompt, c2["baseline_actual"]["prompt"])
-        self.assertEqual([a.text for a in res2.budget_filtered_atoms], c2["baseline_actual"]["budget_filtered"])
+        cl_acc_2 = [a for a in res2.accepted_atoms if a.source_slot == "clothing"]
+        self.assertEqual([a.text for a in cl_acc_2], slots_inp["clothing"])
+        self.assertTrue(assess_clothing_completeness(cl_acc_2, (), "L1").is_complete)
+        tight_frags = dict(frags_2)
+        tight_frags["scene_theme"] = [
+            PromptFragment(
+                text="cozy sunlit wooden bedroom",
+                source_slot="scene_theme",
+                order=0,
+                origin=SelectionOrigin(mode="custom", selector="scene_theme", raw_value="cozy sunlit wooden bedroom"),
+                facts=SemanticFacts(semantic_role="scene_anchor", space_kind="indoor"),
+            )
+        ]
+        with self.assertRaises(PromptValidationError) as ctx_tight:
+            _assembler.assemble_slots(tight_frags, rng=Random(c2["seed"]), max_words=6)
+        self.assertEqual(ctx_tight.exception.error_code, "insufficient_budget_for_complete_outfit")
 
         c3 = self.cases["REP-BUDGET-03"]
         n_frags_3 = c3["inputs"]["quality_override_fragment_count"]
@@ -311,12 +395,9 @@ class TestV121M0Reproductions(unittest.TestCase):
             prompt_seed=c3["seed"],
         )
         acc_cl_3 = [a for a in res3.atoms if a.source_slot == "clothing"]
-        self.assertEqual([a.text for a in acc_cl_3], c3["baseline_actual"]["accepted_clothing"])
-        self.assertEqual([list(a.facts.garment_topologies) for a in acc_cl_3], c3["baseline_actual"]["accepted_clothing_topologies"])
-        self.assertEqual(
-            [a.text for a in res3.budget_filtered_atoms if a.source_slot == "clothing"],
-            c3["baseline_actual"]["budget_filtered_clothing"],
-        )
+        self.assertTrue(assess_clothing_completeness(acc_cl_3, (), "L1").is_complete)
+        self.assertIn("sleeveless cheerleader crop top", [a.text for a in acc_cl_3])
+        self.assertIn("mini pleated skirt", [a.text for a in acc_cl_3])
 
     def test_06_exempt_entry_compatibility_l1_none_and_explicit_single(self) -> None:
         """验证豁免入口兼容性：L1 + 服装=None 跳过槽位允许通过，显式单品不自动补全亦不报错。"""

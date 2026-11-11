@@ -2964,6 +2964,8 @@ class GenerationResult:
     budget_filter_records: Tuple[BudgetFilterRecord, ...] = ()
     overrides: Tuple[OverrideRecord, ...] = ()
     nudity_constraint: Optional[NudityConstraint] = None
+    outfit_completion_info: Optional[Dict[str, Any]] = field(default=None, compare=False, hash=False)
+    preset_adjusted: bool = False
 
 
 @dataclass(frozen=True)
@@ -2994,6 +2996,7 @@ class AssemblyResult:
     budget_filter_records: Tuple[BudgetFilterRecord, ...] = ()
     overrides: Tuple[OverrideRecord, ...] = ()
     nudity_constraint: Optional[NudityConstraint] = None
+    preset_adjusted: bool = False
 
 
 def is_external_atom(a: Any) -> bool:

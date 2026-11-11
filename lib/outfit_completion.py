@@ -1194,7 +1194,7 @@ def _select_companion_piece(
         [picked_raw],
         cid,
         "clothing_completion",
-        semantic_ids=(f"clothing:{cid}", "completion:auto_outfit", f"nudity:{nudity_level_code}"),
+        semantic_ids=(f"clothing:{cid}", f"nudity:{nudity_level_code}"),
         rng=rng,
     )
     if not sampled:
@@ -1202,7 +1202,7 @@ def _select_companion_piece(
 
     comp_prov = TagProvenance(
         item_id=cid,
-        semantic_ids=(f"clothing:{cid}", "completion:auto_outfit", f"nudity:{nudity_level_code}"),
+        semantic_ids=(f"clothing:{cid}", f"nudity:{nudity_level_code}"),
         kind="clothing_completion",
         parent_ids=(cid,),
     )
