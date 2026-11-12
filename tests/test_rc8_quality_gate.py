@@ -629,7 +629,16 @@ def verify_m5_historical_archive(manifest_path: Path, archive_path: Path, repo_d
                             destination.write(chunk)
                 else:
                     raise AssertionError(f"Unexpected entry in historical source archive: {member.name}")
-        return verify_m5_archive_evidence(manifest_path, archive_path, root, stream_recompute=stream_recompute)
+        return verify_m5_archive_evidence(
+            manifest_path,
+            archive_path,
+            root,
+            stream_recompute=stream_recompute,
+            expected_archive_size=EXPECTED_M5_ARCHIVE_SIZE,
+            expected_archive_sha256=EXPECTED_M5_ARCHIVE_SHA256,
+            expected_golden_hash=EXPECTED_M5_GOLDEN_HASH,
+            expected_core_digest=EXPECTED_M5_CORE_SOURCE_DIGEST,
+        )
 
 
 class TestRC8QualityGate(unittest.TestCase):
