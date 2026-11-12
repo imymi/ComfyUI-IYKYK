@@ -33,10 +33,11 @@ import os
 from pathlib import Path
 import platform
 from random import Random
+import re
 import subprocess
 import sys
 import time
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Tuple
 
 REPO_DIR = Path(__file__).resolve().parent.parent
 DATA_DIR = REPO_DIR / "data"
@@ -45,7 +46,7 @@ if str(REPO_DIR) not in sys.path:
     sys.path.insert(0, str(REPO_DIR))
 
 from lib.conflict_resolver import ConflictResolver, find_carrier_mismatch_in_atoms  # noqa: E402
-from lib.lexer import validate_prompt_syntax  # noqa: E402
+from lib.lexer import parse_prompt, split_top_level_tags, validate_prompt_syntax  # noqa: E402
 from lib.sampler import DataSampler, _is_tag_compatible_with_nudity  # noqa: E402
 import nodes  # noqa: E402
 from scratch.run_m5_3_audit import stream_archive_records  # noqa: E402
@@ -191,21 +192,69 @@ def _worker_10k_chunk(args: tuple[int, int]) -> List[Dict[str, Any]]:
         comp_info = getattr(r1, "outfit_completion_info", None) or {}
         pos_hash = hashlib.sha256(r1.positive.encode("utf-8")).hexdigest()
         audit_obj = json.loads(d_audit)
+        global_atom_texts: Dict[str, str] = {}
+        for atom_src in (r1.source_atoms, r1.atoms, r1.budget_filtered_atoms, r1.deduplicated_atoms):
+            for a_obj in atom_src:
+                aid = getattr(a_obj, "atom_id", None)
+                atxt = getattr(a_obj, "text", "")
+                if aid and atxt and aid not in global_atom_texts:
+                    global_atom_texts[aid] = atxt
+
+        occ_counter: collections.Counter[str] = collections.Counter()
         selections_summary = []
         for sel in audit_obj.get("selections", []):
             if not isinstance(sel, dict):
                 continue
-            cf = (sel.get("sampling_rationale") or {}).get("candidate_filter") or {}
+            sel_name = sel.get("selector")
+            occ = occ_counter[sel_name]
+            occ_counter[sel_name] += 1
+            produced_map = {
+                p.get("atom_id"): p.get("text", "")
+                for p in sel.get("produced_atoms", [])
+                if isinstance(p, dict) and p.get("atom_id")
+            }
+            rat = sel.get("sampling_rationale") or {}
+            cf = rat.get("candidate_filter") or {}
+            dist = rat.get("distribution") or {}
+            dist_sha256 = (
+                hashlib.sha256(json.dumps(dist, sort_keys=True).encode("utf-8")).hexdigest()
+                if dist
+                else None
+            )
+            budget_filtered_texts = [
+                produced_map.get(b.get("atom_id")) or global_atom_texts.get(b.get("atom_id"), "")
+                for b in sel.get("budget_filtered_records", [])
+                if isinstance(b, dict)
+            ]
+            budget_filtered_texts = [t for t in budget_filtered_texts if t]
+            dedup_records_clean = []
+            deduplicated_texts: List[str] = []
+            for dr in sel.get("deduplicated_records", []):
+                if not isinstance(dr, dict):
+                    continue
+                d_aid = dr.get("atom_id")
+                d_txt = produced_map.get(d_aid) or global_atom_texts.get(d_aid, "") or dr.get("retained_tag_text", "")
+                if d_txt:
+                    deduplicated_texts.append(d_txt)
+                dedup_records_clean.append({
+                    "atom_id": d_aid,
+                    "text": d_txt,
+                    "basis": dr.get("basis"),
+                    "retained_tag_text": dr.get("retained_tag_text", ""),
+                })
             selections_summary.append({
-                "selector": sel.get("selector"),
+                "selector": sel_name,
+                "occ": occ,
                 "selected_id": sel.get("selected_id"),
                 "accepted_texts": [a.get("text", "") for a in sel.get("accepted_atoms", [])],
                 "excluded_hard_conflicts": list(cf.get("excluded_hard_conflicts", [])),
                 "passed_candidates": cf.get("passed_candidates"),
                 "total_candidates": cf.get("total_candidates"),
-                "budget_filtered_texts": [
-                    b.get("text", "") for b in sel.get("budget_filtered_records", []) if isinstance(b, dict)
-                ],
+                "active_contexts": list(rat.get("active_contexts") or []),
+                "dist_sha256": dist_sha256,
+                "budget_filtered_texts": budget_filtered_texts,
+                "deduplicated_texts": deduplicated_texts,
+                "deduplicated_records": dedup_records_clean,
             })
         decision_sigs = [
             {
@@ -380,10 +429,58 @@ _POSE_BANNED_IN_L1 = (
     "cum dripping", "dripping on", "cupping breasts",
 )
 _SUBTAG_FILTER_CACHE: Optional[Dict[tuple[str, str, str], Dict[str, Any]]] = None
+_REPLAY_SAMPLER_CACHE: Optional[DataSampler] = None
+_REPLAY_GENERATOR_CACHE: Optional[nodes.IYKYKPromptGenerator] = None
+_REPLAY_DIAGNOSTICS_CACHE: Optional[nodes.IYKYKPromptDiagnostics] = None
+_ALL_NUDITY_LEVELS = ("L1", "L2", "L3", "L4", "L5", "L6")
+
+_SELECTOR_SUBSTREAM_MAP: Dict[str, Optional[str]] = {
+    "nudity": "selector:nudity",
+    "scene": "selector:scene_theme",
+    "theme": "selector:theme",
+    "shot_type": "selector:shot_type",
+    "camera_angle": "selector:camera_angle",
+    "clothing": "selector:clothing",
+    "lighting": "selector:lighting",
+    "pose": "selector:pose",
+    "expression": "selector:expression",
+    "film": "selector:film",
+    "makeup": "selector:makeup",
+    "hairstyle": "selector:hairstyle",
+    "jewelry": "selector:jewelry",
+    "imperfections": "selector:imperfections",
+    "tattoo": "selector:tattoo",
+    "props": "selector:props",
+    "character": "selector:character",
+    "liquids": "selector:liquids",
+    "quality": None,
+}
+
+
+def _get_replay_sampler() -> DataSampler:
+    global _REPLAY_SAMPLER_CACHE
+    if _REPLAY_SAMPLER_CACHE is None:
+        _REPLAY_SAMPLER_CACHE = DataSampler(DATA_DIR)
+    return _REPLAY_SAMPLER_CACHE
+
+
+def _get_replay_nodes() -> tuple[nodes.IYKYKPromptGenerator, nodes.IYKYKPromptDiagnostics]:
+    global _REPLAY_GENERATOR_CACHE, _REPLAY_DIAGNOSTICS_CACHE
+    if _REPLAY_GENERATOR_CACHE is None:
+        _REPLAY_GENERATOR_CACHE = nodes.IYKYKPromptGenerator()
+    if _REPLAY_DIAGNOSTICS_CACHE is None:
+        _REPLAY_DIAGNOSTICS_CACHE = nodes.IYKYKPromptDiagnostics()
+    return _REPLAY_GENERATOR_CACHE, _REPLAY_DIAGNOSTICS_CACHE
 
 
 def _tag_text(tag: Any) -> str:
     return (tag.get("text", "") if isinstance(tag, dict) else str(tag)).strip()
+
+
+def _dist_hash(dist: Any) -> Optional[str]:
+    if not dist:
+        return None
+    return hashlib.sha256(json.dumps(dist, sort_keys=True).encode("utf-8")).hexdigest()
 
 
 def _get_subtag_filter_index() -> Dict[tuple[str, str, str], Dict[str, Any]]:
@@ -392,20 +489,18 @@ def _get_subtag_filter_index() -> Dict[tuple[str, str, str], Dict[str, Any]]:
     if _SUBTAG_FILTER_CACHE is not None:
         return _SUBTAG_FILTER_CACHE
 
-    sampler = DataSampler(DATA_DIR)
+    sampler = _get_replay_sampler()
     idx: Dict[tuple[str, str, str], Dict[str, Any]] = {}
 
-    shot_data = sampler._load("shot_types")
-    for slot_name, items in (
-        ("shot_type", shot_data.get("shot_types", [])),
-        ("camera_angle", shot_data.get("camera_angles", [])),
-    ):
+    def _index_items(slot_name: str, items: List[Dict[str, Any]], use_flatten: bool = False) -> None:
         for item in items:
+            if not isinstance(item, dict):
+                continue
             item_id = item.get("id", "")
-            raw_tags = list(item.get("tags", []))
+            raw_tags = sampler._flatten_tags(item) if use_flatten else list(item.get("tags", []))
             if not item_id or not raw_tags:
                 continue
-            for lvl in ("L1", "L2", "L6"):
+            for lvl in _ALL_NUDITY_LEVELS:
                 filtered = [
                     tg for tg in raw_tags
                     if _is_tag_compatible_with_nudity(tg, lvl, slot_name=slot_name, item_id=item_id)
@@ -415,6 +510,19 @@ def _get_subtag_filter_index() -> Dict[tuple[str, str, str], Dict[str, Any]]:
                         "dropped_count": len(raw_tags) - len(filtered),
                         "compat_texts": frozenset(_tag_text(tg) for tg in filtered if _tag_text(tg)),
                     }
+
+    shot_data = sampler._load("shot_types")
+    _index_items("shot_type", shot_data.get("shot_types", []))
+    _index_items("camera_angle", shot_data.get("camera_angles", []))
+    _index_items("theme", sampler._load("themes").get("themes", []))
+
+    acc_data = sampler._load("accessories")
+    _index_items("hairstyle", acc_data.get("hairstyles", []))
+    _index_items("jewelry", acc_data.get("headwear_jewelry", []))
+
+    _index_items("tattoo", sampler._load("tattoos").get("categories", []))
+    _index_items("props", sampler._load("props").get("categories", []), use_flatten=True)
+    _index_items("liquids", sampler._load("nudity_levels").get("liquid_effects", []))
 
     pose_data = sampler._load("poses")
     for cat in pose_data.get("pose_categories", []):
@@ -436,24 +544,665 @@ def _get_subtag_filter_index() -> Dict[tuple[str, str, str], Dict[str, Any]]:
                 "dropped_count": len(all_tags) - len(l1_filtered),
                 "compat_texts": frozenset(_tag_text(tg) for tg in l1_filtered if _tag_text(tg)),
             }
-        l2_filtered = [
-            tg for tg in all_tags
-            if _is_tag_compatible_with_nudity(tg, "L2", slot_name="pose", item_id=cat_id)
-        ]
-        if 0 < len(l2_filtered) < len(all_tags):
-            idx[("pose", cat_id, "L2")] = {
-                "dropped_count": len(all_tags) - len(l2_filtered),
-                "compat_texts": frozenset(_tag_text(tg) for tg in l2_filtered if _tag_text(tg)),
-            }
+        for lvl in ("L2", "L3", "L4", "L5", "L6"):
+            lvl_filtered = [
+                tg for tg in all_tags
+                if _is_tag_compatible_with_nudity(tg, lvl, slot_name="pose", item_id=cat_id)
+            ]
+            if 0 < len(lvl_filtered) < len(all_tags):
+                idx[("pose", cat_id, lvl)] = {
+                    "dropped_count": len(all_tags) - len(lvl_filtered),
+                    "compat_texts": frozenset(_tag_text(tg) for tg in lvl_filtered if _tag_text(tg)),
+                }
 
     _SUBTAG_FILTER_CACHE = idx
     return _SUBTAG_FILTER_CACHE
 
 
+_VARIANT_PARENT_CACHE: Optional[Dict[tuple[str, str], str]] = None
+
+
+def _get_variant_parent_index() -> Dict[tuple[str, str], str]:
+    global _VARIANT_PARENT_CACHE
+    if _VARIANT_PARENT_CACHE is not None:
+        return _VARIANT_PARENT_CACHE
+    sampler = _get_replay_sampler()
+    idx: Dict[tuple[str, str], str] = {}
+    for cat in sampler._load("props").get("categories", []):
+        cid = cat.get("id", "")
+        if not cid:
+            continue
+        for sub_key in ("items", "subcategories", "variants"):
+            for it in cat.get(sub_key, []) or ():
+                if isinstance(it, dict) and it.get("id"):
+                    idx[("props", it["id"])] = cid
+    for cat in sampler._load("poses").get("pose_categories", []):
+        cid = cat.get("id", "")
+        if not cid:
+            continue
+        for sub in cat.get("subcategories", []) or ():
+            if isinstance(sub, dict) and sub.get("id"):
+                idx[("pose", sub["id"])] = cid
+    _VARIANT_PARENT_CACHE = idx
+    return _VARIANT_PARENT_CACHE
+
+
+def _split_fragments_to_atom_texts(frags: List[Any]) -> Tuple[str, ...]:
+    out: List[str] = []
+    for f in frags:
+        txt = getattr(f, "text", "") if not isinstance(f, str) else f
+        if not txt or not str(txt).strip():
+            continue
+        parsed = parse_prompt(str(txt))
+        if parsed.tags:
+            for tag in parsed.tags:
+                for sp in tag.spans:
+                    if sp.text:
+                        out.append(sp.text)
+        else:
+            out.append(str(txt).strip())
+    return tuple(out)
+
+
+def _extract_result_replay_entry(
+    res: Any,
+    frags: List[Any],
+    sel_name: str,
+    rng_stream: Optional[str],
+) -> Dict[str, Any]:
+    item_id = (
+        getattr(res, "style_id", None)
+        or getattr(res, "theme_id", None)
+        or getattr(res, "item_id", None)
+        if res is not None
+        else None
+    )
+    rat = getattr(res, "sampling_rationale", None) if res is not None else None
+    cf = (rat or {}).get("candidate_filter") or {} if isinstance(rat, dict) else {}
+    dist = (rat or {}).get("distribution") or {} if isinstance(rat, dict) else {}
+    act_ctx = list((rat or {}).get("active_contexts") or []) if isinstance(rat, dict) else []
+    raw_texts = _split_fragments_to_atom_texts(frags)
+    parent_id = _get_variant_parent_index().get((sel_name, item_id)) if item_id else None
+    valid_candidate = (
+        item_id is None
+        or not dist
+        or item_id in dist
+        or (parent_id is not None and parent_id in dist)
+    )
+    return {
+        "selector": sel_name,
+        "selected_id": item_id,
+        "rng_stream": rng_stream,
+        "raw_texts": raw_texts,
+        "excluded_hard_conflicts": tuple(cf.get("excluded_hard_conflicts", [])),
+        "passed_candidates": cf.get("passed_candidates"),
+        "total_candidates": cf.get("total_candidates"),
+        "active_contexts": act_ctx,
+        "dist_sha256": _dist_hash(dist),
+        "valid_candidate": valid_candidate,
+    }
+
+
+def _replay_seed_selectors(
+    seed: int,
+    needed_selectors: set[str],
+    controlled_rebuild_attempted: bool = False,
+) -> Dict[str, Any]:
+    """Deterministically replay upstream constraints and any requested selector slots via exact PRNG substreams."""
+    sampler = _get_replay_sampler()
+
+    rng_nudity = nodes.derive_substream_rng(seed, "selector:nudity")
+    nudity_res, nudity_constraint = sampler.resolve_nudity_constraint(
+        DEFAULT_INPUTS["裸露等级"],
+        rng_nudity,
+        has_preset=False,
+        external_overrides=None,
+        explicit_clothing=DEFAULT_INPUTS["服装款式"],
+        clothing_state=DEFAULT_INPUTS["服装状态"],
+    )
+    lvl_code = nudity_constraint.effective_level or "L1"
+    nudity_branch = nudity_constraint.selected_branch
+
+    rng_scene = nodes.derive_substream_rng(seed, "selector:scene_theme")
+    scene_res = sampler.sample_scene_result(DEFAULT_INPUTS["场景大类"], rng_scene)
+    rng_theme = nodes.derive_substream_rng(seed, "selector:theme")
+    theme_res = sampler.sample_theme_result(DEFAULT_INPUTS["剧情主题"], rng_theme, nudity_level_code=lvl_code)
+
+    scene_cids = scene_res.context_ids if (scene_res and hasattr(scene_res, "context_ids")) else ()
+    theme_cids = theme_res.context_ids if (theme_res and hasattr(theme_res, "context_ids")) else ()
+    scene_item_id = getattr(scene_res, "item_id", None)
+    theme_item_id = getattr(theme_res, "theme_id", getattr(theme_res, "item_id", None))
+    primary_context = scene_res.context_ids[0] if (scene_res and scene_res.context_ids) else "generic"
+    context = primary_context if primary_context != "generic" else sampler.detect_context(DEFAULT_INPUTS["场景大类"], DEFAULT_INPUTS["剧情主题"])
+    context_profile = nodes.compute_context_profile(scene_cids, theme_cids, scene_item_id, theme_item_id)
+
+    slots: Dict[Tuple[str, int], Dict[str, Any]] = {}
+    slots[("nudity", 0)] = _extract_result_replay_entry(
+        nudity_res,
+        nodes._make_slot_fragments(nudity_res, "nudity", DEFAULT_INPUTS["裸露等级"], "generator"),
+        "nudity",
+        "selector:nudity",
+    )
+    slots[("scene", 0)] = _extract_result_replay_entry(
+        scene_res,
+        nodes._make_slot_fragments(scene_res, "scene_theme", DEFAULT_INPUTS["场景大类"], "generator", selector="scene"),
+        "scene",
+        "selector:scene_theme",
+    )
+    slots[("theme", 0)] = _extract_result_replay_entry(
+        theme_res,
+        nodes._make_slot_fragments(theme_res, "scene_theme", DEFAULT_INPUTS["剧情主题"], "generator", selector="theme")
+        if theme_res
+        else [],
+        "theme",
+        "selector:theme",
+    )
+
+    shot_res = None
+    if needed_selectors & {"shot_type", "camera_angle", "pose", "props"}:
+        shot_res = sampler.sample_shot_type_result(
+            DEFAULT_INPUTS["景别构图"],
+            nodes.derive_substream_rng(seed, "selector:shot_type"),
+            context_profile=context_profile,
+            nudity_level_code=lvl_code,
+            nudity_branch=nudity_branch,
+        )
+        if "shot_type" in needed_selectors:
+            slots[("shot_type", 0)] = _extract_result_replay_entry(
+                shot_res,
+                nodes._make_slot_fragments(shot_res, "shot_type", DEFAULT_INPUTS["景别构图"], "generator"),
+                "shot_type",
+                "selector:shot_type",
+            )
+    shot_type_id = shot_res.item_id if shot_res else None
+
+    if "camera_angle" in needed_selectors:
+        angle_res = sampler.sample_camera_angle_result(
+            DEFAULT_INPUTS["拍摄视角"],
+            nodes.derive_substream_rng(seed, "selector:camera_angle"),
+            context_profile=context_profile,
+            nudity_level_code=lvl_code,
+            shot_type_id=shot_type_id,
+        )
+        slots[("camera_angle", 0)] = _extract_result_replay_entry(
+            angle_res,
+            nodes._make_slot_fragments(angle_res, "camera_angle", DEFAULT_INPUTS["拍摄视角"], "generator"),
+            "camera_angle",
+            "selector:camera_angle",
+        )
+
+    if needed_selectors & {"clothing", "clothing_state", "clothing_extension"}:
+        if controlled_rebuild_attempted:
+            # Independent full-node replay recovers exact post-resolution failed_ids and rebuild stream without trusting cur_r
+            gen, _ = _get_replay_nodes()
+            res_full = gen.generate_structured(**DEFAULT_INPUTS, prompt_seed=seed)
+            by_sel: Dict[str, List[Any]] = collections.defaultdict(list)
+            for sa in res_full.source_atoms:
+                s_name = sa.origin.selector if getattr(sa, "origin", None) else sa.source_slot
+                by_sel[s_name].append(sa)
+            for c_sel in ("clothing", "clothing_state", "clothing_extension"):
+                sa_list = by_sel.get(c_sel, [])
+                if not sa_list and c_sel != "clothing":
+                    continue
+                origin = sa_list[0].origin if (sa_list and getattr(sa_list[0], "origin", None)) else None
+                rat = getattr(origin, "sampling_rationale", None) or {}
+                cf = rat.get("candidate_filter") or {} if isinstance(rat, dict) else {}
+                dist = rat.get("distribution") or {} if isinstance(rat, dict) else {}
+                sid_rb = getattr(origin, "selected_id", None) if origin else None
+                raw_rb = _split_fragments_to_atom_texts(sa_list)
+                slots[(c_sel, 0)] = {
+                    "selector": c_sel,
+                    "selected_id": sid_rb,
+                    "rng_stream": "selector:clothing_rebuild:1",
+                    "raw_texts": raw_rb,
+                    "excluded_hard_conflicts": tuple(cf.get("excluded_hard_conflicts", [])),
+                    "passed_candidates": cf.get("passed_candidates"),
+                    "total_candidates": cf.get("total_candidates"),
+                    "active_contexts": list(rat.get("active_contexts") or []) if isinstance(rat, dict) else [],
+                    "dist_sha256": _dist_hash(dist),
+                    "valid_candidate": (sid_rb is None or not dist or sid_rb in dist),
+                }
+        else:
+            clothing_res = sampler.sample_clothing_result(
+                DEFAULT_INPUTS["服装款式"],
+                DEFAULT_INPUTS["服装状态"],
+                lvl_code,
+                nodes.derive_substream_rng(seed, "selector:clothing"),
+                context=context,
+                context_profile=context_profile,
+                completion_rng=nodes.derive_substream_rng(seed, "selector:clothing_completion"),
+                nudity_branch=nudity_branch,
+            )
+            clothing_frags = nodes._make_clothing_fragments(
+                clothing_res, DEFAULT_INPUTS["服装款式"], DEFAULT_INPUTS["服装状态"], "generator"
+            )
+            by_frag_sel: Dict[str, List[Any]] = collections.defaultdict(list)
+            for cf_frag in clothing_frags:
+                orig = getattr(cf_frag, "origin", None)
+                s_name = orig.selector if orig else "clothing"
+                by_frag_sel[s_name].append(cf_frag)
+
+            rat_c = getattr(clothing_res, "sampling_rationale", None) or {}
+            cf_c = rat_c.get("candidate_filter") or {}
+            dist_c = rat_c.get("distribution") or {}
+            sid_c = getattr(clothing_res, "style_id", None)
+            slots[("clothing", 0)] = {
+                "selector": "clothing",
+                "selected_id": sid_c,
+                "rng_stream": "selector:clothing+selector:clothing_completion",
+                "raw_texts": _split_fragments_to_atom_texts(by_frag_sel.get("clothing", [])),
+                "excluded_hard_conflicts": tuple(cf_c.get("excluded_hard_conflicts", [])),
+                "passed_candidates": cf_c.get("passed_candidates"),
+                "total_candidates": cf_c.get("total_candidates"),
+                "active_contexts": list(rat_c.get("active_contexts") or []),
+                "dist_sha256": _dist_hash(dist_c),
+                "valid_candidate": (sid_c is None or not dist_c or sid_c in dist_c),
+            }
+            state_frags = by_frag_sel.get("clothing_state", [])
+            state_id = getattr(clothing_res, "state_id", None)
+            if state_frags or state_id is not None:
+                slots[("clothing_state", 0)] = {
+                    "selector": "clothing_state",
+                    "selected_id": state_id,
+                    "rng_stream": "selector:clothing+selector:clothing_completion",
+                    "raw_texts": _split_fragments_to_atom_texts(state_frags),
+                    "excluded_hard_conflicts": (),
+                    "passed_candidates": None,
+                    "total_candidates": None,
+                    "active_contexts": [],
+                    "dist_sha256": None,
+                    "valid_candidate": True,
+                }
+            ext_frags = by_frag_sel.get("clothing_extension", [])
+            if ext_frags:
+                ext_orig = getattr(ext_frags[0], "origin", None)
+                slots[("clothing_extension", 0)] = {
+                    "selector": "clothing_extension",
+                    "selected_id": getattr(ext_orig, "selected_id", None) if ext_orig else None,
+                    "rng_stream": "selector:clothing+selector:clothing_completion",
+                    "raw_texts": _split_fragments_to_atom_texts(ext_frags),
+                    "excluded_hard_conflicts": (),
+                    "passed_candidates": None,
+                    "total_candidates": None,
+                    "active_contexts": [],
+                    "dist_sha256": None,
+                    "valid_candidate": True,
+                }
+
+    if "lighting" in needed_selectors:
+        lighting_res = sampler.sample_lighting_result(
+            DEFAULT_INPUTS["光影预设"],
+            nodes.derive_substream_rng(seed, "selector:lighting"),
+            nudity_level_code=lvl_code,
+            context_profile=context_profile,
+        )
+        slots[("lighting", 0)] = _extract_result_replay_entry(
+            lighting_res,
+            nodes._make_slot_fragments(lighting_res, "lighting", DEFAULT_INPUTS["光影预设"], "generator"),
+            "lighting",
+            "selector:lighting",
+        )
+
+    pose_res = None
+    if needed_selectors & {"pose", "props"}:
+        pose_res = sampler.sample_pose_result(
+            DEFAULT_INPUTS["姿势动作"],
+            nodes.derive_substream_rng(seed, "selector:pose"),
+            nudity_level_code=lvl_code,
+            context_profile=context_profile,
+            shot_type_id=shot_type_id,
+        )
+        if "pose" in needed_selectors:
+            slots[("pose", 0)] = _extract_result_replay_entry(
+                pose_res,
+                nodes._make_slot_fragments(pose_res, "pose", DEFAULT_INPUTS["姿势动作"], "generator"),
+                "pose",
+                "selector:pose",
+            )
+
+    hand_state = None
+    pose_id = pose_res.item_id if pose_res else None
+    if pose_res and pose_res.sampled_tags:
+        for t in pose_res.sampled_tags:
+            hs = getattr(t.facts, "hand_state", None) if t.facts else None
+            if hs in ("both_busy", "restrained"):
+                hand_state = "both_busy"
+                break
+            elif hs == "one_busy" and hand_state != "both_busy":
+                hand_state = "one_busy"
+            elif hs == "free" and not hand_state:
+                hand_state = "free"
+
+    if "expression" in needed_selectors:
+        expr_res = sampler.sample_expression_result(
+            DEFAULT_INPUTS["情绪表情"],
+            nodes.derive_substream_rng(seed, "selector:expression"),
+            context_profile=context_profile,
+        )
+        slots[("expression", 0)] = _extract_result_replay_entry(
+            expr_res,
+            nodes._make_slot_fragments(expr_res, "expression", DEFAULT_INPUTS["情绪表情"], "generator"),
+            "expression",
+            "selector:expression",
+        )
+
+    if "film" in needed_selectors:
+        film_res = sampler.sample_film_result(
+            DEFAULT_INPUTS["胶片风格"],
+            nodes.derive_substream_rng(seed, "selector:film"),
+            context_profile=context_profile,
+        )
+        slots[("film", 0)] = _extract_result_replay_entry(
+            film_res,
+            nodes._make_slot_fragments(film_res, "film", DEFAULT_INPUTS["胶片风格"], "generator"),
+            "film",
+            "selector:film",
+        )
+
+    if "makeup" in needed_selectors:
+        makeup_res = sampler.sample_makeup_result(
+            DEFAULT_INPUTS["妆容细节"],
+            nodes.derive_substream_rng(seed, "selector:makeup"),
+            context=context,
+            context_profile=context_profile,
+        )
+        slots[("makeup", 0)] = _extract_result_replay_entry(
+            makeup_res,
+            nodes._make_slot_fragments(makeup_res, "makeup", DEFAULT_INPUTS["妆容细节"], "generator"),
+            "makeup",
+            "selector:makeup",
+        )
+
+    if "hairstyle" in needed_selectors:
+        hair_res = sampler.sample_hairstyle_result(
+            DEFAULT_INPUTS["发型发色"],
+            nodes.derive_substream_rng(seed, "selector:hairstyle"),
+            context=context,
+            context_profile=context_profile,
+            nudity_level_code=lvl_code,
+        )
+        slots[("hairstyle", 0)] = _extract_result_replay_entry(
+            hair_res,
+            nodes._make_slot_fragments(hair_res, "hairstyle", DEFAULT_INPUTS["发型发色"], "generator"),
+            "hairstyle",
+            "selector:hairstyle",
+        )
+
+    if "jewelry" in needed_selectors:
+        jewel_res = sampler.sample_jewelry_result(
+            DEFAULT_INPUTS["饰品头饰"],
+            nodes.derive_substream_rng(seed, "selector:jewelry"),
+            context=context,
+            context_profile=context_profile,
+            nudity_level_code=lvl_code,
+        )
+        slots[("jewelry", 0)] = _extract_result_replay_entry(
+            jewel_res,
+            nodes._make_slot_fragments(jewel_res, "jewelry", DEFAULT_INPUTS["饰品头饰"], "generator"),
+            "jewelry",
+            "selector:jewelry",
+        )
+
+    if "imperfections" in needed_selectors:
+        imp_res = sampler.sample_imperfections_result(
+            DEFAULT_INPUTS["真实微瑕"],
+            nodes.derive_substream_rng(seed, "selector:imperfections"),
+        )
+        slots[("imperfections", 0)] = _extract_result_replay_entry(
+            imp_res,
+            nodes._make_slot_fragments(imp_res, "imperfections", DEFAULT_INPUTS["真实微瑕"], "generator"),
+            "imperfections",
+            "selector:imperfections",
+        )
+
+    if "tattoo" in needed_selectors:
+        tat_res = sampler.sample_tattoo_result(
+            DEFAULT_INPUTS["纹身标记"],
+            nodes.derive_substream_rng(seed, "selector:tattoo"),
+            context=context,
+            context_profile=context_profile,
+            nudity_level_code=lvl_code,
+        )
+        slots[("tattoo", 0)] = _extract_result_replay_entry(
+            tat_res,
+            nodes._make_slot_fragments(tat_res, "tattoo", DEFAULT_INPUTS["纹身标记"], "generator"),
+            "tattoo",
+            "selector:tattoo",
+        )
+
+    if "props" in needed_selectors:
+        prop_res = sampler.sample_prop_result(
+            DEFAULT_INPUTS["道具物件"],
+            nodes.derive_substream_rng(seed, "selector:props"),
+            context=context,
+            context_profile=context_profile,
+            pose_id=pose_id,
+            hand_state=hand_state,
+            nudity_level_code=lvl_code,
+        )
+        slots[("props", 0)] = _extract_result_replay_entry(
+            prop_res,
+            nodes._make_slot_fragments(prop_res, "props", DEFAULT_INPUTS["道具物件"], "generator"),
+            "props",
+            "selector:props",
+        )
+
+    if "character" in needed_selectors:
+        char_res = sampler.sample_character_result(
+            DEFAULT_INPUTS["角色设定"],
+            nodes.derive_substream_rng(seed, "selector:character"),
+            context=context,
+            context_profile=context_profile,
+        )
+        slots[("character", 0)] = _extract_result_replay_entry(
+            char_res,
+            nodes._make_slot_fragments(char_res, "character", DEFAULT_INPUTS["角色设定"], "generator"),
+            "character",
+            "selector:character",
+        )
+
+    if "liquids" in needed_selectors:
+        liq_res = sampler.sample_liquid_result(
+            DEFAULT_INPUTS["液体效果"],
+            nodes.derive_substream_rng(seed, "selector:liquids"),
+            context=context,
+            context_profile=context_profile,
+            nudity_level_code=lvl_code,
+        )
+        slots[("liquids", 0)] = _extract_result_replay_entry(
+            liq_res,
+            nodes._make_slot_fragments(liq_res, "liquids", DEFAULT_INPUTS["液体效果"], "generator"),
+            "liquids",
+            "selector:liquids",
+        )
+
+    if "quality" in needed_selectors:
+        qual_res = sampler.sample_quality_result(DEFAULT_INPUTS["画质等级"])
+        slots[("quality", 0)] = _extract_result_replay_entry(
+            qual_res,
+            nodes._make_slot_fragments(qual_res, "quality", DEFAULT_INPUTS["画质等级"], "generator"),
+            "quality",
+            None,
+        )
+
+    return {
+        "eff_lvl": lvl_code,
+        "branch": nudity_branch,
+        "context": context,
+        "pose_id": pose_id,
+        "hand_state": hand_state,
+        "shot_type_id": shot_type_id,
+        "slots": slots,
+    }
+
+
+def _check_final_and_positive_integrity(
+    sels1: List[Dict[str, Any]],
+    final_texts: List[str],
+    v121_pos: str,
+) -> Optional[str]:
+    """Verify exact lockstep between accepted_texts across all selections, final_texts, and positive prompt."""
+    acc_counter: collections.Counter[str] = collections.Counter()
+    for s in sels1:
+        for t in s.get("accepted_texts", ()):
+            acc_counter[t] += 1
+    fin_counter = collections.Counter(final_texts)
+    if acc_counter != fin_counter:
+        extra_acc = dict(acc_counter - fin_counter)
+        extra_fin = dict(fin_counter - acc_counter)
+        return f"accepted_vs_final_mismatch(extra_accepted={extra_acc}, extra_final={extra_fin})"
+
+    fin_stripped = [re.sub(r"\s+", " ", t.strip()) for t in final_texts if t.strip()]
+    pos_tags = [re.sub(r"\s+", " ", t.strip()) for t in split_top_level_tags(v121_pos) if t.strip()]
+    idx = 0
+    n_fin = len(fin_stripped)
+    for p_tag in pos_tags:
+        if idx >= n_fin:
+            return f"positive_has_unbacked_trailing_tag({p_tag!r})"
+        if p_tag == fin_stripped[idx]:
+            idx += 1
+            continue
+        # Handle legitimate ResolvedTag atom merges without comma (e.g., '(robin egg blue hair) heart choker')
+        matched = False
+        for k in range(2, min(6, n_fin - idx + 1)):
+            joined_space = re.sub(r"\s+", " ", " ".join(fin_stripped[idx : idx + k]))
+            joined_tight = re.sub(r"\s+", " ", "".join(fin_stripped[idx : idx + k]))
+            if p_tag in (joined_space, joined_tight):
+                idx += k
+                matched = True
+                break
+        if not matched:
+            return f"positive_tag_mismatch(pos_tag={p_tag!r}, expected_final={fin_stripped[idx]!r})"
+    if idx != n_fin:
+        return f"final_texts_missing_from_positive({fin_stripped[idx:]!r})"
+    return None
+
+
+def _extract_positional_v120(v120_round_a: Dict[str, Any]) -> Tuple[List[Dict[str, Any]], Dict[Tuple[str, int], Dict[str, Any]]]:
+    audit0_raw = v120_round_a.get("diagnostics_audit", {})
+    audit0 = json.loads(audit0_raw) if isinstance(audit0_raw, str) else (audit0_raw or {})
+    global_atom_texts0: Dict[str, str] = {}
+    for atom_key in ("source_atoms", "post_secondary_atoms", "final_atoms"):
+        for a_obj in v120_round_a.get(atom_key, []):
+            if isinstance(a_obj, dict) and a_obj.get("atom_id") and a_obj.get("text"):
+                global_atom_texts0.setdefault(a_obj["atom_id"], a_obj["text"])
+
+    occ_counter0: collections.Counter[str] = collections.Counter()
+    sels0: List[Dict[str, Any]] = []
+    map0: Dict[Tuple[str, int], Dict[str, Any]] = {}
+    for x in audit0.get("selections", []):
+        if not isinstance(x, dict):
+            continue
+        sel_name = x.get("selector")
+        occ = occ_counter0[sel_name]
+        occ_counter0[sel_name] += 1
+        key = (sel_name, occ)
+        produced_map = {
+            p.get("atom_id"): p.get("text", "")
+            for p in x.get("produced_atoms", [])
+            if isinstance(p, dict) and p.get("atom_id")
+        }
+        rat = x.get("sampling_rationale") or {}
+        cf = rat.get("candidate_filter") or {}
+        dist = rat.get("distribution") or {}
+        btxts = [
+            produced_map.get(b.get("atom_id")) or global_atom_texts0.get(b.get("atom_id")) or b.get("text", "")
+            for b in x.get("budget_filtered_records", [])
+            if isinstance(b, dict)
+        ]
+        btxts = [t for t in btxts if t]
+        dtxts = [
+            produced_map.get(d.get("atom_id")) or global_atom_texts0.get(d.get("atom_id")) or d.get("retained_tag_text", "")
+            for d in x.get("deduplicated_records", [])
+            if isinstance(d, dict)
+        ]
+        dtxts = [t for t in dtxts if t]
+        entry = {
+            "key": key,
+            "selector": sel_name,
+            "occ": occ,
+            "selected_id": x.get("selected_id"),
+            "accepted_texts": tuple(a.get("text", "") for a in x.get("accepted_atoms", []) if isinstance(a, dict)),
+            "excluded_hard_conflicts": tuple(cf.get("excluded_hard_conflicts", [])),
+            "passed_candidates": cf.get("passed_candidates"),
+            "total_candidates": cf.get("total_candidates"),
+            "active_contexts": list(rat.get("active_contexts") or []) if isinstance(rat, dict) and "active_contexts" in rat else None,
+            "dist_sha256": _dist_hash(dist),
+            "budget_filtered_texts": tuple(btxts),
+            "deduplicated_texts": tuple(dtxts),
+        }
+        sels0.append(entry)
+        map0[key] = entry
+    return sels0, map0
+
+
+def _extract_positional_v121(ctx: Dict[str, Any]) -> Tuple[List[Dict[str, Any]], Dict[Tuple[str, int], Dict[str, Any]]]:
+    occ_counter1: collections.Counter[str] = collections.Counter()
+    sels1: List[Dict[str, Any]] = []
+    map1: Dict[Tuple[str, int], Dict[str, Any]] = {}
+    for x in ctx.get("selections", []):
+        if not isinstance(x, dict):
+            continue
+        sel_name = x.get("selector")
+        occ = x.get("occ")
+        if not isinstance(occ, int):
+            occ = occ_counter1[sel_name]
+            occ_counter1[sel_name] += 1
+        else:
+            occ_counter1[sel_name] = max(occ_counter1[sel_name], occ + 1)
+        key = (sel_name, occ)
+        entry = {
+            "key": key,
+            "selector": sel_name,
+            "occ": occ,
+            "selected_id": x.get("selected_id"),
+            "accepted_texts": tuple(x.get("accepted_texts", [])),
+            "excluded_hard_conflicts": tuple(x.get("excluded_hard_conflicts", [])),
+            "passed_candidates": x.get("passed_candidates"),
+            "total_candidates": x.get("total_candidates"),
+            "active_contexts": x.get("active_contexts"),
+            "dist_sha256": x.get("dist_sha256"),
+            "budget_filtered_texts": tuple(x.get("budget_filtered_texts", [])),
+            "deduplicated_texts": tuple(x.get("deduplicated_texts", [])),
+        }
+        sels1.append(entry)
+        map1[key] = entry
+    return sels1, map1
+
+
+def _slot_key_label(key: Tuple[str, int]) -> str:
+    return key[0] if key[1] == 0 else f"{key[0]}#{key[1]}"
+
+
+def _counter_diff_list(c_hi: collections.Counter[str], c_lo: collections.Counter[str]) -> List[str]:
+    out: List[str] = []
+    for k, cnt in (c_hi - c_lo).items():
+        out.extend([k] * cnt)
+    return out
+
+
 def attribute_v120_vs_v121_seed(v120_round_a: Dict[str, Any], cur_r: Dict[str, Any]) -> Dict[str, Any]:
-    """对单个种子的 v1.2.0 -> v1.2.1 提示词差异执行逐槽位、逐机制的可证伪因果归因。"""
+    """对单个种子的 v1.2.0 -> v1.2.1 提示词差异执行逐槽位、逐词条的确定性重放与可证伪因果归因。"""
     v120_pos = v120_round_a.get("positive", "")
     v121_pos = cur_r.get("positive", "")
+    ctx = cur_r.get("attr_ctx") or {}
+    sels1, map1 = _extract_positional_v121(ctx)
+    final_texts1 = list(ctx.get("final_texts", []))
+
+    integrity_err = _check_final_and_positive_integrity(sels1, final_texts1, v121_pos)
+    if integrity_err is not None:
+        return {
+            "is_divergent": v120_pos != v121_pos,
+            "is_explained": False,
+            "primary_cause": "UNBACKED_AUDIT_INTEGRITY_MISMATCH",
+            "verified_causes": [],
+            "first_diff_selector": None,
+            "diff_slots": [],
+            "slot_verifications": [],
+            "level_preserved": False,
+            "unexplained_reason": f"Prompt/final/accepted integrity check failed: {integrity_err}",
+        }
+
     if v120_pos == v121_pos:
         return {
             "is_divergent": False,
@@ -461,198 +1210,514 @@ def attribute_v120_vs_v121_seed(v120_round_a: Dict[str, Any], cur_r: Dict[str, A
             "primary_cause": "identical",
             "verified_causes": [],
             "first_diff_selector": None,
+            "diff_slots": [],
+            "slot_verifications": [],
             "level_preserved": True,
             "unexplained_reason": None,
         }
 
-    audit0_raw = v120_round_a.get("diagnostics_audit", {})
-    audit0 = json.loads(audit0_raw) if isinstance(audit0_raw, str) else (audit0_raw or {})
-    sels0 = [
-        (
-            x.get("selector"),
-            x.get("selected_id"),
-            tuple(a.get("text", "") for a in x.get("accepted_atoms", [])),
-            tuple(b.get("text", "") for b in x.get("budget_filtered_records", []) if isinstance(b, dict)),
-        )
-        for x in audit0.get("selections", [])
-        if isinstance(x, dict)
-    ]
-    ctx = cur_r.get("attr_ctx") or {}
-    sels1 = [
-        (
-            x.get("selector"),
-            x.get("selected_id"),
-            tuple(x.get("accepted_texts", [])),
-            tuple(x.get("excluded_hard_conflicts", [])),
-            tuple(x.get("budget_filtered_texts", [])),
-        )
-        for x in ctx.get("selections", [])
-    ]
-    map0 = {k: (sid, txts, btxts) for k, sid, txts, btxts in sels0}
-    map1 = {k: (sid, txts, excl, btxts) for k, sid, txts, excl, btxts in sels1}
+    sels0, map0 = _extract_positional_v120(v120_round_a)
+
+    def _fail(reason: str, primary: Optional[str] = None, first_sel: Optional[str] = None, lvl_ok: bool = True, diff_keys_list: Optional[List[Tuple[str, int]]] = None, verifications: Optional[List[Dict[str, Any]]] = None) -> Dict[str, Any]:
+        return {
+            "is_divergent": True,
+            "is_explained": False,
+            "primary_cause": primary,
+            "verified_causes": [],
+            "first_diff_selector": first_sel,
+            "diff_slots": [_slot_key_label(k) for k in (diff_keys_list or [])],
+            "slot_verifications": verifications or [],
+            "level_preserved": lvl_ok,
+            "unexplained_reason": reason,
+        }
+
+    seed = cur_r.get("seed")
+    if not isinstance(seed, int) or isinstance(seed, bool):
+        return _fail(f"Missing or invalid integer seed for deterministic replay: {seed!r}")
 
     v120_nud_id = next(
-        (a.get("source_item_id") for a in v120_round_a.get("source_atoms", []) if a.get("source_slot") == "nudity"),
+        (a.get("source_item_id") for a in v120_round_a.get("source_atoms", []) if isinstance(a, dict) and a.get("source_slot") == "nudity"),
         None,
     )
     v120_lvl = _LEVEL_ID_MAP.get(v120_nud_id or "")
     v121_lvl = cur_r.get("eff_lvl")
     level_preserved = (v120_lvl is not None and v121_lvl is not None and v120_lvl == v121_lvl)
 
-    # 汇总双版本规则决策与预算裁剪文本，用于验证同分类下的精确增删/替换依据
-    decs0 = v120_round_a.get("decisions", [])
-    decs1 = ctx.get("decisions", [])
-    dec_texts0 = {
-        t
-        for d in decs0
-        if isinstance(d, dict)
-        for t in (d.get("before_text"), d.get("after_text"))
-        if isinstance(t, str) and t
-    }
-    dec_texts1 = {
-        t
-        for d in decs1
-        if isinstance(d, dict)
-        for t in (d.get("before_text"), d.get("after_text"))
-        if isinstance(t, str) and t
-    }
-
-    diff_selectors: List[str] = []
-    seen_sel = set()
-    for k, sid1, txts1, _, _ in sels1:
-        seen_sel.add(k)
+    diff_keys: List[Tuple[str, int]] = []
+    seen_keys: set[Tuple[str, int]] = set()
+    for s1 in sels1:
+        k = s1["key"]
+        seen_keys.add(k)
         s0 = map0.get(k)
-        if s0 is None or (s0[0], s0[1]) != (sid1, txts1):
-            diff_selectors.append(k)
-    for k, sid0, txts0, _ in sels0:
-        if k not in seen_sel:
-            diff_selectors.append(k)
+        if s0 is None or (s0["selected_id"], s0["accepted_texts"]) != (s1["selected_id"], s1["accepted_texts"]):
+            diff_keys.append(k)
+    for s0 in sels0:
+        k = s0["key"]
+        if k not in seen_keys:
+            diff_keys.append(k)
+
+    first_diff_label = _slot_key_label(diff_keys[0]) if diff_keys else None
 
     if not level_preserved:
-        return {
-            "is_divergent": True,
-            "is_explained": False,
-            "primary_cause": "UNEXPLAINED_LEVEL_MISMATCH",
-            "verified_causes": [],
-            "first_diff_selector": diff_selectors[0] if diff_selectors else None,
-            "level_preserved": False,
-            "unexplained_reason": f"Nudity level shifted unexpectedly without override: v120={v120_lvl}, v121={v121_lvl}",
-        }
+        return _fail(
+            f"Nudity level shifted unexpectedly without override: v120={v120_lvl}, v121={v121_lvl}",
+            primary="UNEXPLAINED_LEVEL_MISMATCH",
+            first_sel=first_diff_label,
+            lvl_ok=False,
+            diff_keys_list=diff_keys,
+        )
 
+    needed_selectors = {k[0] for k in diff_keys}
+    replay_data = _replay_seed_selectors(
+        seed,
+        needed_selectors,
+        controlled_rebuild_attempted=bool(cur_r.get("controlled_rebuild_attempted")),
+    )
+    if replay_data["eff_lvl"] != v121_lvl or replay_data["branch"] != cur_r.get("branch"):
+        return _fail(
+            f"Replay constraint mismatch for seed={seed}: replay=({replay_data['eff_lvl']}, {replay_data['branch']}) vs cur=({v121_lvl}, {cur_r.get('branch')})",
+            first_sel=first_diff_label,
+            diff_keys_list=diff_keys,
+        )
+
+    decs0 = [d for d in v120_round_a.get("decisions", []) if isinstance(d, dict)]
+    decs1 = [d for d in ctx.get("decisions", []) if isinstance(d, dict)]
+    dec0_before = {d["before_text"] for d in decs0 if isinstance(d.get("before_text"), str) and d["before_text"]}
+    dec0_after = {d["after_text"] for d in decs0 if isinstance(d.get("after_text"), str) and d["after_text"]}
+    dec1_before = {d["before_text"] for d in decs1 if isinstance(d.get("before_text"), str) and d["before_text"]}
+    dec1_after = {d["after_text"] for d in decs1 if isinstance(d.get("after_text"), str) and d["after_text"]}
+    dec1_after_bag = collections.Counter(
+        d["after_text"] for d in decs1 if isinstance(d.get("after_text"), str) and d["after_text"]
+    )
+    dec_texts_all = dec0_before | dec0_after | dec1_before | dec1_after
+
+    fin0 = [a.get("text", "") for a in v120_round_a.get("final_atoms", []) if isinstance(a, dict)]
+
+    # Fast lookup of upstream slot changes (for contextual/dependent selectors)
+    diff_key_set = set(diff_keys)
+    upstream_env_changed = bool(diff_key_set & {("nudity", 0), ("scene", 0), ("theme", 0)})
+    shot_changed = ("shot_type", 0) in diff_key_set
+    pose_changed = ("pose", 0) in diff_key_set
+
+    subtag_idx = _get_subtag_filter_index()
+    slot_verifications: List[Dict[str, Any]] = []
     verified_causes: List[str] = []
-    first_diff = diff_selectors[0] if diff_selectors else None
-    primary_cause: Optional[str] = None
 
-    def _explain_selector(sel_name: Optional[str]) -> Optional[str]:
-        if sel_name is None:
-            return None
-        e0 = map0.get(sel_name)
-        e1 = map1.get(sel_name)
-        sid0, txts0, btxts0 = e0 if e0 else (None, (), ())
-        sid1, txts1, excl1, btxts1 = e1 if e1 else (None, (), (), ())
-        sym_diff = set(txts0) ^ set(txts1)
-
-        if sel_name == "nudity":
-            if cur_r.get("branch"):
-                return "m1_m3_nudity_single_branch_convergence"
-            return None
-
-        if sel_name in ("clothing_state", "clothing_extension") and (
-            sid0 != sid1 or excl1 or (sym_diff & (dec_texts0 | dec_texts1)) or cur_r.get("branch")
-        ):
-            return "m1_m3_clothing_linkage_and_branch_filtering"
-
-        if excl1 and sid0 != sid1:
-            return f"m1_m3_cross_slot_pool_filtering:{sel_name}"
-
-        if sel_name == "clothing" and (
-            cur_r.get("comp_added")
-            or cur_r.get("repaired_ensemble")
-            or cur_r.get("fallback_used")
-            or cur_r.get("controlled_rebuild_attempted")
-        ):
-            return "m2_outfit_completion_or_repair"
-
-        if excl1 and sid0 == sid1:
-            return f"m1_m3_pool_filter_same_category_subsample:{sel_name}"
-
-        if sid0 == sid1 and sid1 is not None:
-            if sym_diff & (dec_texts0 | dec_texts1):
-                return f"m1_m3_resolver_decision_on_same_category:{sel_name}"
-            if sym_diff & (set(btxts0) | set(btxts1)):
-                return f"m3_budget_protection_same_category:{sel_name}"
-            if v121_lvl:
-                subtag_info = _get_subtag_filter_index().get((sel_name, sid1, v121_lvl))
-                if subtag_info and subtag_info["dropped_count"] > 0:
-                    residual_txts = set(txts1) - dec_texts1
-                    if residual_txts <= subtag_info["compat_texts"]:
-                        return f"m3_nudity_subtag_pool_filtering:{sel_name}"
-            if sel_name == "shot_type" and v121_lvl in ("L5", "L6") and (sym_diff & dec_texts1 or sym_diff & set(btxts1)):
-                return "m3_l5_l6_framing_coherence"
-
-        return None
-
-    if first_diff is not None:
-        primary_cause = _explain_selector(first_diff)
-        if primary_cause:
-            verified_causes.append(primary_cause)
-    else:
-        # 所有选择器 (selected_id, accepted_texts) 均一致，检查是否为决策注入/全局裁剪顺序或缺失依据
-        fin0 = [a.get("text", "") for a in v120_round_a.get("final_atoms", [])]
-        fin1 = ctx.get("final_texts", [])
-        if fin0 == fin1 and v120_pos != v121_pos:
+    if not diff_keys:
+        # All selectors identical: verify final prompt delta is strictly backed by formatter join or resolver decisions
+        fin0_c = collections.Counter(fin0)
+        fin1_c = collections.Counter(final_texts1)
+        added_fin = _counter_diff_list(fin1_c, fin0_c)
+        removed_fin = _counter_diff_list(fin0_c, fin1_c)
+        if not added_fin and not removed_fin and fin0 == final_texts1 and v120_pos != v121_pos:
             primary_cause = "m3_prompt_join_or_dedup_formatting"
             verified_causes.append(primary_cause)
-        elif (set(fin0) ^ set(fin1)) & (dec_texts0 | dec_texts1):
+        elif added_fin or removed_fin:
+            for t in added_fin:
+                if t not in (dec1_after | dec0_before):
+                    return _fail(f"Unbacked final atom addition without selector diff: {t!r}", diff_keys_list=diff_keys)
+            for t in removed_fin:
+                if t not in (dec1_before | dec0_after):
+                    return _fail(f"Unbacked final atom removal without selector diff: {t!r}", diff_keys_list=diff_keys)
             primary_cause = "m3_post_rewrite_or_resolver_decision"
             verified_causes.append(primary_cause)
-
-    # 统计后续受影响的已验证机制（仅在真实存在证据时计入，并要求后续选区改变不得早于已解释的上游分叉点）
-    if primary_cause is not None:
-        upstream_shifted_rng = (
-            first_diff == "nudity"
-            or "pool_filtering" in primary_cause
-            or "outfit_completion" in primary_cause
-        )
-        for sel_k in diff_selectors[1:]:
-            c_k = _explain_selector(sel_k)
-            if c_k and c_k not in verified_causes:
-                verified_causes.append(c_k)
-            elif not c_k and upstream_shifted_rng and "downstream_prng_stream_shift" not in verified_causes:
-                verified_causes.append("downstream_prng_stream_shift")
-            if sel_k == "nudity" or (c_k and ("pool_filtering" in c_k or "outfit_completion" in c_k)):
-                upstream_shifted_rng = True
-
-        if cur_r.get("comp_added") and "m2_outfit_completion_or_repair" not in verified_causes:
-            verified_causes.append("m2_outfit_completion_or_repair")
-        if cur_r.get("fallback_used") and "m2_outfit_minimal_fallback" not in verified_causes:
-            verified_causes.append("m2_outfit_minimal_fallback")
-        if cur_r.get("controlled_rebuild_attempted") and "m2_controlled_rebuild" not in verified_causes:
-            verified_causes.append("m2_controlled_rebuild")
-        if "nudity" in diff_selectors and "m1_m3_nudity_single_branch_convergence" not in verified_causes:
-            verified_causes.append("m1_m3_nudity_single_branch_convergence")
+        else:
+            return _fail("Final texts reordered without prompt join formatting or resolver backing", diff_keys_list=diff_keys)
 
         return {
             "is_divergent": True,
             "is_explained": True,
             "primary_cause": primary_cause,
             "verified_causes": verified_causes,
-            "first_diff_selector": first_diff,
+            "first_diff_selector": None,
+            "diff_slots": [],
+            "slot_verifications": [],
             "level_preserved": True,
             "unexplained_reason": None,
         }
 
+    # Verify EVERY changed slot strictly (Fail-Closed: no blind downstream passthrough)
+    for key in diff_keys:
+        sel_name, occ = key
+        slot_label = _slot_key_label(key)
+        e0 = map0.get(key)
+        e1 = map1.get(key)
+        sid0 = e0["selected_id"] if e0 else None
+        txts0 = e0["accepted_texts"] if e0 else ()
+        excl0 = e0["excluded_hard_conflicts"] if e0 else ()
+        passed0 = e0["passed_candidates"] if e0 else None
+        total0 = e0["total_candidates"] if e0 else None
+        ctx0 = e0["active_contexts"] if e0 else None
+        dist0 = e0["dist_sha256"] if e0 else None
+        btxts0 = e0["budget_filtered_texts"] if e0 else ()
+        dtxts0 = e0["deduplicated_texts"] if e0 else ()
+
+        sid1 = e1["selected_id"] if e1 else None
+        txts1 = e1["accepted_texts"] if e1 else ()
+        excl1 = e1["excluded_hard_conflicts"] if e1 else ()
+        passed1 = e1["passed_candidates"] if e1 else None
+        total1 = e1["total_candidates"] if e1 else None
+        ctx1 = e1["active_contexts"] if e1 else None
+        dist1 = e1["dist_sha256"] if e1 else None
+        btxts1 = e1["budget_filtered_texts"] if e1 else ()
+        dtxts1 = e1["deduplicated_texts"] if e1 else ()
+
+        c0 = collections.Counter(txts0)
+        c1 = collections.Counter(txts1)
+        added_texts = _counter_diff_list(c1, c0)
+        removed_texts = _counter_diff_list(c0, c1)
+        sym_diff = set(added_texts) | set(removed_texts)
+
+        # Case A: resolver dermal fusion post-selection entry ("tattoo", 1)
+        if key == ("tattoo", 1):
+            dermal_decs1 = collections.Counter(
+                d["after_text"]
+                for d in decs1
+                if d.get("rule_id") == "tattoo_dermal_fusion" and isinstance(d.get("after_text"), str) and d["after_text"]
+            )
+            dermal_decs0 = {
+                t
+                for d in decs0
+                if d.get("rule_id") == "tattoo_dermal_fusion"
+                for t in (d.get("before_text"), d.get("after_text"))
+                if isinstance(t, str) and t
+            }
+            if sid1 is not None:
+                return _fail(f"Unexpected selected_id={sid1!r} on dermal fusion slot {slot_label}", first_sel=first_diff_label, diff_keys_list=diff_keys, verifications=slot_verifications)
+            for t, cnt in c1.items():
+                if cnt > dermal_decs1[t]:
+                    return _fail(f"Unbacked text {t!r} in {slot_label} without tattoo_dermal_fusion decision", first_sel=first_diff_label, diff_keys_list=diff_keys, verifications=slot_verifications)
+            for t in removed_texts:
+                if t not in (dermal_decs0 | dec1_before | set(btxts1) | set(dtxts1)):
+                    return _fail(f"Unbacked removal {t!r} in {slot_label}", first_sel=first_diff_label, diff_keys_list=diff_keys, verifications=slot_verifications)
+            if not (("tattoo", 0) in diff_key_set or added_texts or removed_texts):
+                return _fail(f"No causal trigger for {slot_label}", first_sel=first_diff_label, diff_keys_list=diff_keys, verifications=slot_verifications)
+            cause_k = "m1_m3_resolver_decision_on_same_category:tattoo"
+            if cause_k not in verified_causes:
+                verified_causes.append(cause_k)
+            slot_verifications.append({
+                "slot_key": slot_label,
+                "cause": cause_k,
+                "v120_selected_id": sid0,
+                "v121_selected_id": sid1,
+                "rng_stream": None,
+                "replay_verified": True,
+                "replay_selected_id": None,
+                "valid_candidate": True,
+                "upstream_triggers": ["tattoo_dermal_fusion_decision"],
+                "added_texts": added_texts,
+                "removed_texts": removed_texts,
+            })
+            continue
+
+        # Case B: v1.2.0 standalone clothing_state merged into v1.2.1 clothing
+        # Case B: selector disappeared from v1.2.1 selections
+        if e1 is None:
+            if sid0 and str(sid0).startswith("rule:"):
+                unbacked_rule_rem = [
+                    t for t in removed_texts
+                    if t not in (dec0_after | set(btxts0) | set(dtxts0))
+                ]
+                if not unbacked_rule_rem:
+                    cause_k = f"m1_m3_resolver_decision_on_same_category:{sel_name}"
+                    if cause_k not in verified_causes:
+                        verified_causes.append(cause_k)
+                    slot_verifications.append({
+                        "slot_key": slot_label,
+                        "cause": cause_k,
+                        "v120_selected_id": sid0,
+                        "v121_selected_id": None,
+                        "rng_stream": None,
+                        "replay_verified": True,
+                        "replay_selected_id": None,
+                        "valid_candidate": True,
+                        "upstream_triggers": [f"v120_resolver_rule_absent_in_v121:{sid0}"],
+                        "added_texts": [],
+                        "removed_texts": removed_texts,
+                    })
+                    continue
+            if sel_name == "clothing_state" and (("clothing", 0) in map1 or ("clothing_state", 0) in map1):
+                c_entry = map1.get(("clothing", 0)) or map1[("clothing_state", 0)]
+                cs_entry = map1.get(("clothing_state", 0))
+                cloth_txts1 = set(c_entry["accepted_texts"]) | set(c_entry["budget_filtered_texts"]) | set(c_entry["deduplicated_texts"])
+                if cs_entry:
+                    cloth_txts1 |= set(cs_entry["accepted_texts"]) | set(cs_entry["budget_filtered_texts"]) | set(cs_entry["deduplicated_texts"])
+                unbacked_rem = [
+                    t for t in removed_texts
+                    if t not in (cloth_txts1 | dec_texts_all | set(btxts0) | set(dtxts0))
+                    and not cur_r.get("branch")
+                ]
+                if unbacked_rem:
+                    return _fail(f"Unbacked removed texts {unbacked_rem} in vanished {slot_label}", first_sel=first_diff_label, diff_keys_list=diff_keys, verifications=slot_verifications)
+                cause_k = "m1_m3_clothing_linkage_and_branch_filtering"
+                if cause_k not in verified_causes:
+                    verified_causes.append(cause_k)
+                slot_verifications.append({
+                    "slot_key": slot_label,
+                    "cause": cause_k,
+                    "v120_selected_id": sid0,
+                    "v121_selected_id": None,
+                    "rng_stream": "selector:clothing",
+                    "replay_verified": True,
+                    "replay_selected_id": c_entry["selected_id"],
+                    "valid_candidate": True,
+                    "upstream_triggers": ["clothing_linkage_merged_to_clothing"],
+                    "added_texts": [],
+                    "removed_texts": removed_texts,
+                })
+                continue
+            rp_vanished = replay_data["slots"].get(key)
+            if sel_name == "clothing" and rp_vanished is not None and len(rp_vanished["raw_texts"]) == 0:
+                cause_k = "m1_m3_nudity_single_branch_convergence"
+                if cause_k not in verified_causes:
+                    verified_causes.append(cause_k)
+                slot_verifications.append({
+                    "slot_key": slot_label,
+                    "cause": cause_k,
+                    "v120_selected_id": sid0,
+                    "v121_selected_id": None,
+                    "rng_stream": rp_vanished["rng_stream"],
+                    "replay_verified": True,
+                    "replay_selected_id": rp_vanished["selected_id"],
+                    "valid_candidate": bool(rp_vanished["valid_candidate"]),
+                    "upstream_triggers": ["nudity_level_omits_clothing_base_tags"],
+                    "added_texts": [],
+                    "removed_texts": removed_texts,
+                })
+                continue
+            return _fail(f"Slot {slot_label} vanished in v1.2.1 without valid merge explanation", first_sel=first_diff_label, diff_keys_list=diff_keys, verifications=slot_verifications)
+
+        # Case C: normal selector slot present in v1.2.1 -> deterministic replay + per-text verification
+        rp = replay_data["slots"].get(key)
+        if rp is None:
+            return _fail(f"Unknown or un-replayable selector slot {slot_label}", first_sel=first_diff_label, diff_keys_list=diff_keys, verifications=slot_verifications)
+        if rp["selected_id"] != sid1:
+            return _fail(
+                f"Replay selected_id mismatch for {slot_label}: replay={rp['selected_id']!r} vs cur={sid1!r}",
+                first_sel=first_diff_label,
+                diff_keys_list=diff_keys,
+                verifications=slot_verifications,
+            )
+        if sid1 is not None and not rp["valid_candidate"]:
+            return _fail(
+                f"Selected candidate {sid1!r} not in replayed valid candidate distribution for {slot_label}",
+                first_sel=first_diff_label,
+                diff_keys_list=diff_keys,
+                verifications=slot_verifications,
+            )
+        if rp["total_candidates"] is not None and total1 is not None:
+            if excl1 != rp["excluded_hard_conflicts"] or passed1 != rp["passed_candidates"] or total1 != rp["total_candidates"]:
+                return _fail(
+                    f"Replay candidate_filter mismatch for {slot_label}: replay=({rp['passed_candidates']}/{rp['total_candidates']}, excl={len(rp['excluded_hard_conflicts'])}) vs cur=({passed1}/{total1}, excl={len(excl1)})",
+                    first_sel=first_diff_label,
+                    diff_keys_list=diff_keys,
+                    verifications=slot_verifications,
+                )
+        if rp["dist_sha256"] is not None and dist1 is not None and rp["dist_sha256"] != dist1:
+            return _fail(
+                f"Replay distribution hash mismatch for {slot_label}",
+                first_sel=first_diff_label,
+                diff_keys_list=diff_keys,
+                verifications=slot_verifications,
+            )
+
+        # Every single accepted text in cur_r MUST come from replayed raw fragments or verified resolver decisions
+        allowed_bag = collections.Counter(rp["raw_texts"]) + dec1_after_bag
+        for t, cnt in c1.items():
+            if cnt > allowed_bag[t]:
+                return _fail(
+                    f"Unbacked accepted text {t!r} in {slot_label} (not in replayed fragments or v1.2.1 resolver decisions)",
+                    first_sel=first_diff_label,
+                    diff_keys_list=diff_keys,
+                    verifications=slot_verifications,
+                )
+
+        # Collect genuine causal triggers vs v1.2.0
+        triggers: List[str] = []
+        cf_changed = (
+            total0 is not None
+            and rp["total_candidates"] is not None
+            and (excl0, passed0, total0) != (rp["excluded_hard_conflicts"], rp["passed_candidates"], rp["total_candidates"])
+        )
+        if cf_changed:
+            triggers.append("candidate_filter_changed")
+        dist_changed = dist0 is not None and rp["dist_sha256"] is not None and dist0 != rp["dist_sha256"]
+        if dist_changed:
+            triggers.append("distribution_changed")
+        ctx_changed = ctx0 is not None and ctx0 != rp["active_contexts"]
+        if ctx_changed:
+            triggers.append("active_contexts_changed")
+
+        branch_conv = sel_name == "nudity" and bool(cur_r.get("branch"))
+        if branch_conv:
+            triggers.append("nudity_single_branch_convergence")
+
+        m2_cloth = sel_name in ("clothing", "clothing_state", "clothing_extension") and bool(
+            cur_r.get("comp_added")
+            or cur_r.get("repaired_ensemble")
+            or cur_r.get("fallback_used")
+            or cur_r.get("controlled_rebuild_attempted")
+        )
+        if m2_cloth:
+            triggers.append("m2_outfit_completion_or_repair")
+
+        clothing_link = (
+            sel_name in ("clothing_state", "clothing_extension")
+            and bool(cur_r.get("branch") or ("clothing", 0) in diff_key_set)
+        ) or (
+            sel_name == "clothing" and (bool(cur_r.get("branch")) or ("clothing_state", 0) in map0)
+        )
+        if clothing_link and (sid0 == sid1 or cf_changed or dist_changed or sel_name in ("clothing_state", "clothing_extension")):
+            triggers.append("clothing_linkage_and_branch")
+
+        subtag_hit = False
+        if sid0 == sid1 and sid1 is not None and v121_lvl:
+            subtag_info = subtag_idx.get((sel_name, sid1, v121_lvl))
+            if subtag_info and subtag_info["dropped_count"] > 0:
+                if (set(txts1) - dec1_after) <= subtag_info["compat_texts"]:
+                    subtag_hit = True
+                    triggers.append("subtag_nudity_filter")
+
+        if sel_name in ("shot_type", "camera_angle", "pose", "props", "clothing", "clothing_state", "clothing_extension", "theme", "lighting", "expression", "film", "makeup", "hairstyle", "jewelry", "tattoo", "character", "liquids"):
+            if upstream_env_changed:
+                triggers.append("upstream_dep:nudity_scene_theme")
+            if sel_name in ("camera_angle", "pose") and shot_changed:
+                triggers.append("upstream_dep:shot_type")
+            if sel_name == "props" and pose_changed:
+                triggers.append("upstream_dep:pose_hand_state")
+            if sel_name in ("clothing_state", "clothing_extension") and ("clothing", 0) in diff_key_set:
+                triggers.append("upstream_dep:clothing")
+
+        dec_touched = bool(sym_diff & dec_texts_all)
+        if dec_touched:
+            triggers.append("resolver_decision")
+        budget_touched = bool(sym_diff & (set(btxts0) | set(btxts1)))
+        if budget_touched:
+            triggers.append("budget_filter")
+        dedup_touched = bool(sym_diff & (set(dtxts0) | set(dtxts1)))
+        if dedup_touched:
+            triggers.append("deduplication")
+
+        raw_pool_changed = cf_changed or dist_changed or ctx_changed or subtag_hit or branch_conv or m2_cloth
+        if sid0 != sid1:
+            if rp["rng_stream"] is None:
+                return _fail(
+                    f"Deterministic non-RNG slot {slot_label} cannot shift selected_id ({sid0!r} -> {sid1!r})",
+                    first_sel=first_diff_label,
+                    diff_keys_list=diff_keys,
+                    verifications=slot_verifications,
+                )
+            if not (cf_changed or dist_changed or ctx_changed or branch_conv or m2_cloth or clothing_link or "upstream_dep:" in ",".join(triggers)):
+                return _fail(
+                    f"Category ID shift in {slot_label} ({sid0!r} -> {sid1!r}) lacks candidate/distribution/context/upstream causal trigger",
+                    first_sel=first_diff_label,
+                    diff_keys_list=diff_keys,
+                    verifications=slot_verifications,
+                )
+        else:
+            # Same category ID: check added & removed texts carefully
+            if not (raw_pool_changed or clothing_link or "upstream_dep:" in ",".join(triggers)):
+                # No pool/dist/context/subtag/upstream change: EVERY added text must be from resolver or unblocked budget/dedup in v120!
+                allowed_added = dec1_after | dec0_before | set(btxts0) | set(dtxts0)
+                unbacked_add = [t for t in added_texts if t not in allowed_added]
+                if unbacked_add:
+                    return _fail(
+                        f"Unbacked text addition(s) {unbacked_add!r} in unchanged-pool {slot_label}",
+                        first_sel=first_diff_label,
+                        diff_keys_list=diff_keys,
+                        verifications=slot_verifications,
+                    )
+
+        # Verify EVERY removed text from v1.2.0 has explicit justification
+        rp_raw_set = set(rp["raw_texts"])
+        rem_allowed_base = dec1_before | set(btxts1) | set(dtxts1) | dec0_after
+        if sid0 != sid1 or raw_pool_changed or clothing_link or ("upstream_dep:" in ",".join(triggers)):
+            for t in removed_texts:
+                if t in rp_raw_set and t not in rem_allowed_base:
+                    return _fail(
+                        f"Unbacked removal of still-generated fragment {t!r} in {slot_label}",
+                        first_sel=first_diff_label,
+                        diff_keys_list=diff_keys,
+                        verifications=slot_verifications,
+                    )
+        else:
+            for t in removed_texts:
+                if t not in rem_allowed_base:
+                    return _fail(
+                        f"Unbacked text removal {t!r} in unchanged-pool {slot_label}",
+                        first_sel=first_diff_label,
+                        diff_keys_list=diff_keys,
+                        verifications=slot_verifications,
+                    )
+
+        # Assign accurate canonical mechanism cause
+        if branch_conv:
+            cause_k = "m1_m3_nudity_single_branch_convergence"
+        elif m2_cloth:
+            cause_k = "m2_outfit_completion_or_repair"
+        elif clothing_link and sid0 == sid1 and not cf_changed:
+            cause_k = "m1_m3_clothing_linkage_and_branch_filtering"
+        elif cf_changed and sid0 != sid1:
+            cause_k = f"m1_m3_cross_slot_pool_filtering:{sel_name}"
+        elif cf_changed and sid0 == sid1:
+            cause_k = f"m1_m3_pool_filter_same_category_subsample:{sel_name}"
+        elif sid0 == sid1 and subtag_hit and not (dec_touched or budget_touched or dedup_touched):
+            cause_k = f"m3_nudity_subtag_pool_filtering:{sel_name}"
+        elif sid0 == sid1 and dec_touched and not (dist_changed or ctx_changed):
+            cause_k = f"m1_m3_resolver_decision_on_same_category:{sel_name}"
+        elif sid0 == sid1 and budget_touched and not (dist_changed or ctx_changed):
+            cause_k = f"m3_budget_protection_same_category:{sel_name}"
+        elif sid0 == sid1 and dedup_touched and not (dist_changed or ctx_changed):
+            cause_k = f"m3_deduplication_same_category:{sel_name}"
+        elif dist_changed or ctx_changed:
+            cause_k = f"verified_context_distribution_substream_replay:{sel_name}"
+        elif subtag_hit:
+            cause_k = f"m3_nudity_subtag_pool_filtering:{sel_name}"
+        elif dec_touched:
+            cause_k = f"m1_m3_resolver_decision_on_same_category:{sel_name}"
+        elif budget_touched:
+            cause_k = f"m3_budget_protection_same_category:{sel_name}"
+        elif dedup_touched:
+            cause_k = f"m3_deduplication_same_category:{sel_name}"
+        else:
+            cause_k = f"verified_upstream_substream_replay:{sel_name}"
+
+        if cause_k not in verified_causes:
+            verified_causes.append(cause_k)
+        slot_verifications.append({
+            "slot_key": slot_label,
+            "cause": cause_k,
+            "v120_selected_id": sid0,
+            "v121_selected_id": sid1,
+            "rng_stream": rp["rng_stream"],
+            "replay_verified": True,
+            "replay_selected_id": rp["selected_id"],
+            "valid_candidate": bool(rp["valid_candidate"]),
+            "upstream_triggers": triggers,
+            "added_texts": added_texts,
+            "removed_texts": removed_texts,
+        })
+
+    if cur_r.get("comp_added") and "m2_outfit_completion_or_repair" not in verified_causes:
+        verified_causes.append("m2_outfit_completion_or_repair")
+    if cur_r.get("fallback_used") and "m2_outfit_minimal_fallback" not in verified_causes:
+        verified_causes.append("m2_outfit_minimal_fallback")
+    if cur_r.get("controlled_rebuild_attempted") and "m2_controlled_rebuild" not in verified_causes:
+        verified_causes.append("m2_controlled_rebuild")
+    if ("nudity", 0) in diff_key_set and "m1_m3_nudity_single_branch_convergence" not in verified_causes:
+        verified_causes.append("m1_m3_nudity_single_branch_convergence")
+
+    primary_cause = slot_verifications[0]["cause"] if slot_verifications else "verified_replay"
     return {
         "is_divergent": True,
-        "is_explained": False,
-        "primary_cause": None,
-        "verified_causes": [],
-        "first_diff_selector": first_diff,
-        "level_preserved": level_preserved,
-        "unexplained_reason": (
-            f"First diff selector {first_diff!r} had no verified v1.2.1 causal trigger "
-            f"(v120={map0.get(first_diff)}, v121={map1.get(first_diff)})"
-        ),
+        "is_explained": True,
+        "primary_cause": primary_cause,
+        "verified_causes": verified_causes,
+        "first_diff_selector": first_diff_label,
+        "diff_slots": [_slot_key_label(k) for k in diff_keys],
+        "slot_verifications": slot_verifications,
+        "level_preserved": True,
+        "unexplained_reason": None,
     }
 
 
@@ -665,6 +1730,7 @@ def _compare_with_v120_archive(cur_records: List[Dict[str, Any]], archive_path: 
     divergent = 0
     explained = 0
     unexplained_seeds: Dict[int, Dict[str, Any]] = {}
+    per_seed_attribution: Dict[int, Dict[str, Any]] = {}
     primary_cause_counts: collections.Counter[str] = collections.Counter()
     mechanism_presence_counts: collections.Counter[str] = collections.Counter()
     first_diff_selector_counts: collections.Counter[str] = collections.Counter()
@@ -678,6 +1744,7 @@ def _compare_with_v120_archive(cur_records: List[Dict[str, Any]], archive_path: 
         cur_r = cur_map[s]
         v120_round_a = rec.get("round_a", {})
         attr = attribute_v120_vs_v121_seed(v120_round_a, cur_r)
+        per_seed_attribution[s] = attr
         if not attr["is_divergent"]:
             identical += 1
             continue
@@ -711,6 +1778,7 @@ def _compare_with_v120_archive(cur_records: List[Dict[str, Any]], archive_path: 
                 "first_diff_selector": attr["first_diff_selector"],
                 "primary_cause": attr["primary_cause"],
                 "verified_causes": attr["verified_causes"],
+                "diff_slots": attr.get("diff_slots", []),
                 "is_explained": attr["is_explained"],
             })
     v120_meta = header_meta.get("metadata", {})
@@ -730,6 +1798,7 @@ def _compare_with_v120_archive(cur_records: List[Dict[str, Any]], archive_path: 
         "mechanism_presence_distribution": dict(sorted(mechanism_presence_counts.items())),
         "divergence_breakdown": dict(sorted(div_level_counts.items())),
         "sample_diffs": sample_diffs,
+        "_per_seed_attribution": per_seed_attribution,
     }
 
 
@@ -802,6 +1871,8 @@ def main() -> None:
             )
         v120_cmp = _compare_with_v120_archive(all_records, v120_archive_path)
 
+    per_seed_attr = v120_cmp.pop("_per_seed_attribution", {}) if v120_cmp else {}
+
     archive_file = scratch_dir / "audit_v1_2_1_10k_evidence.json.gz"
     manifest_file = scratch_dir / "audit_v1_2_1_10k_manifest.json"
     report_file = scratch_dir / "audit_v1_2_1_10k_report.md"
@@ -822,6 +1893,7 @@ def main() -> None:
             },
             "gates": r["gates"],
             "failures": r["failures"],
+            "v120_attribution": per_seed_attr.get(r["seed"]),
         }
         for r in all_records
     ]

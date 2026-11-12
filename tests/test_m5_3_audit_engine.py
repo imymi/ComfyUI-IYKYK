@@ -1748,5 +1748,172 @@ class TestM5EvidenceVerification(unittest.TestCase):
         self.assertEqual(len(discovered), 7, f"Expected exactly 7 tests in TestRC8QualityGate, got: {discovered}")
 
 
+class TestV121CrossVersionAttribution(unittest.TestCase):
+    """v1.2.0 -> v1.2.1 逐槽位、逐词条确定性重放归因引擎正负向门禁测试（禁止无依据下游放行）。"""
+
+    @classmethod
+    def setUpClass(cls):
+        from scratch.run_v1_2_1_10k_audit import (
+            DEFAULT_INPUTS,
+            _worker_10k_chunk,
+        )
+
+        cls.cur_seed0 = _worker_10k_chunk((0, 1))[0]
+        diag = nodes.IYKYKPromptDiagnostics()
+        _, _, _, diag_s = diag.diagnose(**DEFAULT_INPUTS, prompt_seed=0)
+        cls.diag0_obj = json.loads(diag_s)
+
+        # 基于真实 seed 0 构造合法可重放的 v1.2.0 基准对比样本（不依赖 737MB 本地外部归档即可在任意干净签出下执行）
+        sels_v120 = copy.deepcopy(cls.diag0_obj["selections"])
+        # 模拟 nudity L6 单分支收敛、shot_type 跨槽位候选过滤（v1.2.0 为 medium_shot）、以及 context/dist 变化
+        for sel in sels_v120:
+            if sel["selector"] == "nudity":
+                sel["accepted_atoms"] = [{"text": "spread legs"}, {"text": "exposed genitals"}]
+            elif sel["selector"] == "shot_type":
+                sel["selected_id"] = "medium_shot"
+                sel["accepted_atoms"] = [{"text": "medium shot"}]
+                rat = sel.setdefault("sampling_rationale", {})
+                rat["candidate_filter"] = {
+                    "excluded_hard_conflicts": [],
+                    "passed_candidates": 16,
+                    "total_candidates": 16,
+                }
+        pos_v120 = ", ".join(
+            a["text"] for s in sels_v120 for a in s.get("accepted_atoms", []) if a.get("text")
+        )
+        cls.synthetic_v120_seed0 = {
+            "positive": pos_v120,
+            "diagnostics_audit": {"selections": sels_v120},
+            "source_atoms": [{"source_slot": "nudity", "source_item_id": "nudity_l6"}],
+            "decisions": list(cls.cur_seed0["attr_ctx"]["decisions"]),
+            "final_atoms": [{"text": a["text"]} for s in sels_v120 for a in s.get("accepted_atoms", [])],
+        }
+
+        # 若本地存在真实 737MB v1.2.0 基准归档，额外加载真实关键种子验证真实历史样本
+        cls.real_v120_records = {}
+        cls.real_cur_records = {}
+        v120_arch = REPO_DIR / "scratch" / "audit_m5_3_evidence.json.gz"
+        if v120_arch.is_file():
+            target_seeds = {0, 2, 4, 24, 27, 306, 863, 1518}
+            for s in sorted(target_seeds):
+                cls.real_cur_records[s] = cls.cur_seed0 if s == 0 else _worker_10k_chunk((s, 1))[0]
+            _, rec_it = stream_archive_records(v120_arch)
+            for rec in rec_it:
+                s = rec["seed"]
+                if s in target_seeds:
+                    cls.real_v120_records[s] = rec.get("round_a", {})
+                    if len(cls.real_v120_records) == len(target_seeds):
+                        break
+
+    def test_01_positive_legitimate_replay_and_downstream_distribution_shifts_verified(self):
+        """正向验证：真实上游收敛 + 跨槽位候选/分布偏移通过逐槽位 PRNG 子流确定性重放验证，杜绝无名放行。"""
+        from scratch.run_v1_2_1_10k_audit import attribute_v120_vs_v121_seed
+
+        attr = attribute_v120_vs_v121_seed(self.synthetic_v120_seed0, self.cur_seed0)
+        self.assertTrue(attr["is_divergent"])
+        self.assertTrue(attr["is_explained"], f"Expected explained, got: {attr.get('unexplained_reason')}")
+        self.assertNotIn("downstream_prng_stream_shift", attr["verified_causes"])
+        slot_map = {sv["slot_key"]: sv for sv in attr["slot_verifications"]}
+        self.assertIn("shot_type", slot_map)
+        self.assertIn("nudity", slot_map)
+        for sv in attr["slot_verifications"]:
+            self.assertTrue(sv["replay_verified"])
+            self.assertTrue(sv["valid_candidate"])
+
+        # 若本地存在 v1.2.0 归档，同步复核真实跨版本样本（含子标签过滤 306/863/1518 与受控重组 24、上下文/分布变化 27）
+        for sd, v120_ra in self.real_v120_records.items():
+            real_attr = attribute_v120_vs_v121_seed(v120_ra, self.real_cur_records[sd])
+            self.assertTrue(
+                real_attr["is_explained"],
+                f"Real v1.2.0->v1.2.1 seed {sd} failed attribution: {real_attr.get('unexplained_reason')}",
+            )
+            self.assertNotIn("downstream_prng_stream_shift", real_attr["verified_causes"])
+            self.assertGreater(len(real_attr["slot_verifications"]), 0)
+            for sv in real_attr["slot_verifications"]:
+                self.assertTrue(sv["replay_verified"], f"Seed {sd} slot {sv['slot_key']} missing replay_verified")
+                self.assertTrue(sv["valid_candidate"], f"Seed {sd} slot {sv['slot_key']} missing valid_candidate")
+
+    def test_02_negative_unbacked_sentinel_injected_in_quality_hairstyle_pose_rejected(self):
+        """审核员反例复现：向 quality / hairstyle / pose 注入 UNBACKED_AUDIT_SENTINEL 且同步改写 positive 与 final_texts 时，即使上游已有合法分叉，也必须 Fail-Closed 返回 is_explained=False。"""
+        from scratch.run_v1_2_1_10k_audit import attribute_v120_vs_v121_seed
+
+        v120_baselines = [self.synthetic_v120_seed0]
+        if 0 in self.real_v120_records:
+            v120_baselines.append(self.real_v120_records[0])
+
+        for v120_base in v120_baselines:
+            for target_sel in ("quality", "hairstyle", "pose"):
+                mutated = copy.deepcopy(self.cur_seed0)
+                mutated["positive"] = mutated["positive"] + ", UNBACKED_AUDIT_SENTINEL"
+                mutated["attr_ctx"]["final_texts"].append("UNBACKED_AUDIT_SENTINEL")
+                replaced = False
+                for sel in mutated["attr_ctx"]["selections"]:
+                    if sel["selector"] == target_sel and sel.get("occ", 0) == 0:
+                        sel["accepted_texts"].append("UNBACKED_AUDIT_SENTINEL")
+                        replaced = True
+                        break
+                self.assertTrue(replaced, f"Selector {target_sel} not found in cur_seed0")
+
+                attr = attribute_v120_vs_v121_seed(v120_base, mutated)
+                self.assertFalse(
+                    attr["is_explained"],
+                    f"Injected UNBACKED_AUDIT_SENTINEL into {target_sel!r} MUST NOT be explained! Got: {attr}",
+                )
+                self.assertIn("UNBACKED_AUDIT_SENTINEL", attr["unexplained_reason"] or "")
+
+    def test_03_negative_tampered_downstream_selected_id_and_integrity_rejected(self):
+        """负向反例：即使上游存在合法分叉，篡改下游 selected_id（如 hairstyle -> high_ponytail）或破坏 positive/final_texts/accepted_texts 闭环一致性，必须被确定性重放和一致性校验拦截。"""
+        from scratch.run_v1_2_1_10k_audit import attribute_v120_vs_v121_seed
+
+        # 反例 A：下游 selected_id 被篡改为其他合法词库 ID 且不匹配该种子的 PRNG 子流重放
+        tampered_id = copy.deepcopy(self.cur_seed0)
+        for sel in tampered_id["attr_ctx"]["selections"]:
+            if sel["selector"] == "hairstyle" and sel.get("occ", 0) == 0:
+                sel["selected_id"] = "high_ponytail"
+                break
+        attr_id = attribute_v120_vs_v121_seed(self.synthetic_v120_seed0, tampered_id)
+        self.assertFalse(attr_id["is_explained"])
+        self.assertIn("Replay selected_id mismatch for hairstyle", attr_id["unexplained_reason"] or "")
+
+        # 反例 B：positive 与 final_texts 不同步（孤立在 positive 追加词条）
+        tampered_pos = copy.deepcopy(self.cur_seed0)
+        tampered_pos["positive"] = tampered_pos["positive"] + ", ORPHAN_POSITIVE_TOKEN"
+        attr_pos = attribute_v120_vs_v121_seed(self.synthetic_v120_seed0, tampered_pos)
+        self.assertFalse(attr_pos["is_explained"])
+        self.assertIn("integrity check failed", attr_pos["unexplained_reason"] or "")
+
+        # 反例 C：accepted_texts 与 final_texts 不同步
+        tampered_fin = copy.deepcopy(self.cur_seed0)
+        tampered_fin["attr_ctx"]["final_texts"].append("ORPHAN_FINAL_TOKEN")
+        attr_fin = attribute_v120_vs_v121_seed(self.synthetic_v120_seed0, tampered_fin)
+        self.assertFalse(attr_fin["is_explained"])
+        self.assertIn("accepted_vs_final_mismatch", attr_fin["unexplained_reason"] or "")
+
+    def test_04_archived_v121_evidence_per_seed_attribution_completeness(self):
+        """万种子归档证据中必须完整保留逐种子归因结果与重放证明字段，且零 unexplained、零无依据下游放行。"""
+        arch_path = REPO_DIR / "scratch" / "audit_v1_2_1_10k_evidence.json.gz"
+        self.assertTrue(arch_path.is_file(), f"Missing v1.2.1 archive at {arch_path}")
+        _, rec_iter = stream_archive_records(arch_path)
+        count = 0
+        key_seed_checks = {}
+        for rec in rec_iter:
+            count += 1
+            v_attr = rec.get("v120_attribution")
+            self.assertIsInstance(v_attr, dict, f"Seed {rec.get('seed')} missing v120_attribution")
+            self.assertTrue(v_attr.get("is_explained"), f"Seed {rec.get('seed')} not explained in archive")
+            self.assertNotIn("downstream_prng_stream_shift", v_attr.get("verified_causes", []))
+            if rec.get("seed") in (0, 24, 27, 306, 863, 1518):
+                key_seed_checks[rec["seed"]] = v_attr
+        self.assertEqual(count, 10000)
+        self.assertEqual(set(key_seed_checks.keys()), {0, 24, 27, 306, 863, 1518})
+        for sd, v_attr in key_seed_checks.items():
+            svs = v_attr.get("slot_verifications", [])
+            self.assertGreater(len(svs), 0, f"Seed {sd} has empty slot_verifications")
+            for sv in svs:
+                self.assertTrue(sv.get("replay_verified"), f"Seed {sd} slot {sv.get('slot_key')} unverified")
+                self.assertTrue(sv.get("valid_candidate"), f"Seed {sd} slot {sv.get('slot_key')} invalid candidate")
+                self.assertTrue(sv.get("cause"), f"Seed {sd} slot {sv.get('slot_key')} missing cause")
+
+
 if __name__ == "__main__":
     unittest.main()

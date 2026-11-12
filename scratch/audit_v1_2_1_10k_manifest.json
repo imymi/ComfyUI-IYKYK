@@ -3,10 +3,10 @@
     "core_source_digest": "813fb0d857524a0623f2e24a98c4d1ce9c5608db144f2410cf9b460f21adf091",
     "is_dirty": true,
     "script_path": "scratch/run_v1_2_1_10k_audit.py",
-    "script_sha256": "994e7e9b83835fde8ee2b57dbff58e159963c4696f56f5d3d40f26cc480ec563",
+    "script_sha256": "94e9062ca6bbfd7d89ea889b11a96faa7dd00388e6ae557c92e32b61eb70b5a5",
     "target_batch_hash": "b8775f683c9f329bf39be9e6ac1bd85cba499d2a59cddea250f503a63d9661be",
-    "target_commit": "b5b05478ffe1cc49ed1e50c6d2f191ea8bcb5028",
-    "target_tree_hash": "2c01cd74cfbc00a4836ae4732fa447d2f1b146fa",
+    "target_commit": "a80788314a90be135f94a5088be72a1d71474530",
+    "target_tree_hash": "fabca1025e305063f3a99e55a5821cb56a26cdc4",
     "v120_baseline_batch_hash": "48ae2e927fc6c6dc3f19362c806b31e2587df49aad85193f75e2731b18fa4c7d"
   },
   "command": "/Users/jacobyang/Hermes/.venv/bin/python scratch/run_v1_2_1_10k_audit.py --seeds 10000 --strat-seeds 500",
@@ -45,7 +45,7 @@
       "l6_squatting_self_touch": 411
     },
     "divergent_count": 10000,
-    "elapsed_seconds": 549.31,
+    "elapsed_seconds": 592.12,
     "explained_count": 10000,
     "identical_count": 0,
     "is_all_explained": true,
@@ -152,41 +152,55 @@
       "is_all_explained": true,
       "level_mismatch_count": 0,
       "mechanism_presence_distribution": {
-        "downstream_prng_stream_shift": 9994,
-        "m1_m3_clothing_linkage_and_branch_filtering": 6688,
-        "m1_m3_cross_slot_pool_filtering:camera_angle": 691,
-        "m1_m3_cross_slot_pool_filtering:clothing": 5365,
+        "m1_m3_clothing_linkage_and_branch_filtering": 6654,
+        "m1_m3_cross_slot_pool_filtering:clothing": 3648,
         "m1_m3_cross_slot_pool_filtering:hairstyle": 945,
         "m1_m3_cross_slot_pool_filtering:jewelry": 1888,
         "m1_m3_cross_slot_pool_filtering:liquids": 1479,
-        "m1_m3_cross_slot_pool_filtering:props": 1658,
+        "m1_m3_cross_slot_pool_filtering:props": 1006,
         "m1_m3_cross_slot_pool_filtering:shot_type": 1767,
+        "m1_m3_cross_slot_pool_filtering:tattoo": 831,
         "m1_m3_cross_slot_pool_filtering:theme": 3256,
-        "m1_m3_nudity_single_branch_convergence": 8291,
+        "m1_m3_nudity_single_branch_convergence": 8292,
         "m1_m3_pool_filter_same_category_subsample:clothing": 206,
         "m1_m3_pool_filter_same_category_subsample:hairstyle": 1,
         "m1_m3_pool_filter_same_category_subsample:jewelry": 84,
         "m1_m3_pool_filter_same_category_subsample:liquids": 541,
-        "m1_m3_pool_filter_same_category_subsample:props": 87,
+        "m1_m3_pool_filter_same_category_subsample:props": 69,
         "m1_m3_pool_filter_same_category_subsample:shot_type": 190,
+        "m1_m3_pool_filter_same_category_subsample:tattoo": 345,
         "m1_m3_pool_filter_same_category_subsample:theme": 49,
         "m1_m3_resolver_decision_on_same_category:camera_angle": 1174,
-        "m1_m3_resolver_decision_on_same_category:clothing": 648,
-        "m1_m3_resolver_decision_on_same_category:expression": 27,
+        "m1_m3_resolver_decision_on_same_category:clothing_state": 510,
+        "m1_m3_resolver_decision_on_same_category:expression": 2,
         "m1_m3_resolver_decision_on_same_category:hairstyle": 38,
         "m1_m3_resolver_decision_on_same_category:imperfections": 226,
         "m1_m3_resolver_decision_on_same_category:jewelry": 354,
-        "m1_m3_resolver_decision_on_same_category:lighting": 23,
+        "m1_m3_resolver_decision_on_same_category:lighting": 10,
         "m1_m3_resolver_decision_on_same_category:pose": 14,
-        "m1_m3_resolver_decision_on_same_category:props": 5,
+        "m1_m3_resolver_decision_on_same_category:props": 6,
         "m1_m3_resolver_decision_on_same_category:shot_type": 45,
         "m1_m3_resolver_decision_on_same_category:theme": 14,
         "m2_controlled_rebuild": 319,
         "m2_outfit_completion_or_repair": 1888,
         "m2_outfit_minimal_fallback": 319,
         "m3_nudity_subtag_pool_filtering:camera_angle": 106,
+        "m3_nudity_subtag_pool_filtering:hairstyle": 22,
         "m3_nudity_subtag_pool_filtering:pose": 1193,
-        "m3_nudity_subtag_pool_filtering:shot_type": 80
+        "m3_nudity_subtag_pool_filtering:shot_type": 80,
+        "m3_nudity_subtag_pool_filtering:tattoo": 82,
+        "verified_context_distribution_substream_replay:camera_angle": 1306,
+        "verified_context_distribution_substream_replay:character": 1463,
+        "verified_context_distribution_substream_replay:expression": 1843,
+        "verified_context_distribution_substream_replay:film": 1679,
+        "verified_context_distribution_substream_replay:hairstyle": 778,
+        "verified_context_distribution_substream_replay:lighting": 1987,
+        "verified_context_distribution_substream_replay:makeup": 1364,
+        "verified_context_distribution_substream_replay:pose": 1242,
+        "verified_context_distribution_substream_replay:props": 669,
+        "verified_context_distribution_substream_replay:shot_type": 391,
+        "verified_context_distribution_substream_replay:tattoo": 531,
+        "verified_upstream_substream_replay:clothing_state": 4
       },
       "primary_cause_distribution": {
         "m1_m3_clothing_linkage_and_branch_filtering": 1,
@@ -209,6 +223,12 @@
         {
           "branch": "l6_frontal_genital_display",
           "comp_added": false,
+          "diff_slots": [
+            "shot_type",
+            "camera_angle",
+            "nudity",
+            "clothing"
+          ],
           "eff_lvl": "L6",
           "first_diff_selector": "shot_type",
           "is_explained": true,
@@ -220,13 +240,17 @@
             "m1_m3_cross_slot_pool_filtering:shot_type",
             "m1_m3_resolver_decision_on_same_category:camera_angle",
             "m1_m3_nudity_single_branch_convergence",
-            "m1_m3_resolver_decision_on_same_category:clothing",
-            "downstream_prng_stream_shift"
+            "m1_m3_clothing_linkage_and_branch_filtering"
           ]
         },
         {
           "branch": "l2_shoulder_strap",
           "comp_added": true,
+          "diff_slots": [
+            "theme",
+            "nudity",
+            "clothing"
+          ],
           "eff_lvl": "L2",
           "first_diff_selector": "theme",
           "is_explained": true,
@@ -237,14 +261,24 @@
           "verified_causes": [
             "m1_m3_cross_slot_pool_filtering:theme",
             "m1_m3_nudity_single_branch_convergence",
-            "m1_m3_cross_slot_pool_filtering:clothing",
-            "downstream_prng_stream_shift",
             "m2_outfit_completion_or_repair"
           ]
         },
         {
           "branch": "l1_full_clothed",
           "comp_added": false,
+          "diff_slots": [
+            "theme",
+            "camera_angle",
+            "character",
+            "clothing",
+            "lighting",
+            "imperfections",
+            "tattoo",
+            "props",
+            "liquids",
+            "clothing_state"
+          ],
           "eff_lvl": "L1",
           "first_diff_selector": "theme",
           "is_explained": true,
@@ -254,11 +288,13 @@
           "v121_pos": "audition sofa, everyday girl, close-up, OTS perspective, mature female executive, modest outfit, black skirt dress, bedside lamp, hand on own face, eyes squeezed shut in pleasure, transferred lipstick on lips, in two gathered pigtails, one on each side, fluffy cat ear headband, handwritten scratched tally lines, Nintendo Switch console on bed, wet glistening chin, faded colors, best quality, audition lighting, natural beauty, face shot filling frame, confident dominant demeanor, clothed body, gothic dark botanical pattern, rim light on body, satisfied smile, swollen bruised lip, subtle bikini tan lines, headphones around neck, sloppy kiss moisture trail, foggy, detailed, amateur girl, body curves outlined through fabric, candlelight, photorealistic, form-fitting clothing, slightly faded edges",
           "verified_causes": [
             "m1_m3_cross_slot_pool_filtering:theme",
-            "m1_m3_cross_slot_pool_filtering:camera_angle",
-            "downstream_prng_stream_shift",
+            "verified_context_distribution_substream_replay:camera_angle",
+            "verified_context_distribution_substream_replay:character",
             "m1_m3_cross_slot_pool_filtering:clothing",
+            "verified_context_distribution_substream_replay:lighting",
             "m1_m3_resolver_decision_on_same_category:imperfections",
-            "m1_m3_cross_slot_pool_filtering:props",
+            "m1_m3_pool_filter_same_category_subsample:tattoo",
+            "verified_context_distribution_substream_replay:props",
             "m1_m3_cross_slot_pool_filtering:liquids",
             "m1_m3_clothing_linkage_and_branch_filtering"
           ]
@@ -266,6 +302,12 @@
         {
           "branch": "l3_bikini_top_removed",
           "comp_added": false,
+          "diff_slots": [
+            "nudity",
+            "clothing",
+            "jewelry",
+            "clothing_state"
+          ],
           "eff_lvl": "L3",
           "first_diff_selector": "nudity",
           "is_explained": true,
@@ -277,13 +319,21 @@
             "m1_m3_nudity_single_branch_convergence",
             "m1_m3_cross_slot_pool_filtering:clothing",
             "m1_m3_resolver_decision_on_same_category:jewelry",
-            "downstream_prng_stream_shift",
             "m1_m3_clothing_linkage_and_branch_filtering"
           ]
         },
         {
           "branch": "l1_full_clothed",
           "comp_added": true,
+          "diff_slots": [
+            "theme",
+            "clothing",
+            "lighting",
+            "makeup",
+            "hairstyle",
+            "tattoo",
+            "liquids"
+          ],
           "eff_lvl": "L1",
           "first_diff_selector": "theme",
           "is_explained": true,
@@ -293,16 +343,22 @@
           "v121_pos": "private dining room, waitress, medium shot, eye level angle, submissive French maid, everything covered, sneakers, Rembrandt lighting, standing with back arched, passionate gaze, downturned doe-eyed eyeliner, in a defined twist-out, full and springy, white ruffled maid headband, delicate Japanese kanji calligraphy down back, ice bucket on table, wet glistening chin, warm nostalgic tones, best quality, hotel restaurant booth, maid, waist-up framing, polite devoted servant, fully clothed, off-shoulder dress, chiaroscuro, standing with legs crossed, sultry gaze, defined puffy aegyo sal highlights, melting ice cube resting on collarbone, sloppy kiss moisture trail, golden cast, detailed, restaurant with lockable door, convenience store clerk, modest outfit, form-fitting clothing, deep shadow, plump gradient pout, photorealistic, body curves outlined through fabric, candlelight, slightly faded edges",
           "verified_causes": [
             "m1_m3_cross_slot_pool_filtering:theme",
-            "m1_m3_cross_slot_pool_filtering:clothing",
-            "downstream_prng_stream_shift",
+            "m2_outfit_completion_or_repair",
+            "verified_context_distribution_substream_replay:lighting",
+            "verified_context_distribution_substream_replay:makeup",
             "m1_m3_cross_slot_pool_filtering:hairstyle",
-            "m1_m3_cross_slot_pool_filtering:liquids",
-            "m2_outfit_completion_or_repair"
+            "m1_m3_cross_slot_pool_filtering:tattoo",
+            "m1_m3_cross_slot_pool_filtering:liquids"
           ]
         },
         {
           "branch": "l3_bikini_top_removed",
           "comp_added": false,
+          "diff_slots": [
+            "nudity",
+            "clothing",
+            "clothing_state"
+          ],
           "eff_lvl": "L3",
           "first_diff_selector": "nudity",
           "is_explained": true,
@@ -313,13 +369,23 @@
           "verified_causes": [
             "m1_m3_nudity_single_branch_convergence",
             "m1_m3_cross_slot_pool_filtering:clothing",
-            "downstream_prng_stream_shift",
             "m1_m3_clothing_linkage_and_branch_filtering"
           ]
         },
         {
           "branch": "l2_leg_slit",
           "comp_added": false,
+          "diff_slots": [
+            "theme",
+            "character",
+            "nudity",
+            "clothing",
+            "pose",
+            "expression",
+            "makeup",
+            "tattoo",
+            "props"
+          ],
           "eff_lvl": "L2",
           "first_diff_selector": "theme",
           "is_explained": true,
@@ -329,16 +395,31 @@
           "v121_pos": "restaurant private room, police costume, medium shot, neutral perspective, intellectual female teacher, bare feet with otherwise fully dressed, silvercleavage dress, beauty dish, lying with back arched, amused expression, smudged kohl eyeliner, in structured 1940s-revival waves, deep and sculpted, white ruffled maid headband, prominent defined collarbone hollow, small barcode tattoo with serial numbers on back of neck, smartphone in hand recording, beads of sweat rolling down chest, warm skin tones, best quality, hotel restaurant booth, demon costume, waist-up framing, glasses wearing tutor, skirt slit revealing thigh, sculpted sweetheart neckline, hair light, on back, finger mark on cheek, delicate arched foot with tense tendons, product mark aesthetic, screen light glowing on face, dewy sweaty sheen, pastel colors, detailed, tight costume, ankle visible, high slit showing bare leg, fill, photorealistic, soft even, slightly faded edges",
           "verified_causes": [
             "m1_m3_cross_slot_pool_filtering:theme",
-            "downstream_prng_stream_shift",
+            "verified_context_distribution_substream_replay:character",
             "m1_m3_nudity_single_branch_convergence",
             "m1_m3_pool_filter_same_category_subsample:clothing",
             "m3_nudity_subtag_pool_filtering:pose",
+            "verified_context_distribution_substream_replay:expression",
+            "verified_context_distribution_substream_replay:makeup",
+            "verified_context_distribution_substream_replay:tattoo",
             "m1_m3_cross_slot_pool_filtering:props"
           ]
         },
         {
           "branch": "l2_backless",
           "comp_added": false,
+          "diff_slots": [
+            "theme",
+            "character",
+            "nudity",
+            "clothing",
+            "lighting",
+            "pose",
+            "hairstyle",
+            "props",
+            "liquids",
+            "clothing_state"
+          ],
           "eff_lvl": "L2",
           "first_diff_selector": "theme",
           "is_explained": true,
@@ -348,9 +429,12 @@
           "v121_pos": "a hidden underground world ruled by dwarves, dominant, close-up, canted angle, caring young hospital nurse, backless dress showing spine, hooded skinsuit with integrated hood, soft bounced fill light from neutral reflector, standing with feet together, panicked face, grab redness on face, pigtails tied high, playboy bunny ears, subtle knuckle creases, small barcode tattoo with serial numbers on back of neck, crimson hemp rope bindings, saliva string between parted lips, faded colors, best quality, punishment, face shot filling frame, soft-spoken clinical demeanor, eyes wide in panic, delicate manicured fingernails with red polish, product mark aesthetic, metal handcuffs on headboard, sloppy kiss moisture trail, foggy, detailed, restrained, horrified realization, swollen bruised lip, photorealistic, ink embedded in dermis",
           "verified_causes": [
             "m1_m3_cross_slot_pool_filtering:theme",
-            "downstream_prng_stream_shift",
+            "verified_context_distribution_substream_replay:character",
             "m1_m3_nudity_single_branch_convergence",
             "m1_m3_cross_slot_pool_filtering:clothing",
+            "verified_context_distribution_substream_replay:lighting",
+            "verified_context_distribution_substream_replay:pose",
+            "verified_context_distribution_substream_replay:hairstyle",
             "m1_m3_cross_slot_pool_filtering:props",
             "m1_m3_cross_slot_pool_filtering:liquids",
             "m1_m3_clothing_linkage_and_branch_filtering"
@@ -359,6 +443,10 @@
         {
           "branch": "l5_full_nude_standing_or_frontal",
           "comp_added": false,
+          "diff_slots": [
+            "nudity",
+            "clothing_state"
+          ],
           "eff_lvl": "L5",
           "first_diff_selector": "nudity",
           "is_explained": true,
@@ -368,13 +456,27 @@
           "v121_pos": "a beach at dawn, foot domination, full body shot, looking directly at camera, caring young hospital nurse, completely naked, fully bare body, oil on body reflection, looking behind, virgin look but whore body, gothic makeup, playful anime hair buns, delicate arched foot with tense tendons, lewd womb tattoo on lower abdomen just above pubic area, water trickle running down chest, milky white fluid glistening, high contrast B&W, best quality, foot smell worship, wide shot, soft-spoken clinical demeanor, every inch of skin visible, trying to resist but moaning, dark charcoal smoky eyes, space buns on top of head, prominent defined collarbone hollow, ornate symmetrical succubus crest ink, melting ice cube resting on collarbone, drops of semen dripping on stomach, detailed, nude, innocent face but aroused body, sharp contour, photorealistic, pores visible through ink",
           "verified_causes": [
             "m1_m3_nudity_single_branch_convergence",
-            "m1_m3_clothing_linkage_and_branch_filtering",
-            "downstream_prng_stream_shift"
+            "m1_m3_clothing_linkage_and_branch_filtering"
           ]
         },
         {
           "branch": "l1_full_clothed",
           "comp_added": true,
+          "diff_slots": [
+            "theme",
+            "shot_type",
+            "camera_angle",
+            "character",
+            "clothing",
+            "lighting",
+            "pose",
+            "expression",
+            "makeup",
+            "hairstyle",
+            "jewelry",
+            "tattoo",
+            "film"
+          ],
           "eff_lvl": "L1",
           "first_diff_selector": "theme",
           "is_explained": true,
@@ -385,12 +487,17 @@
           "verified_causes": [
             "m1_m3_cross_slot_pool_filtering:theme",
             "m1_m3_cross_slot_pool_filtering:shot_type",
-            "m1_m3_cross_slot_pool_filtering:camera_angle",
-            "downstream_prng_stream_shift",
-            "m1_m3_cross_slot_pool_filtering:clothing",
+            "verified_context_distribution_substream_replay:camera_angle",
+            "verified_context_distribution_substream_replay:character",
+            "m2_outfit_completion_or_repair",
+            "verified_context_distribution_substream_replay:lighting",
+            "verified_context_distribution_substream_replay:pose",
+            "verified_context_distribution_substream_replay:expression",
+            "verified_context_distribution_substream_replay:makeup",
             "m1_m3_cross_slot_pool_filtering:hairstyle",
             "m1_m3_cross_slot_pool_filtering:jewelry",
-            "m2_outfit_completion_or_repair"
+            "m1_m3_cross_slot_pool_filtering:tattoo",
+            "verified_context_distribution_substream_replay:film"
           ]
         }
       ],
@@ -418,10 +525,10 @@
       9999
     ],
     "path": "audit_v1_2_1_10k_evidence.json.gz",
-    "sha256": "68ebc633ebfab8d220b39e85c864c976b74e83152b7d86eb61628f2b7d1d2246",
-    "size_bytes": 2708608,
+    "sha256": "f4db4b98add36dcdfa50b3814a7608dd263687cb4b7d38c501a01693d5436df4",
+    "size_bytes": 6525376,
     "total_records_processed": 10000
   },
   "task": "v1.2.1 10,000-Seed Multi-Node & M0-M3 Audit",
-  "timestamp": "2026-11-12T02:04:03Z"
+  "timestamp": "2026-11-12T07:40:16Z"
 }
