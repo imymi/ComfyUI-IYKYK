@@ -6,6 +6,8 @@ test_doc_contracts.py — 文档与元数据单源契约自动化测试 (P2-4)
 """
 from __future__ import annotations
 
+import json
+import re
 import unittest
 from pathlib import Path
 
@@ -37,6 +39,30 @@ class TestDocContracts(unittest.TestCase):
         # 3. tattoo 规则 ID 为 tattoo_dermal_fusion
         self.assertIn("tattoo_dermal_fusion", self.readme_text)
         self.assertNotIn("`tattoo_fusion`", self.readme_text)
+
+    def test_readme_diagnostics_fields_match_schema(self):
+        """断言 README 按版本列出的诊断顶层字段与 Schema 必需字段一致。"""
+        schema = json.loads((self.repo_dir / "schemas" / "diagnostics.schema.json").read_text(encoding="utf-8"))
+        self.assertEqual(
+            set(schema["properties"]["schema_version"]["enum"]),
+            {"1.0", "2.0"},
+            "Schema versions changed; review README and this test",
+        )
+        self.assertEqual(schema["if"], {"properties": {"schema_version": {"const": "1.0"}}})
+
+        self.assertIn("## 诊断 JSON\n", self.readme_text)
+        section = self.readme_text.split("## 诊断 JSON\n", 1)[1].split("\n## ", 1)[0]
+        for version, branch in (("1.0", "then"), ("2.0", "else")):
+            with self.subTest(version=version):
+                heading = f"### Diagnostics {version}\n"
+                self.assertEqual(section.count(heading), 1)
+                version_section = section.split(heading, 1)[1].split("\n### ", 1)[0]
+                match = re.search(r"(?ms)^```text\n(.*?)^```$", version_section)
+                self.assertIsNotNone(match, f"Diagnostics {version} field list missing")
+                fields = match.group(1).splitlines()
+                self.assertEqual(len(fields), len(set(fields)), f"Diagnostics {version} has duplicate fields")
+                required = set(schema.get("required", ())) | set(schema[branch]["required"])
+                self.assertEqual(set(fields), required)
 
     def test_generator_input_types_match_doc(self):
         """断言 IYKYKPromptGenerator 的输入端口与 README 参数文档一致"""

@@ -1,9 +1,9 @@
 # ComfyUI-IYKYK v1.2.1 10,000 种子与全四节点综合审计报告
 
-- **审计提交 Commit**: `d77ab314d049b7715a8293ed2be4fa38dc7d1edd` (Tree: `6e1b925689d254d67907493f1fd0f8064cbc330a`, Dirty: `True`)
-- **核心源码摘要 (`core_source_digest`)**: `813fb0d857524a0623f2e24a98c4d1ce9c5608db144f2410cf9b460f21adf091`
+- **审计提交 Commit**: `0681f10b0705dc8eb86822ef12d0898127573224` (Tree: `e50040053370676055ef8e2138458616b18e9289`, Dirty: `True`)
+- **核心源码摘要 (`core_source_digest`)**: `0b74c7411d4a58da5b10ac5d63834c3ba01bcf9e128a9eca3f264df73405beb2`
 - **10k 种子汇总哈希 (`target_batch_hash`)**: `b8775f683c9f329bf39be9e6ac1bd85cba499d2a59cddea250f503a63d9661be`
-- **归档文件**: `scratch/audit_v1_2_1_10k_evidence.json.gz` (`6,762,493` 字节, SHA-256: `9dc4877603b2870b7b5bf8840fa7bc293db2eb1c812760972131eb25232f80a7`)
+- **归档文件**: `scratch/audit_v1_2_1_10k_evidence.json.gz` (`6,762,487` 字节, SHA-256: `4b918de0b7f883b7fb9fe02846054cac72285d0b723f420f55c2467317596326`)
 - **执行命令**: `/Users/jacobyang/Hermes/.venv/bin/python scratch/run_v1_2_1_10k_audit.py --seeds 10000 --strat-seeds 500`
 - **环境**: Python `3.9.6` / `Darwin 27.2.0 (arm64)` / jsonschema `4.25.1`
 

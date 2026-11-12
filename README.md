@@ -158,7 +158,39 @@ P = 0.15 × 全局合法分布 + 0.85 × Σ(情境权重 × 情境候选分布)
 
 `IYKYKPromptDiagnostics` 只采样和消解一次。固定 seed 与相同输入下，它的前三个输出和 `IYKYKPromptGenerator` 逐字节一致。
 
-Diagnostics 2.0 的完整结构以 [Schema](schemas/diagnostics.schema.json) 为准，包含以下审计字段，并记录执行状态、采样理由与外部覆盖结果：
+序列化采用 UTF-8、排序键和紧凑分隔符，不写入时间戳、临时路径、内存地址或随机 UUID。Schema 位于 [`schemas/diagnostics.schema.json`](schemas/diagnostics.schema.json)。
+
+### Diagnostics 2.0
+
+Diagnostics 2.0 的完整结构以 [Schema](schemas/diagnostics.schema.json) 为准，包含以下必需的顶层字段：
+
+```text
+schema_version
+status
+effective_seed
+context_profile
+selections
+overrides
+decisions
+rules_applied
+unresolved_conflicts
+counts
+error_info
+```
+
+其中：
+
+- `status` 表示执行成功（`success`）或出错（`error`）。
+- `selections` 记录原始选择、来源模式、source/produced/accepted Atom、去重和预算过滤。
+- `overrides` 记录外部覆盖的状态、来源、输入及替换和注入结果。
+- `decisions` 记录规则、阶段、动作、原因、胜者、目标和替换产生物。
+- `unresolved_conflicts` 正常应为空；受保护内容导致的不可解硬冲突不会被隐藏。
+- `counts` 满足 Atom 生命周期守恒关系。
+- `error_info` 在 `status` 为 `success` 时为 `null`；为 `error` 时是包含错误分类、代码、消息及相关上下文的对象。
+
+### Diagnostics 1.0
+
+Schema 仍兼容历史 `schema_version=1.0`。该分支要求以下顶层字段；`status`、`overrides` 和 `error_info` 在 1.0 中不是必需字段：
 
 ```text
 schema_version
@@ -170,15 +202,6 @@ rules_applied
 unresolved_conflicts
 counts
 ```
-
-其中：
-
-- `selections` 记录原始选择、来源模式、source/produced/accepted Atom、去重和预算过滤。
-- `decisions` 记录规则、阶段、动作、原因、胜者、目标和替换产生物。
-- `unresolved_conflicts` 正常应为空；受保护内容导致的不可解硬冲突不会被隐藏。
-- `counts` 满足 Atom 生命周期守恒关系。
-
-序列化采用 UTF-8、排序键和紧凑分隔符，不写入时间戳、临时路径、内存地址或随机 UUID。Schema 位于 [`schemas/diagnostics.schema.json`](schemas/diagnostics.schema.json)。
 
 ## 确定性与兼容性
 
@@ -204,14 +227,22 @@ python -m pip install -e ".[dev]"
 ruff check .
 python scripts/generate_rule_schemas.py --check
 python scripts/validate_data.py --strict
-python -m unittest discover -s tests -q
+RUN_LIVE_SEED_GATE=1 python -m unittest discover -s tests -q
 python scripts/build_release.py --mode verify
+```
+
+CI 实时验证当前源码的 10,000 组种子，并与历史/现行黄金哈希对照；历史 M5 原始归档未存入 Git，CI 会明确跳过其完整归档校验（该归档只证明它绑定的历史提交），而 v1.2.1 万种子归因归档已随仓库追踪供实时与离线核验。如需在本机同时完整校验历史 M5 归档，可指定归档路径并确保本地 Git 历史包含归档绑定的提交：
+
+```bash
+M5_ARCHIVE_PATH=/path/to/audit_m5_3_evidence.json.gz python -m unittest \
+  tests.test_rc8_quality_gate.TestRC8QualityGate.test_03b_seed_gate_golden_hash \
+  tests.test_m5_3_audit_engine.TestM5EvidenceVerification.test_17_real_production_evidence_fast_metadata_verified -v
 ```
 
 v1.2.1 的本地验收记录包括：
 
-- 冻结核心业务、数据与节点源码（`core_source_digest` = `813fb0d857524a06...`）后执行全量 58 个模块共 **805 项测试**（2113.344s）全部通过，失败、错误和跳过均为 0。
-- 完成 10,000 种子（`seed=0..9999`）8 项全链路质量门禁审计与 v1.2.0 先重放自洽、再逐槽位/逐词条双向多重集守恒的确定性因果归因比对（`10,000 / 10,000` 全部归因解释、`unexplained=0`，严禁无依据增删或下游放行），以及覆盖全部 4 个公开节点的分层矩阵（`IYKYKPresetBrowser` 125 组、`IYKYKCustomSlotCombiner` 200 组、`IYKYKPromptGenerator` + `IYKYKPromptDiagnostics` 3,000 组），全部为 0 失败；万种子汇总哈希 `b8775f683c9f329b...` 与含逐种子归因证据的新归档（`6,762,493` 字节，SHA-256 `9dc4877603b2870b...`）严格绑定。
+- 并入 `origin/main` PR #4（Ruff 导入与类型注解对齐、Diagnostics 1.0/2.0 README 契约、`RUN_LIVE_SEED_GATE=1` CI 与证据模式测试）后冻结核心业务、数据与节点源码（`core_source_digest` = `0b74c7411d4a58da...`），执行全量测试与门禁全部通过，失败、错误和跳过均为 0。
+- 完成 10,000 种子（`seed=0..9999`）8 项全链路质量门禁审计与 v1.2.0 先重放自洽、再逐槽位/逐词条双向多重集守恒的确定性因果归因比对（`10,000 / 10,000` 全部归因解释、`unexplained=0`，严禁无依据增删或下游放行），以及覆盖全部 4 个公开节点的分层矩阵（`IYKYKPresetBrowser` 125 组、`IYKYKCustomSlotCombiner` 200 组、`IYKYKPromptGenerator` + `IYKYKPromptDiagnostics` 3,000 组），全部为 0 失败；万种子汇总哈希 `b8775f683c9f329b...` 与含逐种子归因证据的新归档（`6,762,487` 字节，SHA-256 `4b918de0b7f883b7...`）严格绑定。
 - 在 `git archive HEAD` 干净检出环境中独立复跑文档契约、CI 路径分类、发布门禁、万种子/M5 归档证据验证与核心回归，并完成两份独立确定性 `--mode verify` 发布包核验。
 - 发布包包含 **44 个运行时文件**（较 v1.2.0 增列 [`lib/outfit_completion.py`](lib/outfit_completion.py)）；离线审计归档（`scratch/audit_v1_2_1_10k_evidence.json.gz` 等）已随仓库追踪供离线核验，不随节点安装包分发。
 - 详细改动、逐项测试处置清单与对比报告见 [v1.2.1 验收与发布报告](docs/v1.2.1_acceptance_and_release_report.md)；前序版本记录见 [v1.2.0 发布记录](docs/v1.2.0_release_record.md)。

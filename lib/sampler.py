@@ -21,6 +21,7 @@ from typing import Any, Dict, List, Optional, Sequence, Set, Tuple
 if __package__:
     from .conflict_resolver import (
         ALLOWED_BUTTON_STYLES,
+        ALLOWED_ZIPPER_STYLES as ALLOWED_ZIPPER_STYLES,
         NON_SKIRT_ONE_PIECE,
         GarmentCarrierEntity,
         get_required_carrier_kind,
@@ -66,6 +67,7 @@ if __package__:
 else:
     from lib.conflict_resolver import (
         ALLOWED_BUTTON_STYLES,
+        ALLOWED_ZIPPER_STYLES as ALLOWED_ZIPPER_STYLES,
         NON_SKIRT_ONE_PIECE,
         GarmentCarrierEntity,
         get_required_carrier_kind,

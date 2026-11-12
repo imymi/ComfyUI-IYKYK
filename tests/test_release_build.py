@@ -817,14 +817,38 @@ class TestReleaseBuild(unittest.TestCase):
             # 2. 依次测试关键故障注入点
             injection_cases = [
                 # 故障点 1：在 smoke_test_package 中抛出异常
-                ("smoke_test_package", "def faulty_smoke(zip_path):\n    raise RuntimeError('INJECTED_SMOKE_FAIL')\nbr.smoke_test_package = faulty_smoke\n"),
+                (
+                    "smoke_test_package",
+                    "def faulty_smoke(zip_path):\n"
+                    "    raise RuntimeError('INJECTED_SMOKE_FAIL')\n"
+                    "br.smoke_test_package = faulty_smoke\n",
+                    "INJECTED_SMOKE_FAIL",
+                ),
                 # 故障点 2：在锁内重命名 generation 目录前抛出异常
-                ("os_replace_version", "current_ver = br.get_project_version(Path.cwd())\norig_replace = os.replace\ndef faulty_replace(src, dest):\n    if current_ver in str(dest):\n        raise RuntimeError('INJECTED_REPLACE_FAIL')\n    return orig_replace(src, dest)\nos.replace = faulty_replace\n"),
+                (
+                    "os_replace_version",
+                    "orig_replace = os.replace\n"
+                    "def faulty_replace(src, dest):\n"
+                    "    if Path(dest).name.startswith(f'v{br.get_project_version(Path.cwd())}-'):\n"
+                    "        raise RuntimeError('INJECTED_REPLACE_FAIL')\n"
+                    "    return orig_replace(src, dest)\n"
+                    "os.replace = faulty_replace\n",
+                    "INJECTED_REPLACE_FAIL",
+                ),
                 # 故障点 3：在更新 CURRENT.json 前抛出异常
-                ("update_pointer", "orig_replace = os.replace\ndef faulty_replace(src, dest):\n    if 'CURRENT.json' in str(dest):\n        raise RuntimeError('INJECTED_POINTER_FAIL')\n    return orig_replace(src, dest)\nos.replace = faulty_replace\n"),
+                (
+                    "update_pointer",
+                    "orig_replace = os.replace\n"
+                    "def faulty_replace(src, dest):\n"
+                    "    if Path(dest).name == 'CURRENT.json':\n"
+                    "        raise RuntimeError('INJECTED_POINTER_FAIL')\n"
+                    "    return orig_replace(src, dest)\n"
+                    "os.replace = faulty_replace\n",
+                    "INJECTED_POINTER_FAIL",
+                ),
             ]
 
-            for name, fault_code in injection_cases:
+            for name, fault_code, expected_error in injection_cases:
                 script = (
                     "import sys, os\n"
                     "from pathlib import Path\n"
@@ -840,6 +864,10 @@ class TestReleaseBuild(unittest.TestCase):
                 )
                 # 断言构建失败
                 self.assertNotEqual(res.returncode, 0, f"Injection '{name}' unexpectedly passed!")
+                self.assertIn(
+                    expected_error, res.stderr,
+                    f"Injection '{name}' did not reach its intended fault:\nstdout:\n{res.stdout}\nstderr:\n{res.stderr}",
+                )
 
                 # 逐字节断言旧发布绝对未被篡改
                 self.assertTrue(old_version_dir.exists(), f"Old version dir disappeared in {name}!")

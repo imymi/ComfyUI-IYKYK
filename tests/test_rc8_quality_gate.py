@@ -6,11 +6,14 @@ from __future__ import annotations
 import concurrent.futures
 import copy
 import hashlib
+import io
 import json
 import os
 import subprocess
+import tarfile
+import tempfile
 import unittest
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 from random import Random
 
 try:
@@ -257,7 +260,12 @@ def _worker_seed_batch(start_seed: int, count: int) -> tuple[int, int, list[tupl
         r2 = g.generate_structured(**inputs, prompt_seed=s)
         # 1. 两次生成绝对一致，且与诊断节点前三个输出逐字节一致
         d_pos, d_neg, d_desc, d_audit = diag.diagnose(**inputs, prompt_seed=s)
-        if r1.positive != r2.positive or r1.negative != r2.negative or d_pos != r1.positive or d_neg != r1.negative or d_desc != r1.description:
+        d2_pos, d2_neg, d2_desc, d2_audit = diag.diagnose(**inputs, prompt_seed=s)
+        if (
+            (r1.positive, r1.negative, r1.description) != (r2.positive, r2.negative, r2.description)
+            or (d_pos, d_neg, d_desc) != (r1.positive, r1.negative, r1.description)
+            or (d_pos, d_neg, d_desc, d_audit) != (d2_pos, d2_neg, d2_desc, d2_audit)
+        ):
             if first_fail is None:
                 first_fail = s
                 break
@@ -284,7 +292,9 @@ def _worker_seed_batch(start_seed: int, count: int) -> tuple[int, int, list[tupl
                 first_fail = s
                 break
         # 4. parent/origin 闭环
-        if any(len(a.provenance.parent_ids) == 0 for a in r1.atoms):
+        try:
+            _verify_provenance_dag(r1)
+        except AssertionError:
             if first_fail is None:
                 first_fail = s
                 break
@@ -297,7 +307,7 @@ def _worker_seed_batch(start_seed: int, count: int) -> tuple[int, int, list[tupl
                 break
         # 6. 二次消解零新增决策
         res2, app2, rep2 = resolver.resolve_atoms_with_full_report(r1.atoms, Random(s))
-        if len(rep2.decisions) != 0:
+        if len(rep2.decisions) != 0 or tuple(res2) != r1.atoms:
             if first_fail is None:
                 first_fail = s
                 break
@@ -320,11 +330,41 @@ EXPECTED_M5_GOLDEN_HASH = "48ae2e927fc6c6dc3f19362c806b31e2587df49aad85193f75e27
 EXPECTED_M5_ARCHIVE_SHA256 = "5417aa6529e4a86d2f920d6387ecd88626d70d9fd1973c7896ffa16544b01ff9"
 EXPECTED_M5_ARCHIVE_SIZE = 737487743
 EXPECTED_M5_CORE_SOURCE_DIGEST = "7641d348b44249de809a73e8e3bfd22c8d7ba48ed4e71f6cdf36fe8ab6a6ee7f"
+EXPECTED_M5_SOURCE_COMMIT = "1db9e675666854d569da85d72f6a39708b81c66c"
+EXPECTED_M5_SOURCE_TREE = "1530ce71c110f69cba39fee5f9d8d70b841c25ca"
+
+
+def m5_archive_path(repo_dir: Path) -> Path:
+    """定位本机历史归档；显式配置为空时必须报错。"""
+    if "M5_ARCHIVE_PATH" in os.environ:
+        value = os.environ["M5_ARCHIVE_PATH"].strip()
+        if not value:
+            raise ValueError("M5_ARCHIVE_PATH must not be empty")
+        return Path(value).expanduser()
+    return repo_dir / "scratch" / "audit_m5_3_evidence.json.gz"
+
+
+def may_skip_unavailable_m5_archive(archive_path: Path) -> bool:
+    """只允许实时模式跳过未配置且确实不存在的历史归档。"""
+    return (
+        os.environ.get("RUN_LIVE_SEED_GATE") == "1"
+        and "M5_ARCHIVE_PATH" not in os.environ
+        and not archive_path.exists()
+        and not archive_path.is_symlink()
+    )
+
+
+def hash_complete_seed_batch(pairs: list[tuple[int, str]], expected_count: int) -> str:
+    """只接受连续且无重复的完整种子集，再计算黄金汇总哈希。"""
+    ordered = sorted(pairs, key=lambda pair: pair[0])
+    if [seed for seed, _ in ordered] != list(range(expected_count)):
+        raise AssertionError(f"Live seed gate must cover each seed from 0 to {expected_count - 1} exactly once")
+    return hashlib.sha256("".join(value for _, value in ordered).encode("utf-8")).hexdigest()
 
 EXPECTED_V1_2_1_GOLDEN_HASH = "b8775f683c9f329bf39be9e6ac1bd85cba499d2a59cddea250f503a63d9661be"
-EXPECTED_V1_2_1_ARCHIVE_SHA256 = "9dc4877603b2870b7b5bf8840fa7bc293db2eb1c812760972131eb25232f80a7"
-EXPECTED_V1_2_1_ARCHIVE_SIZE = 6762493
-EXPECTED_V1_2_1_CORE_SOURCE_DIGEST = "813fb0d857524a0623f2e24a98c4d1ce9c5608db144f2410cf9b460f21adf091"
+EXPECTED_V1_2_1_ARCHIVE_SHA256 = "4b918de0b7f883b7fb9fe02846054cac72285d0b723f420f55c2467317596326"
+EXPECTED_V1_2_1_ARCHIVE_SIZE = 6762487
+EXPECTED_V1_2_1_CORE_SOURCE_DIGEST = "0b74c7411d4a58da5b10ac5d63834c3ba01bcf9e128a9eca3f264df73405beb2"
 
 
 def compute_current_core_source_digest(repo_dir: Path) -> str:
@@ -543,6 +583,53 @@ def verify_m5_archive_evidence(
         "total_seeds": expected_seeds_count,
         "core_source_digest": current_core_digest,
     }
+
+
+def verify_m5_historical_archive(manifest_path: Path, archive_path: Path, repo_dir: Path, *, stream_recompute: bool) -> dict:
+    """以归档原始提交的源码校验历史证据，不把旧证据冒充当前源码的验收。"""
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    binding = manifest.get("auditor_binding", {})
+    if (
+        binding.get("target_commit") != EXPECTED_M5_SOURCE_COMMIT
+        or binding.get("target_tree_hash") != EXPECTED_M5_SOURCE_TREE
+    ):
+        raise AssertionError("Historical M5 manifest source commit or tree does not match the frozen evidence")
+
+    git_env = {**os.environ, "GIT_NO_REPLACE_OBJECTS": "1"}
+    tree = subprocess.run(
+        ["git", "rev-parse", "--verify", f"{EXPECTED_M5_SOURCE_COMMIT}^{{tree}}"],
+        cwd=repo_dir, env=git_env, capture_output=True, text=True, check=True,
+    ).stdout.strip()
+    if tree != EXPECTED_M5_SOURCE_TREE:
+        raise AssertionError("Historical M5 source commit tree does not match the frozen evidence")
+    result = subprocess.run(
+        ["git", "archive", "--format=tar", EXPECTED_M5_SOURCE_COMMIT, "--", "lib", "data", "schemas", "nodes.py"],
+        cwd=repo_dir, env=git_env, capture_output=True, check=True,
+    )
+    with tempfile.TemporaryDirectory(prefix="iykyk-m5-history-") as temp_dir:
+        root = Path(temp_dir)
+        with tarfile.open(fileobj=io.BytesIO(result.stdout), mode="r:") as archive:
+            for member in archive:
+                path = PurePosixPath(member.name)
+                if (
+                    path.is_absolute() or not path.parts or ".." in path.parts or "\\" in member.name
+                    or path.parts[0] not in {"lib", "data", "schemas", "nodes.py"}
+                ):
+                    raise AssertionError(f"Unsafe path in historical source archive: {member.name}")
+                target = root.joinpath(*path.parts)
+                if member.isdir():
+                    target.mkdir(parents=True, exist_ok=True)
+                elif member.isfile():
+                    target.parent.mkdir(parents=True, exist_ok=True)
+                    source = archive.extractfile(member)
+                    if source is None:
+                        raise AssertionError(f"Cannot read historical source: {member.name}")
+                    with source, target.open("xb") as destination:
+                        while chunk := source.read(1024 * 1024):
+                            destination.write(chunk)
+                else:
+                    raise AssertionError(f"Unexpected entry in historical source archive: {member.name}")
+        return verify_m5_archive_evidence(manifest_path, archive_path, root, stream_recompute=stream_recompute)
 
 
 class TestRC8QualityGate(unittest.TestCase):
@@ -1357,9 +1444,11 @@ sys.exit(0 if res.wasSuccessful() else 1)
                     first_failure = fail_seed
                 total_pairs.extend(h_list)
 
-            total_pairs.sort(key=lambda x: x[0])
-            ordered_hashes = [h for _, h in total_pairs]
-            batch_hash = hashlib.sha256("".join(ordered_hashes).encode("utf-8")).hexdigest()
+            if first_failure is None:
+                batch_hash = hash_complete_seed_batch(total_pairs, 10000)
+                print(f"Live M5 seed validation completed: {len(total_pairs)} seeds; SHA-256 {batch_hash}")
+            else:
+                batch_hash = ""
             cls._seed_gate_result = (first_failure, len(total_pairs), batch_hash)
             return cls._seed_gate_result
 
@@ -1377,7 +1466,7 @@ sys.exit(0 if res.wasSuccessful() else 1)
         self.assertEqual(count, 10000)
 
     def test_03b_seed_gate_golden_hash(self):
-        """固定汇总哈希稳定性门禁：保留历史演进链基线（含 v1.2.0 M5），流式重算当前 v1.2.1 黄金基线哈希，并绑定归档实物证据。"""
+        """实时/归档验证当前 v1.2.1 源码的 10,000 种子与黄金哈希；历史 M5 归档可用时单独完整校验。"""
         baseline_dba5861_hash = "a39a823d09b3b817107ba6a6ebdd5fdb261f4f71bd8148bd7856533fdf21c218"
         step2_baseline_hash = "3e1291ae60af887ebde1869a8fb60f7937424198c1db6a4856bb90aa954725fc"
         step3_baseline_hash = "ab5a633cfb3fde70d9a6c629ee65a540955d87ee143e66570d780743246cab89"
@@ -1422,13 +1511,32 @@ sys.exit(0 if res.wasSuccessful() else 1)
             )
 
         # ------------------------------------------------------------------
-        # 分支 B: 当前阶段 v1.2.1 黄金基线核验 (共用函数流式逐条重算 + 实物防篡改校验)
+        # 分支 B: 当前阶段 v1.2.1 黄金基线核验（实时门禁 + 随库追踪归档）及历史 M5 归档可选完整核验
         # ------------------------------------------------------------------
-        manifest_path = REPO_DIR / "scratch" / "audit_v1_2_1_10k_manifest.json"
-        archive_path = REPO_DIR / "scratch" / "audit_v1_2_1_10k_evidence.json.gz"
-        res = verify_m5_archive_evidence(manifest_path, archive_path, REPO_DIR, stream_recompute=True)
+        live_mode = os.environ.get("RUN_LIVE_SEED_GATE") == "1"
+        if live_mode:
+            first_failure, count, batch_hash = self._run_seed_gate_10k()
+            self.assertIsNone(first_failure, f"Live seed gate failed at seed: {first_failure}")
+            self.assertEqual(count, 10000)
+            self.assertEqual(batch_hash, EXPECTED_V1_2_1_GOLDEN_HASH, "Current live seed hash differs from v1.2.1 golden hash")
+
+        v121_manifest = REPO_DIR / "scratch" / "audit_v1_2_1_10k_manifest.json"
+        v121_archive = REPO_DIR / "scratch" / "audit_v1_2_1_10k_evidence.json.gz"
+        if v121_manifest.is_file() or not live_mode:
+            v121_res = verify_m5_archive_evidence(v121_manifest, v121_archive, REPO_DIR, stream_recompute=True)
+            self.assertEqual(v121_res["status"], "VERIFIED")
+            self.assertEqual(v121_res["batch_hash"], EXPECTED_V1_2_1_GOLDEN_HASH)
+
+        # 历史 M5 归档只对其原始源码提交负责；CI 无历史归档时，test_17 会明确报告跳过该项。
+        manifest_path = REPO_DIR / "scratch" / "audit_m5_3_reeval_manifest.json"
+        archive_path = m5_archive_path(REPO_DIR)
+        if not archive_path.is_file():
+            if may_skip_unavailable_m5_archive(archive_path):
+                return
+            self.fail(f"Historical M5 evidence archive must exist: {archive_path}")
+        res = verify_m5_historical_archive(manifest_path, archive_path, REPO_DIR, stream_recompute=True)
         self.assertEqual(res["status"], "VERIFIED")
-        self.assertEqual(res["batch_hash"], EXPECTED_V1_2_1_GOLDEN_HASH)
+        self.assertEqual(res["batch_hash"], EXPECTED_M5_GOLDEN_HASH)
 
     def test_03c_dual_version_divergence_audit(self):
         """四阶段全链路版本差异审计门禁：全量核验历史演进链证据 (阶段 1~3)，并核验开发起点 c74084d 至 M1 增量变更的因果归因全量证据 (阶段 4)。"""
