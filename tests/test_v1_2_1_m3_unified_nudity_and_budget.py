@@ -14,7 +14,12 @@ import jsonschema
 import nodes as nodes_mod
 from lib import assembler as _assembler
 from lib.assembler import PromptAssembler
-from lib.conflict_resolver import ConflictResolver, find_carrier_mismatch_in_atoms
+from lib.conflict_resolver import (
+    ConflictResolver,
+    find_carrier_mismatch_in_atoms,
+    get_required_carrier_kind,
+    is_carrier_satisfied_by_garments,
+)
 from lib.errors import PromptValidationError, UnresolvedConflictError
 from lib.models import (
     NUDITY_BRANCHES_BY_LEVEL,
@@ -876,7 +881,7 @@ class TestV121M3UnifiedNudityAndBudget(unittest.TestCase):
         l2_conflict_atoms = [
             PromptAtom(
                 atom_id="n_mid",
-                text="midriff showing between top and skirt",
+                text="bare midriff",
                 span_type=SpanType.PLAIN,
                 source_slot="nudity",
                 source_item_id="nudity_l2",
@@ -1171,6 +1176,116 @@ class TestV121M3UnifiedNudityAndBudget(unittest.TestCase):
                 nudity_override="skirt slit revealing thigh",
                 prompt_seed=3,
             )
+
+        # 5b. 组合载体 top_and_skirt 必须同时具备独立上衣与半身裙（缺其一、裤+上衣、纯连衣裙均不满足）
+        mid_top_skirt_frag = PromptFragment(
+            text="midriff showing between top and skirt",
+            source_slot="nudity",
+            source_item_id="nudity_l2",
+            order=0,
+            provenance=TagProvenance(item_id="nudity_l2", kind="nudity"),
+            origin=SelectionOrigin(mode="explicit", selector="nudity", selected_id="nudity_l2"),
+            facts=SemanticFacts(allowed_nudity_levels=("L2",), exposed_regions=("midriff",), nudity_branches=("l2_midriff_waist",)),
+        )
+        self.assertEqual(get_required_carrier_kind({"text": "midriff showing between top and skirt", "source_slot": "nudity"}), "top_and_skirt")
+        top_frag = PromptFragment(
+            text="white short sleeve shirt",
+            source_slot="clothing",
+            source_item_id="jk_seifuku",
+            order=1,
+            provenance=TagProvenance(item_id="jk_seifuku", kind="base_clothing"),
+            origin=SelectionOrigin(mode="explicit", selector="clothing", selected_id="jk_seifuku"),
+            facts=SemanticFacts(piece_role="top", garment_topologies=("top",), covered_regions=("upper_torso",), allowed_nudity_levels=("L1", "L2")),
+        )
+        skirt_frag = PromptFragment(
+            text="pleated mini skirt",
+            source_slot="clothing",
+            source_item_id="jk_seifuku",
+            order=2,
+            provenance=TagProvenance(item_id="jk_seifuku", kind="base_clothing"),
+            origin=SelectionOrigin(mode="explicit", selector="clothing", selected_id="jk_seifuku"),
+            facts=SemanticFacts(piece_role="bottom", garment_topologies=("bottom_skirt",), covered_regions=("lower_torso",), allowed_nudity_levels=("L1", "L2")),
+        )
+        shorts_frag = PromptFragment(
+            text="denim shorts",
+            source_slot="clothing",
+            source_item_id="denim_shorts",
+            order=3,
+            provenance=TagProvenance(item_id="denim_shorts", kind="base_clothing"),
+            origin=SelectionOrigin(mode="explicit", selector="clothing", selected_id="denim_shorts"),
+            facts=SemanticFacts(piece_role="bottom", garment_topologies=("bottom_pants",), covered_regions=("lower_torso",), allowed_nudity_levels=("L1", "L2")),
+        )
+        dress_frag = PromptFragment(
+            text="evening gown",
+            source_slot="clothing",
+            source_item_id="evening_dress",
+            order=4,
+            provenance=TagProvenance(item_id="evening_dress", kind="base_clothing"),
+            origin=SelectionOrigin(mode="explicit", selector="clothing", selected_id="evening_dress"),
+            facts=SemanticFacts(piece_role="one_piece", garment_topologies=("one_piece",), covered_regions=("upper_torso", "lower_torso"), allowed_nudity_levels=("L1", "L2")),
+        )
+        self.assertFalse(is_carrier_satisfied_by_garments("top_and_skirt", [shorts_frag]))
+        self.assertFalse(is_carrier_satisfied_by_garments("top_and_skirt", [skirt_frag]))
+        self.assertFalse(is_carrier_satisfied_by_garments("top_and_skirt", [top_frag]))
+        self.assertFalse(is_carrier_satisfied_by_garments("top_and_skirt", [top_frag, shorts_frag]))
+        self.assertFalse(is_carrier_satisfied_by_garments("top_and_skirt", [dress_frag]))
+        self.assertTrue(is_carrier_satisfied_by_garments("top_and_skirt", [top_frag, skirt_frag]))
+
+        l2_mid_nc = NudityConstraint(requested_level="L2", effective_level="L2", source="ui_explicit", selected_branch="l2_midriff_waist")
+        for bad_garments in ([shorts_frag], [skirt_frag], [top_frag, shorts_frag], [dress_frag]):
+            with self.assertRaises(PromptValidationError) as ctx_composite:
+                _assembler.assemble_result([mid_top_skirt_frag, *bad_garments], DATA_DIR, Random(42), nudity_constraint=l2_mid_nc)
+            self.assertEqual(ctx_composite.exception.error_code, "nudity_prompts_eliminated_by_conflict")
+        ok_composite = _assembler.assemble_result([mid_top_skirt_frag, top_frag, skirt_frag], DATA_DIR, Random(42), nudity_constraint=l2_mid_nc)
+        self.assertIn("midriff showing between top and skirt", ok_composite.prompt.lower())
+        self.assertEqual(find_carrier_mismatch_in_atoms(ok_composite.accepted_atoms), [])
+
+        jk_top_leaf = PromptFragment(
+            text="white short sleeve shirt",
+            source_slot="clothing",
+            source_item_id="jk_seifuku",
+            id="jk_seifuku__tag_004",
+            order=5,
+            provenance=TagProvenance(item_id="jk_seifuku", kind="base_clothing"),
+            origin=SelectionOrigin(mode="explicit", selector="clothing", selected_id="jk_seifuku"),
+            facts=SemanticFacts(piece_role="top", garment_topologies=("top",), covered_regions=("upper_torso",), allowed_nudity_levels=("L1", "L2")),
+        )
+        jk_skirt_leaf = PromptFragment(
+            text="pleated mini skirt",
+            source_slot="clothing",
+            source_item_id="jk_seifuku",
+            id="jk_seifuku__tag_002",
+            order=6,
+            provenance=TagProvenance(item_id="jk_seifuku", kind="base_clothing"),
+            origin=SelectionOrigin(mode="explicit", selector="clothing", selected_id="jk_seifuku"),
+            facts=SemanticFacts(piece_role="bottom", garment_topologies=("bottom_skirt",), covered_regions=("lower_torso",), allowed_nudity_levels=("L1", "L2")),
+        )
+        pl_skirt_standalone = PromptFragment(
+            text="pleated mini skirt",
+            source_slot="clothing",
+            source_item_id="pleated_skirt",
+            id="pleated_skirt__tag_000",
+            order=7,
+            provenance=TagProvenance(item_id="pleated_skirt", kind="base_clothing"),
+            origin=SelectionOrigin(mode="explicit", selector="clothing", selected_id="pleated_skirt"),
+            facts=SemanticFacts(piece_role="bottom", garment_topologies=("bottom_skirt",), covered_regions=("lower_torso",), allowed_nudity_levels=("L1", "L2")),
+        )
+        sh_top_standalone = PromptFragment(
+            text="button-up shirt",
+            source_slot="clothing",
+            source_item_id="shirts_blouses",
+            id="shirts_blouses__tag_000",
+            order=8,
+            provenance=TagProvenance(item_id="shirts_blouses", kind="base_clothing"),
+            origin=SelectionOrigin(mode="explicit", selector="clothing", selected_id="shirts_blouses"),
+            facts=SemanticFacts(piece_role="top", garment_topologies=("top",), covered_regions=("upper_torso",), allowed_nudity_levels=("L1", "L2")),
+        )
+        with self.assertRaises(PromptValidationError):
+            _assembler.assemble_result([mid_top_skirt_frag, jk_skirt_leaf], DATA_DIR, Random(42), nudity_constraint=l2_mid_nc)
+        for pair in ([jk_top_leaf, jk_skirt_leaf], [sh_top_standalone, pl_skirt_standalone]):
+            ok_pair = _assembler.assemble_result([mid_top_skirt_frag, *pair], DATA_DIR, Random(42), nudity_constraint=l2_mid_nc)
+            self.assertIn("midriff showing between top and skirt", ok_pair.prompt.lower())
+            self.assertEqual(find_carrier_mismatch_in_atoms(ok_pair.accepted_atoms), [])
 
         # 6. 最多 1 次受控重组约束：随机服饰若首轮触发载体缺失错误，最多只调用一次 rebuild 后即 Fail-Closed
         orig_sample_clothing = nodes_mod._sampler.sample_clothing_result

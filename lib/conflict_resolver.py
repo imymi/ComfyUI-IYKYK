@@ -374,6 +374,18 @@ _CARRIER_REQ_SKIRT_SLIT_RE = re.compile(
     r"\b(?:skirt\s+slit|high\s+slit|high\s+side\s+slit|slit\s+revealing\s+thigh)\b",
     re.IGNORECASE,
 )
+_CARRIER_REQ_TOP_AND_SKIRT_RE = re.compile(
+    r"\btop\s+and\s+skirt\b",
+    re.IGNORECASE,
+)
+_SEPARATE_TOP_TEXT_RE = re.compile(
+    r"\b(?:top|shirt|blouse|t-shirt|tee|sweater|hoodie|cardigan|jacket|coat|vest|blazer|camisole|tank\s+top|tube\s+top|jeogori|bikini\s+top|crop\s+top)\b",
+    re.IGNORECASE,
+)
+_SKIRT_BOTTOM_TEXT_RE = re.compile(
+    r"\b(?:skirt|miniskirt|microskirt|skort|petticoat|tutu|kilt|chima|sarong|lehenga)\b",
+    re.IGNORECASE,
+)
 _CARRIER_REQ_SKIRT_ACTION_RE = re.compile(
     r"\bskirt\b",
     re.IGNORECASE,
@@ -703,6 +715,65 @@ def is_item_button_or_collar_carrier(obj: Any, style_id: str = "") -> bool:
     return False
 
 
+def _is_item_separate_top_carrier(obj: Any, style_id: str = "") -> bool:
+    """判定衣物项是否具备独立上衣/上身外搭载体（严禁纯连衣裙 one_piece 或纯下装冒充）。"""
+    if not _is_worn_garment_carrier(obj, style_id=style_id):
+        return False
+    info = _unpack_carrier_subject(obj, style_id=style_id)
+    topos = info["topos"]
+    role = info["role"]
+    tl = info["text_low"]
+    ep = info["ensemble_pieces"]
+    if ep is not None:
+        bindings, extra_pieces = _iter_ensemble_piece_texts(ep)
+        for slot_name, pb_topo, p_txt in bindings:
+            if slot_name == "top_pieces" or pb_topo in ("top", "outerwear"):
+                return True
+            if pb_topo != "bottom_skirt" and pb_topo != "bottom_pants" and _SEPARATE_TOP_TEXT_RE.search(p_txt):
+                return True
+        if any(_SEPARATE_TOP_TEXT_RE.search(pt) and not _STRICT_DRESS_TEXT_RE.search(pt) for pt in extra_pieces):
+            return True
+    if "top" in topos or role == "top" or "outerwear" in topos or role == "outerwear":
+        return True
+    if ("one_piece" in topos or role == "one_piece") and "top" not in topos:
+        return False
+    if any(t in topos for t in ("bottom_pants", "bottom_skirt")) or role == "bottom":
+        return False
+    return bool(
+        _SEPARATE_TOP_TEXT_RE.search(tl)
+        and "without top" not in tl
+        and "no top" not in tl
+        and "topless" not in tl
+    )
+
+
+def _is_item_skirt_bottom_carrier(obj: Any, style_id: str = "") -> bool:
+    """判定衣物项是否具备半身裙载体（严禁连衣裙 one_piece 或裤装冒充分体裙）。"""
+    if not _is_worn_garment_carrier(obj, style_id=style_id):
+        return False
+    info = _unpack_carrier_subject(obj, style_id=style_id)
+    topos = info["topos"]
+    role = info["role"]
+    tl = info["text_low"]
+    ep = info["ensemble_pieces"]
+    if ep is not None:
+        bindings, extra_pieces = _iter_ensemble_piece_texts(ep)
+        for slot_name, pb_topo, p_txt in bindings:
+            if pb_topo == "bottom_skirt":
+                return True
+            if slot_name == "bottom_pieces" and pb_topo != "bottom_pants" and _SKIRT_BOTTOM_TEXT_RE.search(p_txt):
+                return True
+        if any(_SKIRT_BOTTOM_TEXT_RE.search(pt) for pt in extra_pieces):
+            return True
+    if "bottom_skirt" in topos:
+        return True
+    if ("one_piece" in topos or role == "one_piece") and "bottom_skirt" not in topos:
+        return False
+    if "bottom_pants" in topos and "bottom_skirt" not in topos:
+        return False
+    return bool(_SKIRT_BOTTOM_TEXT_RE.search(tl) and "no skirt" not in tl)
+
+
 def get_required_carrier_kind(obj: Any, default_slot: str = "") -> Optional[str]:
     """返回非基础衣物修饰/裸露提示词所依赖的物理载体类别，无载体硬前提或为丢弃态时返回 None。"""
     if isinstance(obj, PromptAtom) and obj.contains_blackbox:
@@ -716,12 +787,14 @@ def get_required_carrier_kind(obj: Any, default_slot: str = "") -> Optional[str]
     if "discarded" in info["garment_states"] or any(k in tl for k in ("tossed aside", "discarded on", "scattered beside", "all clothes removed")):
         return None
     sid = info["sid"] or info["raw_item_id"]
+    if _CARRIER_REQ_TOP_AND_SKIRT_RE.search(tl):
+        return "top_and_skirt"
     if sid == "high_slit" or _CARRIER_REQ_SKIRT_SLIT_RE.search(tl):
         return "skirt_slit"
     if _CARRIER_REQ_SKIRT_ACTION_RE.search(tl) and (
         _CARRIER_REQ_SKIRT_VERBS_RE.search(tl) or slot in ("clothing_state", "clothing_extension")
     ):
-        if "no skirt" not in tl and "top and skirt" not in tl:
+        if "no skirt" not in tl:
             return "skirt_slit"
     if _CARRIER_REQ_DRESS_RE.search(tl) and "dress shirt" not in tl:
         return "dress"
@@ -737,7 +810,15 @@ def get_required_carrier_kind(obj: Any, default_slot: str = "") -> Optional[str]
 
 
 def is_carrier_satisfied_by_garments(required_kind: str, garment_objs: Sequence[Any], style_id: str = "") -> bool:
-    """检查候选或在穿衣物列表是否满足指定的载体类别要求。"""
+    """检查候选或在穿衣物列表是否满足指定的载体类别要求（组合载体必须同时具备全部组成载体）。"""
+    if required_kind == "top_and_skirt":
+        return any(_is_item_separate_top_carrier(g, style_id=style_id) for g in garment_objs) and any(
+            _is_item_skirt_bottom_carrier(g, style_id=style_id) for g in garment_objs
+        )
+    if required_kind == "separate_top":
+        return any(_is_item_separate_top_carrier(g, style_id=style_id) for g in garment_objs)
+    if required_kind == "skirt_bottom":
+        return any(_is_item_skirt_bottom_carrier(g, style_id=style_id) for g in garment_objs)
     if required_kind == "skirt_slit":
         return any(is_item_skirt_or_slit_carrier(g, style_id=style_id) for g in garment_objs)
     if required_kind == "dress":
@@ -751,6 +832,31 @@ def is_carrier_satisfied_by_garments(required_kind: str, garment_objs: Sequence[
     if required_kind == "upper_top":
         return any(is_item_upper_garment_carrier(g, style_id=style_id) for g in garment_objs)
     return True
+
+
+def is_carrier_satisfied_by_style_pool(
+    required_kind: str,
+    garment_pool: Sequence[Any],
+    style_id: str = "",
+    *,
+    is_single_tag: bool = False,
+) -> bool:
+    """校验风格候选池（单件替代项列表或多件套组类别）是否允许满足指定载体前提。"""
+    if required_kind != "top_and_skirt":
+        return is_carrier_satisfied_by_garments(required_kind, garment_pool, style_id=style_id)
+    if is_single_tag or len(garment_pool) <= 1:
+        return is_carrier_satisfied_by_garments("top_and_skirt", garment_pool, style_id=style_id)
+    if any(is_carrier_satisfied_by_garments("top_and_skirt", [g], style_id=style_id) for g in garment_pool):
+        return True
+    is_multi_piece_ensemble = any(
+        "ensemble_outfit" in (((g.get("facts") or {}).get("garment_topologies")) or ())
+        for g in garment_pool
+        if isinstance(g, dict)
+    ) or (style_id in (_SKIRT_ENSEMBLE_IDS | {"blazer_uniform", "ol_suit", "cheerleader"}))
+    return bool(
+        is_multi_piece_ensemble
+        and is_carrier_satisfied_by_garments("top_and_skirt", garment_pool, style_id=style_id)
+    )
 
 
 def find_carrier_mismatch_in_atoms(
@@ -2667,8 +2773,14 @@ def match_pattern(pattern: str, text: str, mode: str = "phrase") -> bool:
 
 
 
-def build_canonical_catalog_facts(data_dir: Path) -> Dict[Tuple[str, str], SemanticFacts]:
-    """单次加载构建 (slot, stable_leaf_id) -> canonical SemanticFacts 权威映射表 (R2R2-P1-001)。"""
+def _build_canonical_catalog_facts_index(
+    data_dir: Path,
+) -> Tuple[
+    Dict[Tuple[str, str], SemanticFacts],
+    Set[Tuple[str, str]],
+    Dict[Tuple[str, str, str], Optional[SemanticFacts]],
+]:
+    """构建 (slot, id) -> canonical SemanticFacts、聚合类目键集合，以及 (slot, category_id, text) 叶子映射。"""
     data_dir = Path(data_dir)
     FILE_SLOT_MAP = {
         "accessories.json": ["jewelry", "accessories"],
@@ -2689,6 +2801,8 @@ def build_canonical_catalog_facts(data_dir: Path) -> Dict[Tuple[str, str], Seman
         "themes.json": ["scene_theme", "scene", "theme"],
     }
     catalog_facts: Dict[Tuple[str, str], SemanticFacts] = {}
+    aggregate_keys: Set[Tuple[str, str]] = set()
+    category_text_leaf_facts: Dict[Tuple[str, str, str], Optional[SemanticFacts]] = {}
     for fname, slots in FILE_SLOT_MAP.items():
         p = data_dir / fname
         if not p.exists():
@@ -2711,8 +2825,23 @@ def build_canonical_catalog_facts(data_dir: Path) -> Dict[Tuple[str, str], Seman
                 if fname == "clothing.json" and "id" in obj and isinstance(obj["id"], str) and "tags" in obj and isinstance(obj["tags"], list):
                     lid = obj["id"]
                     combined: Dict[str, Any] = {}
+                    target_slots = [slot_override] if slot_override else slots
                     for t in obj["tags"]:
                         if isinstance(t, dict) and "facts" in t:
+                            t_text_norm = str(t.get("text") or "").strip().lower()
+                            if t_text_norm:
+                                try:
+                                    leaf_f = SemanticFacts.from_dict(t["facts"])
+                                    for s in target_slots:
+                                        norm_s = normalize_slot_name(s)
+                                        for slot_k in {norm_s, s}:
+                                            ckey = (slot_k, lid, t_text_norm)
+                                            if ckey not in category_text_leaf_facts:
+                                                category_text_leaf_facts[ckey] = leaf_f
+                                            elif category_text_leaf_facts[ckey] != leaf_f:
+                                                category_text_leaf_facts[ckey] = None
+                                except Exception:
+                                    pass
                             for k, v in t["facts"].items():
                                 if isinstance(v, list):
                                     if k not in combined:
@@ -2730,12 +2859,13 @@ def build_canonical_catalog_facts(data_dir: Path) -> Dict[Tuple[str, str], Seman
                     if combined:
                         try:
                             facts = SemanticFacts.from_dict(combined)
-                            target_slots = [slot_override] if slot_override else slots
                             for s in target_slots:
                                 norm_s = normalize_slot_name(s)
                                 if (norm_s, lid) not in catalog_facts:
                                     catalog_facts[(norm_s, lid)] = facts
                                     catalog_facts[(s, lid)] = facts
+                                    aggregate_keys.add((norm_s, lid))
+                                    aggregate_keys.add((s, lid))
                         except Exception:
                             pass
                 for k, v in obj.items():
@@ -2761,6 +2891,12 @@ def build_canonical_catalog_facts(data_dir: Path) -> Dict[Tuple[str, str], Seman
                             catalog_facts[(fslot, fid)] = facts
                     except Exception:
                         pass
+    return catalog_facts, aggregate_keys, category_text_leaf_facts
+
+
+def build_canonical_catalog_facts(data_dir: Path) -> Dict[Tuple[str, str], SemanticFacts]:
+    """单次加载构建 (slot, stable_leaf_id) -> canonical SemanticFacts 权威映射表 (R2R2-P1-001)。"""
+    catalog_facts, _, _ = _build_canonical_catalog_facts_index(data_dir)
     return catalog_facts
 
 
@@ -2916,7 +3052,11 @@ class ConflictResolver:
     def __init__(self, data_dir: Path):
         self.data_dir = data_dir
         self.registry = RuleRegistry(data_dir)
-        self.canonical_catalog_facts: Dict[Tuple[str, str], SemanticFacts] = build_canonical_catalog_facts(data_dir)
+        (
+            self.canonical_catalog_facts,
+            self._category_aggregate_fact_keys,
+            self._category_text_leaf_facts,
+        ) = _build_canonical_catalog_facts_index(data_dir)
         self.text_fallback_hits: int = 0
         self.last_report: Optional[ResolutionReport] = None
         self._active_nudity_constraint: Optional[NudityConstraint] = None
@@ -2962,19 +3102,50 @@ class ConflictResolver:
         norm_slot = normalize_slot_name(a.source_slot)
 
         # 1. 权威事实匹配与未知 ID Fail-Closed
+        # 优先匹配精确叶子条目；其次在服装类目下按精确文本匹配叶子，最后才回退至类目聚合条目，避免多件套类目拓扑污染单件词条。
         canon: Optional[SemanticFacts] = None
         matched_id: Optional[str] = None
+        is_category_aggregate = False
+        a_text_norm = (a.text or "").strip().lower()
+
+        def _lookup_fact(cid: str, *, allow_aggregate: bool) -> Tuple[Optional[SemanticFacts], bool]:
+            for key in ((norm_slot, cid), (a.source_slot, cid)):
+                found = self.canonical_catalog_facts.get(key)
+                if found is not None:
+                    is_agg = key in self._category_aggregate_fact_keys
+                    if is_agg and not allow_aggregate:
+                        continue
+                    return found, is_agg
+            return None, False
+
         for cid in candidate_ids:
-            found = self.canonical_catalog_facts.get((norm_slot, cid)) or self.canonical_catalog_facts.get((a.source_slot, cid))
-            if not found:
-                for alias in (a.source_slot, norm_slot):
-                    found = self.canonical_catalog_facts.get((alias, cid))
-                    if found:
-                        break
-            if found:
+            found, is_agg = _lookup_fact(cid, allow_aggregate=False)
+            if found is not None:
                 canon = found
                 matched_id = cid
+                is_category_aggregate = is_agg
                 break
+
+        if canon is None and a_text_norm:
+            for cid in candidate_ids:
+                for key in ((norm_slot, cid, a_text_norm), (a.source_slot, cid, a_text_norm)):
+                    leaf_f = self._category_text_leaf_facts.get(key)
+                    if leaf_f is not None:
+                        canon = leaf_f
+                        matched_id = cid
+                        is_category_aggregate = False
+                        break
+                if canon is not None:
+                    break
+
+        if canon is None:
+            for cid in candidate_ids:
+                found, is_agg = _lookup_fact(cid, allow_aggregate=True)
+                if found is not None:
+                    canon = found
+                    matched_id = cid
+                    is_category_aggregate = is_agg
+                    break
 
         # 未知正式 ID + 缺失或空 facts 必须 Fail-Closed
         if candidate_ids and not canon:
@@ -3001,7 +3172,26 @@ class ConflictResolver:
                 raise RuleConfigurationError(
                     f"Formal atom '{a.atom_id}' ({leaf_id}) hands_required conflicts with catalog: atom={a.facts.hands_required} vs catalog={canon.hands_required}"
                 )
-            merged_facts = canon.merge(a.facts)
+            if is_category_aggregate:
+                atom_explicit = set(a.facts.explicit_fields or ())
+                piece_specific_keys = (
+                    "garment_topologies", "covered_regions", "exposed_regions", "visible_regions",
+                    "garment_states", "fabric_materials", "cut_features", "piece_role", "is_ensemble",
+                )
+                has_piece_identity = bool(
+                    a.facts.piece_role is not None
+                    or a.facts.garment_topologies
+                    or ("garment_topologies" in atom_explicit)
+                    or ("covered_regions" in atom_explicit)
+                )
+                filtered_dict = {
+                    k: v
+                    for k, v in canon.to_dict().items()
+                    if k not in atom_explicit and not (has_piece_identity and k in piece_specific_keys)
+                }
+                merged_facts = SemanticFacts.from_dict(filtered_dict).merge(a.facts)
+            else:
+                merged_facts = canon.merge(a.facts)
             object.__setattr__(a, "facts", merged_facts)
             if index is not None:
                 for sib in index.get_all_active_ordered():

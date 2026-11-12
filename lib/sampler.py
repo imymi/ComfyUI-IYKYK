@@ -25,6 +25,7 @@ if __package__:
         GarmentCarrierEntity,
         get_required_carrier_kind,
         is_carrier_satisfied_by_garments,
+        is_carrier_satisfied_by_style_pool,
         is_garment_compatible_with_state,
     )
     from .context_affinity import (
@@ -69,6 +70,7 @@ else:
         GarmentCarrierEntity,
         get_required_carrier_kind,
         is_carrier_satisfied_by_garments,
+        is_carrier_satisfied_by_style_pool,
         is_garment_compatible_with_state,
     )
     from lib.context_affinity import (
@@ -2643,7 +2645,12 @@ class DataSampler:
                     carrier_ok = [
                         t for t in raw_tags
                         if (req := get_required_carrier_kind(t, default_slot="nudity")) is None
-                        or is_carrier_satisfied_by_garments(req, garment_pool, style_id=exp_cid)
+                        or is_carrier_satisfied_by_style_pool(
+                            req,
+                            garment_pool,
+                            style_id=exp_cid,
+                            is_single_tag=bool(exp_tag_match),
+                        )
                     ]
                     if carrier_ok:
                         raw_tags = carrier_ok

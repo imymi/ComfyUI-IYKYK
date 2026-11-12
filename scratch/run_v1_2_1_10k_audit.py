@@ -46,6 +46,7 @@ if str(REPO_DIR) not in sys.path:
 
 from lib.conflict_resolver import ConflictResolver, find_carrier_mismatch_in_atoms  # noqa: E402
 from lib.lexer import validate_prompt_syntax  # noqa: E402
+from lib.sampler import DataSampler, _is_tag_compatible_with_nudity  # noqa: E402
 import nodes  # noqa: E402
 from scratch.run_m5_3_audit import stream_archive_records  # noqa: E402
 from tests.audit_oracle import validate_audit_json_oracle  # noqa: E402
@@ -189,6 +190,33 @@ def _worker_10k_chunk(args: tuple[int, int]) -> List[Dict[str, Any]]:
 
         comp_info = getattr(r1, "outfit_completion_info", None) or {}
         pos_hash = hashlib.sha256(r1.positive.encode("utf-8")).hexdigest()
+        audit_obj = json.loads(d_audit)
+        selections_summary = []
+        for sel in audit_obj.get("selections", []):
+            if not isinstance(sel, dict):
+                continue
+            cf = (sel.get("sampling_rationale") or {}).get("candidate_filter") or {}
+            selections_summary.append({
+                "selector": sel.get("selector"),
+                "selected_id": sel.get("selected_id"),
+                "accepted_texts": [a.get("text", "") for a in sel.get("accepted_atoms", [])],
+                "excluded_hard_conflicts": list(cf.get("excluded_hard_conflicts", [])),
+                "passed_candidates": cf.get("passed_candidates"),
+                "total_candidates": cf.get("total_candidates"),
+                "budget_filtered_texts": [
+                    b.get("text", "") for b in sel.get("budget_filtered_records", []) if isinstance(b, dict)
+                ],
+            })
+        decision_sigs = [
+            {
+                "rule_id": d.rule_id,
+                "action": d.action,
+                "reason_code": d.reason_code,
+                "before_text": d.before_text,
+                "after_text": d.after_text,
+            }
+            for d in (rep.decisions if rep else ())
+        ]
         results.append({
             "seed": s,
             "positive": r1.positive,
@@ -198,10 +226,16 @@ def _worker_10k_chunk(args: tuple[int, int]) -> List[Dict[str, Any]]:
             "words": words,
             "comp_exempt": bool(comp_info.get("exempt", False)),
             "comp_added": bool(comp_info.get("complement_ids") or comp_info.get("repaired_ensemble")),
+            "repaired_ensemble": bool(comp_info.get("repaired_ensemble", False)),
             "fallback_used": bool(comp_info.get("fallback_used", False)),
             "controlled_rebuild_attempted": bool(comp_info.get("controlled_rebuild_attempted", False)),
             "decisions_count": len(rep.decisions) if rep else 0,
             "rules_applied": list(r1.rules_applied),
+            "attr_ctx": {
+                "selections": selections_summary,
+                "decisions": decision_sigs,
+                "final_texts": [a.text for a in r1.atoms],
+            },
             "gates": {
                 "determinism": det_ok,
                 "oracle_validation": oracle_ok,
@@ -330,6 +364,298 @@ def _audit_all_four_nodes(seeds_per_level: int = 500) -> Dict[str, Any]:
     }
 
 
+_LEVEL_ID_MAP = {
+    "nudity_l1": "L1",
+    "nudity_l2": "L2",
+    "nudity_l3": "L3",
+    "nudity_l4": "L4",
+    "nudity_l5": "L5",
+    "nudity_l6": "L6",
+}
+
+_POSE_BANNED_IN_L1 = (
+    "skirt lifted", "skirt hiked", "skirt pulled", "skirt riding",
+    "bra", "panties", "breasts", "pussy", "nude", "naked",
+    "undressed", "cock sliding", "penetrated", "face-fucked",
+    "cum dripping", "dripping on", "cupping breasts",
+)
+_SUBTAG_FILTER_CACHE: Optional[Dict[tuple[str, str, str], Dict[str, Any]]] = None
+
+
+def _tag_text(tag: Any) -> str:
+    return (tag.get("text", "") if isinstance(tag, dict) else str(tag)).strip()
+
+
+def _get_subtag_filter_index() -> Dict[tuple[str, str, str], Dict[str, Any]]:
+    """Precompute exact (selector, item_id, nudity_level) sub-tag filtering effects matching DataSampler."""
+    global _SUBTAG_FILTER_CACHE
+    if _SUBTAG_FILTER_CACHE is not None:
+        return _SUBTAG_FILTER_CACHE
+
+    sampler = DataSampler(DATA_DIR)
+    idx: Dict[tuple[str, str, str], Dict[str, Any]] = {}
+
+    shot_data = sampler._load("shot_types")
+    for slot_name, items in (
+        ("shot_type", shot_data.get("shot_types", [])),
+        ("camera_angle", shot_data.get("camera_angles", [])),
+    ):
+        for item in items:
+            item_id = item.get("id", "")
+            raw_tags = list(item.get("tags", []))
+            if not item_id or not raw_tags:
+                continue
+            for lvl in ("L1", "L2", "L6"):
+                filtered = [
+                    tg for tg in raw_tags
+                    if _is_tag_compatible_with_nudity(tg, lvl, slot_name=slot_name, item_id=item_id)
+                ]
+                if 0 < len(filtered) < len(raw_tags):
+                    idx[(slot_name, item_id, lvl)] = {
+                        "dropped_count": len(raw_tags) - len(filtered),
+                        "compat_texts": frozenset(_tag_text(tg) for tg in filtered if _tag_text(tg)),
+                    }
+
+    pose_data = sampler._load("poses")
+    for cat in pose_data.get("pose_categories", []):
+        cat_id = cat.get("id", "")
+        all_tags: List[Any] = []
+        for sub in cat.get("subcategories", []):
+            all_tags.extend(sub.get("tags", []))
+        if not all_tags:
+            all_tags = sampler._flatten_tags(cat)
+        if not cat_id or not all_tags:
+            continue
+        l1_filtered = [
+            tg for tg in all_tags
+            if not any(b in _tag_text(tg).lower() for b in _POSE_BANNED_IN_L1)
+            and _is_tag_compatible_with_nudity(tg, "L1", slot_name="pose", item_id=cat_id)
+        ]
+        if 0 < len(l1_filtered) < len(all_tags):
+            idx[("pose", cat_id, "L1")] = {
+                "dropped_count": len(all_tags) - len(l1_filtered),
+                "compat_texts": frozenset(_tag_text(tg) for tg in l1_filtered if _tag_text(tg)),
+            }
+        l2_filtered = [
+            tg for tg in all_tags
+            if _is_tag_compatible_with_nudity(tg, "L2", slot_name="pose", item_id=cat_id)
+        ]
+        if 0 < len(l2_filtered) < len(all_tags):
+            idx[("pose", cat_id, "L2")] = {
+                "dropped_count": len(all_tags) - len(l2_filtered),
+                "compat_texts": frozenset(_tag_text(tg) for tg in l2_filtered if _tag_text(tg)),
+            }
+
+    _SUBTAG_FILTER_CACHE = idx
+    return _SUBTAG_FILTER_CACHE
+
+
+def attribute_v120_vs_v121_seed(v120_round_a: Dict[str, Any], cur_r: Dict[str, Any]) -> Dict[str, Any]:
+    """对单个种子的 v1.2.0 -> v1.2.1 提示词差异执行逐槽位、逐机制的可证伪因果归因。"""
+    v120_pos = v120_round_a.get("positive", "")
+    v121_pos = cur_r.get("positive", "")
+    if v120_pos == v121_pos:
+        return {
+            "is_divergent": False,
+            "is_explained": True,
+            "primary_cause": "identical",
+            "verified_causes": [],
+            "first_diff_selector": None,
+            "level_preserved": True,
+            "unexplained_reason": None,
+        }
+
+    audit0_raw = v120_round_a.get("diagnostics_audit", {})
+    audit0 = json.loads(audit0_raw) if isinstance(audit0_raw, str) else (audit0_raw or {})
+    sels0 = [
+        (
+            x.get("selector"),
+            x.get("selected_id"),
+            tuple(a.get("text", "") for a in x.get("accepted_atoms", [])),
+            tuple(b.get("text", "") for b in x.get("budget_filtered_records", []) if isinstance(b, dict)),
+        )
+        for x in audit0.get("selections", [])
+        if isinstance(x, dict)
+    ]
+    ctx = cur_r.get("attr_ctx") or {}
+    sels1 = [
+        (
+            x.get("selector"),
+            x.get("selected_id"),
+            tuple(x.get("accepted_texts", [])),
+            tuple(x.get("excluded_hard_conflicts", [])),
+            tuple(x.get("budget_filtered_texts", [])),
+        )
+        for x in ctx.get("selections", [])
+    ]
+    map0 = {k: (sid, txts, btxts) for k, sid, txts, btxts in sels0}
+    map1 = {k: (sid, txts, excl, btxts) for k, sid, txts, excl, btxts in sels1}
+
+    v120_nud_id = next(
+        (a.get("source_item_id") for a in v120_round_a.get("source_atoms", []) if a.get("source_slot") == "nudity"),
+        None,
+    )
+    v120_lvl = _LEVEL_ID_MAP.get(v120_nud_id or "")
+    v121_lvl = cur_r.get("eff_lvl")
+    level_preserved = (v120_lvl is not None and v121_lvl is not None and v120_lvl == v121_lvl)
+
+    # 汇总双版本规则决策与预算裁剪文本，用于验证同分类下的精确增删/替换依据
+    decs0 = v120_round_a.get("decisions", [])
+    decs1 = ctx.get("decisions", [])
+    dec_texts0 = {
+        t
+        for d in decs0
+        if isinstance(d, dict)
+        for t in (d.get("before_text"), d.get("after_text"))
+        if isinstance(t, str) and t
+    }
+    dec_texts1 = {
+        t
+        for d in decs1
+        if isinstance(d, dict)
+        for t in (d.get("before_text"), d.get("after_text"))
+        if isinstance(t, str) and t
+    }
+
+    diff_selectors: List[str] = []
+    seen_sel = set()
+    for k, sid1, txts1, _, _ in sels1:
+        seen_sel.add(k)
+        s0 = map0.get(k)
+        if s0 is None or (s0[0], s0[1]) != (sid1, txts1):
+            diff_selectors.append(k)
+    for k, sid0, txts0, _ in sels0:
+        if k not in seen_sel:
+            diff_selectors.append(k)
+
+    if not level_preserved:
+        return {
+            "is_divergent": True,
+            "is_explained": False,
+            "primary_cause": "UNEXPLAINED_LEVEL_MISMATCH",
+            "verified_causes": [],
+            "first_diff_selector": diff_selectors[0] if diff_selectors else None,
+            "level_preserved": False,
+            "unexplained_reason": f"Nudity level shifted unexpectedly without override: v120={v120_lvl}, v121={v121_lvl}",
+        }
+
+    verified_causes: List[str] = []
+    first_diff = diff_selectors[0] if diff_selectors else None
+    primary_cause: Optional[str] = None
+
+    def _explain_selector(sel_name: Optional[str]) -> Optional[str]:
+        if sel_name is None:
+            return None
+        e0 = map0.get(sel_name)
+        e1 = map1.get(sel_name)
+        sid0, txts0, btxts0 = e0 if e0 else (None, (), ())
+        sid1, txts1, excl1, btxts1 = e1 if e1 else (None, (), (), ())
+        sym_diff = set(txts0) ^ set(txts1)
+
+        if sel_name == "nudity":
+            if cur_r.get("branch"):
+                return "m1_m3_nudity_single_branch_convergence"
+            return None
+
+        if sel_name in ("clothing_state", "clothing_extension") and (
+            sid0 != sid1 or excl1 or (sym_diff & (dec_texts0 | dec_texts1)) or cur_r.get("branch")
+        ):
+            return "m1_m3_clothing_linkage_and_branch_filtering"
+
+        if excl1 and sid0 != sid1:
+            return f"m1_m3_cross_slot_pool_filtering:{sel_name}"
+
+        if sel_name == "clothing" and (
+            cur_r.get("comp_added")
+            or cur_r.get("repaired_ensemble")
+            or cur_r.get("fallback_used")
+            or cur_r.get("controlled_rebuild_attempted")
+        ):
+            return "m2_outfit_completion_or_repair"
+
+        if excl1 and sid0 == sid1:
+            return f"m1_m3_pool_filter_same_category_subsample:{sel_name}"
+
+        if sid0 == sid1 and sid1 is not None:
+            if sym_diff & (dec_texts0 | dec_texts1):
+                return f"m1_m3_resolver_decision_on_same_category:{sel_name}"
+            if sym_diff & (set(btxts0) | set(btxts1)):
+                return f"m3_budget_protection_same_category:{sel_name}"
+            if v121_lvl:
+                subtag_info = _get_subtag_filter_index().get((sel_name, sid1, v121_lvl))
+                if subtag_info and subtag_info["dropped_count"] > 0:
+                    residual_txts = set(txts1) - dec_texts1
+                    if residual_txts <= subtag_info["compat_texts"]:
+                        return f"m3_nudity_subtag_pool_filtering:{sel_name}"
+            if sel_name == "shot_type" and v121_lvl in ("L5", "L6") and (sym_diff & dec_texts1 or sym_diff & set(btxts1)):
+                return "m3_l5_l6_framing_coherence"
+
+        return None
+
+    if first_diff is not None:
+        primary_cause = _explain_selector(first_diff)
+        if primary_cause:
+            verified_causes.append(primary_cause)
+    else:
+        # 所有选择器 (selected_id, accepted_texts) 均一致，检查是否为决策注入/全局裁剪顺序或缺失依据
+        fin0 = [a.get("text", "") for a in v120_round_a.get("final_atoms", [])]
+        fin1 = ctx.get("final_texts", [])
+        if fin0 == fin1 and v120_pos != v121_pos:
+            primary_cause = "m3_prompt_join_or_dedup_formatting"
+            verified_causes.append(primary_cause)
+        elif (set(fin0) ^ set(fin1)) & (dec_texts0 | dec_texts1):
+            primary_cause = "m3_post_rewrite_or_resolver_decision"
+            verified_causes.append(primary_cause)
+
+    # 统计后续受影响的已验证机制（仅在真实存在证据时计入，并要求后续选区改变不得早于已解释的上游分叉点）
+    if primary_cause is not None:
+        upstream_shifted_rng = (
+            first_diff == "nudity"
+            or "pool_filtering" in primary_cause
+            or "outfit_completion" in primary_cause
+        )
+        for sel_k in diff_selectors[1:]:
+            c_k = _explain_selector(sel_k)
+            if c_k and c_k not in verified_causes:
+                verified_causes.append(c_k)
+            elif not c_k and upstream_shifted_rng and "downstream_prng_stream_shift" not in verified_causes:
+                verified_causes.append("downstream_prng_stream_shift")
+            if sel_k == "nudity" or (c_k and ("pool_filtering" in c_k or "outfit_completion" in c_k)):
+                upstream_shifted_rng = True
+
+        if cur_r.get("comp_added") and "m2_outfit_completion_or_repair" not in verified_causes:
+            verified_causes.append("m2_outfit_completion_or_repair")
+        if cur_r.get("fallback_used") and "m2_outfit_minimal_fallback" not in verified_causes:
+            verified_causes.append("m2_outfit_minimal_fallback")
+        if cur_r.get("controlled_rebuild_attempted") and "m2_controlled_rebuild" not in verified_causes:
+            verified_causes.append("m2_controlled_rebuild")
+        if "nudity" in diff_selectors and "m1_m3_nudity_single_branch_convergence" not in verified_causes:
+            verified_causes.append("m1_m3_nudity_single_branch_convergence")
+
+        return {
+            "is_divergent": True,
+            "is_explained": True,
+            "primary_cause": primary_cause,
+            "verified_causes": verified_causes,
+            "first_diff_selector": first_diff,
+            "level_preserved": True,
+            "unexplained_reason": None,
+        }
+
+    return {
+        "is_divergent": True,
+        "is_explained": False,
+        "primary_cause": None,
+        "verified_causes": [],
+        "first_diff_selector": first_diff,
+        "level_preserved": level_preserved,
+        "unexplained_reason": (
+            f"First diff selector {first_diff!r} had no verified v1.2.1 causal trigger "
+            f"(v120={map0.get(first_diff)}, v121={map1.get(first_diff)})"
+        ),
+    }
+
+
 def _compare_with_v120_archive(cur_records: List[Dict[str, Any]], archive_path: Path) -> Optional[Dict[str, Any]]:
     if not archive_path.is_file():
         return None
@@ -337,29 +663,56 @@ def _compare_with_v120_archive(cur_records: List[Dict[str, Any]], archive_path: 
     cur_map = {r["seed"]: r for r in cur_records}
     identical = 0
     divergent = 0
-    div_reasons: collections.Counter[str] = collections.Counter()
+    explained = 0
+    unexplained_seeds: Dict[int, Dict[str, Any]] = {}
+    primary_cause_counts: collections.Counter[str] = collections.Counter()
+    mechanism_presence_counts: collections.Counter[str] = collections.Counter()
+    first_diff_selector_counts: collections.Counter[str] = collections.Counter()
+    div_level_counts: collections.Counter[str] = collections.Counter()
+    level_mismatch_count = 0
     sample_diffs: List[Dict[str, Any]] = []
     for rec in record_iter:
         s = rec["seed"]
-        v120_pos = rec.get("round_a", {}).get("positive", "")
+        if s not in cur_map:
+            continue
         cur_r = cur_map[s]
-        if v120_pos == cur_r["positive"]:
+        v120_round_a = rec.get("round_a", {})
+        attr = attribute_v120_vs_v121_seed(v120_round_a, cur_r)
+        if not attr["is_divergent"]:
             identical += 1
+            continue
+        divergent += 1
+        lvl = cur_r.get("eff_lvl") or "unknown"
+        div_level_counts[f"level_{lvl}"] += 1
+        if not attr["level_preserved"]:
+            level_mismatch_count += 1
+        if attr["first_diff_selector"]:
+            first_diff_selector_counts[attr["first_diff_selector"]] += 1
+        if attr["is_explained"]:
+            explained += 1
+            primary_cause_counts[attr["primary_cause"] or "unknown"] += 1
+            for mc in attr["verified_causes"]:
+                mechanism_presence_counts[mc] += 1
         else:
-            divergent += 1
-            lvl = cur_r.get("eff_lvl") or "unknown"
-            div_reasons[f"level_{lvl}"] += 1
-            if cur_r.get("comp_added"):
-                div_reasons["outfit_completion_applied"] += 1
-            if len(sample_diffs) < 10:
-                sample_diffs.append({
-                    "seed": s,
-                    "v120_pos": v120_pos,
-                    "v121_pos": cur_r["positive"],
-                    "eff_lvl": lvl,
-                    "branch": cur_r.get("branch"),
-                    "comp_added": cur_r.get("comp_added"),
-                })
+            unexplained_seeds[s] = {
+                "reason": attr["unexplained_reason"],
+                "first_diff_selector": attr["first_diff_selector"],
+                "eff_lvl": lvl,
+                "branch": cur_r.get("branch"),
+            }
+        if len(sample_diffs) < 10:
+            sample_diffs.append({
+                "seed": s,
+                "v120_pos": v120_round_a.get("positive", ""),
+                "v121_pos": cur_r["positive"],
+                "eff_lvl": lvl,
+                "branch": cur_r.get("branch"),
+                "comp_added": cur_r.get("comp_added"),
+                "first_diff_selector": attr["first_diff_selector"],
+                "primary_cause": attr["primary_cause"],
+                "verified_causes": attr["verified_causes"],
+                "is_explained": attr["is_explained"],
+            })
     v120_meta = header_meta.get("metadata", {})
     return {
         "v120_archive": str(archive_path.name),
@@ -367,7 +720,15 @@ def _compare_with_v120_archive(cur_records: List[Dict[str, Any]], archive_path: 
         "v120_core_source_digest": v120_meta.get("core_source_digest"),
         "identical_count": identical,
         "divergent_count": divergent,
-        "divergence_breakdown": dict(sorted(div_reasons.items())),
+        "explained_count": explained,
+        "unexplained_count": len(unexplained_seeds),
+        "is_all_explained": len(unexplained_seeds) == 0,
+        "unexplained_seeds": {str(k): unexplained_seeds[k] for k in sorted(unexplained_seeds)[:50]},
+        "level_mismatch_count": level_mismatch_count,
+        "first_diff_selector_distribution": dict(sorted(first_diff_selector_counts.items())),
+        "primary_cause_distribution": dict(sorted(primary_cause_counts.items())),
+        "mechanism_presence_distribution": dict(sorted(mechanism_presence_counts.items())),
+        "divergence_breakdown": dict(sorted(div_level_counts.items())),
         "sample_diffs": sample_diffs,
     }
 
@@ -377,6 +738,7 @@ def main() -> None:
     parser.add_argument("--seeds", type=int, default=10000)
     parser.add_argument("--workers", type=int, default=min(8, os.cpu_count() or 4))
     parser.add_argument("--strat-seeds", type=int, default=500)
+    parser.add_argument("--skip-v120-attribution", action="store_true")
     args = parser.parse_args()
 
     scratch_dir = REPO_DIR / "scratch"
@@ -429,7 +791,16 @@ def main() -> None:
     target_batch_hash = hashlib.sha256("".join(ordered_hashes).encode("utf-8")).hexdigest()
 
     node_matrix = _audit_all_four_nodes(seeds_per_level=args.strat_seeds)
-    v120_cmp = _compare_with_v120_archive(all_records, scratch_dir / "audit_m5_3_evidence.json.gz")
+    v120_archive_path = scratch_dir / "audit_m5_3_evidence.json.gz"
+    if args.skip_v120_attribution:
+        v120_cmp = None
+    else:
+        if not v120_archive_path.is_file():
+            raise FileNotFoundError(
+                f"v1.2.0 baseline archive missing at {v120_archive_path}; "
+                "cannot verify per-seed cross-version causal attribution (pass --skip-v120-attribution only for standalone gate runs)."
+            )
+        v120_cmp = _compare_with_v120_archive(all_records, v120_archive_path)
 
     archive_file = scratch_dir / "audit_v1_2_1_10k_evidence.json.gz"
     manifest_file = scratch_dir / "audit_v1_2_1_10k_manifest.json"
@@ -481,6 +852,9 @@ def main() -> None:
 
     div_cnt = v120_cmp["divergent_count"] if v120_cmp else 0
     iden_cnt = v120_cmp["identical_count"] if v120_cmp else total_seeds
+    unexplained_cnt = v120_cmp["unexplained_count"] if v120_cmp else total_seeds
+    is_all_explained = v120_cmp["is_all_explained"] if v120_cmp else False
+    unexplained_seeds_map = v120_cmp["unexplained_seeds"] if v120_cmp else {"baseline": "v1.2.0 archive skipped"}
 
     manifest_doc = {
         "manifest_version": "2.1-v1.2.1",
@@ -514,11 +888,14 @@ def main() -> None:
         },
         "evaluation_result": {
             "total_seeds": total_seeds,
+            "quality_gate_failure_count": len(failed_seeds),
+            "quality_gate_failed_seeds": {str(k): v for k, v in list(failed_seeds.items())[:50]},
             "identical_count": iden_cnt,
             "divergent_count": div_cnt,
-            "unexplained_count": len(failed_seeds),
-            "is_all_explained": len(failed_seeds) == 0,
-            "unexplained_seeds": {str(k): v for k, v in list(failed_seeds.items())[:50]},
+            "explained_count": v120_cmp["explained_count"] if v120_cmp else 0,
+            "unexplained_count": unexplained_cnt,
+            "is_all_explained": is_all_explained,
+            "unexplained_seeds": unexplained_seeds_map,
             "elapsed_seconds": round(time.time() - t0, 2),
             "level_distribution": dict(sorted(level_counts.items())),
             "branch_distribution": dict(sorted(branch_counts.items())),
@@ -548,7 +925,7 @@ def main() -> None:
         md_lines.append(f"| `{g}` | {cnt} | {'PASS' if cnt == 0 else 'FAIL'} |")
     md_lines.extend([
         "",
-        f"- **总失败种子数**: `{len(failed_seeds)}`",
+        f"- **质量门禁失败种子数**: `{len(failed_seeds)}`",
         f"- **等级分布**: `{dict(sorted(level_counts.items()))}`",
         f"- **分支分布**: `{dict(sorted(branch_counts.items()))}`",
         "",
@@ -561,12 +938,18 @@ def main() -> None:
     if v120_cmp:
         md_lines.extend([
             "",
-            "## 三、与 v1.2.0 归档（`audit_m5_3_evidence.json.gz`）逐种子比对",
+            "## 三、与 v1.2.0 归档（`audit_m5_3_evidence.json.gz`）逐种子因果归因比对",
             "",
             f"- **v1.2.0 批次哈希**: `{v120_cmp['v120_target_batch_hash']}`",
             f"- **完全一致种子数**: {v120_cmp['identical_count']:,} / {total_seeds:,}",
             f"- **差异种子数**: {v120_cmp['divergent_count']:,} / {total_seeds:,}",
-            f"- **差异归因分布**: `{v120_cmp['divergence_breakdown']}`",
+            f"- **已因果归因差异数**: {v120_cmp['explained_count']:,} / {v120_cmp['divergent_count']:,}",
+            f"- **未解释差异数 (`unexplained_count`)**: `{v120_cmp['unexplained_count']}` (`is_all_explained={v120_cmp['is_all_explained']}`)",
+            f"- **等效等级跨版本保持失配数**: `{v120_cmp['level_mismatch_count']}`",
+            f"- **首分叉选择器分布**: `{v120_cmp['first_diff_selector_distribution']}`",
+            f"- **主因归因分布**: `{v120_cmp['primary_cause_distribution']}`",
+            f"- **已验证机制触发频次**: `{v120_cmp['mechanism_presence_distribution']}`",
+            f"- **等级差异分布**: `{v120_cmp['divergence_breakdown']}`",
         ])
     report_file.write_text("\n".join(md_lines) + "\n", encoding="utf-8")
 
@@ -575,10 +958,16 @@ def main() -> None:
     print(f"[+] Saved report  : {report_file}")
     print(f"[+] Batch hash    : {target_batch_hash}")
     print(f"[+] Gate failures : {gate_failures}")
+    if v120_cmp:
+        print(
+            f"[+] v1.2.0 attribution: identical={iden_cnt}, divergent={div_cnt}, "
+            f"explained={v120_cmp['explained_count']}, unexplained={unexplained_cnt}"
+        )
     print(f"[+] Node matrix failures: preset={node_matrix['preset_browser']['failure_count']}, combiner={node_matrix['custom_slot_combiner']['failure_count']}, strat={node_matrix['stratified_generator_diagnostics']['failure_count']}")
 
     total_fail = (
         len(failed_seeds)
+        + (unexplained_cnt if v120_cmp is not None else 0)
         + node_matrix["preset_browser"]["failure_count"]
         + node_matrix["custom_slot_combiner"]["failure_count"]
         + node_matrix["stratified_generator_diagnostics"]["failure_count"]

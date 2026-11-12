@@ -491,6 +491,46 @@
               "l2_sleeve_wrist"
             ]
           }
+        },
+        {
+          "id": "nudity_l2__tag_012",
+          "text": "bare midriff",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body",
+              "lower_body"
+            ],
+            "exposed_regions": [
+              "midriff"
+            ],
+            "allowed_nudity_levels": [
+              "L2"
+            ],
+            "nudity_branches": [
+              "l2_midriff_waist"
+            ]
+          }
+        },
+        {
+          "id": "nudity_l2__tag_013",
+          "text": "exposed navel",
+          "facts": {
+            "semantic_role": "selector",
+            "visible_regions": [
+              "upper_body",
+              "lower_body"
+            ],
+            "exposed_regions": [
+              "midriff"
+            ],
+            "allowed_nudity_levels": [
+              "L2"
+            ],
+            "nudity_branches": [
+              "l2_midriff_waist"
+            ]
+          }
         }
       ],
       "aliases": [

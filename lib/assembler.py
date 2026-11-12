@@ -685,16 +685,45 @@ def _pack_budget_tags_with_carriers(
                     ca for ca in c_tag.atoms
                     if getattr(ca, "can_detect", True) and _is_worn_garment_carrier(ca)
                 ]
-                if c_worn and is_carrier_satisfied_by_garments(rk, c_worn):
+                if c_worn and is_carrier_satisfied_by_garments(rk, list(temp_worn) + c_worn):
                     cand_carriers.append((len(c_tag.text.split()), c_tier, c_idx, c_tag, c_worn))
-            if not cand_carriers:
-                all_satisfied = False
-                break
-            cand_carriers.sort(key=lambda x: (x[0], x[1], x[2]))
-            best_words, _, best_idx, _, best_worn = cand_carriers[0]
-            chosen_carrier_indices.append(best_idx)
-            temp_worn.extend(best_worn)
-            extra_words += best_words
+            if cand_carriers:
+                cand_carriers.sort(key=lambda x: (x[0], x[1], x[2]))
+                best_words, _, best_idx, _, best_worn = cand_carriers[0]
+                chosen_carrier_indices.append(best_idx)
+                temp_worn.extend(best_worn)
+                extra_words += best_words
+                continue
+            if rk == "top_and_skirt":
+                sub_picks: List[Tuple[int, int, List[PromptAtom]]] = []
+                for sub_req in ("separate_top", "skirt_bottom"):
+                    if temp_worn and is_carrier_satisfied_by_garments(sub_req, temp_worn):
+                        continue
+                    sub_cands = []
+                    for c_tier, c_idx, c_tag in non_ext_ranked:
+                        if c_idx == idx or c_idx in kept_indices or c_idx in chosen_carrier_indices or any(x[1] == c_idx for x in sub_picks):
+                            continue
+                        c_worn = [
+                            ca for ca in c_tag.atoms
+                            if getattr(ca, "can_detect", True) and _is_worn_garment_carrier(ca)
+                        ]
+                        if c_worn and is_carrier_satisfied_by_garments(sub_req, c_worn):
+                            sub_cands.append((len(c_tag.text.split()), c_tier, c_idx, c_worn))
+                    if sub_cands:
+                        sub_cands.sort(key=lambda x: (x[0], x[1], x[2]))
+                        sub_picks.append((sub_cands[0][0], sub_cands[0][2], sub_cands[0][3]))
+                if sub_picks:
+                    trial_worn = list(temp_worn)
+                    for _, _, sw in sub_picks:
+                        trial_worn.extend(sw)
+                    if is_carrier_satisfied_by_garments("top_and_skirt", trial_worn):
+                        for sw_words, s_idx, sw in sub_picks:
+                            chosen_carrier_indices.append(s_idx)
+                            temp_worn.extend(sw)
+                            extra_words += sw_words
+                        continue
+            all_satisfied = False
+            break
 
         total_cost = tag_words + extra_words
         if all_satisfied and total_cost <= remaining_budget:
@@ -1234,10 +1263,17 @@ def assemble_result(
         carrier_mismatches = find_carrier_mismatch_in_atoms(accepted_atoms)
         if carrier_mismatches:
             bad_atom, req_kind, worn_atoms = carrier_mismatches[0]
-            culled_carriers = [
+            culled_worn = [
                 bf for bf in budget_filtered_atoms
-                if getattr(bf, "can_detect", True) and _is_worn_garment_carrier(bf) and is_carrier_satisfied_by_garments(req_kind, [bf])
+                if getattr(bf, "can_detect", True) and _is_worn_garment_carrier(bf)
             ]
+            culled_carriers = [
+                bf for bf in culled_worn
+                if is_carrier_satisfied_by_garments(req_kind, [bf])
+                or (worn_atoms and is_carrier_satisfied_by_garments(req_kind, list(worn_atoms) + [bf]))
+            ]
+            if not culled_carriers and culled_worn and is_carrier_satisfied_by_garments(req_kind, list(worn_atoms) + culled_worn):
+                culled_carriers = culled_worn
             is_budget_culled = bool(culled_carriers)
             err = PromptValidationError(
                 (

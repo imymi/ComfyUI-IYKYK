@@ -210,10 +210,10 @@ python scripts/build_release.py --mode verify
 
 v1.2.1 的本地验收记录包括：
 
-- 冻结业务与测试代码后执行全量 58 个模块共 **805 项测试**（2130.603s）全部通过，失败、错误和跳过均为 0。
-- 完成 10,000 种子（`seed=0..9999`）8 项全链路质量门禁审计，以及覆盖全部 4 个公开节点的分层矩阵（`IYKYKPresetBrowser` 125 组、`IYKYKCustomSlotCombiner` 200 组、`IYKYKPromptGenerator` + `IYKYKPromptDiagnostics` 3,000 组），全部为 0 失败；核心源码摘要 `91887118fbe4af25...` 与万种子汇总哈希 `a614506a1380c0e9...` 绑定。
-- 修复后独立完成 `test_doc_contracts`、`test_ci_path_classification`、`test_release_ci_gate` 与 `test_release_build` 验证，以及两份独立确定性 `--mode verify` 发布包核验。
-- 发布包包含 **44 个运行时文件**（较 v1.2.0 增列 [`lib/outfit_completion.py`](lib/outfit_completion.py)）；大型离线审计归档不随节点安装包分发。
+- 冻结核心业务、数据与测试代码后执行全量 58 个模块共 **805 项测试**（2113.344s）全部通过，失败、错误和跳过均为 0。
+- 完成 10,000 种子（`seed=0..9999`）8 项全链路质量门禁审计与 v1.2.0 逐种子可证伪因果归因比对（`10,000 / 10,000` 全部归因解释、`unexplained=0`），以及覆盖全部 4 个公开节点的分层矩阵（`IYKYKPresetBrowser` 125 组、`IYKYKCustomSlotCombiner` 200 组、`IYKYKPromptGenerator` + `IYKYKPromptDiagnostics` 3,000 组），全部为 0 失败；核心源码摘要 `813fb0d857524a06...` 与万种子汇总哈希 `b8775f683c9f329b...` 绑定。
+- 在 `git archive HEAD` 干净检出环境中独立复跑文档契约、CI 路径分类、发布门禁、万种子/M5 归档证据验证与核心回归，并完成两份独立确定性 `--mode verify` 发布包核验。
+- 发布包包含 **44 个运行时文件**（较 v1.2.0 增列 [`lib/outfit_completion.py`](lib/outfit_completion.py)）；离线审计归档（`scratch/audit_v1_2_1_10k_evidence.json.gz` 等）已随仓库追踪供离线核验，不随节点安装包分发。
 - 详细改动、逐项测试处置清单与对比报告见 [v1.2.1 验收与发布报告](docs/v1.2.1_acceptance_and_release_report.md)；前序版本记录见 [v1.2.0 发布记录](docs/v1.2.0_release_record.md)。
 
 rc10 历史候选冻结的本地审核记录包括：

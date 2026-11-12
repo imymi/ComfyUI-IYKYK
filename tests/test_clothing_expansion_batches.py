@@ -704,7 +704,7 @@ class TestClothingExpansionBatches(unittest.TestCase):
         """
         from tests.fixtures.conflict_rule_fixtures import make_test_atom
 
-        # 1. denim_shorts + 解扣
+        # 1. denim_shorts + 解扣（含常规场景与全可选槽 None 最小复现）
         res_denim = self.generator.generate_structured(
             场景预设="日常街道",
             服装款式="denim_shorts",
@@ -716,6 +716,46 @@ class TestClothingExpansionBatches(unittest.TestCase):
         self.assertIn("jeans unbuttoned", res_denim.positive)
         self.assertNotIn("buttons undone revealing cleavage", res_denim.positive)
         self.assertNotIn("shirt open at chest", res_denim.positive)
+        self.assertNotIn("top and skirt", res_denim.positive.lower())
+        self.assertNotIn("skirt", res_denim.positive.lower())
+
+        res_denim_min = self.generator.generate_structured(
+            场景大类="无 (None)",
+            剧情主题="无 (None)",
+            景别构图="无 (None)",
+            拍摄视角="无 (None)",
+            服装款式="denim_shorts",
+            服装状态="解开纽扣 (Unbuttoned)",
+            裸露等级="L2 差分微露 (Partially Exposed)",
+            发型发色="无 (None)",
+            姿势动作="无 (None)",
+            情绪表情="无 (None)",
+            光影预设="无 (None)",
+            prompt_seed=42,
+        )
+        denim_min_low = res_denim_min.positive.lower()
+        self.assertIn("denim shorts", denim_min_low)
+        self.assertIn("jeans unbuttoned", denim_min_low)
+        self.assertIn("pants button undone", denim_min_low)
+        self.assertIn("bare midriff", denim_min_low)
+        self.assertNotIn("skirt", denim_min_low)
+        self.assertNotIn("top and skirt", denim_min_low)
+        self.assertEqual(res_denim_min.nudity_constraint.selected_branch, "l2_midriff_waist")
+        # 显式单品绝不因腰部描述被自动补齐虚构上衣或裙子，且在穿主衣物严格仅有 denim_shorts
+        actual_worn_denim = [
+            a for a in res_denim_min.atoms
+            if a.source_slot == "clothing" and not (a.provenance and a.provenance.kind in ("clothing_state", "clothing_extension"))
+        ]
+        self.assertTrue(actual_worn_denim, f"Expected actual denim_shorts garment atom in: {res_denim_min.atoms}")
+        self.assertTrue(
+            all(
+                a.source_item_id == "denim_shorts" and not (a.facts and "bottom_skirt" in a.facts.garment_topologies)
+                for a in actual_worn_denim
+            ),
+            f"Explicit denim_shorts must never synthesize skirt/top garments: {actual_worn_denim}",
+        )
+        from lib.conflict_resolver import find_carrier_mismatch_in_atoms
+        self.assertEqual(find_carrier_mismatch_in_atoms(res_denim_min.atoms), [])
 
         # 独立消解器核验：上装开扣动作与 denim_shorts 强行组合时必须以 state_lacks_carrier drop
         atoms_denim = [
@@ -740,6 +780,9 @@ class TestClothingExpansionBatches(unittest.TestCase):
         self.assertIn("skirt unbuttoned", res_leather.positive)
         self.assertNotIn("buttons undone revealing cleavage", res_leather.positive)
         self.assertNotIn("shirt open at chest", res_leather.positive)
+        self.assertNotIn("midriff showing between top and skirt", res_leather.positive.lower())
+        self.assertNotIn("top and skirt", res_leather.positive.lower())
+        self.assertEqual(find_carrier_mismatch_in_atoms(res_leather.atoms), [])
 
         # 独立消解器核验：上装开扣动作与 leather_skirt 强行组合时必须以 state_lacks_carrier drop
         atoms_leather = [
