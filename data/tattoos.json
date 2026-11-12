@@ -67,7 +67,17 @@
           "facts": {
             "semantic_role": "selector",
             "visible_regions": [
-              "upper_body"
+              "lower_body"
+            ],
+            "exposed_regions": [
+              "midriff",
+              "genitals"
+            ],
+            "allowed_nudity_levels": [
+              "L3",
+              "L4",
+              "L5",
+              "L6"
             ]
           }
         },
@@ -77,7 +87,17 @@
           "facts": {
             "semantic_role": "selector",
             "visible_regions": [
-              "upper_body"
+              "lower_body"
+            ],
+            "exposed_regions": [
+              "midriff"
+            ],
+            "allowed_nudity_levels": [
+              "L2",
+              "L3",
+              "L4",
+              "L5",
+              "L6"
             ]
           }
         }
@@ -120,6 +140,16 @@
             "semantic_role": "selector",
             "visible_regions": [
               "upper_body"
+            ],
+            "exposed_regions": [
+              "midriff"
+            ],
+            "allowed_nudity_levels": [
+              "L2",
+              "L3",
+              "L4",
+              "L5",
+              "L6"
             ]
           }
         },
@@ -146,6 +176,16 @@
             "semantic_role": "selector",
             "visible_regions": [
               "upper_body"
+            ],
+            "exposed_regions": [
+              "underboob_sideboob"
+            ],
+            "allowed_nudity_levels": [
+              "L2",
+              "L3",
+              "L4",
+              "L5",
+              "L6"
             ]
           }
         },
@@ -156,6 +196,16 @@
             "semantic_role": "selector",
             "visible_regions": [
               "upper_body"
+            ],
+            "exposed_regions": [
+              "underboob_sideboob"
+            ],
+            "allowed_nudity_levels": [
+              "L2",
+              "L3",
+              "L4",
+              "L5",
+              "L6"
             ]
           }
         }
@@ -172,6 +222,16 @@
             "semantic_role": "selector",
             "visible_regions": [
               "upper_body"
+            ],
+            "exposed_regions": [
+              "back"
+            ],
+            "allowed_nudity_levels": [
+              "L2",
+              "L3",
+              "L4",
+              "L5",
+              "L6"
             ]
           }
         },
@@ -250,6 +310,16 @@
             "semantic_role": "selector",
             "visible_regions": [
               "lower_body"
+            ],
+            "exposed_regions": [
+              "thigh_leg"
+            ],
+            "allowed_nudity_levels": [
+              "L2",
+              "L3",
+              "L4",
+              "L5",
+              "L6"
             ]
           }
         },
@@ -276,6 +346,16 @@
             "semantic_role": "selector",
             "visible_regions": [
               "upper_body"
+            ],
+            "exposed_regions": [
+              "back"
+            ],
+            "allowed_nudity_levels": [
+              "L2",
+              "L3",
+              "L4",
+              "L5",
+              "L6"
             ]
           }
         },

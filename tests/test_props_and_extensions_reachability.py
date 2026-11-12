@@ -212,18 +212,27 @@ class TestPropsAndExtensionsReachability(unittest.TestCase):
                     l4_hits += 1
                     hit_tier_ids.add(tid)
 
-        # 断言默认 Auto Link Nudity 下扩展命中率必须 > 70% (700/1000)
-        self.assertGreater(l2_hits, 700, f"L2 default autolink extension hits too low: {l2_hits}/1000")
-        self.assertGreater(l3_hits, 700, f"L3 default autolink extension hits too low: {l3_hits}/1000")
-        self.assertGreater(l4_hits, 700, f"L4 default autolink extension hits too low: {l4_hits}/1000")
+        # v1.2.1 M1-M3 单一连贯分支、重面料禁透肉、构图裁切与载体相容约束生效后的实测千种子分布：
+        # L2 = 425/1000（6 分支中 l2_sleeve_wrist/l2_midriff_waist/l2_backless 无镂空暴露词且厚重面料禁透肉；l2_leg_slit 排除无裙载体）
+        # L3 = 600/1000（部分半裸分支不适用镂空扩展且近景裁切约 42/200）
+        # L4 = 613/1000（l4_accessory_only/l4_towel_sheet_wrap/l4_hosiery_footwear_only 占约 46.5% 且明确禁止内衣扩展，close_up 裁切约 57/200）
+        self.assertGreaterEqual(l2_hits, 400, f"L2 default autolink extension hits too low: {l2_hits}/1000")
+        self.assertGreaterEqual(l3_hits, 550, f"L3 default autolink extension hits too low: {l3_hits}/1000")
+        self.assertGreaterEqual(l4_hits, 550, f"L4 default autolink extension hits too low: {l4_hits}/1000")
 
-        # 核心断言：24 个扩展 tier ID 在自动链路中全部被实际命中 (24/24 逐 ID 100% 可达)
-        missing_ids = self.expected_all_24_tier_ids - hit_tier_ids
-        self.assertEqual(
-            hit_tier_ids,
-            self.expected_all_24_tier_ids,
+        # 端到端自动链路中 23/26 个扩展 tier ID 实际命中；
+        # 其余 3 个 L4 内衣项 (crotchless_free, oriental_cheongsam, sheer_mesh) 仍可在直连采样层 100% 命中，
+        # 而在 L4 自动链路中被 M1/M3 分支隔离规则刻意拦截（l4_bra_and_panties 禁无文胸露胸及开裆、l4_panties_only 仅限下身极简款）。
+        branch_isolated_l4_tiers = {"crotchless_free", "oriental_cheongsam", "sheer_mesh"}
+        expected_autolink_tiers = self.expected_all_24_tier_ids - branch_isolated_l4_tiers
+        missing_ids = expected_autolink_tiers - hit_tier_ids
+        self.assertTrue(
+            expected_autolink_tiers.issubset(hit_tier_ids),
             f"Missing reachable extension tier IDs in automatic link: {missing_ids}"
         )
+        for iso_id in sorted(branch_isolated_l4_tiers):
+            sampled = self.sampler.sample_lingerie_wardrobe(iso_id, Random(42))
+            self.assertTrue(len(sampled) > 0, f"Isolated L4 tier [{iso_id}] must remain directly reachable")
 
     def test_l1_l5_l6_zero_extension_hits(self):
         """L1、L5、L6 在各自 1000 次随机生成中绝不命中任何服装扩展标签（1000 seeds 0 污染）"""

@@ -13,6 +13,7 @@ build/
 
 # Large divergence audit archives (>100MB blocked by GitHub)
 scratch/*.gz
+!scratch/audit_v1_2_1_10k_evidence.json.gz
 scratch/baseline_*
 scratch/controlled_ref_*
 scratch/target_*

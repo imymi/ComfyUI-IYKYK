@@ -76,7 +76,7 @@ class TestM5CIEvidenceModes(unittest.TestCase):
                         case.test_03b_seed_gate_golden_hash()
                 with patch.object(
                     quality_gate.TestRC8QualityGate, "_run_seed_gate_10k",
-                    return_value=(None, 10000, quality_gate.EXPECTED_M5_GOLDEN_HASH),
+                    return_value=(None, 10000, quality_gate.EXPECTED_V1_2_1_GOLDEN_HASH),
                 ):
                     case.test_03b_seed_gate_golden_hash()
                     with patch.dict(os.environ, {"M5_ARCHIVE_PATH": str(root / "missing.gz")}):

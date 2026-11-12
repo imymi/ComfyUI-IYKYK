@@ -71,7 +71,14 @@
           "slot": "style_recipe",
           "text": "half_nude",
           "facts": {
-            "semantic_role": "selector"
+            "semantic_role": "selector",
+            "exposed_regions": [
+              "breasts"
+            ],
+            "allowed_nudity_levels": [
+              "L3",
+              "L4"
+            ]
           },
           "origin": {
             "entry_point": "preset_browser",
@@ -513,7 +520,18 @@
           "text": "bare face",
           "facts": {
             "semantic_role": "selector",
-            "makeup_base": "clean"
+            "makeup_base": "clean",
+            "exposed_regions": [
+              "none"
+            ],
+            "allowed_nudity_levels": [
+              "L1",
+              "L2",
+              "L3",
+              "L4",
+              "L5",
+              "L6"
+            ]
           },
           "origin": {
             "entry_point": "preset_browser",
@@ -1156,7 +1174,17 @@
           "text": "bare shoulder",
           "facts": {
             "semantic_role": "selector",
-            "hand_state": "free"
+            "hand_state": "free",
+            "exposed_regions": [
+              "shoulders"
+            ],
+            "allowed_nudity_levels": [
+              "L2",
+              "L3",
+              "L4",
+              "L5",
+              "L6"
+            ]
           },
           "origin": {
             "entry_point": "preset_browser",
@@ -1413,7 +1441,14 @@
           "slot": "style_recipe",
           "text": "half_nude",
           "facts": {
-            "semantic_role": "selector"
+            "semantic_role": "selector",
+            "exposed_regions": [
+              "breasts"
+            ],
+            "allowed_nudity_levels": [
+              "L3",
+              "L4"
+            ]
           },
           "origin": {
             "entry_point": "preset_browser",
@@ -1857,7 +1892,18 @@
           "text": "completely bare face",
           "facts": {
             "semantic_role": "selector",
-            "makeup_base": "clean"
+            "makeup_base": "clean",
+            "exposed_regions": [
+              "none"
+            ],
+            "allowed_nudity_levels": [
+              "L1",
+              "L2",
+              "L3",
+              "L4",
+              "L5",
+              "L6"
+            ]
           },
           "origin": {
             "entry_point": "preset_browser",
@@ -2094,7 +2140,18 @@
           "slot": "lighting",
           "text": "golden morning sun ray through sheer curtain",
           "facts": {
-            "semantic_role": "selector"
+            "semantic_role": "selector",
+            "exposed_regions": [
+              "none"
+            ],
+            "allowed_nudity_levels": [
+              "L1",
+              "L2",
+              "L3",
+              "L4",
+              "L5",
+              "L6"
+            ]
           },
           "origin": {
             "entry_point": "preset_browser",
@@ -2320,7 +2377,18 @@
           "slot": "quality",
           "text": "sheer curtain texture",
           "facts": {
-            "semantic_role": "selector"
+            "semantic_role": "selector",
+            "exposed_regions": [
+              "none"
+            ],
+            "allowed_nudity_levels": [
+              "L1",
+              "L2",
+              "L3",
+              "L4",
+              "L5",
+              "L6"
+            ]
           },
           "origin": {
             "entry_point": "preset_browser",
@@ -2555,7 +2623,18 @@
           "text": "sheer gloss",
           "facts": {
             "semantic_role": "selector",
-            "makeup_base": "natural"
+            "makeup_base": "natural",
+            "exposed_regions": [
+              "none"
+            ],
+            "allowed_nudity_levels": [
+              "L1",
+              "L2",
+              "L3",
+              "L4",
+              "L5",
+              "L6"
+            ]
           },
           "origin": {
             "entry_point": "preset_browser",

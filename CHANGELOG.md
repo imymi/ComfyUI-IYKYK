@@ -4,6 +4,28 @@
 
 本日志也保留开发阶段的历史记录；版本标题本身不代表存在同名 Git tag 或 GitHub Release，公开发布记录以 [GitHub Releases](https://github.com/imymi/ComfyUI-IYKYK/releases) 为准。
 
+## [v1.2.1] - 2026-11-12
+
+### 穿搭完整补全、L1–L6 单分支自洽约束与全链路语义对齐
+
+- **M1 结构化语义事实与统一等级契约**：
+  - 引入全局 [`NudityConstraint`](lib/models.py)，并在 [`SemanticFacts`](lib/models.py) 中扩展 `piece_role`、`covered_regions`、`exposed_regions`、`reveal_effect`、`allowed_nudity_levels` 与 `nudity_branches`；同步更新严格 Schema 与全量 20 份运行时数据目录。
+  - 修复脚链等跨等级标签按 `allowed_nudity_levels` 误触发 L5/L6 脱衣的问题；对齐外部 `nudity_override`（如 `L5`）与 `nudity=None` / `L5 + clothing_override` 让位同步；完善开口/透视单品在其他不透明衣物遮挡下的暴露判定（如不透明连裤袜遮挡 `crotchless` 内裤与普通 `bodystocking` 非默认露胸）。
+- **M2 独立子流随机穿搭补全（新增 `lib/outfit_completion.py`）**：
+  - 对未豁免的 `随机/自动` 穿搭路径实行“保留主款 → 判定缺件 → 独立 RNG 子流相容补件 → 状态/扩展选择”，严格隔离主随机流；精确保留 `服装=None`、显式单品与外部服装覆盖的自动补全豁免。
+  - 保护多标签制服主件不退化为纯配件/袜类；展开动态槽位后保留实际上下装并禁止鞋袜冒充主件；厚重针织/皮革/牛仔/盔甲禁止叠穿透明材质扩展；遵循 L3/L4 目标分支约束与最小组合回退，冲突消解后缺件最多受控重组 1 次并 Fail-Closed。
+- **M3 统一等级分支约束、改写复检与预算保护**：
+  - 在 L1–L6 上执行单次单一相容状态分支选择，打通 `presets.json` / `style_recipes` 显式等级过滤与跨槽位过滤（保留 `UI Random` 下的 `preset_native` 原意）；全面核验 L2/L3 载体前提（无裙装载体严禁残留裙衩/高开衩，非裙连体衣与裤装回归固定）。
+  - 规则改写后同步更新语义事实并复检目标等级与分支；词数预算优先保护完整套装、等级必需核心语义及有效载体，仅验收 `accepted_atoms`，极紧预算明确报错并保留 `max_words=0` 例外。
+- **M4 验收与契约对齐**：
+  - 将下装裤扣/裙扣解开语义（`pants button undone` / `jeans unbuttoned` / `skirt button undone` / `skirt unbuttoned`）与上装领口解扣在 `l2_midriff_waist` 下精准分流；修正 [`_align_facts_with_rewritten_text`](lib/conflict_resolver.py) 改写状态清理与 [`_choose_coherent_branch`](lib/sampler.py) 单分支等级（`len(allowed) == 1`）的 RNG 对齐。
+  - 在 [`schemas/diagnostics.schema.json`](schemas/diagnostics.schema.json) 的 `fact_trace` 补全可选字段 `required_carrier`，消除万种子中 204 条 `nudity_clothing_conflicts` 决策的 Draft-7 校验缺口。
+  - 更新运行时发布清单 [`lib/runtime_manifest.py`](lib/runtime_manifest.py) 至 **44 个文件**（新增 `lib/outfit_completion.py`），完成 58 模块 805 项全量回归、10,000 种子与全四节点分层矩阵审计及独立双构建校验。详情见 [`docs/v1.2.1_acceptance_and_release_report.md`](docs/v1.2.1_acceptance_and_release_report.md)。
+
+同一 v1.2.1 版本、相同输入与固定 seed 保持确定性；因统一了等级分支选择与穿搭补全规则，同一 seed 在 v1.2.0 与 v1.2.1 之间的输出按设计调整。
+
+---
+
 ## [v1.2.0] - 2026-10-21
 
 ### 情境亲和、冲突治理与全槽位外部覆盖

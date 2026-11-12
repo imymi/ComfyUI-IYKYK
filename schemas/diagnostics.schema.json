@@ -362,6 +362,83 @@
               "type": "string"
             }
           }
+        },
+        "nudity_constraint": {
+          "$ref": "#/definitions/nudity_constraint_trace"
+        },
+        "outfit_completion": {
+          "$ref": "#/definitions/outfit_completion_trace"
+        }
+      }
+    },
+    "nudity_constraint_trace": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "requested_level",
+        "effective_level",
+        "source",
+        "selected_branch",
+        "yielded_to_override",
+        "yield_reason"
+      ],
+      "properties": {
+        "requested_level": {
+          "type": ["string", "null"]
+        },
+        "effective_level": {
+          "type": ["string", "null"]
+        },
+        "source": {
+          "type": "string"
+        },
+        "selected_branch": {
+          "type": ["string", "null"]
+        },
+        "yielded_to_override": {
+          "type": "boolean"
+        },
+        "yield_reason": {
+          "type": ["string", "null"]
+        }
+      }
+    },
+    "outfit_completion_trace": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "exempt",
+        "exempt_reason",
+        "repaired_ensemble",
+        "complement_ids",
+        "fallback_used",
+        "fallback_reason",
+        "controlled_rebuild_attempted"
+      ],
+      "properties": {
+        "exempt": {
+          "type": "boolean"
+        },
+        "exempt_reason": {
+          "type": ["string", "null"]
+        },
+        "repaired_ensemble": {
+          "type": "boolean"
+        },
+        "complement_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "fallback_used": {
+          "type": "boolean"
+        },
+        "fallback_reason": {
+          "type": ["string", "null"]
+        },
+        "controlled_rebuild_attempted": {
+          "type": "boolean"
         }
       }
     },
@@ -445,6 +522,12 @@
         },
         "prop_capacity": {
           "$ref": "#/definitions/prop_capacity_trace"
+        },
+        "nudity_constraint": {
+          "$ref": "#/definitions/nudity_constraint_trace"
+        },
+        "required_carrier": {
+          "type": ["string", "null"]
         }
       }
     },

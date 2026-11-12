@@ -1560,7 +1560,18 @@
             "semantic_role": "selector",
             "time_of_day": null,
             "light_sources": [],
-            "color_modes": []
+            "color_modes": [],
+            "exposed_regions": [
+              "none"
+            ],
+            "allowed_nudity_levels": [
+              "L1",
+              "L2",
+              "L3",
+              "L4",
+              "L5",
+              "L6"
+            ]
           }
         },
         {
@@ -2105,7 +2116,18 @@
             "light_sources": [
               "daylight"
             ],
-            "color_modes": []
+            "color_modes": [],
+            "exposed_regions": [
+              "none"
+            ],
+            "allowed_nudity_levels": [
+              "L1",
+              "L2",
+              "L3",
+              "L4",
+              "L5",
+              "L6"
+            ]
           }
         },
         {
@@ -3332,7 +3354,15 @@
             "semantic_role": "selector",
             "time_of_day": null,
             "light_sources": [],
-            "color_modes": []
+            "color_modes": [],
+            "exposed_regions": [
+              "cleavage"
+            ],
+            "allowed_nudity_levels": [
+              "L2",
+              "L3",
+              "L4"
+            ]
           }
         },
         {
@@ -3914,7 +3944,15 @@
             "light_sources": [
               "artificial_warm"
             ],
-            "color_modes": []
+            "color_modes": [],
+            "exposed_regions": [
+              "full_nude"
+            ],
+            "allowed_nudity_levels": [
+              "L4",
+              "L5",
+              "L6"
+            ]
           }
         },
         {
@@ -4003,7 +4041,15 @@
             "semantic_role": "selector",
             "time_of_day": null,
             "light_sources": [],
-            "color_modes": []
+            "color_modes": [],
+            "exposed_regions": [
+              "full_nude"
+            ],
+            "allowed_nudity_levels": [
+              "L4",
+              "L5",
+              "L6"
+            ]
           }
         },
         {
@@ -4033,7 +4079,16 @@
             "semantic_role": "selector",
             "time_of_day": null,
             "light_sources": [],
-            "color_modes": []
+            "color_modes": [],
+            "exposed_regions": [
+              "breasts"
+            ],
+            "allowed_nudity_levels": [
+              "L2",
+              "L3",
+              "L4",
+              "L5"
+            ]
           }
         },
         {
@@ -4154,7 +4209,13 @@
             "semantic_role": "selector",
             "time_of_day": null,
             "light_sources": [],
-            "color_modes": []
+            "color_modes": [],
+            "allowed_nudity_levels": [
+              "L3",
+              "L4",
+              "L5",
+              "L6"
+            ]
           }
         },
         {
@@ -4359,7 +4420,15 @@
             "light_sources": [
               "screen"
             ],
-            "color_modes": []
+            "color_modes": [],
+            "exposed_regions": [
+              "full_nude"
+            ],
+            "allowed_nudity_levels": [
+              "L4",
+              "L5",
+              "L6"
+            ]
           }
         },
         {

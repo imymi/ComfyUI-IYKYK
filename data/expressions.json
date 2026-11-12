@@ -1024,7 +1024,16 @@
           "text": "shy smile but legs spread",
           "facts": {
             "semantic_role": "selector",
-            "emotion": "contrast"
+            "emotion": "contrast",
+            "exposed_regions": [
+              "thigh_leg"
+            ],
+            "allowed_nudity_levels": [
+              "L3",
+              "L4",
+              "L5",
+              "L6"
+            ]
           }
         },
         {
@@ -1672,7 +1681,15 @@
           "text": "eyes downcast but body exposed",
           "facts": {
             "semantic_role": "selector",
-            "gaze": "away"
+            "gaze": "away",
+            "exposed_regions": [
+              "full_nude"
+            ],
+            "allowed_nudity_levels": [
+              "L4",
+              "L5",
+              "L6"
+            ]
           }
         },
         {

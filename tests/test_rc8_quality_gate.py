@@ -361,6 +361,11 @@ def hash_complete_seed_batch(pairs: list[tuple[int, str]], expected_count: int) 
         raise AssertionError(f"Live seed gate must cover each seed from 0 to {expected_count - 1} exactly once")
     return hashlib.sha256("".join(value for _, value in ordered).encode("utf-8")).hexdigest()
 
+EXPECTED_V1_2_1_GOLDEN_HASH = "b8775f683c9f329bf39be9e6ac1bd85cba499d2a59cddea250f503a63d9661be"
+EXPECTED_V1_2_1_ARCHIVE_SHA256 = "4b918de0b7f883b7fb9fe02846054cac72285d0b723f420f55c2467317596326"
+EXPECTED_V1_2_1_ARCHIVE_SIZE = 6762487
+EXPECTED_V1_2_1_CORE_SOURCE_DIGEST = "0b74c7411d4a58da5b10ac5d63834c3ba01bcf9e128a9eca3f264df73405beb2"
+
 
 def compute_current_core_source_digest(repo_dir: Path) -> str:
     """计算当前仓库核心业务代码与数据契约文件的确定性 SHA-256 摘要。"""
@@ -384,10 +389,10 @@ def verify_m5_archive_evidence(
     archive_path: Path,
     repo_dir: Path,
     stream_recompute: bool = True,
-    expected_archive_size: int = EXPECTED_M5_ARCHIVE_SIZE,
-    expected_archive_sha256: str = EXPECTED_M5_ARCHIVE_SHA256,
-    expected_golden_hash: str = EXPECTED_M5_GOLDEN_HASH,
-    expected_core_digest: str = EXPECTED_M5_CORE_SOURCE_DIGEST,
+    expected_archive_size: int = EXPECTED_V1_2_1_ARCHIVE_SIZE,
+    expected_archive_sha256: str = EXPECTED_V1_2_1_ARCHIVE_SHA256,
+    expected_golden_hash: str = EXPECTED_V1_2_1_GOLDEN_HASH,
+    expected_core_digest: str = EXPECTED_V1_2_1_CORE_SOURCE_DIGEST,
     expected_seeds_count: int = 10000,
 ) -> dict:
     """
@@ -624,7 +629,16 @@ def verify_m5_historical_archive(manifest_path: Path, archive_path: Path, repo_d
                             destination.write(chunk)
                 else:
                     raise AssertionError(f"Unexpected entry in historical source archive: {member.name}")
-        return verify_m5_archive_evidence(manifest_path, archive_path, root, stream_recompute=stream_recompute)
+        return verify_m5_archive_evidence(
+            manifest_path,
+            archive_path,
+            root,
+            stream_recompute=stream_recompute,
+            expected_archive_size=EXPECTED_M5_ARCHIVE_SIZE,
+            expected_archive_sha256=EXPECTED_M5_ARCHIVE_SHA256,
+            expected_golden_hash=EXPECTED_M5_GOLDEN_HASH,
+            expected_core_digest=EXPECTED_M5_CORE_SOURCE_DIGEST,
+        )
 
 
 class TestRC8QualityGate(unittest.TestCase):
@@ -690,12 +704,24 @@ class TestRC8QualityGate(unittest.TestCase):
 
         # 历史重放基线数据环境绑定 (Directive 3: 历史重放使用匹配的历史数据环境，保留旧黄金基线断言)
         baseline_repo = REPO_DIR / "scratch" / "baseline_6da94cb"
+        if not os.environ.get("IYKYK_INSIDE_ISOLATED_REPLAY"):
+            if not (baseline_repo.exists() and (baseline_repo / "nodes.py").exists() and (baseline_repo / "data").exists()):
+                chk_6da = subprocess.run(["git", "cat-file", "-e", "6da94cb"], capture_output=True, text=True, cwd=str(REPO_DIR))
+                if chk_6da.returncode == 0:
+                    baseline_repo.mkdir(parents=True, exist_ok=True)
+                    subprocess.run(
+                        f"git archive 6da94cb | tar -x -C {baseline_repo}",
+                        shell=True,
+                        check=True,
+                        capture_output=True,
+                        text=True,
+                        cwd=str(REPO_DIR),
+                    )
         if (
             baseline_repo.exists()
             and (baseline_repo / "nodes.py").exists()
             and not os.environ.get("IYKYK_INSIDE_ISOLATED_REPLAY")
         ):
-            import subprocess
             import sys
             worker_code = """
 import os
@@ -907,6 +933,35 @@ sys.exit(0 if res.wasSuccessful() else 1)
         for line in case_report_lines:
             print(line)
         print("=" * 90 + "\n")
+
+    def test_01b_v1_2_1_28_cases_live_quality_gate(self):
+        """在线实时验证全部 28 组 rc7/rc8 场景在当前 v1.2.1 主线上的核心质量门禁（零残余冲突、<=250词、合法语法、无重复、DAG 闭环、M3 单分支一致）。"""
+        baseline_file = FIXTURES_DIR / "rc7_text_quality_baseline.json"
+        doc = json.loads(baseline_file.read_text(encoding="utf-8"))
+        cases = doc.get("cases", [])
+        self.assertEqual(len(cases), 28)
+
+        for c in cases:
+            cid = c["id"]
+            cat = c.get("category", "normal")
+            inputs = c["inputs"]
+            seed = inputs["prompt_seed"]
+            gen_inputs = {k: v for k, v in inputs.items() if k != "prompt_seed"}
+            res = self.generator.generate_structured(**gen_inputs, prompt_seed=seed)
+            pos = res.positive
+            rep = res.resolution_report
+            tags = [t.strip() for t in pos.split(",") if t.strip()]
+
+            self.assertTrue(pos, f"Live Case {cid} returned empty positive prompt")
+            self.assertLessEqual(len(pos.split()), 250, f"Live Case {cid} exceeded 250 words")
+            validate_prompt_syntax(pos)
+            self.assertEqual(len(tags), len(set(tags)), f"Live Case {cid} contains duplicate tags: {pos}")
+            self.assertIsNotNone(rep)
+            self.assertEqual(rep.unresolved_conflicts, (), f"Live Case {cid} has unresolved conflicts: {rep.unresolved_conflicts}")
+            self.assertTrue(_verify_provenance_dag(res), f"Live Case {cid} provenance DAG verification failed")
+            if cat == "normal":
+                drops = [d for d in rep.decisions if d.action == "drop"]
+                self.assertEqual(len(drops), 0, f"Live normal case {cid} had unexpected drops: {drops}")
 
     def test_04_oracle_negative_mutations(self):
         """Oracle 负向变异门禁测试：清空受保护集合、篡改证据、注入垃圾 replace、篡改基线 SHA、断裂 provenance 均必须 Fail-Closed (R2R3-P1-003)。"""
@@ -1406,9 +1461,9 @@ sys.exit(0 if res.wasSuccessful() else 1)
             cls._seed_gate_result = (first_failure, len(total_pairs), batch_hash)
             return cls._seed_gate_result
 
-        # 默认路径：复用经 M5-3 归档实物证据与共用证据校验函数 (Fail-Closed, 毫秒级返回)
-        manifest_path = REPO_DIR / "scratch" / "audit_m5_3_reeval_manifest.json"
-        archive_path = m5_archive_path(REPO_DIR)
+        # 默认路径：复用经 v1.2.1 归档实物证据与共用证据校验函数 (Fail-Closed, 毫秒级返回)
+        manifest_path = REPO_DIR / "scratch" / "audit_v1_2_1_10k_manifest.json"
+        archive_path = REPO_DIR / "scratch" / "audit_v1_2_1_10k_evidence.json.gz"
         evidence_result = verify_m5_archive_evidence(manifest_path, archive_path, REPO_DIR, stream_recompute=False)
         cls._seed_gate_result = (None, evidence_result["total_seeds"], evidence_result["batch_hash"])
         return cls._seed_gate_result
@@ -1420,11 +1475,12 @@ sys.exit(0 if res.wasSuccessful() else 1)
         self.assertEqual(count, 10000)
 
     def test_03b_seed_gate_golden_hash(self):
-        """实时结果与历史黄金哈希对照；历史归档可用时单独完整校验。"""
+        """实时/归档验证当前 v1.2.1 源码的 10,000 种子与黄金哈希；历史 M5 归档可用时单独完整校验。"""
         baseline_dba5861_hash = "a39a823d09b3b817107ba6a6ebdd5fdb261f4f71bd8148bd7856533fdf21c218"
         step2_baseline_hash = "3e1291ae60af887ebde1869a8fb60f7937424198c1db6a4856bb90aa954725fc"
         step3_baseline_hash = "ab5a633cfb3fde70d9a6c629ee65a540955d87ee143e66570d780743246cab89"
         m1_historical_hash = "aa7581bc2304f6f75530d95ab4e1b75e7e1101720b1dfaf14c2a1c328fcd1139"
+        v1_2_0_m5_historical_hash = EXPECTED_M5_GOLDEN_HASH
 
         # ------------------------------------------------------------------
         # 分支 A: 历史参考数据校验 (保留 M1 历史演进链向下兼容校验)
@@ -1449,6 +1505,7 @@ sys.exit(0 if res.wasSuccessful() else 1)
                 recomputed_historical_hash,
                 m1_historical_hash,
                 f"Historical M1 reference cache hash drifted! Expected M1: {m1_historical_hash}, "
+                f"v1.2.0 M5 was: {v1_2_0_m5_historical_hash}, "
                 f"Step 3 was: {step3_baseline_hash}, Step 2 was: {step2_baseline_hash}, dba5861 was: {baseline_dba5861_hash}",
             )
 
@@ -1463,16 +1520,23 @@ sys.exit(0 if res.wasSuccessful() else 1)
             )
 
         # ------------------------------------------------------------------
-        # 分支 B: 实时模式验证当前源码的 10,000 种子和历史黄金哈希。
+        # 分支 B: 当前阶段 v1.2.1 黄金基线核验（实时门禁 + 随库追踪归档）及历史 M5 归档可选完整核验
         # ------------------------------------------------------------------
         live_mode = os.environ.get("RUN_LIVE_SEED_GATE") == "1"
         if live_mode:
             first_failure, count, batch_hash = self._run_seed_gate_10k()
             self.assertIsNone(first_failure, f"Live seed gate failed at seed: {first_failure}")
             self.assertEqual(count, 10000)
-            self.assertEqual(batch_hash, EXPECTED_M5_GOLDEN_HASH, "Current live seed hash differs from historical golden hash")
+            self.assertEqual(batch_hash, EXPECTED_V1_2_1_GOLDEN_HASH, "Current live seed hash differs from v1.2.1 golden hash")
 
-        # 历史归档只对其原始源码提交负责。CI 无归档时，test_17 会明确报告跳过该项。
+        v121_manifest = REPO_DIR / "scratch" / "audit_v1_2_1_10k_manifest.json"
+        v121_archive = REPO_DIR / "scratch" / "audit_v1_2_1_10k_evidence.json.gz"
+        if v121_manifest.is_file() or not live_mode:
+            v121_res = verify_m5_archive_evidence(v121_manifest, v121_archive, REPO_DIR, stream_recompute=True)
+            self.assertEqual(v121_res["status"], "VERIFIED")
+            self.assertEqual(v121_res["batch_hash"], EXPECTED_V1_2_1_GOLDEN_HASH)
+
+        # 历史 M5 归档只对其原始源码提交负责；CI 无历史归档时，test_17 会明确报告跳过该项。
         manifest_path = REPO_DIR / "scratch" / "audit_m5_3_reeval_manifest.json"
         archive_path = m5_archive_path(REPO_DIR)
         if not archive_path.is_file():

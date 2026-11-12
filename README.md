@@ -7,7 +7,7 @@
 
 ComfyUI-IYKYK 是一套面向东亚人像与剧情场景的提示词生成节点。它把场景、人物、服装、构图、光线等选择组织成结构化语义，再通过冲突规则生成更自洽的正向提示词、负向提示词和中文说明。
 
-当前版本：**v1.2.0**。本版本优化情境亲和矩阵与冲突规则，为全部 20 个槽位提供外部覆盖端口，并升级 Diagnostics 2.0 审计输出。
+当前版本：**v1.2.1**。本版本在 v1.2.0 基础上完成随机穿搭自动补全、裸露等级 L1–L6 单一分支自洽约束、规则改写与词数预算协同保护，以及全链路语义事实与诊断契约对齐。
 
 > 本项目包含仅适合成年人的 SFW/NSFW 词库。请先阅读[内容与授权](#内容与授权)。
 
@@ -27,7 +27,7 @@ ComfyUI-IYKYK 是一套面向东亚人像与剧情场景的提示词生成节点
 
 ### Release ZIP（推荐）
 
-1. 从 [GitHub Releases](https://github.com/imymi/ComfyUI-IYKYK/releases) 下载 `ComfyUI-IYKYK-v1.2.0.zip`。
+1. 从 [GitHub Releases](https://github.com/imymi/ComfyUI-IYKYK/releases) 下载 `ComfyUI-IYKYK-v1.2.1.zip`。
 2. 解压到 `ComfyUI/custom_nodes/ComfyUI-IYKYK`。
 3. 重启 ComfyUI，在节点搜索中输入 `IYKYK`。
 
@@ -42,7 +42,7 @@ git clone https://github.com/imymi/ComfyUI-IYKYK.git
 
 ```bash
 cd ComfyUI-IYKYK
-git checkout v1.2.0
+git checkout v1.2.1
 ```
 
 ### ComfyUI Manager
@@ -205,9 +205,9 @@ counts
 
 ## 确定性与兼容性
 
-- `prompt_seed >= 0`：同一 v1.2.0 版本、相同输入得到相同输出与诊断 JSON。
+- `prompt_seed >= 0`：同一 v1.2.1 版本、相同输入得到相同输出与诊断 JSON。
 - `prompt_seed = -1`：按 ComfyUI 的生成周期更新结果。
-- v1.2.0 调整了亲和采样与冲突消解，同一个 seed 的输出可能与旧版不同；升级后请在 v1.2.0 内重新固定并验证预期结果。
+- v1.2.1 统一了裸露等级分支约束并接入随机穿搭自动补全，同一个 seed 的输出可能与旧版不同；升级后请在 v1.2.1 内重新固定并验证预期结果。
 - 四个节点的输出数量与类型保持不变；旧工作流中的服装选项 ID 继续保留。
 - 输出是普通字符串，可接入常见 ComfyUI 文本编码流程；最终模型效果仍取决于 checkpoint、文本编码器、采样参数和工作流。
 
@@ -231,9 +231,7 @@ RUN_LIVE_SEED_GATE=1 python -m unittest discover -s tests -q
 python scripts/build_release.py --mode verify
 ```
 
-CI 实时验证当前源码的 10,000 组种子，并与历史黄金哈希对照。历史 M5 原始归档未存入 Git，CI 会明确跳过其完整归档校验；该归档只证明它绑定的历史提交。Release 工作流会复用此 CI，云端发布门禁同样不校验该历史归档。
-
-如需在本机完整校验历史归档，可指定归档路径并确保本地 Git 历史包含归档绑定的提交：
+CI 实时验证当前源码的 10,000 组种子，并与历史/现行黄金哈希对照；历史 M5 原始归档未存入 Git，CI 会明确跳过其完整归档校验（该归档只证明它绑定的历史提交），而 v1.2.1 万种子归因归档已随仓库追踪供实时与离线核验。如需在本机同时完整校验历史 M5 归档，可指定归档路径并确保本地 Git 历史包含归档绑定的提交：
 
 ```bash
 M5_ARCHIVE_PATH=/path/to/audit_m5_3_evidence.json.gz python -m unittest \
@@ -241,13 +239,13 @@ M5_ARCHIVE_PATH=/path/to/audit_m5_3_evidence.json.gz python -m unittest \
   tests.test_m5_3_audit_engine.TestM5EvidenceVerification.test_17_real_production_evidence_fast_metadata_verified -v
 ```
 
-v1.2.0 的本地验收记录包括：
+v1.2.1 的本地验收记录包括：
 
-- 53 个模块共 747 项测试通过，其中 241 项复用已有完成记录，506 项补测通过；失败、错误和跳过均为 0。
-- 10,000 种子 M5 归档完整性与因果重评通过，未解释差异为 0；核心源码与验收归档保持绑定。
-- Jacoby 完成节点加载与双轮确定性、Diagnostics JSON、服装外部覆盖和裸露等级触发衣物冲突消解四类实机验证。
-- 发布包包含 43 个运行时文件；大型离线审计归档不随节点安装包分发。
-- 发布过程仅更新版本与文档，并保留远程已有 CI 改进；验收依据与复用范围见 [v1.2.0 发布记录](docs/v1.2.0_release_record.md)。
+- 并入 `origin/main` PR #4（Ruff 导入与类型注解对齐、Diagnostics 1.0/2.0 README 契约、`RUN_LIVE_SEED_GATE=1` CI 与证据模式测试）后冻结核心业务、数据与节点源码（`core_source_digest` = `0b74c7411d4a58da...`），执行全量 59 个模块 825 项测试并在修复 `verify_m5_historical_archive` 历史参数传递后完成受影响门禁、审计、`RUN_LIVE_SEED_GATE=1` 实时万种子与发布构建全部通过，0 失败。
+- 完成 10,000 种子（`seed=0..9999`）8 项全链路质量门禁审计与 v1.2.0 先重放自洽、再逐槽位/逐词条双向多重集守恒的确定性因果归因比对（`10,000 / 10,000` 全部归因解释、`unexplained=0`，严禁无依据增删或下游放行），以及覆盖全部 4 个公开节点的分层矩阵（`IYKYKPresetBrowser` 125 组、`IYKYKCustomSlotCombiner` 200 组、`IYKYKPromptGenerator` + `IYKYKPromptDiagnostics` 3,000 组），全部为 0 失败；万种子汇总哈希 `b8775f683c9f329b...` 与含逐种子归因证据的新归档（`6,762,487` 字节，SHA-256 `4b918de0b7f883b7...`）严格绑定。
+- 在 `git archive HEAD` 干净检出环境中独立复跑文档契约、CI 路径分类、发布门禁、万种子/M5 归档证据验证与核心回归，并完成两份独立确定性 `--mode verify` 发布包核验。
+- 发布包包含 **44 个运行时文件**（较 v1.2.0 增列 [`lib/outfit_completion.py`](lib/outfit_completion.py)）；离线审计归档（`scratch/audit_v1_2_1_10k_evidence.json.gz` 等）已随仓库追踪供离线核验，不随节点安装包分发。
+- 详细改动、逐项测试处置清单与对比报告见 [v1.2.1 验收与发布报告](docs/v1.2.1_acceptance_and_release_report.md)；前序版本记录见 [v1.2.0 发布记录](docs/v1.2.0_release_record.md)。
 
 rc10 历史候选冻结的本地审核记录包括：
 

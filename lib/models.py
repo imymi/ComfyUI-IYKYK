@@ -6,7 +6,8 @@ from __future__ import annotations
 import math
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Any, Dict, List, Optional, Tuple
+from types import MappingProxyType
+from typing import Any, Dict, List, Mapping, Optional, Tuple
 
 if __package__:
     from .errors import UnresolvedEnsembleRelationError
@@ -120,6 +121,86 @@ VALID_SPACE_KINDS: Tuple[str, ...] = (
 )
 VALID_VISIBLE_REGIONS: Tuple[str, ...] = (
     "face", "upper_body", "lower_body", "hands", "feet", "full_body", "intimate_lower_body"
+)
+VALID_NUDITY_LEVELS: Tuple[str, ...] = ("L1", "L2", "L3", "L4", "L5", "L6")
+VALID_PIECE_ROLES: Tuple[str, ...] = (
+    "top", "bottom", "one_piece", "ensemble", "outerwear", "legwear", "footwear", "accessory", "underwear", "none", "unspecified"
+)
+VALID_COVERED_REGIONS: Tuple[str, ...] = (
+    "upper_torso", "lower_torso", "outer_layer", "intimate_upper", "intimate_lower", "legs", "feet", "none"
+)
+VALID_COVERAGE_DELTAS: Tuple[str, ...] = (
+    "none", "preserve", "partial_reveal", "uncover_upper", "uncover_lower", "uncover_all", "minimal_cover_only", "unspecified"
+)
+VALID_EXPOSED_REGIONS: Tuple[str, ...] = (
+    "none",
+    "collarbone_neck",
+    "shoulders",
+    "arms_wrists",
+    "back",
+    "midriff",
+    "cleavage",
+    "thigh_leg",
+    "ankle_feet",
+    "underboob_sideboob",
+    "breasts",
+    "underwear_bra",
+    "underwear_panties",
+    "buttocks",
+    "genitals",
+    "anus",
+    "full_nude",
+)
+NUDITY_BRANCHES_BY_LEVEL: Mapping[str, Tuple[str, ...]] = MappingProxyType({
+    "L1": ("l1_full_clothed",),
+    "L2": (
+        "l2_collar_neckline",
+        "l2_shoulder_strap",
+        "l2_midriff_waist",
+        "l2_leg_slit",
+        "l2_backless",
+        "l2_sheer_hint",
+        "l2_sleeve_wrist",
+    ),
+    "L3": (
+        "l3_open_shirt_breasts",
+        "l3_raised_top_breasts",
+        "l3_pulled_down_dress",
+        "l3_bra_pushed_up",
+        "l3_topless_skirt_kept",
+        "l3_topless_pants_kept",
+        "l3_bikini_top_removed",
+        "l3_panties_only",
+    ),
+    "L4": (
+        "l4_panties_only",
+        "l4_bra_and_panties",
+        "l4_hosiery_footwear_only",
+        "l4_towel_sheet_wrap",
+        "l4_accessory_only",
+    ),
+    "L5": (
+        "l5_full_nude_standing_or_frontal",
+        "l5_clothes_discarded_nearby",
+    ),
+    "L6": (
+        "l6_frontal_genital_display",
+        "l6_rear_bent_display",
+        "l6_lying_spread_display",
+        "l6_squatting_self_touch",
+    ),
+})
+VALID_NUDITY_BRANCHES: Tuple[str, ...] = tuple(
+    b for lvl in VALID_NUDITY_LEVELS for b in NUDITY_BRANCHES_BY_LEVEL[lvl]
+)
+VALID_NUDITY_CONSTRAINT_SOURCES: Tuple[str, ...] = (
+    "ui_explicit",
+    "ui_random",
+    "ui_none",
+    "preset_native",
+    "external_override",
+    "derived_override",
+    "unconstrained",
 )
 VALID_GARMENT_TOPOLOGIES: Tuple[str, ...] = (
     "one_piece", "top", "bottom_pants", "bottom_skirt", "underwear", "outerwear", "ensemble_outfit", "none"
@@ -1710,6 +1791,12 @@ class SemanticFacts:
     visible_regions: Any = field(default=_ABSENT)
     garment_topologies: Any = field(default=_ABSENT)
     garment_states: Any = field(default=_ABSENT)
+    piece_role: Any = field(default=_ABSENT)
+    covered_regions: Any = field(default=_ABSENT)
+    coverage_delta: Any = field(default=_ABSENT)
+    exposed_regions: Any = field(default=_ABSENT)
+    allowed_nudity_levels: Any = field(default=_ABSENT)
+    nudity_branches: Any = field(default=_ABSENT)
     hand_state: Any = field(default=_ABSENT)
     prop_usage: Any = field(default=_ABSENT)
     hands_required: Any = field(default=_ABSENT)
@@ -1806,6 +1893,7 @@ class SemanticFacts:
         # 3. Tuple 集合字段强类型与有序去重归一化
         tuple_fields = (
             "venue_ids", "visible_regions", "garment_topologies", "garment_states",
+            "covered_regions", "exposed_regions", "allowed_nudity_levels", "nudity_branches",
             "light_sources", "color_modes", "makeup_effects", "liquid_locations",
             "mutex_groups", "fabric_materials", "pattern_textures", "incompatible_with"
         )
@@ -1852,11 +1940,13 @@ class SemanticFacts:
         else:
             object.__setattr__(self, "is_ensemble", False)
 
-        # 6. 四态标量 (space_kind, time_of_day, hand_state)
+        # 6. 四态标量 (space_kind, time_of_day, hand_state, piece_role, coverage_delta)
         for fld, valid_enums in (
             ("space_kind", VALID_SPACE_KINDS),
             ("time_of_day", VALID_TIMES_OF_DAY),
             ("hand_state", VALID_HAND_STATES),
+            ("piece_role", VALID_PIECE_ROLES),
+            ("coverage_delta", VALID_COVERAGE_DELTAS),
         ):
             val = getattr(self, fld)
             if val is not _ABSENT:
@@ -1917,6 +2007,18 @@ class SemanticFacts:
         for gs in self.garment_states:
             if gs not in VALID_GARMENT_STATES:
                 raise ValueError(f"Invalid garment_state: {gs!r}")
+        for cr in self.covered_regions:
+            if cr not in VALID_COVERED_REGIONS:
+                raise ValueError(f"Invalid covered_region: {cr!r}")
+        for er in self.exposed_regions:
+            if er not in VALID_EXPOSED_REGIONS:
+                raise ValueError(f"Invalid exposed_region: {er!r}")
+        for nl in self.allowed_nudity_levels:
+            if nl not in VALID_NUDITY_LEVELS:
+                raise ValueError(f"Invalid allowed_nudity_level: {nl!r}")
+        for nb in self.nudity_branches:
+            if nb not in VALID_NUDITY_BRANCHES:
+                raise ValueError(f"Invalid nudity_branch: {nb!r}")
         for ls in self.light_sources:
             if ls not in VALID_LIGHT_SOURCES:
                 raise ValueError(f"Invalid light_source: {ls!r}")
@@ -1935,6 +2037,22 @@ class SemanticFacts:
         # 校验同一叶子的矛盾事实
         if "none" in self.garment_topologies and len(self.garment_topologies) > 1:
             raise ValueError(f"garment_topologies cannot contain 'none' alongside other topologies: {self.garment_topologies!r}")
+        if "none" in self.covered_regions and len(self.covered_regions) > 1:
+            raise ValueError(f"covered_regions cannot contain 'none' alongside other regions: {self.covered_regions!r}")
+        if "none" in self.exposed_regions and len(self.exposed_regions) > 1:
+            raise ValueError(f"exposed_regions cannot contain 'none' alongside other regions: {self.exposed_regions!r}")
+        if self.piece_role == "none" and any(cr != "none" for cr in self.covered_regions):
+            raise ValueError(f"piece_role='none' cannot have non-none covered_regions: {self.covered_regions!r}")
+        if self.coverage_delta == "uncover_all" and any(s in ("worn", "loosened") for s in self.garment_states):
+            raise ValueError(f"coverage_delta='uncover_all' cannot coexist with worn/loosened garment_states: {self.garment_states!r}")
+        if self.allowed_nudity_levels and self.nudity_branches:
+            allowed_lvl_set = set(self.allowed_nudity_levels)
+            for nb in self.nudity_branches:
+                lvl_prefix = nb.split("_", 1)[0].upper()
+                if lvl_prefix not in allowed_lvl_set:
+                    raise ValueError(
+                        f"nudity_branch {nb!r} is incompatible with allowed_nudity_levels {self.allowed_nudity_levels!r}"
+                    )
         if any(s in ("removed", "discarded") for s in self.garment_states) and any(s in ("worn", "loosened") for s in self.garment_states):
             raise ValueError(f"garment_states cannot contain both removed/discarded and worn states: {self.garment_states!r}")
         if self.liquid_kind == "none" and (self.liquid_locations or self.liquid_amount):
@@ -1957,10 +2075,20 @@ class SemanticFacts:
                 return c_val
             return p_val
 
+        _SENTINEL_NONE_TUPLE_FIELDS = {"garment_topologies", "covered_regions", "exposed_regions"}
+        _OVERRIDE_TUPLE_FIELDS = {"allowed_nudity_levels", "nudity_branches"}
+
         def _merge_tuple(p_tup: Tuple[str, ...], c_tup: Tuple[str, ...], fld: str) -> Tuple[str, ...]:
             if fld in child.explicit_fields:
                 if not c_tup:
                     return ()
+                if fld in _OVERRIDE_TUPLE_FIELDS:
+                    return tuple(sorted(set(c_tup)))
+                if fld in _SENTINEL_NONE_TUPLE_FIELDS:
+                    if "none" in c_tup:
+                        return ("none",)
+                    base_p = tuple(x for x in (p_tup or ()) if x != "none")
+                    return tuple(sorted(set(base_p).union(set(c_tup))))
                 combined = set(p_tup or ()).union(set(c_tup))
                 return tuple(sorted(combined))
             return p_tup or ()
@@ -1988,6 +2116,12 @@ class SemanticFacts:
             visible_regions=_merge_tuple(self.visible_regions, child.visible_regions, "visible_regions"),
             garment_topologies=_merge_tuple(self.garment_topologies, child.garment_topologies, "garment_topologies"),
             garment_states=_merge_tuple(self.garment_states, child.garment_states, "garment_states"),
+            piece_role=_merge_scalar(self.piece_role, child.piece_role, "piece_role"),
+            covered_regions=_merge_tuple(self.covered_regions, child.covered_regions, "covered_regions"),
+            coverage_delta=_merge_scalar(self.coverage_delta, child.coverage_delta, "coverage_delta"),
+            exposed_regions=_merge_tuple(self.exposed_regions, child.exposed_regions, "exposed_regions"),
+            allowed_nudity_levels=_merge_tuple(self.allowed_nudity_levels, child.allowed_nudity_levels, "allowed_nudity_levels"),
+            nudity_branches=_merge_tuple(self.nudity_branches, child.nudity_branches, "nudity_branches"),
             hand_state=_merge_scalar(self.hand_state, child.hand_state, "hand_state"),
             prop_usage=_merge_scalar(self.prop_usage, child.prop_usage, "prop_usage"),
             hands_required=hands_req,
@@ -2413,6 +2547,107 @@ class BudgetFilterRecord:
             )
 
 
+def normalize_nudity_level_code(raw: Any) -> Optional[str]:
+    """将用户输入或旧版别名规范化为标准等级编码 (L1..L6 / random / none / unspecified)。"""
+    if raw is None:
+        return None
+    if raw is UNSPECIFIED:
+        return "unspecified"
+    s = str(raw).strip()
+    if not s:
+        return None
+    low = s.lower()
+    if low in ("none", "无", "无 (none)", "none (无)", "null", "false"):
+        return "none"
+    if low in ("random", "随机", "随机 (random)", "random (随机)", "auto", "自动", "自动 (auto)"):
+        return "random"
+    if low == "unspecified":
+        return "unspecified"
+    up = s.upper()
+    digit_map = {"1": "L1", "2": "L2", "3": "L3", "4": "L4", "5": "L5", "6": "L6"}
+    if up in digit_map:
+        return digit_map[up]
+    for code in VALID_NUDITY_LEVELS:
+        if up == code or up.startswith(f"{code} ") or up.startswith(f"{code}_") or f" {code} " in f" {up} ":
+            return code
+    return None
+
+
+@dataclass(frozen=True)
+class NudityConstraint:
+    """内部统一裸露等级约束对象 (v1.2.1 M1 核心契约)。
+
+    贯穿采样、预设/配方装配、冲突消解与最终校验，记录：
+    - requested_level: 用户或入口请求等级 ('L1'..'L6' / 'random' / 'none' / 'unspecified' / None)
+    - effective_level: 实际生效等级 ('L1'..'L6' 或 None)
+    - source: 生效来源 ('ui_explicit', 'ui_random', 'ui_none', 'preset_native', 'external_override', 'derived_override', 'unconstrained')
+    - selected_branch: 本次选定的单一相容状态分支 ID (可选)
+    - yielded_to_override: 是否因外部覆盖导致内部等级让位
+    - yield_reason: 让位原因说明
+    - raw_requested_value: 原始请求值，用于追溯
+    """
+    requested_level: Optional[str] = None
+    effective_level: Optional[str] = None
+    source: str = "unconstrained"
+    selected_branch: Optional[str] = None
+    yielded_to_override: bool = False
+    yield_reason: Optional[str] = None
+    raw_requested_value: Optional[str] = None
+
+    def __post_init__(self) -> None:
+        valid_requested = VALID_NUDITY_LEVELS + ("random", "none", "unspecified")
+        for fld in ("requested_level", "effective_level", "source", "selected_branch", "yield_reason", "raw_requested_value"):
+            val = getattr(self, fld)
+            if val is not None and (not isinstance(val, str) or isinstance(val, bool)):
+                raise TypeError(f"NudityConstraint.{fld} must be str or None, got {type(val).__name__}")
+        if self.requested_level is not None and self.requested_level not in valid_requested:
+            raise ValueError(f"Invalid NudityConstraint.requested_level: {self.requested_level!r}")
+        if self.effective_level is not None and self.effective_level not in VALID_NUDITY_LEVELS:
+            raise ValueError(f"Invalid NudityConstraint.effective_level: {self.effective_level!r}")
+        if self.source not in VALID_NUDITY_CONSTRAINT_SOURCES:
+            raise ValueError(f"Invalid NudityConstraint.source: {self.source!r}")
+        if not isinstance(self.yielded_to_override, bool):
+            raise TypeError(f"NudityConstraint.yielded_to_override must be bool, got {type(self.yielded_to_override).__name__}")
+        if self.selected_branch is not None:
+            if self.selected_branch not in VALID_NUDITY_BRANCHES:
+                raise ValueError(f"Invalid NudityConstraint.selected_branch: {self.selected_branch!r}")
+            if self.effective_level is not None and self.selected_branch not in NUDITY_BRANCHES_BY_LEVEL[self.effective_level]:
+                raise ValueError(
+                    f"NudityConstraint.selected_branch {self.selected_branch!r} is incompatible with effective_level {self.effective_level!r}"
+                )
+
+    def to_dict(self) -> Dict[str, Any]:
+        return {
+            "requested_level": self.requested_level,
+            "effective_level": self.effective_level,
+            "source": self.source,
+            "selected_branch": self.selected_branch,
+            "yielded_to_override": self.yielded_to_override,
+            "yield_reason": self.yield_reason,
+            "raw_requested_value": self.raw_requested_value,
+        }
+
+    @classmethod
+    def from_dict(cls, d: Optional[Dict[str, Any]]) -> Optional["NudityConstraint"]:
+        if d is None:
+            return None
+        if not isinstance(d, dict):
+            raise TypeError(f"NudityConstraint data must be dict, got {type(d).__name__}")
+        allowed = {
+            "requested_level",
+            "effective_level",
+            "source",
+            "selected_branch",
+            "yielded_to_override",
+            "yield_reason",
+            "raw_requested_value",
+        }
+        unexpected = set(d.keys()) - allowed
+        if unexpected:
+            raise KeyError(f"Unexpected keys in NudityConstraint: {sorted(unexpected)}")
+        return cls(**d)
+
+
 @dataclass(frozen=True)
 class ResolutionReport:
     """完整消解审计报告 (rc8 诊断闭环模型)。"""
@@ -2428,6 +2663,7 @@ class ResolutionReport:
     replaced_count: int = 0
     injected_count: int = 0
     produced_atoms: Tuple[PromptAtom, ...] = ()
+    nudity_constraint: Optional[NudityConstraint] = None
 
     def __post_init__(self) -> None:
         if not isinstance(self.schema_version, str) or isinstance(self.schema_version, bool):
@@ -2515,6 +2751,10 @@ class ResolutionReport:
                 f"output_count mismatch: expected {expected_output} "
                 f"(input {self.input_count} - dropped {self.dropped_count} - replaced {self.replaced_count} + produced {produced_count}), "
                 f"got {self.output_count}"
+            )
+        if self.nudity_constraint is not None and not isinstance(self.nudity_constraint, NudityConstraint):
+            raise TypeError(
+                f"nudity_constraint must be NudityConstraint or None, got {type(self.nudity_constraint).__name__}"
             )
 
 
@@ -2612,10 +2852,14 @@ class ClothingSampleResult:
     state_id: Optional[str] = None
     nudity_level: str = "L1"
     sampling_rationale: Optional[Dict[str, Any]] = None
+    complement_tags: Tuple[SampledTag, ...] = ()
+    completion_info: Optional[Dict[str, Any]] = field(default=None, compare=False, hash=False)
 
     @property
     def all_tags(self) -> Tuple[SampledTag, ...]:
-        return self.base_tags + self.state_tags + self.extension_tags
+        if self.state_id == "linkage_override" and not self.base_tags:
+            return self.state_tags + self.complement_tags + self.extension_tags
+        return self.base_tags + self.complement_tags + self.state_tags + self.extension_tags
 
     @property
     def sampled_tags(self) -> Tuple[SampledTag, ...]:
@@ -2719,6 +2963,9 @@ class GenerationResult:
     deduplication_records: Tuple[DeduplicationRecord, ...] = ()
     budget_filter_records: Tuple[BudgetFilterRecord, ...] = ()
     overrides: Tuple[OverrideRecord, ...] = ()
+    nudity_constraint: Optional[NudityConstraint] = None
+    outfit_completion_info: Optional[Dict[str, Any]] = field(default=None, compare=False, hash=False)
+    preset_adjusted: bool = False
 
 
 @dataclass(frozen=True)
@@ -2748,6 +2995,8 @@ class AssemblyResult:
     deduplication_records: Tuple[DeduplicationRecord, ...] = ()
     budget_filter_records: Tuple[BudgetFilterRecord, ...] = ()
     overrides: Tuple[OverrideRecord, ...] = ()
+    nudity_constraint: Optional[NudityConstraint] = None
+    preset_adjusted: bool = False
 
 
 def is_external_atom(a: Any) -> bool:

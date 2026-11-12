@@ -247,7 +247,18 @@
             "color_modes": [
               "color"
             ],
-            "capture_device": null
+            "capture_device": null,
+            "exposed_regions": [
+              "none"
+            ],
+            "allowed_nudity_levels": [
+              "L1",
+              "L2",
+              "L3",
+              "L4",
+              "L5",
+              "L6"
+            ]
           }
         },
         {
@@ -6874,7 +6885,14 @@
             "color_modes": [
               "color"
             ],
-            "capture_device": null
+            "capture_device": null,
+            "allowed_nudity_levels": [
+              "L2",
+              "L3",
+              "L4",
+              "L5",
+              "L6"
+            ]
           }
         },
         {
@@ -6896,7 +6914,15 @@
             "color_modes": [
               "color"
             ],
-            "capture_device": null
+            "capture_device": null,
+            "exposed_regions": [
+              "full_nude"
+            ],
+            "allowed_nudity_levels": [
+              "L4",
+              "L5",
+              "L6"
+            ]
           }
         },
         {
@@ -6907,7 +6933,14 @@
             "color_modes": [
               "color"
             ],
-            "capture_device": null
+            "capture_device": null,
+            "allowed_nudity_levels": [
+              "L2",
+              "L3",
+              "L4",
+              "L5",
+              "L6"
+            ]
           }
         },
         {
@@ -6962,7 +6995,14 @@
             "color_modes": [
               "color"
             ],
-            "capture_device": null
+            "capture_device": null,
+            "allowed_nudity_levels": [
+              "L2",
+              "L3",
+              "L4",
+              "L5",
+              "L6"
+            ]
           }
         }
       ]

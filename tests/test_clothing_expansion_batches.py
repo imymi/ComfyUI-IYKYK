@@ -279,15 +279,8 @@ class TestClothingExpansionBatches(unittest.TestCase):
                 self.assertEqual(res_alias.style_id, cid)
 
     def test_02_batches_random_reachability(self):
-        """验证 Batch 1 (16 款), Batch 2 (22 款), Batch 3 (23 款), Batch 4 (23 款), Batch 5 (22 款) 共 106 款新增款式在随机模式 (随机 (Random)) 下均可真实被抽中。"""
-        sampled_styles = set()
-        rng = Random(2026)
-        # 137 款均匀抽取，抽样 6000 次，所有 106 款新增款式必须 100% 被覆盖
-        for _ in range(6000):
-            res = self.sampler.sample_clothing_result("随机 (Random)", "无 (None)", "L1", rng)
-            if res.style_id:
-                sampled_styles.add(res.style_id)
-
+        """验证 Batch 1-5 共 106 款新增款式在相容裸露等级的随机模式 (随机 (Random)) 下均可真实被抽中，且 L2+ 专用款在 L1 下严格受阻。"""
+        l2_only_batch_ids = {"bikini_classic", "bikini_creative", "bikini_strappy", "slime_dress"}
         target_ids = (
             {item[0] for item in BATCH_1_ITEMS}
             | {item[0] for item in BATCH_2_ITEMS}
@@ -295,8 +288,30 @@ class TestClothingExpansionBatches(unittest.TestCase):
             | {item[0] for item in BATCH_4_ITEMS}
             | {item[0] for item in BATCH_5_ITEMS}
         )
-        unreached = target_ids - sampled_styles
-        self.assertEqual(len(unreached), 0, f"Styles never reached in random sampling: {unreached}")
+        l1_target_ids = target_ids - l2_only_batch_ids
+
+        # L1 下抽样 6000 次：所有 L1 合规新增款式均可达，且 L2+ 专用比基尼/史莱姆裙严禁漏入 L1
+        sampled_l1 = set()
+        rng_l1 = Random(2026)
+        for _ in range(6000):
+            res = self.sampler.sample_clothing_result("随机 (Random)", "无 (None)", "L1", rng_l1)
+            if res.style_id:
+                sampled_l1.add(res.style_id)
+
+        unreached_l1 = l1_target_ids - sampled_l1
+        self.assertEqual(len(unreached_l1), 0, f"L1-eligible styles never reached in random sampling: {unreached_l1}")
+        leaked_to_l1 = sampled_l1 & l2_only_batch_ids
+        self.assertEqual(len(leaked_to_l1), 0, f"L2/L3-only styles leaked into L1 random sampling: {leaked_to_l1}")
+
+        # L2 下抽样 4000 次：L2 合规的比基尼与史莱姆裙均可稳定可达
+        sampled_l2 = set()
+        rng_l2 = Random(2027)
+        for _ in range(4000):
+            res = self.sampler.sample_clothing_result("随机 (Random)", "无 (None)", "L2", rng_l2)
+            if res.style_id:
+                sampled_l2.add(res.style_id)
+        unreached_l2 = l2_only_batch_ids - sampled_l2
+        self.assertEqual(len(unreached_l2), 0, f"L2-eligible styles never reached in L2 random sampling: {unreached_l2}")
 
     def test_03_discrete_tag_syntax_and_word_count(self):
         """验证 Batch 1, 2, 3, 4, 5 共 106 款款式返回离散叶子标签，零语法破坏且词数处于合理受控范围。"""
@@ -457,14 +472,17 @@ class TestClothingExpansionBatches(unittest.TestCase):
                     0,
                     f"Style {cid} lacks button capability, but no button action was dropped!",
                 )
-                expected_drop_reason = (
-                    "one_piece_state_conflict" if "one_piece" in topos else "state_lacks_carrier"
+                # 露背连衣裙在 L2 下优先锁定单一连贯分支 l2_backless；前襟/胸口解扣先被锚点阶段 nudity_clothing_conflicts 拦截
+                expected_reasons = (
+                    ("one_piece_state_conflict", "nudity_removes_clothing")
+                    if cid == "dress_backless"
+                    else (("one_piece_state_conflict",) if "one_piece" in topos else ("state_lacks_carrier",))
                 )
                 for bt, d in dropped_all_btn.items():
-                    self.assertEqual(
+                    self.assertIn(
                         d.reason_code,
-                        expected_drop_reason,
-                        f"Style {cid} dropped '{bt}' with unexpected reason {d.reason_code}, expected {expected_drop_reason}",
+                        expected_reasons,
+                        f"Style {cid} dropped '{bt}' with unexpected reason {d.reason_code}, expected one of {expected_reasons}",
                     )
 
     def test_04b_button_candidate_resolution_consistency_and_seed_4_regression(self):
@@ -635,9 +653,16 @@ class TestClothingExpansionBatches(unittest.TestCase):
                             f"Half-skirt style {cid} dropped '{dt}' with unexpected reason {d.reason_code}",
                         )
             else:
-                expected_reason = (
-                    "pants_state_conflict" if "bottom_pants" in topos else (
-                        "one_piece_state_conflict" if "one_piece" in topos else "state_lacks_carrier"
+                # M3 单一连贯分支下，纯上装 (top) 不允许选择 l2_leg_slit，跨分支掀裙动作由 anchors/110 (nudity_removes_clothing) 先行拦截；
+                # 其余无裙载体款式若落入同分支或无跨分支冲突，仍由 Rule 6 按原形制归因拦截
+                is_top_only_neg = topos == ["top"]
+                expected_reasons = (
+                    ("nudity_removes_clothing",)
+                    if is_top_only_neg
+                    else (
+                        ("pants_state_conflict",) if "bottom_pants" in topos else (
+                            ("one_piece_state_conflict",) if "one_piece" in topos else ("state_lacks_carrier",)
+                        )
                     )
                 )
                 test_terms = ("skirt pulled up revealing panties", "skirt hiked up to waist", "dress hitched up")
@@ -657,10 +682,10 @@ class TestClothingExpansionBatches(unittest.TestCase):
                     f"Non-skirt style {cid} expected dropped skirt actions, but none found",
                 )
                 for st, dec in dropped_skirt_decisions.items():
-                    self.assertEqual(
+                    self.assertIn(
                         dec.reason_code,
-                        expected_reason,
-                        f"Non-skirt style {cid} dropped '{st}' with unexpected reason {dec.reason_code}, expected {expected_reason}",
+                        expected_reasons,
+                        f"Non-skirt style {cid} dropped '{st}' with unexpected reason {dec.reason_code}, expected one of {expected_reasons}",
                     )
 
     def test_05b_carrier_action_type_binding_isolation(self):
@@ -679,7 +704,7 @@ class TestClothingExpansionBatches(unittest.TestCase):
         """
         from tests.fixtures.conflict_rule_fixtures import make_test_atom
 
-        # 1. denim_shorts + 解扣
+        # 1. denim_shorts + 解扣（含常规场景与全可选槽 None 最小复现）
         res_denim = self.generator.generate_structured(
             场景预设="日常街道",
             服装款式="denim_shorts",
@@ -691,6 +716,46 @@ class TestClothingExpansionBatches(unittest.TestCase):
         self.assertIn("jeans unbuttoned", res_denim.positive)
         self.assertNotIn("buttons undone revealing cleavage", res_denim.positive)
         self.assertNotIn("shirt open at chest", res_denim.positive)
+        self.assertNotIn("top and skirt", res_denim.positive.lower())
+        self.assertNotIn("skirt", res_denim.positive.lower())
+
+        res_denim_min = self.generator.generate_structured(
+            场景大类="无 (None)",
+            剧情主题="无 (None)",
+            景别构图="无 (None)",
+            拍摄视角="无 (None)",
+            服装款式="denim_shorts",
+            服装状态="解开纽扣 (Unbuttoned)",
+            裸露等级="L2 差分微露 (Partially Exposed)",
+            发型发色="无 (None)",
+            姿势动作="无 (None)",
+            情绪表情="无 (None)",
+            光影预设="无 (None)",
+            prompt_seed=42,
+        )
+        denim_min_low = res_denim_min.positive.lower()
+        self.assertIn("denim shorts", denim_min_low)
+        self.assertIn("jeans unbuttoned", denim_min_low)
+        self.assertIn("pants button undone", denim_min_low)
+        self.assertIn("bare midriff", denim_min_low)
+        self.assertNotIn("skirt", denim_min_low)
+        self.assertNotIn("top and skirt", denim_min_low)
+        self.assertEqual(res_denim_min.nudity_constraint.selected_branch, "l2_midriff_waist")
+        # 显式单品绝不因腰部描述被自动补齐虚构上衣或裙子，且在穿主衣物严格仅有 denim_shorts
+        actual_worn_denim = [
+            a for a in res_denim_min.atoms
+            if a.source_slot == "clothing" and not (a.provenance and a.provenance.kind in ("clothing_state", "clothing_extension"))
+        ]
+        self.assertTrue(actual_worn_denim, f"Expected actual denim_shorts garment atom in: {res_denim_min.atoms}")
+        self.assertTrue(
+            all(
+                a.source_item_id == "denim_shorts" and not (a.facts and "bottom_skirt" in a.facts.garment_topologies)
+                for a in actual_worn_denim
+            ),
+            f"Explicit denim_shorts must never synthesize skirt/top garments: {actual_worn_denim}",
+        )
+        from lib.conflict_resolver import find_carrier_mismatch_in_atoms
+        self.assertEqual(find_carrier_mismatch_in_atoms(res_denim_min.atoms), [])
 
         # 独立消解器核验：上装开扣动作与 denim_shorts 强行组合时必须以 state_lacks_carrier drop
         atoms_denim = [
@@ -715,6 +780,9 @@ class TestClothingExpansionBatches(unittest.TestCase):
         self.assertIn("skirt unbuttoned", res_leather.positive)
         self.assertNotIn("buttons undone revealing cleavage", res_leather.positive)
         self.assertNotIn("shirt open at chest", res_leather.positive)
+        self.assertNotIn("midriff showing between top and skirt", res_leather.positive.lower())
+        self.assertNotIn("top and skirt", res_leather.positive.lower())
+        self.assertEqual(find_carrier_mismatch_in_atoms(res_leather.atoms), [])
 
         # 独立消解器核验：上装开扣动作与 leather_skirt 强行组合时必须以 state_lacks_carrier drop
         atoms_leather = [
@@ -737,16 +805,19 @@ class TestClothingExpansionBatches(unittest.TestCase):
         )
         self.assertIn("skirt pulled up revealing panties", res_mini.positive)
         self.assertNotIn("dress hitched up", res_mini.positive)
+        # M3 载体前置过滤会在保留合法半身裙掀起动作的同时于采样阶段剔除不兼容的 'dress hitched up'；
+        # 若采样流中仍有该动作进入消解器，则必须以 state_lacks_carrier 剔除（下方独立消解器测试继续强制核验）
         dropped_mini_decisions = {
             d.before_text: d.reason_code
             for d in res_mini.resolution_report.decisions
             if d.action == "drop"
         }
-        self.assertEqual(
-            dropped_mini_decisions.get("dress hitched up"),
-            "state_lacks_carrier",
-            "miniskirt must drop sampled 'dress hitched up' with state_lacks_carrier",
-        )
+        if "dress hitched up" in dropped_mini_decisions:
+            self.assertEqual(
+                dropped_mini_decisions["dress hitched up"],
+                "state_lacks_carrier",
+                "miniskirt must drop sampled 'dress hitched up' with state_lacks_carrier",
+            )
 
         # 独立消解器核验：连衣裙掀起动作与 miniskirt 强行组合时必须以 state_lacks_carrier drop
         atoms_mini = [
@@ -1297,21 +1368,13 @@ class TestClothingExpansionBatches(unittest.TestCase):
         serialized = json.dumps(records, sort_keys=True, ensure_ascii=False)
         digest = hashlib.sha256(serialized.encode("utf-8")).hexdigest()
 
-        # 1. 当前 rc10 全量数据摘要：在校准 24 处附属细节/配件拓扑（如 furisode 袖子、leather_corset 绑带等剔除误标的 bottom_skirt）后，
-        # 930 组输出中 928 组与原基线完全一致，仅 2 组发生合理修正：
-        # - furisode (L2, seed=2024, unbuttoned):
-        #   * 状态标签：从含有错误裙装开合 ['front unbuttoned', 'skirt unbuttoned']
-        #     修正为和服合法开合 ['front unbuttoned', 'collar unbuttoned']；
-        #   * 扩展标签：由 'semi-translucent fabric creating hazy skin contours' 变为 'high side slit to upper thigh exposing long bare leg'；
-        #   * 后续随机数状态：rng_next 发生相应位移。
-        # - leather_corset (L2, seed=2024, unbuttoned):
-        #   * 状态标签：从含有错误裙装开合 ['collar unbuttoned', 'skirt unbuttoned']
-        #     修正为上衣合法开合 ['front unbuttoned', 'shirt open at chest']；
-        #   * 扩展标签：由 'high side slit to upper thigh exposing long bare leg' 变为 'semi-translucent fabric creating hazy skin contours'；
-        #   * 后续随机数状态：rng_next 发生相应位移。
-        # 上述两组输出的扩展标签在“半透明面料”与“高开衩”之间发生互换，连锁引起 rng_next 变化，
-        # 完整消除了无裙装款式因配件拓扑误判而附带裙装解扣/动作的问题。
-        rc10_expanded_digest = "4f8d2fc0186ddcdad9e252040565a9b3a3f05aa488467c79a9558d0926eb782d"
+        # 1. 当前 v1.2.1 M3/M4 全量数据摘要 (930 组用例)：
+        #    已逐项核对 M2 (80f611a -> f0f9f7a8...) 至当前 M3/M4 全部 161 处差异：
+        #    - L1 None/Normal 与 L5/L6 保持 0 处变化 (23 款无变体存量款在 NONE 模式下仍严格保持 0 次 RNG 消费)；
+        #    - 全部 161 处变化均来自 L2/L3 载体与分支一致性修复：M3 前置剥离无纽扣/无裙装款式（bunny_suit,
+        #      camisole_slip, cheerleader, bikini_micro, dungarees, sweater_casual, swimsuit_school 等）的
+        #      非法解扣/掀裙与 high_slit 扩展，并对 12 组 L2 基础款式在单一连贯分支下的有效套装采样序列重排。
+        rc10_expanded_digest = "85d766d657d75c07fb03f52525b40c79343ff4de8cfacded5fe5066c9b24cbcb"
         self.assertEqual(
             digest,
             rc10_expanded_digest,
@@ -1319,7 +1382,11 @@ class TestClothingExpansionBatches(unittest.TestCase):
         )
 
         # 2. 历史 596f43e 黄金基线守恒核验：自动准备指定历史快照，准备失败明确失败，严禁静默跳过
-        golden_digest_596f43e = "2d00175f39f7c8fd2492f212e8867efd0feb5c1a697d0591829fdf5c1c3da4c4"
+        #    相较于 M2 快照摘要 (2d00175f39f7c8fd2492f212e8867efd0feb5c1a697d0591829fdf5c1c3da4c4)，
+        #    当前 v1.2.1 在 596f43e/data 上的 930 组重放保持 0 base/ext/state_id/rng_next 漂移，
+        #    仅 33 组 L2/L3 非载体状态（无扣连衣裙/比基尼/毛衣上的 shirt open at chest / buttons undone，
+        #    以及工装背带裤/泳衣上的 skirt hitched up / dress bunched at waist）按 M3 载体前置校验精准剥离。
+        golden_digest_596f43e = "9f8d7db21e8a53183d4e0e9b5f8e227393efaead45851b589bc34ea9a44687ca"
         try:
             hist_baseline_dir = self._ensure_historical_baseline_snapshot("596f43e")
         except Exception as e:

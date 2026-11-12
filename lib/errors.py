@@ -56,9 +56,9 @@ class PromptValidationError(Exception):
         self.texts: Tuple[str, ...] = tuple(texts)
         self.rule_id: Optional[str] = rule_id
 
-        inferred = category or error_code or self._infer_category(self.message, rule_id)
-        self.category: str = inferred
-        self.error_code: str = inferred
+        resolved_category = category or self._infer_category(self.message, rule_id)
+        self.category: str = resolved_category
+        self.error_code: str = error_code or resolved_category
         self.details: Dict[str, Any] = dict(details or {})
 
     @staticmethod
@@ -108,7 +108,16 @@ class PromptValidationError(Exception):
             "effective_seed": int(effective_seed),
             "error_info": {
                 "category": self.category,
-                "details": self.details,
+                "details": (
+                    {
+                        **self.details,
+                        "nudity_constraint": self.nudity_constraint.to_dict(),
+                    }
+                    if getattr(self, "nudity_constraint", None) is not None
+                    and hasattr(self.nudity_constraint, "to_dict")
+                    and "nudity_constraint" not in self.details
+                    else dict(self.details)
+                ),
                 "error_code": self.error_code,
                 "message": self.message,
                 "rule_id": self.rule_id,

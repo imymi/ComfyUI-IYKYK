@@ -28,6 +28,7 @@ if __package__:
         make_override_fragments as make_override_fragments,
         split_top_level_tags,
     )
+    from .lib.conflict_resolver import find_carrier_mismatch_in_atoms
     from .lib.context_affinity import compute_context_profile
     from .lib.errors import (
         CATEGORY_EXTERNAL_BUDGET_EXCEEDED,
@@ -39,7 +40,8 @@ if __package__:
         PromptValidationError,
         UnresolvedConflictError,
     )
-    from .lib.models import GenerationResult, ORDERED_CONTEXT_IDS, PromptAtom, PromptFragment, SelectionOrigin, SemanticFacts, TagProvenance, is_external_atom
+    from .lib.models import ClothingSampleResult, GenerationResult, NudityConstraint, ORDERED_CONTEXT_IDS, PromptAtom, PromptFragment, SelectionOrigin, SemanticFacts, TagProvenance, VALID_NUDITY_LEVELS, is_external_atom, normalize_nudity_level_code
+    from .lib.outfit_completion import assess_clothing_completeness, check_completion_exemption
     from .lib.rng import derive_substream_rng, recover_effective_seed
     from .lib.sampler import DataSampler, _is_none, get_selection_mode
     from .lib.slot_contract import AUXILIARY_SLOT_ORDER, SLOT_ORDER, normalize_slot_mapping, normalize_slot_name
@@ -51,6 +53,7 @@ else:
         make_override_fragments as make_override_fragments,
         split_top_level_tags,
     )
+    from lib.conflict_resolver import find_carrier_mismatch_in_atoms
     from lib.context_affinity import compute_context_profile
     from lib.errors import (
         CATEGORY_EXTERNAL_BUDGET_EXCEEDED,
@@ -62,7 +65,8 @@ else:
         PromptValidationError,
         UnresolvedConflictError,
     )
-    from lib.models import GenerationResult, ORDERED_CONTEXT_IDS, PromptAtom, PromptFragment, SelectionOrigin, SemanticFacts, TagProvenance, is_external_atom
+    from lib.models import ClothingSampleResult, GenerationResult, NudityConstraint, ORDERED_CONTEXT_IDS, PromptAtom, PromptFragment, SelectionOrigin, SemanticFacts, TagProvenance, VALID_NUDITY_LEVELS, is_external_atom, normalize_nudity_level_code
+    from lib.outfit_completion import assess_clothing_completeness, check_completion_exemption
     from lib.rng import derive_substream_rng, recover_effective_seed
     from lib.sampler import DataSampler, _is_none, get_selection_mode
     from lib.slot_contract import AUXILIARY_SLOT_ORDER, SLOT_ORDER, normalize_slot_mapping, normalize_slot_name
@@ -425,9 +429,44 @@ def _make_clothing_fragments(
         )
         order += 1
 
-    # state_tags -> clothing_state_origin (unless linkage_override, which overrides clothing style tags)
+    complement_tags = getattr(res, "complement_tags", ())
     state_tags = getattr(res, "state_tags", ())
     is_linkage_override = (state_id == "linkage_override")
+
+    def _emit_complement_fragments() -> None:
+        nonlocal order
+        for stag in complement_tags:
+            t_text = stag.text if hasattr(stag, "text") else str(stag)
+            t_facts = getattr(stag, "facts", SemanticFacts())
+            t_prov = getattr(stag, "provenance", None)
+            comp_item_id = (t_prov.item_id if (t_prov and t_prov.item_id) else style_id) or ""
+            t_id = getattr(stag, "id", f"{comp_item_id}__comp_{order:03d}" if comp_item_id else "")
+            if not t_prov or not t_prov.item_id:
+                t_prov = TagProvenance(
+                    item_id=comp_item_id or t_id,
+                    kind="clothing_completion",
+                    parent_ids=(comp_item_id,) if comp_item_id else (),
+                    semantic_ids=((f"clothing:{comp_item_id}",) if comp_item_id else ()),
+                )
+            frags.append(
+                PromptFragment(
+                    text=t_text,
+                    source_slot="clothing",
+                    source_item_id=comp_item_id,
+                    order=order,
+                    provenance=t_prov,
+                    id=t_id,
+                    facts=t_facts,
+                    origin=clothing_origin,
+                )
+            )
+            order += 1
+
+    # 非 linkage_override 时，先输出主款补充件再输出状态词
+    if not (is_linkage_override and not base_tags):
+        _emit_complement_fragments()
+
+    # state_tags -> clothing_state_origin (unless linkage_override, which overrides clothing style tags)
     for stag in state_tags:
         t_text = stag.text if hasattr(stag, "text") else str(stag)
         t_id = getattr(stag, "id", f"{state_id}__tag_{order:03d}" if state_id else "")
@@ -469,6 +508,10 @@ def _make_clothing_fragments(
         )
         order += 1
 
+    # 若主款走 linkage_override，主款文本即 state_tags，补件跟随在主款之后并保留各自独立 origin
+    if is_linkage_override and not base_tags:
+        _emit_complement_fragments()
+
     # extension_tags -> clothing_origin (extensions of clothing style)
     extension_tags = getattr(res, "extension_tags", ())
     for stag in extension_tags:
@@ -499,8 +542,8 @@ def _make_clothing_fragments(
         )
         order += 1
 
-    # Fallback if res didn't have base_tags/state_tags/extension_tags
-    if not base_tags and not state_tags and not extension_tags and hasattr(res, "all_tags"):
+    # Fallback if res didn't have base_tags/complement_tags/state_tags/extension_tags
+    if not base_tags and not complement_tags and not state_tags and not extension_tags and hasattr(res, "all_tags"):
         for stag in getattr(res, "all_tags", ()):
             t_text = stag.text if hasattr(stag, "text") else str(stag)
             t_id = getattr(stag, "id", f"{style_id}__tag_{order:03d}" if style_id else "")
@@ -519,6 +562,124 @@ def _make_clothing_fragments(
             order += 1
 
     return frags
+
+
+def _serialize_nudity_constraint_trace(nc: Optional[NudityConstraint]) -> Optional[Dict[str, Any]]:
+    if nc is None:
+        return None
+    return {
+        "requested_level": nc.requested_level,
+        "effective_level": nc.effective_level,
+        "source": nc.source,
+        "selected_branch": nc.selected_branch,
+        "yielded_to_override": bool(nc.yielded_to_override),
+        "yield_reason": nc.yield_reason,
+    }
+
+
+def _build_completion_info_summary(
+    clothing_res: Optional[ClothingSampleResult],
+    *,
+    controlled_rebuild_attempted: bool = False,
+    has_external_clothing_override: bool = False,
+    accepted_atoms: Sequence[PromptAtom] = (),
+) -> Optional[Dict[str, Any]]:
+    if clothing_res is None:
+        return None
+    if has_external_clothing_override:
+        return {
+            "exempt": True,
+            "exempt_reason": "external_clothing_override",
+            "repaired_ensemble": False,
+            "complement_ids": [],
+            "fallback_used": False,
+            "fallback_reason": None,
+            "controlled_rebuild_attempted": False,
+        }
+    raw_info = dict(getattr(clothing_res, "completion_info", None) or {})
+    raw_comps = tuple(getattr(clothing_res, "complement_tags", None) or ())
+    if accepted_atoms:
+        acc_cl = [
+            a for a in accepted_atoms
+            if a.source_slot in ("clothing", "clothing_state", "clothing_extension", "underwear")
+        ]
+        acc_texts = {a.text.strip().lower() for a in acc_cl if a.text}
+        acc_item_ids = {
+            getattr(a.provenance, "item_id", None) or a.source_item_id
+            for a in acc_cl
+            if (getattr(a.provenance, "item_id", None) or a.source_item_id)
+        }
+        kept_comps = [
+            t for t in raw_comps
+            if (getattr(t, "text", "") or "").strip().lower() in acc_texts
+            or (
+                getattr(getattr(t, "provenance", None), "item_id", None)
+                and getattr(t.provenance, "item_id", None) in acc_item_ids
+            )
+        ]
+    else:
+        kept_comps = list(raw_comps)
+    comp_ids = [
+        str(getattr(t, "id", "") or getattr(t, "text", ""))
+        for t in kept_comps
+    ]
+    return {
+        "exempt": bool(raw_info.get("exempt", False)),
+        "exempt_reason": raw_info.get("exempt_reason"),
+        "repaired_ensemble": bool(raw_info.get("repaired_ensemble", False)) and bool(accepted_atoms),
+        "complement_ids": comp_ids,
+        "fallback_used": bool(raw_info.get("fallback_used", False)) and bool(comp_ids),
+        "fallback_reason": raw_info.get("fallback_reason") or raw_info.get("reason"),
+        "controlled_rebuild_attempted": bool(controlled_rebuild_attempted),
+    }
+
+
+def _format_description_nudity_label(
+    eff_nc: Optional[NudityConstraint],
+    fallback_lvl_code: Optional[str] = None,
+) -> Optional[str]:
+    if eff_nc is None:
+        return fallback_lvl_code
+    if eff_nc.yielded_to_override:
+        if eff_nc.effective_level:
+            if (
+                eff_nc.requested_level in VALID_NUDITY_LEVELS
+                and eff_nc.requested_level != eff_nc.effective_level
+            ):
+                return f"{eff_nc.effective_level} (原请求: {eff_nc.requested_level})"
+            return eff_nc.effective_level
+        if eff_nc.requested_level in VALID_NUDITY_LEVELS:
+            return f"已让位(原请求: {eff_nc.requested_level})"
+        return "已让位"
+    return eff_nc.effective_level or fallback_lvl_code
+
+
+def _append_description_status_markers(
+    base_desc: str,
+    *,
+    nudity_constraint: Optional[NudityConstraint] = None,
+    completion_info: Optional[Dict[str, Any]] = None,
+    rules_applied: Sequence[str] = (),
+    preset_adjusted: bool = False,
+    is_preset_flow: bool = False,
+) -> str:
+    markers: List[str] = []
+    if nudity_constraint is not None and nudity_constraint.yielded_to_override:
+        markers.append("外部覆盖导致等级让位")
+    if completion_info and (
+        completion_info.get("complement_ids")
+        or completion_info.get("fallback_used")
+        or completion_info.get("repaired_ensemble")
+        or completion_info.get("controlled_rebuild_attempted")
+    ):
+        markers.append("已补全")
+    if preset_adjusted or (
+        rules_applied and (not is_preset_flow or (nudity_constraint is not None and nudity_constraint.source != "preset_native"))
+    ):
+        markers.append("已调整")
+    if not markers:
+        return base_desc
+    return f"{base_desc} | 状态: {', '.join(markers)}"
 
 
 def _generate_structured(
@@ -583,21 +744,44 @@ def _generate_structured(
         if preset:
             rng_recipe = derive_substream_rng(effective_seed, "selector:style_recipe")
             recipe = sampler.get_style_recipe(风格配方, rng_recipe) if not _is_none(风格配方) else None
-            assembly_res = assembler.assemble_preset(
-                preset,
-                recipe,
-                画质等级,
-                rng=rng,
-                entry_point=entry_point,
-                extra_fragments=custom_fragments,
-                preset_raw_value=预设模板,
-                recipe_raw_value=风格配方 if not _is_none(风格配方) else None,
+            rng_nudity = derive_substream_rng(effective_seed, "selector:nudity")
+            _, preset_nudity_constraint = sampler.resolve_nudity_constraint(
+                裸露等级,
+                rng_nudity,
+                has_preset=True,
                 external_overrides=external_overrides,
             )
+            try:
+                assembly_res = assembler.assemble_preset(
+                    preset,
+                    recipe,
+                    画质等级,
+                    rng=rng,
+                    entry_point=entry_point,
+                    extra_fragments=custom_fragments,
+                    preset_raw_value=预设模板,
+                    recipe_raw_value=风格配方 if not _is_none(风格配方) else None,
+                    external_overrides=external_overrides,
+                    nudity_constraint=preset_nudity_constraint,
+                )
+            except (PromptValidationError, UnresolvedConflictError) as err:
+                err.nudity_constraint = preset_nudity_constraint
+                raise
+            eff_preset_nc = assembly_res.nudity_constraint or preset_nudity_constraint
             neg = sampler.get_negative_prompt()
             desc = f"【预设模板】{preset.get('id', '')} {preset.get('name_zh', '')}"
             if recipe:
                 desc += f" | 【叠加配方】{recipe.get('style_name', recipe.get('name_zh', ''))}"
+            preset_nudity_label = _format_description_nudity_label(eff_preset_nc)
+            if eff_preset_nc and preset_nudity_label and eff_preset_nc.source != "preset_native":
+                desc += f" | 裸露: {preset_nudity_label}"
+            desc = _append_description_status_markers(
+                desc,
+                nudity_constraint=eff_preset_nc,
+                rules_applied=assembly_res.rules_applied,
+                preset_adjusted=getattr(assembly_res, "preset_adjusted", False),
+                is_preset_flow=True,
+            )
             selections = _extract_ordered_selections(assembly_res.source_atoms)
             return GenerationResult(
                 positive=assembly_res.prompt,
@@ -615,10 +799,24 @@ def _generate_structured(
                 deduplication_records=assembly_res.deduplication_records,
                 budget_filter_records=assembly_res.budget_filter_records,
                 overrides=assembly_res.overrides,
+                nudity_constraint=eff_preset_nc,
+                preset_adjusted=getattr(assembly_res, "preset_adjusted", False),
             )
 
-    # 2. 采样各槽位
-    # 槽位 1: 场景 + 主题
+    # 2. 采样各槽位 (首先解析统一裸露等级与单一分支约束，以跨全槽位传递)
+    rng_nudity = derive_substream_rng(effective_seed, "selector:nudity")
+    nudity_res, nudity_constraint = sampler.resolve_nudity_constraint(
+        裸露等级,
+        rng_nudity,
+        has_preset=False,
+        external_overrides=external_overrides,
+        explicit_clothing=服装款式,
+        clothing_state=服装状态,
+    )
+    lvl_code = nudity_constraint.effective_level or "L1"
+    nudity_branch = nudity_constraint.selected_branch
+
+    # 槽位 1: 场景 + 主题 (按目标裸露等级过滤不兼容随机主题)
     rng_scene = derive_substream_rng(effective_seed, "selector:scene_theme")
     scene_res = sampler.sample_scene_result(场景大类, rng_scene)
     slots: Dict[str, List[Any]] = {}
@@ -626,7 +824,7 @@ def _generate_structured(
     slots["scene_theme"] = _make_slot_fragments(scene_res, "scene_theme", 场景大类, entry_point, selector="scene")
 
     rng_theme = derive_substream_rng(effective_seed, "selector:theme")
-    theme_res = sampler.sample_theme_result(剧情主题, rng_theme)
+    theme_res = sampler.sample_theme_result(剧情主题, rng_theme, nudity_level_code=lvl_code)
     if theme_res:
         slots["scene_theme"].extend(_make_slot_fragments(theme_res, "scene_theme", 剧情主题, entry_point, selector="theme"))
 
@@ -662,14 +860,17 @@ def _generate_structured(
 
     context_profile = compute_context_profile(scene_cids, theme_cids, scene_item_id, theme_item_id)
 
-    # 槽位 3 & 4: 裸露等级与服装穿脱联动 (优先解析裸露等级以约束视角与服装)
-    rng_nudity = derive_substream_rng(effective_seed, "selector:nudity")
-    nudity_res, lvl_code = sampler.sample_nudity_result(裸露等级, rng_nudity)
     slots["nudity"] = _make_slot_fragments(nudity_res, "nudity", 裸露等级, entry_point)
 
     # 槽位 2: 景别 + 视角
     rng_shot = derive_substream_rng(effective_seed, "selector:shot_type")
-    shot_res = sampler.sample_shot_type_result(景别构图, rng_shot, context_profile=context_profile)
+    shot_res = sampler.sample_shot_type_result(
+        景别构图,
+        rng_shot,
+        context_profile=context_profile,
+        nudity_level_code=lvl_code,
+        nudity_branch=nudity_branch,
+    )
     slots["shot_type"] = _make_slot_fragments(shot_res, "shot_type", 景别构图, entry_point)
     shot_type_id = shot_res.item_id if shot_res else None
 
@@ -684,8 +885,16 @@ def _generate_structured(
     slots["camera_angle"] = _make_slot_fragments(angle_res, "camera_angle", 拍摄视角, entry_point)
 
     rng_clothing = derive_substream_rng(effective_seed, "selector:clothing")
+    rng_clothing_comp = derive_substream_rng(effective_seed, "selector:clothing_completion")
     clothing_res = sampler.sample_clothing_result(
-        服装款式, 服装状态, lvl_code, rng_clothing, context=context, context_profile=context_profile
+        服装款式,
+        服装状态,
+        lvl_code,
+        rng_clothing,
+        context=context,
+        context_profile=context_profile,
+        completion_rng=rng_clothing_comp,
+        nudity_branch=nudity_branch,
     )
     slots["clothing"] = _make_clothing_fragments(clothing_res, 服装款式, 服装状态, entry_point)
 
@@ -724,11 +933,23 @@ def _generate_structured(
 
     # 槽位 10: 发型与饰品
     rng_hair = derive_substream_rng(effective_seed, "selector:hairstyle")
-    hairstyle_res = sampler.sample_hairstyle_result(发型发色, rng_hair, context=context, context_profile=context_profile)
+    hairstyle_res = sampler.sample_hairstyle_result(
+        发型发色,
+        rng_hair,
+        context=context,
+        context_profile=context_profile,
+        nudity_level_code=lvl_code,
+    )
     slots["hairstyle"] = _make_slot_fragments(hairstyle_res, "hairstyle", 发型发色, entry_point)
 
     rng_jewel = derive_substream_rng(effective_seed, "selector:jewelry")
-    jewelry_res = sampler.sample_jewelry_result(饰品头饰, rng_jewel, context=context, context_profile=context_profile)
+    jewelry_res = sampler.sample_jewelry_result(
+        饰品头饰,
+        rng_jewel,
+        context=context,
+        context_profile=context_profile,
+        nudity_level_code=lvl_code,
+    )
     slots["jewelry"] = _make_slot_fragments(jewelry_res, "jewelry", 饰品头饰, entry_point)
 
     # 槽位 11: 真实微瑕
@@ -738,7 +959,13 @@ def _generate_structured(
 
     # 槽位 12: 纹身标记（仅在显式配置时生效）
     rng_tat = derive_substream_rng(effective_seed, "selector:tattoo")
-    tattoo_res = sampler.sample_tattoo_result(纹身标记, rng_tat, context=context, context_profile=context_profile)
+    tattoo_res = sampler.sample_tattoo_result(
+        纹身标记,
+        rng_tat,
+        context=context,
+        context_profile=context_profile,
+        nudity_level_code=lvl_code,
+    )
     slots["tattoo"] = _make_slot_fragments(tattoo_res, "tattoo", 纹身标记, entry_point)
 
     # 槽位 13: 道具物件
@@ -774,7 +1001,13 @@ def _generate_structured(
 
     # 槽位 15: 液体体液
     rng_liq = derive_substream_rng(effective_seed, "selector:liquids")
-    liquid_res = sampler.sample_liquid_result(液体效果, rng_liq, context=context, context_profile=context_profile)
+    liquid_res = sampler.sample_liquid_result(
+        液体效果,
+        rng_liq,
+        context=context,
+        context_profile=context_profile,
+        nudity_level_code=lvl_code,
+    )
     slots["liquids"] = _make_slot_fragments(liquid_res, "liquids", 液体效果, entry_point)
 
     # 画质强化锚点
@@ -843,13 +1076,164 @@ def _generate_structured(
         slots["custom"] = custom_fragments
 
     # 4. 组装、冲突消解与统一 Finalize
-    assembly_res = assembler.assemble_slots(
-        slots,
-        rng=rng,
-        context_profile=context_profile,
-        external_overrides=external_overrides,
-        entry_point=entry_point,
+    rng_state_pre_assemble = rng.getstate()
+    pre_exemption = check_completion_exemption(服装款式)
+    has_ext_clothing_in = bool(
+        external_overrides
+        and "clothing" in external_overrides
+        and not _inspect_blank_input(
+            external_overrides["clothing"][1] if isinstance(external_overrides["clothing"], tuple) else external_overrides["clothing"]
+        )[0]
     )
+    assembly_res = None
+    rebuild_trigger_err: Optional[Exception] = None
+    try:
+        assembly_res = assembler.assemble_slots(
+            slots,
+            rng=rng,
+            context_profile=context_profile,
+            external_overrides=external_overrides,
+            entry_point=entry_point,
+            nudity_constraint=nudity_constraint,
+        )
+    except (PromptValidationError, UnresolvedConflictError) as err:
+        if (
+            not pre_exemption.is_exempt
+            and not has_ext_clothing_in
+            and isinstance(err, PromptValidationError)
+            and getattr(err, "error_code", None) in ("missing_garment_carrier", "nudity_prompts_eliminated_by_conflict")
+        ):
+            rebuild_trigger_err = err
+        else:
+            err.nudity_constraint = nudity_constraint
+            raise
+
+    # 4b. M2/M3 最终实际输出完整性与载体一致性校验（最多受控重组 1 次）
+    active_clothing_res = clothing_res
+    rebuild_attempted = False
+    has_ext_clothing_override = any(
+        getattr(o, "canonical_slot", None) == "clothing" and getattr(o, "status", None) == "applied"
+        for o in (getattr(assembly_res, "overrides", None) or ())
+    ) if assembly_res is not None else has_ext_clothing_in
+    post_exemption = check_completion_exemption(
+        服装款式,
+        has_external_clothing_override=has_ext_clothing_override,
+    )
+    eff_nc = (getattr(assembly_res, "nudity_constraint", None) if assembly_res is not None else None) or nudity_constraint
+    if not post_exemption.is_exempt and not (eff_nc and eff_nc.yielded_to_override):
+        eff_lvl = getattr(eff_nc, "effective_level", None) or lvl_code
+        eff_branch = getattr(eff_nc, "selected_branch", None)
+        need_rebuild = rebuild_trigger_err is not None
+        post_assessment = None
+        if not need_rebuild and assembly_res is not None:
+            post_res_clothing_atoms = [
+                a for a in assembly_res.accepted_atoms
+                if getattr(a, "source_slot", None) in ("clothing", "clothing_state", "clothing_extension", "underwear")
+            ]
+            post_assessment = assess_clothing_completeness(
+                post_res_clothing_atoms,
+                (),
+                nudity_level_code=eff_lvl,
+                nudity_branch=eff_branch,
+            )
+            post_carrier_mismatches = find_carrier_mismatch_in_atoms(assembly_res.accepted_atoms)
+            need_rebuild = (not post_assessment.is_complete) or bool(post_carrier_mismatches)
+        if need_rebuild:
+            rebuild_attempted = True
+            rng_clothing_rebuild = derive_substream_rng(effective_seed, "selector:clothing_rebuild:1")
+            failed_ids = set(post_assessment.violating_item_ids) if post_assessment is not None else set()
+            if getattr(clothing_res, "style_id", None):
+                failed_ids.add(clothing_res.style_id)
+            rebuild_res = sampler.sample_clothing_result(
+                服装款式,
+                服装状态,
+                eff_lvl,
+                rng_clothing_rebuild,
+                context=context,
+                context_profile=context_profile,
+                completion_rng=rng_clothing_rebuild,
+                nudity_branch=eff_branch,
+                extra_excluded_ids=failed_ids,
+                force_minimal_fallback=True,
+            )
+            active_clothing_res = rebuild_res
+            slots["clothing"] = _make_clothing_fragments(rebuild_res, 服装款式, 服装状态, entry_point)
+            rng.setstate(rng_state_pre_assemble)
+            try:
+                assembly_res = assembler.assemble_slots(
+                    slots,
+                    rng=rng,
+                    context_profile=context_profile,
+                    external_overrides=external_overrides,
+                    entry_point=entry_point,
+                    nudity_constraint=eff_nc,
+                )
+            except (PromptValidationError, UnresolvedConflictError) as err:
+                err.nudity_constraint = eff_nc
+                raise
+            eff_constraint_after = getattr(assembly_res, "nudity_constraint", None) or eff_nc
+            eff_lvl_after = getattr(eff_constraint_after, "effective_level", None) or eff_lvl
+            eff_branch_after = getattr(eff_constraint_after, "selected_branch", None)
+            post_res_after = [
+                a for a in assembly_res.accepted_atoms
+                if getattr(a, "source_slot", None) in ("clothing", "clothing_state", "clothing_extension", "underwear")
+            ]
+            final_assessment = assess_clothing_completeness(
+                post_res_after,
+                (),
+                nudity_level_code=eff_lvl_after,
+                nudity_branch=eff_branch_after,
+            )
+            final_carrier_mismatches = find_carrier_mismatch_in_atoms(assembly_res.accepted_atoms)
+            if not final_assessment.is_complete:
+                err = PromptValidationError(
+                    f"Clothing outfit remained incomplete after 1 controlled rebuild under {eff_lvl_after} "
+                    f"(missing_parts={final_assessment.missing_parts}, violating={final_assessment.violating_item_ids})",
+                    slots=("clothing",),
+                    texts=[a.text for a in post_res_after],
+                    error_code="incomplete_outfit_after_rebuild",
+                    category="unresolved_hard_conflict",
+                    details={
+                        "level": eff_lvl_after,
+                        "branch": eff_branch_after,
+                        "missing_parts": list(final_assessment.missing_parts),
+                        "violating_item_ids": list(final_assessment.violating_item_ids),
+                        "rebuild_attempts": 1,
+                        "nudity_constraint": _serialize_nudity_constraint_trace(eff_constraint_after),
+                    },
+                )
+                err.nudity_constraint = eff_constraint_after
+                raise err
+            if final_carrier_mismatches:
+                bad_atom, req_kind, worn_atoms = final_carrier_mismatches[0]
+                err = PromptValidationError(
+                    f"Accepted prompt atom '{bad_atom.text}' lacked carrier '{req_kind}' after 1 controlled rebuild under {eff_lvl_after}",
+                    slots=(bad_atom.source_slot, "clothing"),
+                    texts=[bad_atom.text] + [w.text for w in worn_atoms[:2]],
+                    error_code="missing_garment_carrier",
+                    category="unresolved_hard_conflict",
+                    details={
+                        "level": eff_lvl_after,
+                        "branch": eff_branch_after,
+                        "required_carrier": req_kind,
+                        "rebuild_attempts": 1,
+                        "nudity_constraint": _serialize_nudity_constraint_trace(eff_constraint_after),
+                    },
+                )
+                err.nudity_constraint = eff_constraint_after
+                raise err
+    elif rebuild_trigger_err is not None:
+        rebuild_trigger_err.nudity_constraint = eff_nc
+        raise rebuild_trigger_err
+
+    final_eff_nc = getattr(assembly_res, "nudity_constraint", None) or nudity_constraint
+    completion_summary = _build_completion_info_summary(
+        active_clothing_res,
+        controlled_rebuild_attempted=rebuild_attempted,
+        has_external_clothing_override=has_ext_clothing_override,
+        accepted_atoms=assembly_res.accepted_atoms,
+    )
+
     negative_prompt = sampler.get_negative_prompt()
 
     # 5. 生成中文概要
@@ -858,9 +1242,13 @@ def _generate_structured(
         desc_parts.append(f"场景: {场景大类}")
     if not _is_none(剧情主题):
         desc_parts.append(f"主题: {剧情主题}")
-    if not _is_none(服装款式):
+    if has_ext_clothing_override:
+        desc_parts.append("服装: 外部覆盖")
+    elif not _is_none(服装款式):
         desc_parts.append(f"服装: {服装款式}")
-    desc_parts.append(f"裸露: {lvl_code}")
+    nudity_desc_label = _format_description_nudity_label(final_eff_nc, lvl_code)
+    if nudity_desc_label:
+        desc_parts.append(f"裸露: {nudity_desc_label}")
     if not _is_none(发型发色):
         desc_parts.append(f"发型: {发型发色}")
     if not _is_none(妆容细节):
@@ -870,7 +1258,14 @@ def _generate_structured(
     if recipe:
         desc_parts.append(f"配方: {recipe.get('style_name', recipe.get('name_zh', ''))}")
 
-    chinese_desc = " | ".join(desc_parts)
+    chinese_desc = _append_description_status_markers(
+        " | ".join(desc_parts),
+        nudity_constraint=final_eff_nc,
+        completion_info=completion_summary,
+        rules_applied=assembly_res.rules_applied,
+        preset_adjusted=False,
+        is_preset_flow=False,
+    )
     selections = _extract_ordered_selections(assembly_res.source_atoms)
     return GenerationResult(
         positive=assembly_res.prompt,
@@ -888,6 +1283,8 @@ def _generate_structured(
         deduplication_records=assembly_res.deduplication_records,
         budget_filter_records=assembly_res.budget_filter_records,
         overrides=assembly_res.overrides,
+        nudity_constraint=final_eff_nc,
+        outfit_completion_info=completion_summary,
     )
 
 
@@ -1173,6 +1570,22 @@ class IYKYKPresetBrowser:
         all_inputs["自定义提示词"] = 自定义提示词
         all_inputs["prompt_seed"] = prompt_seed
         external_overrides = _extract_external_overrides(all_inputs)
+        ext_nudity = external_overrides.get("nudity") if external_overrides else None
+        ext_code = normalize_nudity_level_code(ext_nudity) if isinstance(ext_nudity, str) else None
+        if ext_code in VALID_NUDITY_LEVELS:
+            browser_constraint = NudityConstraint(
+                requested_level="unspecified",
+                effective_level=ext_code,
+                source="external_override",
+                yielded_to_override=False,
+                yield_reason="external_nudity_override",
+            )
+        else:
+            browser_constraint = NudityConstraint(
+                requested_level="unspecified",
+                effective_level=None,
+                source="preset_native",
+            )
 
         assembly_res = _assembler.assemble_preset(
             preset,
@@ -1184,12 +1597,24 @@ class IYKYKPresetBrowser:
             preset_raw_value=预设模板,
             recipe_raw_value=风格配方 if not _is_none(风格配方) else None,
             external_overrides=external_overrides,
+            nudity_constraint=browser_constraint,
         )
+        eff_browser_nc = assembly_res.nudity_constraint or browser_constraint
         neg = _sampler.get_negative_prompt()
 
         desc = f"【预设模板】{preset.get('id', '')} {preset.get('name_zh', '')}"
         if recipe:
             desc += f" | 【叠加配方】{recipe.get('style_name', recipe.get('name_zh', ''))}"
+        browser_nudity_label = _format_description_nudity_label(eff_browser_nc)
+        if eff_browser_nc and browser_nudity_label and eff_browser_nc.source != "preset_native":
+            desc += f" | 裸露: {browser_nudity_label}"
+        desc = _append_description_status_markers(
+            desc,
+            nudity_constraint=eff_browser_nc,
+            rules_applied=assembly_res.rules_applied,
+            preset_adjusted=getattr(assembly_res, "preset_adjusted", False),
+            is_preset_flow=True,
+        )
 
         selections = _extract_ordered_selections(assembly_res.source_atoms)
         return GenerationResult(
@@ -1208,6 +1633,8 @@ class IYKYKPresetBrowser:
             deduplication_records=assembly_res.deduplication_records,
             budget_filter_records=assembly_res.budget_filter_records,
             overrides=assembly_res.overrides,
+            nudity_constraint=eff_browser_nc,
+            preset_adjusted=getattr(assembly_res, "preset_adjusted", False),
         )
 
     def browse(
@@ -1366,11 +1793,38 @@ class IYKYKCustomSlotCombiner:
                         slot_fragments[slot_name] = frags
 
         # 4. 复用 M3 标准 assemble_slots 执行覆盖与消解装配
+        ext_nudity = clean_overrides.get("nudity") if clean_overrides else None
+        ext_code = normalize_nudity_level_code(ext_nudity) if isinstance(ext_nudity, str) else None
+        base_nudity = normalized_base.get("nudity")
+        base_code = normalize_nudity_level_code(base_nudity) if isinstance(base_nudity, str) else None
+        if ext_code in VALID_NUDITY_LEVELS:
+            combiner_constraint = NudityConstraint(
+                requested_level="unspecified",
+                effective_level=ext_code,
+                source="external_override",
+                yielded_to_override=False,
+                yield_reason="external_nudity_override",
+            )
+        elif base_code in VALID_NUDITY_LEVELS:
+            combiner_constraint = NudityConstraint(
+                requested_level=base_code,
+                effective_level=base_code,
+                source="unconstrained",
+                raw_requested_value=str(base_nudity),
+            )
+        else:
+            combiner_constraint = NudityConstraint(
+                requested_level="unspecified",
+                effective_level=None,
+                source="unconstrained",
+            )
+
         assembly_res = _assembler.assemble_slots(
             slot_fragments,
             rng=rng,
             external_overrides=clean_overrides,
             entry_point="custom_combiner",
+            nudity_constraint=combiner_constraint,
         )
 
         negative_prompt = _sampler.get_negative_prompt()
@@ -1402,6 +1856,7 @@ class IYKYKCustomSlotCombiner:
             deduplication_records=assembly_res.deduplication_records,
             budget_filter_records=assembly_res.budget_filter_records,
             overrides=assembly_res.overrides,
+            nudity_constraint=assembly_res.nudity_constraint,
         )
 
     def combine(self, prompt_seed: int = -1, **kwargs) -> Tuple[str, str, str]:
@@ -1674,6 +2129,8 @@ def format_diagnostics_dict(res: GenerationResult) -> Dict[str, Any]:
             seen_origins.add(a.origin)
             ordered_origins.append(a.origin)
 
+    eff_nc_trace = _serialize_nudity_constraint_trace(getattr(res, "nudity_constraint", None))
+    comp_trace = getattr(res, "outfit_completion_info", None)
     selections_list = []
     for s in ordered_origins:
         source_atoms_for_s = [a for a in all_source_atoms if a.origin == s]
@@ -1686,6 +2143,36 @@ def format_diagnostics_dict(res: GenerationResult) -> Dict[str, Any]:
         ]
         dedup_records_for_s = [r for r in res.deduplication_records if atom_origin_map.get(r.atom_id) == s]
         budget_records_for_s = [r for r in res.budget_filter_records if atom_origin_map.get(r.atom_id) == s]
+
+        rat = dict(s.sampling_rationale) if isinstance(s.sampling_rationale, dict) else None
+        if s.selector in ("nudity", "preset_core") and eff_nc_trace is not None:
+            if rat is None:
+                rat = {
+                    "active_contexts": [],
+                    "candidate_filter": {
+                        "total_candidates": 1 if s.selected_id else 0,
+                        "excluded_hard_conflicts": [],
+                        "passed_candidates": 1 if s.selected_id else 0,
+                    },
+                    "distribution": {s.selected_id: 1.0} if s.selected_id else {},
+                    "fallback": {"used": False, "reason": None},
+                    "final_selection": {"selected_id": s.selected_id, "mode": s.mode},
+                }
+            rat["nudity_constraint"] = eff_nc_trace
+        elif s.selector == "clothing" and comp_trace is not None and isinstance(comp_trace, dict):
+            if rat is None:
+                rat = {
+                    "active_contexts": [],
+                    "candidate_filter": {
+                        "total_candidates": 1 if s.selected_id else 0,
+                        "excluded_hard_conflicts": [],
+                        "passed_candidates": 1 if s.selected_id else 0,
+                    },
+                    "distribution": {s.selected_id: 1.0} if s.selected_id else {},
+                    "fallback": {"used": False, "reason": None},
+                    "final_selection": {"selected_id": s.selected_id, "mode": s.mode},
+                }
+            rat["outfit_completion"] = dict(comp_trace)
 
         selections_list.append({
             "accepted_atoms": [
@@ -1719,7 +2206,7 @@ def format_diagnostics_dict(res: GenerationResult) -> Dict[str, Any]:
                 for a in produced_atoms_for_s
             ],
             "raw_value": s.raw_value,
-            "sampling_rationale": s.sampling_rationale,
+            "sampling_rationale": rat,
             "selected_id": s.selected_id,
             "selector": s.selector,
             "source_atoms": [
@@ -1886,9 +2373,14 @@ def format_diagnostics_error_dict(
         for c in unres_raw
     ]
 
+    err_details = dict(getattr(err, "details", {}) or {})
+    err_nc = getattr(err, "nudity_constraint", None)
+    if err_nc is not None and "nudity_constraint" not in err_details:
+        err_details["nudity_constraint"] = _serialize_nudity_constraint_trace(err_nc)
+
     error_info_dict = {
         "category": getattr(err, "category", "generic_error"),
-        "details": getattr(err, "details", {}),
+        "details": err_details,
         "error_code": getattr(err, "error_code", type(err).__name__),
         "message": str(err),
         "rule_id": getattr(err, "rule_id", None),
@@ -2100,7 +2592,7 @@ class IYKYKPromptDiagnostics:
             **kwargs,
         )
         if res is None:
-            return ("", "", "Error: generation failed (see audit_json)", audit_json)
+            return ("", "", "无法生成: 请检查诊断审计报告 (see audit_json)", audit_json)
         return (res.positive, res.negative, res.description, audit_json)
 
 
