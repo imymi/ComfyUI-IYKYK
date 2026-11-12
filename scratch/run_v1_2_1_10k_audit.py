@@ -193,12 +193,19 @@ def _worker_10k_chunk(args: tuple[int, int]) -> List[Dict[str, Any]]:
         pos_hash = hashlib.sha256(r1.positive.encode("utf-8")).hexdigest()
         audit_obj = json.loads(d_audit)
         global_atom_texts: Dict[str, str] = {}
+        global_atom_selectors: Dict[str, str] = {}
         for atom_src in (r1.source_atoms, r1.atoms, r1.budget_filtered_atoms, r1.deduplicated_atoms):
             for a_obj in atom_src:
                 aid = getattr(a_obj, "atom_id", None)
                 atxt = getattr(a_obj, "text", "")
                 if aid and atxt and aid not in global_atom_texts:
                     global_atom_texts[aid] = atxt
+                asel = (
+                    getattr(getattr(a_obj, "origin", None), "selector", None)
+                    or getattr(a_obj, "source_slot", None)
+                )
+                if aid and asel and aid not in global_atom_selectors:
+                    global_atom_selectors[aid] = asel
 
         occ_counter: collections.Counter[str] = collections.Counter()
         selections_summary = []
@@ -263,6 +270,7 @@ def _worker_10k_chunk(args: tuple[int, int]) -> List[Dict[str, Any]]:
                 "reason_code": d.reason_code,
                 "before_text": d.before_text,
                 "after_text": d.after_text,
+                "target_selector": global_atom_selectors.get(getattr(d, "target_atom_id", None)),
             }
             for d in (rep.decisions if rep else ())
         ]
@@ -1164,6 +1172,7 @@ def _extract_positional_v121(ctx: Dict[str, Any]) -> Tuple[List[Dict[str, Any]],
             "dist_sha256": x.get("dist_sha256"),
             "budget_filtered_texts": tuple(x.get("budget_filtered_texts", [])),
             "deduplicated_texts": tuple(x.get("deduplicated_texts", [])),
+            "deduplicated_records": list(x.get("deduplicated_records", [])),
         }
         sels1.append(entry)
         map1[key] = entry
@@ -1181,32 +1190,342 @@ def _counter_diff_list(c_hi: collections.Counter[str], c_lo: collections.Counter
     return out
 
 
+def _consume_scoped_bag(
+    scoped_bag: collections.Counter[Tuple[str, str]],
+    unscoped_bag: collections.Counter[str],
+    sel_name: str,
+    text: str,
+    count: int,
+) -> int:
+    """从可消耗的多重集凭证池中 1:1 核销指定槽位/文本；返回核销后仍缺口的次数。"""
+    rem = count
+    if rem <= 0:
+        return 0
+    s_key = (sel_name, text)
+    take_scoped = min(rem, scoped_bag[s_key])
+    if take_scoped > 0:
+        scoped_bag[s_key] -= take_scoped
+        if scoped_bag[s_key] <= 0:
+            del scoped_bag[s_key]
+        rem -= take_scoped
+    if rem > 0:
+        take_unscoped = min(rem, unscoped_bag[text])
+        if take_unscoped > 0:
+            unscoped_bag[text] -= take_unscoped
+            if unscoped_bag[text] <= 0:
+                del unscoped_bag[text]
+            rem -= take_unscoped
+    return rem
+
+
+def _verify_current_replay_consistency(
+    cur_r: Dict[str, Any],
+    sels1: List[Dict[str, Any]],
+    map1: Dict[Tuple[str, int], Dict[str, Any]],
+    final_texts1: List[str],
+    v121_pos: str,
+    decs1: List[Dict[str, Any]],
+) -> Tuple[Optional[Dict[str, Any]], Optional[Dict[str, Any]]]:
+    """先验证当前 v1.2.1 结果与确定性重放的双向多重集守恒一致性。
+
+    返回 `(replay_data, None)` 表示通过；`(None, failure_info)` 表示失败。
+    """
+    integrity_err = _check_final_and_positive_integrity(sels1, final_texts1, v121_pos)
+    if integrity_err is not None:
+        return None, {
+            "primary_cause": "UNBACKED_AUDIT_INTEGRITY_MISMATCH",
+            "reason": f"Prompt/final/accepted integrity check failed: {integrity_err}",
+        }
+
+    seed = cur_r.get("seed")
+    if not isinstance(seed, int) or isinstance(seed, bool):
+        return None, {
+            "primary_cause": None,
+            "reason": f"Missing or invalid integer seed for deterministic replay: {seed!r}",
+        }
+
+    all_needed_selectors = {s["selector"] for s in sels1 if s.get("selector")} | {
+        "nudity",
+        "scene",
+        "theme",
+        "clothing",
+    }
+    replay_data = _replay_seed_selectors(
+        seed,
+        all_needed_selectors,
+        controlled_rebuild_attempted=bool(cur_r.get("controlled_rebuild_attempted")),
+    )
+    v121_lvl = cur_r.get("eff_lvl")
+    if replay_data["eff_lvl"] != v121_lvl or replay_data["branch"] != cur_r.get("branch"):
+        return None, {
+            "primary_cause": None,
+            "reason": (
+                f"Replay constraint mismatch for seed={seed}: "
+                f"replay=({replay_data['eff_lvl']}, {replay_data['branch']}) "
+                f"vs cur=({v121_lvl}, {cur_r.get('branch')})"
+            ),
+        }
+
+    # 构建可消耗的 1:1 消解决策凭据池（严格区分增补 vs 删除，不允许跨动作或重复消耗）
+    dec_add_scoped: collections.Counter[Tuple[str, str]] = collections.Counter()
+    dec_add_unscoped: collections.Counter[str] = collections.Counter()
+    dec_rem_scoped: collections.Counter[Tuple[str, str]] = collections.Counter()
+    dec_rem_unscoped: collections.Counter[str] = collections.Counter()
+    dermal_add_bag: collections.Counter[str] = collections.Counter()
+    all_dec_after_norm: collections.Counter[str] = collections.Counter()
+
+    for d in decs1:
+        action = d.get("action")
+        tsel = d.get("target_selector")
+        btxt = d.get("before_text")
+        atxt = d.get("after_text")
+        if action in ("inject", "replace") and isinstance(atxt, str) and atxt:
+            if isinstance(tsel, str) and tsel:
+                dec_add_scoped[(tsel, atxt)] += 1
+            else:
+                dec_add_unscoped[atxt] += 1
+            all_dec_after_norm[atxt.strip().casefold()] += 1
+            if d.get("rule_id") == "tattoo_dermal_fusion":
+                dermal_add_bag[atxt] += 1
+        if action in ("drop", "replace") and isinstance(btxt, str) and btxt:
+            if isinstance(tsel, str) and tsel:
+                dec_rem_scoped[(tsel, btxt)] += 1
+            else:
+                dec_rem_unscoped[btxt] += 1
+
+    # 全局标准化文本计数，用于核验去重记录确有真实重复母本与保留项
+    generated_norm_bag: collections.Counter[str] = collections.Counter(all_dec_after_norm)
+    for rp_entry in replay_data["slots"].values():
+        for raw_t in rp_entry.get("raw_texts", ()):
+            if raw_t:
+                generated_norm_bag[raw_t.strip().casefold()] += 1
+    final_norm_bag: collections.Counter[str] = collections.Counter(
+        t.strip().casefold() for t in final_texts1 if isinstance(t, str) and t
+    )
+    dedup_claims_norm: collections.Counter[str] = collections.Counter()
+    for s1 in sels1:
+        dr_list = s1.get("deduplicated_records") or []
+        dtxts = s1.get("deduplicated_texts") or ()
+        for dr in dr_list:
+            if isinstance(dr, dict):
+                dt = dr.get("text") or ""
+                rt = dr.get("retained_tag_text") or ""
+                if dt and rt and dt.strip().casefold() != rt.strip().casefold():
+                    return None, {
+                        "primary_cause": "UNBACKED_AUDIT_INTEGRITY_MISMATCH",
+                        "reason": (
+                            f"Deduplication record retained_tag_text {rt!r} does not match "
+                            f"deduplicated text {dt!r} in {_slot_key_label(s1['key'])}"
+                        ),
+                    }
+        for dt in dtxts:
+            if dt:
+                dedup_claims_norm[dt.strip().casefold()] += 1
+
+    for norm_t, claim_cnt in dedup_claims_norm.items():
+        if generated_norm_bag[norm_t] < claim_cnt + 1:
+            return None, {
+                "primary_cause": "UNBACKED_AUDIT_INTEGRITY_MISMATCH",
+                "reason": (
+                    f"Invalid deduplication claim for {norm_t!r}: claimed={claim_cnt}, "
+                    f"total_generated={generated_norm_bag[norm_t]} (requires >= {claim_cnt + 1})"
+                ),
+            }
+        if final_norm_bag[norm_t] < 1 and dec_rem_unscoped[norm_t] == 0:
+            # 确认至少存在一个同规范化文本保留在最终输出中（除非保留副本被后续规则显式删除）
+            retained_in_any_final = final_norm_bag[norm_t] >= 1
+            if not retained_in_any_final and generated_norm_bag[norm_t] == claim_cnt + 1:
+                # 仅在确实不存在保留项时报错（预算全删等极少数情形除外，需另检查前序是否全删）
+                pass
+
+    # 逐槽位执行正向（新增必须有据）与反向（被确定性重放产生但未进入输出的词条必须按多重集有据可查）核验
+    for s1 in sels1:
+        key = s1["key"]
+        sel_name = s1["selector"]
+        slot_label = _slot_key_label(key)
+        sid1 = s1["selected_id"]
+        c1 = collections.Counter(s1["accepted_texts"])
+        b_bag = collections.Counter(s1["budget_filtered_texts"])
+        d_bag = collections.Counter(s1["deduplicated_texts"])
+
+        # 去重记录逐条确认保留目标存在于最终输出或全局生成>=2
+        for norm_dt in {dt.strip().casefold() for dt in d_bag if dt}:
+            if final_norm_bag[norm_dt] < 1 and sum(
+                1 for other_s in sels1 for bt in other_s.get("budget_filtered_texts", ()) if bt.strip().casefold() == norm_dt
+            ) == 0:
+                return None, {
+                    "primary_cause": "UNBACKED_AUDIT_INTEGRITY_MISMATCH",
+                    "reason": (
+                        f"Deduplication claim for {norm_dt!r} in {slot_label} lacks any retained copy in final output"
+                    ),
+                }
+
+        if key == ("tattoo", 1):
+            if sid1 is not None:
+                return None, {
+                    "primary_cause": None,
+                    "reason": f"Unexpected selected_id={sid1!r} on dermal fusion slot {slot_label}",
+                }
+            dermal_expected = collections.Counter(dermal_add_bag)
+            for t, cnt in c1.items():
+                take_d = min(cnt, dermal_add_bag[t])
+                dermal_add_bag[t] -= take_d
+                _consume_scoped_bag(dec_add_scoped, dec_add_unscoped, sel_name, t, cnt)
+                if take_d < cnt:
+                    return None, {
+                        "primary_cause": None,
+                        "reason": f"Unbacked text {t!r} in {slot_label} without tattoo_dermal_fusion decision",
+                    }
+            for t, rem_cnt in (dermal_expected - c1).items():
+                left = rem_cnt
+                take_b = min(left, b_bag[t])
+                if take_b > 0:
+                    b_bag[t] -= take_b
+                    left -= take_b
+                take_d = min(left, d_bag[t])
+                if take_d > 0:
+                    d_bag[t] -= take_d
+                    left -= take_d
+                if left > 0:
+                    left = _consume_scoped_bag(dec_rem_scoped, dec_rem_unscoped, sel_name, t, left)
+                if left > 0:
+                    return None, {
+                        "primary_cause": "UNBACKED_OMISSION_FROM_REPLAY",
+                        "reason": (
+                            f"Unbacked omission of injected atom {t!r} (unbacked_count={left}) "
+                            f"in {slot_label} without drop/replace/budget/dedup backing"
+                        ),
+                    }
+            continue
+
+        rp = replay_data["slots"].get(key)
+        if rp is None:
+            return None, {
+                "primary_cause": None,
+                "reason": f"Unknown or un-replayable selector slot {slot_label}",
+            }
+        if rp["selected_id"] != sid1:
+            return None, {
+                "primary_cause": None,
+                "reason": f"Replay selected_id mismatch for {slot_label}: replay={rp['selected_id']!r} vs cur={sid1!r}",
+            }
+        if sid1 is not None and not rp["valid_candidate"]:
+            return None, {
+                "primary_cause": None,
+                "reason": f"Selected candidate {sid1!r} not in replayed valid candidate distribution for {slot_label}",
+            }
+        total1 = s1["total_candidates"]
+        passed1 = s1["passed_candidates"]
+        excl1 = s1["excluded_hard_conflicts"]
+        dist1 = s1["dist_sha256"]
+        if rp["total_candidates"] is not None and total1 is not None:
+            if excl1 != rp["excluded_hard_conflicts"] or passed1 != rp["passed_candidates"] or total1 != rp["total_candidates"]:
+                return None, {
+                    "primary_cause": None,
+                    "reason": (
+                        f"Replay candidate_filter mismatch for {slot_label}: "
+                        f"replay=({rp['passed_candidates']}/{rp['total_candidates']}, excl={len(rp['excluded_hard_conflicts'])}) "
+                        f"vs cur=({passed1}/{total1}, excl={len(excl1)})"
+                    ),
+                }
+        if rp["dist_sha256"] is not None and dist1 is not None and rp["dist_sha256"] != dist1:
+            return None, {
+                "primary_cause": None,
+                "reason": f"Replay distribution hash mismatch for {slot_label}",
+            }
+
+        raw_bag = collections.Counter(rp["raw_texts"])
+
+        # 正向核验：cur accepted_texts - raw_texts 必须 1:1 由 inject/replace 决策支撑
+        for t, add_cnt in (c1 - raw_bag).items():
+            rem_add = _consume_scoped_bag(dec_add_scoped, dec_add_unscoped, sel_name, t, add_cnt)
+            if rem_add > 0:
+                return None, {
+                    "primary_cause": None,
+                    "reason": (
+                        f"Unbacked accepted text {t!r} (excess={rem_add}) in {slot_label} "
+                        f"(not in replayed fragments or v1.2.1 inject/replace decisions)"
+                    ),
+                }
+
+        # 反向多重集核验：raw_texts - accepted_texts 中每个未进入输出的词条必须有真实 drop/replace/budget/dedup 支撑
+        omitted_bag = raw_bag - c1
+        for t, rem_cnt in omitted_bag.items():
+            left = rem_cnt
+            take_b = min(left, b_bag[t])
+            if take_b > 0:
+                b_bag[t] -= take_b
+                left -= take_b
+            take_d = min(left, d_bag[t])
+            if take_d > 0:
+                d_bag[t] -= take_d
+                left -= take_d
+            if left > 0:
+                left = _consume_scoped_bag(dec_rem_scoped, dec_rem_unscoped, sel_name, t, left)
+            if left > 0:
+                return None, {
+                    "primary_cause": "UNBACKED_OMISSION_FROM_REPLAY",
+                    "reason": (
+                        f"Unbacked omission of replayed atom {t!r} (unbacked_count={left}, "
+                        f"replayed={raw_bag[t]}, accepted={c1[t]}) in {slot_label} without drop/replace/budget/dedup backing"
+                    ),
+                }
+
+    # 检查被确定性重放产生但整个槽位在当前 selections 中消失的非空槽位
+    for r_key, rp in replay_data["slots"].items():
+        if r_key in map1:
+            continue
+        raw_bag = collections.Counter(rp.get("raw_texts", ()))
+        if not raw_bag:
+            continue
+        r_sel = r_key[0]
+        r_label = _slot_key_label(r_key)
+        for t, rem_cnt in raw_bag.items():
+            left = _consume_scoped_bag(dec_rem_scoped, dec_rem_unscoped, r_sel, t, rem_cnt)
+            if left > 0:
+                return None, {
+                    "primary_cause": "UNBACKED_OMISSION_FROM_REPLAY",
+                    "reason": (
+                        f"Missing slot {r_label} in current selections despite replayed non-empty atom "
+                        f"{t!r} (unbacked_count={left})"
+                    ),
+                }
+
+    return replay_data, None
+
+
 def attribute_v120_vs_v121_seed(v120_round_a: Dict[str, Any], cur_r: Dict[str, Any]) -> Dict[str, Any]:
-    """对单个种子的 v1.2.0 -> v1.2.1 提示词差异执行逐槽位、逐词条的确定性重放与可证伪因果归因。"""
+    """对单个种子的 v1.2.0 -> v1.2.1 提示词差异执行先重放自洽、再逐槽位跨版本因果归因。"""
     v120_pos = v120_round_a.get("positive", "")
     v121_pos = cur_r.get("positive", "")
     ctx = cur_r.get("attr_ctx") or {}
     sels1, map1 = _extract_positional_v121(ctx)
     final_texts1 = list(ctx.get("final_texts", []))
+    decs1 = [d for d in ctx.get("decisions", []) if isinstance(d, dict)]
 
-    integrity_err = _check_final_and_positive_integrity(sels1, final_texts1, v121_pos)
-    if integrity_err is not None:
+    # 第一步：先校验当前 v1.2.1 结果是否与确定性重放双向多重集自洽
+    replay_data, consistency_err = _verify_current_replay_consistency(
+        cur_r, sels1, map1, final_texts1, v121_pos, decs1
+    )
+    if consistency_err is not None or replay_data is None:
         return {
             "is_divergent": v120_pos != v121_pos,
             "is_explained": False,
-            "primary_cause": "UNBACKED_AUDIT_INTEGRITY_MISMATCH",
+            "current_replay_verified": False,
+            "primary_cause": (consistency_err or {}).get("primary_cause"),
             "verified_causes": [],
             "first_diff_selector": None,
             "diff_slots": [],
             "slot_verifications": [],
             "level_preserved": False,
-            "unexplained_reason": f"Prompt/final/accepted integrity check failed: {integrity_err}",
+            "unexplained_reason": (consistency_err or {}).get("reason", "Replay consistency check failed"),
         }
 
     if v120_pos == v121_pos:
         return {
             "is_divergent": False,
             "is_explained": True,
+            "current_replay_verified": True,
             "primary_cause": "identical",
             "verified_causes": [],
             "first_diff_selector": None,
@@ -1222,6 +1541,7 @@ def attribute_v120_vs_v121_seed(v120_round_a: Dict[str, Any], cur_r: Dict[str, A
         return {
             "is_divergent": True,
             "is_explained": False,
+            "current_replay_verified": True,
             "primary_cause": primary,
             "verified_causes": [],
             "first_diff_selector": first_sel,
@@ -1230,10 +1550,6 @@ def attribute_v120_vs_v121_seed(v120_round_a: Dict[str, Any], cur_r: Dict[str, A
             "level_preserved": lvl_ok,
             "unexplained_reason": reason,
         }
-
-    seed = cur_r.get("seed")
-    if not isinstance(seed, int) or isinstance(seed, bool):
-        return _fail(f"Missing or invalid integer seed for deterministic replay: {seed!r}")
 
     v120_nud_id = next(
         (a.get("source_item_id") for a in v120_round_a.get("source_atoms", []) if isinstance(a, dict) and a.get("source_slot") == "nudity"),
@@ -1267,28 +1583,11 @@ def attribute_v120_vs_v121_seed(v120_round_a: Dict[str, Any], cur_r: Dict[str, A
             diff_keys_list=diff_keys,
         )
 
-    needed_selectors = {k[0] for k in diff_keys}
-    replay_data = _replay_seed_selectors(
-        seed,
-        needed_selectors,
-        controlled_rebuild_attempted=bool(cur_r.get("controlled_rebuild_attempted")),
-    )
-    if replay_data["eff_lvl"] != v121_lvl or replay_data["branch"] != cur_r.get("branch"):
-        return _fail(
-            f"Replay constraint mismatch for seed={seed}: replay=({replay_data['eff_lvl']}, {replay_data['branch']}) vs cur=({v121_lvl}, {cur_r.get('branch')})",
-            first_sel=first_diff_label,
-            diff_keys_list=diff_keys,
-        )
-
     decs0 = [d for d in v120_round_a.get("decisions", []) if isinstance(d, dict)]
-    decs1 = [d for d in ctx.get("decisions", []) if isinstance(d, dict)]
     dec0_before = {d["before_text"] for d in decs0 if isinstance(d.get("before_text"), str) and d["before_text"]}
     dec0_after = {d["after_text"] for d in decs0 if isinstance(d.get("after_text"), str) and d["after_text"]}
     dec1_before = {d["before_text"] for d in decs1 if isinstance(d.get("before_text"), str) and d["before_text"]}
     dec1_after = {d["after_text"] for d in decs1 if isinstance(d.get("after_text"), str) and d["after_text"]}
-    dec1_after_bag = collections.Counter(
-        d["after_text"] for d in decs1 if isinstance(d.get("after_text"), str) and d["after_text"]
-    )
     dec_texts_all = dec0_before | dec0_after | dec1_before | dec1_after
 
     fin0 = [a.get("text", "") for a in v120_round_a.get("final_atoms", []) if isinstance(a, dict)]
@@ -1327,6 +1626,7 @@ def attribute_v120_vs_v121_seed(v120_round_a: Dict[str, Any], cur_r: Dict[str, A
         return {
             "is_divergent": True,
             "is_explained": True,
+            "current_replay_verified": True,
             "primary_cause": primary_cause,
             "verified_causes": verified_causes,
             "first_diff_selector": None,
@@ -1521,16 +1821,7 @@ def attribute_v120_vs_v121_seed(v120_round_a: Dict[str, Any], cur_r: Dict[str, A
                 verifications=slot_verifications,
             )
 
-        # Every single accepted text in cur_r MUST come from replayed raw fragments or verified resolver decisions
-        allowed_bag = collections.Counter(rp["raw_texts"]) + dec1_after_bag
-        for t, cnt in c1.items():
-            if cnt > allowed_bag[t]:
-                return _fail(
-                    f"Unbacked accepted text {t!r} in {slot_label} (not in replayed fragments or v1.2.1 resolver decisions)",
-                    first_sel=first_diff_label,
-                    diff_keys_list=diff_keys,
-                    verifications=slot_verifications,
-                )
+        # (accepted_texts 与 omitted_texts 的双向多重集守恒已由 _verify_current_replay_consistency 预先核验)
 
         # Collect genuine causal triggers vs v1.2.0
         triggers: List[str] = []
@@ -1693,6 +1984,9 @@ def attribute_v120_vs_v121_seed(v120_round_a: Dict[str, Any], cur_r: Dict[str, A
             "replay_verified": True,
             "replay_selected_id": rp["selected_id"],
             "valid_candidate": bool(rp["valid_candidate"]),
+            "replay_raw_count": len(rp["raw_texts"]),
+            "accepted_count": len(txts1),
+            "omitted_count": sum((collections.Counter(rp["raw_texts"]) - c1).values()),
             "upstream_triggers": triggers,
             "added_texts": added_texts,
             "removed_texts": removed_texts,
@@ -1711,6 +2005,7 @@ def attribute_v120_vs_v121_seed(v120_round_a: Dict[str, Any], cur_r: Dict[str, A
     return {
         "is_divergent": True,
         "is_explained": True,
+        "current_replay_verified": True,
         "primary_cause": primary_cause,
         "verified_causes": verified_causes,
         "first_diff_selector": first_diff_label,
@@ -1745,10 +2040,11 @@ def _compare_with_v120_archive(cur_records: List[Dict[str, Any]], archive_path: 
         v120_round_a = rec.get("round_a", {})
         attr = attribute_v120_vs_v121_seed(v120_round_a, cur_r)
         per_seed_attribution[s] = attr
-        if not attr["is_divergent"]:
+        if not attr["is_divergent"] and attr["is_explained"]:
             identical += 1
             continue
-        divergent += 1
+        if attr["is_divergent"]:
+            divergent += 1
         lvl = cur_r.get("eff_lvl") or "unknown"
         div_level_counts[f"level_{lvl}"] += 1
         if not attr["level_preserved"]:

@@ -1,9 +1,9 @@
 # ComfyUI-IYKYK v1.2.1 10,000 种子与全四节点综合审计报告
 
-- **审计提交 Commit**: `a80788314a90be135f94a5088be72a1d71474530` (Tree: `fabca1025e305063f3a99e55a5821cb56a26cdc4`, Dirty: `True`)
+- **审计提交 Commit**: `d77ab314d049b7715a8293ed2be4fa38dc7d1edd` (Tree: `6e1b925689d254d67907493f1fd0f8064cbc330a`, Dirty: `True`)
 - **核心源码摘要 (`core_source_digest`)**: `813fb0d857524a0623f2e24a98c4d1ce9c5608db144f2410cf9b460f21adf091`
 - **10k 种子汇总哈希 (`target_batch_hash`)**: `b8775f683c9f329bf39be9e6ac1bd85cba499d2a59cddea250f503a63d9661be`
-- **归档文件**: `scratch/audit_v1_2_1_10k_evidence.json.gz` (`6,525,376` 字节, SHA-256: `f4db4b98add36dcdfa50b3814a7608dd263687cb4b7d38c501a01693d5436df4`)
+- **归档文件**: `scratch/audit_v1_2_1_10k_evidence.json.gz` (`6,762,493` 字节, SHA-256: `9dc4877603b2870b7b5bf8840fa7bc293db2eb1c812760972131eb25232f80a7`)
 - **执行命令**: `/Users/jacobyang/Hermes/.venv/bin/python scratch/run_v1_2_1_10k_audit.py --seeds 10000 --strat-seeds 500`
 - **环境**: Python `3.9.6` / `Darwin 27.2.0 (arm64)` / jsonschema `4.25.1`
 
